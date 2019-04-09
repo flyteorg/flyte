@@ -2,8 +2,6 @@ sudo: required
 language: go
 go:
   - "1.11"
-services:
-  - docker
 jobs:
   include:
     - stage: test
