@@ -1,0 +1,72 @@
+[[constraint]]
+  name = "github.com/aws/aws-sdk-go"
+  version = "1.15.0"
+
+[[constraint]]
+  name = "github.com/coocood/freecache"
+  version = "1.0.1"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/ernesto-jimenez/gogen"
+
+[[constraint]]
+  name = "github.com/fatih/color"
+  version = "1.7.0"
+
+[[constraint]]
+  name = "github.com/fatih/structtag"
+  version = "1.0.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/fsnotify/fsnotify"
+
+[[constraint]]
+  name = "github.com/golang/protobuf"
+  version = "1.1.0"
+
+[[constraint]]
+  name = "github.com/mitchellh/mapstructure"
+  version = "1.1.2"
+
+[[constraint]]
+  name = "github.com/pkg/errors"
+  version = "0.8.0"
+
+[[constraint]]
+  name = "github.com/prometheus/client_golang"
+  version = "^0.9.0"
+
+[[constraint]]
+  name = "github.com/spf13/cobra"
+  version = "0.0.3"
+
+[[constraint]]
+  name = "github.com/spf13/pflag"
+  version = "1.0.1"
+
+[[constraint]]
+  name = "github.com/spf13/viper"
+  # Viper only fixed symlink config watching after this SHA. move to a proper semVer when one is available.
+  revision = "ae103d7e593e371c69e832d5eb3347e2b80cbbc9"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/time"
+
+[[constraint]]
+  name = "k8s.io/apimachinery"
+  version = "kubernetes-1.11.2"
+
+[[constraint]]
+  name = "k8s.io/client-go"
+  version = "kubernetes-1.11.2"
+
+[[constraint]]
+  name = "github.com/graymeta/stow"
+  revision = "77c84b1dd69c41b74fe0a94ca8ee257d85947327"
+
+[prune]
+  go-tests = true
+  unused-packages = true
