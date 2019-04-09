@@ -1,0 +1,7 @@
+my-component:
+  str: Hello World
+  nested:
+    - int-val: 1
+array-config:
+  - int-val: 1
+  - int-val: 4

@@ -1,0 +1,44 @@
+package storage
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/pkg/errors"
+
+	"net/url"
+	"os"
+	"path/filepath"
+
+	"github.com/lyft/flytestdlib/logger"
+)
+
+// Implements ReferenceConstructor that assumes paths are URL-compatible.
+type URLPathConstructor struct {
+}
+
+func ensureEndingPathSeparator(path DataReference) DataReference {
+	if len(path) > 0 && path[len(path)-1] == os.PathSeparator {
+		return path
+	}
+
+	return path + "/"
+}
+
+func (URLPathConstructor) ConstructReference(ctx context.Context, reference DataReference, nestedKeys ...string) (DataReference, error) {
+	u, err := url.Parse(string(ensureEndingPathSeparator(reference)))
+	if err != nil {
+		logger.Errorf(ctx, "Failed to parse prefix: %v", reference)
+		return "", errors.Wrap(err, fmt.Sprintf("Reference is of an invalid format [%v]", reference))
+	}
+
+	rel, err := url.Parse(filepath.Join(nestedKeys...))
+	if err != nil {
+		logger.Errorf(ctx, "Failed to parse nested keys: %v", reference)
+		return "", errors.Wrap(err, fmt.Sprintf("Reference is of an invalid format [%v]", reference))
+	}
+
+	u = u.ResolveReference(rel)
+
+	return DataReference(u.String()), nil
+}

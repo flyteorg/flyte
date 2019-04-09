@@ -1,0 +1,20 @@
+sudo: required
+language: go
+go:
+  - "1.10"
+services:
+  - docker
+jobs:
+  include:
+    - stage: test
+      name: unit tests
+      install: make install
+      script: make test_unit
+    - stage: test
+      name: benchmark tests
+      install: make install
+      script: make test_benchmark
+    - stage: test
+      install: make install
+      name: lint
+      script: make lint
