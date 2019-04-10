@@ -103,7 +103,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("type"); err == nil {
-				assert.Equal(t, string("s3"), vString)
+				assert.Equal(t, string(defaultConfig.Type), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -125,7 +125,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("connection.endpoint"); err == nil {
-				assert.Equal(t, string(""), vString)
+				assert.Equal(t, string(defaultConfig.Connection.Endpoint.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -147,7 +147,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("connection.auth-type"); err == nil {
-				assert.Equal(t, string("iam"), vString)
+				assert.Equal(t, string(defaultConfig.Connection.AuthType), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -169,7 +169,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("connection.access-key"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(defaultConfig.Connection.AccessKey), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -191,7 +191,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("connection.secret-key"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(defaultConfig.Connection.SecretKey), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -213,7 +213,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("connection.region"); err == nil {
-				assert.Equal(t, string("us-east-1"), vString)
+				assert.Equal(t, string(defaultConfig.Connection.Region), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -235,7 +235,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vBool, err := cmdFlags.GetBool("connection.disable-ssl"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
+				assert.Equal(t, bool(defaultConfig.Connection.DisableSSL), vBool)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -257,7 +257,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("container"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(defaultConfig.InitContainer), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -279,7 +279,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("cache.max_size_mbs"); err == nil {
-				assert.Equal(t, int(*new(int)), vInt)
+				assert.Equal(t, int(defaultConfig.Cache.MaxSizeMegabytes), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -301,7 +301,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("cache.target_gc_percent"); err == nil {
-				assert.Equal(t, int(*new(int)), vInt)
+				assert.Equal(t, int(defaultConfig.Cache.TargetGCPercent), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -323,7 +323,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt64, err := cmdFlags.GetInt64("limits.maxDownloadMBs"); err == nil {
-				assert.Equal(t, int64(2), vInt64)
+				assert.Equal(t, int64(defaultConfig.Limits.GetLimitMegabytes), vInt64)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
