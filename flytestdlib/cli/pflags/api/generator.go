@@ -19,8 +19,9 @@ const (
 
 // PFlagProviderGenerator parses and generates GetPFlagSet implementation to add PFlags for a given struct's fields.
 type PFlagProviderGenerator struct {
-	pkg *types.Package
-	st  *types.Named
+	pkg        *types.Package
+	st         *types.Named
+	defaultVar *types.Var
 }
 
 // This list is restricted because that's the only kinds viper parses out, otherwise it assumes strings.
@@ -54,7 +55,7 @@ func buildFieldForSlice(ctx context.Context, t SliceOrArray, name, goName, usage
 	emptyDefaultValue := `[]string{}`
 	if b, ok := t.Elem().(*types.Basic); !ok {
 		logger.Infof(ctx, "Elem of type [%v] is not a basic type. It must be json unmarshalable or generation will fail.", t.Elem())
-		if !jsonUnmarshaler(t.Elem()) {
+		if !isJSONUnmarshaler(t.Elem()) {
 			return FieldInfo{},
 				fmt.Errorf("slice of type [%v] is not supported. Only basic slices or slices of json-unmarshalable types are supported",
 					t.Elem().String())
@@ -85,9 +86,17 @@ func buildFieldForSlice(ctx context.Context, t SliceOrArray, name, goName, usage
 	}, nil
 }
 
+func appendAccessorIfNotEmpty(baseAccessor, childAccessor string) string {
+	if len(baseAccessor) == 0 {
+		return baseAccessor
+	}
+
+	return baseAccessor + "." + childAccessor
+}
+
 // Traverses fields in type and follows recursion tree to discover all fields. It stops when one of two conditions is
 // met; encountered a basic type (e.g. string, int... etc.) or the field type implements UnmarshalJSON.
-func discoverFieldsRecursive(ctx context.Context, typ *types.Named) ([]FieldInfo, error) {
+func discoverFieldsRecursive(ctx context.Context, typ *types.Named, defaultValueAccessor string) ([]FieldInfo, error) {
 	logger.Printf(ctx, "Finding all fields in [%v.%v.%v]",
 		typ.Obj().Pkg().Path(), typ.Obj().Pkg().Name(), typ.Obj().Name())
 
@@ -111,9 +120,11 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named) ([]FieldInfo
 			tag.Name = v.Name()
 		}
 
+		isPtr := false
 		typ := v.Type()
-		if ptr, isPtr := typ.(*types.Pointer); isPtr {
+		if ptr, casted := typ.(*types.Pointer); casted {
 			typ = ptr.Elem()
+			isPtr = true
 		}
 
 		switch t := typ.(type) {
@@ -137,12 +148,21 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named) ([]FieldInfo
 					t.String(), t.Kind(), allowedKinds)
 			}
 
+			defaultValue := tag.DefaultValue
+			if accessor := appendAccessorIfNotEmpty(defaultValueAccessor, v.Name()); len(accessor) > 0 {
+				defaultValue = accessor
+
+				if isPtr {
+					defaultValue = fmt.Sprintf("cfg.elemValueOrNil(%s).(%s)", defaultValue, t.Name())
+				}
+			}
+
 			fields = append(fields, FieldInfo{
 				Name:           tag.Name,
 				GoName:         v.Name(),
 				Typ:            t,
 				FlagMethodName: camelCase(t.String()),
-				DefaultValue:   tag.DefaultValue,
+				DefaultValue:   defaultValue,
 				UsageString:    tag.Usage,
 				TestValue:      `"1"`,
 				TestStrategy:   JSON,
@@ -155,12 +175,22 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named) ([]FieldInfo
 
 			// If the type has json unmarshaler, then stop the recursion and assume the type is string. config package
 			// will use json unmarshaler to fill in the final config object.
-			jsonUnmarshaler := jsonUnmarshaler(t)
+			jsonUnmarshaler := isJSONUnmarshaler(t)
 
 			testValue := tag.DefaultValue
 			if len(tag.DefaultValue) == 0 {
 				tag.DefaultValue = `""`
 				testValue = `"1"`
+			}
+
+			defaultValue := tag.DefaultValue
+			if accessor := appendAccessorIfNotEmpty(defaultValueAccessor, v.Name()); len(accessor) > 0 {
+				defaultValue = accessor
+				if isStringer(t) {
+					defaultValue = defaultValue + ".String()"
+				} else {
+					defaultValue = fmt.Sprintf("fmt.Sprintf(\"%%v\",%s)", defaultValue)
+				}
 			}
 
 			logger.Infof(ctx, "[%v] is of a Named type (struct) with default value [%v].", tag.Name, tag.DefaultValue)
@@ -173,7 +203,7 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named) ([]FieldInfo
 					GoName:         v.Name(),
 					Typ:            types.Typ[types.String],
 					FlagMethodName: "String",
-					DefaultValue:   tag.DefaultValue,
+					DefaultValue:   defaultValue,
 					UsageString:    tag.Usage,
 					TestValue:      testValue,
 					TestStrategy:   JSON,
@@ -181,7 +211,7 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named) ([]FieldInfo
 			} else {
 				logger.Infof(ctx, "Traversing fields in type.")
 
-				nested, err := discoverFieldsRecursive(logger.WithIndent(ctx, indent), t)
+				nested, err := discoverFieldsRecursive(logger.WithIndent(ctx, indent), t, appendAccessorIfNotEmpty(defaultValueAccessor, v.Name()))
 				if err != nil {
 					return nil, err
 				}
@@ -228,7 +258,8 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named) ([]FieldInfo
 // NewGenerator initializes a PFlagProviderGenerator for pflags files for targetTypeName struct under pkg. If pkg is not filled in,
 // it's assumed to be current package (which is expected to be the common use case when invoking pflags from
 // go:generate comments)
-func NewGenerator(pkg, targetTypeName string) (*PFlagProviderGenerator, error) {
+func NewGenerator(pkg, targetTypeName, defaultVariableName string) (*PFlagProviderGenerator, error) {
+	ctx := context.Background()
 	var err error
 	// Resolve package path
 	if pkg == "" || pkg[0] == '.' {
@@ -257,9 +288,22 @@ func NewGenerator(pkg, targetTypeName string) (*PFlagProviderGenerator, error) {
 		return nil, fmt.Errorf("%s should be an struct, was %s", targetTypeName, obj.Type().Underlying())
 	}
 
+	var defaultVar *types.Var
+	obj = targetPackage.Scope().Lookup(defaultVariableName)
+	if obj != nil {
+		defaultVar = obj.(*types.Var)
+	}
+
+	if defaultVar != nil {
+		logger.Infof(ctx, "Using default variable with name [%v] to assign all default values.", defaultVariableName)
+	} else {
+		logger.Infof(ctx, "Using default values defined in tags if any.")
+	}
+
 	return &PFlagProviderGenerator{
-		st:  st,
-		pkg: targetPackage,
+		st:         st,
+		pkg:        targetPackage,
+		defaultVar: defaultVar,
 	}, nil
 }
 
@@ -268,7 +312,12 @@ func (g PFlagProviderGenerator) GetTargetPackage() *types.Package {
 }
 
 func (g PFlagProviderGenerator) Generate(ctx context.Context) (PFlagProvider, error) {
-	fields, err := discoverFieldsRecursive(ctx, g.st)
+	defaultValueAccessor := ""
+	if g.defaultVar != nil {
+		defaultValueAccessor = g.defaultVar.Name()
+	}
+
+	fields, err := discoverFieldsRecursive(ctx, g.st, defaultValueAccessor)
 	if err != nil {
 		return PFlagProvider{}, err
 	}

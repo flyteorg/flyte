@@ -28,12 +28,22 @@ const (
 )
 
 var (
-	ConfigSection = config.MustRegisterSection(configSectionKey, &Config{})
+	ConfigSection = config.MustRegisterSection(configSectionKey, defaultConfig)
+	defaultConfig = &Config{
+		Type: TypeS3,
+		Limits: LimitsConfig{
+			GetLimitMegabytes: 2,
+		},
+		Connection: ConnectionConfig{
+			Region:   "us-east-1",
+			AuthType: "iam",
+		},
+	}
 )
 
 // A common storage config.
 type Config struct {
-	Type          Type             `json:"type" pflag:"\"s3\",Sets the type of storage to configure [s3/minio/local/mem]."`
+	Type          Type             `json:"type" pflag:",Sets the type of storage to configure [s3/minio/local/mem]."`
 	Connection    ConnectionConfig `json:"connection"`
 	InitContainer string           `json:"container" pflag:",Initial container to create -if it doesn't exist-.'"`
 	// Caching is recommended to improve the performance of underlying systems. It caches the metadata and resolving
@@ -47,10 +57,10 @@ type Config struct {
 // Defines connection configurations.
 type ConnectionConfig struct {
 	Endpoint   config.URL `json:"endpoint" pflag:",URL for storage client to connect to."`
-	AuthType   string     `json:"auth-type" pflag:"\"iam\",Auth Type to use [iam,accesskey]."`
+	AuthType   string     `json:"auth-type" pflag:",Auth Type to use [iam,accesskey]."`
 	AccessKey  string     `json:"access-key" pflag:",Access key to use. Only required when authtype is set to accesskey."`
 	SecretKey  string     `json:"secret-key" pflag:",Secret to use when accesskey is set."`
-	Region     string     `json:"region" pflag:"\"us-east-1\",Region to connect to."`
+	Region     string     `json:"region" pflag:",Region to connect to."`
 	DisableSSL bool       `json:"disable-ssl" pflag:",Disables SSL connection. Should only be used for development."`
 }
 
@@ -71,7 +81,7 @@ type CachingConfig struct {
 
 // Specifies limits for storage package.
 type LimitsConfig struct {
-	GetLimitMegabytes int64 `json:"maxDownloadMBs" pflag:"2,Maximum allowed download size (in MBs) per call."`
+	GetLimitMegabytes int64 `json:"maxDownloadMBs" pflag:",Maximum allowed download size (in MBs) per call."`
 }
 
 // Retrieve current global config for storage.

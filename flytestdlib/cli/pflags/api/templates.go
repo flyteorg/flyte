@@ -26,9 +26,25 @@ import (
 	{{$name}} "{{$path}}"{{end}}
 )
 
+// If v is a pointer, it will get its element value or the zero value of the element type.
+// If v is not a pointer, it will return it as is.
+func ({{ .Name }}) elemValueOrNil(v interface{}) interface{} {
+	if t := reflect.TypeOf(v); t.Kind() == reflect.Ptr {
+		if reflect.ValueOf(v).IsNil() {
+			return reflect.Zero(t.Elem()).Interface()
+		} else {
+			return reflect.ValueOf(v).Interface()
+		}
+	} else if v == nil {
+		return reflect.Zero(t).Interface()
+	}
+
+	return v
+}
+
 // GetPFlagSet will return strongly types pflags for all fields in {{ .Name }} and its nested types. The format of the
 // flags is json-name.json-sub-name... etc.
-func ({{ .Name }}) GetPFlagSet(prefix string) *pflag.FlagSet {
+func (cfg {{ .Name }}) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("{{ .Name }}", pflag.ExitOnError)
 	{{- range .Fields }}
 	cmdFlags.{{ .FlagMethodName }}(fmt.Sprintf("%v%v", prefix, "{{ .Name }}"), {{ .DefaultValue }}, {{ .UsageString }})

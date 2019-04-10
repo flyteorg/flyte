@@ -3,7 +3,6 @@ package cmd
 import (
 	"bytes"
 	"context"
-	"flag"
 	"fmt"
 	"strings"
 
@@ -13,7 +12,8 @@ import (
 )
 
 var (
-	pkg = flag.String("pkg", ".", "what package to get the interface from")
+	pkg                   string
+	defaultValuesVariable string
 )
 
 var root = cobra.Command{
@@ -31,7 +31,8 @@ type MyStruct struct {
 }
 
 func init() {
-	root.Flags().StringP("package", "p", ".", "Determines the source/destination package.")
+	root.Flags().StringVarP(&pkg, "package", "p", ".", "Determines the source/destination package.")
+	root.Flags().StringVar(&defaultValuesVariable, "default-var", "defaultConfig", "Points to a variable to use to load default configs. If specified & found, it'll be used instead of the values specified in the tag.")
 }
 
 func Execute() error {
@@ -45,7 +46,7 @@ func generatePflagsProvider(cmd *cobra.Command, args []string) error {
 	}
 
 	ctx := context.Background()
-	gen, err := api.NewGenerator(*pkg, structName)
+	gen, err := api.NewGenerator(pkg, structName, defaultValuesVariable)
 	if err != nil {
 		return err
 	}
