@@ -399,8 +399,8 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 }
 
 func changeSymLink(targetPath, symLink string) error {
+	tmpLink := tempFileName("temp-sym-link-*")
 	if runtime.GOOS == "windows" {
-		tmpLink := tempFileName("temp-sym-link-*")
 		err := exec.Command("mklink", filepath.Clean(tmpLink), filepath.Clean(targetPath)).Run()
 		if err != nil {
 			return err
@@ -414,7 +414,15 @@ func changeSymLink(targetPath, symLink string) error {
 		return exec.Command("del", filepath.Clean(tmpLink)).Run()
 	}
 
-	return exec.Command("ln", "-sfn", filepath.Clean(targetPath), filepath.Clean(symLink)).Run()
+	// ln -sfn is not an atomic operation. Under the hood, it first calls the system unlink then symlink calls. During
+	// that, there will be a brief moment when there is no symlink at all. mv operation is, however, atomic. That's
+	// why we make this command instead
+	err := exec.Command("ln", "-s", filepath.Clean(targetPath), filepath.Clean(tmpLink)).Run()
+	if err != nil {
+		return err
+	}
+
+	return exec.Command("mv", "-Tf", filepath.Clean(tmpLink), filepath.Clean(symLink)).Run()
 }
 
 // 1. Create Dir structure:
@@ -492,7 +500,7 @@ func beginWaitForFileChange(logger testLogger, filename string) (done chan error
 					return
 				}
 
-				logger.Logf("Received watcher event [%v], %v", event)
+				logger.Logf("Received watcher event [%v]", event)
 				// we only care about the config file
 				currentConfigFile, err := filepath.EvalSymlinks(filename)
 				if err != nil {
