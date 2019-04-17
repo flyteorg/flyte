@@ -30,6 +30,11 @@ import (
 
 type accessorCreatorFn func(registry config.Section, configPath string) config.Accessor
 
+type testLogger interface {
+	Logf(format string, args ...interface{})
+	Errorf(format string, args ...interface{})
+}
+
 func getRandInt() uint64 {
 	c := 10
 	b := make([]byte, c)
@@ -323,7 +328,7 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			r := reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
 			firstValue := r.StringValue
 
-			fileUpdated, err := beginWaitForFileChange(configFile)
+			fileUpdated, err := beginWaitForFileChange(t, configFile)
 			assert.NoError(t, err)
 
 			_, err = populateConfigData(configFile)
@@ -346,7 +351,7 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 
 			// Independently watch for when symlink underlying change happens to know when do we expect accessor to have picked up
 			// the changes
-			fileUpdated, err := beginWaitForFileChange(configFile)
+			fileUpdated, err := beginWaitForFileChange(t, configFile)
 			assert.NoError(t, err)
 
 			// 2. Start accessor with the symlink as config location
@@ -383,7 +388,7 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			// Wait for filewatcher event
 			assert.NoError(t, waitForFileChangeOrTimeout(fileUpdated))
 
-			time.Sleep(2 * time.Second)
+			time.Sleep(5 * time.Second)
 
 			r = section.GetConfig().(*MyComponentConfig)
 			secondValue := r.StringValue
@@ -462,7 +467,7 @@ func waitForFileChangeOrTimeout(done chan error) error {
 	}
 }
 
-func beginWaitForFileChange(filename string) (done chan error, terminalErr error) {
+func beginWaitForFileChange(logger testLogger, filename string) (done chan error, terminalErr error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, err
@@ -480,12 +485,21 @@ func beginWaitForFileChange(filename string) (done chan error, terminalErr error
 	go func() {
 		for {
 			select {
-			case event := <-watcher.Events:
+			case event, channelOpen := <-watcher.Events:
+				if !channelOpen {
+					logger.Logf("Events Channel has been closed")
+					done <- nil
+					return
+				}
+
+				logger.Logf("Received watcher event [%v], %v", event)
 				// we only care about the config file
 				currentConfigFile, err := filepath.EvalSymlinks(filename)
 				if err != nil {
+					logger.Errorf("Failed to EvalSymLinks. Will attempt to close watcher now. Error: %v", err)
 					closeErr := watcher.Close()
 					if closeErr != nil {
+						logger.Errorf("Failed to close watcher. Error: %v", closeErr)
 						done <- closeErr
 					} else {
 						done <- err
@@ -501,10 +515,12 @@ func beginWaitForFileChange(filename string) (done chan error, terminalErr error
 				if (filepath.Clean(event.Name) == configFile &&
 					event.Op&writeOrCreateMask != 0) ||
 					(currentConfigFile != "" && currentConfigFile != realConfigFile) {
+
+					logger.Logf("CurrentConfigFile [%v], RealConfigFile [%v]", currentConfigFile, realConfigFile)
 					realConfigFile = currentConfigFile
 					closeErr := watcher.Close()
 					if closeErr != nil {
-						fmt.Printf("Close Watcher error: %v\n", closeErr)
+						logger.Errorf("Failed to close watcher. Error: %v", closeErr)
 					} else {
 						done <- nil
 					}
@@ -512,21 +528,25 @@ func beginWaitForFileChange(filename string) (done chan error, terminalErr error
 					return
 				} else if filepath.Clean(event.Name) == configFile &&
 					event.Op&fsnotify.Remove&fsnotify.Remove != 0 {
+
+					logger.Logf("ConfigFile [%v] Removed.", configFile)
 					closeErr := watcher.Close()
 					if closeErr != nil {
-						fmt.Printf("Close Watcher error: %v\n", closeErr)
+						logger.Logf("Close Watcher error: %v", closeErr)
 					} else {
 						done <- nil
 					}
 
 					return
 				}
-			case err, ok := <-watcher.Errors:
-				if ok {
-					fmt.Printf("Watcher error: %v\n", err)
+			case err, channelOpen := <-watcher.Errors:
+				if !channelOpen {
+					logger.Logf("Error Channel has been closed.")
+				} else {
+					logger.Logf("Watcher error: %v", err)
 					closeErr := watcher.Close()
 					if closeErr != nil {
-						fmt.Printf("Close Watcher error: %v\n", closeErr)
+						logger.Logf("Close Watcher error: %v\n", closeErr)
 					}
 				}
 
