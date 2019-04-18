@@ -10,6 +10,10 @@ import (
 	"github.com/golang/protobuf/ptypes/struct"
 )
 
+type SimpleType struct {
+	StringValue string `json:"string_value,omitempty"`
+}
+
 // Simple proto
 type TestProto struct {
 	StringValue string `protobuf:"bytes,3,opt,name=string_value,json=stringValue,proto3" json:"string_value,omitempty"`
@@ -70,9 +74,13 @@ func TestMarshalObjToStruct(t *testing.T) {
 		want    *structpb.Struct
 		wantErr bool
 	}{
-		{"has value", args{input: &TestProto{StringValue: "hello"}}, &structpb.Struct{Fields: map[string]*structpb.Value{
+		{"has proto value", args{input: &TestProto{StringValue: "hello"}}, &structpb.Struct{Fields: map[string]*structpb.Value{
+			"stringValue": {Kind: &structpb.Value_StringValue{StringValue: "hello"}},
+		}}, false},
+		{"has struct value", args{input: SimpleType{StringValue: "hello"}}, &structpb.Struct{Fields: map[string]*structpb.Value{
 			"string_value": {Kind: &structpb.Value_StringValue{StringValue: "hello"}},
 		}}, false},
+		{"has string value", args{input: "hello"}, nil, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -118,8 +126,7 @@ func TestUnmarshalStructToPb(t *testing.T) {
 
 func TestMarshalPbToStruct(t *testing.T) {
 	type args struct {
-		in  proto.Message
-		out *structpb.Struct
+		in proto.Message
 	}
 	tests := []struct {
 		name     string
@@ -127,17 +134,17 @@ func TestMarshalPbToStruct(t *testing.T) {
 		expected *structpb.Struct
 		wantErr  bool
 	}{
-		{"empty", args{in: &TestProto{}, out: &structpb.Struct{}}, &structpb.Struct{Fields: map[string]*structpb.Value{}}, false},
-		{"has value", args{in: &TestProto{StringValue: "hello"}, out: &structpb.Struct{}}, &structpb.Struct{Fields: map[string]*structpb.Value{
+		{"empty", args{in: &TestProto{}}, &structpb.Struct{Fields: map[string]*structpb.Value{}}, false},
+		{"has value", args{in: &TestProto{StringValue: "hello"}}, &structpb.Struct{Fields: map[string]*structpb.Value{
 			"stringValue": {Kind: &structpb.Value_StringValue{StringValue: "hello"}},
 		}}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := MarshalPbToStruct(tt.args.in, tt.args.out); (err != nil) != tt.wantErr {
+			if got, err := MarshalPbToStruct(tt.args.in); (err != nil) != tt.wantErr {
 				t.Errorf("MarshalPbToStruct() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
-				assert.Equal(t, tt.expected.Fields, tt.args.out.Fields)
+				assert.Equal(t, tt.expected.Fields, got.Fields)
 			}
 		})
 	}
