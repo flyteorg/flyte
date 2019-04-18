@@ -21,9 +21,9 @@ func elemValueOrNil(v interface{}) interface{} {
 	if t := reflect.TypeOf(v); t.Kind() == reflect.Ptr {
 		if reflect.ValueOf(v).IsNil() {
 			return reflect.Zero(t.Elem()).Interface()
-		} else {
-			return reflect.ValueOf(v).Interface()
 		}
+
+		return reflect.ValueOf(v).Interface()
 	} else if v == nil {
 		return reflect.Zero(t).Interface()
 	}
