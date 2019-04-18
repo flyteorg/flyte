@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/types"
 	"path/filepath"
+	"strings"
 
 	"github.com/lyft/flytestdlib/logger"
 
@@ -86,17 +87,35 @@ func buildFieldForSlice(ctx context.Context, t SliceOrArray, name, goName, usage
 	}, nil
 }
 
-func appendAccessorIfNotEmpty(baseAccessor, childAccessor string) string {
-	if len(baseAccessor) == 0 {
-		return baseAccessor
+// Appends field accessors using "." as the delimiter.
+// e.g. appendAccessors("var1", "field1", "subField") will output "var1.field1.subField"
+func appendAccessors(accessors ...string) string {
+	sb := strings.Builder{}
+	switch len(accessors) {
+	case 0:
+		return ""
+	case 1:
+		return accessors[0]
 	}
 
-	return baseAccessor + "." + childAccessor
+	for _, s := range accessors {
+		if len(s) > 0 {
+			if sb.Len() > 0 {
+				sb.WriteString(".")
+			}
+
+			sb.WriteString(s)
+		}
+	}
+
+	return sb.String()
 }
 
 // Traverses fields in type and follows recursion tree to discover all fields. It stops when one of two conditions is
 // met; encountered a basic type (e.g. string, int... etc.) or the field type implements UnmarshalJSON.
-func discoverFieldsRecursive(ctx context.Context, typ *types.Named, defaultValueAccessor string) ([]FieldInfo, error) {
+// If passed a non-empty defaultValueAccessor, it'll be used to fill in default values instead of any default value
+// specified in pflag tag.
+func discoverFieldsRecursive(ctx context.Context, typ *types.Named, defaultValueAccessor, fieldPath string) ([]FieldInfo, error) {
 	logger.Printf(ctx, "Finding all fields in [%v.%v.%v]",
 		typ.Obj().Pkg().Path(), typ.Obj().Pkg().Name(), typ.Obj().Name())
 
@@ -149,8 +168,8 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named, defaultValue
 			}
 
 			defaultValue := tag.DefaultValue
-			if accessor := appendAccessorIfNotEmpty(defaultValueAccessor, v.Name()); len(accessor) > 0 {
-				defaultValue = accessor
+			if len(defaultValueAccessor) > 0 {
+				defaultValue = appendAccessors(defaultValueAccessor, fieldPath, v.Name())
 
 				if isPtr {
 					defaultValue = fmt.Sprintf("cfg.elemValueOrNil(%s).(%s)", defaultValue, t.Name())
@@ -184,11 +203,13 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named, defaultValue
 			}
 
 			defaultValue := tag.DefaultValue
-			if accessor := appendAccessorIfNotEmpty(defaultValueAccessor, v.Name()); len(accessor) > 0 {
-				defaultValue = accessor
+			if len(defaultValueAccessor) > 0 {
+				defaultValue = appendAccessors(defaultValueAccessor, fieldPath, v.Name())
 				if isStringer(t) {
 					defaultValue = defaultValue + ".String()"
 				} else {
+					logger.Infof(ctx, "Field [%v] of type [%v] does not implement Stringer interface."+
+						" Will use fmt.Sprintf() to get its default value.", v.Name(), t.String())
 					defaultValue = fmt.Sprintf("fmt.Sprintf(\"%%v\",%s)", defaultValue)
 				}
 			}
@@ -211,7 +232,7 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named, defaultValue
 			} else {
 				logger.Infof(ctx, "Traversing fields in type.")
 
-				nested, err := discoverFieldsRecursive(logger.WithIndent(ctx, indent), t, appendAccessorIfNotEmpty(defaultValueAccessor, v.Name()))
+				nested, err := discoverFieldsRecursive(logger.WithIndent(ctx, indent), t, defaultValueAccessor, appendAccessors(fieldPath, v.Name()))
 				if err != nil {
 					return nil, err
 				}
@@ -317,7 +338,7 @@ func (g PFlagProviderGenerator) Generate(ctx context.Context) (PFlagProvider, er
 		defaultValueAccessor = g.defaultVar.Name()
 	}
 
-	fields, err := discoverFieldsRecursive(ctx, g.st, defaultValueAccessor)
+	fields, err := discoverFieldsRecursive(ctx, g.st, defaultValueAccessor, "")
 	if err != nil {
 		return PFlagProvider{}, err
 	}

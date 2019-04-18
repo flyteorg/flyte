@@ -16,8 +16,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fsnotify/fsnotify"
-
 	k8sRand "k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/lyft/flytestdlib/config"
@@ -29,11 +27,6 @@ import (
 )
 
 type accessorCreatorFn func(registry config.Section, configPath string) config.Accessor
-
-type testLogger interface {
-	Logf(format string, args ...interface{})
-	Errorf(format string, args ...interface{})
-}
 
 func getRandInt() uint64 {
 	c := 10
@@ -328,16 +321,11 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			r := reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
 			firstValue := r.StringValue
 
-			fileUpdated, err := beginWaitForFileChange(t, configFile)
-			assert.NoError(t, err)
-
 			_, err = populateConfigData(configFile)
 			assert.NoError(t, err)
 
-			// Simulate filewatcher event
-			assert.NoError(t, waitForFileChangeOrTimeout(fileUpdated))
-
-			time.Sleep(2 * time.Second)
+			// Wait enough for the file change notification to propagate.
+			time.Sleep(5 * time.Second)
 
 			r = reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
 			secondValue := r.StringValue
@@ -345,20 +333,17 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 		})
 
 		t.Run(fmt.Sprintf("[%v] Change handler k8s configmaps", provider(config.Options{}).ID()), func(t *testing.T) {
-			// 1. Create Dir structure
-			watchDir, configFile, cleanup := newSymlinkedConfigFile(t)
-			defer cleanup()
-
-			// Independently watch for when symlink underlying change happens to know when do we expect accessor to have picked up
-			// the changes
-			fileUpdated, err := beginWaitForFileChange(t, configFile)
-			assert.NoError(t, err)
-
-			// 2. Start accessor with the symlink as config location
 			reg := config.NewRootSection()
 			section, err := reg.RegisterSection(MyComponentSectionKey, &MyComponentConfig{})
 			assert.NoError(t, err)
 
+			var firstValue string
+
+			// 1. Create Dir structure
+			watchDir, configFile, cleanup := newSymlinkedConfigFile(t)
+			defer cleanup()
+
+			// 2. Start accessor with the symlink as config location
 			opts := config.Options{
 				SearchPaths: []string{configFile},
 				RootSection: reg,
@@ -368,7 +353,8 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			assert.NoError(t, err)
 
 			r := section.GetConfig().(*MyComponentConfig)
-			firstValue := r.StringValue
+			firstValue = r.StringValue
+			t.Logf("First value: %v", firstValue)
 
 			// 3. Now update /data symlink to point to data2
 			dataDir2 := path.Join(watchDir, "data2")
@@ -376,17 +362,15 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			assert.NoError(t, err)
 
 			configFile2 := path.Join(dataDir2, "config.yaml")
-			_, err = populateConfigData(configFile2)
+			newData, err := populateConfigData(configFile2)
 			assert.NoError(t, err)
+			t.Logf("New value written to file: %v", newData.MyComponentConfig.StringValue)
 
 			// change the symlink using the `ln -sfn` command
 			err = changeSymLink(dataDir2, path.Join(watchDir, "data"))
 			assert.NoError(t, err)
 
 			t.Logf("New config Location: %v", configFile2)
-
-			// Wait for filewatcher event
-			assert.NoError(t, waitForFileChangeOrTimeout(fileUpdated))
 
 			time.Sleep(5 * time.Second)
 
@@ -414,15 +398,9 @@ func changeSymLink(targetPath, symLink string) error {
 		return exec.Command("del", filepath.Clean(tmpLink)).Run()
 	}
 
-	// ln -sfn is not an atomic operation. Under the hood, it first calls the system unlink then symlink calls. During
-	// that, there will be a brief moment when there is no symlink at all. mv operation is, however, atomic. That's
-	// why we make this command instead
-	err := exec.Command("ln", "-s", filepath.Clean(targetPath), filepath.Clean(tmpLink)).Run()
-	if err != nil {
-		return err
-	}
-
-	return exec.Command("mv", "-Tf", filepath.Clean(tmpLink), filepath.Clean(symLink)).Run()
+	//// ln -sfn is not an atomic operation. Under the hood, it first calls the system unlink then symlink calls. During
+	//// that, there will be a brief moment when there is no symlink at all.
+	return exec.Command("ln", "-sfn", filepath.Clean(targetPath), filepath.Clean(symLink)).Run()
 }
 
 // 1. Create Dir structure:
@@ -444,6 +422,7 @@ func newSymlinkedConfigFile(t *testing.T) (watchDir, configFile string, cleanup 
 	assert.NoError(t, err)
 
 	cleanup = func() {
+		t.Logf("Removing watchDir [%v]", watchDir)
 		assert.NoError(t, os.RemoveAll(watchDir))
 	}
 
@@ -456,120 +435,6 @@ func newSymlinkedConfigFile(t *testing.T) (watchDir, configFile string, cleanup 
 
 	t.Logf("Config file location: %s\n", path.Join(watchDir, "config.yaml"))
 	return watchDir, configFile, cleanup
-}
-
-func waitForFileChangeOrTimeout(done chan error) error {
-	timeout := make(chan bool, 1)
-	go func() {
-		time.Sleep(5 * time.Second)
-		timeout <- true
-	}()
-
-	for {
-		select {
-		case <-timeout:
-			return fmt.Errorf("timed out")
-		case err := <-done:
-			return err
-		}
-	}
-}
-
-func beginWaitForFileChange(logger testLogger, filename string) (done chan error, terminalErr error) {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		return nil, err
-	}
-
-	configFile := filepath.Clean(filename)
-	realConfigFile, err := filepath.EvalSymlinks(configFile)
-	if err != nil {
-		return nil, err
-	}
-
-	configDir, _ := filepath.Split(configFile)
-
-	done = make(chan error)
-	go func() {
-		for {
-			select {
-			case event, channelOpen := <-watcher.Events:
-				if !channelOpen {
-					logger.Logf("Events Channel has been closed")
-					done <- nil
-					return
-				}
-
-				logger.Logf("Received watcher event [%v]", event)
-				// we only care about the config file
-				currentConfigFile, err := filepath.EvalSymlinks(filename)
-				if err != nil {
-					logger.Errorf("Failed to EvalSymLinks. Will attempt to close watcher now. Error: %v", err)
-					closeErr := watcher.Close()
-					if closeErr != nil {
-						logger.Errorf("Failed to close watcher. Error: %v", closeErr)
-						done <- closeErr
-					} else {
-						done <- err
-					}
-
-					return
-				}
-
-				// We only care about the config file with the following cases:
-				// 1 - if the config file was modified or created
-				// 2 - if the real path to the config file changed (eg: k8s ConfigMap replacement)
-				const writeOrCreateMask = fsnotify.Write | fsnotify.Create
-				if (filepath.Clean(event.Name) == configFile &&
-					event.Op&writeOrCreateMask != 0) ||
-					(currentConfigFile != "" && currentConfigFile != realConfigFile) {
-
-					logger.Logf("CurrentConfigFile [%v], RealConfigFile [%v]", currentConfigFile, realConfigFile)
-					realConfigFile = currentConfigFile
-					closeErr := watcher.Close()
-					if closeErr != nil {
-						logger.Errorf("Failed to close watcher. Error: %v", closeErr)
-					} else {
-						done <- nil
-					}
-
-					return
-				} else if filepath.Clean(event.Name) == configFile &&
-					event.Op&fsnotify.Remove&fsnotify.Remove != 0 {
-
-					logger.Logf("ConfigFile [%v] Removed.", configFile)
-					closeErr := watcher.Close()
-					if closeErr != nil {
-						logger.Logf("Close Watcher error: %v", closeErr)
-					} else {
-						done <- nil
-					}
-
-					return
-				}
-			case err, channelOpen := <-watcher.Errors:
-				if !channelOpen {
-					logger.Logf("Error Channel has been closed.")
-				} else {
-					logger.Logf("Watcher error: %v", err)
-					closeErr := watcher.Close()
-					if closeErr != nil {
-						logger.Logf("Close Watcher error: %v\n", closeErr)
-					}
-				}
-
-				done <- nil
-				return
-			}
-		}
-	}()
-
-	err = watcher.Add(configDir)
-	if err != nil {
-		return nil, err
-	}
-
-	return done, err
 }
 
 func testTypes(accessor accessorCreatorFn) func(t *testing.T) {
