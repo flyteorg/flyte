@@ -20,13 +20,29 @@ func camelCase(str string) string {
 	return str
 }
 
-func jsonUnmarshaler(t types.Type) bool {
+func isJSONUnmarshaler(t types.Type) bool {
+	found, _ := implementsAnyOfMethods(t, "UnmarshalJSON")
+	return found
+}
+
+func isStringer(t types.Type) bool {
+	found, _ := implementsAnyOfMethods(t, "String")
+	return found
+}
+
+func implementsAnyOfMethods(t types.Type, methodNames ...string) (found, implementedByPtr bool) {
 	mset := types.NewMethodSet(t)
-	jsonUnmarshaler := mset.Lookup(nil, "UnmarshalJSON")
-	if jsonUnmarshaler == nil {
-		mset = types.NewMethodSet(types.NewPointer(t))
-		jsonUnmarshaler = mset.Lookup(nil, "UnmarshalJSON")
+	for _, name := range methodNames {
+		if mset.Lookup(nil, name) != nil {
+			return true, false
+		}
+	}
+	mset = types.NewMethodSet(types.NewPointer(t))
+	for _, name := range methodNames {
+		if mset.Lookup(nil, name) != nil {
+			return true, true
+		}
 	}
 
-	return jsonUnmarshaler != nil
+	return false, false
 }

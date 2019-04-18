@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,8 +15,37 @@ import (
 // Make sure existing config file(s) parse correctly before overriding them with this flag!
 var update = flag.Bool("update", false, "Updates testdata")
 
+// If v is a pointer, it will get its element value or the zero value of the element type.
+// If v is not a pointer, it will return it as is.
+func elemValueOrNil(v interface{}) interface{} {
+	if t := reflect.TypeOf(v); t.Kind() == reflect.Ptr {
+		if reflect.ValueOf(v).IsNil() {
+			return reflect.Zero(t.Elem()).Interface()
+		}
+
+		return reflect.ValueOf(v).Interface()
+	} else if v == nil {
+		return reflect.Zero(t).Interface()
+	}
+
+	return v
+}
+
+func TestElemValueOrNil(t *testing.T) {
+	var iPtr *int
+	assert.Equal(t, 0, elemValueOrNil(iPtr))
+	var sPtr *string
+	assert.Equal(t, "", elemValueOrNil(sPtr))
+	var i int
+	assert.Equal(t, 0, elemValueOrNil(i))
+	var s string
+	assert.Equal(t, "", elemValueOrNil(s))
+	var arr []string
+	assert.Equal(t, arr, elemValueOrNil(arr))
+}
+
 func TestNewGenerator(t *testing.T) {
-	g, err := NewGenerator(".", "TestType")
+	g, err := NewGenerator(".", "TestType", "DefaultTestType")
 	assert.NoError(t, err)
 
 	ctx := context.Background()

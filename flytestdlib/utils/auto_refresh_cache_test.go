@@ -15,6 +15,7 @@ type testCacheItem struct {
 	val          int
 	deleted      atomic.Bool
 	resyncPeriod time.Duration
+	synced       atomic.Int32
 }
 
 func (m *testCacheItem) ID() string {
@@ -28,9 +29,12 @@ func (m *testCacheItem) moveNext() {
 }
 
 func (m *testCacheItem) syncItem(ctx context.Context, obj CacheItem) (CacheItem, error) {
+	defer func() { m.synced.Inc() }()
+
 	if m.deleted.Load() {
 		return nil, nil
 	}
+
 	return m, nil
 }
 
@@ -51,10 +55,13 @@ func TestCache(t *testing.T) {
 	testResyncPeriod := time.Millisecond
 	rateLimiter := NewRateLimiter("mockLimiter", 100, 1)
 
-	item := &testCacheItem{val: 0, resyncPeriod: testResyncPeriod, deleted: atomic.NewBool(false)}
+	item := &testCacheItem{
+		val:          0,
+		resyncPeriod: testResyncPeriod,
+		deleted:      atomic.NewBool(false),
+		synced:       atomic.NewInt32(0)}
 	cache := NewAutoRefreshCache(item.syncItem, rateLimiter, testResyncPeriod)
 
-	//ctx := context.Background()
 	ctx, cancel := context.WithCancel(context.Background())
 	cache.Start(ctx)
 
@@ -74,8 +81,14 @@ func TestCache(t *testing.T) {
 
 	// removed?
 	item.moveNext()
+	currentSyncCount := item.synced.Load()
 	item.deleted.Store(true)
+	for currentSyncCount == item.synced.Load() {
+		time.Sleep(testResyncPeriod * 5) // spare enough time to process remove!
+	}
+
 	time.Sleep(testResyncPeriod * 10) // spare enough time to process remove!
+
 	val := cache.Get(item.ID())
 
 	assert.Nil(t, val)

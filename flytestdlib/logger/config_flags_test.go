@@ -103,7 +103,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vBool, err := cmdFlags.GetBool("show-source"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
+				assert.Equal(t, bool(defaultConfig.IncludeSourceCode), vBool)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -125,7 +125,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vBool, err := cmdFlags.GetBool("mute"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
+				assert.Equal(t, bool(defaultConfig.Mute), vBool)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -147,7 +147,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("level"); err == nil {
-				assert.Equal(t, int(4), vInt)
+				assert.Equal(t, int(defaultConfig.Level), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -169,7 +169,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("formatter.type"); err == nil {
-				assert.Equal(t, string("json"), vString)
+				assert.Equal(t, string(defaultConfig.Formatter.Type), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -187,4 +187,37 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+}
+
+func TestConfig_elemValueOrNil(t *testing.T) {
+	type fields struct {
+		IncludeSourceCode bool
+		Mute              bool
+		Level             Level
+		Formatter         FormatterConfig
+	}
+	type args struct {
+		v interface{}
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   interface{}
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := Config{
+				IncludeSourceCode: tt.fields.IncludeSourceCode,
+				Mute:              tt.fields.Mute,
+				Level:             tt.fields.Level,
+				Formatter:         tt.fields.Formatter,
+			}
+			if got := c.elemValueOrNil(tt.args.v); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Config.elemValueOrNil() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
