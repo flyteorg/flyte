@@ -103,7 +103,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("str"); err == nil {
-				assert.Equal(t, string("hello world"), vString)
+				assert.Equal(t, string(DefaultTestType.StringValue), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -125,7 +125,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vBool, err := cmdFlags.GetBool("bl"); err == nil {
-				assert.Equal(t, bool(true), vBool)
+				assert.Equal(t, bool(DefaultTestType.BoolValue), vBool)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -147,7 +147,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("nested.i"); err == nil {
-				assert.Equal(t, int(*new(int)), vInt)
+				assert.Equal(t, int(DefaultTestType.NestedType.IntValue), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -235,7 +235,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("c"); err == nil {
-				assert.Equal(t, string(""), vString)
+				assert.Equal(t, string(fmt.Sprintf("%v", DefaultTestType.StringToJSON)), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -257,7 +257,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("storage.type"); err == nil {
-				assert.Equal(t, string("s3"), vString)
+				assert.Equal(t, string(DefaultTestType.StorageConfig.Type), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -279,7 +279,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("storage.connection.endpoint"); err == nil {
-				assert.Equal(t, string(""), vString)
+				assert.Equal(t, string(DefaultTestType.StorageConfig.Connection.Endpoint.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -301,7 +301,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("storage.connection.auth-type"); err == nil {
-				assert.Equal(t, string("iam"), vString)
+				assert.Equal(t, string(DefaultTestType.StorageConfig.Connection.AuthType), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -323,7 +323,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("storage.connection.access-key"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(DefaultTestType.StorageConfig.Connection.AccessKey), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -345,7 +345,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("storage.connection.secret-key"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(DefaultTestType.StorageConfig.Connection.SecretKey), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -367,7 +367,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("storage.connection.region"); err == nil {
-				assert.Equal(t, string("us-east-1"), vString)
+				assert.Equal(t, string(DefaultTestType.StorageConfig.Connection.Region), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -389,7 +389,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vBool, err := cmdFlags.GetBool("storage.connection.disable-ssl"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
+				assert.Equal(t, bool(DefaultTestType.StorageConfig.Connection.DisableSSL), vBool)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -411,7 +411,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("storage.container"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(DefaultTestType.StorageConfig.InitContainer), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -433,7 +433,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("storage.cache.max_size_mbs"); err == nil {
-				assert.Equal(t, int(*new(int)), vInt)
+				assert.Equal(t, int(DefaultTestType.StorageConfig.Cache.MaxSizeMegabytes), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -455,7 +455,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("storage.cache.target_gc_percent"); err == nil {
-				assert.Equal(t, int(*new(int)), vInt)
+				assert.Equal(t, int(DefaultTestType.StorageConfig.Cache.TargetGCPercent), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -477,7 +477,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt64, err := cmdFlags.GetInt64("storage.limits.maxDownloadMBs"); err == nil {
-				assert.Equal(t, int64(2), vInt64)
+				assert.Equal(t, int64(DefaultTestType.StorageConfig.Limits.GetLimitMegabytes), vInt64)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -499,7 +499,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("i"); err == nil {
-				assert.Equal(t, int(*new(int)), vInt)
+				assert.Equal(t, int(cfg.elemValueOrNil(DefaultTestType.IntValue).(int)), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}

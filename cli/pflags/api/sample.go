@@ -7,6 +7,10 @@ import (
 	"github.com/lyft/flytestdlib/storage"
 )
 
+var DefaultTestType = &TestType{
+	StringValue: "Welcome to defaults",
+}
+
 type TestType struct {
 	StringValue      string            `json:"str" pflag:"\"hello world\",\"life is short\""`
 	BoolValue        bool              `json:"bl" pflag:"true"`

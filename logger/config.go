@@ -6,7 +6,7 @@ import (
 	"github.com/lyft/flytestdlib/config"
 )
 
-//go:generate pflags Config
+//go:generate pflags Config --default-var defaultConfig
 
 const configSectionKey = "Logger"
 
@@ -21,6 +21,13 @@ const (
 	jsonDataKey string = "json"
 )
 
+var defaultConfig = &Config{
+	Formatter: FormatterConfig{
+		Type: FormatterJSON,
+	},
+	Level: InfoLevel,
+}
+
 // Global logger config.
 type Config struct {
 	// Determines whether to include source code location in logs. This might incurs a performance hit and is only
@@ -31,13 +38,13 @@ type Config struct {
 	Mute bool `json:"mute" pflag:",Mutes all logs regardless of severity. Intended for benchmarks/tests only."`
 
 	// Determines the minimum log level to log.
-	Level Level `json:"level" pflag:"4,Sets the minimum logging level."`
+	Level Level `json:"level" pflag:",Sets the minimum logging level."`
 
 	Formatter FormatterConfig `json:"formatter" pflag:",Sets logging format."`
 }
 
 type FormatterConfig struct {
-	Type FormatterType `json:"type" pflag:"\"json\",Sets logging format type."`
+	Type FormatterType `json:"type" pflag:",Sets logging format type."`
 }
 
 var globalConfig = Config{}
@@ -73,9 +80,7 @@ const (
 )
 
 func init() {
-	if _, err := config.RegisterSectionWithUpdates(configSectionKey, &Config{}, func(ctx context.Context, newValue config.Config) {
+	config.MustRegisterSectionWithUpdates(configSectionKey, defaultConfig, func(ctx context.Context, newValue config.Config) {
 		SetConfig(*newValue.(*Config))
-	}); err != nil {
-		panic(err)
-	}
+	})
 }
