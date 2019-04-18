@@ -101,10 +101,16 @@ func appendAccessors(accessors ...string) string {
 	for _, s := range accessors {
 		if len(s) > 0 {
 			if sb.Len() > 0 {
-				sb.WriteString(".")
+				if _, err := sb.WriteString("."); err != nil {
+					fmt.Printf("Failed to writeString, error: %v", err)
+					return ""
+				}
 			}
 
-			sb.WriteString(s)
+			if _, err := sb.WriteString(s); err != nil {
+				fmt.Printf("Failed to writeString, error: %v", err)
+				return ""
+			}
 		}
 	}
 

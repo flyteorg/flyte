@@ -379,6 +379,27 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			// Make sure values have changed
 			assert.NotEqual(t, firstValue, secondValue)
 		})
+
+		t.Run(fmt.Sprintf("[%v] Default variables", provider(config.Options{}).ID()), func(t *testing.T) {
+			reg := config.NewRootSection()
+			_, err := reg.RegisterSection(MyComponentSectionKey, &MyComponentConfig{
+				StringValue:  "default value 1",
+				StringValue2: "default value 2",
+			})
+			assert.NoError(t, err)
+
+			v := provider(config.Options{
+				SearchPaths: []string{filepath.Join("testdata", "config.yaml")},
+				RootSection: reg,
+			})
+			key := strings.ToUpper("my-component.str")
+			assert.NoError(t, os.Setenv(key, "Set From Env"))
+			defer func() { assert.NoError(t, os.Unsetenv(key)) }()
+			assert.NoError(t, v.UpdateConfig(context.TODO()))
+			r := reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
+			assert.Equal(t, "Set From Env", r.StringValue)
+			assert.Equal(t, "default value 2", r.StringValue2)
+		})
 	}
 }
 
