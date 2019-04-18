@@ -59,7 +59,7 @@ func TestCache(t *testing.T) {
 		val:          0,
 		resyncPeriod: testResyncPeriod,
 		deleted:      atomic.NewBool(false),
-		synced:       atomic.NewInt32(0),}
+		synced:       atomic.NewInt32(0)}
 	cache := NewAutoRefreshCache(item.syncItem, rateLimiter, testResyncPeriod)
 
 	ctx, cancel := context.WithCancel(context.Background())
