@@ -139,11 +139,10 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named, defaultValue
 			tag.Name = v.Name()
 		}
 
-		isPtr := false
 		typ := v.Type()
-		if ptr, casted := typ.(*types.Pointer); casted {
+		ptr, isPtr := typ.(*types.Pointer)
+		if isPtr {
 			typ = ptr.Elem()
-			isPtr = true
 		}
 
 		switch t := typ.(type) {
