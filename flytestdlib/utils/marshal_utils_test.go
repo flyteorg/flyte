@@ -7,15 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/golang/protobuf/proto"
-	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/golang/protobuf/ptypes/struct"
 )
 
 // Simple proto
 type TestProto struct {
-	StringValue          string   `protobuf:"bytes,3,opt,name=string_value,json=stringValue,proto3" json:"string_value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	StringValue string `protobuf:"bytes,3,opt,name=string_value,json=stringValue,proto3" json:"string_value,omitempty"`
 }
 
 func (m *TestProto) Reset()         { *m = TestProto{} }
@@ -24,24 +21,6 @@ func (*TestProto) ProtoMessage()    {}
 func (*TestProto) Descriptor() ([]byte, []int) {
 	return []byte{}, []int{0}
 }
-func (m *TestProto) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_TestProto.Unmarshal(m, b)
-}
-func (m *TestProto) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_TestProto.Marshal(b, m, deterministic)
-}
-func (dst *TestProto) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TestProto.Merge(dst, src)
-}
-func (m *TestProto) XXX_Size() int {
-	return xxx_messageInfo_TestProto.Size(m)
-}
-func (m *TestProto) XXX_DiscardUnknown() {
-	xxx_messageInfo_TestProto.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_TestProto proto.InternalMessageInfo
-
 func (m *TestProto) GetWorkflowId() string {
 	if m != nil {
 		return m.StringValue
