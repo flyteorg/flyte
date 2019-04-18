@@ -21,7 +21,7 @@ func (*TestProto) ProtoMessage()    {}
 func (*TestProto) Descriptor() ([]byte, []int) {
 	return []byte{}, []int{0}
 }
-func (m *TestProto) GetWorkflowId() string {
+func (m *TestProto) GetWorkflowID() string {
 	if m != nil {
 		return m.StringValue
 	}
