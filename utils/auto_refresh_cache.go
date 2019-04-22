@@ -31,10 +31,11 @@ type CacheItem interface {
 
 // Possible actions for the cache to take as a result of running the sync function on any given cache item
 type CacheSyncAction int
-
 const (
+	Unchanged CacheSyncAction = iota
+
 	// The item returned has been updated and should be updated in the cache
-	Update CacheSyncAction = iota
+	Update
 
 	// The item should be removed from the cache
 	Delete
@@ -52,9 +53,8 @@ func getEvictionFunction(counter prometheus.Counter) func(key interface{}, value
 func NewAutoRefreshCache(syncCb CacheSyncItem, syncRateLimiter RateLimiter, resyncPeriod time.Duration,
 	size int, scope promutils.Scope) (AutoRefreshCache, error) {
 
+	// If a scope is specified, we'll add a function to log a metric when an object gets evicted
 	var evictionFunction func(key interface{}, value interface{})
-
-	// If a scope is specified, we'll add a function to log a metric when evicting
 	if scope != nil {
 		counter := scope.MustNewCounter("lru_evictions", "Counter for evictions from LRU")
 		evictionFunction = getEvictionFunction(counter)
@@ -130,7 +130,7 @@ func (w *autoRefreshCache) sync(ctx context.Context) {
 		if value, ok := w.lruMap.Peek(k); ok {
 			newItem, result, err := w.syncCb(ctx, value.(CacheItem))
 			if err != nil {
-				logger.Error(ctx, "failed to get latest copy of the item %v", key)
+				logger.Error(ctx, "failed to get latest copy of the item %v", k)
 			}
 
 			if result == Update {
