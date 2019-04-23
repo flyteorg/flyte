@@ -113,7 +113,6 @@ func (w *autoRefreshCache) GetOrCreate(item CacheItem) (CacheItem, error) {
 		return val.(CacheItem), nil
 	}
 
-	//fmt.Println("adding")
 	w.lruMap.Add(item.ID(), item)
 	return item, nil
 }
