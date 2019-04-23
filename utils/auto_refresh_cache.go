@@ -109,7 +109,6 @@ func (w *autoRefreshCache) Get(id string) CacheItem {
 // Create should be invoked only once. recreating the object is not supported.
 func (w *autoRefreshCache) GetOrCreate(item CacheItem) (CacheItem, error) {
 	if val, ok := w.lruMap.Get(item.ID()); ok {
-		//fmt.Println("existing")
 		return val.(CacheItem), nil
 	}
 
