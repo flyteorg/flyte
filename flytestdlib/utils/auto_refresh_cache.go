@@ -139,7 +139,6 @@ func (w *autoRefreshCache) sync(ctx context.Context) {
 			}
 
 			if result == Update {
-				w.lruMap.Remove(k)
 				w.lruMap.Add(k, newItem)
 			} else if result == Delete {
 				w.lruMap.Remove(k)
