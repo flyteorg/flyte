@@ -31,6 +31,7 @@ type CacheItem interface {
 
 // Possible actions for the cache to take as a result of running the sync function on any given cache item
 type CacheSyncAction int
+
 const (
 	Unchanged CacheSyncAction = iota
 
@@ -41,6 +42,10 @@ const (
 	Delete
 )
 
+// Your implementation of this function for your cache instance is responsible for returning
+//   1. The new CacheItem, and
+//   2. What action should be taken.  The sync function has no insight into your object, and needs to be
+//      told explicitly if the new item is different from the old one.
 type CacheSyncItem func(ctx context.Context, obj CacheItem) (
 	newItem CacheItem, result CacheSyncAction, err error)
 
@@ -105,9 +110,11 @@ func (w *autoRefreshCache) Get(id string) CacheItem {
 // Create should be invoked only once. recreating the object is not supported.
 func (w *autoRefreshCache) GetOrCreate(item CacheItem) (CacheItem, error) {
 	if val, ok := w.lruMap.Get(item.ID()); ok {
+		//fmt.Println("existing")
 		return val.(CacheItem), nil
 	}
 
+	//fmt.Println("adding")
 	w.lruMap.Add(item.ID(), item)
 	return item, nil
 }
@@ -126,7 +133,8 @@ func (w *autoRefreshCache) GetOrCreate(item CacheItem) (CacheItem, error) {
 func (w *autoRefreshCache) sync(ctx context.Context) {
 	keys := w.lruMap.Keys()
 	for _, k := range keys {
-		// If not ok, it means evicted between the item was evicted between calling the keys and the iteration loop
+		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
+		// which is fine, we can just ignore.
 		if value, ok := w.lruMap.Peek(k); ok {
 			newItem, result, err := w.syncCb(ctx, value.(CacheItem))
 			if err != nil {
@@ -136,7 +144,6 @@ func (w *autoRefreshCache) sync(ctx context.Context) {
 			if result == Update {
 				w.lruMap.Remove(k)
 				w.lruMap.Add(k, newItem)
-
 			} else if result == Delete {
 				w.lruMap.Remove(k)
 			}
