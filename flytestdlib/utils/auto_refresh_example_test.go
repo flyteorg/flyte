@@ -46,8 +46,13 @@ func ExampleNewAutoRefreshCache() {
 	exampleService := newExampleService()
 
 	// define a sync method that the cache can use to auto-refresh in background
-	syncItemCb := func(ctx context.Context, obj CacheItem) (CacheItem, error) {
-		return exampleService.getStatus(obj.(*ExampleCacheItem).ID()), nil
+	syncItemCb := func(ctx context.Context, obj CacheItem) (CacheItem, CacheSyncAction, error) {
+		oldItem := obj.(*ExampleCacheItem)
+		newItem := exampleService.getStatus(oldItem.ID())
+		if newItem.status != oldItem.status {
+			return newItem, Update, nil
+		}
+		return newItem, Unchanged, nil
 	}
 
 	// define resync period as time duration we want cache to refresh. We can go as low as we want but cache
@@ -61,7 +66,10 @@ func ExampleNewAutoRefreshCache() {
 	// since cache refreshes itself asynchronously, it may not notice that an object has been deleted immediately,
 	// so users of the cache should have the delete logic aware of this shortcoming (eg. not-exists may be a valid
 	// error during removal if based on status in cache).
-	cache := NewAutoRefreshCache(syncItemCb, rateLimiter, resyncPeriod)
+	cache, err := NewAutoRefreshCache(syncItemCb, rateLimiter, resyncPeriod, 100, nil)
+	if err != nil {
+		panic(err)
+	}
 
 	// start the cache with a context that would be to stop the cache by cancelling the context
 	ctx, cancel := context.WithCancel(context.Background())

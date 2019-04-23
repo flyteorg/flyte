@@ -163,6 +163,17 @@
   revision = "77c84b1dd69c41b74fe0a94ca8ee257d85947327"
 
 [[projects]]
+  digest = "1:d15ee511aa0f56baacc1eb4c6b922fa1c03b38413b6be18166b996d82a0156ea"
+  name = "github.com/hashicorp/golang-lru"
+  packages = [
+    ".",
+    "simplelru",
+  ]
+  pruneopts = "UT"
+  revision = "7087cb70de9f7a8bc0a10c375cb0d2280a8edf9c"
+  version = "v0.5.1"
+
+[[projects]]
   digest = "1:c0d19ab64b32ce9fe5cf4ddceba78d5bc9807f0016db6b1183599da3dcc24d10"
   name = "github.com/hashicorp/hcl"
   packages = [
@@ -492,10 +503,12 @@
     "github.com/golang/protobuf/proto",
     "github.com/golang/protobuf/ptypes",
     "github.com/golang/protobuf/ptypes/duration",
+    "github.com/golang/protobuf/ptypes/struct",
     "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/graymeta/stow",
     "github.com/graymeta/stow/local",
     "github.com/graymeta/stow/s3",
+    "github.com/hashicorp/golang-lru",
     "github.com/magiconair/properties/assert",
     "github.com/mitchellh/mapstructure",
     "github.com/pkg/errors",
