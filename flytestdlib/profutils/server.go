@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/lyft/flytestdlib/config"
 
@@ -28,12 +29,20 @@ const (
 	contentTypeJSON   = "application/json; charset=utf-8"
 )
 
+type BuildVersion struct {
+	Build     string    `json:"build"`
+	Version   string    `json:"version"`
+	Timestamp time.Time `json:"timestamp,string"`
+}
+
+// Writes a string to the Http output stream
 func WriteStringResponse(resp http.ResponseWriter, code int, body string) error {
 	resp.WriteHeader(code)
 	_, err := resp.Write([]byte(body))
 	return err
 }
 
+// Writes a JSON to the http output stream
 func WriteJSONResponse(resp http.ResponseWriter, code int, body interface{}) error {
 	resp.Header().Set(contentTypeHeader, contentTypeJSON)
 	resp.WriteHeader(code)
@@ -44,6 +53,8 @@ func WriteJSONResponse(resp http.ResponseWriter, code int, body interface{}) err
 	return WriteStringResponse(resp, http.StatusOK, string(j))
 }
 
+// Simple healthcheck module that returns OK and provides a simple L7 healthcheck
+// TODO we may want to provide a simple function that returns a bool, where users could provide custom healthchecks
 func healtcheckHandler(w http.ResponseWriter, req *http.Request) {
 	err := WriteStringResponse(w, http.StatusOK, http.StatusText(http.StatusOK))
 	if err != nil {
@@ -51,13 +62,15 @@ func healtcheckHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// Handler that returns a JSON response indicating the Build Version information (refer to #version module)
 func versionHandler(w http.ResponseWriter, req *http.Request) {
-	err := WriteStringResponse(w, http.StatusOK, fmt.Sprintf("Build [%s], Version [%s]", version.Build, version.Version))
+	err := WriteJSONResponse(w, http.StatusOK, BuildVersion{Build: version.Build, Version: version.Version, Timestamp: version.BuildTime})
 	if err != nil {
 		panic(err)
 	}
 }
 
+// Provides a handler that dumps the config information as a string
 func configHandler(w http.ResponseWriter, req *http.Request) {
 	m, err := config.AllConfigsAsMap(config.GetRootSection())
 	if err != nil {

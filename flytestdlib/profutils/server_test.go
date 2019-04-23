@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
+	"time"
+
+	"github.com/lyft/flytestdlib/version"
 
 	"github.com/lyft/flytestdlib/internal/utils"
 
@@ -85,9 +88,16 @@ func TestVersionHandler(t *testing.T) {
 		URL: &testURL,
 	}
 
+	version.BuildTime = time.Now()
+
 	http.DefaultServeMux.ServeHTTP(writer, request)
 	assert.Equal(t, http.StatusOK, writer.Status)
-	assert.Equal(t, `Build [unknown], Version [unknown]`, string(writer.Body))
+	assert.NotNil(t, writer.Body)
+	bv := BuildVersion{}
+	assert.NoError(t, json.Unmarshal(writer.Body, &bv))
+	assert.Equal(t, bv.Timestamp.Unix(), version.BuildTime.Unix())
+	assert.Equal(t, bv.Build, version.Build)
+	assert.Equal(t, bv.Version, version.Version)
 }
 
 func TestHealthcheckHandler(t *testing.T) {
