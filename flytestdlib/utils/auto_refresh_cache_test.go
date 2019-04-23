@@ -3,9 +3,10 @@ package utils
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const fakeCacheItemValueLimit = 10
@@ -29,11 +30,6 @@ func syncFakeItem(_ context.Context, obj CacheItem) (CacheItem, CacheSyncAction,
 	return fakeCacheItem{id: item.ID(), val: item.val + 1}, Update, nil
 }
 
-func syncFakeItemLagged(ctx context.Context, obj CacheItem) (CacheItem, CacheSyncAction, error) {
-	time.Sleep(100 * time.Millisecond)
-	return syncFakeItem(ctx, obj)
-}
-
 func syncFakeItemAlwaysDelete(_ context.Context, obj CacheItem) (CacheItem, CacheSyncAction, error) {
 	return obj, Delete, nil
 }
@@ -52,10 +48,11 @@ func TestCacheTwo(t *testing.T) {
 
 		// Create ten items in the cache
 		for i := 1; i <= 10; i++ {
-			cache.GetOrCreate(fakeCacheItem{
+			_, err := cache.GetOrCreate(fakeCacheItem{
 				id:  fmt.Sprintf("%d", i),
 				val: 0,
 			})
+			assert.NoError(t, err)
 		}
 
 		// Wait half a second for all resync periods to complete
@@ -77,10 +74,11 @@ func TestCacheTwo(t *testing.T) {
 
 		// Create ten items in the cache
 		for i := 1; i <= 10; i++ {
-			cache.GetOrCreate(fakeCacheItem{
+			_, err = cache.GetOrCreate(fakeCacheItem{
 				id:  fmt.Sprintf("%d", i),
 				val: 0,
 			})
+			assert.NoError(t, err)
 		}
 
 		// Wait for all resync periods to complete

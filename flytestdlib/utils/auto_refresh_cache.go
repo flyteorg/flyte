@@ -2,13 +2,13 @@ package utils
 
 import (
 	"context"
-	"github.com/hashicorp/golang-lru"
+	"time"
+
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"sync"
-	"time"
 )
 
 // AutoRefreshCache with regular GetOrCreate and Delete along with background asynchronous refresh. Caller provides
@@ -88,7 +88,6 @@ func NewAutoRefreshCache(syncCb CacheSyncItem, syncRateLimiter RateLimiter, resy
 // Sync is run as a fixed-interval-scheduled-task, and is skipped if sync from previous cycle is still running.
 type autoRefreshCache struct {
 	syncCb          CacheSyncItem
-	syncMap         sync.Map
 	lruMap          lru.Cache
 	syncRateLimiter RateLimiter
 	resyncPeriod    time.Duration
