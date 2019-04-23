@@ -71,7 +71,7 @@ func NewAutoRefreshCache(syncCb CacheSyncItem, syncRateLimiter RateLimiter, resy
 
 	cache := &autoRefreshCache{
 		syncCb:          syncCb,
-		lruMap:          *lruCache,
+		lruMap:          lruCache,
 		syncRateLimiter: syncRateLimiter,
 		resyncPeriod:    resyncPeriod,
 		scope:           scope,
@@ -88,7 +88,7 @@ func NewAutoRefreshCache(syncCb CacheSyncItem, syncRateLimiter RateLimiter, resy
 // Sync is run as a fixed-interval-scheduled-task, and is skipped if sync from previous cycle is still running.
 type autoRefreshCache struct {
 	syncCb          CacheSyncItem
-	lruMap          lru.Cache
+	lruMap          *lru.Cache
 	syncRateLimiter RateLimiter
 	resyncPeriod    time.Duration
 	scope           promutils.Scope
