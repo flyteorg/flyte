@@ -46,3 +46,41 @@ This library consists of:
 
  - utils
  - version
+
+Contributing
+------------
+
+## Versioning
+
+This repo follows [semantic versioning](https://semver.org/).
+
+## Releases
+
+This repository is hooked up with [goreleaser](https://goreleaser.com/). Maintainers are expected to create tags and let goreleaser compose the release message and create a release.
+
+To create a new release, follow these steps:
+
+- Create a PR with your changes.
+
+- [Optional] Create an alpha tag on your branch and push that.
+  
+  - First get existing tags `git describe --abbrev=0 --tags`
+  
+  - Figure out the next alpha version (e.g. if tag is v1.2.3 then you should create a v1.2.4-alpha.0 tag)
+  
+  - Create a tag `git tag v1.2.4-alpha.0`
+  
+  - Push tag `git push --tags`
+
+- Merge your changes and checkout master branch `git checkout master && git pull`
+
+- Bump version tag and push to branch.
+
+  - First get existing tags `git describe --abbrev=0 --tags`
+  
+  - Figure out the next release version (e.g. if tag is v1.2.3 then you should create a v1.2.4 tag or v1.3.0 or a v2.0.0 depending on what has changed. Refer to [Semantic Versioning](https://semver.org/) for information about when to bump each)
+  
+  - Create a tag `git tag v1.2.4`
+  
+  - Push tag `git push --tags`
+

@@ -5,13 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/lyft/flytestdlib/config"
-
-	"github.com/lyft/flytestdlib/version"
-
 	"github.com/lyft/flytestdlib/logger"
+	"github.com/lyft/flytestdlib/version"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	_ "net/http/pprof" // Import for pprof server
@@ -30,9 +27,9 @@ const (
 )
 
 type BuildVersion struct {
-	Build     string    `json:"build"`
-	Version   string    `json:"version"`
-	Timestamp time.Time `json:"timestamp,string"`
+	Build     string `json:"build"`
+	Version   string `json:"version"`
+	Timestamp string `json:"timestamp,string"`
 }
 
 // Writes a string to the Http output stream
