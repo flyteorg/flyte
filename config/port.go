@@ -12,6 +12,10 @@ type Port struct {
 	Port int `json:"port,omitempty"`
 }
 
+func (p Port) String() string {
+	return strconv.Itoa(p.Port)
+}
+
 func (p Port) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p.Port)
 }

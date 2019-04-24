@@ -1,4 +1,6 @@
 logger:
+  formatter:
+    type: ""
   level: 5
   mute: false
   show-source: false

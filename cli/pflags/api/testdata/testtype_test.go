@@ -235,14 +235,14 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("c"); err == nil {
-				assert.Equal(t, string(fmt.Sprintf("%v", DefaultTestType.StringToJSON)), vString)
+				assert.Equal(t, string(DefaultTestType.mustMarshalJSON(DefaultTestType.StringToJSON)), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
+			testValue := DefaultTestType.mustMarshalJSON(DefaultTestType.StringToJSON)
 
 			cmdFlags.Set("c", testValue)
 			if vString, err := cmdFlags.GetString("c"); err == nil {
@@ -286,7 +286,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
+			testValue := DefaultTestType.StorageConfig.Connection.Endpoint.String()
 
 			cmdFlags.Set("storage.connection.endpoint", testValue)
 			if vString, err := cmdFlags.GetString("storage.connection.endpoint"); err == nil {
@@ -499,7 +499,7 @@ func TestTestType_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("i"); err == nil {
-				assert.Equal(t, int(cfg.elemValueOrNil(DefaultTestType.IntValue).(int)), vInt)
+				assert.Equal(t, int(DefaultTestType.elemValueOrNil(DefaultTestType.IntValue).(int)), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
