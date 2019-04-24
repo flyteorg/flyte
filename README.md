@@ -16,6 +16,18 @@ This library consists of:
 
    Tool to generate a pflags for all fields in a given struct.
 
+   #### Install
+
+   On POSIX systems, run: `curl -sfL https://raw.githubusercontent.com/lyft/flytestdlib/godownloader/godownloader.sh | sh`
+
+   On Windows:
+
+   Install scoop: `iex (new-object net.webclient).downloadstring('https://get.scoop.sh')`
+
+   Run: `scoop bucket add flytestdlib https://github.com/lyft/flytestdlib.git`
+
+   Run: `scoop install pflags`
+
  - storage
 
    Abstract storage library that uses stow behind the scenes to connect to s3/azure/gcs but also offers configurable factory, in-memory storage (for testing) as well as native protobuf support.
@@ -63,13 +75,13 @@ To create a new release, follow these steps:
 - Create a PR with your changes.
 
 - [Optional] Create an alpha tag on your branch and push that.
-  
+
   - First get existing tags `git describe --abbrev=0 --tags`
-  
+
   - Figure out the next alpha version (e.g. if tag is v1.2.3 then you should create a v1.2.4-alpha.0 tag)
-  
+
   - Create a tag `git tag v1.2.4-alpha.0`
-  
+
   - Push tag `git push --tags`
 
 - Merge your changes and checkout master branch `git checkout master && git pull`
@@ -77,10 +89,10 @@ To create a new release, follow these steps:
 - Bump version tag and push to branch.
 
   - First get existing tags `git describe --abbrev=0 --tags`
-  
+
   - Figure out the next release version (e.g. if tag is v1.2.3 then you should create a v1.2.4 tag or v1.3.0 or a v2.0.0 depending on what has changed. Refer to [Semantic Versioning](https://semver.org/) for information about when to bump each)
-  
+
   - Create a tag `git tag v1.2.4`
-  
+
   - Push tag `git push --tags`
 
