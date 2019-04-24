@@ -1,0 +1,26 @@
+{
+    "version": "0.2.2-alpha.1",
+    "architecture": {
+        "32bit": {
+            "url": "https://github.com/lyft/flytestdlib/releases/download/v0.2.2-alpha.1/flytestdlib_0.2.2-alpha.1_Windows_i386.zip",
+            "bin": [
+                "pflags.exe"
+            ],
+            "hash": "47d5e8405da7ab80e402e4bc02fc935d165b6bd0d7e42a13a728dfb756fc170f"
+        },
+        "64bit": {
+            "url": "https://github.com/lyft/flytestdlib/releases/download/v0.2.2-alpha.1/flytestdlib_0.2.2-alpha.1_Windows_x86_64.zip",
+            "bin": [
+                "pflags.exe"
+            ],
+            "hash": "59a9766bba67bb20fadcbe907137de8ad9d88996147bc3905098457e73103a00"
+        }
+    },
+    "homepage": "https://godoc.org/github.com/lyft/flytestdlib",
+    "license": "Apache-2.0",
+    "description": "Common Go utilities (Typed-Config, PFlags, Prometheus Metrics,... more).",
+    "persist": [
+        "data",
+        "config.toml"
+    ]
+}
