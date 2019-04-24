@@ -1,6 +1,6 @@
 Common Go Tools
 =====================
-[![Current Release](https://img.shields.io/github/release/flytestdlib.svg)](https://github.com/lyft/flytestdlib/releases/latest)
+[![Current Release](https://img.shields.io/github/release/lyft/flytestdlib.svg)](https://github.com/lyft/flytestdlib/releases/latest)
 [![Build Status](https://travis-ci.org/lyft/flytestdlib.svg?branch=master)](https://travis-ci.org/lyft/flytestdlib)
 [![GoDoc](https://godoc.org/github.com/lyft/flytestdlib?status.svg)](https://godoc.org/github.com/lyft/flytestdlib)
 [![License](https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
