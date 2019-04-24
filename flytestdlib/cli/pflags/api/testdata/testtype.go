@@ -4,8 +4,10 @@
 package api
 
 import (
-	"fmt"
+	"encoding/json"
 	"reflect"
+
+	"fmt"
 
 	"github.com/spf13/pflag"
 )
@@ -26,6 +28,15 @@ func (TestType) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (TestType) mustMarshalJSON(v json.Marshaler) string {
+	raw, err := v.MarshalJSON()
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 // GetPFlagSet will return strongly types pflags for all fields in TestType and its nested types. The format of the
 // flags is json-name.json-sub-name... etc.
 func (cfg TestType) GetPFlagSet(prefix string) *pflag.FlagSet {
@@ -36,7 +47,7 @@ func (cfg TestType) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.IntSlice(fmt.Sprintf("%v%v", prefix, "ints"), []int{12, 1}, "")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "strs"), []string{"12", "1"}, "")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "complexArr"), []string{}, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "c"), fmt.Sprintf("%v", DefaultTestType.StringToJSON), "I'm a complex type but can be converted from string.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "c"), DefaultTestType.mustMarshalJSON(DefaultTestType.StringToJSON), "I'm a complex type but can be converted from string.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.type"), DefaultTestType.StorageConfig.Type, "Sets the type of storage to configure [s3/minio/local/mem].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.connection.endpoint"), DefaultTestType.StorageConfig.Connection.Endpoint.String(), "URL for storage client to connect to.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.connection.auth-type"), DefaultTestType.StorageConfig.Connection.AuthType, "Auth Type to use [iam, accesskey].")
@@ -48,6 +59,6 @@ func (cfg TestType) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "storage.cache.max_size_mbs"), DefaultTestType.StorageConfig.Cache.MaxSizeMegabytes, "Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0,  cache is not used")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "storage.cache.target_gc_percent"), DefaultTestType.StorageConfig.Cache.TargetGCPercent, "Sets the garbage collection target percentage.")
 	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "storage.limits.maxDownloadMBs"), DefaultTestType.StorageConfig.Limits.GetLimitMegabytes, "Maximum allowed download size (in MBs) per call.")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "i"), cfg.elemValueOrNil(DefaultTestType.IntValue).(int), "")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "i"), DefaultTestType.elemValueOrNil(DefaultTestType.IntValue).(int), "")
 	return cmdFlags
 }

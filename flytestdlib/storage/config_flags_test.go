@@ -132,7 +132,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
+			testValue := defaultConfig.Connection.Endpoint.String()
 
 			cmdFlags.Set("connection.endpoint", testValue)
 			if vString, err := cmdFlags.GetString("connection.endpoint"); err == nil {

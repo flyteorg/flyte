@@ -20,6 +20,8 @@ var mainTmpl = template.Must(template.New("MainFile").Parse(
 package {{ .Package }}
 
 import (
+	"encoding/json"
+
 	"github.com/spf13/pflag"
 	"fmt"
 {{range $path, $name := .Imports}}
@@ -40,6 +42,15 @@ func ({{ .Name }}) elemValueOrNil(v interface{}) interface{} {
 	}
 
 	return v
+}
+
+func ({{ .Name }}) mustMarshalJSON(v json.Marshaler) string {
+    raw, err := v.MarshalJSON()
+    if err != nil {
+        panic(err)
+    }
+
+    return string(raw)
 }
 
 // GetPFlagSet will return strongly types pflags for all fields in {{ .Name }} and its nested types. The format of the
