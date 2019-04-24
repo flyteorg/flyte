@@ -4,6 +4,10 @@ Common Go Tools
 [![Build Status](https://travis-ci.org/lyft/flytestdlib.svg?branch=master)](https://travis-ci.org/lyft/flytestdlib)
 [![GoDoc](https://godoc.org/github.com/lyft/flytestdlib?status.svg)](https://godoc.org/github.com/lyft/flytestdlib)
 [![License](https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![CodeCoverage](https://img.shields.io/codecov/c/github/lyft/flytestdlib.svg)](https://codecov.io/gh/lyft/flytestdlib)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lyft/flytestdlib)](https://goreportcard.com/report/github.com/lyft/flytestdlib)
+![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flytestdlib.svg?style=plastic)
+![Commit since last releast](https://img.shields.io/github/commits-since/lyft/flytestdlib/latest.svg?style=plastic)
 
 Shared components we found ourselves building time and time again, so we collected them in one place!
 
