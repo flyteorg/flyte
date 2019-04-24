@@ -88,14 +88,14 @@ func TestVersionHandler(t *testing.T) {
 		URL: &testURL,
 	}
 
-	version.BuildTime = time.Now()
+	version.BuildTime = time.Now().String()
 
 	http.DefaultServeMux.ServeHTTP(writer, request)
 	assert.Equal(t, http.StatusOK, writer.Status)
 	assert.NotNil(t, writer.Body)
 	bv := BuildVersion{}
 	assert.NoError(t, json.Unmarshal(writer.Body, &bv))
-	assert.Equal(t, bv.Timestamp.Unix(), version.BuildTime.Unix())
+	assert.Equal(t, bv.Timestamp, version.BuildTime)
 	assert.Equal(t, bv.Build, version.Build)
 	assert.Equal(t, bv.Version, version.Version)
 }

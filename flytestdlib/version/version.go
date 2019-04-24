@@ -17,13 +17,13 @@ var (
 	// Version for the build, should follow a semver
 	Version = "unknown"
 	// Build timestamp
-	BuildTime = time.Now()
+	BuildTime = time.Now().String()
 )
 
 // Use this method to log the build information for the current app. The app name should be provided. To inject the build
 // and version information refer to the top-level comment in this file
 func LogBuildInformation(appName string) {
 	logrus.Info("------------------------------------------------------------------------")
-	logrus.Infof("App [%s], Version [%s], BuildSHA [%s], BuildTS [%s]", appName, Version, Build, BuildTime.String())
+	logrus.Infof("App [%s], Version [%s], BuildSHA [%s], BuildTS [%s]", appName, Version, Build, BuildTime)
 	logrus.Info("------------------------------------------------------------------------")
 }

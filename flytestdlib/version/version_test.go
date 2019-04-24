@@ -20,7 +20,7 @@ func (dFormat) Format(e *logrus.Entry) ([]byte, error) {
 func TestLogBuildInformation(t *testing.T) {
 
 	n := time.Now()
-	BuildTime = n
+	BuildTime = n.String()
 	buf := bytes.NewBufferString("")
 	logrus.SetFormatter(dFormat{})
 	logrus.SetOutput(buf)

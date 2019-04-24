@@ -8,7 +8,7 @@ import (
 var versionCmd = &cobra.Command{
 	Aliases: []string{"version", "ver"},
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Printf("Version: %s\nBuildSHA: %s\nBuildTS: %s\n", version.Version, version.Build, version.BuildTime.String())
+		version.LogBuildInformation("pflags")
 	},
 }
 
