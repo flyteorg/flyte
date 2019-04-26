@@ -26,7 +26,7 @@ parse_args() {
   #BINDIR is ./bin unless set be ENV
   # over-ridden by flag below
 
-  BINDIR=${BINDIR:-./bin}
+  BINDIR=${BINDIR:-${GOPATH}/bin}
   while getopts "b:dh?x" arg; do
     case "$arg" in
       b) BINDIR="$OPTARG" ;;
@@ -66,10 +66,13 @@ is_supported_platform() {
   case "$platform" in
     linux/amd64) found=0 ;;
     linux/386) found=0 ;;
+    linux/x86_64) found=0 ;;
     windows/amd64) found=0 ;;
     windows/386) found=0 ;;
+    windows/x86_64) found=0 ;;
     darwin/amd64) found=0 ;;
     darwin/386) found=0 ;;
+    darwin/x86_64) found=0 ;;
   esac
   return $found
 }
@@ -99,11 +102,28 @@ tag_to_version() {
 }
 adjust_format() {
   # change format (tar.gz or zip) based on OS
-  true
+  FORMAT="tar.gz"
+  case "$os" in
+    darwin) return 0 ;;
+    dragonfly) return 0 ;;
+    freebsd) return 0 ;;
+    linux) return 0 ;;
+    android) return 0 ;;
+    nacl) return 0 ;;
+    netbsd) return 0 ;;
+    openbsd) return 0 ;;
+    plan9) return 0 ;;
+    solaris) return 0 ;;
+  esac
+    FORMAT="zip"
+  return 0
 }
 adjust_os() {
   # adjust archive name based on OS
-  true
+  case "$os" in
+    darwin) OS="macOS";
+  esac
+    return 0;
 }
 adjust_arch() {
   # adjust archive name based on ARCH
@@ -177,7 +197,7 @@ uname_os() {
 uname_arch() {
   arch=$(uname -m)
   case $arch in
-    x86_64) arch="amd64" ;;
+    x86_64) arch="x86_64" ;;
     x86) arch="386" ;;
     i686) arch="386" ;;
     i386) arch="386" ;;
@@ -223,6 +243,7 @@ uname_arch_check() {
     mips64le) return 0 ;;
     s390x) return 0 ;;
     amd64p32) return 0 ;;
+    x86_64) return 0 ;;
   esac
   log_crit "uname_arch_check '$(uname -m)' got converted to '$arch' which is not a GOARCH value.  Please file bug report at https://github.com/client9/shlib"
   return 1
@@ -371,11 +392,12 @@ adjust_arch
 
 log_info "found version: ${VERSION} for ${TAG}/${OS}/${ARCH}"
 
-NAME=
+NAME=${PROJECT_NAME}_${VERSION}_${OS}_${ARCH}
 TARBALL=${NAME}.${FORMAT}
 TARBALL_URL=${GITHUB_DOWNLOAD}/${TAG}/${TARBALL}
 CHECKSUM=checksums.txt
 CHECKSUM_URL=${GITHUB_DOWNLOAD}/${TAG}/${CHECKSUM}
 
+log_info "Tarball url: ${TARBALL_URL}"
 
 execute
