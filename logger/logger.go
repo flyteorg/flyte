@@ -17,7 +17,12 @@ import (
 
 //go:generate gotests -w -all $FILE
 
-const indentLevelKey contextutils.Key = "LoggerIndentLevel"
+const (
+	indentLevelKey contextutils.Key = "LoggerIndentLevel"
+	sourceCodeKey  string           = "src"
+)
+
+var noopLogger = NoopLogger{}
 
 func onConfigUpdated(cfg Config) {
 	logrus.SetLevel(logrus.Level(cfg.Level))
@@ -44,51 +49,35 @@ func onConfigUpdated(cfg Config) {
 }
 
 func getSourceLocation() string {
-	if globalConfig.IncludeSourceCode {
-		_, file, line, ok := runtime.Caller(3)
-		if !ok {
-			file = "???"
-			line = 1
-		} else {
-			slash := strings.LastIndex(file, "/")
-			if slash >= 0 {
-				file = file[slash+1:]
-			}
+	// The reason we pass 3 here: 0 means this function (getSourceLocation), 1 means the getLogger function (only caller
+	// to getSourceLocation, 2 means the logging function (e.g. Debugln), and 3 means the caller for the logging function.
+	_, file, line, ok := runtime.Caller(3)
+	if !ok {
+		file = "???"
+		line = 1
+	} else {
+		slash := strings.LastIndex(file, "/")
+		if slash >= 0 {
+			file = file[slash+1:]
 		}
-
-		return fmt.Sprintf("[%v:%v] ", file, line)
 	}
 
-	return ""
+	return fmt.Sprintf("%v:%v", file, line)
 }
 
-func wrapHeader(ctx context.Context, args ...interface{}) []interface{} {
-	args = append([]interface{}{getIndent(ctx)}, args...)
-
-	if globalConfig.IncludeSourceCode {
-		return append(
-			[]interface{}{
-				fmt.Sprintf("%v", getSourceLocation()),
-			},
-			args...)
+func getLogger(ctx context.Context) logrus.FieldLogger {
+	cfg := GetConfig()
+	if cfg.Mute {
+		return noopLogger
 	}
 
-	return args
-}
-
-func wrapHeaderForMessage(ctx context.Context, message string) string {
-	message = fmt.Sprintf("%v%v", getIndent(ctx), message)
-
-	if globalConfig.IncludeSourceCode {
-		return fmt.Sprintf("%v%v", getSourceLocation(), message)
-	}
-
-	return message
-}
-
-func getLogger(ctx context.Context) *logrus.Entry {
 	entry := logrus.WithFields(logrus.Fields(contextutils.GetLogFields(ctx)))
-	entry.Level = logrus.Level(globalConfig.Level)
+	if cfg.IncludeSourceCode {
+		entry = entry.WithField(sourceCodeKey, getSourceLocation())
+	}
+
+	entry.Level = logrus.Level(cfg.Level)
+
 	return entry
 }
 
@@ -107,231 +96,218 @@ func getIndent(ctx context.Context) string {
 
 // Gets a value indicating whether logs at this level will be written to the logger. This is particularly useful to avoid
 // computing log messages unnecessarily.
-func IsLoggable(ctx context.Context, level Level) bool {
-	return getLogger(ctx).Level >= logrus.Level(level)
+func IsLoggable(_ context.Context, level Level) bool {
+	return GetConfig().Level >= level
 }
 
 // Debug logs a message at level Debug on the standard logger.
 func Debug(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Debug(wrapHeader(ctx, args)...)
+	getLogger(ctx).Debug(args...)
 }
 
 // Print logs a message at level Info on the standard logger.
 func Print(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Print(wrapHeader(ctx, args)...)
+	getLogger(ctx).Print(args...)
 }
 
 // Info logs a message at level Info on the standard logger.
 func Info(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Info(wrapHeader(ctx, args)...)
+	getLogger(ctx).Info(args...)
 }
 
 // Warn logs a message at level Warn on the standard logger.
 func Warn(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Warn(wrapHeader(ctx, args)...)
+	getLogger(ctx).Warn(args...)
 }
 
 // Warning logs a message at level Warn on the standard logger.
 func Warning(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Warning(wrapHeader(ctx, args)...)
+	getLogger(ctx).Warning(args...)
 }
 
 // Error logs a message at level Error on the standard logger.
 func Error(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Error(wrapHeader(ctx, args)...)
+	getLogger(ctx).Error(args...)
 }
 
 // Panic logs a message at level Panic on the standard logger.
 func Panic(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Panic(wrapHeader(ctx, args)...)
+	getLogger(ctx).Panic(args...)
 }
 
 // Fatal logs a message at level Fatal on the standard logger.
 func Fatal(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Fatal(wrapHeader(ctx, args)...)
+	getLogger(ctx).Fatal(args...)
 }
 
 // Debugf logs a message at level Debug on the standard logger.
 func Debugf(ctx context.Context, format string, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Debugf(wrapHeaderForMessage(ctx, format), args...)
+	getLogger(ctx).Debugf(format, args...)
 }
 
 // Printf logs a message at level Info on the standard logger.
 func Printf(ctx context.Context, format string, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Printf(wrapHeaderForMessage(ctx, format), args...)
+	getLogger(ctx).Printf(format, args...)
 }
 
 // Infof logs a message at level Info on the standard logger.
 func Infof(ctx context.Context, format string, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Infof(wrapHeaderForMessage(ctx, format), args...)
+	getLogger(ctx).Infof(format, args...)
 }
 
 // InfofNoCtx logs a formatted message without context.
 func InfofNoCtx(format string, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
 	getLogger(context.TODO()).Infof(format, args...)
 }
 
 // Warnf logs a message at level Warn on the standard logger.
 func Warnf(ctx context.Context, format string, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Warnf(wrapHeaderForMessage(ctx, format), args...)
+	getLogger(ctx).Warnf(format, args...)
 }
 
 // Warningf logs a message at level Warn on the standard logger.
 func Warningf(ctx context.Context, format string, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Warningf(wrapHeaderForMessage(ctx, format), args...)
+	getLogger(ctx).Warningf(format, args...)
 }
 
 // Errorf logs a message at level Error on the standard logger.
 func Errorf(ctx context.Context, format string, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Errorf(wrapHeaderForMessage(ctx, format), args...)
+	getLogger(ctx).Errorf(format, args...)
 }
 
 // Panicf logs a message at level Panic on the standard logger.
 func Panicf(ctx context.Context, format string, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Panicf(wrapHeaderForMessage(ctx, format), args...)
+	getLogger(ctx).Panicf(format, args...)
 }
 
 // Fatalf logs a message at level Fatal on the standard logger.
 func Fatalf(ctx context.Context, format string, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Fatalf(wrapHeaderForMessage(ctx, format), args...)
+	getLogger(ctx).Fatalf(format, args...)
 }
 
 // Debugln logs a message at level Debug on the standard logger.
 func Debugln(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Debugln(wrapHeader(ctx, args)...)
+	getLogger(ctx).Debugln(args...)
 }
 
 // Println logs a message at level Info on the standard logger.
 func Println(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Println(wrapHeader(ctx, args)...)
+	getLogger(ctx).Println(args...)
 }
 
 // Infoln logs a message at level Info on the standard logger.
 func Infoln(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Infoln(wrapHeader(ctx, args)...)
+	getLogger(ctx).Infoln(args...)
 }
 
 // Warnln logs a message at level Warn on the standard logger.
 func Warnln(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Warnln(wrapHeader(ctx, args)...)
+	getLogger(ctx).Warnln(args...)
 }
 
 // Warningln logs a message at level Warn on the standard logger.
 func Warningln(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Warningln(wrapHeader(ctx, args)...)
+	getLogger(ctx).Warningln(args...)
 }
 
 // Errorln logs a message at level Error on the standard logger.
 func Errorln(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Errorln(wrapHeader(ctx, args)...)
+	getLogger(ctx).Errorln(args...)
 }
 
 // Panicln logs a message at level Panic on the standard logger.
 func Panicln(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
-
-	getLogger(ctx).Panicln(wrapHeader(ctx, args)...)
+	getLogger(ctx).Panicln(args...)
 }
 
 // Fatalln logs a message at level Fatal on the standard logger.
 func Fatalln(ctx context.Context, args ...interface{}) {
-	if globalConfig.Mute {
-		return
-	}
+	getLogger(ctx).Fatalln(args...)
+}
 
-	getLogger(ctx).Fatalln(wrapHeader(ctx, args)...)
+type NoopLogger struct {
+}
+
+func (NoopLogger) WithField(key string, value interface{}) *logrus.Entry {
+	return nil
+}
+
+func (NoopLogger) WithFields(fields logrus.Fields) *logrus.Entry {
+	return nil
+}
+
+func (NoopLogger) WithError(err error) *logrus.Entry {
+	return nil
+}
+
+func (NoopLogger) Debugf(format string, args ...interface{}) {
+}
+
+func (NoopLogger) Infof(format string, args ...interface{}) {
+}
+
+func (NoopLogger) Warnf(format string, args ...interface{}) {
+}
+
+func (NoopLogger) Warningf(format string, args ...interface{}) {
+}
+
+func (NoopLogger) Errorf(format string, args ...interface{}) {
+}
+
+func (NoopLogger) Debug(args ...interface{}) {
+}
+
+func (NoopLogger) Info(args ...interface{}) {
+}
+
+func (NoopLogger) Warn(args ...interface{}) {
+}
+
+func (NoopLogger) Warning(args ...interface{}) {
+}
+
+func (NoopLogger) Error(args ...interface{}) {
+}
+
+func (NoopLogger) Debugln(args ...interface{}) {
+}
+
+func (NoopLogger) Infoln(args ...interface{}) {
+}
+
+func (NoopLogger) Warnln(args ...interface{}) {
+}
+
+func (NoopLogger) Warningln(args ...interface{}) {
+}
+
+func (NoopLogger) Errorln(args ...interface{}) {
+}
+
+func (NoopLogger) Print(...interface{}) {
+}
+
+func (NoopLogger) Printf(string, ...interface{}) {
+}
+
+func (NoopLogger) Println(...interface{}) {
+}
+
+func (NoopLogger) Fatal(...interface{}) {
+}
+
+func (NoopLogger) Fatalf(string, ...interface{}) {
+}
+
+func (NoopLogger) Fatalln(...interface{}) {
+}
+
+func (NoopLogger) Panic(...interface{}) {
+}
+
+func (NoopLogger) Panicf(string, ...interface{}) {
+}
+
+func (NoopLogger) Panicln(...interface{}) {
 }

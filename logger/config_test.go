@@ -1,10 +1,14 @@
 package logger
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestSetConfig(t *testing.T) {
 	type args struct {
-		cfg Config
+		cfg *Config
 	}
 	tests := []struct {
 		name string
@@ -14,7 +18,7 @@ func TestSetConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			SetConfig(tt.args.cfg)
+			assert.NoError(t, SetConfig(tt.args.cfg))
 		})
 	}
 }

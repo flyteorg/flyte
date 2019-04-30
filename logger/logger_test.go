@@ -6,7 +6,6 @@ package logger
 import (
 	"context"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -14,46 +13,11 @@ import (
 )
 
 func init() {
-	SetConfig(Config{
+	if err := SetConfig(&Config{
 		Level:             InfoLevel,
 		IncludeSourceCode: true,
-	})
-}
-
-func Test_getSourceLocation(t *testing.T) {
-	tests := []struct {
-		name string
-		want string
-	}{
-		{"current", " "},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getSourceLocation(); !strings.HasSuffix(got, tt.want) {
-				t.Errorf("getSourceLocation() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_wrapHeaderForMessage(t *testing.T) {
-	type args struct {
-		message string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{"no args", args{message: ""}, " "},
-		{"1 arg", args{message: "hello"}, " hello"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := wrapHeaderForMessage(context.TODO(), tt.args.message); !strings.HasSuffix(got, tt.want) {
-				t.Errorf("wrapHeaderForMessage() = %v, want %v", got, tt.want)
-			}
-		})
+	}); err != nil {
+		panic(err)
 	}
 }
 
@@ -484,27 +448,6 @@ func TestPanicln(t *testing.T) {
 			assert.Panics(t, func() {
 				Panicln(tt.args.ctx, tt.args.args...)
 			})
-		})
-	}
-}
-
-func Test_wrapHeader(t *testing.T) {
-	type args struct {
-		ctx  context.Context
-		args []interface{}
-	}
-	tests := []struct {
-		name string
-		args args
-		want []interface{}
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := wrapHeader(tt.args.ctx, tt.args.args...); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("wrapHeader() = %v, want %v", got, tt.want)
-			}
 		})
 	}
 }

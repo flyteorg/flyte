@@ -61,7 +61,14 @@ func healtcheckHandler(w http.ResponseWriter, req *http.Request) {
 
 // Handler that returns a JSON response indicating the Build Version information (refer to #version module)
 func versionHandler(w http.ResponseWriter, req *http.Request) {
-	err := WriteJSONResponse(w, http.StatusOK, BuildVersion{Build: version.Build, Version: version.Version, Timestamp: version.BuildTime})
+	err := WriteJSONResponse(
+		w,
+		http.StatusOK,
+		BuildVersion{
+			Build:     version.Build,
+			Version:   version.Version,
+			Timestamp: version.BuildTime,
+		})
 	if err != nil {
 		panic(err)
 	}

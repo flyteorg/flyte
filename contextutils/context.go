@@ -4,22 +4,24 @@ package contextutils
 import (
 	"context"
 	"fmt"
+	"runtime/pprof"
 )
 
 type Key string
 
 const (
-	AppNameKey    Key = "app_name"
-	NamespaceKey  Key = "ns"
-	TaskTypeKey   Key = "tasktype"
-	ProjectKey    Key = "project"
-	DomainKey     Key = "domain"
-	WorkflowIDKey Key = "wf"
-	NodeIDKey     Key = "node"
-	TaskIDKey     Key = "task"
-	ExecIDKey     Key = "exec_id"
-	JobIDKey      Key = "job_id"
-	PhaseKey      Key = "phase"
+	AppNameKey      Key = "app_name"
+	NamespaceKey    Key = "ns"
+	TaskTypeKey     Key = "tasktype"
+	ProjectKey      Key = "project"
+	DomainKey       Key = "domain"
+	WorkflowIDKey   Key = "wf"
+	NodeIDKey       Key = "node"
+	TaskIDKey       Key = "task"
+	ExecIDKey       Key = "exec_id"
+	JobIDKey        Key = "job_id"
+	PhaseKey        Key = "phase"
+	RoutineLabelKey Key = "routine"
 )
 
 func (k Key) String() string {
@@ -35,6 +37,7 @@ var logKeys = []Key{
 	WorkflowIDKey,
 	TaskTypeKey,
 	PhaseKey,
+	RoutineLabelKey,
 }
 
 // Gets a new context with namespace set.
@@ -98,6 +101,14 @@ func WithTaskType(ctx context.Context, taskType string) context.Context {
 	return context.WithValue(ctx, TaskTypeKey, taskType)
 }
 
+// Gets a new context with Go Routine label key set and a label assigned to the context using pprof.Labels.
+// You can then call pprof.SetGoroutineLabels(ctx) to annotate the current go-routine and have that show up in
+// pprof analysis.
+func WithGoroutineLabel(ctx context.Context, routineLabel string) context.Context {
+	ctx = pprof.WithLabels(ctx, pprof.Labels(RoutineLabelKey.String(), routineLabel))
+	return context.WithValue(ctx, RoutineLabelKey, routineLabel)
+}
+
 func addFieldIfNotNil(ctx context.Context, m map[string]interface{}, fieldKey Key) {
 	val := ctx.Value(fieldKey)
 	if val != nil {
@@ -110,6 +121,7 @@ func addStringFieldWithDefaults(ctx context.Context, m map[string]string, fieldK
 	if val == nil {
 		val = ""
 	}
+
 	m[fieldKey.String()] = val.(string)
 }
 
@@ -120,6 +132,7 @@ func GetLogFields(ctx context.Context) map[string]interface{} {
 	for _, k := range logKeys {
 		addFieldIfNotNil(ctx, res, k)
 	}
+
 	return res
 }
 
@@ -128,6 +141,7 @@ func Value(ctx context.Context, key Key) string {
 	if val != nil {
 		return val.(string)
 	}
+
 	return ""
 }
 
@@ -136,5 +150,6 @@ func Values(ctx context.Context, keys ...Key) map[string]string {
 	for _, k := range keys {
 		addStringFieldWithDefaults(ctx, res, k)
 	}
+
 	return res
 }
