@@ -2,6 +2,7 @@ package contextutils
 
 import (
 	"context"
+	"runtime/pprof"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -110,4 +111,13 @@ func TestValues(t *testing.T) {
 	assert.Equal(t, 2, len(m))
 	assert.Equal(t, "flyte", m[WorkflowIDKey.String()])
 	assert.Equal(t, "", m[ProjectKey.String()])
+}
+
+func TestWithGoroutineLabel(t *testing.T) {
+	ctx := context.Background()
+	ctx = WithGoroutineLabel(ctx, "my_routine_123")
+	pprof.SetGoroutineLabels(ctx)
+	m := Values(ctx, RoutineLabelKey)
+	assert.Equal(t, 1, len(m))
+	assert.Equal(t, "my_routine_123", m[RoutineLabelKey.String()])
 }

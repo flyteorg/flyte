@@ -21,12 +21,18 @@ const (
 	jsonDataKey string = "json"
 )
 
-var defaultConfig = &Config{
-	Formatter: FormatterConfig{
-		Type: FormatterJSON,
-	},
-	Level: InfoLevel,
-}
+var (
+	defaultConfig = &Config{
+		Formatter: FormatterConfig{
+			Type: FormatterJSON,
+		},
+		Level: InfoLevel,
+	}
+
+	configSection = config.MustRegisterSectionWithUpdates(configSectionKey, defaultConfig, func(ctx context.Context, newValue config.Config) {
+		onConfigUpdated(*newValue.(*Config))
+	})
+)
 
 // Global logger config.
 type Config struct {
@@ -47,13 +53,18 @@ type FormatterConfig struct {
 	Type FormatterType `json:"type" pflag:",Sets logging format type."`
 }
 
-var globalConfig = Config{}
-
 // Sets global logger config
-func SetConfig(cfg Config) {
-	globalConfig = cfg
+func SetConfig(cfg *Config) error {
+	if err := configSection.SetConfig(cfg); err != nil {
+		return err
+	}
 
-	onConfigUpdated(cfg)
+	onConfigUpdated(*cfg)
+	return nil
+}
+
+func GetConfig() *Config {
+	return configSection.GetConfig().(*Config)
 }
 
 // Level type.
@@ -78,9 +89,3 @@ const (
 	// DebugLevel level. Usually only enabled when debugging. Very verbose logging.
 	DebugLevel
 )
-
-func init() {
-	config.MustRegisterSectionWithUpdates(configSectionKey, defaultConfig, func(ctx context.Context, newValue config.Config) {
-		SetConfig(*newValue.(*Config))
-	})
-}

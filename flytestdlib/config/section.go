@@ -199,6 +199,10 @@ func (r *section) SetConfig(c Config) error {
 	r.lockObj.Lock()
 	defer r.lockObj.Unlock()
 
+	if reflect.TypeOf(c).Kind() != reflect.Ptr {
+		return fmt.Errorf("config must be a Pointer")
+	}
+
 	if !DeepEqual(r.config, c) {
 		r.config = c
 		r.isDirty.Store(true)
