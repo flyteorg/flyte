@@ -64,9 +64,18 @@ func (v viperAccessor) InitializePflags(cmdFlags *pflag.FlagSet) {
 }
 
 func (v viperAccessor) addSectionsPFlags(flags *pflag.FlagSet) (err error) {
-	for key, section := range v.rootConfig.GetSections() {
+	return v.addSubsectionsPFlags(flags, "", v.rootConfig)
+}
+
+func (v viperAccessor) addSubsectionsPFlags(flags *pflag.FlagSet, rootKey string, root config.Section) error {
+	for key, section := range root.GetSections() {
+		prefix := rootKey + key + keyDelim
 		if asPFlagProvider, ok := section.GetConfig().(config.PFlagProvider); ok {
-			flags.AddFlagSet(asPFlagProvider.GetPFlagSet(key + keyDelim))
+			flags.AddFlagSet(asPFlagProvider.GetPFlagSet(prefix))
+		}
+
+		if err := v.addSubsectionsPFlags(flags, prefix, section); err != nil {
+			return err
 		}
 	}
 

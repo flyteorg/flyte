@@ -159,6 +159,36 @@ func TestAccessor_InitializePflags(t *testing.T) {
 			assert.Equal(t, 4, otherC.IntValue)
 			assert.Equal(t, []string{"default value"}, otherC.StringArrayWithDefaults)
 		})
+
+		t.Run(fmt.Sprintf("[%v] Sub-sections", provider(config.Options{}).ID()), func(t *testing.T) {
+			reg := config.NewRootSection()
+			sec, err := reg.RegisterSection(MyComponentSectionKey, &MyComponentConfig{})
+			assert.NoError(t, err)
+
+			_, err = sec.RegisterSection("nested", &OtherComponentConfig{})
+			assert.NoError(t, err)
+
+			v := provider(config.Options{
+				SearchPaths: []string{filepath.Join("testdata", "nested_config.yaml")},
+				RootSection: reg,
+			})
+
+			set := pflag.NewFlagSet("test", pflag.ExitOnError)
+			v.InitializePflags(set)
+			assert.NoError(t, set.Parse([]string{"--my-component.nested.int-val=3"}))
+			assert.True(t, set.Parsed())
+
+			flagValue, err := set.GetInt("my-component.nested.int-val")
+			assert.NoError(t, err)
+			assert.Equal(t, 3, flagValue)
+
+			assert.NoError(t, v.UpdateConfig(context.TODO()))
+			r := reg.GetSection(MyComponentSectionKey).GetConfig().(*MyComponentConfig)
+			assert.Equal(t, "Hello World", r.StringValue)
+
+			nested := sec.GetSection("nested").GetConfig().(*OtherComponentConfig)
+			assert.Equal(t, 3, nested.IntValue)
+		})
 	}
 }
 
