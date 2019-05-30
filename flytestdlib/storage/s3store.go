@@ -68,8 +68,9 @@ func newS3RawStore(cfg *Config, metricsScope promutils.Scope) (RawStore, error) 
 					logger.Infof(context.TODO(), "Storage init-container already exists [%v].", cfg.InitContainer)
 					return NewStowRawStore(s3FQN(c.Name()), c, metricsScope)
 				}
+				return emptyStore, fmt.Errorf("unable to initialize container [%v]. Error: %v", cfg.InitContainer, err)
 			}
-			return emptyStore, fmt.Errorf("unable to initialize container [%v]. Error: %v", cfg.InitContainer, err)
+			return NewStowRawStore(s3FQN(c.Name()), c, metricsScope)
 		}
 		return emptyStore, err
 	}
