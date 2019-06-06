@@ -149,7 +149,7 @@ func (v viperAccessor) updateConfig(ctx context.Context, r config.Section) error
 		})
 	}
 
-	return v.RefreshFromConfig(ctx, r)
+	return v.RefreshFromConfig(ctx, r, true)
 }
 
 func (v viperAccessor) UpdateConfig(ctx context.Context) error {
@@ -287,7 +287,7 @@ func decode(input interface{}, config *mapstructure.DecoderConfig) error {
 
 func (v viperAccessor) configChangeHandler() {
 	ctx := context.Background()
-	err := v.RefreshFromConfig(ctx, v.rootConfig)
+	err := v.RefreshFromConfig(ctx, v.rootConfig, false)
 	if err != nil {
 		// TODO: Retry? panic?
 		logger.Printf(ctx, "Failed to update config. Error: %v", err)
@@ -296,20 +296,20 @@ func (v viperAccessor) configChangeHandler() {
 	}
 }
 
-func (v viperAccessor) RefreshFromConfig(ctx context.Context, r config.Section) error {
+func (v viperAccessor) RefreshFromConfig(ctx context.Context, r config.Section, forceSendUpdates bool) error {
 	err := v.parseViperConfig(r)
 	if err != nil {
 		return err
 	}
 
-	v.sendUpdatedEvents(ctx, r, "")
+	v.sendUpdatedEvents(ctx, r, forceSendUpdates, "")
 
 	return nil
 }
 
-func (v viperAccessor) sendUpdatedEvents(ctx context.Context, root config.Section, sectionKey config.SectionKey) {
+func (v viperAccessor) sendUpdatedEvents(ctx context.Context, root config.Section, forceSend bool, sectionKey config.SectionKey) {
 	for key, section := range root.GetSections() {
-		if !section.GetConfigChangedAndClear() {
+		if !section.GetConfigChangedAndClear() && !forceSend {
 			logger.Infof(ctx, "Config section [%v] hasn't changed.", sectionKey+key)
 		} else if section.GetConfigUpdatedHandler() == nil {
 			logger.Infof(ctx, "Config section [%v] updated. No update handler registered.", sectionKey+key)
@@ -318,7 +318,7 @@ func (v viperAccessor) sendUpdatedEvents(ctx context.Context, root config.Sectio
 			section.GetConfigUpdatedHandler()(ctx, section.GetConfig())
 		}
 
-		v.sendUpdatedEvents(ctx, section, sectionKey+key+keyDelim)
+		v.sendUpdatedEvents(ctx, section, forceSend, sectionKey+key+keyDelim)
 	}
 }
 
