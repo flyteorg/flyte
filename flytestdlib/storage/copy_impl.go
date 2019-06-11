@@ -39,6 +39,7 @@ func (c copyImpl) CopyRaw(ctx context.Context, source, destination DataReference
 			return err
 		}
 
+		rc = ioutils.NewBytesReadCloser(raw)
 		length = int64(len(raw))
 	}
 
