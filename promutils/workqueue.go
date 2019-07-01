@@ -31,6 +31,26 @@ func init() {
 
 type prometheusMetricsProvider struct{}
 
+func (prometheusMetricsProvider) NewUnfinishedWorkSecondsMetric(name string) workqueue.SettableGaugeMetric {
+	unfinishedWork := prometheus.NewGauge(prometheus.GaugeOpts{
+		Subsystem: name,
+		Name:      "unfinished_work_s",
+		Help:      "How many seconds of work in progress in workqueue: " + name,
+	})
+	prometheus.MustRegister(unfinishedWork)
+	return unfinishedWork
+}
+
+func (prometheusMetricsProvider) NewLongestRunningProcessorMicrosecondsMetric(name string) workqueue.SettableGaugeMetric {
+	unfinishedWork := prometheus.NewGauge(prometheus.GaugeOpts{
+		Subsystem: name,
+		Name:      "longest_running_processor_us",
+		Help:      "How many microseconds longest running processor from workqueue" + name + " takes.",
+	})
+	prometheus.MustRegister(unfinishedWork)
+	return unfinishedWork
+}
+
 func (prometheusMetricsProvider) NewDepthMetric(name string) workqueue.GaugeMetric {
 	depth := prometheus.NewGauge(prometheus.GaugeOpts{
 		Subsystem: name,
