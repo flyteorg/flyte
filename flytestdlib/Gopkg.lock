@@ -128,14 +128,6 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:1ba1d79f2810270045c328ae5d674321db34e3aae468eb4233883b473c5c0467"
-  name = "github.com/golang/glog"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
-
-[[projects]]
   digest = "1:9d6dc4d6de69b330d0de86494d6db90c09848c003d5db748f40c925f865c8534"
   name = "github.com/golang/protobuf"
   packages = [
@@ -465,7 +457,7 @@
   version = "v2.2.2"
 
 [[projects]]
-  digest = "1:5922c4db083d03579c576df514f096003f422b602aeb30028aedd892b69a4876"
+  digest = "1:074fb0a8da1e416b8a201e8e664c303ae610f316ffd615b678b636d27c225412"
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/util/clock",
@@ -474,16 +466,24 @@
     "pkg/util/wait",
   ]
   pruneopts = "UT"
-  revision = "103fd098999dc9c0c88536f5c9ad2e5da39373ae"
-  version = "kubernetes-1.11.2"
+  revision = "2b1284ed4c93a43499e781493253e2ac5959c4fd"
+  version = "kubernetes-1.13.1"
 
 [[projects]]
-  digest = "1:8d66fef1249b9b2105840377af3bab078604d3c298058f563685e88d2a9e6ad3"
+  digest = "1:b6412f8acd9a9fc6fb67302c24966618b16501b9d769a20bee42ce61e510c92c"
   name = "k8s.io/client-go"
   packages = ["util/workqueue"]
   pruneopts = "UT"
-  revision = "1f13a808da65775f22cbf47862c4e5898d8f4ca1"
-  version = "kubernetes-1.11.2"
+  revision = "8d9ed539ba3134352c586810e749e58df4e94e4f"
+  version = "kubernetes-1.13.1"
+
+[[projects]]
+  digest = "1:c283ca5951eb7d723d3300762f96ff94c2ea11eaceb788279e2b7327f92e4f2a"
+  name = "k8s.io/klog"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d98d8acdac006fb39831f1b25640813fef9c314f"
+  version = "v0.3.3"
 
 [solve-meta]
   analyzer-name = "dep"
