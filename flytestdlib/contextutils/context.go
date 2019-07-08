@@ -22,6 +22,7 @@ const (
 	JobIDKey        Key = "job_id"
 	PhaseKey        Key = "phase"
 	RoutineLabelKey Key = "routine"
+	LaunchPlanIDKey Key = "lp"
 )
 
 func (k Key) String() string {
@@ -38,6 +39,7 @@ var logKeys = []Key{
 	TaskTypeKey,
 	PhaseKey,
 	RoutineLabelKey,
+	LaunchPlanIDKey,
 }
 
 // Gets a new context with namespace set.
@@ -83,6 +85,11 @@ func WithNodeID(ctx context.Context, nodeID string) context.Context {
 // Gets a new context with WorkflowName set.
 func WithWorkflowID(ctx context.Context, workflow string) context.Context {
 	return context.WithValue(ctx, WorkflowIDKey, workflow)
+}
+
+// Gets a new context with a launch plan ID set.
+func WithLaunchPlanID(ctx context.Context, launchPlan string) context.Context {
+	return context.WithValue(ctx, LaunchPlanIDKey, launchPlan)
 }
 
 // Get new context with Project and Domain values set
