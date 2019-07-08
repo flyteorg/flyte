@@ -69,6 +69,13 @@ func TestWithWorkflowID(t *testing.T) {
 	assert.Equal(t, "flyte", ctx.Value(WorkflowIDKey))
 }
 
+func TestWithLaunchPlanID(t *testing.T) {
+	ctx := context.Background()
+	assert.Nil(t, ctx.Value(LaunchPlanIDKey))
+	ctx = WithLaunchPlanID(ctx, "flytelp")
+	assert.Equal(t, "flytelp", ctx.Value(LaunchPlanIDKey))
+}
+
 func TestWithNodeID(t *testing.T) {
 	ctx := context.Background()
 	assert.Nil(t, ctx.Value(NodeIDKey))

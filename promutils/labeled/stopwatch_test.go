@@ -11,6 +11,7 @@ import (
 )
 
 func TestLabeledStopWatch(t *testing.T) {
+	UnsetMetricKeys()
 	assert.NotPanics(t, func() {
 		SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 	})

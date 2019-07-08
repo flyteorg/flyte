@@ -18,11 +18,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func init() {
-	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
-}
-
 func TestNewCachedStore(t *testing.T) {
+	resetMetricKeys()
 
 	t.Run("CachingDisabled", func(t *testing.T) {
 		testScope := promutils.NewTestScope()
@@ -48,6 +45,11 @@ func TestNewCachedStore(t *testing.T) {
 		assert.NotNil(t, cStore)
 		assert.NotNil(t, cStore.(*cachedRawStore).cache)
 	})
+}
+
+func resetMetricKeys() {
+	labeled.UnsetMetricKeys()
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 }
 
 func dummyCacheStore(t *testing.T, store RawStore, scope promutils.Scope) *cachedRawStore {
@@ -86,6 +88,7 @@ func (d *dummyStore) WriteRaw(ctx context.Context, reference DataReference, size
 }
 
 func TestCachedRawStore(t *testing.T) {
+	resetMetricKeys()
 	ctx := context.TODO()
 	k1 := DataReference("k1")
 	k2 := DataReference("k2")

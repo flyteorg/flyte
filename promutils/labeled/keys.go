@@ -15,11 +15,11 @@ var (
 
 	// Metric Keys to label metrics with. These keys get pulled from context if they are present. Use contextutils to fill
 	// them in.
-	metricKeys = make([]contextutils.Key, 0)
+	metricKeys []contextutils.Key
 
 	// :(, we have to create a separate list to satisfy the MustNewCounterVec API as it accepts string only
-	metricStringKeys = make([]string, 0)
-	metricKeysAreSet = sync.Once{}
+	metricStringKeys []string
+	metricKeysAreSet sync.Once
 )
 
 // Sets keys to use with labeled metrics. The values of these keys will be pulled from context at runtime.
@@ -44,4 +44,15 @@ func SetMetricKeys(keys ...contextutils.Key) {
 
 func GetUnlabeledMetricName(metricName string) string {
 	return metricName + "_unlabeled"
+}
+
+// Warning: This function is not thread safe and should be used for testing only outside of this package.
+func UnsetMetricKeys() {
+	metricKeys = make([]contextutils.Key, 0)
+	metricStringKeys = make([]string, 0)
+	metricKeysAreSet = sync.Once{}
+}
+
+func init() {
+	UnsetMetricKeys()
 }
