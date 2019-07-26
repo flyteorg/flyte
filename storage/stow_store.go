@@ -5,6 +5,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/lyft/flytestdlib/errors"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/lyft/flytestdlib/promutils"
@@ -116,7 +118,7 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 	}
 
 	if sizeBytes/MiB > GetConfig().Limits.GetLimitMegabytes {
-		return nil, ErrExceedsLimit
+		return nil, errors.Wrapf(ErrExceedsLimit, err, "limit exceeded")
 	}
 
 	return item.Open()

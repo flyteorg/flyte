@@ -7,6 +7,8 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/lyft/flytestdlib/errors"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/lyft/flytestdlib/promutils"
@@ -75,11 +77,11 @@ func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (
 
 	err = s.cache.Set(key, b, 0)
 	if err != nil {
-		// TODO Ignore errors in writing to cache?
 		logger.Debugf(ctx, "Failed to Cache the metadata")
+		err = errors.Wrapf(ErrFailedToWriteCache, err, "Failed to Cache the metadata")
 	}
 
-	return ioutils.NewBytesReadCloser(b), nil
+	return ioutils.NewBytesReadCloser(b), err
 }
 
 // Stores a raw byte array.
@@ -94,9 +96,9 @@ func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, 
 	err = s.cache.Set([]byte(reference), buf.Bytes(), neverExpire)
 	if err != nil {
 		s.metrics.CacheWriteError.Inc()
+		err = errors.Wrapf(ErrFailedToWriteCache, err, "Failed to Cache the metadata")
 	}
 
-	// TODO ignore errors?
 	return err
 }
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"runtime/debug"
 	"testing"
 
@@ -92,8 +93,12 @@ func TestCachedRawStore(t *testing.T) {
 	ctx := context.TODO()
 	k1 := DataReference("k1")
 	k2 := DataReference("k2")
+	bigK := DataReference("bigK")
 	d1 := []byte("abc")
 	d2 := []byte("xyz")
+	bigD := make([]byte, 1.5*1024*1024)
+	// #nosec G404
+	rand.Read(bigD)
 	writeCalled := false
 	readCalled := false
 	store := &dummyStore{
@@ -113,6 +118,11 @@ func TestCachedRawStore(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, d2, b)
 				return nil
+			} else if reference == "bigK" {
+				b, err := ioutil.ReadAll(raw)
+				assert.NoError(t, err)
+				assert.Equal(t, bigD, b)
+				return nil
 			}
 			return fmt.Errorf("err")
 		},
@@ -123,6 +133,8 @@ func TestCachedRawStore(t *testing.T) {
 			readCalled = true
 			if reference == "k1" {
 				return ioutils.NewBytesReadCloser(d1), nil
+			} else if reference == "bigK" {
+				return ioutils.NewBytesReadCloser(bigD), nil
 			}
 			return nil, fmt.Errorf("err")
 		},
@@ -182,4 +194,18 @@ func TestCachedRawStore(t *testing.T) {
 		assert.False(t, readCalled)
 	})
 
+	t.Run("WriteAndReadBigData", func(t *testing.T) {
+		writeCalled = false
+		readCalled = false
+		err := cStore.WriteRaw(ctx, bigK, int64(len(bigD)), Options{}, bytes.NewReader(bigD))
+		assert.True(t, writeCalled)
+		assert.True(t, IsFailedWriteToCache(err))
+
+		o, err := cStore.ReadRaw(ctx, bigK)
+		assert.True(t, IsFailedWriteToCache(err))
+		b, err := ioutil.ReadAll(o)
+		assert.NoError(t, err)
+		assert.Equal(t, bigD, b)
+		assert.True(t, readCalled)
+	})
 }
