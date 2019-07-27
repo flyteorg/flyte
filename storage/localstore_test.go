@@ -7,7 +7,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
 
 	"github.com/lyft/flytestdlib/config"
 	"github.com/lyft/flytestdlib/internal/utils"
@@ -15,6 +17,7 @@ import (
 )
 
 func TestNewLocalStore(t *testing.T) {
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 	t.Run("Valid config", func(t *testing.T) {
 		testScope := promutils.NewTestScope()
 		store, err := newLocalRawStore(&Config{
@@ -28,7 +31,7 @@ func TestNewLocalStore(t *testing.T) {
 		assert.NotNil(t, store)
 
 		// Stow local store expects the full path after the container portion (looks like a bug to me)
-		rc, err := store.ReadRaw(context.TODO(), DataReference("file://testdata/testdata/config.yaml"))
+		rc, err := store.ReadRaw(context.TODO(), DataReference("file://testdata/config.yaml"))
 		assert.NoError(t, err)
 		assert.NotNil(t, rc)
 		assert.NoError(t, rc.Close())

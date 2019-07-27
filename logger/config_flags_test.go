@@ -221,3 +221,36 @@ func TestConfig_elemValueOrNil(t *testing.T) {
 		})
 	}
 }
+
+func TestConfig_mustMarshalJSON(t *testing.T) {
+	type fields struct {
+		IncludeSourceCode bool
+		Mute              bool
+		Level             Level
+		Formatter         FormatterConfig
+	}
+	type args struct {
+		v json.Marshaler
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := Config{
+				IncludeSourceCode: tt.fields.IncludeSourceCode,
+				Mute:              tt.fields.Mute,
+				Level:             tt.fields.Level,
+				Formatter:         tt.fields.Formatter,
+			}
+			if got := c.mustMarshalJSON(tt.args.v); got != tt.want {
+				t.Errorf("Config.mustMarshalJSON() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
