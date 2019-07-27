@@ -4,8 +4,10 @@
 package logger
 
 import (
-	"fmt"
+	"encoding/json"
 	"reflect"
+
+	"fmt"
 
 	"github.com/spf13/pflag"
 )
@@ -24,6 +26,15 @@ func (Config) elemValueOrNil(v interface{}) interface{} {
 	}
 
 	return v
+}
+
+func (Config) mustMarshalJSON(v json.Marshaler) string {
+	raw, err := v.MarshalJSON()
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
 }
 
 // GetPFlagSet will return strongly types pflags for all fields in Config and its nested types. The format of the

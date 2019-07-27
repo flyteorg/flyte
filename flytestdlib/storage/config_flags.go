@@ -4,8 +4,10 @@
 package storage
 
 import (
-	"fmt"
+	"encoding/json"
 	"reflect"
+
+	"fmt"
 
 	"github.com/spf13/pflag"
 )
@@ -26,11 +28,20 @@ func (Config) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (Config) mustMarshalJSON(v json.Marshaler) string {
+	raw, err := v.MarshalJSON()
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 // GetPFlagSet will return strongly types pflags for all fields in Config and its nested types. The format of the
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, "Sets the type of storage to configure [s3/minio/local/mem].")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, "Sets the type of storage to configure [s3/minio/local/mem/stow].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.endpoint"), defaultConfig.Connection.Endpoint.String(), "URL for storage client to connect to.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.auth-type"), defaultConfig.Connection.AuthType, "Auth Type to use [iam, accesskey].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "connection.access-key"), defaultConfig.Connection.AccessKey, "Access key to use. Only required when authtype is set to accesskey.")

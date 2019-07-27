@@ -102,7 +102,8 @@ func (mockStowItem) Metadata() (map[string]interface{}, error) {
 func TestStowStore_ReadRaw(t *testing.T) {
 	t.Run("Happy Path", func(t *testing.T) {
 		testScope := promutils.NewTestScope()
-		s, err := NewStowRawStore(s3FQN("container"), newMockStowContainer("container"), testScope)
+		fn := fQNFn["s3"]
+		s, err := NewStowRawStore(fn("container"), newMockStowContainer("container"), testScope)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 0, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)
@@ -119,7 +120,8 @@ func TestStowStore_ReadRaw(t *testing.T) {
 
 	t.Run("Exceeds limit", func(t *testing.T) {
 		testScope := promutils.NewTestScope()
-		s, err := NewStowRawStore(s3FQN("container"), newMockStowContainer("container"), testScope)
+		fn := fQNFn["s3"]
+		s, err := NewStowRawStore(fn("container"), newMockStowContainer("container"), testScope)
 		assert.NoError(t, err)
 		err = s.WriteRaw(context.TODO(), DataReference("s3://container/path"), 3*MiB, Options{}, bytes.NewReader([]byte{}))
 		assert.NoError(t, err)

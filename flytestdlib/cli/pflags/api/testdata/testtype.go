@@ -48,7 +48,7 @@ func (cfg TestType) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "strs"), []string{"12", "1"}, "")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "complexArr"), []string{}, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "c"), DefaultTestType.mustMarshalJSON(DefaultTestType.StringToJSON), "I'm a complex type but can be converted from string.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.type"), DefaultTestType.StorageConfig.Type, "Sets the type of storage to configure [s3/minio/local/mem].")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.type"), DefaultTestType.StorageConfig.Type, "Sets the type of storage to configure [s3/minio/local/mem/stow].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.connection.endpoint"), DefaultTestType.StorageConfig.Connection.Endpoint.String(), "URL for storage client to connect to.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.connection.auth-type"), DefaultTestType.StorageConfig.Connection.AuthType, "Auth Type to use [iam, accesskey].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.connection.access-key"), DefaultTestType.StorageConfig.Connection.AccessKey, "Access key to use. Only required when authtype is set to accesskey.")

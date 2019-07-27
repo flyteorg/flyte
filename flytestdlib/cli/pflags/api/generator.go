@@ -145,6 +145,11 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named, defaultValue
 			tag.Name = v.Name()
 		}
 
+		if tag.DefaultValue == "-" {
+			logger.Infof(ctx, "Skipping field [%s], as '-' value detected", tag.Name)
+			continue
+		}
+
 		typ := v.Type()
 		ptr, isPtr := typ.(*types.Pointer)
 		if isPtr {
