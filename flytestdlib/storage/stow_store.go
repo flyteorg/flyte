@@ -53,7 +53,7 @@ func (s StowMetadata) Exists() bool {
 func (s *StowStore) getContainer(container string) (c stow.Container, err error) {
 	if s.Container.Name() != container {
 		s.metrics.BadContainer.Inc()
-		return nil, stow.ErrNotFound
+		return nil, errs.Wrapf(stow.ErrNotFound, "Conf container:%v != Passed Container:%v", s.Container.Name(), container)
 	}
 
 	return s.Container, nil
