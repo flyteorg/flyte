@@ -1,0 +1,315 @@
+syntax = "proto3";
+package flyteidl.service;
+
+option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/service";
+
+import "google/api/annotations.proto";
+import "flyteidl/admin/project.proto";
+import "flyteidl/admin/task.proto";
+import "flyteidl/admin/workflow.proto";
+import "flyteidl/admin/launch_plan.proto";
+import "flyteidl/admin/event.proto";
+import "flyteidl/admin/execution.proto";
+import "flyteidl/admin/node_execution.proto";
+import "flyteidl/admin/task_execution.proto";
+import "flyteidl/admin/common.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+service AdminService {
+  rpc CreateTask (flyteidl.admin.TaskCreateRequest) returns (flyteidl.admin.TaskCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/tasks"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Create and register a task definition"
+      responses: {
+        key: "400"
+        value: {
+          description: "Returned for bad request that may have failed validation."
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "Returned for a request that references an identical entity that has already been registered."
+        }
+      }
+    };
+  }
+
+  rpc GetTask (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.Task) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version}"
+    };
+  }
+
+  rpc ListTaskIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
+    option (google.api.http) = {
+      get: "/api/v1/task_ids/{project}/{domain}"
+    };
+  }
+
+  rpc ListTasks (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.TaskList) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/tasks/{id.project}/{id.domain}"
+      }
+    };
+  }
+
+  rpc CreateWorkflow (flyteidl.admin.WorkflowCreateRequest) returns (flyteidl.admin.WorkflowCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/workflows"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Create and register a workflow definition"
+      responses: {
+        key: "400"
+        value: {
+          description: "Returned for bad request that may have failed validation."
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "Returned for a request that references an identical entity that has already been registered."
+        }
+      }
+    };
+  }
+
+  rpc GetWorkflow (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.Workflow) {
+    option (google.api.http) = {
+      get: "/api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}"
+    };
+  }
+
+  rpc ListWorkflowIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
+    option (google.api.http) = {
+      get: "/api/v1/workflow_ids/{project}/{domain}"
+    };
+  }
+
+  rpc ListWorkflows (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.WorkflowList) {
+    option (google.api.http) = {
+      get: "/api/v1/workflows/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/workflows/{id.project}/{id.domain}"
+      }
+    };
+  }
+
+  rpc CreateLaunchPlan (flyteidl.admin.LaunchPlanCreateRequest) returns (flyteidl.admin.LaunchPlanCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/launch_plans"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Create and register a launch plan definition"
+      responses: {
+        key: "400"
+        value: {
+          description: "Returned for bad request that may have failed validation."
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "Returned for a request that references an identical entity that has already been registered."
+        }
+      }
+    };
+  }
+
+  rpc GetLaunchPlan (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.LaunchPlan) {
+    option (google.api.http) = {
+      get: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}"
+    };
+  }
+
+  rpc ListLaunchPlanIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
+    option (google.api.http) = {
+      get: "/api/v1/launch_plan_ids/{project}/{domain}"
+    };
+  }
+
+  rpc ListLaunchPlans (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.LaunchPlanList) {
+    option (google.api.http) = {
+      get: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/launch_plans/{id.project}/{id.domain}"
+      }
+    };
+  }
+
+  rpc UpdateLaunchPlan (flyteidl.admin.LaunchPlanUpdateRequest) returns (flyteidl.admin.LaunchPlanUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}"
+      body: "*"
+    };
+  }
+
+  rpc CreateExecution (flyteidl.admin.ExecutionCreateRequest) returns (flyteidl.admin.ExecutionCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/executions"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Create a workflow execution"
+      responses: {
+        key: "400"
+        value: {
+          description: "Returned for bad request that may have failed validation."
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "Returned for a request that references an identical entity that has already been registered."
+        }
+      }
+    };
+  }
+
+  rpc RelaunchExecution (flyteidl.admin.ExecutionRelaunchRequest) returns (flyteidl.admin.ExecutionCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/executions/relaunch"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Relaunch a workflow execution"
+      responses: {
+        key: "400"
+        value: {
+          description: "Returned for bad request that may have failed validation."
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "Returned for a request that references an identical entity that has already been registered."
+        }
+      }
+    };
+  }
+
+  rpc GetExecution (flyteidl.admin.WorkflowExecutionGetRequest) returns (flyteidl.admin.Execution) {
+    option (google.api.http) = {
+      get: "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
+    };
+  }
+
+  rpc GetExecutionData (flyteidl.admin.WorkflowExecutionGetDataRequest) returns (flyteidl.admin.WorkflowExecutionGetDataResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/data/executions/{id.project}/{id.domain}/{id.name}"
+    };
+  };
+
+
+  rpc ListExecutions (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.ExecutionList) {
+    option (google.api.http) = {
+      get: "/api/v1/executions/{id.project}/{id.domain}"
+    };
+  }
+
+  rpc TerminateExecution (flyteidl.admin.ExecutionTerminateRequest) returns (flyteidl.admin.ExecutionTerminateResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
+      body: "*"
+    };
+  }
+
+  rpc GetNodeExecution (flyteidl.admin.NodeExecutionGetRequest) returns (flyteidl.admin.NodeExecution) {
+    option (google.api.http) = {
+      get: "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+    };
+  }
+
+  rpc ListNodeExecutions (flyteidl.admin.NodeExecutionListRequest) returns (flyteidl.admin.NodeExecutionList) {
+    option (google.api.http) = {
+      get: "/api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+    };
+  }
+
+  rpc ListNodeExecutionsForTask (flyteidl.admin.NodeExecutionForTaskListRequest) returns (flyteidl.admin.NodeExecutionList) {
+    option (google.api.http) = {
+      get: "/api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
+    };
+  }
+
+  rpc GetNodeExecutionData (flyteidl.admin.NodeExecutionGetDataRequest) returns (flyteidl.admin.NodeExecutionGetDataResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+    };
+  };
+
+  rpc RegisterProject (flyteidl.admin.ProjectRegisterRequest) returns (flyteidl.admin.ProjectRegisterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/projects"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Register a project along with valid domains"
+      responses: {
+        key: "201"
+        value: {
+	  description: "Returned for successful registration."
+	}
+      }
+      responses: {
+        key: "400"
+        value: {
+	  description: "Returned for bad request that may have failed validation."
+	}
+      }
+    };
+  }
+
+  rpc ListProjects (flyteidl.admin.ProjectListRequest) returns (flyteidl.admin.Projects) {
+    option (google.api.http) = {
+      get:  "/api/v1/projects"
+    };
+  }
+
+  rpc CreateWorkflowEvent (flyteidl.admin.WorkflowExecutionEventRequest) returns (flyteidl.admin.WorkflowExecutionEventResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/events/workflows"
+      body: "*"
+    };
+  }
+
+  rpc CreateNodeEvent (flyteidl.admin.NodeExecutionEventRequest) returns (flyteidl.admin.NodeExecutionEventResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/events/nodes"
+      body: "*"
+    };
+  }
+
+  rpc CreateTaskEvent (flyteidl.admin.TaskExecutionEventRequest) returns (flyteidl.admin.TaskExecutionEventResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/events/tasks"
+      body: "*"
+    };
+  }
+
+  rpc GetTaskExecution (flyteidl.admin.TaskExecutionGetRequest) returns (flyteidl.admin.TaskExecution) {
+    option (google.api.http) = {
+        get: "/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+    };
+  }
+
+  rpc ListTaskExecutions (flyteidl.admin.TaskExecutionListRequest) returns (flyteidl.admin.TaskExecutionList) {
+    option (google.api.http) = {
+        get: "/api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}"
+    };
+  }
+
+  rpc GetTaskExecutionData (flyteidl.admin.TaskExecutionGetDataRequest) returns (flyteidl.admin.TaskExecutionGetDataResponse) {
+    option (google.api.http) = {
+        get: "/api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+    };
+  }
+}

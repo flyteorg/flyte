@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package pb.lyft.datacatalog;
+
+option go_package = "datacatalog";
+option py_generic_services = true;
+
+message Parameter {
+
+    string name = 1;
+    string value = 2;
+}
+
+// Before jumping to message definition, lets go over the expected flow-
+//   An Artifact represents an unit-of-work identified by (task, version, inputs). This is
+//   encoded as unique hash for faster queries(called provenance). An artifact is persisted with some other
+//   attributes (revision, createdAt, reference_id, outputs).
+//   Only Discovery service knows about the hashing algorithm; one can use the closure (task, version, inputs)
+//   to query an artifact if it doesnt have the provenance value.
+//
+//   Before starting the work on a task, programming-model first checks if the task has been done.
+//     Request:   GET (task, version, inputs)
+//     Response:  (Exists, Artifact) or (NotFound, nil)
+//   if not found, Task executor goes ahead with the execution and at the end of execution creates a new entry in
+//   the discovery service
+//     Request:  CREATE (task, version, inputs) + (revision, reference_id, outputs)
+//     Response: (Exists, Artifact) or (Created, Artifact)
+//
+//   One can also Query all the artifacts by querying any subset of properties.
+// Message Artifact represents the complete information of an artifact- field that unique define the artifact +
+// properties.
+// Message ArtifactInternal is our storage model where we create an additional derived column for faster queries.
+// Message ArtifactId only represents field that uniquely define the artifact.
+message Artifact {
+    string provenance = 1;
+    string name = 2;
+    string version = 3;
+    int64 revision = 4;       // strictly increasing value set by users. users can do range query on this attribute.
+    int64 created_at = 5;     // the time when discovery service received the request.
+    string reference_id = 6;  // this could be a workflow runid or something that ties it data elsewhere
+    repeated Parameter inputs = 7;
+    repeated Parameter outputs = 8;
+}
+
+message ArtifactId {
+    string name = 1;
+    string version = 2;
+    repeated Parameter inputs = 3;
+}
+
+message GetRequest {
+    oneof id {
+        string provenance = 1;
+        ArtifactId artifact_id = 2;
+    }
+}
+
+message GetResponse {
+    Artifact artifact = 1;
+}
+
+enum QueryOperator {
+    EQUAL = 0;
+    GREATER_THAN = 1;
+    LESSER_THAN = 2;
+}
+
+message IntFilter {
+    int64 value = 1;
+    QueryOperator operator = 2;
+}
+
+message IntRangeFilter {
+    int64 min = 1;
+    int64 max = 2;
+}
+
+message IntQueryKey {
+    oneof filter {
+        IntFilter val = 1;
+        IntRangeFilter range = 2;
+    }
+}
+
+// QueryRequest allows queries on a range of values for revision column and point queries on created_at
+// and reference_id
+message QueryRequest {
+    string name = 1;
+    string version = 2;
+    IntQueryKey revision = 3;
+    int64 created_at = 4;
+    string reference_id = 5;
+}
+
+message QueryResponse {
+    repeated Artifact artifact = 1;
+}
+
+message CreateRequest {
+    ArtifactId ref = 1;
+    string reference_id = 2;
+    int64 revision = 3;
+    repeated Parameter outputs = 4;
+}
+
+message CreateResponse {
+    Artifact artifact = 1;
+    enum Status {
+        ALREADY_EXISTS = 0;
+        CREATED        = 1;
+    }
+    Status status = 2;
+}
+
+message GenerateProvenanceRequest {
+    ArtifactId id = 1;
+}
+
+message GenerateProvenanceResponse {
+    string provenance = 1;
+}
+
+service Artifacts {
+    rpc Get (GetRequest) returns (GetResponse) {}
+    rpc Query (QueryRequest) returns (QueryResponse) {}
+    rpc Create (CreateRequest) returns (CreateResponse) {}
+    rpc GenerateProvenance (GenerateProvenanceRequest) returns (GenerateProvenanceResponse) {}
+}

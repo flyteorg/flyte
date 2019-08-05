@@ -1,0 +1,10 @@
+.idea/*
+.DS_Store
+vendor
+
+# Vim swapfiles
+*.swp
+*.swo
+
+dist
+gen/pb_python/flyteidl.egg-info/

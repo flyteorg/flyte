@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core";
+
+// Indicates a resource type within Flyte.
+enum ResourceType {
+  UNSPECIFIED        = 0;
+  TASK               = 1;
+  WORKFLOW           = 2;
+  LAUNCH_PLAN        = 3;
+}
+
+// Encapsulation of fields that uniquely identifies a Flyte resource.
+message Identifier {
+    // Identifies the specific type of resource that this identifer corresponds to.
+    ResourceType resource_type  = 1;
+
+    // Name of the project the resource belongs to.
+    string project              = 2;
+
+    // Name of the domain the resource belongs to.
+    // A domain can be considered as a subset within a specific project.
+    string domain               = 3;
+
+    // User provided value for the resource.
+    string name                 = 4;
+
+    // Specific version of the resource.
+    string version              = 5;
+}
+
+// Encapsulation of fields that uniquely identifies a Flyte workflow execution
+message WorkflowExecutionIdentifier {
+    // Name of the project the resource belongs to.
+    string project              = 1;
+
+    // Name of the domain the resource belongs to.
+    // A domain can be considered as a subset within a specific project.
+    string domain               = 2;
+
+    // User or system provided value for the resource.
+    string name                 = 4;
+}
+
+// Encapsulation of fields that identify a Flyte node execution entity.
+message NodeExecutionIdentifier {
+    string node_id           = 1;
+
+    WorkflowExecutionIdentifier execution_id        = 2;
+}
+
+// Encapsulation of fields that identify a Flyte task execution entity.
+message TaskExecutionIdentifier {
+    core.Identifier task_id           = 1;
+
+    core.NodeExecutionIdentifier node_execution_id = 2;
+
+    uint32 retry_attempt     = 3;
+}

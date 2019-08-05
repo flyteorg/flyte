@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package flyteidl.plugins;
+
+option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins";
+
+import "k8s.io/api/core/v1/generated.proto";
+
+// A sidecar job brings up the desired pod_spec.
+// The plugin executor is responsible for keeping the pod alive until the primary container terminates
+// or the task itself times out.
+message SidecarJob {
+    k8s.io.api.core.v1.PodSpec pod_spec = 1;
+
+    string primary_container_name       = 2;
+}

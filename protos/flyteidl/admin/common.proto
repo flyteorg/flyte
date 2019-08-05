@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/identifier.proto";
+// import "validate/validate.proto";
+
+// Encapsulation of fields that identifies a Flyte resource.
+// A resource can internally have multiple versions.
+message NamedEntityIdentifier {
+    // Name of the project the resource belongs to.
+    string project    = 1;  // [(validate.rules).string.min_bytes = 1];
+    // Name of the domain the resource belongs to.
+    // A domain can be considered as a subset within a specific project.
+    string domain     = 2;  // [(validate.rules).string.min_bytes = 1];
+    // User provided value for the resource.
+    // The combination of project + domain + name uniquely identifies the resource.
+    // +optional - in certain contexts - like 'List API', 'Launch plans'
+    string name       = 3;
+}
+
+// Species sort ordering in a list request.
+message Sort {
+    enum Direction {
+        DESCENDING        = 0;
+        ASCENDING         = 1;
+    }
+    // Indicates an attribute to sort the response values.
+    // TODO(katrogan): Add string validation here. This should never be empty.
+    string key            = 1;
+
+    // Indicates the direction to apply sort key for response values.
+    // +optional
+    Direction direction   = 2;
+}
+
+// Represents a request structure to list identifiers.
+message NamedEntityIdentifierListRequest {
+    // Name of the project that contains the identifiers.
+    string project    = 1;  // [(validate.rules).string.min_bytes = 1];
+    // Name of the domain the identifiers belongs to within the project.
+    string domain     = 2;  // [(validate.rules).string.min_bytes = 1];
+    // Indicates the number of resources to be returned.
+    uint32 limit      = 3;
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token      = 4;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by      = 5;
+}
+
+// Represents a list of Identifiers.
+message NamedEntityIdentifierList {
+    // A list of identifiers.
+    repeated NamedEntityIdentifier entities = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token                      = 2;
+}
+
+// Represents a structure to fetch a single resource.
+message ObjectGetRequest {
+    // Indicates a unique version of resource.
+    core.Identifier id   = 1;
+}
+
+// Represents a request structure to retrieve a list of resources.
+// Resources include: Task, Workflow, LaunchPlan
+message ResourceListRequest {
+    // id represents the unique identifier of the resource.
+    NamedEntityIdentifier id   = 1;
+    // Indicates the number of resources to be returned.
+    uint32 limit    = 2;
+    // In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token    = 3;
+    // Indicates a list of filters passed as string.
+    // More info on constructing filters : <Link>
+    // +optional
+    string filters  = 4;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by    = 5;
+}
+
+message EmailNotification {
+    // The list of email addresses recipients for this notification.
+    repeated string recipients_email = 1;  // [(validate.rules).repeated = {min_items: 1, unique: true, items: {string: {email: true}}}];
+}
+
+message PagerDutyNotification {
+    // Currently, PagerDuty notifications leverage email to trigger a notification.
+    repeated string recipients_email = 1;  // [(validate.rules).repeated = {min_items: 1, unique: true, items: {string: {email: true}}}];
+}
+
+message SlackNotification {
+    // Currently, Slack notifications leverage email to trigger a notification.
+    repeated string recipients_email = 1;  // [(validate.rules).repeated = {min_items: 1, unique: true, items: {string: {email: true}}}];
+
+}
+
+// Represents a structure for notifications based on execution status.
+// The Notification content is configured within Admin. Future iterations could
+// expose configuring notifications with custom content.
+message Notification {
+    // A list of phases to which users can associate the notifications to.
+    repeated core.WorkflowExecution.Phase phases = 1;
+
+    oneof type {
+        // option (validate.required) = true;
+        EmailNotification email = 2;
+        PagerDutyNotification pager_duty = 3;
+        SlackNotification slack = 4;
+    }
+
+}
+
+// Represents a string url and associated metadata used throughout the platform.
+message UrlBlob {
+    // Actual url value.
+    string url                         = 1;
+
+    // Represents the size of the file accessible at the above url.
+    int64 bytes                        = 2;
+}
+
+// Label values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge labels defined at registration and execution time.
+message Labels {
+    // Map of custom labels to be applied to the execution resource.
+    map<string, string> values          = 1;
+}
+
+// Annotation values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge annotations defined at registration and execution time.
+message Annotations {
+    // Map of custom annotations to be applied to the execution resource.
+    map<string, string> values          = 1;
+}
+

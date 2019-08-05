@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/interface.proto";
+import "flyteidl/core/literals.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+
+package flyteidl.core;
+
+option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core";
+
+// A customizable interface to convey resources requested for a container. This can be interpretted differently for different
+// container engines.
+message Resources {
+    // Known resource names.
+    enum ResourceName {
+        UNKNOWN = 0;
+        CPU = 1;
+        GPU = 2;
+        MEMORY = 3;
+        STORAGE = 4;
+    }
+
+    // Encapsulates a resource name and value.
+    message ResourceEntry {
+        // Resource name.
+        ResourceName name = 1;
+
+        // Value must be a valid k8s quantity. See
+        // https://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80
+        string value = 2;
+    }
+
+    // The desired set of resources requested. ResourceNames must be unique within the list.
+    repeated ResourceEntry requests = 1;
+
+    // Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique
+    // within the list.
+    repeated ResourceEntry limits = 2;
+}
+
+// Runtime information. This is losely defined to allow for extensibility.
+message RuntimeMetadata {
+    enum RuntimeType {
+        OTHER = 0;
+        FLYTE_SDK = 1;
+    }
+
+    // Type of runtime.
+    RuntimeType type = 1;
+
+    // Version of the runtime. All versions should be backward compatible. However, certain cases call for version
+    // checks to ensure tighter validation or setting expectations.
+    string version = 2;
+
+    //+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+    string flavor = 3;
+}
+
+// Task Metadata
+message TaskMetadata {
+    // Indicates whether the system should attempt to lookup this task's output to avoid duplication of work.
+    bool discoverable = 1;
+
+    // Runtime information about the task.
+    RuntimeMetadata runtime = 2;
+
+    // The overall timeout of a task including user-triggered retries.
+    google.protobuf.Duration timeout = 4;
+
+    // Number of retries per task.
+    RetryStrategy retries = 5;
+
+    // Indicates a logical version to apply to this task for the purpose of discovery.
+    string discovery_version = 6;
+
+    // If set, this indicates that this task is deprecated.  This will enable owners of tasks to notify consumers
+    // of the ending of support for a given task.
+    string deprecated_error_message = 7;
+}
+
+// A Task structure that uniquely identifies a task in the system
+// Tasks are registered as a first step in the system.
+message TaskTemplate {
+    // Auto generated taskId by the system. Task Id uniquely identifies this task globally.
+    Identifier id = 1;
+
+    // A predefined yet extensible Task type identifier. This can be used to customize any of the components. If no
+    // extensions are provided in the system, Flyte will resolve the this task to its TaskCategory and default the
+    // implementation registered for the TaskCategory.
+    string type = 2;
+
+    // Extra metadata about the task.
+    TaskMetadata metadata = 3;
+
+    // A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees
+    // compile-time validation of the workflow to avoid costly runtime failures.
+    TypedInterface interface = 4;
+
+    // Custom data about the task. This is extensible to allow various plugins in the system.
+    google.protobuf.Struct custom = 5;
+
+    // Known target types that the system will guarantee plugins for. Custom SDK plugins are allowed to set these if needed.
+    // If no corresponding execution-layer plugins are found, the system will default to handling these using built-in
+    // handlers.
+    oneof target {
+        Container container = 6;
+    }
+}
+
+// ----------------- First class Plugins
+
+// Defines port properties for a container.
+message ContainerPort {
+    // Number of port to expose on the pod's IP address.
+    // This must be a valid port number, 0 < x < 65536.
+    uint32 container_port = 1;
+}
+
+message Container {
+    // Container image url. Eg: docker/redis:latest
+    string image = 1;
+
+    // Command to be executed, if not provided, the default entrypoint in the container image will be used.
+    repeated string command = 2;
+
+    // These will default to Flyte given paths. If provided, the system will not append known paths. If the task still
+    // needs flyte's inputs and outputs path, add $(FLYTE_INPUT_FILE), $(FLYTE_OUTPUT_FILE) wherever makes sense and the
+    // system will populate these before executing the container.
+    repeated string args = 3;
+
+    // Container resources requirement as specified by the container engine.
+    Resources resources = 4;
+
+    // Environment variables will be set as the container is starting up.
+    repeated KeyValuePair env = 5;
+
+    // Allows extra configs to be available for the container.
+    // TODO: elaborate on how configs will become available.
+    repeated KeyValuePair config = 6;
+
+    // Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
+    // not supported on AWS Batch)
+    repeated ContainerPort ports = 7;
+}
