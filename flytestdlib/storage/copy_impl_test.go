@@ -2,8 +2,12 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"math/rand"
 	"testing"
+
+	"github.com/lyft/flytestdlib/errors"
 
 	"github.com/lyft/flytestdlib/ioutils"
 	"github.com/lyft/flytestdlib/promutils"
@@ -40,6 +44,7 @@ func newNotSeekerReader(bytesCount int) *notSeekerReader {
 }
 
 func TestCopyRaw(t *testing.T) {
+	resetMetricKeys()
 	t.Run("Called", func(t *testing.T) {
 		readerCalled := false
 		writerCalled := false
@@ -78,5 +83,60 @@ func TestCopyRaw(t *testing.T) {
 		assert.NoError(t, copier.CopyRaw(context.Background(), DataReference("source.pb"), DataReference("dest.pb"), Options{}))
 		assert.True(t, readerCalled)
 		assert.True(t, writerCalled)
+	})
+}
+
+func TestCopyRaw_CachingErrorHandling(t *testing.T) {
+	resetMetricKeys()
+	t.Run("CopyRaw with Caching Error", func(t *testing.T) {
+		readerCalled := false
+		writerCalled := false
+		bigD := make([]byte, 1.5*1024*1024)
+		// #nosec G404
+		rand.Read(bigD)
+		dummyErrorMsg := "Dummy caching error"
+
+		store := dummyStore{
+			ReadRawCb: func(ctx context.Context, reference DataReference) (closer io.ReadCloser, e error) {
+				readerCalled = true
+				return ioutils.NewBytesReadCloser(bigD), errors.Wrapf(ErrFailedToWriteCache, fmt.Errorf(dummyErrorMsg), "Failed to Cache the metadata")
+			},
+			WriteRawCb: func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
+				writerCalled = true
+				return errors.Wrapf(ErrFailedToWriteCache, fmt.Errorf(dummyErrorMsg), "Failed to Cache the metadata")
+			},
+		}
+
+		copier := newCopyImpl(&store, promutils.NewTestScope())
+		assert.NoError(t, copier.CopyRaw(context.Background(), DataReference("source.pb"), DataReference("dest.pb"), Options{}))
+		assert.True(t, readerCalled)
+		assert.True(t, writerCalled)
+	})
+
+	t.Run("CopyRaw with Hard Error", func(t *testing.T) {
+		readerCalled := false
+		writerCalled := false
+		bigD := make([]byte, 1.5*1024*1024)
+		// #nosec G404
+		rand.Read(bigD)
+		dummyErrorMsg := "Dummy non-caching error"
+
+		store := dummyStore{
+			ReadRawCb: func(ctx context.Context, reference DataReference) (closer io.ReadCloser, e error) {
+				readerCalled = true
+				return ioutils.NewBytesReadCloser(bigD), fmt.Errorf(dummyErrorMsg)
+			},
+			WriteRawCb: func(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
+				writerCalled = true
+				return fmt.Errorf(dummyErrorMsg)
+			},
+		}
+
+		copier := newCopyImpl(&store, promutils.NewTestScope())
+		err := copier.CopyRaw(context.Background(), DataReference("source.pb"), DataReference("dest.pb"), Options{})
+		assert.True(t, readerCalled)
+		// writerCalled should be false because CopyRaw should error out right after c.rawstore.ReadRaw() when the underlying error is a hard error
+		assert.False(t, writerCalled)
+		assert.False(t, IsFailedWriteToCache(err))
 	})
 }

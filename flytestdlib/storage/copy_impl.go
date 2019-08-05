@@ -2,12 +2,17 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"time"
+
+	"github.com/lyft/flytestdlib/logger"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/lyft/flytestdlib/ioutils"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
+	errs "github.com/pkg/errors"
 )
 
 type copyImpl struct {
@@ -16,8 +21,10 @@ type copyImpl struct {
 }
 
 type copyMetrics struct {
-	CopyLatency          labeled.StopWatch
-	ComputeLengthLatency labeled.StopWatch
+	CopyLatency                  labeled.StopWatch
+	ComputeLengthLatency         labeled.StopWatch
+	WriteFailureUnrelatedToCache prometheus.Counter
+	ReadFailureUnrelatedToCache  prometheus.Counter
 }
 
 // A naiive implementation for copy that reads all data locally then writes them to destination.
@@ -25,8 +32,11 @@ type copyMetrics struct {
 // 	https://docs.aws.amazon.com/AmazonS3/latest/dev/CopyingObjectUsingREST.html
 func (c copyImpl) CopyRaw(ctx context.Context, source, destination DataReference, opts Options) error {
 	rc, err := c.rawStore.ReadRaw(ctx, source)
-	if err != nil {
-		return err
+
+	if err != nil && !IsFailedWriteToCache(err) {
+		logger.Errorf(ctx, "Failed to read from the raw store. Error: %v", err)
+		c.metrics.ReadFailureUnrelatedToCache.Inc()
+		return errs.Wrap(err, fmt.Sprintf("path:%v", destination))
 	}
 
 	length := int64(0)
@@ -43,13 +53,23 @@ func (c copyImpl) CopyRaw(ctx context.Context, source, destination DataReference
 		length = int64(len(raw))
 	}
 
-	return c.rawStore.WriteRaw(ctx, destination, length, Options{}, rc)
+	err = c.rawStore.WriteRaw(ctx, destination, length, Options{}, rc)
+
+	if err != nil && !IsFailedWriteToCache(err) {
+		logger.Errorf(ctx, "Failed to write to the raw store. Error: %v", err)
+		c.metrics.WriteFailureUnrelatedToCache.Inc()
+		return err
+	}
+
+	return nil
 }
 
 func newCopyMetrics(scope promutils.Scope) copyMetrics {
 	return copyMetrics{
-		CopyLatency:          labeled.NewStopWatch("overall", "Overall copy latency", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
-		ComputeLengthLatency: labeled.NewStopWatch("length", "Latency involved in computing length of content before writing.", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		CopyLatency:                  labeled.NewStopWatch("overall", "Overall copy latency", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		ComputeLengthLatency:         labeled.NewStopWatch("length", "Latency involved in computing length of content before writing.", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		WriteFailureUnrelatedToCache: scope.MustNewCounter("write_failure_unrelated_to_cache", "Raw store write failures that are not caused by ErrFailedToWriteCache"),
+		ReadFailureUnrelatedToCache:  scope.MustNewCounter("read_failure_unrelated_to_cache", "Raw store read failures that are not caused by ErrFailedToWriteCache"),
 	}
 }
 
