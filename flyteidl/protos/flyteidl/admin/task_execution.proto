@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/common.proto";
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/identifier.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+
+// A message used to fetch a single task execution entity.
+message TaskExecutionGetRequest {
+    // Unique identifier for the task execution.
+    core.TaskExecutionIdentifier id = 1;
+}
+
+// Represents a request structure to retrieve a list of task execution entities.
+message TaskExecutionListRequest {
+    // Indicates the node execution to filter by.
+    core.NodeExecutionIdentifier node_execution_id = 1;
+
+    // Indicates the number of resources to be returned.
+    uint32 limit    = 2;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token    = 3;
+
+    // Indicates a list of filters passed as string.
+    // More info on constructing filters : <Link>
+    // +optional
+    string filters  = 4;
+
+    // Sort ordering for returned list.
+    // +optional
+    Sort sort_by    = 5;
+}
+
+// Encapsulates all details for a single task execution entity.
+// A task execution represents an instantiated task, including all inputs and additional
+// metadata as well as computed results included state, outputs, and duration-based attributes.
+message TaskExecution {
+    // Unique identifier for the task execution.
+    core.TaskExecutionIdentifier id = 1;
+
+    // Path to remote data store where input blob is stored.
+    string input_uri                       = 2;
+
+    // Task execution details and results.
+    TaskExecutionClosure closure           = 3;
+
+    // Whether this task spawned nodes.
+    bool is_parent                         = 4;
+}
+
+// Response structure for a query to list of task execution entities.
+message TaskExecutionList {
+    repeated TaskExecution task_executions = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token                           = 2;
+}
+
+// Container for task execution details and results.
+message TaskExecutionClosure {
+    oneof output_result {
+        // Path to remote data store where output blob is stored if the execution succeeded (and produced outputs).
+        string output_uri                  = 1;
+
+        // Error information for the task execution. Populated if the execution failed.
+        core.ExecutionError error          = 2;
+    }
+
+    // The last recorded phase for this task execution.
+    core.TaskExecution.Phase phase          = 3;
+
+    // Detailed log information output by the task execution.
+    repeated core.TaskLog logs = 4;
+
+    // Time at which the task execution began running.
+    google.protobuf.Timestamp started_at   = 5;
+
+    // The amount of time the task execution spent running.
+    google.protobuf.Duration duration      = 6;
+
+    // Time at which the task execution was created.
+    google.protobuf.Timestamp created_at   = 7;
+
+    // Time at which the task execution was last updated.
+    google.protobuf.Timestamp updated_at   = 8;
+
+    // Custom data specific to the task plugin.
+    google.protobuf.Struct custom_info     = 9;
+}
+
+// Request structure to fetch inputs and output urls for a task execution.
+message TaskExecutionGetDataRequest {
+    // The identifier of the task execution for which to fetch inputs and outputs.
+    core.TaskExecutionIdentifier id        = 1;
+}
+
+// Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution.
+message TaskExecutionGetDataResponse {
+    // Signed url to fetch a core.LiteralMap of task execution inputs.
+    UrlBlob inputs                             = 1;
+
+    // Signed url to fetch a core.LiteralMap of task execution outputs.
+    UrlBlob outputs                            = 2;
+}

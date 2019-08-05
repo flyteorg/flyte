@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+package flyteidl.event;
+
+option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/event";
+
+import "flyteidl/core/execution.proto";
+import "flyteidl/core/identifier.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+message WorkflowExecutionEvent {
+    // Workflow execution id
+    core.WorkflowExecutionIdentifier execution_id = 1;
+
+    // the id of the originator (Propeller) of the event
+    string producer_id = 2;
+
+    core.WorkflowExecution.Phase phase = 3;
+
+    // This timestamp represents when the original event occurred, it is generated
+    // by the executor of the workflow.
+    google.protobuf.Timestamp occurred_at = 4;
+
+    oneof output_result {
+        // URL to the output of the execution, it encodes all the information
+        // including Cloud source provider. ie., s3://...
+        string output_uri = 5;
+
+        // Error information for the execution
+        core.ExecutionError error = 6;
+    }
+}
+
+message NodeExecutionEvent {
+    // Unique identifier for this node execution
+    core.NodeExecutionIdentifier id = 1;
+
+    // the id of the originator (Propeller) of the event
+    string producer_id = 2;
+
+    core.NodeExecution.Phase phase = 3;
+
+    // This timestamp represents when the original event occurred, it is generated
+    // by the executor of the node.
+    google.protobuf.Timestamp occurred_at           = 4;
+
+    string input_uri = 5;
+
+    oneof output_result {
+        // URL to the output of the execution, it encodes all the information
+        // including Cloud source provider. ie., s3://...
+        string output_uri = 6;
+
+        // Error information for the execution
+        core.ExecutionError error = 7;
+    }
+
+    // Additional metadata to do with this event's node target based
+    // on the node type
+    oneof target_metadata {
+        WorkflowNodeMetadata workflow_node_metadata = 8;
+    }
+
+    // Specifies which task (if any) launched this node.
+    ParentTaskExecutionMetadata parent_task_metadata         = 9;
+}
+
+// For Workflow Nodes we need to send information about the workflow that's launched
+message WorkflowNodeMetadata {
+    core.WorkflowExecutionIdentifier execution_id = 1;
+}
+
+message ParentTaskExecutionMetadata {
+    core.TaskExecutionIdentifier id = 1;
+}
+
+// Plugin specific execution event information. For tasks like Python, Hive, Spark, DynamicJob.
+message TaskExecutionEvent {
+    // ID of the task. In combination with the retryAttempt this will indicate
+    // the task execution uniquely for a given parent node execution.
+    core.Identifier task_id = 1;
+
+    // A task execution is always kicked off by a node execution, the event consumer
+    // will use the parent_id to relate the task to it's parent node execution
+    core.NodeExecutionIdentifier parent_node_execution_id = 2;
+
+    // retry attempt number for this task, ie., 2 for the second attempt
+    uint32 retry_attempt = 3;
+
+    // Phase associated with the event
+    core.TaskExecution.Phase phase = 4;
+
+    // id of the process that sent this event, mainly for trace debugging
+    string producer_id = 5;
+
+    // log information for the task execution
+    repeated core.TaskLog logs           = 6;
+
+    // This timestamp represents when the original event occurred, it is generated
+    // by the executor of the task.
+    google.protobuf.Timestamp occurred_at = 7;
+
+    // URI of the input file, it encodes all the information
+    // including Cloud source provider. ie., s3://...
+    string input_uri                      = 8;
+
+    oneof output_result {
+        // URI to the output of the execution, it will be in a format that encodes all the information
+        // including Cloud source provider. ie., s3://...
+        string output_uri                 = 9;
+
+        // Error information for the execution
+        core.ExecutionError error         = 10;
+    }
+
+    // Custom data that the task plugin sends back. This is extensible to allow various plugins in the system.
+    google.protobuf.Struct custom_info    = 11;
+
+    // Some phases, like RUNNING, can send multiple events with changed metadata (new logs, additional custom_info, etc)
+    // that should be recorded regardless of the lack of phase change.
+    // The version field should be incremented when metadata changes across the duration of an individual phase.
+    uint32 phase_version                  = 12;    
+}

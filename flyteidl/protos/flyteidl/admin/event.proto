@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/event/event.proto";
+
+message EventErrorAlreadyInTerminalState {
+    string current_phase = 1;
+}
+
+message EventFailureReason {
+    oneof reason {
+        EventErrorAlreadyInTerminalState already_in_terminal_state = 1;
+    }
+}
+
+// Request to send a notification that a workflow execution event has occurred.
+message WorkflowExecutionEventRequest {
+    // Unique ID for this request that can be traced between services
+    string request_id = 1;
+
+    // Details about the event that occurred.
+    event.WorkflowExecutionEvent event = 2;
+}
+
+message WorkflowExecutionEventResponse {
+    // a placeholder for now
+}
+
+// Request to send a notification that a node execution event has occurred.
+message NodeExecutionEventRequest {
+    // Unique ID for this request that can be traced between services
+    string request_id = 1;
+
+    // Details about the event that occurred.
+    event.NodeExecutionEvent event = 2;
+}
+
+message NodeExecutionEventResponse {
+    // a placeholder for now
+}
+
+// Request to send a notification that a task execution event has occurred.
+message TaskExecutionEventRequest {
+    // Unique ID for this request that can be traced between services
+    string request_id = 1;
+
+    // Details about the event that occurred.
+    event.TaskExecutionEvent event = 2;
+}
+
+message TaskExecutionEventResponse {
+    // a placeholder for now
+}
