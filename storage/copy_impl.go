@@ -34,7 +34,7 @@ func (c copyImpl) CopyRaw(ctx context.Context, source, destination DataReference
 	rc, err := c.rawStore.ReadRaw(ctx, source)
 
 	if err != nil && !IsFailedWriteToCache(err) {
-		logger.Errorf(ctx, "Failed to read from the raw store. Error: %v", err)
+		logger.Errorf(ctx, "Failed to read from the raw store when copying. Error: %v", err)
 		c.metrics.ReadFailureUnrelatedToCache.Inc()
 		return errs.Wrap(err, fmt.Sprintf("path:%v", destination))
 	}
@@ -56,7 +56,7 @@ func (c copyImpl) CopyRaw(ctx context.Context, source, destination DataReference
 	err = c.rawStore.WriteRaw(ctx, destination, length, Options{}, rc)
 
 	if err != nil && !IsFailedWriteToCache(err) {
-		logger.Errorf(ctx, "Failed to write to the raw store. Error: %v", err)
+		logger.Errorf(ctx, "Failed to write to the raw store when copying. Error: %v", err)
 		c.metrics.WriteFailureUnrelatedToCache.Inc()
 		return err
 	}
