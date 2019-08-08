@@ -1,0 +1,13 @@
+{
+    "name": "@lyft/flyteidl",
+    "version": "0.1.0",
+    "description": "Compiled protocol buffers and gRPC service clients/servers for Flyte IDLs",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:lyft/flyteidl"
+    },
+    "author": "Randy Schott <rschott@lyft.com>",
+    "license": "Apache-2.0",
+    "keywords": ["flyte", "lyft"],
+    "files": ["example", "protos", "gen/pb-js"]
+}
