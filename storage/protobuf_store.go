@@ -35,7 +35,7 @@ type DefaultProtobufStore struct {
 func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataReference, msg proto.Message) error {
 	rc, err := s.ReadRaw(ctx, reference)
 	if err != nil && !IsFailedWriteToCache(err) {
-		logger.Errorf(ctx, "Failed to read from the raw store. Error: %v", err)
+		logger.Errorf(ctx, "Failed to read from the raw store [%s] Error: %v", reference, err)
 		s.metrics.ReadFailureUnrelatedToCache.Inc()
 		return errs.Wrap(err, fmt.Sprintf("path:%v", reference))
 	}
@@ -74,7 +74,7 @@ func (s DefaultProtobufStore) WriteProtobuf(ctx context.Context, reference DataR
 
 	err = s.WriteRaw(ctx, reference, int64(len(raw)), opts, bytes.NewReader(raw))
 	if err != nil && !IsFailedWriteToCache(err) {
-		logger.Errorf(ctx, "Failed to write to the raw store. Error: %v", err)
+		logger.Errorf(ctx, "Failed to write to the raw store [%s] Error: %v", reference, err)
 		s.metrics.WriteFailureUnrelatedToCache.Inc()
 		return err
 	}
