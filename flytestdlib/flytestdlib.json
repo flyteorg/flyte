@@ -1,19 +1,19 @@
 {
-    "version": "0.2.15",
+    "version": "0.2.16",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/lyft/flytestdlib/releases/download/v0.2.15/flytestdlib_0.2.15_Windows_i386.zip",
+            "url": "https://github.com/lyft/flytestdlib/releases/download/v0.2.16/flytestdlib_0.2.16_Windows_i386.zip",
             "bin": [
                 "pflags.exe"
             ],
-            "hash": "8fa9e2f415e82a14a9c7283be8809ada61cd6da68878228139aeed1d471dc0d9"
+            "hash": "042389e9e0d08df89d771962b10ed193cd2834a8328d90f307a2acf3bbbb4094"
         },
         "64bit": {
-            "url": "https://github.com/lyft/flytestdlib/releases/download/v0.2.15/flytestdlib_0.2.15_Windows_x86_64.zip",
+            "url": "https://github.com/lyft/flytestdlib/releases/download/v0.2.16/flytestdlib_0.2.16_Windows_x86_64.zip",
             "bin": [
                 "pflags.exe"
             ],
-            "hash": "faf6d8f7f20a3d2453b83eb3d739a3e3c4e6e0e08ddbd1182cb464bd4c2ae5da"
+            "hash": "030581539f3e55c525bbf0157058701cfd7281ef0b40156c4b4049269bc0093b"
         }
     },
     "homepage": "https://godoc.org/github.com/lyft/flytestdlib",
