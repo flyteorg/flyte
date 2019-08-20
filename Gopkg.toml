@@ -1,0 +1,52 @@
+required = ["github.com/lyft/flytestdlib/storage",
+            "github.com/lyft/flyteidl/gen/pb-go/flyteidl/event",
+            "sigs.k8s.io/controller-runtime/pkg/client/config",
+            "k8s.io/apimachinery/pkg/apis/meta/v1",
+            "k8s.io/client-go/tools/record",
+            ]
+ignored = ["k8s.io/spark-on-k8s-operator",
+          ]
+
+[[constraint]]
+  name = "github.com/lyft/flyteidl"
+  source = "git@github.com:lyft/flyteidl"
+  version = "^0.1.x"
+
+[[constraint]]
+  name = "github.com/lyft/flytestdlib"
+  source = "git@github.com:lyft/flytestdlib"
+  version = "^0.2.x"
+
+[[constraint]]
+  name = "sigs.k8s.io/controller-runtime"
+  version = "^0.1.0"
+
+# Type resource.Quantity unmarshals with json, but not jsonpb (https://github.com/kubernetes/apimachinery/issues/59).
+# Because we embed k8s protos in our own proto definitions we need to be able to call jsonpb marshal/unmarshal in order
+# to use the k8s types in our our struct messages.
+[[override]]
+  name = "k8s.io/apimachinery"
+  source = "https://github.com/lyft/apimachinery"
+  revision = "695912cabb3a9c08353fbe628115867d47f56b1f"
+
+[[constraint]]
+  name = "k8s.io/client-go"
+  version = "kubernetes-1.13.1"
+
+[[constraint]]
+  name = "github.com/GoogleCloudPlatform/spark-on-k8s-operator"
+  version = "^0.1.x"
+  source = "https://github.com/lyft/spark-on-k8s-operator"
+
+[[override]]
+  name = "k8s.io/api"
+  revision = "27b77cf22008a0bf6e510b2a500b8885805a1b68"
+  source = "https://github.com/lyft/api"
+
+[[override]]
+  name = "github.com/prometheus/client_golang"
+  version = "^0.9.0"
+
+[[override]]
+  name = "github.com/stretchr/objx"
+  version = "0.1.1"
