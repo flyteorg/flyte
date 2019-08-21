@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package datacatalog;
+
+import "flyteidl/core/literals.proto";
+
+service DataCatalog {
+    rpc CreateDataset (CreateDatasetRequest) returns (CreateDatasetResponse);
+    rpc GetDataset (GetDatasetRequest) returns (GetDatasetResponse);
+    rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse);
+    rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse);
+    rpc AddTag (AddTagRequest) returns (AddTagResponse);
+}
+
+message CreateDatasetRequest {
+    Dataset dataset = 1;
+}
+
+message CreateDatasetResponse {
+
+}
+
+message GetDatasetRequest {
+    DatasetID dataset = 1;
+}
+
+message GetDatasetResponse {
+    Dataset dataset = 1;
+}
+
+message GetArtifactRequest {
+    DatasetID dataset = 1;
+
+    oneof query_handle {
+        string artifact_id = 2;
+        string tag_name = 3;
+    }
+}
+
+message GetArtifactResponse {
+    Artifact artifact = 1;
+}
+
+message CreateArtifactRequest {
+    Artifact artifact = 1;
+}
+
+message CreateArtifactResponse {
+
+}
+
+message AddTagRequest {
+    Tag tag = 1;
+}
+
+message AddTagResponse {
+
+}
+
+message Dataset {
+    DatasetID id = 1;
+    Metadata metadata = 2;
+}
+
+message DatasetID {
+    string project = 1;  // The name of the project
+    string name = 2;     // The name of the dataset
+    string domain = 3;   // The domain (eg. environment) in which it's desired to run (optional)
+    string version = 4;  // Version of the data schema
+}
+
+message Artifact {
+    string id = 1;
+    DatasetID dataset = 2;
+    repeated ArtifactData data = 3;
+    Metadata metadata = 4;
+}
+
+message ArtifactData {
+    string name = 1;
+    flyteidl.core.Literal value = 2;
+}
+
+message Tag {
+    string name = 1;
+    string artifact_id = 2;
+    DatasetID dataset = 3;
+}
+
+message Metadata {
+    map<string, string> key_map = 1; // key map is a dictionary of key/val strings that represent metadata
+}

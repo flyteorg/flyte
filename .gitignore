@@ -1,0 +1,5 @@
+.idea/
+vendor/
+vendor-new/
+.DS_Store
+bin/
