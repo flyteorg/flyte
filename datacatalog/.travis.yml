@@ -1,0 +1,26 @@
+sudo: required
+language: go
+go:
+  - "1.10"
+services:
+  - docker
+jobs:
+  include:
+    - if: fork = true
+      stage: test
+      name: docker build
+      install: true
+      script: make docker_build
+    - if: fork = false
+      stage: test
+      name: docker build and push
+      install: true
+      script: make dockerhub_push
+    - stage: test
+      install: make install
+      name: lint
+      script: make lint
+    - stage: test
+      name: unit tests
+      install: make install
+      script: make test_unit
