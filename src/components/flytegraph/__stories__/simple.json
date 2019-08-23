@@ -9,7 +9,6 @@
                 "version": "ABC123"
             },
             "metadata": {},
-            "interface": { "inputs": {}, "outputs": {} },
             "nodes": [
                 { "id": "start-node" },
                 { "id": "end-node" },
@@ -65,8 +64,7 @@
                             "project": "myflyteproject",
                             "domain": "development",
                             "name": "work-find-odd-numbers",
-                            "version":
-                                "ABC123"
+                            "version": "ABC123"
                         }
                     }
                 }
@@ -129,8 +127,7 @@
                     }
                 },
                 "container": {
-                    "image":
-                        "myflyteproject:DEF123",
+                    "image": "myflyteproject:DEF123",
                     "command": ["pyflyte-execute"],
                     "args": [
                         "--task-module",
@@ -146,8 +143,7 @@
                     "env": [
                         {
                             "key": "FLYTE_CONFIGURATION_PATH",
-                            "value":
-                                "/myflyteproject/flytekit.config"
+                            "value": "/myflyteproject/flytekit.config"
                         }
                     ]
                 }

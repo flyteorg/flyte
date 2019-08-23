@@ -67,4 +67,5 @@ export const taskColors: TaskColorMap = {
     [TaskType.WAITABLE]: '#E1E8ED'
 };
 
-export const bodyFontSize = '.875rem';
+export const bodyFontSize = '0.875rem';
+export const smallFontSize = '0.75rem';

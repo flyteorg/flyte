@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { ButtonCircularProgress } from 'components/common/ButtonCircularProgress';
 import { useCommonStyles } from 'components/common/styles';
+import { smallFontSize } from 'components/Theme';
 import * as React from 'react';
 import { useTerminateExecutionState } from './useTerminateExecutionState';
 
@@ -11,7 +12,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         justifyContent: 'center'
     },
     input: {
-        fontSize: '.75rem'
+        fontSize: smallFontSize
     },
     root: {
         width: theme.spacing(30),

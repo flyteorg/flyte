@@ -1,6 +1,6 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import * as classnames from 'classnames';
-import { bodyFontFamily } from 'components/Theme';
+import { bodyFontFamily, smallFontSize } from 'components/Theme';
 import {
     NodeExecutionPhase,
     TaskExecutionPhase,
@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         flex: '0 0 auto',
         height: theme.spacing(3),
-        fontSize: '.75rem',
+        fontSize: smallFontSize,
         justifyContent: 'center',
         textTransform: 'uppercase',
         width: theme.spacing(11)

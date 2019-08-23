@@ -6,7 +6,7 @@ import { formatDateUTC, protobufDurationToHMS } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
 import { NavBarContent } from 'components/Navigation/NavBarContent';
-import { interactiveTextDisabledColor } from 'components/Theme';
+import { interactiveTextDisabledColor, smallFontSize } from 'components/Theme';
 import { Execution, TaskExecution } from 'models';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme: Theme) => {
             marginLeft: theme.spacing(2)
         },
         detailLabel: {
-            fontSize: '0.75rem',
+            fontSize: smallFontSize,
             lineHeight: 1.25
         },
         detailValue: {

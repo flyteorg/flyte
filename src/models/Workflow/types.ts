@@ -1,10 +1,11 @@
 import { Admin, Core } from 'flyteidl';
-import { Identifier } from 'models/Common';
+import { Identifier, TypedInterface } from 'models/Common';
 import { CompiledNode, ConnectionSet } from 'models/Node';
 import { CompiledTask } from 'models/Task';
 
 /** Holds information about all nodes existing in a Workflow graph */
 export interface WorkflowTemplate extends Core.IWorkflowTemplate {
+    interface?: TypedInterface;
     nodes: CompiledNode[];
 }
 
@@ -12,7 +13,6 @@ export interface WorkflowTemplate extends Core.IWorkflowTemplate {
  * version of a Workflow
  */
 export interface CompiledWorkflow extends Core.ICompiledWorkflow {
-    // interface?: CompiledWorkflowInterface;
     template: WorkflowTemplate;
     connections: ConnectionSet;
 }
