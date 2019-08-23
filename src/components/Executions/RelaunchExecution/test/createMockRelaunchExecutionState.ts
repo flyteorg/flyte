@@ -6,7 +6,10 @@ export function createMockRelaunchExecutionState(): ReturnType<
     typeof useRelaunchExecutionState
 > {
     return {
-        fetchable: createMockFetchable<WorkflowExecutionIdentifier>({}),
+        fetchable: createMockFetchable<WorkflowExecutionIdentifier>(
+            {},
+            jest.fn()
+        ),
         relaunchWorkflowExecution: jest.fn()
     };
 }
