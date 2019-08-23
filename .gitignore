@@ -1,0 +1,52 @@
+.env
+*.swp
+
+# C extensions
+*.so
+
+# Packages
+bin/
+build/
+dist/
+downloads/
+env/
+lib/
+lib64/
+parts/
+sdist/
+var/
+
+# Translations
+*.mo
+
+# build packages or files that shouldn't be in repo
+node_modules
+bower_components
+.sass-cache
+.tmp
+app/public/dist
+app/public/styles/*.css
+
+# Mr Developer (mac, editor, IDEs, etc)
+.mr.developer.cfg
+.project
+.pydevproject
+.vagrant
+.ropeproject
+.tmp
+.sass-cache
+.DS_Store
+.zedstate
+.idea
+.cache/
+venv/
+
+# Frontend
+.vscode/
+.awcache/
+.dist/
+npm-debug.log
+jest
+jest_0
+yarn-error.log
+.coverage/

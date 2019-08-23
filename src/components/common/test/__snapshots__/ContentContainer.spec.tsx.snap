@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContentContainer in centered mode matches the known snapshot 1`] = `
+<div
+  className="makeStyles-root-1 centered"
+  id="content-container"
+  style={
+    Object {
+      "marginRight": "auto",
+    }
+  }
+>
+  <div>
+    the content
+  </div>
+</div>
+`;
+
+exports[`ContentContainer matches the known snapshot 1`] = `
+<div
+  className="makeStyles-root-1"
+  id="content-container"
+  style={
+    Object {
+      "marginRight": "auto",
+    }
+  }
+>
+  <div>
+    the content
+  </div>
+</div>
+`;

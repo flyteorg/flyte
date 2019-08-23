@@ -1,0 +1,19 @@
+{
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "targets": {
+                    "browsers": ["last 2 versions", "safari >= 7"]
+                }
+            }
+        ],
+        "@babel/preset-react"
+    ],
+    "plugins": [
+        "react-hot-loader/babel",
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        ["@babel/proposal-class-properties", { "loose": true }],
+        "@babel/proposal-object-rest-spread"
+    ]
+}

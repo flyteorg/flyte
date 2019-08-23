@@ -1,0 +1,20 @@
+sudo: required
+language: node_js
+node_js: 8
+services:
+- docker
+cache: yarn
+jobs:
+  include:
+  - stage: test
+    name: docker build and push
+    install: true
+    script: make dockerhub_push
+  - stage: test
+    name: unit tests
+    install: make install
+    script: make test_unit
+  - stage: test
+    install: make install
+    name: lint
+    script: make lint
