@@ -22,7 +22,7 @@ const options = mockWorkflowVersions.map<WorkflowSelectorOption>(
         name: wf.id.version,
         description:
             index === 0
-                ? 'latest'
+                ? 'Latest'
                 : moment()
                       .subtract(index, 'days')
                       .format('DD MMM YYYY')

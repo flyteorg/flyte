@@ -3,11 +3,13 @@ import {
     InputAdornment,
     MenuItem,
     Paper,
-    TextField
+    TextField,
+    Typography
 } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+import { useCommonStyles } from 'components/common/styles';
 import { FetchableData } from 'components/hooks';
 import { NamedEntityIdentifier, WorkflowId } from 'models';
 import * as React from 'react';
@@ -16,6 +18,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     container: {
         flexGrow: 1,
         position: 'relative'
+    },
+    menuItem: {
+        display: 'flex',
+        justifyContent: 'space-between'
     },
     paper: {
         border: `1px solid ${theme.palette.divider}`,
@@ -86,6 +92,7 @@ function useWorkflowSelectorState(props: WorkflowSelectorProps) {
 
 export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
     const styles = useStyles();
+    const commonStyles = useCommonStyles();
     const {
         inputValue,
         isOpen,
@@ -134,6 +141,7 @@ export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
                         const onClick = () => selectItem(item);
                         return (
                             <MenuItem
+                                className={styles.menuItem}
                                 onClick={onClick}
                                 key={item.id}
                                 // selected={isHighlighted}
@@ -143,6 +151,9 @@ export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
                                 // }}
                             >
                                 {item.name}
+                                <span className={commonStyles.hintText}>
+                                    {item.description}
+                                </span>
                             </MenuItem>
                         );
                     })}
