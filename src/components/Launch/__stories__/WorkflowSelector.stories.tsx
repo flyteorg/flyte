@@ -18,8 +18,8 @@ const mockWorkflowVersions = createMockWorkflowVersions(
 const options = mockWorkflowVersions.map<WorkflowSelectorOption>(
     (wf, index) => ({
         data: wf.id,
-        id: wf.id.name,
-        name: wf.id.name,
+        id: wf.id.version,
+        name: wf.id.version,
         description:
             index === 0
                 ? 'latest'
@@ -35,10 +35,9 @@ stories.addDecorator(story => {
     return <div style={{ width: 600, height: '95vh' }}>{story()}</div>;
 });
 
-const onSelectionChanged = (...args: any[]) => console.log(args);
-
 stories.add('Basic', () => {
     const [searchValue, setSearchValue] = React.useState<string>();
+    const [selectedItem, setSelectedItem] = React.useState(options[0]);
 
     const fetch = () => resolveAfter(1000, []);
     const searchResults = createMockFetchable<WorkflowSelectorOption[]>(
@@ -49,10 +48,10 @@ stories.add('Basic', () => {
     return (
         <WorkflowSelector
             searchResults={searchResults}
-            onSelectionChanged={onSelectionChanged}
+            onSelectionChanged={setSelectedItem}
             onSearchStringChanged={setSearchValue}
             searchValue={searchValue}
-            selectedItem={options[0]}
+            selectedItem={selectedItem}
             options={options}
             workflowId={mockWorkflow.id}
         />
