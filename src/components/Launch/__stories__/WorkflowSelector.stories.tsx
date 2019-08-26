@@ -1,6 +1,5 @@
 import { storiesOf } from '@storybook/react';
 import { resolveAfter } from 'common/promiseUtils';
-import { createMockFetchable } from 'components/hooks/__mocks__/fetchableData';
 import {
     createMockWorkflow,
     createMockWorkflowVersions
@@ -36,21 +35,14 @@ stories.addDecorator(story => {
 });
 
 stories.add('Basic', () => {
-    const [searchValue, setSearchValue] = React.useState<string>();
     const [selectedItem, setSelectedItem] = React.useState(options[0]);
-
-    const fetch = () => resolveAfter(1000, []);
-    const searchResults = createMockFetchable<WorkflowSelectorOption[]>(
-        [],
-        fetch
-    );
+    const fetch = (query: string) =>
+        resolveAfter(750, options.filter(({ name }) => name.includes(query)));
 
     return (
         <WorkflowSelector
-            searchResults={searchResults}
+            fetchSearchResults={fetch}
             onSelectionChanged={setSelectedItem}
-            onSearchStringChanged={setSearchValue}
-            searchValue={searchValue}
             selectedItem={selectedItem}
             options={options}
             workflowId={mockWorkflow.id}

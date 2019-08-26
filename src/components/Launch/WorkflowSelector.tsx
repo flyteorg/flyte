@@ -3,16 +3,19 @@ import {
     InputAdornment,
     MenuItem,
     Paper,
-    TextField,
-    Typography
+    TextField
 } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import { useCommonStyles } from 'components/common/styles';
-import { FetchableData } from 'components/hooks';
+import { FetchFn, useFetchableData } from 'components/hooks';
+import { useDebouncedValue } from 'components/hooks/useDebouncedValue';
 import { NamedEntityIdentifier, WorkflowId } from 'models';
 import * as React from 'react';
+
+const minimumQuerySize = 3;
+const searchDebounceTimeMs = 500;
 
 const useStyles = makeStyles((theme: Theme) => ({
     container: {
@@ -42,90 +45,146 @@ export interface WorkflowSelectorOption {
 
 export interface WorkflowSelectorProps {
     options: WorkflowSelectorOption[];
-    searchResults: FetchableData<WorkflowSelectorOption[]>;
-    searchValue?: string;
     selectedItem?: WorkflowSelectorOption;
     workflowId: NamedEntityIdentifier;
-    onSearchStringChanged(newValue: string): void;
+    fetchSearchResults: FetchFn<WorkflowSelectorOption[], string>;
     onSelectionChanged(newSelection: WorkflowSelectorOption): void;
 }
 
-function useWorkflowSelectorState(props: WorkflowSelectorProps) {
-    const {
-        options,
-        searchResults,
-        searchValue = '',
-        selectedItem,
-        workflowId,
-        onSearchStringChanged,
-        onSelectionChanged
-    } = props;
-    const [isOpen, setIsOpen] = React.useState(false);
-    const [items, setItems] = React.useState(options);
-    const searchActive = searchValue.length > 0;
-    let inputValue = '';
+function useWorkflowSelectorState({
+    fetchSearchResults,
+    options,
+    selectedItem,
+    workflowId,
+    onSelectionChanged
+}: WorkflowSelectorProps) {
+    const [rawSearchValue, setSearchValue] = React.useState('');
+    const debouncedSearchValue = useDebouncedValue(
+        rawSearchValue,
+        searchDebounceTimeMs
+    );
 
-    if (searchActive) {
-        inputValue = searchValue;
+    const [isExpanded, setIsExpanded] = React.useState(false);
+    const [focused, setFocused] = React.useState(false);
+
+    const searchResults = useFetchableData<WorkflowSelectorOption[], string>(
+        {
+            defaultValue: [],
+            autoFetch: debouncedSearchValue.length > minimumQuerySize,
+            debugName: 'WorkflowSelector Search',
+            doFetch: fetchSearchResults
+        },
+        debouncedSearchValue
+    );
+    const items = focused ? searchResults.value : options;
+
+    let inputValue = '';
+    if (focused) {
+        inputValue = rawSearchValue;
     } else if (selectedItem) {
         inputValue = selectedItem.name;
     }
 
+    const onBlur = () => {
+        setFocused(false);
+    };
+
+    const onFocus = () => {
+        setFocused(true);
+    };
+
+    const onClickTextInput = () => {
+        if (!focused) {
+            setSearchValue('');
+            setIsExpanded(false);
+        }
+    };
+
     const onChange = ({
         target: { value }
-    }: React.ChangeEvent<HTMLInputElement>) => onSearchStringChanged(value);
+    }: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchValue(value);
+    };
 
     const selectItem = (item: WorkflowSelectorOption) => {
-        setIsOpen(false);
+        console.log(item.id);
         onSelectionChanged(item);
+        setSearchValue('');
+        setFocused(false);
+        setIsExpanded(false);
     };
+
+    const showSearchResults =
+        (searchResults.hasLoaded || searchResults.loading) && focused;
+    const showList = showSearchResults || isExpanded;
 
     return {
         inputValue,
-        isOpen,
+        isExpanded,
         items,
+        onBlur,
         onChange,
+        onClickTextInput,
+        onFocus,
+        searchResults,
         selectItem,
-        setIsOpen
+        setIsExpanded,
+        showList
     };
 }
+
+const preventBubble = (event: React.MouseEvent<any>) => {
+    event.preventDefault();
+};
 
 export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
     const styles = useStyles();
     const commonStyles = useCommonStyles();
     const {
         inputValue,
-        isOpen,
+        isExpanded,
         items,
+        onBlur,
         onChange,
+        onClickTextInput,
+        onFocus,
         selectItem,
-        setIsOpen
+        setIsExpanded,
+        showList
     } = useWorkflowSelectorState(props);
+    const inputRef = React.useRef<HTMLInputElement>();
 
-    const handleClickShowOptions = () => {
-        setIsOpen(!isOpen);
+    const blurInput = () => {
+        if (inputRef.current) {
+            inputRef.current.blur();
+        }
     };
 
-    const handleMouseDownShowOptions = (
-        event: React.MouseEvent<HTMLButtonElement>
-    ) => {
-        event.preventDefault();
+    const handleClickShowOptions = () => {
+        blurInput();
+        setIsExpanded(!isExpanded);
     };
 
     return (
         <div className={styles.container}>
             <TextField
+                inputRef={inputRef}
                 fullWidth={true}
+                inputProps={{
+                    onClick: onClickTextInput
+                }}
                 InputProps={{
+                    onBlur,
+                    onFocus,
                     endAdornment: (
                         <InputAdornment position="end">
                             <IconButton
                                 edge="end"
                                 onClick={handleClickShowOptions}
-                                onMouseDown={handleMouseDownShowOptions}
+                                onMouseDown={preventBubble}
                                 size="small"
                             >
-                                {isOpen ? <ExpandLess /> : <ExpandMore />}
+                                {isExpanded ? <ExpandLess /> : <ExpandMore />}
                             </IconButton>
                         </InputAdornment>
                     )
@@ -135,14 +194,18 @@ export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
                 value={inputValue}
                 variant="outlined"
             />
-            {isOpen ? (
+            {showList ? (
                 <Paper className={styles.paper} elevation={1}>
                     {items.map(item => {
-                        const onClick = () => selectItem(item);
+                        const onClick = () => {
+                            selectItem(item);
+                            blurInput();
+                        };
                         return (
                             <MenuItem
                                 className={styles.menuItem}
                                 onClick={onClick}
+                                onMouseDown={preventBubble}
                                 key={item.id}
                                 // selected={isHighlighted}
                                 component="div"
