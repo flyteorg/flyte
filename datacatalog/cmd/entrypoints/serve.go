@@ -28,7 +28,7 @@ var serveCmd = &cobra.Command{
 		go func() {
 			err := serveHealthcheck(ctx, cfg)
 			if err != nil {
-				logger.Errorf(ctx, "Unable to serve http", config.GetConfig().GetGrpcHostAddress(), err)
+				logger.Errorf(ctx, "Unable to serve http", config.GetConfig().GetHTTPHostAddress(), err)
 			}
 		}()
 

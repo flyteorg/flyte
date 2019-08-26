@@ -12,6 +12,7 @@ import (
 	"github.com/lyft/datacatalog/pkg/runtime"
 	catalog "github.com/lyft/datacatalog/protos/gen"
 	"github.com/lyft/flytestdlib/logger"
+	"github.com/lyft/flytestdlib/profutils"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/storage"
 )
@@ -85,6 +86,15 @@ func NewDataCatalogService() *DataCatalogService {
 	}
 	repos := repositories.GetRepository(repositories.POSTGRES, dbConfig, catalogScope)
 	logger.Infof(ctx, "Created DB connection.")
+
+	// Serve profiling endpoint.
+	go func() {
+		err := profutils.StartProfilingServerWithDefaultHandlers(
+			context.Background(), dataCatalogConfig.ProfilerPort, nil)
+		if err != nil {
+			logger.Panicf(context.Background(), "Failed to Start profiling and Metrics server. Error, %v", err)
+		}
+	}()
 
 	return &DataCatalogService{
 		DatasetManager:  impl.NewDatasetManager(repos, dataStorageClient, catalogScope.NewSubScope("dataset")),
