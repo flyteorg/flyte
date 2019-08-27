@@ -42,6 +42,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         position: 'absolute',
         right: 0,
         zIndex: 1
+    },
+    selectedItem: {
+        fontWeight: 'bold'
     }
 }));
 
@@ -74,11 +77,12 @@ function useWorkflowSelectorState({
 
     const [isExpanded, setIsExpanded] = React.useState(false);
     const [focused, setFocused] = React.useState(false);
+    const minimumQueryMet = debouncedSearchValue.length > minimumQuerySize;
 
     const searchResults = useFetchableData<WorkflowSelectorOption[], string>(
         {
             defaultValue: [],
-            autoFetch: debouncedSearchValue.length > minimumQuerySize,
+            autoFetch: minimumQueryMet,
             debugName: 'WorkflowSelector Search',
             doFetch: fetchSearchResults
         },
@@ -116,7 +120,9 @@ function useWorkflowSelectorState({
     };
 
     const showSearchResults =
-        (searchResults.hasLoaded || searchResults.loading) && focused;
+        (searchResults.hasLoaded || searchResults.loading) &&
+        focused &&
+        minimumQueryMet;
     const showList = showSearchResults || isExpanded;
 
     return {
@@ -128,6 +134,7 @@ function useWorkflowSelectorState({
         onFocus,
         searchResults,
         selectItem,
+        selectedItem,
         setIsExpanded,
         showList
     };
@@ -154,6 +161,7 @@ const LoadingContent: React.FC = () => (
 const SelectorItems: React.FC<ReturnType<typeof useWorkflowSelectorState>> = ({
     items,
     selectItem,
+    selectedItem,
     searchResults
 }) => {
     const styles = useStyles();
@@ -168,19 +176,22 @@ const SelectorItems: React.FC<ReturnType<typeof useWorkflowSelectorState>> = ({
         <>
             {items.map(item => {
                 const onClick = () => selectItem(item);
+                const selected = selectedItem && selectedItem.id === item.id;
                 return (
                     <MenuItem
                         className={styles.menuItem}
                         onClick={onClick}
                         onMouseDown={preventBubble}
                         key={item.id}
-                        // selected={isHighlighted}
                         component="div"
-                        // style={{
-                        //     fontWeight: isSelected ? 500 : 400
-                        // }}
                     >
-                        {item.name}
+                        <span
+                            className={
+                                selected ? styles.selectedItem : undefined
+                            }
+                        >
+                            {item.name}
+                        </span>
                         <span className={commonStyles.hintText}>
                             {item.description}
                         </span>

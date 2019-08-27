@@ -37,7 +37,7 @@ stories.addDecorator(story => {
 stories.add('Basic', () => {
     const [selectedItem, setSelectedItem] = React.useState(options[0]);
     const fetch = (query: string) =>
-        resolveAfter(750, options.filter(({ name }) => name.includes(query)));
+        resolveAfter(500, options.filter(({ name }) => name.includes(query)));
 
     return (
         <WorkflowSelector
