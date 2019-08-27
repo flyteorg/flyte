@@ -14,6 +14,9 @@ import { FetchFn, useFetchableData } from 'components/hooks';
 import { useDebouncedValue } from 'components/hooks/useDebouncedValue';
 import { NamedEntityIdentifier, WorkflowId } from 'models';
 import * as React from 'react';
+import reactLoadingSkeleton from 'react-loading-skeleton';
+
+const Skeleton = reactLoadingSkeleton;
 
 const minimumQuerySize = 3;
 const searchDebounceTimeMs = 500;
@@ -26,6 +29,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     menuItem: {
         display: 'flex',
         justifyContent: 'space-between'
+    },
+    placeholderResult: {
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none'
     },
     paper: {
         border: `1px solid ${theme.palette.divider}`,
@@ -56,7 +64,6 @@ function useWorkflowSelectorState({
     fetchSearchResults,
     options,
     selectedItem,
-    workflowId,
     onSelectionChanged
 }: WorkflowSelectorProps) {
     const [rawSearchValue, setSearchValue] = React.useState('');
@@ -94,13 +101,6 @@ function useWorkflowSelectorState({
         setFocused(true);
     };
 
-    const onClickTextInput = () => {
-        if (!focused) {
-            setSearchValue('');
-            setIsExpanded(false);
-        }
-    };
-
     const onChange = ({
         target: { value }
     }: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,7 +125,6 @@ function useWorkflowSelectorState({
         items,
         onBlur,
         onChange,
-        onClickTextInput,
         onFocus,
         searchResults,
         selectItem,
@@ -138,30 +137,86 @@ const preventBubble = (event: React.MouseEvent<any>) => {
     event.preventDefault();
 };
 
+const NoResultsContent: React.FC = () => (
+    <MenuItem className={useStyles().placeholderResult} disabled={true}>
+        No results found.
+    </MenuItem>
+);
+
+const LoadingContent: React.FC = () => (
+    <MenuItem className={useStyles().placeholderResult} disabled={true}>
+        <div style={{ width: '100%' }}>
+            <Skeleton />
+        </div>
+    </MenuItem>
+);
+
+const SelectorItems: React.FC<ReturnType<typeof useWorkflowSelectorState>> = ({
+    items,
+    selectItem,
+    searchResults
+}) => {
+    const styles = useStyles();
+    const commonStyles = useCommonStyles();
+    if (searchResults.loading) {
+        return <LoadingContent />;
+    }
+    if (items.length === 0) {
+        return <NoResultsContent />;
+    }
+    return (
+        <>
+            {items.map(item => {
+                const onClick = () => selectItem(item);
+                return (
+                    <MenuItem
+                        className={styles.menuItem}
+                        onClick={onClick}
+                        onMouseDown={preventBubble}
+                        key={item.id}
+                        // selected={isHighlighted}
+                        component="div"
+                        // style={{
+                        //     fontWeight: isSelected ? 500 : 400
+                        // }}
+                    >
+                        {item.name}
+                        <span className={commonStyles.hintText}>
+                            {item.description}
+                        </span>
+                    </MenuItem>
+                );
+            })}
+        </>
+    );
+};
+
 /** Combines a dropdown selector of default options with a searchable text input
  * that will fetch results using a provided function.
  */
 export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
     const styles = useStyles();
-    const commonStyles = useCommonStyles();
+    const state = useWorkflowSelectorState(props);
     const {
         inputValue,
         isExpanded,
-        items,
         onBlur,
         onChange,
-        onClickTextInput,
         onFocus,
-        selectItem,
         setIsExpanded,
         showList
-    } = useWorkflowSelectorState(props);
+    } = state;
     const inputRef = React.useRef<HTMLInputElement>();
 
     const blurInput = () => {
         if (inputRef.current) {
             inputRef.current.blur();
         }
+    };
+
+    const selectItem = (item: WorkflowSelectorOption) => {
+        state.selectItem(item);
+        blurInput();
     };
 
     const handleClickShowOptions = () => {
@@ -174,9 +229,6 @@ export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
             <TextField
                 inputRef={inputRef}
                 fullWidth={true}
-                inputProps={{
-                    onClick: onClickTextInput
-                }}
                 InputProps={{
                     onBlur,
                     onFocus,
@@ -201,30 +253,7 @@ export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
             />
             {showList ? (
                 <Paper className={styles.paper} elevation={1}>
-                    {items.map(item => {
-                        const onClick = () => {
-                            selectItem(item);
-                            blurInput();
-                        };
-                        return (
-                            <MenuItem
-                                className={styles.menuItem}
-                                onClick={onClick}
-                                onMouseDown={preventBubble}
-                                key={item.id}
-                                // selected={isHighlighted}
-                                component="div"
-                                // style={{
-                                //     fontWeight: isSelected ? 500 : 400
-                                // }}
-                            >
-                                {item.name}
-                                <span className={commonStyles.hintText}>
-                                    {item.description}
-                                </span>
-                            </MenuItem>
-                        );
-                    })}
+                    <SelectorItems {...state} selectItem={selectItem} />
                 </Paper>
             ) : null}
         </div>
