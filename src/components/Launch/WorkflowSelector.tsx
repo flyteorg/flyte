@@ -8,6 +8,7 @@ import {
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+import { escapeKeyListener } from 'components/common/keyboardEvents';
 import { useCommonStyles } from 'components/common/styles';
 import { FetchFn, useFetchableData } from 'components/hooks';
 import { useDebouncedValue } from 'components/hooks/useDebouncedValue';
@@ -137,6 +138,9 @@ const preventBubble = (event: React.MouseEvent<any>) => {
     event.preventDefault();
 };
 
+/** Combines a dropdown selector of default options with a searchable text input
+ * that will fetch results using a provided function.
+ */
 export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
     const styles = useStyles();
     const commonStyles = useCommonStyles();
@@ -176,6 +180,7 @@ export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
                 InputProps={{
                     onBlur,
                     onFocus,
+                    onKeyDown: escapeKeyListener(blurInput),
                     endAdornment: (
                         <InputAdornment position="end">
                             <IconButton
