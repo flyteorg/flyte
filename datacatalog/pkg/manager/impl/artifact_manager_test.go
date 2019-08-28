@@ -20,6 +20,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+func init() {
+	labeled.SetMetricKeys(contextutils.AppNameKey)
+}
+
 func createInmemoryDataStore(t testing.TB, scope mockScope.Scope) *storage.DataStore {
 	labeled.SetMetricKeys(contextutils.AppNameKey)
 	cfg := storage.Config{

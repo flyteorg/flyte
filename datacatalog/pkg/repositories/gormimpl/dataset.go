@@ -7,27 +7,30 @@ import (
 	"github.com/lyft/datacatalog/pkg/repositories/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/interfaces"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
-
 	idl_datacatalog "github.com/lyft/datacatalog/protos/gen"
 	"github.com/lyft/flytestdlib/logger"
+	"github.com/lyft/flytestdlib/promutils"
 )
 
 type dataSetRepo struct {
 	db               *gorm.DB
 	errorTransformer errors.ErrorTransformer
-
-	// TODO: add metrics
+	repoMetrics      gormMetrics
 }
 
-func NewDatasetRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer) interfaces.DatasetRepo {
+func NewDatasetRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.DatasetRepo {
 	return &dataSetRepo{
 		db:               db,
 		errorTransformer: errorTransformer,
+		repoMetrics:      newGormMetrics(scope),
 	}
 }
 
 // Create a Dataset model
 func (h *dataSetRepo) Create(ctx context.Context, in models.Dataset) error {
+	timer := h.repoMetrics.CreateDuration.Start(ctx)
+	defer timer.Stop()
+
 	result := h.db.Create(&in)
 	if result.Error != nil {
 		return h.errorTransformer.ToDataCatalogError(result.Error)
@@ -37,6 +40,9 @@ func (h *dataSetRepo) Create(ctx context.Context, in models.Dataset) error {
 
 // Get Dataset model
 func (h *dataSetRepo) Get(ctx context.Context, in models.DatasetKey) (models.Dataset, error) {
+	timer := h.repoMetrics.GetDuration.Start(ctx)
+	defer timer.Stop()
+
 	var ds models.Dataset
 	result := h.db.Where(&models.Dataset{DatasetKey: in}).First(&ds)
 

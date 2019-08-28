@@ -11,9 +11,11 @@ import (
 	"github.com/lyft/datacatalog/pkg/repositories/config"
 	"github.com/lyft/datacatalog/pkg/runtime"
 	catalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/profutils"
 	"github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
 	"github.com/lyft/flytestdlib/storage"
 )
 
@@ -23,7 +25,6 @@ type DataCatalogService struct {
 	TagManager      interfaces.TagManager
 }
 
-// TODO: add metrics and counters to these service methods
 func (s *DataCatalogService) CreateDataset(ctx context.Context, request *catalog.CreateDatasetRequest) (*catalog.CreateDatasetResponse, error) {
 	return s.DatasetManager.CreateDataset(ctx, *request)
 }
@@ -49,6 +50,9 @@ func NewDataCatalogService() *DataCatalogService {
 
 	dataCatalogScope := "datacatalog"
 	catalogScope := promutils.NewScope(dataCatalogScope).NewSubScope("service")
+
+	// Set Keys
+	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
 
 	defer func() {
 		if err := recover(); err != nil {

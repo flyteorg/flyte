@@ -16,7 +16,14 @@ import (
 	"github.com/lyft/datacatalog/pkg/repositories/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	"github.com/lyft/datacatalog/pkg/repositories/utils"
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
 )
+
+func init() {
+	labeled.SetMetricKeys(contextutils.AppNameKey)
+}
 
 func getTestDataset() models.Dataset {
 	return models.Dataset{
@@ -49,7 +56,7 @@ func TestCreateDataset(t *testing.T) {
 		},
 	)
 
-	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	err := datasetRepo.Create(context.Background(), getTestDataset())
 	assert.NoError(t, err)
 	assert.True(t, datasetCreated)
@@ -72,7 +79,7 @@ func TestGetDataset(t *testing.T) {
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL AND (("datasets"."project" = testProject) AND ("datasets"."name" = testName) AND ("datasets"."domain" = testDomain) AND ("datasets"."version" = testVersion)) ORDER BY "datasets"."project" ASC LIMIT 1`).WithReply(expectedResponse)
 
-	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	actualDataset, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
 	assert.NoError(t, err)
 	assert.Equal(t, dataset.Project, actualDataset.Project)
@@ -95,7 +102,7 @@ func TestGetDatasetNotFound(t *testing.T) {
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL AND (("datasets"."project" = testProject) AND ("datasets"."name" = testName) AND ("datasets"."domain" = testDomain) AND ("datasets"."version" = testVersion)) ORDER BY "datasets"."id" ASC LIMIT 1`).WithReply(nil)
 
-	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	_, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
 	assert.Error(t, err)
 	notFoundErr, ok := err.(datacatalog_error.DataCatalogError)
@@ -113,7 +120,7 @@ func TestCreateDatasetAlreadyExists(t *testing.T) {
 		getAlreadyExistsErr(),
 	)
 
-	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	err := datasetRepo.Create(context.Background(), getTestDataset())
 	assert.Error(t, err)
 	dcErr, ok := err.(datacatalog_error.DataCatalogError)

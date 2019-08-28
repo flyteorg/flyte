@@ -212,7 +212,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:72841617053e049a34e8d98232b863fe5c173cdf03a4d8bc8dc9039303ad418e"
+  digest = "1:87d447239dd6752a762a4f94652b69c46cb53ca3d32dc52898857f7d1776c701"
   name = "github.com/lyft/flyteidl"
   packages = ["gen/pb-go/flyteidl/core"]
   pruneopts = "T"
@@ -220,7 +220,7 @@
   version = "v0.1.0"
 
 [[projects]]
-  digest = "1:6cc3cfda698262608d464cd89bfab217bb8fa8d507bf13b82cd585a520aed37d"
+  digest = "1:ef46e605151d1cacde38e96f3dac8d458d5380d3be4b58cae9e7c8220c8fffd2"
   name = "github.com/lyft/flytestdlib"
   packages = [
     "atomic",
@@ -230,9 +230,11 @@
     "contextutils",
     "ioutils",
     "logger",
+    "profutils",
     "promutils",
     "promutils/labeled",
     "storage",
+    "version",
   ]
   pruneopts = "NUT"
   revision = "2577ff228d559b8fdf687f6cfad196bfbf1bd50a"
@@ -311,11 +313,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:0f362379987ecc2cf4df1b8e4c1653a782f6f9f77f749547b734499b3c543080"
+  digest = "1:3d7ad9c93ee2e43dc7dd48b76f96804c365be7fe30e75f7405028c4e633d189a"
   name = "github.com/prometheus/client_golang"
   packages = [
     "prometheus",
     "prometheus/internal",
+    "prometheus/promhttp",
   ]
   pruneopts = "NUT"
   revision = "2641b987480bca71fb39738eb8c8b0d577cb1d76"
@@ -584,11 +587,11 @@
     "github.com/lyft/flytestdlib/config/viper",
     "github.com/lyft/flytestdlib/contextutils",
     "github.com/lyft/flytestdlib/logger",
+    "github.com/lyft/flytestdlib/profutils",
     "github.com/lyft/flytestdlib/promutils",
     "github.com/lyft/flytestdlib/promutils/labeled",
     "github.com/lyft/flytestdlib/storage",
     "github.com/mitchellh/mapstructure",
-    "github.com/pkg/errors",
     "github.com/spf13/cobra",
     "github.com/spf13/pflag",
     "github.com/stretchr/testify/assert",

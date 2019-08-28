@@ -16,8 +16,15 @@ import (
 	"github.com/lib/pq"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	"github.com/lyft/datacatalog/pkg/repositories/utils"
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
 	"google.golang.org/grpc/codes"
 )
+
+func init() {
+	labeled.SetMetricKeys(contextutils.AppNameKey)
+}
 
 func getAlreadyExistsErr() error {
 	return &pq.Error{Code: "23505"}
@@ -50,7 +57,7 @@ func TestCreateTag(t *testing.T) {
 		},
 	)
 
-	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	err := tagRepo.Create(context.Background(), getTestTag())
 	assert.NoError(t, err)
 	assert.True(t, tagCreated)
@@ -109,7 +116,7 @@ func TestGetTag(t *testing.T) {
 		TagName:        "test-tag",
 	}
 
-	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	response, err := tagRepo.Get(context.Background(), getInput)
 	assert.NoError(t, err)
 	assert.Equal(t, artifact.ArtifactID, response.ArtifactID)
@@ -127,7 +134,7 @@ func TestTagAlreadyExists(t *testing.T) {
 		getAlreadyExistsErr(),
 	)
 
-	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	err := tagRepo.Create(context.Background(), getTestTag())
 	assert.Error(t, err)
 	dcErr, ok := err.(datacatalog_error.DataCatalogError)
