@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { SectionHeader, WaitForData, withRouteParams } from 'components/common';
 import { useLaunchPlans } from 'components/hooks';
-import { SchedulesTable } from 'components/Launch';
+import { SchedulesTable } from 'components/Launch/SchedulesTable';
 
 import { SortDirection } from 'models/AdminEntity';
 import { launchSortFields } from 'models/Launch';

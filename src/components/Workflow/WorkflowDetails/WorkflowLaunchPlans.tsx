@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { WaitForData, withRouteParams } from 'components/common';
 import { useLaunchPlans } from 'components/hooks';
-import { LaunchPlansTable } from 'components/Launch';
+import { LaunchPlansTable } from 'components/Launch/LaunchPlansTable';
 
 import { launchSortFields, SortDirection } from 'models';
 
