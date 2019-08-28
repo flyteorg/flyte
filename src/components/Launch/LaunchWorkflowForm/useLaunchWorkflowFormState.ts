@@ -1,11 +1,12 @@
 import { useAPIContext } from 'components/data/apiContext';
-import { useFetchableData, useWorkflows } from 'components/hooks';
+import { useFetchableData, useWorkflow, useWorkflows } from 'components/hooks';
 import {
     FilterOperationName,
     LaunchPlan,
     LiteralType,
     Workflow,
-    WorkflowExecutionIdentifier
+    WorkflowExecutionIdentifier,
+    WorkflowId
 } from 'models';
 import { useEffect, useMemo, useState } from 'react';
 import { useDefaultLaunchPlan } from '../useDefaultLaunchPlan';
@@ -23,6 +24,7 @@ import {
     getWorkflowInputs,
     workflowsToWorkflowSelectorOptions
 } from './utils';
+import { WorkflowSelectorOption } from './WorkflowSelector';
 
 // We use a non-empty string for the description to allow display components
 // to depend on the existence of a value
@@ -137,37 +139,42 @@ function useWorkflowSelectorOptions(workflows: Workflow[]) {
     ]);
 }
 
-function useLaunchPlansForWorkflow(workflow?: Workflow) {
+function useLaunchPlansForWorkflow(workflowId: WorkflowId | null = null) {
     const { listLaunchPlans } = useAPIContext();
-    return useFetchableData<LaunchPlan[], Workflow | undefined>({
-        autoFetch: !!workflow,
-        debugName: 'useLaunchPlansForWorkflow',
-        defaultValue: [],
-        doFetch: async workflow => {
-            if (!workflow) return Promise.reject('No workflow specified');
-            const { project, domain, name, version } = workflow.id;
-            const { entities } = await listLaunchPlans(
-                { project, domain },
-                // TODO: Only active?
-                {
-                    filter: [
-                        {
-                            key: 'workflow.name',
-                            operation: FilterOperationName.EQ,
-                            value: name
-                        },
-                        {
-                            key: 'workflow.version',
-                            operation: FilterOperationName.EQ,
-                            value: version
-                        }
-                    ],
-                    limit: 10
+    return useFetchableData<LaunchPlan[], WorkflowId | null>(
+        {
+            autoFetch: workflowId !== null,
+            debugName: 'useLaunchPlansForWorkflow',
+            defaultValue: [],
+            doFetch: async workflowId => {
+                if (workflowId === null) {
+                    return Promise.reject('No workflowId specified');
                 }
-            );
-            return entities;
-        }
-    });
+                const { project, domain, name, version } = workflowId;
+                const { entities } = await listLaunchPlans(
+                    { project, domain },
+                    // TODO: Only active?
+                    {
+                        filter: [
+                            {
+                                key: 'workflow.name',
+                                operation: FilterOperationName.EQ,
+                                value: name
+                            },
+                            {
+                                key: 'workflow.version',
+                                operation: FilterOperationName.EQ,
+                                value: version
+                            }
+                        ],
+                        limit: 10
+                    }
+                );
+                return entities;
+            }
+        },
+        workflowId
+    );
 }
 
 /** Contains all of the form state for a LaunchWorkflowForm, including input
@@ -178,13 +185,19 @@ export function useLaunchWorkflowFormState({
 }: LaunchWorkflowFormProps): LaunchWorkflowFormState {
     const workflows = useWorkflows(workflowId, { limit: 10 });
     const workflowSelectorOptions = useWorkflowSelectorOptions(workflows.value);
-    const [selectedWorkflow, setWorkflow] = useState<Workflow>();
-    const defaultLaunchPlan = useDefaultLaunchPlan(selectedWorkflow);
+    const [selectedWorkflow, setWorkflow] = useState<WorkflowSelectorOption>();
+    const selectedWorkflowId = selectedWorkflow ? selectedWorkflow.data : null;
+    const defaultLaunchPlan = useDefaultLaunchPlan(selectedWorkflowId);
 
-    const launchPlans = useLaunchPlansForWorkflow(selectedWorkflow);
-    const [selectedLaunchPlan, setLaunchPlan] = useState<
-        LaunchPlan | undefined
-    >();
+    // We have to do a single item get once a workflow is selected so that we
+    // receive the full workflow spec
+    const workflow = useWorkflow(selectedWorkflowId);
+
+    const launchPlans = useLaunchPlansForWorkflow(selectedWorkflowId);
+    const [selectedLaunchPlan, setLaunchPlan] = useState<LaunchPlan>();
+    const launchPlan = selectedLaunchPlan
+        ? selectedLaunchPlan
+        : defaultLaunchPlan.value;
 
     const [parsedInputs, setParsedInputs] = useState<ParsedInput[]>([]);
     const { inputs } = useFormInputsState(parsedInputs);
@@ -212,12 +225,12 @@ export function useLaunchWorkflowFormState({
     useEffect(
         () => {
             const parsedInputs =
-                selectedLaunchPlan && selectedWorkflow
-                    ? getInputs(selectedWorkflow, selectedLaunchPlan)
+                launchPlan && workflow.hasLoaded
+                    ? getInputs(workflow.value, launchPlan)
                     : [];
             setParsedInputs(parsedInputs);
         },
-        [selectedWorkflow, selectedLaunchPlan]
+        [selectedWorkflow, launchPlan]
     );
 
     return {
@@ -229,9 +242,9 @@ export function useLaunchWorkflowFormState({
         selectedLaunchPlan,
         selectedWorkflow,
         setLaunchPlan,
-        setWorkflow,
         submissionState,
         workflowName,
-        workflowSelectorOptions
+        workflowSelectorOptions,
+        onSelectWorkflow: setWorkflow
     };
 }

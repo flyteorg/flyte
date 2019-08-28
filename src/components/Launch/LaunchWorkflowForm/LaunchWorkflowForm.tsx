@@ -5,13 +5,16 @@ import {
     Typography
 } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+import { rejectAfter } from 'common/promiseUtils';
 import { ButtonCircularProgress } from 'components/common/ButtonCircularProgress';
+import { FetchFn } from 'components/hooks';
 import { smallFontSize } from 'components/Theme';
 import * as React from 'react';
 import { SimpleInput } from './SimpleInput';
 import { InputProps, InputType, LaunchWorkflowFormProps } from './types';
 import { UnsupportedInput } from './UnsupportedInput';
 import { useLaunchWorkflowFormState } from './useLaunchWorkflowFormState';
+import { WorkflowSelector, WorkflowSelectorOption } from './WorkflowSelector';
 
 const useStyles = makeStyles((theme: Theme) => ({
     footer: {
@@ -53,6 +56,9 @@ function getComponentForInput(input: InputProps) {
     }
 }
 
+const fetchSearchResults: FetchFn<WorkflowSelectorOption[], string> = () =>
+    rejectAfter(0, 'Not Implemented');
+
 /** Renders the form for initiating a Launch request based on a Workflow */
 export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
     const state = useLaunchWorkflowFormState(props);
@@ -70,6 +76,12 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                 <Typography variant="h6">{state.workflowName}</Typography>
             </header>
             <section className={styles.inputsSection}>
+                <WorkflowSelector
+                    onSelectionChanged={state.onSelectWorkflow}
+                    options={state.workflowSelectorOptions}
+                    fetchSearchResults={fetchSearchResults}
+                    selectedItem={state.selectedWorkflow}
+                />
                 {state.inputs.map(input => (
                     <div key={input.label} className={styles.formControl}>
                         {getComponentForInput(input)}

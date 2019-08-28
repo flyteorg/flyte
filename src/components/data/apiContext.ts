@@ -14,15 +14,18 @@ type APIFunctions = typeof CommonAPI &
     typeof WorkflowAPI;
 
 export interface APIContextValue extends APIFunctions {}
-
-export const APIContext = React.createContext<APIContextValue>({
+export const defaultAPIContextValue = {
     ...CommonAPI,
     ...ExecutionAPI,
     ...LaunchAPI,
     ...ProjectAPI,
     ...TaskAPI,
     ...WorkflowAPI
-});
+};
+
+export const APIContext = React.createContext<APIContextValue>(
+    defaultAPIContextValue
+);
 
 export function useAPIContext() {
     return React.useContext(APIContext);

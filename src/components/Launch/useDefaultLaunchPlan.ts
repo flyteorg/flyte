@@ -1,13 +1,13 @@
 import { useAPIContext } from 'components/data/apiContext';
 import { useFetchableData } from 'components/hooks';
 import { NotFoundError } from 'errors';
-import { LaunchPlan, Workflow, WorkflowId } from 'models';
+import { LaunchPlan, WorkflowId } from 'models';
 
-export function useDefaultLaunchPlan(workflow?: Workflow) {
+export function useDefaultLaunchPlan(workflowId: WorkflowId | null = null) {
     const { getLaunchPlan } = useAPIContext();
 
-    const doFetch = async (id?: WorkflowId) => {
-        if (!id) {
+    const doFetch = async (id: WorkflowId | null) => {
+        if (id === null) {
             throw new Error('No workflow id provided');
         }
         try {
@@ -21,10 +21,13 @@ export function useDefaultLaunchPlan(workflow?: Workflow) {
             throw error;
         }
     };
-    return useFetchableData<LaunchPlan | undefined, WorkflowId | undefined>({
-        doFetch,
-        defaultValue: {} as LaunchPlan,
-        debugName: 'useDefaultLaunchPlan',
-        autoFetch: !!workflow
-    });
+    return useFetchableData<LaunchPlan | undefined, WorkflowId | null>(
+        {
+            doFetch,
+            defaultValue: {} as LaunchPlan,
+            debugName: 'useDefaultLaunchPlan',
+            autoFetch: workflowId !== null
+        },
+        workflowId
+    );
 }

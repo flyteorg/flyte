@@ -1,10 +1,5 @@
 import { FetchableData } from 'components/hooks';
-import {
-    LaunchPlan,
-    Workflow,
-    WorkflowExecutionIdentifier,
-    WorkflowId
-} from 'models';
+import { LaunchPlan, WorkflowExecutionIdentifier, WorkflowId } from 'models';
 import { WorkflowSelectorOption } from './WorkflowSelector';
 
 export interface LaunchWorkflowFormProps {
@@ -17,13 +12,13 @@ export interface LaunchWorkflowFormState {
     launchPlans: FetchableData<LaunchPlan[]>;
     selectedLaunchPlan?: LaunchPlan;
     submissionState: FetchableData<WorkflowExecutionIdentifier>;
-    selectedWorkflow?: Workflow;
+    selectedWorkflow?: WorkflowSelectorOption;
     workflowName: string;
     workflowSelectorOptions: WorkflowSelectorOption[];
     onCancel(): void;
+    onSelectWorkflow(selected: WorkflowSelectorOption): void;
     onSubmit(): void;
     setLaunchPlan(launchPlan: LaunchPlan): void;
-    setWorkflow(workflow: Workflow): void;
 }
 
 export enum InputType {

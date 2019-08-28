@@ -58,7 +58,6 @@ export interface WorkflowSelectorOption {
 export interface WorkflowSelectorProps {
     options: WorkflowSelectorOption[];
     selectedItem?: WorkflowSelectorOption;
-    workflowId: NamedEntityIdentifier;
     fetchSearchResults: FetchFn<WorkflowSelectorOption[], string>;
     onSelectionChanged(newSelection: WorkflowSelectorOption): void;
 }
