@@ -12,7 +12,9 @@ import (
 	"github.com/lyft/datacatalog/pkg/repositories/transformers"
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
 
+	"github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
 	"github.com/lyft/flytestdlib/storage"
@@ -24,6 +26,7 @@ type tagMetrics struct {
 	addTagFailureCounter   labeled.Counter
 	addTagResponseTime     labeled.StopWatch
 	validationErrorCounter labeled.Counter
+	alreadyExistsCounter   labeled.Counter
 }
 
 type tagManager struct {
@@ -55,7 +58,14 @@ func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagReque
 		ArtifactID: request.Tag.ArtifactId,
 	})
 	if err != nil {
-		m.systemMetrics.addTagFailureCounter.Inc(ctx)
+		if errors.IsAlreadyExistsError(err) {
+			logger.Warnf(ctx, "Tag already exists key: %+v, err %v", request, err)
+			m.systemMetrics.alreadyExistsCounter.Inc(ctx)
+		} else {
+			logger.Errorf(ctx, "Failed to tag artifact: %+v err: %v", request, err)
+			m.systemMetrics.addTagFailureCounter.Inc(ctx)
+		}
+
 		return nil, err
 	}
 
@@ -70,6 +80,7 @@ func NewTagManager(repo repositories.RepositoryInterface, store *storage.DataSto
 		addTagSuccessCounter:   labeled.NewCounter("add_tag_success_count", "The number of times an artifact was tagged successfully", tagScope, labeled.EmitUnlabeledMetric),
 		addTagFailureCounter:   labeled.NewCounter("add_tag_failure_count", "The number of times we failed  to tag an artifact", tagScope, labeled.EmitUnlabeledMetric),
 		validationErrorCounter: labeled.NewCounter("validation_error_count", "The number of times we failed validate a tag", tagScope, labeled.EmitUnlabeledMetric),
+		alreadyExistsCounter:   labeled.NewCounter("already_exists_count", "The number of times an tag already exists", tagScope, labeled.EmitUnlabeledMetric),
 	}
 
 	return &tagManager{
