@@ -2,17 +2,13 @@ package entrypoints
 
 import (
 	"context"
-	"fmt"
-	"html"
 	"net"
 	"net/http"
 
 	"github.com/lyft/datacatalog/pkg/config"
 	"github.com/lyft/datacatalog/pkg/rpc/datacatalogservice"
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
-	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils/labeled"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
@@ -38,8 +34,6 @@ var serveCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(serveCmd)
-
-	labeled.SetMetricKeys(contextutils.AppNameKey)
 }
 
 // Create and start the gRPC server
@@ -63,10 +57,13 @@ func newGRPCServer(_ context.Context) *grpc.Server {
 }
 
 func serveHealthcheck(ctx context.Context, cfg *config.Config) error {
-	http.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Healthcheck success on %v", html.EscapeString(r.URL.Path))
+	mux := http.NewServeMux()
+
+	// Register Healthcheck
+	mux.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
 	})
 
 	logger.Infof(ctx, "Serving DataCatalog http on port %v", cfg.GetHTTPHostAddress())
-	return http.ListenAndServe(cfg.GetHTTPHostAddress(), nil)
+	return http.ListenAndServe(cfg.GetHTTPHostAddress(), mux)
 }
