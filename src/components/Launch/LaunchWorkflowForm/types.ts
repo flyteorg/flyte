@@ -5,19 +5,21 @@ import {
     WorkflowExecutionIdentifier,
     WorkflowId
 } from 'models';
+import { WorkflowSelectorOption } from './WorkflowSelector';
 
 export interface LaunchWorkflowFormProps {
-    launchPlan?: LaunchPlan;
     workflowId: WorkflowId;
-    workflow?: Workflow;
 }
 
 export interface LaunchWorkflowFormState {
+    defaultLaunchPlan: FetchableData<LaunchPlan | undefined>;
     inputs: InputProps[];
-    launchPlan?: LaunchPlan;
+    launchPlans: FetchableData<LaunchPlan[]>;
+    selectedLaunchPlan?: LaunchPlan;
     submissionState: FetchableData<WorkflowExecutionIdentifier>;
-    workflow?: Workflow;
+    selectedWorkflow?: Workflow;
     workflowName: string;
+    workflowSelectorOptions: WorkflowSelectorOption[];
     onCancel(): void;
     onSubmit(): void;
     setLaunchPlan(launchPlan: LaunchPlan): void;
