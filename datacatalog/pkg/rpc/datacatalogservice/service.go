@@ -46,10 +46,9 @@ func (s *DataCatalogService) AddTag(ctx context.Context, request *catalog.AddTag
 }
 
 func NewDataCatalogService() *DataCatalogService {
-	ctx := context.Background()
-
-	dataCatalogScope := "datacatalog"
-	catalogScope := promutils.NewScope(dataCatalogScope).NewSubScope("service")
+	dataCatalogName := "datacatalog"
+	catalogScope := promutils.NewScope(dataCatalogName).NewSubScope("service")
+	ctx := contextutils.WithAppName(context.Background(), dataCatalogName)
 
 	// Set Keys
 	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)

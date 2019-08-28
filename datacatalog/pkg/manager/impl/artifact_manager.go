@@ -13,6 +13,7 @@ import (
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	"github.com/lyft/datacatalog/pkg/repositories/transformers"
 
+	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
 	"github.com/lyft/flytestdlib/storage"
@@ -51,6 +52,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalo
 		return nil, err
 	}
 
+	ctx = contextutils.WithProjectDomain(ctx, artifact.Dataset.Project, artifact.Dataset.Domain)
 	datasetKey := transformers.FromDatasetID(*artifact.Dataset)
 
 	// The dataset must exist for the artifact, let's verify that first
@@ -100,6 +102,7 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.G
 		return nil, err
 	}
 
+	ctx = contextutils.WithProjectDomain(ctx, datasetID.Project, datasetID.Domain)
 	var artifactModel models.Artifact
 	switch request.QueryHandle.(type) {
 	case *datacatalog.GetArtifactRequest_ArtifactId:
