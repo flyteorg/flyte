@@ -1,20 +1,29 @@
-import { FetchableData } from '../types';
+import { FetchableData, FetchFn } from '../types';
 
-export function createMockFetchable<T>(value: any): FetchableData<T> {
+export function createMockFetchable<T>(
+    value: any,
+    fetch: FetchFn<T, any>
+): FetchableData<T> {
     return {
+        fetch,
         value,
         debugName: '',
         hasLoaded: false,
-        fetch: jest.fn(),
         lastError: null,
         loading: false
     };
 }
 
-export function loadingFetchable<T>(value: any): FetchableData<T> {
-    return { ...createMockFetchable(value), loading: true };
+export function loadingFetchable<T>(
+    value: any,
+    fetch: FetchFn<T, any>
+): FetchableData<T> {
+    return { ...createMockFetchable(value, fetch), loading: true };
 }
 
-export function loadedFetchable<T>(value: any): FetchableData<T> {
-    return { ...createMockFetchable(value), hasLoaded: true };
+export function loadedFetchable<T>(
+    value: any,
+    fetch: FetchFn<T, any>
+): FetchableData<T> {
+    return { ...createMockFetchable(value, fetch), hasLoaded: true };
 }

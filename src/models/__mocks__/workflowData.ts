@@ -1,3 +1,4 @@
+import { getCacheKey } from 'components/Cache';
 import { Admin } from 'flyteidl';
 import { Identifier } from '../Common';
 import { Workflow, WorkflowClosure } from '../Workflow';
@@ -33,3 +34,9 @@ export const createMockWorkflows: Fn<Workflow[]> = () => [
     createMockWorkflow('workflow2'),
     createMockWorkflow('workflow3')
 ];
+
+export const createMockWorkflowVersions = (name: string, length: number) => {
+    return Array.from({ length }, (_, idx) => {
+        return createMockWorkflow(name, getCacheKey({ idx }));
+    });
+};

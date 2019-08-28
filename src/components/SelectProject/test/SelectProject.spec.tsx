@@ -24,7 +24,7 @@ describe.skip('SelectProject', () => {
 
     describe('while loading', () => {
         beforeEach(() => {
-            useProjectsMock.mockReturnValue(loadingFetchable([]));
+            useProjectsMock.mockReturnValue(loadingFetchable([], jest.fn()));
         });
         it('should match the known snapshot', () => {
             expect(renderSnapshot()).toMatchSnapshot();
@@ -35,7 +35,9 @@ describe.skip('SelectProject', () => {
         let projects: Project[];
         beforeEach(() => {
             projects = createMockProjects();
-            useProjectsMock.mockReturnValue(loadedFetchable(projects));
+            useProjectsMock.mockReturnValue(
+                loadedFetchable(projects, jest.fn())
+            );
         });
 
         it('should match the known snapshot', () => {
