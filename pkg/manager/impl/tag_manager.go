@@ -12,6 +12,7 @@ import (
 	"github.com/lyft/datacatalog/pkg/repositories/transformers"
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
 
+	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
 	"github.com/lyft/flytestdlib/storage"
@@ -32,7 +33,6 @@ type tagManager struct {
 }
 
 func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagRequest) (*datacatalog.AddTagResponse, error) {
-
 	if err := validators.ValidateTag(request.Tag); err != nil {
 		m.systemMetrics.validationErrorCounter.Inc(ctx)
 		return nil, err
@@ -40,6 +40,8 @@ func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagReque
 
 	// verify the artifact exists before adding a tag to it
 	datasetID := *request.Tag.Dataset
+	ctx = contextutils.WithProjectDomain(ctx, datasetID.Project, datasetID.Domain)
+
 	artifactKey := transformers.ToArtifactKey(datasetID, request.Tag.ArtifactId)
 	_, err := m.repo.ArtifactRepo().Get(ctx, artifactKey)
 	if err != nil {
