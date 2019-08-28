@@ -43,3 +43,19 @@ func NewDataCatalogError(code codes.Code, message string) error {
 func NewDataCatalogErrorf(code codes.Code, format string, a ...interface{}) error {
 	return NewDataCatalogError(code, fmt.Sprintf(format, a...))
 }
+
+func IsAlreadyExistsError(err error) bool {
+	dcErr, ok := err.(DataCatalogError)
+	if ok && dcErr.GRPCStatus().Code() == codes.AlreadyExists {
+		return true
+	}
+	return false
+}
+
+func IsDoesNotExistError(err error) bool {
+	dcErr, ok := err.(DataCatalogError)
+	if ok && dcErr.GRPCStatus().Code() == codes.NotFound {
+		return true
+	}
+	return false
+}
