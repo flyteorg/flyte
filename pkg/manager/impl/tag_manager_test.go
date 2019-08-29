@@ -8,12 +8,18 @@ import (
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
 
+	"github.com/lyft/flytestdlib/contextutils"
 	mockScope "github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+func init() {
+	labeled.SetMetricKeys(contextutils.AppNameKey)
+}
 
 func getTestTag() models.Tag {
 	return models.Tag{

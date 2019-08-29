@@ -8,23 +8,28 @@ import (
 	"github.com/lyft/datacatalog/pkg/repositories/interfaces"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/lyft/flytestdlib/promutils"
 )
 
 type artifactRepo struct {
 	db               *gorm.DB
 	errorTransformer errors.ErrorTransformer
-	// TODO: add metrics
+	repoMetrics      gormMetrics
 }
 
-func NewArtifactRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer) interfaces.ArtifactRepo {
+func NewArtifactRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.ArtifactRepo {
 	return &artifactRepo{
 		db:               db,
 		errorTransformer: errorTransformer,
+		repoMetrics:      newGormMetrics(scope),
 	}
 }
 
+// Create the artifact in a transaction because ArtifactData will be created and associated along with it
 func (h *artifactRepo) Create(ctx context.Context, artifact models.Artifact) error {
-	// Create the artifact in a transaction because ArtifactData will be created and associated along with it
+	timer := h.repoMetrics.CreateDuration.Start(ctx)
+	defer timer.Stop()
+
 	tx := h.db.Begin()
 
 	tx = tx.Create(&artifact)
@@ -43,6 +48,9 @@ func (h *artifactRepo) Create(ctx context.Context, artifact models.Artifact) err
 }
 
 func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.Artifact, error) {
+	timer := h.repoMetrics.GetDuration.Start(ctx)
+	defer timer.Stop()
+
 	var artifact models.Artifact
 	result := h.db.Preload("ArtifactData").Find(&artifact, &models.Artifact{
 		ArtifactKey: in,

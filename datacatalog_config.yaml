@@ -2,10 +2,12 @@
 # Real configuration when running inside K8s (local or otherwise) lives in a ConfigMap
 # Look in the artifacts directory in the flyte repo for what's actually run
 application:
-  grpcPort: 8089
+  grpcPort: 8081
   httpPort: 8080
 datacatalog:
   storage-prefix: "metadata"
+  metrics-scope: "datacatalog"
+  profiler-port: 10254
 storage:
   connection:
     access-key: minio

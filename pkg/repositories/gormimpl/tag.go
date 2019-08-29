@@ -8,22 +8,27 @@ import (
 	"github.com/lyft/datacatalog/pkg/repositories/interfaces"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	idl_datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/lyft/flytestdlib/promutils"
 )
 
 type tagRepo struct {
 	db               *gorm.DB
 	errorTransformer errors.ErrorTransformer
-	// TODO: add metrics
+	repoMetrics      gormMetrics
 }
 
-func NewTagRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer) interfaces.TagRepo {
+func NewTagRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.TagRepo {
 	return &tagRepo{
 		db:               db,
 		errorTransformer: errorTransformer,
+		repoMetrics:      newGormMetrics(scope),
 	}
 }
 
 func (h *tagRepo) Create(ctx context.Context, tag models.Tag) error {
+	timer := h.repoMetrics.CreateDuration.Start(ctx)
+	defer timer.Stop()
+
 	db := h.db.Create(&tag)
 
 	if db.Error != nil {
@@ -33,6 +38,9 @@ func (h *tagRepo) Create(ctx context.Context, tag models.Tag) error {
 }
 
 func (h *tagRepo) Get(ctx context.Context, in models.TagKey) (models.Tag, error) {
+	timer := h.repoMetrics.GetDuration.Start(ctx)
+	defer timer.Stop()
+
 	var tag models.Tag
 	result := h.db.Preload("Artifact").Preload("Artifact.ArtifactData").Find(&tag, &models.Tag{
 		TagKey: in,
