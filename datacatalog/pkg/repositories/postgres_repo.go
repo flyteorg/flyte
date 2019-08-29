@@ -28,8 +28,8 @@ func (dc *PostgresRepo) TagRepo() interfaces.TagRepo {
 
 func NewPostgresRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.DataCatalogRepo {
 	return &PostgresRepo{
-		datasetRepo:  gormimpl.NewDatasetRepo(db, errorTransformer),
-		artifactRepo: gormimpl.NewArtifactRepo(db, errorTransformer),
-		tagRepo:      gormimpl.NewTagRepo(db, errorTransformer),
+		datasetRepo:  gormimpl.NewDatasetRepo(db, errorTransformer, scope.NewSubScope("dataset")),
+		artifactRepo: gormimpl.NewArtifactRepo(db, errorTransformer, scope.NewSubScope("artifact")),
+		tagRepo:      gormimpl.NewTagRepo(db, errorTransformer, scope.NewSubScope("tag")),
 	}
 }

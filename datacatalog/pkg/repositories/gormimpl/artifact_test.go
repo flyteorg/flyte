@@ -14,8 +14,15 @@ import (
 	"github.com/lyft/datacatalog/pkg/repositories/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	"github.com/lyft/datacatalog/pkg/repositories/utils"
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
 	"google.golang.org/grpc/codes"
 )
+
+func init() {
+	labeled.SetMetricKeys(contextutils.AppNameKey)
+}
 
 func getTestArtifact() models.Artifact {
 	return models.Artifact{
@@ -65,7 +72,7 @@ func TestCreateArtifact(t *testing.T) {
 
 	artifact.ArtifactData = data
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	err := artifactRepo.Create(context.Background(), artifact)
 	assert.NoError(t, err)
 	assert.True(t, artifactCreated)
@@ -112,7 +119,7 @@ func TestGetArtifact(t *testing.T) {
 		ArtifactID:     artifact.ArtifactID,
 	}
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	response, err := artifactRepo.Get(context.Background(), getInput)
 	assert.NoError(t, err)
 	assert.Equal(t, artifact.ArtifactID, response.ArtifactID)
@@ -139,7 +146,7 @@ func TestGetArtifactDoesNotExist(t *testing.T) {
 	}
 
 	// by default mocket will return nil for any queries
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	_, err := artifactRepo.Get(context.Background(), getInput)
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
@@ -159,7 +166,7 @@ func TestCreateArtifactAlreadyExists(t *testing.T) {
 		getAlreadyExistsErr(),
 	)
 
-	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer())
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	err := artifactRepo.Create(context.Background(), artifact)
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
