@@ -28,6 +28,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**CreateTaskEvent**](docs/AdminServiceApi.md#createtaskevent) | **Post** /api/v1/events/tasks | 
 *AdminServiceApi* | [**CreateWorkflow**](docs/AdminServiceApi.md#createworkflow) | **Post** /api/v1/workflows | 
 *AdminServiceApi* | [**CreateWorkflowEvent**](docs/AdminServiceApi.md#createworkflowevent) | **Post** /api/v1/events/workflows | 
+*AdminServiceApi* | [**GetActiveLaunchPlan**](docs/AdminServiceApi.md#getactivelaunchplan) | **Get** /api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**GetExecution**](docs/AdminServiceApi.md#getexecution) | **Get** /api/v1/executions/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**GetExecutionData**](docs/AdminServiceApi.md#getexecutiondata) | **Get** /api/v1/data/executions/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**GetLaunchPlan**](docs/AdminServiceApi.md#getlaunchplan) | **Get** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | 
@@ -37,6 +38,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**GetTaskExecution**](docs/AdminServiceApi.md#gettaskexecution) | **Get** /api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | 
 *AdminServiceApi* | [**GetTaskExecutionData**](docs/AdminServiceApi.md#gettaskexecutiondata) | **Get** /api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | 
 *AdminServiceApi* | [**GetWorkflow**](docs/AdminServiceApi.md#getworkflow) | **Get** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | 
+*AdminServiceApi* | [**ListActiveLaunchPlans**](docs/AdminServiceApi.md#listactivelaunchplans) | **Get** /api/v1/active_launch_plans/{project}/{domain} | 
 *AdminServiceApi* | [**ListExecutions**](docs/AdminServiceApi.md#listexecutions) | **Get** /api/v1/executions/{id.project}/{id.domain} | 
 *AdminServiceApi* | [**ListLaunchPlanIds**](docs/AdminServiceApi.md#listlaunchplanids) | **Get** /api/v1/launch_plan_ids/{project}/{domain} | 
 *AdminServiceApi* | [**ListLaunchPlans**](docs/AdminServiceApi.md#listlaunchplans) | **Get** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name} | 

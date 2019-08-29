@@ -42,7 +42,7 @@ namespace protobuf_flyteidl_2fadmin_2fcommon_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[15];
+  static const ::google::protobuf::internal::ParseTable schema[16];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -52,6 +52,8 @@ void InitDefaultsNamedEntityIdentifierImpl();
 void InitDefaultsNamedEntityIdentifier();
 void InitDefaultsSortImpl();
 void InitDefaultsSort();
+void InitDefaultsActiveLaunchPlanRequestImpl();
+void InitDefaultsActiveLaunchPlanRequest();
 void InitDefaultsNamedEntityIdentifierListRequestImpl();
 void InitDefaultsNamedEntityIdentifierListRequest();
 void InitDefaultsNamedEntityIdentifierListImpl();
@@ -81,6 +83,7 @@ void InitDefaultsAnnotations();
 inline void InitDefaults() {
   InitDefaultsNamedEntityIdentifier();
   InitDefaultsSort();
+  InitDefaultsActiveLaunchPlanRequest();
   InitDefaultsNamedEntityIdentifierListRequest();
   InitDefaultsNamedEntityIdentifierList();
   InitDefaultsObjectGetRequest();
@@ -98,6 +101,9 @@ inline void InitDefaults() {
 }  // namespace protobuf_flyteidl_2fadmin_2fcommon_2eproto
 namespace flyteidl {
 namespace admin {
+class ActiveLaunchPlanRequest;
+class ActiveLaunchPlanRequestDefaultTypeInternal;
+extern ActiveLaunchPlanRequestDefaultTypeInternal _ActiveLaunchPlanRequest_default_instance_;
 class Annotations;
 class AnnotationsDefaultTypeInternal;
 extern AnnotationsDefaultTypeInternal _Annotations_default_instance_;
@@ -448,6 +454,108 @@ class Sort : public ::google::protobuf::Message /* @@protoc_insertion_point(clas
 };
 // -------------------------------------------------------------------
 
+class ActiveLaunchPlanRequest : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ActiveLaunchPlanRequest) */ {
+ public:
+  ActiveLaunchPlanRequest();
+  virtual ~ActiveLaunchPlanRequest();
+
+  ActiveLaunchPlanRequest(const ActiveLaunchPlanRequest& from);
+
+  inline ActiveLaunchPlanRequest& operator=(const ActiveLaunchPlanRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ActiveLaunchPlanRequest(ActiveLaunchPlanRequest&& from) noexcept
+    : ActiveLaunchPlanRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline ActiveLaunchPlanRequest& operator=(ActiveLaunchPlanRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ActiveLaunchPlanRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ActiveLaunchPlanRequest* internal_default_instance() {
+    return reinterpret_cast<const ActiveLaunchPlanRequest*>(
+               &_ActiveLaunchPlanRequest_default_instance_);
+  }
+  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+    2;
+
+  void Swap(ActiveLaunchPlanRequest* other);
+  friend void swap(ActiveLaunchPlanRequest& a, ActiveLaunchPlanRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ActiveLaunchPlanRequest* New() const PROTOBUF_FINAL { return New(NULL); }
+
+  ActiveLaunchPlanRequest* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void CopyFrom(const ActiveLaunchPlanRequest& from);
+  void MergeFrom(const ActiveLaunchPlanRequest& from);
+  void Clear() PROTOBUF_FINAL;
+  bool IsInitialized() const PROTOBUF_FINAL;
+
+  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const PROTOBUF_FINAL;
+  void InternalSwap(ActiveLaunchPlanRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.NamedEntityIdentifier id = 1;
+  bool has_id() const;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  const ::flyteidl::admin::NamedEntityIdentifier& id() const;
+  ::flyteidl::admin::NamedEntityIdentifier* release_id();
+  ::flyteidl::admin::NamedEntityIdentifier* mutable_id();
+  void set_allocated_id(::flyteidl::admin::NamedEntityIdentifier* id);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ActiveLaunchPlanRequest)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::admin::NamedEntityIdentifier* id_;
+  mutable int _cached_size_;
+  friend struct ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::TableStruct;
+  friend void ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::InitDefaultsActiveLaunchPlanRequestImpl();
+};
+// -------------------------------------------------------------------
+
 class NamedEntityIdentifierListRequest : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.NamedEntityIdentifierListRequest) */ {
  public:
   NamedEntityIdentifierListRequest();
@@ -483,7 +591,7 @@ class NamedEntityIdentifierListRequest : public ::google::protobuf::Message /* @
                &_NamedEntityIdentifierListRequest_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    2;
+    3;
 
   void Swap(NamedEntityIdentifierListRequest* other);
   friend void swap(NamedEntityIdentifierListRequest& a, NamedEntityIdentifierListRequest& b) {
@@ -637,7 +745,7 @@ class NamedEntityIdentifierList : public ::google::protobuf::Message /* @@protoc
                &_NamedEntityIdentifierList_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    3;
+    4;
 
   void Swap(NamedEntityIdentifierList* other);
   friend void swap(NamedEntityIdentifierList& a, NamedEntityIdentifierList& b) {
@@ -757,7 +865,7 @@ class ObjectGetRequest : public ::google::protobuf::Message /* @@protoc_insertio
                &_ObjectGetRequest_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    4;
+    5;
 
   void Swap(ObjectGetRequest* other);
   friend void swap(ObjectGetRequest& a, ObjectGetRequest& b) {
@@ -859,7 +967,7 @@ class ResourceListRequest : public ::google::protobuf::Message /* @@protoc_inser
                &_ResourceListRequest_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(ResourceListRequest* other);
   friend void swap(ResourceListRequest& a, ResourceListRequest& b) {
@@ -1008,7 +1116,7 @@ class EmailNotification : public ::google::protobuf::Message /* @@protoc_inserti
                &_EmailNotification_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(EmailNotification* other);
   friend void swap(EmailNotification& a, EmailNotification& b) {
@@ -1123,7 +1231,7 @@ class PagerDutyNotification : public ::google::protobuf::Message /* @@protoc_ins
                &_PagerDutyNotification_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(PagerDutyNotification* other);
   friend void swap(PagerDutyNotification& a, PagerDutyNotification& b) {
@@ -1238,7 +1346,7 @@ class SlackNotification : public ::google::protobuf::Message /* @@protoc_inserti
                &_SlackNotification_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(SlackNotification* other);
   friend void swap(SlackNotification& a, SlackNotification& b) {
@@ -1360,7 +1468,7 @@ class Notification : public ::google::protobuf::Message /* @@protoc_insertion_po
                &_Notification_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(Notification* other);
   friend void swap(Notification& a, Notification& b) {
@@ -1507,7 +1615,7 @@ class UrlBlob : public ::google::protobuf::Message /* @@protoc_insertion_point(c
                &_UrlBlob_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(UrlBlob* other);
   friend void swap(UrlBlob& a, UrlBlob& b) {
@@ -1642,7 +1750,7 @@ class Labels : public ::google::protobuf::Message /* @@protoc_insertion_point(cl
                &_Labels_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(Labels* other);
   friend void swap(Labels& a, Labels& b) {
@@ -1771,7 +1879,7 @@ class Annotations : public ::google::protobuf::Message /* @@protoc_insertion_poi
                &_Annotations_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(Annotations* other);
   friend void swap(Annotations& a, Annotations& b) {
@@ -2081,6 +2189,60 @@ inline void Sort::set_direction(::flyteidl::admin::Sort_Direction value) {
   
   direction_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.Sort.direction)
+}
+
+// -------------------------------------------------------------------
+
+// ActiveLaunchPlanRequest
+
+// .flyteidl.admin.NamedEntityIdentifier id = 1;
+inline bool ActiveLaunchPlanRequest::has_id() const {
+  return this != internal_default_instance() && id_ != NULL;
+}
+inline void ActiveLaunchPlanRequest::clear_id() {
+  if (GetArenaNoVirtual() == NULL && id_ != NULL) {
+    delete id_;
+  }
+  id_ = NULL;
+}
+inline const ::flyteidl::admin::NamedEntityIdentifier& ActiveLaunchPlanRequest::id() const {
+  const ::flyteidl::admin::NamedEntityIdentifier* p = id_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ActiveLaunchPlanRequest.id)
+  return p != NULL ? *p : *reinterpret_cast<const ::flyteidl::admin::NamedEntityIdentifier*>(
+      &::flyteidl::admin::_NamedEntityIdentifier_default_instance_);
+}
+inline ::flyteidl::admin::NamedEntityIdentifier* ActiveLaunchPlanRequest::release_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ActiveLaunchPlanRequest.id)
+  
+  ::flyteidl::admin::NamedEntityIdentifier* temp = id_;
+  id_ = NULL;
+  return temp;
+}
+inline ::flyteidl::admin::NamedEntityIdentifier* ActiveLaunchPlanRequest::mutable_id() {
+  
+  if (id_ == NULL) {
+    id_ = new ::flyteidl::admin::NamedEntityIdentifier;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ActiveLaunchPlanRequest.id)
+  return id_;
+}
+inline void ActiveLaunchPlanRequest::set_allocated_id(::flyteidl::admin::NamedEntityIdentifier* id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete id_;
+  }
+  if (id) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  id_ = id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ActiveLaunchPlanRequest.id)
 }
 
 // -------------------------------------------------------------------
@@ -3173,6 +3335,8 @@ Annotations::mutable_values() {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

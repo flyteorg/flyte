@@ -31,6 +31,11 @@ class SortDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<Sort>
       _instance;
 } _Sort_default_instance_;
+class ActiveLaunchPlanRequestDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<ActiveLaunchPlanRequest>
+      _instance;
+} _ActiveLaunchPlanRequest_default_instance_;
 class NamedEntityIdentifierListRequestDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<NamedEntityIdentifierListRequest>
@@ -142,6 +147,28 @@ void InitDefaultsSortImpl() {
 void InitDefaultsSort() {
   static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
   ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsSortImpl);
+}
+
+void InitDefaultsActiveLaunchPlanRequestImpl() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
+  ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  protobuf_flyteidl_2fadmin_2fcommon_2eproto::InitDefaultsNamedEntityIdentifier();
+  {
+    void* ptr = &::flyteidl::admin::_ActiveLaunchPlanRequest_default_instance_;
+    new (ptr) ::flyteidl::admin::ActiveLaunchPlanRequest();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::admin::ActiveLaunchPlanRequest::InitAsDefaultInstance();
+}
+
+void InitDefaultsActiveLaunchPlanRequest() {
+  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
+  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsActiveLaunchPlanRequestImpl);
 }
 
 void InitDefaultsNamedEntityIdentifierListRequestImpl() {
@@ -425,7 +452,7 @@ void InitDefaultsAnnotations() {
   ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsAnnotationsImpl);
 }
 
-::google::protobuf::Metadata file_level_metadata[15];
+::google::protobuf::Metadata file_level_metadata[16];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[1];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
@@ -444,6 +471,12 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::Sort, key_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::Sort, direction_),
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::ActiveLaunchPlanRequest, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::ActiveLaunchPlanRequest, id_),
   ~0u,  // no _has_bits_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::NamedEntityIdentifierListRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -546,24 +579,26 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::admin::NamedEntityIdentifier)},
   { 8, -1, sizeof(::flyteidl::admin::Sort)},
-  { 15, -1, sizeof(::flyteidl::admin::NamedEntityIdentifierListRequest)},
-  { 25, -1, sizeof(::flyteidl::admin::NamedEntityIdentifierList)},
-  { 32, -1, sizeof(::flyteidl::admin::ObjectGetRequest)},
-  { 38, -1, sizeof(::flyteidl::admin::ResourceListRequest)},
-  { 48, -1, sizeof(::flyteidl::admin::EmailNotification)},
-  { 54, -1, sizeof(::flyteidl::admin::PagerDutyNotification)},
-  { 60, -1, sizeof(::flyteidl::admin::SlackNotification)},
-  { 66, -1, sizeof(::flyteidl::admin::Notification)},
-  { 76, -1, sizeof(::flyteidl::admin::UrlBlob)},
-  { 83, 90, sizeof(::flyteidl::admin::Labels_ValuesEntry_DoNotUse)},
-  { 92, -1, sizeof(::flyteidl::admin::Labels)},
-  { 98, 105, sizeof(::flyteidl::admin::Annotations_ValuesEntry_DoNotUse)},
-  { 107, -1, sizeof(::flyteidl::admin::Annotations)},
+  { 15, -1, sizeof(::flyteidl::admin::ActiveLaunchPlanRequest)},
+  { 21, -1, sizeof(::flyteidl::admin::NamedEntityIdentifierListRequest)},
+  { 31, -1, sizeof(::flyteidl::admin::NamedEntityIdentifierList)},
+  { 38, -1, sizeof(::flyteidl::admin::ObjectGetRequest)},
+  { 44, -1, sizeof(::flyteidl::admin::ResourceListRequest)},
+  { 54, -1, sizeof(::flyteidl::admin::EmailNotification)},
+  { 60, -1, sizeof(::flyteidl::admin::PagerDutyNotification)},
+  { 66, -1, sizeof(::flyteidl::admin::SlackNotification)},
+  { 72, -1, sizeof(::flyteidl::admin::Notification)},
+  { 82, -1, sizeof(::flyteidl::admin::UrlBlob)},
+  { 89, 96, sizeof(::flyteidl::admin::Labels_ValuesEntry_DoNotUse)},
+  { 98, -1, sizeof(::flyteidl::admin::Labels)},
+  { 104, 111, sizeof(::flyteidl::admin::Annotations_ValuesEntry_DoNotUse)},
+  { 113, -1, sizeof(::flyteidl::admin::Annotations)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_NamedEntityIdentifier_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_Sort_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ActiveLaunchPlanRequest_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_NamedEntityIdentifierListRequest_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_NamedEntityIdentifierList_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ObjectGetRequest_default_instance_),
@@ -595,7 +630,7 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 15);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 16);
 }
 
 void AddDescriptorsImpl() {
@@ -608,39 +643,41 @@ void AddDescriptorsImpl() {
       "\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\"r\n\004Sort\022\013\n\003key\030\001 \001("
       "\t\0221\n\tdirection\030\002 \001(\0162\036.flyteidl.admin.So"
       "rt.Direction\"*\n\tDirection\022\016\n\nDESCENDING\020"
-      "\000\022\r\n\tASCENDING\020\001\"\210\001\n NamedEntityIdentifi"
-      "erListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain"
-      "\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007"
-      "sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort\"c\n\031N"
-      "amedEntityIdentifierList\0227\n\010entities\030\001 \003"
-      "(\0132%.flyteidl.admin.NamedEntityIdentifie"
-      "r\022\r\n\005token\030\002 \001(\t\"9\n\020ObjectGetRequest\022%\n\002"
-      "id\030\001 \001(\0132\031.flyteidl.core.Identifier\"\236\001\n\023"
-      "ResourceListRequest\0221\n\002id\030\001 \001(\0132%.flytei"
-      "dl.admin.NamedEntityIdentifier\022\r\n\005limit\030"
-      "\002 \001(\r\022\r\n\005token\030\003 \001(\t\022\017\n\007filters\030\004 \001(\t\022%\n"
-      "\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort\"-\n\021"
-      "EmailNotification\022\030\n\020recipients_email\030\001 "
-      "\003(\t\"1\n\025PagerDutyNotification\022\030\n\020recipien"
-      "ts_email\030\001 \003(\t\"-\n\021SlackNotification\022\030\n\020r"
-      "ecipients_email\030\001 \003(\t\"\363\001\n\014Notification\0226"
-      "\n\006phases\030\001 \003(\0162&.flyteidl.core.WorkflowE"
-      "xecution.Phase\0222\n\005email\030\002 \001(\0132!.flyteidl"
-      ".admin.EmailNotificationH\000\022;\n\npager_duty"
-      "\030\003 \001(\0132%.flyteidl.admin.PagerDutyNotific"
-      "ationH\000\0222\n\005slack\030\004 \001(\0132!.flyteidl.admin."
-      "SlackNotificationH\000B\006\n\004type\"%\n\007UrlBlob\022\013"
-      "\n\003url\030\001 \001(\t\022\r\n\005bytes\030\002 \001(\003\"k\n\006Labels\0222\n\006"
-      "values\030\001 \003(\0132\".flyteidl.admin.Labels.Val"
-      "uesEntry\032-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005"
-      "value\030\002 \001(\t:\0028\001\"u\n\013Annotations\0227\n\006values"
-      "\030\001 \003(\0132\'.flyteidl.admin.Annotations.Valu"
-      "esEntry\032-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005v"
-      "alue\030\002 \001(\t:\0028\001B3Z1github.com/lyft/flytei"
-      "dl/gen/pb-go/flyteidl/adminb\006proto3"
+      "\000\022\r\n\tASCENDING\020\001\"L\n\027ActiveLaunchPlanRequ"
+      "est\0221\n\002id\030\001 \001(\0132%.flyteidl.admin.NamedEn"
+      "tityIdentifier\"\210\001\n NamedEntityIdentifier"
+      "ListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002"
+      " \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007so"
+      "rt_by\030\005 \001(\0132\024.flyteidl.admin.Sort\"c\n\031Nam"
+      "edEntityIdentifierList\0227\n\010entities\030\001 \003(\013"
+      "2%.flyteidl.admin.NamedEntityIdentifier\022"
+      "\r\n\005token\030\002 \001(\t\"9\n\020ObjectGetRequest\022%\n\002id"
+      "\030\001 \001(\0132\031.flyteidl.core.Identifier\"\236\001\n\023Re"
+      "sourceListRequest\0221\n\002id\030\001 \001(\0132%.flyteidl"
+      ".admin.NamedEntityIdentifier\022\r\n\005limit\030\002 "
+      "\001(\r\022\r\n\005token\030\003 \001(\t\022\017\n\007filters\030\004 \001(\t\022%\n\007s"
+      "ort_by\030\005 \001(\0132\024.flyteidl.admin.Sort\"-\n\021Em"
+      "ailNotification\022\030\n\020recipients_email\030\001 \003("
+      "\t\"1\n\025PagerDutyNotification\022\030\n\020recipients"
+      "_email\030\001 \003(\t\"-\n\021SlackNotification\022\030\n\020rec"
+      "ipients_email\030\001 \003(\t\"\363\001\n\014Notification\0226\n\006"
+      "phases\030\001 \003(\0162&.flyteidl.core.WorkflowExe"
+      "cution.Phase\0222\n\005email\030\002 \001(\0132!.flyteidl.a"
+      "dmin.EmailNotificationH\000\022;\n\npager_duty\030\003"
+      " \001(\0132%.flyteidl.admin.PagerDutyNotificat"
+      "ionH\000\0222\n\005slack\030\004 \001(\0132!.flyteidl.admin.Sl"
+      "ackNotificationH\000B\006\n\004type\"%\n\007UrlBlob\022\013\n\003"
+      "url\030\001 \001(\t\022\r\n\005bytes\030\002 \001(\003\"k\n\006Labels\0222\n\006va"
+      "lues\030\001 \003(\0132\".flyteidl.admin.Labels.Value"
+      "sEntry\032-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va"
+      "lue\030\002 \001(\t:\0028\001\"u\n\013Annotations\0227\n\006values\030\001"
+      " \003(\0132\'.flyteidl.admin.Annotations.Values"
+      "Entry\032-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005val"
+      "ue\030\002 \001(\t:\0028\001B3Z1github.com/lyft/flyteidl"
+      "/gen/pb-go/flyteidl/adminb\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 1475);
+      descriptor, 1553);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "flyteidl/admin/common.proto", &protobuf_RegisterTypes);
   ::protobuf_flyteidl_2fcore_2fexecution_2eproto::AddDescriptors();
@@ -1344,6 +1381,255 @@ void Sort::InternalSwap(Sort* other) {
 }
 
 ::google::protobuf::Metadata Sort::GetMetadata() const {
+  protobuf_flyteidl_2fadmin_2fcommon_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void ActiveLaunchPlanRequest::InitAsDefaultInstance() {
+  ::flyteidl::admin::_ActiveLaunchPlanRequest_default_instance_._instance.get_mutable()->id_ = const_cast< ::flyteidl::admin::NamedEntityIdentifier*>(
+      ::flyteidl::admin::NamedEntityIdentifier::internal_default_instance());
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int ActiveLaunchPlanRequest::kIdFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+ActiveLaunchPlanRequest::ActiveLaunchPlanRequest()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
+    ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::InitDefaultsActiveLaunchPlanRequest();
+  }
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.admin.ActiveLaunchPlanRequest)
+}
+ActiveLaunchPlanRequest::ActiveLaunchPlanRequest(const ActiveLaunchPlanRequest& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      _cached_size_(0) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  if (from.has_id()) {
+    id_ = new ::flyteidl::admin::NamedEntityIdentifier(*from.id_);
+  } else {
+    id_ = NULL;
+  }
+  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.ActiveLaunchPlanRequest)
+}
+
+void ActiveLaunchPlanRequest::SharedCtor() {
+  id_ = NULL;
+  _cached_size_ = 0;
+}
+
+ActiveLaunchPlanRequest::~ActiveLaunchPlanRequest() {
+  // @@protoc_insertion_point(destructor:flyteidl.admin.ActiveLaunchPlanRequest)
+  SharedDtor();
+}
+
+void ActiveLaunchPlanRequest::SharedDtor() {
+  if (this != internal_default_instance()) delete id_;
+}
+
+void ActiveLaunchPlanRequest::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* ActiveLaunchPlanRequest::descriptor() {
+  ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const ActiveLaunchPlanRequest& ActiveLaunchPlanRequest::default_instance() {
+  ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::InitDefaultsActiveLaunchPlanRequest();
+  return *internal_default_instance();
+}
+
+ActiveLaunchPlanRequest* ActiveLaunchPlanRequest::New(::google::protobuf::Arena* arena) const {
+  ActiveLaunchPlanRequest* n = new ActiveLaunchPlanRequest;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void ActiveLaunchPlanRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (GetArenaNoVirtual() == NULL && id_ != NULL) {
+    delete id_;
+  }
+  id_ = NULL;
+  _internal_metadata_.Clear();
+}
+
+bool ActiveLaunchPlanRequest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // .flyteidl.admin.NamedEntityIdentifier id = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_id()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.admin.ActiveLaunchPlanRequest)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.admin.ActiveLaunchPlanRequest)
+  return false;
+#undef DO_
+}
+
+void ActiveLaunchPlanRequest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .flyteidl.admin.NamedEntityIdentifier id = 1;
+  if (this->has_id()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, *this->id_, output);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.admin.ActiveLaunchPlanRequest)
+}
+
+::google::protobuf::uint8* ActiveLaunchPlanRequest::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .flyteidl.admin.NamedEntityIdentifier id = 1;
+  if (this->has_id()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        1, *this->id_, deterministic, target);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.ActiveLaunchPlanRequest)
+  return target;
+}
+
+size_t ActiveLaunchPlanRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  // .flyteidl.admin.NamedEntityIdentifier id = 1;
+  if (this->has_id()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *this->id_);
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void ActiveLaunchPlanRequest::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  GOOGLE_DCHECK_NE(&from, this);
+  const ActiveLaunchPlanRequest* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const ActiveLaunchPlanRequest>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.ActiveLaunchPlanRequest)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.ActiveLaunchPlanRequest)
+    MergeFrom(*source);
+  }
+}
+
+void ActiveLaunchPlanRequest::MergeFrom(const ActiveLaunchPlanRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.has_id()) {
+    mutable_id()->::flyteidl::admin::NamedEntityIdentifier::MergeFrom(from.id());
+  }
+}
+
+void ActiveLaunchPlanRequest::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ActiveLaunchPlanRequest::CopyFrom(const ActiveLaunchPlanRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ActiveLaunchPlanRequest::IsInitialized() const {
+  return true;
+}
+
+void ActiveLaunchPlanRequest::Swap(ActiveLaunchPlanRequest* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void ActiveLaunchPlanRequest::InternalSwap(ActiveLaunchPlanRequest* other) {
+  using std::swap;
+  swap(id_, other->id_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata ActiveLaunchPlanRequest::GetMetadata() const {
   protobuf_flyteidl_2fadmin_2fcommon_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::file_level_metadata[kIndexInFileMessages];
 }
@@ -4360,7 +4646,7 @@ void Labels_ValuesEntry_DoNotUse::MergeFrom(const Labels_ValuesEntry_DoNotUse& o
 }
 ::google::protobuf::Metadata Labels_ValuesEntry_DoNotUse::GetMetadata() const {
   ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::file_level_metadata[11];
+  return ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::file_level_metadata[12];
 }
 void Labels_ValuesEntry_DoNotUse::MergeFrom(
     const ::google::protobuf::Message& other) {
@@ -4732,7 +5018,7 @@ void Annotations_ValuesEntry_DoNotUse::MergeFrom(const Annotations_ValuesEntry_D
 }
 ::google::protobuf::Metadata Annotations_ValuesEntry_DoNotUse::GetMetadata() const {
   ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::file_level_metadata[13];
+  return ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::file_level_metadata[14];
 }
 void Annotations_ValuesEntry_DoNotUse::MergeFrom(
     const ::google::protobuf::Message& other) {

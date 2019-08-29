@@ -72,6 +72,16 @@ class AdminServiceStub(object):
         request_serializer=flyteidl_dot_admin_dot_common__pb2.ObjectGetRequest.SerializeToString,
         response_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlan.FromString,
         )
+    self.GetActiveLaunchPlan = channel.unary_unary(
+        '/flyteidl.service.AdminService/GetActiveLaunchPlan',
+        request_serializer=flyteidl_dot_admin_dot_common__pb2.ActiveLaunchPlanRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlan.FromString,
+        )
+    self.ListActiveLaunchPlans = channel.unary_unary(
+        '/flyteidl.service.AdminService/ListActiveLaunchPlans',
+        request_serializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanList.FromString,
+        )
     self.ListLaunchPlanIds = channel.unary_unary(
         '/flyteidl.service.AdminService/ListLaunchPlanIds',
         request_serializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.SerializeToString,
@@ -247,6 +257,20 @@ class AdminServiceServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def GetLaunchPlan(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def GetActiveLaunchPlan(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def ListActiveLaunchPlans(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -452,6 +476,16 @@ def add_AdminServiceServicer_to_server(servicer, server):
           servicer.GetLaunchPlan,
           request_deserializer=flyteidl_dot_admin_dot_common__pb2.ObjectGetRequest.FromString,
           response_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlan.SerializeToString,
+      ),
+      'GetActiveLaunchPlan': grpc.unary_unary_rpc_method_handler(
+          servicer.GetActiveLaunchPlan,
+          request_deserializer=flyteidl_dot_admin_dot_common__pb2.ActiveLaunchPlanRequest.FromString,
+          response_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlan.SerializeToString,
+      ),
+      'ListActiveLaunchPlans': grpc.unary_unary_rpc_method_handler(
+          servicer.ListActiveLaunchPlans,
+          request_deserializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.FromString,
+          response_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanList.SerializeToString,
       ),
       'ListLaunchPlanIds': grpc.unary_unary_rpc_method_handler(
           servicer.ListLaunchPlanIds,

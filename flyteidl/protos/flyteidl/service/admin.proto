@@ -130,6 +130,18 @@ service AdminService {
     };
   }
 
+  rpc GetActiveLaunchPlan (flyteidl.admin.ActiveLaunchPlanRequest) returns (flyteidl.admin.LaunchPlan) {
+    option (google.api.http) = {
+      get: "/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}"
+    };
+  }
+
+  rpc ListActiveLaunchPlans (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.LaunchPlanList) {
+    option (google.api.http) = {
+      get: "/api/v1/active_launch_plans/{project}/{domain}"
+    };
+  }
+
   rpc ListLaunchPlanIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
     option (google.api.http) = {
       get: "/api/v1/launch_plan_ids/{project}/{domain}"
