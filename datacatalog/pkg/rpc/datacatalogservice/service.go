@@ -68,7 +68,6 @@ func (s *DataCatalogService) AddTag(ctx context.Context, request *catalog.AddTag
 func NewDataCatalogService() *DataCatalogService {
 	configProvider := runtime.NewConfigurationProvider()
 	dataCatalogConfig := configProvider.ApplicationConfiguration().GetDataCatalogConfig()
-
 	catalogScope := promutils.NewScope(dataCatalogConfig.MetricsScope).NewSubScope("service")
 	ctx := contextutils.WithAppName(context.Background(), "datacatalog")
 
