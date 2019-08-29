@@ -2,7 +2,6 @@ package impl
 
 import (
 	"context"
-	"time"
 
 	"github.com/lyft/datacatalog/pkg/manager/impl/validators"
 	"github.com/lyft/datacatalog/pkg/manager/interfaces"
@@ -25,8 +24,6 @@ type datasetMetrics struct {
 	getErrorCounter         labeled.Counter
 	transformerErrorCounter labeled.Counter
 	validationErrorCounter  labeled.Counter
-	createResponseTime      labeled.StopWatch
-	getResponseTime         labeled.StopWatch
 	alreadyExistsCounter    labeled.Counter
 	doesNotExistCounter     labeled.Counter
 }
@@ -39,12 +36,9 @@ type datasetManager struct {
 
 // Create a Dataset with optional metadata. If one already exists a grpc AlreadyExists err will be returned
 func (dm *datasetManager) CreateDataset(ctx context.Context, request datacatalog.CreateDatasetRequest) (*datacatalog.CreateDatasetResponse, error) {
-	t := dm.systemMetrics.createResponseTime.Start(ctx)
-	defer t.Stop()
-
 	err := validators.ValidateDatasetID(request.Dataset.Id)
 	if err != nil {
-		logger.Errorf(ctx, "Invalid create dataset request %+v err: %v", request, err)
+		logger.Warnf(ctx, "Invalid create dataset request %+v err: %v", request, err)
 		dm.systemMetrics.validationErrorCounter.Inc(ctx)
 		return nil, err
 	}
@@ -75,12 +69,9 @@ func (dm *datasetManager) CreateDataset(ctx context.Context, request datacatalog
 
 // Get a Dataset with the given DatasetID if it exists. If none exist a grpc NotFound err will be returned
 func (dm *datasetManager) GetDataset(ctx context.Context, request datacatalog.GetDatasetRequest) (*datacatalog.GetDatasetResponse, error) {
-	t := dm.systemMetrics.getResponseTime.Start(ctx)
-	defer t.Stop()
-
 	err := validators.ValidateDatasetID(request.Dataset)
 	if err != nil {
-		logger.Errorf(ctx, "Invalid get dataset request %+v err: %v", request, err)
+		logger.Warnf(ctx, "Invalid get dataset request %+v err: %v", request, err)
 		dm.systemMetrics.validationErrorCounter.Inc(ctx)
 		return nil, err
 	}
@@ -117,8 +108,6 @@ func NewDatasetManager(repo repositories.RepositoryInterface, store *storage.Dat
 		store: store,
 		systemMetrics: datasetMetrics{
 			scope:                   datasetScope,
-			createResponseTime:      labeled.NewStopWatch("create_duration", "The duration of the create dataset calls.", time.Millisecond, datasetScope, labeled.EmitUnlabeledMetric),
-			getResponseTime:         labeled.NewStopWatch("get_duration", "The duration of the get dataset calls.", time.Millisecond, datasetScope, labeled.EmitUnlabeledMetric),
 			createSuccessCounter:    labeled.NewCounter("create_success_count", "The number of times create dataset was called", datasetScope, labeled.EmitUnlabeledMetric),
 			getSuccessCounter:       labeled.NewCounter("get_success_count", "The number of times get dataset was called", datasetScope, labeled.EmitUnlabeledMetric),
 			createErrorCounter:      labeled.NewCounter("create_failed_count", "The number of times create dataset failed", datasetScope, labeled.EmitUnlabeledMetric),

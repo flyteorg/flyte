@@ -2,7 +2,6 @@ package impl
 
 import (
 	"context"
-	"time"
 
 	"github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/datacatalog/pkg/manager/impl/validators"
@@ -31,8 +30,6 @@ type artifactMetrics struct {
 	createDataSuccessCounter labeled.Counter
 	transformerErrorCounter  labeled.Counter
 	validationErrorCounter   labeled.Counter
-	createResponseTime       labeled.StopWatch
-	getResponseTime          labeled.StopWatch
 	alreadyExistsCounter     labeled.Counter
 	doesNotExistCounter      labeled.Counter
 }
@@ -45,13 +42,10 @@ type artifactManager struct {
 
 // Create an Artifact along with the associated ArtifactData. The ArtifactData will be stored in an offloaded location.
 func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalog.CreateArtifactRequest) (*datacatalog.CreateArtifactResponse, error) {
-	timer := m.systemMetrics.createResponseTime.Start(ctx)
-	defer timer.Stop()
-
 	artifact := request.Artifact
 	err := validators.ValidateArtifact(artifact)
 	if err != nil {
-		logger.Errorf(ctx, "Invalid create artifact request %v, err: %v", request, err)
+		logger.Warningf(ctx, "Invalid create artifact request %v, err: %v", request, err)
 		m.systemMetrics.validationErrorCounter.Inc(ctx)
 		return nil, err
 	}
@@ -62,7 +56,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalo
 	// The dataset must exist for the artifact, let's verify that first
 	_, err = m.repo.DatasetRepo().Get(ctx, datasetKey)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to get dataset for artifact creation %v, err: %v", datasetKey, err)
+		logger.Warnf(ctx, "Failed to get dataset for artifact creation %v, err: %v", datasetKey, err)
 		m.systemMetrics.createFailureCounter.Inc(ctx)
 		return nil, err
 	}
@@ -114,7 +108,7 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.G
 	datasetID := request.Dataset
 	err := validators.ValidateGetArtifactRequest(request)
 	if err != nil {
-		logger.Errorf(ctx, "Invalid get artifact request %v, err: %v", request, err)
+		logger.Warningf(ctx, "Invalid get artifact request %v, err: %v", request, err)
 		m.systemMetrics.validationErrorCounter.Inc(ctx)
 		return nil, err
 	}
@@ -192,8 +186,6 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.G
 func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.DataStore, storagePrefix storage.DataReference, artifactScope promutils.Scope) interfaces.ArtifactManager {
 	artifactMetrics := artifactMetrics{
 		scope:                    artifactScope,
-		createResponseTime:       labeled.NewStopWatch("create_artifact_duration", "The duration of the create artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
-		getResponseTime:          labeled.NewStopWatch("get_artifact_duration", "The duration of the get artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
 		createSuccessCounter:     labeled.NewCounter("create_artifact_success_count", "The number of times create artifact was called", artifactScope, labeled.EmitUnlabeledMetric),
 		getSuccessCounter:        labeled.NewCounter("get_artifact_success_count", "The number of times get artifact was called", artifactScope, labeled.EmitUnlabeledMetric),
 		createFailureCounter:     labeled.NewCounter("create_artifact_failure_count", "The number of times create artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
