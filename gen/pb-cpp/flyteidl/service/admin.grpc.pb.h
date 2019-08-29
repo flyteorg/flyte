@@ -112,11 +112,11 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>> PrepareAsyncGetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>>(PrepareAsyncGetActiveLaunchPlanRaw(context, request, cq));
     }
-    virtual ::grpc::Status ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::LaunchPlanList* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>> AsyncListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
+    virtual ::grpc::Status ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::flyteidl::admin::LaunchPlanList* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>> AsyncListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>>(AsyncListActiveLaunchPlansRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>> PrepareAsyncListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>> PrepareAsyncListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>>(PrepareAsyncListActiveLaunchPlansRaw(context, request, cq));
     }
     virtual ::grpc::Status ListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::NamedEntityIdentifierList* response) = 0;
@@ -289,8 +289,8 @@ class AdminService final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>* PrepareAsyncGetLaunchPlanRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>* AsyncGetActiveLaunchPlanRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlan>* PrepareAsyncGetActiveLaunchPlanRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>* AsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>* PrepareAsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>* AsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>* PrepareAsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>* AsyncListLaunchPlanIdsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>* PrepareAsyncListLaunchPlanIdsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::LaunchPlanList>* AsyncListLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -414,11 +414,11 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlan>> PrepareAsyncGetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlan>>(PrepareAsyncGetActiveLaunchPlanRaw(context, request, cq));
     }
-    ::grpc::Status ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::LaunchPlanList* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>> AsyncListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
+    ::grpc::Status ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::flyteidl::admin::LaunchPlanList* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>> AsyncListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>>(AsyncListActiveLaunchPlansRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>> PrepareAsyncListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>> PrepareAsyncListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>>(PrepareAsyncListActiveLaunchPlansRaw(context, request, cq));
     }
     ::grpc::Status ListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::NamedEntityIdentifierList* response) override;
@@ -593,8 +593,8 @@ class AdminService final {
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlan>* PrepareAsyncGetLaunchPlanRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlan>* AsyncGetActiveLaunchPlanRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlan>* PrepareAsyncGetActiveLaunchPlanRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>* AsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>* PrepareAsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>* AsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>* PrepareAsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityIdentifierList>* AsyncListLaunchPlanIdsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityIdentifierList>* PrepareAsyncListLaunchPlanIdsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>* AsyncListLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) override;
@@ -688,7 +688,7 @@ class AdminService final {
     virtual ::grpc::Status CreateLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response);
     virtual ::grpc::Status GetLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response);
     virtual ::grpc::Status GetActiveLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response);
-    virtual ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::LaunchPlanList* response);
+    virtual ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response);
     virtual ::grpc::Status ListLaunchPlanIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response);
     virtual ::grpc::Status ListLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response);
     virtual ::grpc::Status UpdateLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response);
@@ -943,11 +943,11 @@ class AdminService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
+    ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestListActiveLaunchPlans(::grpc::ServerContext* context, ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::LaunchPlanList>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestListActiveLaunchPlans(::grpc::ServerContext* context, ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::LaunchPlanList>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(11, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -1571,7 +1571,7 @@ class AdminService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
+    ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -2165,7 +2165,7 @@ class AdminService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
+    ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -2820,18 +2820,18 @@ class AdminService final {
    public:
     WithStreamedUnaryMethod_ListActiveLaunchPlans() {
       ::grpc::Service::MarkMethodStreamed(11,
-        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::LaunchPlanList>(std::bind(&WithStreamedUnaryMethod_ListActiveLaunchPlans<BaseClass>::StreamedListActiveLaunchPlans, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanListRequest, ::flyteidl::admin::LaunchPlanList>(std::bind(&WithStreamedUnaryMethod_ListActiveLaunchPlans<BaseClass>::StreamedListActiveLaunchPlans, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ListActiveLaunchPlans() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
+    ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedListActiveLaunchPlans(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::NamedEntityIdentifierListRequest,::flyteidl::admin::LaunchPlanList>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedListActiveLaunchPlans(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::ActiveLaunchPlanListRequest,::flyteidl::admin::LaunchPlanList>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_ListLaunchPlanIds : public BaseClass {

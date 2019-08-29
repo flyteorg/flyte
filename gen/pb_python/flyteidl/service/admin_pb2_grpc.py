@@ -74,12 +74,12 @@ class AdminServiceStub(object):
         )
     self.GetActiveLaunchPlan = channel.unary_unary(
         '/flyteidl.service.AdminService/GetActiveLaunchPlan',
-        request_serializer=flyteidl_dot_admin_dot_common__pb2.ActiveLaunchPlanRequest.SerializeToString,
+        request_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.ActiveLaunchPlanRequest.SerializeToString,
         response_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlan.FromString,
         )
     self.ListActiveLaunchPlans = channel.unary_unary(
         '/flyteidl.service.AdminService/ListActiveLaunchPlans',
-        request_serializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.SerializeToString,
+        request_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.ActiveLaunchPlanListRequest.SerializeToString,
         response_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanList.FromString,
         )
     self.ListLaunchPlanIds = channel.unary_unary(
@@ -479,12 +479,12 @@ def add_AdminServiceServicer_to_server(servicer, server):
       ),
       'GetActiveLaunchPlan': grpc.unary_unary_rpc_method_handler(
           servicer.GetActiveLaunchPlan,
-          request_deserializer=flyteidl_dot_admin_dot_common__pb2.ActiveLaunchPlanRequest.FromString,
+          request_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.ActiveLaunchPlanRequest.FromString,
           response_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlan.SerializeToString,
       ),
       'ListActiveLaunchPlans': grpc.unary_unary_rpc_method_handler(
           servicer.ListActiveLaunchPlans,
-          request_deserializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.FromString,
+          request_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.ActiveLaunchPlanListRequest.FromString,
           response_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanList.SerializeToString,
       ),
       'ListLaunchPlanIds': grpc.unary_unary_rpc_method_handler(

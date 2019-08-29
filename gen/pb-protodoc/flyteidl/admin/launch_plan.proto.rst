@@ -352,6 +352,82 @@ Purposefully empty, may be populated in the future.
 
 
 
+
+.. _api_msg_flyteidl.admin.ActiveLaunchPlanRequest:
+
+flyteidl.admin.ActiveLaunchPlanRequest
+--------------------------------------
+
+`[flyteidl.admin.ActiveLaunchPlanRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L137>`_
+
+Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+
+.. code-block:: json
+
+  {
+    "id": "{...}"
+  }
+
+.. _api_field_flyteidl.admin.ActiveLaunchPlanRequest.id:
+
+id
+  (:ref:`flyteidl.admin.NamedEntityIdentifier <api_msg_flyteidl.admin.NamedEntityIdentifier>`) 
+  
+
+
+.. _api_msg_flyteidl.admin.ActiveLaunchPlanListRequest:
+
+flyteidl.admin.ActiveLaunchPlanListRequest
+------------------------------------------
+
+`[flyteidl.admin.ActiveLaunchPlanListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L142>`_
+
+Represents a request structure to list active launch plans within a project/domain.
+
+.. code-block:: json
+
+  {
+    "project": "...",
+    "domain": "...",
+    "limit": "...",
+    "token": "...",
+    "sort_by": "{...}"
+  }
+
+.. _api_field_flyteidl.admin.ActiveLaunchPlanListRequest.project:
+
+project
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Name of the project that contains the identifiers.
+  
+  
+.. _api_field_flyteidl.admin.ActiveLaunchPlanListRequest.domain:
+
+domain
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Name of the domain the identifiers belongs to within the project.
+  
+  
+.. _api_field_flyteidl.admin.ActiveLaunchPlanListRequest.limit:
+
+limit
+  (`uint32 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Indicates the number of resources to be returned.
+  
+  
+.. _api_field_flyteidl.admin.ActiveLaunchPlanListRequest.token:
+
+token
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  in a query.
+  +optional
+  
+  
+.. _api_field_flyteidl.admin.ActiveLaunchPlanListRequest.sort_by:
+
+sort_by
+  (:ref:`flyteidl.admin.Sort <api_msg_flyteidl.admin.Sort>`) Sort ordering.
+  +optional
+  
+  
+
 .. _api_enum_flyteidl.admin.LaunchPlanState:
 
 Enum flyteidl.admin.LaunchPlanState
