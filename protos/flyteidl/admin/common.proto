@@ -36,6 +36,11 @@ message Sort {
     Direction direction   = 2;
 }
 
+// Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+message ActiveLaunchPlanRequest {
+    NamedEntityIdentifier id = 1;
+}
+
 // Represents a request structure to list identifiers.
 message NamedEntityIdentifierListRequest {
     // Name of the project that contains the identifiers.

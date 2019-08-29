@@ -71,6 +71,12 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_active_launch_plan(self):
+        """Test case for get_active_launch_plan
+
+        """
+        pass
+
     def test_get_execution(self):
         """Test case for get_execution
 
@@ -121,6 +127,12 @@ class TestAdminServiceApi(unittest.TestCase):
 
     def test_get_workflow(self):
         """Test case for get_workflow
+
+        """
+        pass
+
+    def test_list_active_launch_plans(self):
+        """Test case for list_active_launch_plans
 
         """
         pass

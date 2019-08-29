@@ -11584,6 +11584,118 @@ export const flyteidl = $root.flyteidl = (() => {
             return Sort;
         })();
 
+        admin.ActiveLaunchPlanRequest = (function() {
+
+            /**
+             * Properties of an ActiveLaunchPlanRequest.
+             * @memberof flyteidl.admin
+             * @interface IActiveLaunchPlanRequest
+             * @property {flyteidl.admin.INamedEntityIdentifier|null} [id] ActiveLaunchPlanRequest id
+             */
+
+            /**
+             * Constructs a new ActiveLaunchPlanRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents an ActiveLaunchPlanRequest.
+             * @implements IActiveLaunchPlanRequest
+             * @constructor
+             * @param {flyteidl.admin.IActiveLaunchPlanRequest=} [properties] Properties to set
+             */
+            function ActiveLaunchPlanRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * ActiveLaunchPlanRequest id.
+             * @member {flyteidl.admin.INamedEntityIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.ActiveLaunchPlanRequest
+             * @instance
+             */
+            ActiveLaunchPlanRequest.prototype.id = null;
+
+            /**
+             * Creates a new ActiveLaunchPlanRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.ActiveLaunchPlanRequest
+             * @static
+             * @param {flyteidl.admin.IActiveLaunchPlanRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.ActiveLaunchPlanRequest} ActiveLaunchPlanRequest instance
+             */
+            ActiveLaunchPlanRequest.create = function create(properties) {
+                return new ActiveLaunchPlanRequest(properties);
+            };
+
+            /**
+             * Encodes the specified ActiveLaunchPlanRequest message. Does not implicitly {@link flyteidl.admin.ActiveLaunchPlanRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.ActiveLaunchPlanRequest
+             * @static
+             * @param {flyteidl.admin.IActiveLaunchPlanRequest} message ActiveLaunchPlanRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ActiveLaunchPlanRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.admin.NamedEntityIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes an ActiveLaunchPlanRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.ActiveLaunchPlanRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.ActiveLaunchPlanRequest} ActiveLaunchPlanRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ActiveLaunchPlanRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ActiveLaunchPlanRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.id = $root.flyteidl.admin.NamedEntityIdentifier.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies an ActiveLaunchPlanRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.ActiveLaunchPlanRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            ActiveLaunchPlanRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.admin.NamedEntityIdentifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                return null;
+            };
+
+            return ActiveLaunchPlanRequest;
+        })();
+
         admin.NamedEntityIdentifierListRequest = (function() {
 
             /**
@@ -23431,6 +23543,72 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              * @param {flyteidl.admin.IObjectGetRequest} request ObjectGetRequest message or plain object
              * @returns {Promise<flyteidl.admin.LaunchPlan>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getActiveLaunchPlan}.
+             * @memberof flyteidl.service.AdminService
+             * @typedef GetActiveLaunchPlanCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.LaunchPlan} [response] LaunchPlan
+             */
+
+            /**
+             * Calls GetActiveLaunchPlan.
+             * @function getActiveLaunchPlan
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.IActiveLaunchPlanRequest} request ActiveLaunchPlanRequest message or plain object
+             * @param {flyteidl.service.AdminService.GetActiveLaunchPlanCallback} callback Node-style callback called with the error, if any, and LaunchPlan
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(AdminService.prototype.getActiveLaunchPlan = function getActiveLaunchPlan(request, callback) {
+                return this.rpcCall(getActiveLaunchPlan, $root.flyteidl.admin.ActiveLaunchPlanRequest, $root.flyteidl.admin.LaunchPlan, request, callback);
+            }, "name", { value: "GetActiveLaunchPlan" });
+
+            /**
+             * Calls GetActiveLaunchPlan.
+             * @function getActiveLaunchPlan
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.IActiveLaunchPlanRequest} request ActiveLaunchPlanRequest message or plain object
+             * @returns {Promise<flyteidl.admin.LaunchPlan>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#listActiveLaunchPlans}.
+             * @memberof flyteidl.service.AdminService
+             * @typedef ListActiveLaunchPlansCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.LaunchPlanList} [response] LaunchPlanList
+             */
+
+            /**
+             * Calls ListActiveLaunchPlans.
+             * @function listActiveLaunchPlans
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.INamedEntityIdentifierListRequest} request NamedEntityIdentifierListRequest message or plain object
+             * @param {flyteidl.service.AdminService.ListActiveLaunchPlansCallback} callback Node-style callback called with the error, if any, and LaunchPlanList
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(AdminService.prototype.listActiveLaunchPlans = function listActiveLaunchPlans(request, callback) {
+                return this.rpcCall(listActiveLaunchPlans, $root.flyteidl.admin.NamedEntityIdentifierListRequest, $root.flyteidl.admin.LaunchPlanList, request, callback);
+            }, "name", { value: "ListActiveLaunchPlans" });
+
+            /**
+             * Calls ListActiveLaunchPlans.
+             * @function listActiveLaunchPlans
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.INamedEntityIdentifierListRequest} request NamedEntityIdentifierListRequest message or plain object
+             * @returns {Promise<flyteidl.admin.LaunchPlanList>} Promise
              * @variation 2
              */
 
