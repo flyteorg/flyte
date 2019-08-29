@@ -25,7 +25,6 @@ func init() {
 }
 
 func createInmemoryDataStore(t testing.TB, scope mockScope.Scope) *storage.DataStore {
-	labeled.SetMetricKeys(contextutils.AppNameKey)
 	cfg := storage.Config{
 		Type: storage.TypeMemory,
 	}

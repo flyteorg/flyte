@@ -2,7 +2,6 @@ package impl
 
 import (
 	"context"
-	"time"
 
 	"github.com/lyft/datacatalog/pkg/manager/impl/validators"
 	"github.com/lyft/datacatalog/pkg/manager/interfaces"
@@ -24,7 +23,6 @@ type tagMetrics struct {
 	scope                  promutils.Scope
 	addTagSuccessCounter   labeled.Counter
 	addTagFailureCounter   labeled.Counter
-	addTagResponseTime     labeled.StopWatch
 	validationErrorCounter labeled.Counter
 	alreadyExistsCounter   labeled.Counter
 }
@@ -37,6 +35,7 @@ type tagManager struct {
 
 func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagRequest) (*datacatalog.AddTagResponse, error) {
 	if err := validators.ValidateTag(request.Tag); err != nil {
+		logger.Warnf(ctx, "Invalid get tag request %+v err: %v", request, err)
 		m.systemMetrics.validationErrorCounter.Inc(ctx)
 		return nil, err
 	}
@@ -76,7 +75,6 @@ func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagReque
 func NewTagManager(repo repositories.RepositoryInterface, store *storage.DataStore, tagScope promutils.Scope) interfaces.TagManager {
 	systemMetrics := tagMetrics{
 		scope:                  tagScope,
-		addTagResponseTime:     labeled.NewStopWatch("add_tag_duration", "The duration of tagging an artifact.", time.Millisecond, tagScope, labeled.EmitUnlabeledMetric),
 		addTagSuccessCounter:   labeled.NewCounter("add_tag_success_count", "The number of times an artifact was tagged successfully", tagScope, labeled.EmitUnlabeledMetric),
 		addTagFailureCounter:   labeled.NewCounter("add_tag_failure_count", "The number of times we failed  to tag an artifact", tagScope, labeled.EmitUnlabeledMetric),
 		validationErrorCounter: labeled.NewCounter("validation_error_count", "The number of times we failed validate a tag", tagScope, labeled.EmitUnlabeledMetric),

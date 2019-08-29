@@ -46,16 +46,10 @@ func NewDataCatalogErrorf(code codes.Code, format string, a ...interface{}) erro
 
 func IsAlreadyExistsError(err error) bool {
 	dcErr, ok := err.(DataCatalogError)
-	if ok && dcErr.GRPCStatus().Code() == codes.AlreadyExists {
-		return true
-	}
-	return false
+	return ok && dcErr.GRPCStatus().Code() == codes.AlreadyExists
 }
 
 func IsDoesNotExistError(err error) bool {
 	dcErr, ok := err.(DataCatalogError)
-	if ok && dcErr.GRPCStatus().Code() == codes.NotFound {
-		return true
-	}
-	return false
+	return ok && dcErr.GRPCStatus().Code() == codes.NotFound
 }

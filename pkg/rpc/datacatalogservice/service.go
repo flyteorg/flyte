@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"runtime/debug"
+	"time"
 
 	"github.com/lyft/datacatalog/pkg/manager/impl"
 	"github.com/lyft/datacatalog/pkg/manager/interfaces"
@@ -19,29 +20,48 @@ import (
 	"github.com/lyft/flytestdlib/storage"
 )
 
+type serviceMetrics struct {
+	createDatasetResponseTime  labeled.StopWatch
+	getDatasetResponseTime     labeled.StopWatch
+	createArtifactResponseTime labeled.StopWatch
+	getArtifactResponseTime    labeled.StopWatch
+	addTagResponseTime         labeled.StopWatch
+}
+
 type DataCatalogService struct {
 	DatasetManager  interfaces.DatasetManager
 	ArtifactManager interfaces.ArtifactManager
 	TagManager      interfaces.TagManager
+	serviceMetrics  serviceMetrics
 }
 
 func (s *DataCatalogService) CreateDataset(ctx context.Context, request *catalog.CreateDatasetRequest) (*catalog.CreateDatasetResponse, error) {
+	timer := s.serviceMetrics.createDatasetResponseTime.Start(ctx)
+	defer timer.Stop()
 	return s.DatasetManager.CreateDataset(ctx, *request)
 }
 
 func (s *DataCatalogService) CreateArtifact(ctx context.Context, request *catalog.CreateArtifactRequest) (*catalog.CreateArtifactResponse, error) {
+	timer := s.serviceMetrics.createArtifactResponseTime.Start(ctx)
+	defer timer.Stop()
 	return s.ArtifactManager.CreateArtifact(ctx, *request)
 }
 
 func (s *DataCatalogService) GetDataset(ctx context.Context, request *catalog.GetDatasetRequest) (*catalog.GetDatasetResponse, error) {
+	timer := s.serviceMetrics.getDatasetResponseTime.Start(ctx)
+	defer timer.Stop()
 	return s.DatasetManager.GetDataset(ctx, *request)
 }
 
 func (s *DataCatalogService) GetArtifact(ctx context.Context, request *catalog.GetArtifactRequest) (*catalog.GetArtifactResponse, error) {
+	timer := s.serviceMetrics.getArtifactResponseTime.Start(ctx)
+	defer timer.Stop()
 	return s.ArtifactManager.GetArtifact(ctx, *request)
 }
 
 func (s *DataCatalogService) AddTag(ctx context.Context, request *catalog.AddTagRequest) (*catalog.AddTagResponse, error) {
+	timer := s.serviceMetrics.addTagResponseTime.Start(ctx)
+	defer timer.Stop()
 	return s.TagManager.AddTag(ctx, *request)
 }
 
@@ -103,5 +123,12 @@ func NewDataCatalogService() *DataCatalogService {
 		DatasetManager:  impl.NewDatasetManager(repos, dataStorageClient, catalogScope.NewSubScope("dataset")),
 		ArtifactManager: impl.NewArtifactManager(repos, dataStorageClient, storagePrefix, catalogScope.NewSubScope("artifact")),
 		TagManager:      impl.NewTagManager(repos, dataStorageClient, catalogScope.NewSubScope("tag")),
+		serviceMetrics: serviceMetrics{
+			createDatasetResponseTime:  labeled.NewStopWatch("create_dataset_duration", "The duration of the create artifact calls.", time.Millisecond, catalogScope, labeled.EmitUnlabeledMetric),
+			getDatasetResponseTime:     labeled.NewStopWatch("get_dataset_duration", "The duration of the get artifact calls.", time.Millisecond, catalogScope, labeled.EmitUnlabeledMetric),
+			createArtifactResponseTime: labeled.NewStopWatch("create_artifact_duration", "The duration of the get artifact calls.", time.Millisecond, catalogScope, labeled.EmitUnlabeledMetric),
+			getArtifactResponseTime:    labeled.NewStopWatch("get_artifact_duration", "The duration of the get artifact calls.", time.Millisecond, catalogScope, labeled.EmitUnlabeledMetric),
+			addTagResponseTime:         labeled.NewStopWatch("add_tag_duration", "The duration of the get artifact calls.", time.Millisecond, catalogScope, labeled.EmitUnlabeledMetric),
+		},
 	}
 }
