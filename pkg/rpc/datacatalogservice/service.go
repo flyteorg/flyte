@@ -66,9 +66,11 @@ func (s *DataCatalogService) AddTag(ctx context.Context, request *catalog.AddTag
 }
 
 func NewDataCatalogService() *DataCatalogService {
-	dataCatalogName := "datacatalog"
-	catalogScope := promutils.NewScope(dataCatalogName).NewSubScope("service")
-	ctx := contextutils.WithAppName(context.Background(), dataCatalogName)
+	configProvider := runtime.NewConfigurationProvider()
+	dataCatalogConfig := configProvider.ApplicationConfiguration().GetDataCatalogConfig()
+
+	catalogScope := promutils.NewScope(dataCatalogConfig.MetricsScope).NewSubScope("service")
+	ctx := contextutils.WithAppName(context.Background(), "datacatalog")
 
 	// Set Keys
 	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
@@ -89,9 +91,7 @@ func NewDataCatalogService() *DataCatalogService {
 	}
 	logger.Infof(ctx, "Created data storage.")
 
-	configProvider := runtime.NewConfigurationProvider()
 	baseStorageReference := dataStorageClient.GetBaseContainerFQN(ctx)
-	dataCatalogConfig := configProvider.ApplicationConfiguration().GetDataCatalogConfig()
 	storagePrefix, err := dataStorageClient.ConstructReference(ctx, baseStorageReference, dataCatalogConfig.StoragePrefix)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create prefix %v, err %v", dataCatalogConfig.StoragePrefix, err)
