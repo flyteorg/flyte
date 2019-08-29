@@ -4788,58 +4788,6 @@ export namespace flyteidl {
             }
         }
 
-        /** Properties of an ActiveLaunchPlanRequest. */
-        interface IActiveLaunchPlanRequest {
-
-            /** ActiveLaunchPlanRequest id */
-            id?: (flyteidl.admin.INamedEntityIdentifier|null);
-        }
-
-        /** Represents an ActiveLaunchPlanRequest. */
-        class ActiveLaunchPlanRequest implements IActiveLaunchPlanRequest {
-
-            /**
-             * Constructs a new ActiveLaunchPlanRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IActiveLaunchPlanRequest);
-
-            /** ActiveLaunchPlanRequest id. */
-            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
-
-            /**
-             * Creates a new ActiveLaunchPlanRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ActiveLaunchPlanRequest instance
-             */
-            public static create(properties?: flyteidl.admin.IActiveLaunchPlanRequest): flyteidl.admin.ActiveLaunchPlanRequest;
-
-            /**
-             * Encodes the specified ActiveLaunchPlanRequest message. Does not implicitly {@link flyteidl.admin.ActiveLaunchPlanRequest.verify|verify} messages.
-             * @param message ActiveLaunchPlanRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IActiveLaunchPlanRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an ActiveLaunchPlanRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ActiveLaunchPlanRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ActiveLaunchPlanRequest;
-
-            /**
-             * Verifies an ActiveLaunchPlanRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
         /** Properties of a NamedEntityIdentifierListRequest. */
         interface INamedEntityIdentifierListRequest {
 
@@ -7512,6 +7460,134 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ActiveLaunchPlanRequest. */
+        interface IActiveLaunchPlanRequest {
+
+            /** ActiveLaunchPlanRequest id */
+            id?: (flyteidl.admin.INamedEntityIdentifier|null);
+        }
+
+        /** Represents an ActiveLaunchPlanRequest. */
+        class ActiveLaunchPlanRequest implements IActiveLaunchPlanRequest {
+
+            /**
+             * Constructs a new ActiveLaunchPlanRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IActiveLaunchPlanRequest);
+
+            /** ActiveLaunchPlanRequest id. */
+            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /**
+             * Creates a new ActiveLaunchPlanRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ActiveLaunchPlanRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IActiveLaunchPlanRequest): flyteidl.admin.ActiveLaunchPlanRequest;
+
+            /**
+             * Encodes the specified ActiveLaunchPlanRequest message. Does not implicitly {@link flyteidl.admin.ActiveLaunchPlanRequest.verify|verify} messages.
+             * @param message ActiveLaunchPlanRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IActiveLaunchPlanRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ActiveLaunchPlanRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ActiveLaunchPlanRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ActiveLaunchPlanRequest;
+
+            /**
+             * Verifies an ActiveLaunchPlanRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ActiveLaunchPlanListRequest. */
+        interface IActiveLaunchPlanListRequest {
+
+            /** ActiveLaunchPlanListRequest project */
+            project?: (string|null);
+
+            /** ActiveLaunchPlanListRequest domain */
+            domain?: (string|null);
+
+            /** ActiveLaunchPlanListRequest limit */
+            limit?: (number|null);
+
+            /** ActiveLaunchPlanListRequest token */
+            token?: (string|null);
+
+            /** ActiveLaunchPlanListRequest sortBy */
+            sortBy?: (flyteidl.admin.ISort|null);
+        }
+
+        /** Represents an ActiveLaunchPlanListRequest. */
+        class ActiveLaunchPlanListRequest implements IActiveLaunchPlanListRequest {
+
+            /**
+             * Constructs a new ActiveLaunchPlanListRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IActiveLaunchPlanListRequest);
+
+            /** ActiveLaunchPlanListRequest project. */
+            public project: string;
+
+            /** ActiveLaunchPlanListRequest domain. */
+            public domain: string;
+
+            /** ActiveLaunchPlanListRequest limit. */
+            public limit: number;
+
+            /** ActiveLaunchPlanListRequest token. */
+            public token: string;
+
+            /** ActiveLaunchPlanListRequest sortBy. */
+            public sortBy?: (flyteidl.admin.ISort|null);
+
+            /**
+             * Creates a new ActiveLaunchPlanListRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ActiveLaunchPlanListRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IActiveLaunchPlanListRequest): flyteidl.admin.ActiveLaunchPlanListRequest;
+
+            /**
+             * Encodes the specified ActiveLaunchPlanListRequest message. Does not implicitly {@link flyteidl.admin.ActiveLaunchPlanListRequest.verify|verify} messages.
+             * @param message ActiveLaunchPlanListRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IActiveLaunchPlanListRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ActiveLaunchPlanListRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ActiveLaunchPlanListRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ActiveLaunchPlanListRequest;
+
+            /**
+             * Verifies an ActiveLaunchPlanListRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** FixedRateUnit enum. */
         enum FixedRateUnit {
             MINUTE = 0,
@@ -9929,17 +10005,17 @@ export namespace flyteidl {
 
             /**
              * Calls ListActiveLaunchPlans.
-             * @param request NamedEntityIdentifierListRequest message or plain object
+             * @param request ActiveLaunchPlanListRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and LaunchPlanList
              */
-            public listActiveLaunchPlans(request: flyteidl.admin.INamedEntityIdentifierListRequest, callback: flyteidl.service.AdminService.ListActiveLaunchPlansCallback): void;
+            public listActiveLaunchPlans(request: flyteidl.admin.IActiveLaunchPlanListRequest, callback: flyteidl.service.AdminService.ListActiveLaunchPlansCallback): void;
 
             /**
              * Calls ListActiveLaunchPlans.
-             * @param request NamedEntityIdentifierListRequest message or plain object
+             * @param request ActiveLaunchPlanListRequest message or plain object
              * @returns Promise
              */
-            public listActiveLaunchPlans(request: flyteidl.admin.INamedEntityIdentifierListRequest): Promise<flyteidl.admin.LaunchPlanList>;
+            public listActiveLaunchPlans(request: flyteidl.admin.IActiveLaunchPlanListRequest): Promise<flyteidl.admin.LaunchPlanList>;
 
             /**
              * Calls ListLaunchPlanIds.

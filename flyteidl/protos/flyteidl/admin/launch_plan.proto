@@ -133,3 +133,26 @@ message LaunchPlanUpdateRequest {
 // Purposefully empty, may be populated in the future.
 message LaunchPlanUpdateResponse {
 }
+
+// Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+message ActiveLaunchPlanRequest {
+    NamedEntityIdentifier id = 1;
+}
+
+// Represents a request structure to list active launch plans within a project/domain.
+message ActiveLaunchPlanListRequest {
+    // Name of the project that contains the identifiers.
+    string project    = 1;  // [(validate.rules).string.min_bytes = 1];
+    // Name of the domain the identifiers belongs to within the project.
+    string domain     = 2;  // [(validate.rules).string.min_bytes = 1];
+    // Indicates the number of resources to be returned.
+    uint32 limit      = 3;
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token      = 4;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by      = 5;
+}

@@ -10351,6 +10351,1881 @@ public final class LaunchPlanOuterClass {
 
   }
 
+  public interface ActiveLaunchPlanRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.ActiveLaunchPlanRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+     */
+    boolean hasId();
+    /**
+     * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+     */
+    flyteidl.admin.Common.NamedEntityIdentifier getId();
+    /**
+     * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+     */
+    flyteidl.admin.Common.NamedEntityIdentifierOrBuilder getIdOrBuilder();
+  }
+  /**
+   * <pre>
+   * Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.ActiveLaunchPlanRequest}
+   */
+  public  static final class ActiveLaunchPlanRequest extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.ActiveLaunchPlanRequest)
+      ActiveLaunchPlanRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ActiveLaunchPlanRequest.newBuilder() to construct.
+    private ActiveLaunchPlanRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ActiveLaunchPlanRequest() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ActiveLaunchPlanRequest(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              flyteidl.admin.Common.NamedEntityIdentifier.Builder subBuilder = null;
+              if (id_ != null) {
+                subBuilder = id_.toBuilder();
+              }
+              id_ = input.readMessage(flyteidl.admin.Common.NamedEntityIdentifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(id_);
+                id_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanRequest_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest.class, flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest.Builder.class);
+    }
+
+    public static final int ID_FIELD_NUMBER = 1;
+    private flyteidl.admin.Common.NamedEntityIdentifier id_;
+    /**
+     * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+     */
+    public boolean hasId() {
+      return id_ != null;
+    }
+    /**
+     * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+     */
+    public flyteidl.admin.Common.NamedEntityIdentifier getId() {
+      return id_ == null ? flyteidl.admin.Common.NamedEntityIdentifier.getDefaultInstance() : id_;
+    }
+    /**
+     * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+     */
+    public flyteidl.admin.Common.NamedEntityIdentifierOrBuilder getIdOrBuilder() {
+      return getId();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (id_ != null) {
+        output.writeMessage(1, getId());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (id_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getId());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest other = (flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest) obj;
+
+      boolean result = true;
+      result = result && (hasId() == other.hasId());
+      if (hasId()) {
+        result = result && getId()
+            .equals(other.getId());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.ActiveLaunchPlanRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.ActiveLaunchPlanRequest)
+        flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanRequest_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest.class, flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        if (idBuilder_ == null) {
+          id_ = null;
+        } else {
+          id_ = null;
+          idBuilder_ = null;
+        }
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanRequest_descriptor;
+      }
+
+      public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest getDefaultInstanceForType() {
+        return flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest.getDefaultInstance();
+      }
+
+      public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest build() {
+        flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest buildPartial() {
+        flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest result = new flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest(this);
+        if (idBuilder_ == null) {
+          result.id_ = id_;
+        } else {
+          result.id_ = idBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest) {
+          return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest other) {
+        if (other == flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          mergeId(other.getId());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.admin.Common.NamedEntityIdentifier id_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.NamedEntityIdentifier, flyteidl.admin.Common.NamedEntityIdentifier.Builder, flyteidl.admin.Common.NamedEntityIdentifierOrBuilder> idBuilder_;
+      /**
+       * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+       */
+      public boolean hasId() {
+        return idBuilder_ != null || id_ != null;
+      }
+      /**
+       * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+       */
+      public flyteidl.admin.Common.NamedEntityIdentifier getId() {
+        if (idBuilder_ == null) {
+          return id_ == null ? flyteidl.admin.Common.NamedEntityIdentifier.getDefaultInstance() : id_;
+        } else {
+          return idBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+       */
+      public Builder setId(flyteidl.admin.Common.NamedEntityIdentifier value) {
+        if (idBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          id_ = value;
+          onChanged();
+        } else {
+          idBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+       */
+      public Builder setId(
+          flyteidl.admin.Common.NamedEntityIdentifier.Builder builderForValue) {
+        if (idBuilder_ == null) {
+          id_ = builderForValue.build();
+          onChanged();
+        } else {
+          idBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+       */
+      public Builder mergeId(flyteidl.admin.Common.NamedEntityIdentifier value) {
+        if (idBuilder_ == null) {
+          if (id_ != null) {
+            id_ =
+              flyteidl.admin.Common.NamedEntityIdentifier.newBuilder(id_).mergeFrom(value).buildPartial();
+          } else {
+            id_ = value;
+          }
+          onChanged();
+        } else {
+          idBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+       */
+      public Builder clearId() {
+        if (idBuilder_ == null) {
+          id_ = null;
+          onChanged();
+        } else {
+          id_ = null;
+          idBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+       */
+      public flyteidl.admin.Common.NamedEntityIdentifier.Builder getIdBuilder() {
+        
+        onChanged();
+        return getIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+       */
+      public flyteidl.admin.Common.NamedEntityIdentifierOrBuilder getIdOrBuilder() {
+        if (idBuilder_ != null) {
+          return idBuilder_.getMessageOrBuilder();
+        } else {
+          return id_ == null ?
+              flyteidl.admin.Common.NamedEntityIdentifier.getDefaultInstance() : id_;
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.NamedEntityIdentifier, flyteidl.admin.Common.NamedEntityIdentifier.Builder, flyteidl.admin.Common.NamedEntityIdentifierOrBuilder> 
+          getIdFieldBuilder() {
+        if (idBuilder_ == null) {
+          idBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.NamedEntityIdentifier, flyteidl.admin.Common.NamedEntityIdentifier.Builder, flyteidl.admin.Common.NamedEntityIdentifierOrBuilder>(
+                  getId(),
+                  getParentForChildren(),
+                  isClean());
+          id_ = null;
+        }
+        return idBuilder_;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.ActiveLaunchPlanRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.ActiveLaunchPlanRequest)
+    private static final flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest();
+    }
+
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ActiveLaunchPlanRequest>
+        PARSER = new com.google.protobuf.AbstractParser<ActiveLaunchPlanRequest>() {
+      public ActiveLaunchPlanRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ActiveLaunchPlanRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ActiveLaunchPlanRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ActiveLaunchPlanRequest> getParserForType() {
+      return PARSER;
+    }
+
+    public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ActiveLaunchPlanListRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.ActiveLaunchPlanListRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Name of the project that contains the identifiers.
+     * </pre>
+     *
+     * <code>string project = 1;</code>
+     */
+    java.lang.String getProject();
+    /**
+     * <pre>
+     * Name of the project that contains the identifiers.
+     * </pre>
+     *
+     * <code>string project = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getProjectBytes();
+
+    /**
+     * <pre>
+     * Name of the domain the identifiers belongs to within the project.
+     * </pre>
+     *
+     * <code>string domain = 2;</code>
+     */
+    java.lang.String getDomain();
+    /**
+     * <pre>
+     * Name of the domain the identifiers belongs to within the project.
+     * </pre>
+     *
+     * <code>string domain = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getDomainBytes();
+
+    /**
+     * <pre>
+     * Indicates the number of resources to be returned.
+     * </pre>
+     *
+     * <code>uint32 limit = 3;</code>
+     */
+    int getLimit();
+
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query.
+     * +optional
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    java.lang.String getToken();
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query.
+     * +optional
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getTokenBytes();
+
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+     */
+    boolean hasSortBy();
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+     */
+    flyteidl.admin.Common.Sort getSortBy();
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+     */
+    flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder();
+  }
+  /**
+   * <pre>
+   * Represents a request structure to list active launch plans within a project/domain.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.ActiveLaunchPlanListRequest}
+   */
+  public  static final class ActiveLaunchPlanListRequest extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.ActiveLaunchPlanListRequest)
+      ActiveLaunchPlanListRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ActiveLaunchPlanListRequest.newBuilder() to construct.
+    private ActiveLaunchPlanListRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ActiveLaunchPlanListRequest() {
+      project_ = "";
+      domain_ = "";
+      limit_ = 0;
+      token_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ActiveLaunchPlanListRequest(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              project_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              domain_ = s;
+              break;
+            }
+            case 24: {
+
+              limit_ = input.readUInt32();
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              token_ = s;
+              break;
+            }
+            case 42: {
+              flyteidl.admin.Common.Sort.Builder subBuilder = null;
+              if (sortBy_ != null) {
+                subBuilder = sortBy_.toBuilder();
+              }
+              sortBy_ = input.readMessage(flyteidl.admin.Common.Sort.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(sortBy_);
+                sortBy_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest.class, flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest.Builder.class);
+    }
+
+    public static final int PROJECT_FIELD_NUMBER = 1;
+    private volatile java.lang.Object project_;
+    /**
+     * <pre>
+     * Name of the project that contains the identifiers.
+     * </pre>
+     *
+     * <code>string project = 1;</code>
+     */
+    public java.lang.String getProject() {
+      java.lang.Object ref = project_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        project_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Name of the project that contains the identifiers.
+     * </pre>
+     *
+     * <code>string project = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getProjectBytes() {
+      java.lang.Object ref = project_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        project_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DOMAIN_FIELD_NUMBER = 2;
+    private volatile java.lang.Object domain_;
+    /**
+     * <pre>
+     * Name of the domain the identifiers belongs to within the project.
+     * </pre>
+     *
+     * <code>string domain = 2;</code>
+     */
+    public java.lang.String getDomain() {
+      java.lang.Object ref = domain_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        domain_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Name of the domain the identifiers belongs to within the project.
+     * </pre>
+     *
+     * <code>string domain = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDomainBytes() {
+      java.lang.Object ref = domain_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        domain_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LIMIT_FIELD_NUMBER = 3;
+    private int limit_;
+    /**
+     * <pre>
+     * Indicates the number of resources to be returned.
+     * </pre>
+     *
+     * <code>uint32 limit = 3;</code>
+     */
+    public int getLimit() {
+      return limit_;
+    }
+
+    public static final int TOKEN_FIELD_NUMBER = 4;
+    private volatile java.lang.Object token_;
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query.
+     * +optional
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query.
+     * +optional
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int SORT_BY_FIELD_NUMBER = 5;
+    private flyteidl.admin.Common.Sort sortBy_;
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+     */
+    public boolean hasSortBy() {
+      return sortBy_ != null;
+    }
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+     */
+    public flyteidl.admin.Common.Sort getSortBy() {
+      return sortBy_ == null ? flyteidl.admin.Common.Sort.getDefaultInstance() : sortBy_;
+    }
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+     */
+    public flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder() {
+      return getSortBy();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getProjectBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, project_);
+      }
+      if (!getDomainBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, domain_);
+      }
+      if (limit_ != 0) {
+        output.writeUInt32(3, limit_);
+      }
+      if (!getTokenBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, token_);
+      }
+      if (sortBy_ != null) {
+        output.writeMessage(5, getSortBy());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getProjectBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, project_);
+      }
+      if (!getDomainBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, domain_);
+      }
+      if (limit_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(3, limit_);
+      }
+      if (!getTokenBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, token_);
+      }
+      if (sortBy_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getSortBy());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest other = (flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest) obj;
+
+      boolean result = true;
+      result = result && getProject()
+          .equals(other.getProject());
+      result = result && getDomain()
+          .equals(other.getDomain());
+      result = result && (getLimit()
+          == other.getLimit());
+      result = result && getToken()
+          .equals(other.getToken());
+      result = result && (hasSortBy() == other.hasSortBy());
+      if (hasSortBy()) {
+        result = result && getSortBy()
+            .equals(other.getSortBy());
+      }
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + PROJECT_FIELD_NUMBER;
+      hash = (53 * hash) + getProject().hashCode();
+      hash = (37 * hash) + DOMAIN_FIELD_NUMBER;
+      hash = (53 * hash) + getDomain().hashCode();
+      hash = (37 * hash) + LIMIT_FIELD_NUMBER;
+      hash = (53 * hash) + getLimit();
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
+      if (hasSortBy()) {
+        hash = (37 * hash) + SORT_BY_FIELD_NUMBER;
+        hash = (53 * hash) + getSortBy().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Represents a request structure to list active launch plans within a project/domain.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.ActiveLaunchPlanListRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.ActiveLaunchPlanListRequest)
+        flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest.class, flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        project_ = "";
+
+        domain_ = "";
+
+        limit_ = 0;
+
+        token_ = "";
+
+        if (sortByBuilder_ == null) {
+          sortBy_ = null;
+        } else {
+          sortBy_ = null;
+          sortByBuilder_ = null;
+        }
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor;
+      }
+
+      public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest getDefaultInstanceForType() {
+        return flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest.getDefaultInstance();
+      }
+
+      public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest build() {
+        flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest buildPartial() {
+        flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest result = new flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest(this);
+        result.project_ = project_;
+        result.domain_ = domain_;
+        result.limit_ = limit_;
+        result.token_ = token_;
+        if (sortByBuilder_ == null) {
+          result.sortBy_ = sortBy_;
+        } else {
+          result.sortBy_ = sortByBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest) {
+          return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest other) {
+        if (other == flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest.getDefaultInstance()) return this;
+        if (!other.getProject().isEmpty()) {
+          project_ = other.project_;
+          onChanged();
+        }
+        if (!other.getDomain().isEmpty()) {
+          domain_ = other.domain_;
+          onChanged();
+        }
+        if (other.getLimit() != 0) {
+          setLimit(other.getLimit());
+        }
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
+          onChanged();
+        }
+        if (other.hasSortBy()) {
+          mergeSortBy(other.getSortBy());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object project_ = "";
+      /**
+       * <pre>
+       * Name of the project that contains the identifiers.
+       * </pre>
+       *
+       * <code>string project = 1;</code>
+       */
+      public java.lang.String getProject() {
+        java.lang.Object ref = project_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          project_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Name of the project that contains the identifiers.
+       * </pre>
+       *
+       * <code>string project = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getProjectBytes() {
+        java.lang.Object ref = project_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          project_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Name of the project that contains the identifiers.
+       * </pre>
+       *
+       * <code>string project = 1;</code>
+       */
+      public Builder setProject(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        project_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Name of the project that contains the identifiers.
+       * </pre>
+       *
+       * <code>string project = 1;</code>
+       */
+      public Builder clearProject() {
+        
+        project_ = getDefaultInstance().getProject();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Name of the project that contains the identifiers.
+       * </pre>
+       *
+       * <code>string project = 1;</code>
+       */
+      public Builder setProjectBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        project_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object domain_ = "";
+      /**
+       * <pre>
+       * Name of the domain the identifiers belongs to within the project.
+       * </pre>
+       *
+       * <code>string domain = 2;</code>
+       */
+      public java.lang.String getDomain() {
+        java.lang.Object ref = domain_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          domain_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Name of the domain the identifiers belongs to within the project.
+       * </pre>
+       *
+       * <code>string domain = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDomainBytes() {
+        java.lang.Object ref = domain_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          domain_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Name of the domain the identifiers belongs to within the project.
+       * </pre>
+       *
+       * <code>string domain = 2;</code>
+       */
+      public Builder setDomain(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        domain_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Name of the domain the identifiers belongs to within the project.
+       * </pre>
+       *
+       * <code>string domain = 2;</code>
+       */
+      public Builder clearDomain() {
+        
+        domain_ = getDefaultInstance().getDomain();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Name of the domain the identifiers belongs to within the project.
+       * </pre>
+       *
+       * <code>string domain = 2;</code>
+       */
+      public Builder setDomainBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        domain_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int limit_ ;
+      /**
+       * <pre>
+       * Indicates the number of resources to be returned.
+       * </pre>
+       *
+       * <code>uint32 limit = 3;</code>
+       */
+      public int getLimit() {
+        return limit_;
+      }
+      /**
+       * <pre>
+       * Indicates the number of resources to be returned.
+       * </pre>
+       *
+       * <code>uint32 limit = 3;</code>
+       */
+      public Builder setLimit(int value) {
+        
+        limit_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates the number of resources to be returned.
+       * </pre>
+       *
+       * <code>uint32 limit = 3;</code>
+       */
+      public Builder clearLimit() {
+        
+        limit_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query.
+       * +optional
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query.
+       * +optional
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query.
+       * +optional
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query.
+       * +optional
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public Builder clearToken() {
+        
+        token_ = getDefaultInstance().getToken();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query.
+       * +optional
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        token_ = value;
+        onChanged();
+        return this;
+      }
+
+      private flyteidl.admin.Common.Sort sortBy_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Sort, flyteidl.admin.Common.Sort.Builder, flyteidl.admin.Common.SortOrBuilder> sortByBuilder_;
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+       */
+      public boolean hasSortBy() {
+        return sortByBuilder_ != null || sortBy_ != null;
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+       */
+      public flyteidl.admin.Common.Sort getSortBy() {
+        if (sortByBuilder_ == null) {
+          return sortBy_ == null ? flyteidl.admin.Common.Sort.getDefaultInstance() : sortBy_;
+        } else {
+          return sortByBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+       */
+      public Builder setSortBy(flyteidl.admin.Common.Sort value) {
+        if (sortByBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          sortBy_ = value;
+          onChanged();
+        } else {
+          sortByBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+       */
+      public Builder setSortBy(
+          flyteidl.admin.Common.Sort.Builder builderForValue) {
+        if (sortByBuilder_ == null) {
+          sortBy_ = builderForValue.build();
+          onChanged();
+        } else {
+          sortByBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+       */
+      public Builder mergeSortBy(flyteidl.admin.Common.Sort value) {
+        if (sortByBuilder_ == null) {
+          if (sortBy_ != null) {
+            sortBy_ =
+              flyteidl.admin.Common.Sort.newBuilder(sortBy_).mergeFrom(value).buildPartial();
+          } else {
+            sortBy_ = value;
+          }
+          onChanged();
+        } else {
+          sortByBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+       */
+      public Builder clearSortBy() {
+        if (sortByBuilder_ == null) {
+          sortBy_ = null;
+          onChanged();
+        } else {
+          sortBy_ = null;
+          sortByBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+       */
+      public flyteidl.admin.Common.Sort.Builder getSortByBuilder() {
+        
+        onChanged();
+        return getSortByFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+       */
+      public flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder() {
+        if (sortByBuilder_ != null) {
+          return sortByBuilder_.getMessageOrBuilder();
+        } else {
+          return sortBy_ == null ?
+              flyteidl.admin.Common.Sort.getDefaultInstance() : sortBy_;
+        }
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Sort, flyteidl.admin.Common.Sort.Builder, flyteidl.admin.Common.SortOrBuilder> 
+          getSortByFieldBuilder() {
+        if (sortByBuilder_ == null) {
+          sortByBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.Sort, flyteidl.admin.Common.Sort.Builder, flyteidl.admin.Common.SortOrBuilder>(
+                  getSortBy(),
+                  getParentForChildren(),
+                  isClean());
+          sortBy_ = null;
+        }
+        return sortByBuilder_;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.ActiveLaunchPlanListRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.ActiveLaunchPlanListRequest)
+    private static final flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest();
+    }
+
+    public static flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ActiveLaunchPlanListRequest>
+        PARSER = new com.google.protobuf.AbstractParser<ActiveLaunchPlanListRequest>() {
+      public ActiveLaunchPlanListRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ActiveLaunchPlanListRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ActiveLaunchPlanListRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ActiveLaunchPlanListRequest> getParserForType() {
+      return PARSER;
+    }
+
+    public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_LaunchPlanCreateRequest_descriptor;
   private static final 
@@ -10401,6 +12276,16 @@ public final class LaunchPlanOuterClass {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_LaunchPlanUpdateResponse_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_ActiveLaunchPlanRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_ActiveLaunchPlanRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -10450,9 +12335,15 @@ public final class LaunchPlanOuterClass {
       "dateRequest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core." +
       "Identifier\022.\n\005state\030\002 \001(\0162\037.flyteidl.adm" +
       "in.LaunchPlanState\"\032\n\030LaunchPlanUpdateRe" +
-      "sponse*+\n\017LaunchPlanState\022\014\n\010INACTIVE\020\000\022" +
-      "\n\n\006ACTIVE\020\001B3Z1github.com/lyft/flyteidl/" +
-      "gen/pb-go/flyteidl/adminb\006proto3"
+      "sponse\"L\n\027ActiveLaunchPlanRequest\0221\n\002id\030" +
+      "\001 \001(\0132%.flyteidl.admin.NamedEntityIdenti" +
+      "fier\"\203\001\n\033ActiveLaunchPlanListRequest\022\017\n\007" +
+      "project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003" +
+      " \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.f" +
+      "lyteidl.admin.Sort*+\n\017LaunchPlanState\022\014\n" +
+      "\010INACTIVE\020\000\022\n\n\006ACTIVE\020\001B3Z1github.com/ly" +
+      "ft/flyteidl/gen/pb-go/flyteidl/adminb\006pr" +
+      "oto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10532,6 +12423,18 @@ public final class LaunchPlanOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LaunchPlanUpdateResponse_descriptor,
         new java.lang.String[] { });
+    internal_static_flyteidl_admin_ActiveLaunchPlanRequest_descriptor =
+      getDescriptor().getMessageTypes().get(10);
+    internal_static_flyteidl_admin_ActiveLaunchPlanRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_ActiveLaunchPlanRequest_descriptor,
+        new java.lang.String[] { "Id", });
+    internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor =
+      getDescriptor().getMessageTypes().get(11);
+    internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor,
+        new java.lang.String[] { "Project", "Domain", "Limit", "Token", "SortBy", });
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Interface.getDescriptor();

@@ -73,6 +73,16 @@ class LaunchPlanUpdateResponseDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<LaunchPlanUpdateResponse>
       _instance;
 } _LaunchPlanUpdateResponse_default_instance_;
+class ActiveLaunchPlanRequestDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<ActiveLaunchPlanRequest>
+      _instance;
+} _ActiveLaunchPlanRequest_default_instance_;
+class ActiveLaunchPlanListRequestDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<ActiveLaunchPlanListRequest>
+      _instance;
+} _ActiveLaunchPlanListRequest_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
 namespace protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto {
@@ -305,7 +315,51 @@ void InitDefaultsLaunchPlanUpdateResponse() {
   ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsLaunchPlanUpdateResponseImpl);
 }
 
-::google::protobuf::Metadata file_level_metadata[10];
+void InitDefaultsActiveLaunchPlanRequestImpl() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
+  ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  protobuf_flyteidl_2fadmin_2fcommon_2eproto::InitDefaultsNamedEntityIdentifier();
+  {
+    void* ptr = &::flyteidl::admin::_ActiveLaunchPlanRequest_default_instance_;
+    new (ptr) ::flyteidl::admin::ActiveLaunchPlanRequest();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::admin::ActiveLaunchPlanRequest::InitAsDefaultInstance();
+}
+
+void InitDefaultsActiveLaunchPlanRequest() {
+  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
+  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsActiveLaunchPlanRequestImpl);
+}
+
+void InitDefaultsActiveLaunchPlanListRequestImpl() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
+  ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  protobuf_flyteidl_2fadmin_2fcommon_2eproto::InitDefaultsSort();
+  {
+    void* ptr = &::flyteidl::admin::_ActiveLaunchPlanListRequest_default_instance_;
+    new (ptr) ::flyteidl::admin::ActiveLaunchPlanListRequest();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::admin::ActiveLaunchPlanListRequest::InitAsDefaultInstance();
+}
+
+void InitDefaultsActiveLaunchPlanListRequest() {
+  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
+  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsActiveLaunchPlanListRequestImpl);
+}
+
+::google::protobuf::Metadata file_level_metadata[12];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[1];
 
 const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
@@ -386,6 +440,22 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::ActiveLaunchPlanRequest, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::ActiveLaunchPlanRequest, id_),
+  ~0u,  // no _has_bits_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::ActiveLaunchPlanListRequest, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::ActiveLaunchPlanListRequest, project_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::ActiveLaunchPlanListRequest, domain_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::ActiveLaunchPlanListRequest, limit_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::ActiveLaunchPlanListRequest, token_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::ActiveLaunchPlanListRequest, sort_by_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::admin::LaunchPlanCreateRequest)},
@@ -398,6 +468,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 58, -1, sizeof(::flyteidl::admin::LaunchPlanMetadata)},
   { 65, -1, sizeof(::flyteidl::admin::LaunchPlanUpdateRequest)},
   { 72, -1, sizeof(::flyteidl::admin::LaunchPlanUpdateResponse)},
+  { 77, -1, sizeof(::flyteidl::admin::ActiveLaunchPlanRequest)},
+  { 83, -1, sizeof(::flyteidl::admin::ActiveLaunchPlanListRequest)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -411,6 +483,8 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_LaunchPlanMetadata_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_LaunchPlanUpdateRequest_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_LaunchPlanUpdateResponse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ActiveLaunchPlanRequest_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ActiveLaunchPlanListRequest_default_instance_),
 };
 
 void protobuf_AssignDescriptors() {
@@ -429,7 +503,7 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 10);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 12);
 }
 
 void AddDescriptorsImpl() {
@@ -475,12 +549,18 @@ void AddDescriptorsImpl() {
       "dateRequest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core."
       "Identifier\022.\n\005state\030\002 \001(\0162\037.flyteidl.adm"
       "in.LaunchPlanState\"\032\n\030LaunchPlanUpdateRe"
-      "sponse*+\n\017LaunchPlanState\022\014\n\010INACTIVE\020\000\022"
-      "\n\n\006ACTIVE\020\001B3Z1github.com/lyft/flyteidl/"
-      "gen/pb-go/flyteidl/adminb\006proto3"
+      "sponse\"L\n\027ActiveLaunchPlanRequest\0221\n\002id\030"
+      "\001 \001(\0132%.flyteidl.admin.NamedEntityIdenti"
+      "fier\"\203\001\n\033ActiveLaunchPlanListRequest\022\017\n\007"
+      "project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003"
+      " \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.f"
+      "lyteidl.admin.Sort*+\n\017LaunchPlanState\022\014\n"
+      "\010INACTIVE\020\000\022\n\n\006ACTIVE\020\001B3Z1github.com/ly"
+      "ft/flyteidl/gen/pb-go/flyteidl/adminb\006pr"
+      "oto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 1712);
+      descriptor, 1924);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "flyteidl/admin/launch_plan.proto", &protobuf_RegisterTypes);
   ::protobuf_flyteidl_2fcore_2fliterals_2eproto::AddDescriptors();
@@ -3903,6 +3983,727 @@ void LaunchPlanUpdateResponse::InternalSwap(LaunchPlanUpdateResponse* other) {
 }
 
 ::google::protobuf::Metadata LaunchPlanUpdateResponse::GetMetadata() const {
+  protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void ActiveLaunchPlanRequest::InitAsDefaultInstance() {
+  ::flyteidl::admin::_ActiveLaunchPlanRequest_default_instance_._instance.get_mutable()->id_ = const_cast< ::flyteidl::admin::NamedEntityIdentifier*>(
+      ::flyteidl::admin::NamedEntityIdentifier::internal_default_instance());
+}
+void ActiveLaunchPlanRequest::clear_id() {
+  if (GetArenaNoVirtual() == NULL && id_ != NULL) {
+    delete id_;
+  }
+  id_ = NULL;
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int ActiveLaunchPlanRequest::kIdFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+ActiveLaunchPlanRequest::ActiveLaunchPlanRequest()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
+    ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::InitDefaultsActiveLaunchPlanRequest();
+  }
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.admin.ActiveLaunchPlanRequest)
+}
+ActiveLaunchPlanRequest::ActiveLaunchPlanRequest(const ActiveLaunchPlanRequest& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      _cached_size_(0) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  if (from.has_id()) {
+    id_ = new ::flyteidl::admin::NamedEntityIdentifier(*from.id_);
+  } else {
+    id_ = NULL;
+  }
+  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.ActiveLaunchPlanRequest)
+}
+
+void ActiveLaunchPlanRequest::SharedCtor() {
+  id_ = NULL;
+  _cached_size_ = 0;
+}
+
+ActiveLaunchPlanRequest::~ActiveLaunchPlanRequest() {
+  // @@protoc_insertion_point(destructor:flyteidl.admin.ActiveLaunchPlanRequest)
+  SharedDtor();
+}
+
+void ActiveLaunchPlanRequest::SharedDtor() {
+  if (this != internal_default_instance()) delete id_;
+}
+
+void ActiveLaunchPlanRequest::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* ActiveLaunchPlanRequest::descriptor() {
+  ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const ActiveLaunchPlanRequest& ActiveLaunchPlanRequest::default_instance() {
+  ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::InitDefaultsActiveLaunchPlanRequest();
+  return *internal_default_instance();
+}
+
+ActiveLaunchPlanRequest* ActiveLaunchPlanRequest::New(::google::protobuf::Arena* arena) const {
+  ActiveLaunchPlanRequest* n = new ActiveLaunchPlanRequest;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void ActiveLaunchPlanRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (GetArenaNoVirtual() == NULL && id_ != NULL) {
+    delete id_;
+  }
+  id_ = NULL;
+  _internal_metadata_.Clear();
+}
+
+bool ActiveLaunchPlanRequest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // .flyteidl.admin.NamedEntityIdentifier id = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_id()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.admin.ActiveLaunchPlanRequest)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.admin.ActiveLaunchPlanRequest)
+  return false;
+#undef DO_
+}
+
+void ActiveLaunchPlanRequest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .flyteidl.admin.NamedEntityIdentifier id = 1;
+  if (this->has_id()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, *this->id_, output);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.admin.ActiveLaunchPlanRequest)
+}
+
+::google::protobuf::uint8* ActiveLaunchPlanRequest::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .flyteidl.admin.NamedEntityIdentifier id = 1;
+  if (this->has_id()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        1, *this->id_, deterministic, target);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.ActiveLaunchPlanRequest)
+  return target;
+}
+
+size_t ActiveLaunchPlanRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  // .flyteidl.admin.NamedEntityIdentifier id = 1;
+  if (this->has_id()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *this->id_);
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void ActiveLaunchPlanRequest::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  GOOGLE_DCHECK_NE(&from, this);
+  const ActiveLaunchPlanRequest* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const ActiveLaunchPlanRequest>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.ActiveLaunchPlanRequest)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.ActiveLaunchPlanRequest)
+    MergeFrom(*source);
+  }
+}
+
+void ActiveLaunchPlanRequest::MergeFrom(const ActiveLaunchPlanRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.has_id()) {
+    mutable_id()->::flyteidl::admin::NamedEntityIdentifier::MergeFrom(from.id());
+  }
+}
+
+void ActiveLaunchPlanRequest::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ActiveLaunchPlanRequest::CopyFrom(const ActiveLaunchPlanRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.ActiveLaunchPlanRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ActiveLaunchPlanRequest::IsInitialized() const {
+  return true;
+}
+
+void ActiveLaunchPlanRequest::Swap(ActiveLaunchPlanRequest* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void ActiveLaunchPlanRequest::InternalSwap(ActiveLaunchPlanRequest* other) {
+  using std::swap;
+  swap(id_, other->id_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata ActiveLaunchPlanRequest::GetMetadata() const {
+  protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void ActiveLaunchPlanListRequest::InitAsDefaultInstance() {
+  ::flyteidl::admin::_ActiveLaunchPlanListRequest_default_instance_._instance.get_mutable()->sort_by_ = const_cast< ::flyteidl::admin::Sort*>(
+      ::flyteidl::admin::Sort::internal_default_instance());
+}
+void ActiveLaunchPlanListRequest::clear_sort_by() {
+  if (GetArenaNoVirtual() == NULL && sort_by_ != NULL) {
+    delete sort_by_;
+  }
+  sort_by_ = NULL;
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int ActiveLaunchPlanListRequest::kProjectFieldNumber;
+const int ActiveLaunchPlanListRequest::kDomainFieldNumber;
+const int ActiveLaunchPlanListRequest::kLimitFieldNumber;
+const int ActiveLaunchPlanListRequest::kTokenFieldNumber;
+const int ActiveLaunchPlanListRequest::kSortByFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+ActiveLaunchPlanListRequest::ActiveLaunchPlanListRequest()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
+    ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::InitDefaultsActiveLaunchPlanListRequest();
+  }
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.admin.ActiveLaunchPlanListRequest)
+}
+ActiveLaunchPlanListRequest::ActiveLaunchPlanListRequest(const ActiveLaunchPlanListRequest& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      _cached_size_(0) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  project_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.project().size() > 0) {
+    project_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.project_);
+  }
+  domain_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.domain().size() > 0) {
+    domain_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.domain_);
+  }
+  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.token().size() > 0) {
+    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
+  }
+  if (from.has_sort_by()) {
+    sort_by_ = new ::flyteidl::admin::Sort(*from.sort_by_);
+  } else {
+    sort_by_ = NULL;
+  }
+  limit_ = from.limit_;
+  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.ActiveLaunchPlanListRequest)
+}
+
+void ActiveLaunchPlanListRequest::SharedCtor() {
+  project_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  domain_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&sort_by_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&limit_) -
+      reinterpret_cast<char*>(&sort_by_)) + sizeof(limit_));
+  _cached_size_ = 0;
+}
+
+ActiveLaunchPlanListRequest::~ActiveLaunchPlanListRequest() {
+  // @@protoc_insertion_point(destructor:flyteidl.admin.ActiveLaunchPlanListRequest)
+  SharedDtor();
+}
+
+void ActiveLaunchPlanListRequest::SharedDtor() {
+  project_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  domain_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete sort_by_;
+}
+
+void ActiveLaunchPlanListRequest::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* ActiveLaunchPlanListRequest::descriptor() {
+  ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::protobuf_AssignDescriptorsOnce();
+  return ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const ActiveLaunchPlanListRequest& ActiveLaunchPlanListRequest::default_instance() {
+  ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::InitDefaultsActiveLaunchPlanListRequest();
+  return *internal_default_instance();
+}
+
+ActiveLaunchPlanListRequest* ActiveLaunchPlanListRequest::New(::google::protobuf::Arena* arena) const {
+  ActiveLaunchPlanListRequest* n = new ActiveLaunchPlanListRequest;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void ActiveLaunchPlanListRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.admin.ActiveLaunchPlanListRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  project_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  domain_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (GetArenaNoVirtual() == NULL && sort_by_ != NULL) {
+    delete sort_by_;
+  }
+  sort_by_ = NULL;
+  limit_ = 0u;
+  _internal_metadata_.Clear();
+}
+
+bool ActiveLaunchPlanListRequest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.admin.ActiveLaunchPlanListRequest)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string project = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_project()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->project().data(), static_cast<int>(this->project().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.ActiveLaunchPlanListRequest.project"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string domain = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_domain()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->domain().data(), static_cast<int>(this->domain().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.ActiveLaunchPlanListRequest.domain"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // uint32 limit = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(24u /* 24 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &limit_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string token = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_token()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->token().data(), static_cast<int>(this->token().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.ActiveLaunchPlanListRequest.token"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.admin.Sort sort_by = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(42u /* 42 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_sort_by()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.admin.ActiveLaunchPlanListRequest)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.admin.ActiveLaunchPlanListRequest)
+  return false;
+#undef DO_
+}
+
+void ActiveLaunchPlanListRequest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.admin.ActiveLaunchPlanListRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string project = 1;
+  if (this->project().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->project().data(), static_cast<int>(this->project().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ActiveLaunchPlanListRequest.project");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->project(), output);
+  }
+
+  // string domain = 2;
+  if (this->domain().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->domain().data(), static_cast<int>(this->domain().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ActiveLaunchPlanListRequest.domain");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->domain(), output);
+  }
+
+  // uint32 limit = 3;
+  if (this->limit() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->limit(), output);
+  }
+
+  // string token = 4;
+  if (this->token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->token().data(), static_cast<int>(this->token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ActiveLaunchPlanListRequest.token");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->token(), output);
+  }
+
+  // .flyteidl.admin.Sort sort_by = 5;
+  if (this->has_sort_by()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      5, *this->sort_by_, output);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.admin.ActiveLaunchPlanListRequest)
+}
+
+::google::protobuf::uint8* ActiveLaunchPlanListRequest::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.ActiveLaunchPlanListRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string project = 1;
+  if (this->project().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->project().data(), static_cast<int>(this->project().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ActiveLaunchPlanListRequest.project");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->project(), target);
+  }
+
+  // string domain = 2;
+  if (this->domain().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->domain().data(), static_cast<int>(this->domain().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ActiveLaunchPlanListRequest.domain");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->domain(), target);
+  }
+
+  // uint32 limit = 3;
+  if (this->limit() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->limit(), target);
+  }
+
+  // string token = 4;
+  if (this->token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->token().data(), static_cast<int>(this->token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ActiveLaunchPlanListRequest.token");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->token(), target);
+  }
+
+  // .flyteidl.admin.Sort sort_by = 5;
+  if (this->has_sort_by()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        5, *this->sort_by_, deterministic, target);
+  }
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.ActiveLaunchPlanListRequest)
+  return target;
+}
+
+size_t ActiveLaunchPlanListRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.ActiveLaunchPlanListRequest)
+  size_t total_size = 0;
+
+  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+  }
+  // string project = 1;
+  if (this->project().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->project());
+  }
+
+  // string domain = 2;
+  if (this->domain().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->domain());
+  }
+
+  // string token = 4;
+  if (this->token().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->token());
+  }
+
+  // .flyteidl.admin.Sort sort_by = 5;
+  if (this->has_sort_by()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *this->sort_by_);
+  }
+
+  // uint32 limit = 3;
+  if (this->limit() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->limit());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void ActiveLaunchPlanListRequest::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.ActiveLaunchPlanListRequest)
+  GOOGLE_DCHECK_NE(&from, this);
+  const ActiveLaunchPlanListRequest* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const ActiveLaunchPlanListRequest>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.ActiveLaunchPlanListRequest)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.ActiveLaunchPlanListRequest)
+    MergeFrom(*source);
+  }
+}
+
+void ActiveLaunchPlanListRequest::MergeFrom(const ActiveLaunchPlanListRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.ActiveLaunchPlanListRequest)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.project().size() > 0) {
+
+    project_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.project_);
+  }
+  if (from.domain().size() > 0) {
+
+    domain_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.domain_);
+  }
+  if (from.token().size() > 0) {
+
+    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
+  }
+  if (from.has_sort_by()) {
+    mutable_sort_by()->::flyteidl::admin::Sort::MergeFrom(from.sort_by());
+  }
+  if (from.limit() != 0) {
+    set_limit(from.limit());
+  }
+}
+
+void ActiveLaunchPlanListRequest::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.ActiveLaunchPlanListRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ActiveLaunchPlanListRequest::CopyFrom(const ActiveLaunchPlanListRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.ActiveLaunchPlanListRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ActiveLaunchPlanListRequest::IsInitialized() const {
+  return true;
+}
+
+void ActiveLaunchPlanListRequest::Swap(ActiveLaunchPlanListRequest* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void ActiveLaunchPlanListRequest::InternalSwap(ActiveLaunchPlanListRequest* other) {
+  using std::swap;
+  project_.Swap(&other->project_);
+  domain_.Swap(&other->domain_);
+  token_.Swap(&other->token_);
+  swap(sort_by_, other->sort_by_);
+  swap(limit_, other->limit_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata ActiveLaunchPlanListRequest::GetMetadata() const {
   protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::protobuf_AssignDescriptorsOnce();
   return ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::file_level_metadata[kIndexInFileMessages];
 }

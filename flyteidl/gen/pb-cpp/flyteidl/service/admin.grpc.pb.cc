@@ -226,15 +226,15 @@ AdminService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chann
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::LaunchPlan>::Create(channel_.get(), cq, rpcmethod_GetActiveLaunchPlan_, context, request, false);
 }
 
-::grpc::Status AdminService::Stub::ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::LaunchPlanList* response) {
+::grpc::Status AdminService::Stub::ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::flyteidl::admin::LaunchPlanList* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_ListActiveLaunchPlans_, context, request, response);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>* AdminService::Stub::AsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>* AdminService::Stub::AsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::LaunchPlanList>::Create(channel_.get(), cq, rpcmethod_ListActiveLaunchPlans_, context, request, true);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>* AdminService::Stub::PrepareAsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::LaunchPlanList>* AdminService::Stub::PrepareAsyncListActiveLaunchPlansRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::LaunchPlanList>::Create(channel_.get(), cq, rpcmethod_ListActiveLaunchPlans_, context, request, false);
 }
 
@@ -549,7 +549,7 @@ AdminService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[11],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::LaunchPlanList>(
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ActiveLaunchPlanListRequest, ::flyteidl::admin::LaunchPlanList>(
           std::mem_fn(&AdminService::Service::ListActiveLaunchPlans), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[12],
@@ -738,7 +738,7 @@ AdminService::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status AdminService::Service::ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::LaunchPlanList* response) {
+::grpc::Status AdminService::Service::ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response) {
   (void) context;
   (void) request;
   (void) response;

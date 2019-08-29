@@ -43,7 +43,7 @@ namespace protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[10];
+  static const ::google::protobuf::internal::ParseTable schema[12];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -69,6 +69,10 @@ void InitDefaultsLaunchPlanUpdateRequestImpl();
 void InitDefaultsLaunchPlanUpdateRequest();
 void InitDefaultsLaunchPlanUpdateResponseImpl();
 void InitDefaultsLaunchPlanUpdateResponse();
+void InitDefaultsActiveLaunchPlanRequestImpl();
+void InitDefaultsActiveLaunchPlanRequest();
+void InitDefaultsActiveLaunchPlanListRequestImpl();
+void InitDefaultsActiveLaunchPlanListRequest();
 inline void InitDefaults() {
   InitDefaultsLaunchPlanCreateRequest();
   InitDefaultsLaunchPlanCreateResponse();
@@ -80,10 +84,18 @@ inline void InitDefaults() {
   InitDefaultsLaunchPlanMetadata();
   InitDefaultsLaunchPlanUpdateRequest();
   InitDefaultsLaunchPlanUpdateResponse();
+  InitDefaultsActiveLaunchPlanRequest();
+  InitDefaultsActiveLaunchPlanListRequest();
 }
 }  // namespace protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto
 namespace flyteidl {
 namespace admin {
+class ActiveLaunchPlanListRequest;
+class ActiveLaunchPlanListRequestDefaultTypeInternal;
+extern ActiveLaunchPlanListRequestDefaultTypeInternal _ActiveLaunchPlanListRequest_default_instance_;
+class ActiveLaunchPlanRequest;
+class ActiveLaunchPlanRequestDefaultTypeInternal;
+extern ActiveLaunchPlanRequestDefaultTypeInternal _ActiveLaunchPlanRequest_default_instance_;
 class Auth;
 class AuthDefaultTypeInternal;
 extern AuthDefaultTypeInternal _Auth_default_instance_;
@@ -1364,6 +1376,262 @@ class LaunchPlanUpdateResponse : public ::google::protobuf::Message /* @@protoc_
   friend struct ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::TableStruct;
   friend void ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::InitDefaultsLaunchPlanUpdateResponseImpl();
 };
+// -------------------------------------------------------------------
+
+class ActiveLaunchPlanRequest : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ActiveLaunchPlanRequest) */ {
+ public:
+  ActiveLaunchPlanRequest();
+  virtual ~ActiveLaunchPlanRequest();
+
+  ActiveLaunchPlanRequest(const ActiveLaunchPlanRequest& from);
+
+  inline ActiveLaunchPlanRequest& operator=(const ActiveLaunchPlanRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ActiveLaunchPlanRequest(ActiveLaunchPlanRequest&& from) noexcept
+    : ActiveLaunchPlanRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline ActiveLaunchPlanRequest& operator=(ActiveLaunchPlanRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ActiveLaunchPlanRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ActiveLaunchPlanRequest* internal_default_instance() {
+    return reinterpret_cast<const ActiveLaunchPlanRequest*>(
+               &_ActiveLaunchPlanRequest_default_instance_);
+  }
+  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+    10;
+
+  void Swap(ActiveLaunchPlanRequest* other);
+  friend void swap(ActiveLaunchPlanRequest& a, ActiveLaunchPlanRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ActiveLaunchPlanRequest* New() const PROTOBUF_FINAL { return New(NULL); }
+
+  ActiveLaunchPlanRequest* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void CopyFrom(const ActiveLaunchPlanRequest& from);
+  void MergeFrom(const ActiveLaunchPlanRequest& from);
+  void Clear() PROTOBUF_FINAL;
+  bool IsInitialized() const PROTOBUF_FINAL;
+
+  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const PROTOBUF_FINAL;
+  void InternalSwap(ActiveLaunchPlanRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.NamedEntityIdentifier id = 1;
+  bool has_id() const;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  const ::flyteidl::admin::NamedEntityIdentifier& id() const;
+  ::flyteidl::admin::NamedEntityIdentifier* release_id();
+  ::flyteidl::admin::NamedEntityIdentifier* mutable_id();
+  void set_allocated_id(::flyteidl::admin::NamedEntityIdentifier* id);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ActiveLaunchPlanRequest)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::admin::NamedEntityIdentifier* id_;
+  mutable int _cached_size_;
+  friend struct ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::TableStruct;
+  friend void ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::InitDefaultsActiveLaunchPlanRequestImpl();
+};
+// -------------------------------------------------------------------
+
+class ActiveLaunchPlanListRequest : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ActiveLaunchPlanListRequest) */ {
+ public:
+  ActiveLaunchPlanListRequest();
+  virtual ~ActiveLaunchPlanListRequest();
+
+  ActiveLaunchPlanListRequest(const ActiveLaunchPlanListRequest& from);
+
+  inline ActiveLaunchPlanListRequest& operator=(const ActiveLaunchPlanListRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ActiveLaunchPlanListRequest(ActiveLaunchPlanListRequest&& from) noexcept
+    : ActiveLaunchPlanListRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline ActiveLaunchPlanListRequest& operator=(ActiveLaunchPlanListRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ActiveLaunchPlanListRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ActiveLaunchPlanListRequest* internal_default_instance() {
+    return reinterpret_cast<const ActiveLaunchPlanListRequest*>(
+               &_ActiveLaunchPlanListRequest_default_instance_);
+  }
+  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+    11;
+
+  void Swap(ActiveLaunchPlanListRequest* other);
+  friend void swap(ActiveLaunchPlanListRequest& a, ActiveLaunchPlanListRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ActiveLaunchPlanListRequest* New() const PROTOBUF_FINAL { return New(NULL); }
+
+  ActiveLaunchPlanListRequest* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+  void CopyFrom(const ActiveLaunchPlanListRequest& from);
+  void MergeFrom(const ActiveLaunchPlanListRequest& from);
+  void Clear() PROTOBUF_FINAL;
+  bool IsInitialized() const PROTOBUF_FINAL;
+
+  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const PROTOBUF_FINAL;
+  void InternalSwap(ActiveLaunchPlanListRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string project = 1;
+  void clear_project();
+  static const int kProjectFieldNumber = 1;
+  const ::std::string& project() const;
+  void set_project(const ::std::string& value);
+  #if LANG_CXX11
+  void set_project(::std::string&& value);
+  #endif
+  void set_project(const char* value);
+  void set_project(const char* value, size_t size);
+  ::std::string* mutable_project();
+  ::std::string* release_project();
+  void set_allocated_project(::std::string* project);
+
+  // string domain = 2;
+  void clear_domain();
+  static const int kDomainFieldNumber = 2;
+  const ::std::string& domain() const;
+  void set_domain(const ::std::string& value);
+  #if LANG_CXX11
+  void set_domain(::std::string&& value);
+  #endif
+  void set_domain(const char* value);
+  void set_domain(const char* value, size_t size);
+  ::std::string* mutable_domain();
+  ::std::string* release_domain();
+  void set_allocated_domain(::std::string* domain);
+
+  // string token = 4;
+  void clear_token();
+  static const int kTokenFieldNumber = 4;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
+  // .flyteidl.admin.Sort sort_by = 5;
+  bool has_sort_by() const;
+  void clear_sort_by();
+  static const int kSortByFieldNumber = 5;
+  const ::flyteidl::admin::Sort& sort_by() const;
+  ::flyteidl::admin::Sort* release_sort_by();
+  ::flyteidl::admin::Sort* mutable_sort_by();
+  void set_allocated_sort_by(::flyteidl::admin::Sort* sort_by);
+
+  // uint32 limit = 3;
+  void clear_limit();
+  static const int kLimitFieldNumber = 3;
+  ::google::protobuf::uint32 limit() const;
+  void set_limit(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ActiveLaunchPlanListRequest)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr project_;
+  ::google::protobuf::internal::ArenaStringPtr domain_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
+  ::flyteidl::admin::Sort* sort_by_;
+  ::google::protobuf::uint32 limit_;
+  mutable int _cached_size_;
+  friend struct ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::TableStruct;
+  friend void ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::InitDefaultsActiveLaunchPlanListRequestImpl();
+};
 // ===================================================================
 
 
@@ -2625,9 +2893,282 @@ inline void LaunchPlanUpdateRequest::set_state(::flyteidl::admin::LaunchPlanStat
 
 // LaunchPlanUpdateResponse
 
+// -------------------------------------------------------------------
+
+// ActiveLaunchPlanRequest
+
+// .flyteidl.admin.NamedEntityIdentifier id = 1;
+inline bool ActiveLaunchPlanRequest::has_id() const {
+  return this != internal_default_instance() && id_ != NULL;
+}
+inline const ::flyteidl::admin::NamedEntityIdentifier& ActiveLaunchPlanRequest::id() const {
+  const ::flyteidl::admin::NamedEntityIdentifier* p = id_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ActiveLaunchPlanRequest.id)
+  return p != NULL ? *p : *reinterpret_cast<const ::flyteidl::admin::NamedEntityIdentifier*>(
+      &::flyteidl::admin::_NamedEntityIdentifier_default_instance_);
+}
+inline ::flyteidl::admin::NamedEntityIdentifier* ActiveLaunchPlanRequest::release_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ActiveLaunchPlanRequest.id)
+  
+  ::flyteidl::admin::NamedEntityIdentifier* temp = id_;
+  id_ = NULL;
+  return temp;
+}
+inline ::flyteidl::admin::NamedEntityIdentifier* ActiveLaunchPlanRequest::mutable_id() {
+  
+  if (id_ == NULL) {
+    id_ = new ::flyteidl::admin::NamedEntityIdentifier;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ActiveLaunchPlanRequest.id)
+  return id_;
+}
+inline void ActiveLaunchPlanRequest::set_allocated_id(::flyteidl::admin::NamedEntityIdentifier* id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(id_);
+  }
+  if (id) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  id_ = id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ActiveLaunchPlanRequest.id)
+}
+
+// -------------------------------------------------------------------
+
+// ActiveLaunchPlanListRequest
+
+// string project = 1;
+inline void ActiveLaunchPlanListRequest::clear_project() {
+  project_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ActiveLaunchPlanListRequest::project() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ActiveLaunchPlanListRequest.project)
+  return project_.GetNoArena();
+}
+inline void ActiveLaunchPlanListRequest::set_project(const ::std::string& value) {
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ActiveLaunchPlanListRequest.project)
+}
+#if LANG_CXX11
+inline void ActiveLaunchPlanListRequest::set_project(::std::string&& value) {
+  
+  project_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ActiveLaunchPlanListRequest.project)
+}
+#endif
+inline void ActiveLaunchPlanListRequest::set_project(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ActiveLaunchPlanListRequest.project)
+}
+inline void ActiveLaunchPlanListRequest::set_project(const char* value, size_t size) {
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ActiveLaunchPlanListRequest.project)
+}
+inline ::std::string* ActiveLaunchPlanListRequest::mutable_project() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ActiveLaunchPlanListRequest.project)
+  return project_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ActiveLaunchPlanListRequest::release_project() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ActiveLaunchPlanListRequest.project)
+  
+  return project_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ActiveLaunchPlanListRequest::set_allocated_project(::std::string* project) {
+  if (project != NULL) {
+    
+  } else {
+    
+  }
+  project_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), project);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ActiveLaunchPlanListRequest.project)
+}
+
+// string domain = 2;
+inline void ActiveLaunchPlanListRequest::clear_domain() {
+  domain_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ActiveLaunchPlanListRequest::domain() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ActiveLaunchPlanListRequest.domain)
+  return domain_.GetNoArena();
+}
+inline void ActiveLaunchPlanListRequest::set_domain(const ::std::string& value) {
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ActiveLaunchPlanListRequest.domain)
+}
+#if LANG_CXX11
+inline void ActiveLaunchPlanListRequest::set_domain(::std::string&& value) {
+  
+  domain_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ActiveLaunchPlanListRequest.domain)
+}
+#endif
+inline void ActiveLaunchPlanListRequest::set_domain(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ActiveLaunchPlanListRequest.domain)
+}
+inline void ActiveLaunchPlanListRequest::set_domain(const char* value, size_t size) {
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ActiveLaunchPlanListRequest.domain)
+}
+inline ::std::string* ActiveLaunchPlanListRequest::mutable_domain() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ActiveLaunchPlanListRequest.domain)
+  return domain_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ActiveLaunchPlanListRequest::release_domain() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ActiveLaunchPlanListRequest.domain)
+  
+  return domain_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ActiveLaunchPlanListRequest::set_allocated_domain(::std::string* domain) {
+  if (domain != NULL) {
+    
+  } else {
+    
+  }
+  domain_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), domain);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ActiveLaunchPlanListRequest.domain)
+}
+
+// uint32 limit = 3;
+inline void ActiveLaunchPlanListRequest::clear_limit() {
+  limit_ = 0u;
+}
+inline ::google::protobuf::uint32 ActiveLaunchPlanListRequest::limit() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ActiveLaunchPlanListRequest.limit)
+  return limit_;
+}
+inline void ActiveLaunchPlanListRequest::set_limit(::google::protobuf::uint32 value) {
+  
+  limit_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ActiveLaunchPlanListRequest.limit)
+}
+
+// string token = 4;
+inline void ActiveLaunchPlanListRequest::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ActiveLaunchPlanListRequest::token() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ActiveLaunchPlanListRequest.token)
+  return token_.GetNoArena();
+}
+inline void ActiveLaunchPlanListRequest::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ActiveLaunchPlanListRequest.token)
+}
+#if LANG_CXX11
+inline void ActiveLaunchPlanListRequest::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ActiveLaunchPlanListRequest.token)
+}
+#endif
+inline void ActiveLaunchPlanListRequest::set_token(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ActiveLaunchPlanListRequest.token)
+}
+inline void ActiveLaunchPlanListRequest::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ActiveLaunchPlanListRequest.token)
+}
+inline ::std::string* ActiveLaunchPlanListRequest::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ActiveLaunchPlanListRequest.token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ActiveLaunchPlanListRequest::release_token() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ActiveLaunchPlanListRequest.token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ActiveLaunchPlanListRequest::set_allocated_token(::std::string* token) {
+  if (token != NULL) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ActiveLaunchPlanListRequest.token)
+}
+
+// .flyteidl.admin.Sort sort_by = 5;
+inline bool ActiveLaunchPlanListRequest::has_sort_by() const {
+  return this != internal_default_instance() && sort_by_ != NULL;
+}
+inline const ::flyteidl::admin::Sort& ActiveLaunchPlanListRequest::sort_by() const {
+  const ::flyteidl::admin::Sort* p = sort_by_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ActiveLaunchPlanListRequest.sort_by)
+  return p != NULL ? *p : *reinterpret_cast<const ::flyteidl::admin::Sort*>(
+      &::flyteidl::admin::_Sort_default_instance_);
+}
+inline ::flyteidl::admin::Sort* ActiveLaunchPlanListRequest::release_sort_by() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ActiveLaunchPlanListRequest.sort_by)
+  
+  ::flyteidl::admin::Sort* temp = sort_by_;
+  sort_by_ = NULL;
+  return temp;
+}
+inline ::flyteidl::admin::Sort* ActiveLaunchPlanListRequest::mutable_sort_by() {
+  
+  if (sort_by_ == NULL) {
+    sort_by_ = new ::flyteidl::admin::Sort;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ActiveLaunchPlanListRequest.sort_by)
+  return sort_by_;
+}
+inline void ActiveLaunchPlanListRequest::set_allocated_sort_by(::flyteidl::admin::Sort* sort_by) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(sort_by_);
+  }
+  if (sort_by) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      sort_by = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, sort_by, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  sort_by_ = sort_by;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ActiveLaunchPlanListRequest.sort_by)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

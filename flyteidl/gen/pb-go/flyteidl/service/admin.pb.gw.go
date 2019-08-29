@@ -632,7 +632,7 @@ var (
 )
 
 func request_AdminService_ListActiveLaunchPlans_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq admin.NamedEntityIdentifierListRequest
+	var protoReq admin.ActiveLaunchPlanListRequest
 	var metadata runtime.ServerMetadata
 
 	var (

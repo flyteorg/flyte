@@ -920,3 +920,166 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = LaunchPlanUpdateResponseValidationError{}
+
+// Validate checks the field values on ActiveLaunchPlanRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ActiveLaunchPlanRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActiveLaunchPlanRequestValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ActiveLaunchPlanRequestValidationError is the validation error returned by
+// ActiveLaunchPlanRequest.Validate if the designated constraints aren't met.
+type ActiveLaunchPlanRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ActiveLaunchPlanRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ActiveLaunchPlanRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ActiveLaunchPlanRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ActiveLaunchPlanRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ActiveLaunchPlanRequestValidationError) ErrorName() string {
+	return "ActiveLaunchPlanRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ActiveLaunchPlanRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sActiveLaunchPlanRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ActiveLaunchPlanRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ActiveLaunchPlanRequestValidationError{}
+
+// Validate checks the field values on ActiveLaunchPlanListRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ActiveLaunchPlanListRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Project
+
+	// no validation rules for Domain
+
+	// no validation rules for Limit
+
+	// no validation rules for Token
+
+	if v, ok := interface{}(m.GetSortBy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActiveLaunchPlanListRequestValidationError{
+				field:  "SortBy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ActiveLaunchPlanListRequestValidationError is the validation error returned
+// by ActiveLaunchPlanListRequest.Validate if the designated constraints
+// aren't met.
+type ActiveLaunchPlanListRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ActiveLaunchPlanListRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ActiveLaunchPlanListRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ActiveLaunchPlanListRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ActiveLaunchPlanListRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ActiveLaunchPlanListRequestValidationError) ErrorName() string {
+	return "ActiveLaunchPlanListRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ActiveLaunchPlanListRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sActiveLaunchPlanListRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ActiveLaunchPlanListRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ActiveLaunchPlanListRequestValidationError{}

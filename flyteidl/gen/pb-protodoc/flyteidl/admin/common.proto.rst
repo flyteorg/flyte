@@ -94,34 +94,12 @@ ASCENDING
   ⁣
   
 
-.. _api_msg_flyteidl.admin.ActiveLaunchPlanRequest:
-
-flyteidl.admin.ActiveLaunchPlanRequest
---------------------------------------
-
-`[flyteidl.admin.ActiveLaunchPlanRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L39>`_
-
-Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
-
-.. code-block:: json
-
-  {
-    "id": "{...}"
-  }
-
-.. _api_field_flyteidl.admin.ActiveLaunchPlanRequest.id:
-
-id
-  (:ref:`flyteidl.admin.NamedEntityIdentifier <api_msg_flyteidl.admin.NamedEntityIdentifier>`) 
-  
-
-
 .. _api_msg_flyteidl.admin.NamedEntityIdentifierListRequest:
 
 flyteidl.admin.NamedEntityIdentifierListRequest
 -----------------------------------------------
 
-`[flyteidl.admin.NamedEntityIdentifierListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L44>`_
+`[flyteidl.admin.NamedEntityIdentifierListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L39>`_
 
 Represents a request structure to list identifiers.
 
@@ -175,7 +153,7 @@ sort_by
 flyteidl.admin.NamedEntityIdentifierList
 ----------------------------------------
 
-`[flyteidl.admin.NamedEntityIdentifierList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L62>`_
+`[flyteidl.admin.NamedEntityIdentifierList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L57>`_
 
 Represents a list of Identifiers.
 
@@ -206,7 +184,7 @@ token
 flyteidl.admin.ObjectGetRequest
 -------------------------------
 
-`[flyteidl.admin.ObjectGetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L72>`_
+`[flyteidl.admin.ObjectGetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L67>`_
 
 Represents a structure to fetch a single resource.
 
@@ -229,7 +207,7 @@ id
 flyteidl.admin.ResourceListRequest
 ----------------------------------
 
-`[flyteidl.admin.ResourceListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L79>`_
+`[flyteidl.admin.ResourceListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L74>`_
 
 Represents a request structure to retrieve a list of resources.
 Resources include: Task, Workflow, LaunchPlan
@@ -286,7 +264,7 @@ sort_by
 flyteidl.admin.EmailNotification
 --------------------------------
 
-`[flyteidl.admin.EmailNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L98>`_
+`[flyteidl.admin.EmailNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L93>`_
 
 
 .. code-block:: json
@@ -308,7 +286,7 @@ recipients_email
 flyteidl.admin.PagerDutyNotification
 ------------------------------------
 
-`[flyteidl.admin.PagerDutyNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L103>`_
+`[flyteidl.admin.PagerDutyNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L98>`_
 
 
 .. code-block:: json
@@ -330,7 +308,7 @@ recipients_email
 flyteidl.admin.SlackNotification
 --------------------------------
 
-`[flyteidl.admin.SlackNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L108>`_
+`[flyteidl.admin.SlackNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L103>`_
 
 
 .. code-block:: json
@@ -352,7 +330,7 @@ recipients_email
 flyteidl.admin.Notification
 ---------------------------
 
-`[flyteidl.admin.Notification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L117>`_
+`[flyteidl.admin.Notification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L112>`_
 
 Represents a structure for notifications based on execution status.
 The Notification content is configured within Admin. Future iterations could
@@ -405,7 +383,7 @@ slack
 flyteidl.admin.UrlBlob
 ----------------------
 
-`[flyteidl.admin.UrlBlob proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L131>`_
+`[flyteidl.admin.UrlBlob proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L126>`_
 
 Represents a string url and associated metadata used throughout the platform.
 
@@ -435,7 +413,7 @@ bytes
 flyteidl.admin.Labels
 ---------------------
 
-`[flyteidl.admin.Labels proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L142>`_
+`[flyteidl.admin.Labels proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L137>`_
 
 Label values to be applied to an execution resource.
 In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
@@ -460,7 +438,7 @@ values
 flyteidl.admin.Annotations
 --------------------------
 
-`[flyteidl.admin.Annotations proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L150>`_
+`[flyteidl.admin.Annotations proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L145>`_
 
 Annotation values to be applied to an execution resource.
 In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
