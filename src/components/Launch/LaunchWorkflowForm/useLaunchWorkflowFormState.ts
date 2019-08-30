@@ -1,5 +1,10 @@
 import { useAPIContext } from 'components/data/apiContext';
-import { useFetchableData, useWorkflow, useWorkflows } from 'components/hooks';
+import {
+    useFetchableData,
+    useWorkflow,
+    useWorkflows,
+    waitForAllFetchables
+} from 'components/hooks';
 import {
     FilterOperationName,
     LaunchPlan,
@@ -194,10 +199,18 @@ export function useLaunchWorkflowFormState({
     const workflow = useWorkflow(selectedWorkflowId);
 
     const launchPlans = useLaunchPlansForWorkflow(selectedWorkflowId);
-    const [selectedLaunchPlan, setLaunchPlan] = useState<LaunchPlan>();
-    const launchPlan = selectedLaunchPlan
-        ? selectedLaunchPlan
+    const [userSelectedLaunchPlan, setLaunchPlan] = useState<LaunchPlan>();
+    const launchPlan = userSelectedLaunchPlan
+        ? userSelectedLaunchPlan
         : defaultLaunchPlan.value;
+
+    const workflowOptionsLoadingState = waitForAllFetchables([workflows]);
+
+    const inputLoadingState = waitForAllFetchables([
+        workflow,
+        defaultLaunchPlan,
+        launchPlans
+    ]);
 
     const [parsedInputs, setParsedInputs] = useState<ParsedInput[]>([]);
     const { inputs } = useFormInputsState(parsedInputs);
@@ -235,16 +248,18 @@ export function useLaunchWorkflowFormState({
 
     return {
         defaultLaunchPlan,
+        inputLoadingState,
         inputs,
         launchPlans,
         onCancel,
         onSubmit,
-        selectedLaunchPlan,
         selectedWorkflow,
         setLaunchPlan,
         submissionState,
         workflowName,
+        workflowOptionsLoadingState,
         workflowSelectorOptions,
-        onSelectWorkflow: setWorkflow
+        onSelectWorkflow: setWorkflow,
+        selectedLaunchPlan: launchPlan
     };
 }

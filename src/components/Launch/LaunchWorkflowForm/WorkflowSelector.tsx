@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: theme.spacing(0.5),
         position: 'absolute',
         right: 0,
-        zIndex: 1
+        zIndex: 2
     },
     selectedItem: {
         fontWeight: 'bold'

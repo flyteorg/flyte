@@ -6,6 +6,7 @@ import {
 } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { rejectAfter } from 'common/promiseUtils';
+import { WaitForData } from 'components/common';
 import { ButtonCircularProgress } from 'components/common/ButtonCircularProgress';
 import { FetchFn } from 'components/hooks';
 import { smallFontSize } from 'components/Theme';
@@ -76,17 +77,26 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                 <Typography variant="h6">{state.workflowName}</Typography>
             </header>
             <section className={styles.inputsSection}>
-                <WorkflowSelector
-                    onSelectionChanged={state.onSelectWorkflow}
-                    options={state.workflowSelectorOptions}
-                    fetchSearchResults={fetchSearchResults}
-                    selectedItem={state.selectedWorkflow}
-                />
-                {state.inputs.map(input => (
-                    <div key={input.label} className={styles.formControl}>
-                        {getComponentForInput(input)}
+                <WaitForData {...state.workflowOptionsLoadingState}>
+                    <div className={styles.formControl}>
+                        <WorkflowSelector
+                            onSelectionChanged={state.onSelectWorkflow}
+                            options={state.workflowSelectorOptions}
+                            fetchSearchResults={fetchSearchResults}
+                            selectedItem={state.selectedWorkflow}
+                        />
                     </div>
-                ))}
+                    <WaitForData {...state.inputLoadingState}>
+                        {state.inputs.map(input => (
+                            <div
+                                key={input.label}
+                                className={styles.formControl}
+                            >
+                                {getComponentForInput(input)}
+                            </div>
+                        ))}
+                    </WaitForData>
+                </WaitForData>
             </section>
             <div className={styles.footer}>
                 {!!submissionState.lastError && (
@@ -106,7 +116,10 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     </Button>
                     <Button
                         color="primary"
-                        disabled={submissionState.loading}
+                        disabled={
+                            submissionState.loading ||
+                            !state.inputLoadingState.hasLoaded
+                        }
                         id="launch-workflow-submit"
                         onClick={submit}
                         type="submit"
