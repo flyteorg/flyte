@@ -205,6 +205,16 @@ func (m *QuboleHiveJob) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetQuery()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuboleHiveJobValidationError{
+				field:  "Query",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

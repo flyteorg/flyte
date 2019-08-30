@@ -74,7 +74,8 @@ of a hive task's TaskTemplate
   {
     "cluster_label": "...",
     "query_collection": "{...}",
-    "tags": []
+    "tags": [],
+    "query": "{...}"
   }
 
 .. _api_field_flyteidl.plugins.QuboleHiveJob.cluster_label:
@@ -91,5 +92,10 @@ query_collection
 
 tags
   (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_flyteidl.plugins.QuboleHiveJob.query:
+
+query
+  (:ref:`flyteidl.plugins.HiveQuery <api_msg_flyteidl.plugins.HiveQuery>`) 
   
 

@@ -22,6 +22,7 @@ message HiveQueryCollection {
 // of a hive task's TaskTemplate
 message QuboleHiveJob {
     string cluster_label = 1;
-    HiveQueryCollection query_collection = 2;
+    HiveQueryCollection query_collection = 2 [deprecated=true];
     repeated string tags = 3;
+    HiveQuery query = 4;
 }

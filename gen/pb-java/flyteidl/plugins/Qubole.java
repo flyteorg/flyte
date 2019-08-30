@@ -1453,17 +1453,17 @@ public final class Qubole {
         getClusterLabelBytes();
 
     /**
-     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
      */
-    boolean hasQueryCollection();
+    @java.lang.Deprecated boolean hasQueryCollection();
     /**
-     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
      */
-    flyteidl.plugins.Qubole.HiveQueryCollection getQueryCollection();
+    @java.lang.Deprecated flyteidl.plugins.Qubole.HiveQueryCollection getQueryCollection();
     /**
-     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
      */
-    flyteidl.plugins.Qubole.HiveQueryCollectionOrBuilder getQueryCollectionOrBuilder();
+    @java.lang.Deprecated flyteidl.plugins.Qubole.HiveQueryCollectionOrBuilder getQueryCollectionOrBuilder();
 
     /**
      * <code>repeated string tags = 3;</code>
@@ -1483,6 +1483,19 @@ public final class Qubole {
      */
     com.google.protobuf.ByteString
         getTagsBytes(int index);
+
+    /**
+     * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+     */
+    boolean hasQuery();
+    /**
+     * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+     */
+    flyteidl.plugins.Qubole.HiveQuery getQuery();
+    /**
+     * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+     */
+    flyteidl.plugins.Qubole.HiveQueryOrBuilder getQueryOrBuilder();
   }
   /**
    * <pre>
@@ -1565,6 +1578,19 @@ public final class Qubole {
               tags_.add(s);
               break;
             }
+            case 34: {
+              flyteidl.plugins.Qubole.HiveQuery.Builder subBuilder = null;
+              if (query_ != null) {
+                subBuilder = query_.toBuilder();
+              }
+              query_ = input.readMessage(flyteidl.plugins.Qubole.HiveQuery.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(query_);
+                query_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1630,21 +1656,21 @@ public final class Qubole {
     public static final int QUERY_COLLECTION_FIELD_NUMBER = 2;
     private flyteidl.plugins.Qubole.HiveQueryCollection queryCollection_;
     /**
-     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
      */
-    public boolean hasQueryCollection() {
+    @java.lang.Deprecated public boolean hasQueryCollection() {
       return queryCollection_ != null;
     }
     /**
-     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
      */
-    public flyteidl.plugins.Qubole.HiveQueryCollection getQueryCollection() {
+    @java.lang.Deprecated public flyteidl.plugins.Qubole.HiveQueryCollection getQueryCollection() {
       return queryCollection_ == null ? flyteidl.plugins.Qubole.HiveQueryCollection.getDefaultInstance() : queryCollection_;
     }
     /**
-     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+     * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
      */
-    public flyteidl.plugins.Qubole.HiveQueryCollectionOrBuilder getQueryCollectionOrBuilder() {
+    @java.lang.Deprecated public flyteidl.plugins.Qubole.HiveQueryCollectionOrBuilder getQueryCollectionOrBuilder() {
       return getQueryCollection();
     }
 
@@ -1677,6 +1703,27 @@ public final class Qubole {
       return tags_.getByteString(index);
     }
 
+    public static final int QUERY_FIELD_NUMBER = 4;
+    private flyteidl.plugins.Qubole.HiveQuery query_;
+    /**
+     * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+     */
+    public boolean hasQuery() {
+      return query_ != null;
+    }
+    /**
+     * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+     */
+    public flyteidl.plugins.Qubole.HiveQuery getQuery() {
+      return query_ == null ? flyteidl.plugins.Qubole.HiveQuery.getDefaultInstance() : query_;
+    }
+    /**
+     * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+     */
+    public flyteidl.plugins.Qubole.HiveQueryOrBuilder getQueryOrBuilder() {
+      return getQuery();
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1697,6 +1744,9 @@ public final class Qubole {
       }
       for (int i = 0; i < tags_.size(); i++) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, tags_.getRaw(i));
+      }
+      if (query_ != null) {
+        output.writeMessage(4, getQuery());
       }
       unknownFields.writeTo(output);
     }
@@ -1720,6 +1770,10 @@ public final class Qubole {
         }
         size += dataSize;
         size += 1 * getTagsList().size();
+      }
+      if (query_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getQuery());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1746,6 +1800,11 @@ public final class Qubole {
       }
       result = result && getTagsList()
           .equals(other.getTagsList());
+      result = result && (hasQuery() == other.hasQuery());
+      if (hasQuery()) {
+        result = result && getQuery()
+            .equals(other.getQuery());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1766,6 +1825,10 @@ public final class Qubole {
       if (getTagsCount() > 0) {
         hash = (37 * hash) + TAGS_FIELD_NUMBER;
         hash = (53 * hash) + getTagsList().hashCode();
+      }
+      if (hasQuery()) {
+        hash = (37 * hash) + QUERY_FIELD_NUMBER;
+        hash = (53 * hash) + getQuery().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -1911,6 +1974,12 @@ public final class Qubole {
         }
         tags_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
+        if (queryBuilder_ == null) {
+          query_ = null;
+        } else {
+          query_ = null;
+          queryBuilder_ = null;
+        }
         return this;
       }
 
@@ -1946,6 +2015,11 @@ public final class Qubole {
           bitField0_ = (bitField0_ & ~0x00000004);
         }
         result.tags_ = tags_;
+        if (queryBuilder_ == null) {
+          result.query_ = query_;
+        } else {
+          result.query_ = queryBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2004,6 +2078,9 @@ public final class Qubole {
             tags_.addAll(other.tags_);
           }
           onChanged();
+        }
+        if (other.hasQuery()) {
+          mergeQuery(other.getQuery());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2106,15 +2183,15 @@ public final class Qubole {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.plugins.Qubole.HiveQueryCollection, flyteidl.plugins.Qubole.HiveQueryCollection.Builder, flyteidl.plugins.Qubole.HiveQueryCollectionOrBuilder> queryCollectionBuilder_;
       /**
-       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
        */
-      public boolean hasQueryCollection() {
+      @java.lang.Deprecated public boolean hasQueryCollection() {
         return queryCollectionBuilder_ != null || queryCollection_ != null;
       }
       /**
-       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
        */
-      public flyteidl.plugins.Qubole.HiveQueryCollection getQueryCollection() {
+      @java.lang.Deprecated public flyteidl.plugins.Qubole.HiveQueryCollection getQueryCollection() {
         if (queryCollectionBuilder_ == null) {
           return queryCollection_ == null ? flyteidl.plugins.Qubole.HiveQueryCollection.getDefaultInstance() : queryCollection_;
         } else {
@@ -2122,9 +2199,9 @@ public final class Qubole {
         }
       }
       /**
-       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
        */
-      public Builder setQueryCollection(flyteidl.plugins.Qubole.HiveQueryCollection value) {
+      @java.lang.Deprecated public Builder setQueryCollection(flyteidl.plugins.Qubole.HiveQueryCollection value) {
         if (queryCollectionBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -2138,9 +2215,9 @@ public final class Qubole {
         return this;
       }
       /**
-       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
        */
-      public Builder setQueryCollection(
+      @java.lang.Deprecated public Builder setQueryCollection(
           flyteidl.plugins.Qubole.HiveQueryCollection.Builder builderForValue) {
         if (queryCollectionBuilder_ == null) {
           queryCollection_ = builderForValue.build();
@@ -2152,9 +2229,9 @@ public final class Qubole {
         return this;
       }
       /**
-       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
        */
-      public Builder mergeQueryCollection(flyteidl.plugins.Qubole.HiveQueryCollection value) {
+      @java.lang.Deprecated public Builder mergeQueryCollection(flyteidl.plugins.Qubole.HiveQueryCollection value) {
         if (queryCollectionBuilder_ == null) {
           if (queryCollection_ != null) {
             queryCollection_ =
@@ -2170,9 +2247,9 @@ public final class Qubole {
         return this;
       }
       /**
-       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
        */
-      public Builder clearQueryCollection() {
+      @java.lang.Deprecated public Builder clearQueryCollection() {
         if (queryCollectionBuilder_ == null) {
           queryCollection_ = null;
           onChanged();
@@ -2184,17 +2261,17 @@ public final class Qubole {
         return this;
       }
       /**
-       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
        */
-      public flyteidl.plugins.Qubole.HiveQueryCollection.Builder getQueryCollectionBuilder() {
+      @java.lang.Deprecated public flyteidl.plugins.Qubole.HiveQueryCollection.Builder getQueryCollectionBuilder() {
         
         onChanged();
         return getQueryCollectionFieldBuilder().getBuilder();
       }
       /**
-       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
        */
-      public flyteidl.plugins.Qubole.HiveQueryCollectionOrBuilder getQueryCollectionOrBuilder() {
+      @java.lang.Deprecated public flyteidl.plugins.Qubole.HiveQueryCollectionOrBuilder getQueryCollectionOrBuilder() {
         if (queryCollectionBuilder_ != null) {
           return queryCollectionBuilder_.getMessageOrBuilder();
         } else {
@@ -2203,7 +2280,7 @@ public final class Qubole {
         }
       }
       /**
-       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2;</code>
+       * <code>.flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.plugins.Qubole.HiveQueryCollection, flyteidl.plugins.Qubole.HiveQueryCollection.Builder, flyteidl.plugins.Qubole.HiveQueryCollectionOrBuilder> 
@@ -2312,6 +2389,123 @@ public final class Qubole {
         onChanged();
         return this;
       }
+
+      private flyteidl.plugins.Qubole.HiveQuery query_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.plugins.Qubole.HiveQuery, flyteidl.plugins.Qubole.HiveQuery.Builder, flyteidl.plugins.Qubole.HiveQueryOrBuilder> queryBuilder_;
+      /**
+       * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+       */
+      public boolean hasQuery() {
+        return queryBuilder_ != null || query_ != null;
+      }
+      /**
+       * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+       */
+      public flyteidl.plugins.Qubole.HiveQuery getQuery() {
+        if (queryBuilder_ == null) {
+          return query_ == null ? flyteidl.plugins.Qubole.HiveQuery.getDefaultInstance() : query_;
+        } else {
+          return queryBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+       */
+      public Builder setQuery(flyteidl.plugins.Qubole.HiveQuery value) {
+        if (queryBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          query_ = value;
+          onChanged();
+        } else {
+          queryBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+       */
+      public Builder setQuery(
+          flyteidl.plugins.Qubole.HiveQuery.Builder builderForValue) {
+        if (queryBuilder_ == null) {
+          query_ = builderForValue.build();
+          onChanged();
+        } else {
+          queryBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+       */
+      public Builder mergeQuery(flyteidl.plugins.Qubole.HiveQuery value) {
+        if (queryBuilder_ == null) {
+          if (query_ != null) {
+            query_ =
+              flyteidl.plugins.Qubole.HiveQuery.newBuilder(query_).mergeFrom(value).buildPartial();
+          } else {
+            query_ = value;
+          }
+          onChanged();
+        } else {
+          queryBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+       */
+      public Builder clearQuery() {
+        if (queryBuilder_ == null) {
+          query_ = null;
+          onChanged();
+        } else {
+          query_ = null;
+          queryBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+       */
+      public flyteidl.plugins.Qubole.HiveQuery.Builder getQueryBuilder() {
+        
+        onChanged();
+        return getQueryFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+       */
+      public flyteidl.plugins.Qubole.HiveQueryOrBuilder getQueryOrBuilder() {
+        if (queryBuilder_ != null) {
+          return queryBuilder_.getMessageOrBuilder();
+        } else {
+          return query_ == null ?
+              flyteidl.plugins.Qubole.HiveQuery.getDefaultInstance() : query_;
+        }
+      }
+      /**
+       * <code>.flyteidl.plugins.HiveQuery query = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.plugins.Qubole.HiveQuery, flyteidl.plugins.Qubole.HiveQuery.Builder, flyteidl.plugins.Qubole.HiveQueryOrBuilder> 
+          getQueryFieldBuilder() {
+        if (queryBuilder_ == null) {
+          queryBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.plugins.Qubole.HiveQuery, flyteidl.plugins.Qubole.HiveQuery.Builder, flyteidl.plugins.Qubole.HiveQueryOrBuilder>(
+                  getQuery(),
+                  getParentForChildren(),
+                  isClean());
+          query_ = null;
+        }
+        return queryBuilder_;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -2390,11 +2584,13 @@ public final class Qubole {
       "HiveQuery\022\r\n\005query\030\001 \001(\t\022\023\n\013timeout_sec\030" +
       "\002 \001(\r\022\022\n\nretryCount\030\003 \001(\r\"C\n\023HiveQueryCo" +
       "llection\022,\n\007queries\030\002 \003(\0132\033.flyteidl.plu" +
-      "gins.HiveQuery\"u\n\rQuboleHiveJob\022\025\n\rclust" +
-      "er_label\030\001 \001(\t\022?\n\020query_collection\030\002 \001(\013" +
-      "2%.flyteidl.plugins.HiveQueryCollection\022" +
-      "\014\n\004tags\030\003 \003(\tB5Z3github.com/lyft/flyteid" +
-      "l/gen/pb-go/flyteidl/pluginsb\006proto3"
+      "gins.HiveQuery\"\245\001\n\rQuboleHiveJob\022\025\n\rclus" +
+      "ter_label\030\001 \001(\t\022C\n\020query_collection\030\002 \001(" +
+      "\0132%.flyteidl.plugins.HiveQueryCollection" +
+      "B\002\030\001\022\014\n\004tags\030\003 \003(\t\022*\n\005query\030\004 \001(\0132\033.flyt" +
+      "eidl.plugins.HiveQueryB5Z3github.com/lyf" +
+      "t/flyteidl/gen/pb-go/flyteidl/pluginsb\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2426,7 +2622,7 @@ public final class Qubole {
     internal_static_flyteidl_plugins_QuboleHiveJob_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_QuboleHiveJob_descriptor,
-        new java.lang.String[] { "ClusterLabel", "QueryCollection", "Tags", });
+        new java.lang.String[] { "ClusterLabel", "QueryCollection", "Tags", "Query", });
     flyteidl.core.Tasks.getDescriptor();
   }
 

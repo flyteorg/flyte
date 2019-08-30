@@ -91,6 +91,7 @@ void InitDefaultsQuboleHiveJobImpl() {
   ::google::protobuf::internal::InitProtobufDefaults();
 #endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsHiveQueryCollection();
+  protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsHiveQuery();
   {
     void* ptr = &::flyteidl::plugins::_QuboleHiveJob_default_instance_;
     new (ptr) ::flyteidl::plugins::QuboleHiveJob();
@@ -129,6 +130,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, cluster_label_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, query_collection_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, tags_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, query_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::plugins::HiveQuery)},
@@ -169,14 +171,16 @@ void AddDescriptorsImpl() {
       "HiveQuery\022\r\n\005query\030\001 \001(\t\022\023\n\013timeout_sec\030"
       "\002 \001(\r\022\022\n\nretryCount\030\003 \001(\r\"C\n\023HiveQueryCo"
       "llection\022,\n\007queries\030\002 \003(\0132\033.flyteidl.plu"
-      "gins.HiveQuery\"u\n\rQuboleHiveJob\022\025\n\rclust"
-      "er_label\030\001 \001(\t\022\?\n\020query_collection\030\002 \001(\013"
-      "2%.flyteidl.plugins.HiveQueryCollection\022"
-      "\014\n\004tags\030\003 \003(\tB5Z3github.com/lyft/flyteid"
-      "l/gen/pb-go/flyteidl/pluginsb\006proto3"
+      "gins.HiveQuery\"\245\001\n\rQuboleHiveJob\022\025\n\rclus"
+      "ter_label\030\001 \001(\t\022C\n\020query_collection\030\002 \001("
+      "\0132%.flyteidl.plugins.HiveQueryCollection"
+      "B\002\030\001\022\014\n\004tags\030\003 \003(\t\022*\n\005query\030\004 \001(\0132\033.flyt"
+      "eidl.plugins.HiveQueryB5Z3github.com/lyf"
+      "t/flyteidl/gen/pb-go/flyteidl/pluginsb\006p"
+      "roto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 396);
+      descriptor, 445);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "flyteidl/plugins/qubole.proto", &protobuf_RegisterTypes);
   ::protobuf_flyteidl_2fcore_2ftasks_2eproto::AddDescriptors();
@@ -779,11 +783,14 @@ void HiveQueryCollection::InternalSwap(HiveQueryCollection* other) {
 void QuboleHiveJob::InitAsDefaultInstance() {
   ::flyteidl::plugins::_QuboleHiveJob_default_instance_._instance.get_mutable()->query_collection_ = const_cast< ::flyteidl::plugins::HiveQueryCollection*>(
       ::flyteidl::plugins::HiveQueryCollection::internal_default_instance());
+  ::flyteidl::plugins::_QuboleHiveJob_default_instance_._instance.get_mutable()->query_ = const_cast< ::flyteidl::plugins::HiveQuery*>(
+      ::flyteidl::plugins::HiveQuery::internal_default_instance());
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int QuboleHiveJob::kClusterLabelFieldNumber;
 const int QuboleHiveJob::kQueryCollectionFieldNumber;
 const int QuboleHiveJob::kTagsFieldNumber;
+const int QuboleHiveJob::kQueryFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 QuboleHiveJob::QuboleHiveJob()
@@ -809,12 +816,19 @@ QuboleHiveJob::QuboleHiveJob(const QuboleHiveJob& from)
   } else {
     query_collection_ = NULL;
   }
+  if (from.has_query()) {
+    query_ = new ::flyteidl::plugins::HiveQuery(*from.query_);
+  } else {
+    query_ = NULL;
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.plugins.QuboleHiveJob)
 }
 
 void QuboleHiveJob::SharedCtor() {
   cluster_label_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  query_collection_ = NULL;
+  ::memset(&query_collection_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&query_) -
+      reinterpret_cast<char*>(&query_collection_)) + sizeof(query_));
   _cached_size_ = 0;
 }
 
@@ -826,6 +840,7 @@ QuboleHiveJob::~QuboleHiveJob() {
 void QuboleHiveJob::SharedDtor() {
   cluster_label_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete query_collection_;
+  if (this != internal_default_instance()) delete query_;
 }
 
 void QuboleHiveJob::SetCachedSize(int size) const {
@@ -863,6 +878,10 @@ void QuboleHiveJob::Clear() {
     delete query_collection_;
   }
   query_collection_ = NULL;
+  if (GetArenaNoVirtual() == NULL && query_ != NULL) {
+    delete query_;
+  }
+  query_ = NULL;
   _internal_metadata_.Clear();
 }
 
@@ -892,7 +911,7 @@ bool QuboleHiveJob::MergePartialFromCodedStream(
         break;
       }
 
-      // .flyteidl.plugins.HiveQueryCollection query_collection = 2;
+      // .flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
@@ -915,6 +934,18 @@ bool QuboleHiveJob::MergePartialFromCodedStream(
             static_cast<int>(this->tags(this->tags_size() - 1).length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
             "flyteidl.plugins.QuboleHiveJob.tags"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.plugins.HiveQuery query = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_query()));
         } else {
           goto handle_unusual;
         }
@@ -957,7 +988,7 @@ void QuboleHiveJob::SerializeWithCachedSizes(
       1, this->cluster_label(), output);
   }
 
-  // .flyteidl.plugins.HiveQueryCollection query_collection = 2;
+  // .flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];
   if (this->has_query_collection()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       2, *this->query_collection_, output);
@@ -971,6 +1002,12 @@ void QuboleHiveJob::SerializeWithCachedSizes(
       "flyteidl.plugins.QuboleHiveJob.tags");
     ::google::protobuf::internal::WireFormatLite::WriteString(
       3, this->tags(i), output);
+  }
+
+  // .flyteidl.plugins.HiveQuery query = 4;
+  if (this->has_query()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, *this->query_, output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -998,7 +1035,7 @@ void QuboleHiveJob::SerializeWithCachedSizes(
         1, this->cluster_label(), target);
   }
 
-  // .flyteidl.plugins.HiveQueryCollection query_collection = 2;
+  // .flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];
   if (this->has_query_collection()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
@@ -1013,6 +1050,13 @@ void QuboleHiveJob::SerializeWithCachedSizes(
       "flyteidl.plugins.QuboleHiveJob.tags");
     target = ::google::protobuf::internal::WireFormatLite::
       WriteStringToArray(3, this->tags(i), target);
+  }
+
+  // .flyteidl.plugins.HiveQuery query = 4;
+  if (this->has_query()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        4, *this->query_, deterministic, target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -1047,11 +1091,18 @@ size_t QuboleHiveJob::ByteSizeLong() const {
         this->cluster_label());
   }
 
-  // .flyteidl.plugins.HiveQueryCollection query_collection = 2;
+  // .flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];
   if (this->has_query_collection()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *this->query_collection_);
+  }
+
+  // .flyteidl.plugins.HiveQuery query = 4;
+  if (this->has_query()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *this->query_);
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -1091,6 +1142,9 @@ void QuboleHiveJob::MergeFrom(const QuboleHiveJob& from) {
   if (from.has_query_collection()) {
     mutable_query_collection()->::flyteidl::plugins::HiveQueryCollection::MergeFrom(from.query_collection());
   }
+  if (from.has_query()) {
+    mutable_query()->::flyteidl::plugins::HiveQuery::MergeFrom(from.query());
+  }
 }
 
 void QuboleHiveJob::CopyFrom(const ::google::protobuf::Message& from) {
@@ -1120,6 +1174,7 @@ void QuboleHiveJob::InternalSwap(QuboleHiveJob* other) {
   tags_.InternalSwap(&other->tags_);
   cluster_label_.Swap(&other->cluster_label_);
   swap(query_collection_, other->query_collection_);
+  swap(query_, other->query_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_cached_size_, other->_cached_size_);
 }
