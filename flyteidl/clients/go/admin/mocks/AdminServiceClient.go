@@ -222,6 +222,36 @@ func (_m *AdminServiceClient) CreateWorkflowEvent(ctx context.Context, in *admin
 	return r0, r1
 }
 
+// GetActiveLaunchPlan provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetActiveLaunchPlan(ctx context.Context, in *admin.ActiveLaunchPlanRequest, opts ...grpc.CallOption) (*admin.LaunchPlan, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.LaunchPlan
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ActiveLaunchPlanRequest, ...grpc.CallOption) *admin.LaunchPlan); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.LaunchPlan)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ActiveLaunchPlanRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetExecution provides a mock function with given fields: ctx, in, opts
 func (_m *AdminServiceClient) GetExecution(ctx context.Context, in *admin.WorkflowExecutionGetRequest, opts ...grpc.CallOption) (*admin.Execution, error) {
 	_va := make([]interface{}, len(opts))
@@ -484,6 +514,36 @@ func (_m *AdminServiceClient) GetWorkflow(ctx context.Context, in *admin.ObjectG
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.ObjectGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListActiveLaunchPlans provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) ListActiveLaunchPlans(ctx context.Context, in *admin.ActiveLaunchPlanListRequest, opts ...grpc.CallOption) (*admin.LaunchPlanList, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.LaunchPlanList
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ActiveLaunchPlanListRequest, ...grpc.CallOption) *admin.LaunchPlanList); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.LaunchPlanList)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ActiveLaunchPlanListRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
