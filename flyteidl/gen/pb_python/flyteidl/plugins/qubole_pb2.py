@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='flyteidl/plugins/qubole.proto',
   package='flyteidl.plugins',
   syntax='proto3',
-  serialized_pb=_b('\n\x1d\x66lyteidl/plugins/qubole.proto\x12\x10\x66lyteidl.plugins\x1a\x19\x66lyteidl/core/tasks.proto\"C\n\tHiveQuery\x12\r\n\x05query\x18\x01 \x01(\t\x12\x13\n\x0btimeout_sec\x18\x02 \x01(\r\x12\x12\n\nretryCount\x18\x03 \x01(\r\"C\n\x13HiveQueryCollection\x12,\n\x07queries\x18\x02 \x03(\x0b\x32\x1b.flyteidl.plugins.HiveQuery\"u\n\rQuboleHiveJob\x12\x15\n\rcluster_label\x18\x01 \x01(\t\x12?\n\x10query_collection\x18\x02 \x01(\x0b\x32%.flyteidl.plugins.HiveQueryCollection\x12\x0c\n\x04tags\x18\x03 \x03(\tB5Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
+  serialized_pb=_b('\n\x1d\x66lyteidl/plugins/qubole.proto\x12\x10\x66lyteidl.plugins\x1a\x19\x66lyteidl/core/tasks.proto\"C\n\tHiveQuery\x12\r\n\x05query\x18\x01 \x01(\t\x12\x13\n\x0btimeout_sec\x18\x02 \x01(\r\x12\x12\n\nretryCount\x18\x03 \x01(\r\"C\n\x13HiveQueryCollection\x12,\n\x07queries\x18\x02 \x03(\x0b\x32\x1b.flyteidl.plugins.HiveQuery\"\xa5\x01\n\rQuboleHiveJob\x12\x15\n\rcluster_label\x18\x01 \x01(\t\x12\x43\n\x10query_collection\x18\x02 \x01(\x0b\x32%.flyteidl.plugins.HiveQueryCollectionB\x02\x18\x01\x12\x0c\n\x04tags\x18\x03 \x03(\t\x12*\n\x05query\x18\x04 \x01(\x0b\x32\x1b.flyteidl.plugins.HiveQueryB5Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
   ,
   dependencies=[flyteidl_dot_core_dot_tasks__pb2.DESCRIPTOR,])
 
@@ -123,11 +123,18 @@ _QUBOLEHIVEJOB = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\030\001')), file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='tags', full_name='flyteidl.plugins.QuboleHiveJob.tags', index=2,
       number=3, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='query', full_name='flyteidl.plugins.QuboleHiveJob.query', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
@@ -143,12 +150,13 @@ _QUBOLEHIVEJOB = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=216,
-  serialized_end=333,
+  serialized_start=217,
+  serialized_end=382,
 )
 
 _HIVEQUERYCOLLECTION.fields_by_name['queries'].message_type = _HIVEQUERY
 _QUBOLEHIVEJOB.fields_by_name['query_collection'].message_type = _HIVEQUERYCOLLECTION
+_QUBOLEHIVEJOB.fields_by_name['query'].message_type = _HIVEQUERY
 DESCRIPTOR.message_types_by_name['HiveQuery'] = _HIVEQUERY
 DESCRIPTOR.message_types_by_name['HiveQueryCollection'] = _HIVEQUERYCOLLECTION
 DESCRIPTOR.message_types_by_name['QuboleHiveJob'] = _QUBOLEHIVEJOB
@@ -178,4 +186,6 @@ _sym_db.RegisterMessage(QuboleHiveJob)
 
 DESCRIPTOR.has_options = True
 DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins'))
+_QUBOLEHIVEJOB.fields_by_name['query_collection'].has_options = True
+_QUBOLEHIVEJOB.fields_by_name['query_collection']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\030\001'))
 # @@protoc_insertion_point(module_scope)
