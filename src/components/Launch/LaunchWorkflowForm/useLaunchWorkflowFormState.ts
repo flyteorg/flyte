@@ -230,7 +230,7 @@ export function useLaunchWorkflowFormState({
                     : [];
             setParsedInputs(parsedInputs);
         },
-        [selectedWorkflow, launchPlan]
+        [workflow.hasLoaded, workflow.value, launchPlan]
     );
 
     return {
