@@ -5,17 +5,18 @@ import {
     Typography
 } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { rejectAfter } from 'common/promiseUtils';
 import { WaitForData } from 'components/common';
 import { ButtonCircularProgress } from 'components/common/ButtonCircularProgress';
-import { FetchFn } from 'components/hooks';
+import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import { smallFontSize } from 'components/Theme';
+import { FilterOperationName, WorkflowId } from 'models';
 import * as React from 'react';
 import { SimpleInput } from './SimpleInput';
 import { InputProps, InputType, LaunchWorkflowFormProps } from './types';
 import { UnsupportedInput } from './UnsupportedInput';
 import { useLaunchWorkflowFormState } from './useLaunchWorkflowFormState';
-import { WorkflowSelector, WorkflowSelectorOption } from './WorkflowSelector';
+import { workflowsToWorkflowSelectorOptions } from './utils';
+import { WorkflowSelector } from './WorkflowSelector';
 
 const useStyles = makeStyles((theme: Theme) => ({
     footer: {
@@ -57,14 +58,38 @@ function getComponentForInput(input: InputProps) {
     }
 }
 
-const fetchSearchResults: FetchFn<WorkflowSelectorOption[], string> = () =>
-    rejectAfter(0, 'Not Implemented');
+function generateFetchSearchResults(
+    { listWorkflows }: APIContextValue,
+    workflowId: WorkflowId
+) {
+    return async (query: string) => {
+        const { entities: workflows } = await listWorkflows(workflowId, {
+            filter: [
+                {
+                    key: 'version',
+                    operation: FilterOperationName.CONTAINS,
+                    value: query
+                }
+            ]
+        });
+        const options = workflowsToWorkflowSelectorOptions(workflows);
+        if (options.length > 0) {
+            options[0].description = 'latest';
+        }
+        return options;
+    };
+}
 
 /** Renders the form for initiating a Launch request based on a Workflow */
 export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
     const state = useLaunchWorkflowFormState(props);
     const { submissionState } = state;
     const styles = useStyles();
+    const fetchSearchResults = generateFetchSearchResults(
+        useAPIContext(),
+        props.workflowId
+    );
+
     const submit: React.FormEventHandler = event => {
         event.preventDefault();
         state.onSubmit();
@@ -77,7 +102,10 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                 <Typography variant="h6">{state.workflowName}</Typography>
             </header>
             <section className={styles.inputsSection}>
-                <WaitForData {...state.workflowOptionsLoadingState}>
+                <WaitForData
+                    spinnerVariant="medium"
+                    {...state.workflowOptionsLoadingState}
+                >
                     <div className={styles.formControl}>
                         <WorkflowSelector
                             onSelectionChanged={state.onSelectWorkflow}
@@ -86,7 +114,10 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                             selectedItem={state.selectedWorkflow}
                         />
                     </div>
-                    <WaitForData {...state.inputLoadingState}>
+                    <WaitForData
+                        spinnerVariant="medium"
+                        {...state.inputLoadingState}
+                    >
                         {state.inputs.map(input => (
                             <div
                                 key={input.label}
