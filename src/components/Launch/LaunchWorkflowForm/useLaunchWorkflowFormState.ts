@@ -14,6 +14,7 @@ import {
     WorkflowId
 } from 'models';
 import { useEffect, useMemo, useState } from 'react';
+import { history, Routes } from 'routes';
 import { simpleTypeToInputType } from './constants';
 import { SearchableSelectorOption } from './SearchableSelector';
 import {
@@ -195,6 +196,7 @@ function useLaunchPlansForWorkflow(workflowId: WorkflowId | null = null) {
 export function useLaunchWorkflowFormState({
     workflowId
 }: LaunchWorkflowFormProps): LaunchWorkflowFormState {
+    const { createWorkflowExecution } = useAPIContext();
     const workflows = useWorkflows(workflowId, { limit: 10 });
     const workflowSelectorOptions = useWorkflowSelectorOptions(workflows.value);
     const [selectedWorkflow, setWorkflow] = useState<
@@ -230,12 +232,24 @@ export function useLaunchWorkflowFormState({
         setWorkflow(newWorkflow);
     };
 
-    const launchWorkflow = () => {
-        const literalMap = convertFormInputsToLiteralMap(inputs);
-        console.log('launch', literalMap);
-        return new Promise<WorkflowExecutionIdentifier>((resolve, reject) => {
-            setTimeout(() => reject('Launching is not implemented'), 1500);
+    const launchWorkflow = async () => {
+        if (!selectedLaunchPlan) {
+            throw new Error('Attempting to launch with no LaunchPlan');
+        }
+        const launchPlanId = selectedLaunchPlan.data.id;
+        const { domain, project } = workflowId;
+        const response = await createWorkflowExecution({
+            domain,
+            launchPlanId,
+            project,
+            inputs: convertFormInputsToLiteralMap(inputs)
         });
+        const newExecutionId = response.id as WorkflowExecutionIdentifier;
+        if (!newExecutionId) {
+            throw new Error('API Response did not include new execution id');
+        }
+        history.push(Routes.ExecutionDetails.makeUrl(newExecutionId));
+        return newExecutionId;
     };
 
     const submissionState = useFetchableData<WorkflowExecutionIdentifier>({

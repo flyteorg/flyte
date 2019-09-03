@@ -1,4 +1,4 @@
-import { Admin } from 'flyteidl';
+import { Admin, Core } from 'flyteidl';
 import {
     defaultPaginationConfig,
     getAdminEntity,
@@ -7,6 +7,7 @@ import {
 } from 'models/AdminEntity';
 import {
     endpointPrefixes,
+    Identifier,
     IdentifierScope,
     makeIdentifierPath,
     NameIdentifierScope
@@ -72,6 +73,37 @@ export const getExecutionData = (
         {
             path: `/data${makeExecutionPath(id)}`,
             messageType: Admin.WorkflowExecutionGetDataResponse
+        },
+        config
+    );
+
+interface CreateWorkflowExecutionArguments {
+    domain: string;
+    inputs: Core.ILiteralMap;
+    launchPlanId: Identifier;
+    project: string;
+}
+/** Submits a request to create a new `WorkflowExecution` using the provided
+ * LaunchPlan and input values.
+ */
+export const createWorkflowExecution = (
+    {
+        domain,
+        inputs,
+        launchPlanId: launchPlan,
+        project
+    }: CreateWorkflowExecutionArguments,
+    config?: RequestConfig
+) =>
+    postAdminEntity<
+        Admin.IExecutionCreateRequest,
+        Admin.ExecutionCreateResponse
+    >(
+        {
+            data: { project, domain, spec: { inputs, launchPlan } },
+            path: endpointPrefixes.execution,
+            requestMessageType: Admin.ExecutionCreateRequest,
+            responseMessageType: Admin.ExecutionCreateResponse
         },
         config
     );
