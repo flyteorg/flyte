@@ -1,7 +1,9 @@
+import { Dialog } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { contentMarginGridUnits } from 'common/layout';
 import { WaitForData, withRouteParams } from 'components/common';
 import { useProject } from 'components/hooks';
+import { LaunchWorkflowForm } from 'components/Launch/LaunchWorkflowForm/LaunchWorkflowForm';
 import * as React from 'react';
 import { WorkflowDescription } from './WorkflowDescription';
 import { WorkflowDetailsHeader } from './WorkflowDetailsHeader';
@@ -46,6 +48,10 @@ export const WorkflowDetailsContainer: React.FC<WorkflowDetailsRouteParams> = ({
 }) => {
     const project = useProject(projectId);
     const styles = useStyles();
+    const [showLaunchForm, setShowLaunchForm] = React.useState(false);
+    const onLaunch = () => setShowLaunchForm(true);
+    const onCancelLaunch = () => setShowLaunchForm(false);
+
     const workflowId = {
         project: projectId,
         domain: domainId,
@@ -58,6 +64,7 @@ export const WorkflowDetailsContainer: React.FC<WorkflowDetailsRouteParams> = ({
                     project={project.value}
                     domainId={domainId}
                     workflowName={workflowName}
+                    onClickLaunch={onLaunch}
                 />
                 <div className={styles.metadataContainer}>
                     <div className={styles.descriptionContainer}>
@@ -70,6 +77,12 @@ export const WorkflowDetailsContainer: React.FC<WorkflowDetailsRouteParams> = ({
                 <div className={styles.executionsContainer}>
                     <WorkflowExecutions workflowId={workflowId} />
                 </div>
+                <Dialog maxWidth="sm" fullWidth={true} open={showLaunchForm}>
+                    <LaunchWorkflowForm
+                        onClose={onCancelLaunch}
+                        workflowId={workflowId}
+                    />
+                </Dialog>
             </WaitForData>
         </>
     );

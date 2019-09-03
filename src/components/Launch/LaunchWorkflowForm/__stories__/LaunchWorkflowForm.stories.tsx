@@ -41,6 +41,8 @@ const mockApi = mockAPIContextValue({
     listLaunchPlans: () => resolveAfter(500, { entities: [mockLaunchPlan] })
 });
 
+const onClose = () => console.log('Close');
+
 const stories = storiesOf('Launch/LaunchWorkflowForm', module);
 stories.addDecorator(story => (
     <APIContext.Provider value={mockApi}>
@@ -48,4 +50,6 @@ stories.addDecorator(story => (
     </APIContext.Provider>
 ));
 
-stories.add('Basic', () => <LaunchWorkflowForm workflowId={mockWorkflow.id} />);
+stories.add('Basic', () => (
+    <LaunchWorkflowForm onClose={onClose} workflowId={mockWorkflow.id} />
+));

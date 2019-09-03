@@ -9,9 +9,11 @@ import {
     FilterOperationName,
     LaunchPlan,
     LiteralType,
+    SortDirection,
     Workflow,
     WorkflowExecutionIdentifier,
-    WorkflowId
+    WorkflowId,
+    workflowSortFields
 } from 'models';
 import { useEffect, useMemo, useState } from 'react';
 import { history, Routes } from 'routes';
@@ -140,10 +142,17 @@ function useFormInputsState(parsedInputs: ParsedInput[]): FormInputsState {
     };
 }
 
-function useWorkflowSelectorOptions(workflows: Workflow[]) {
-    return useMemo(() => workflowsToSearchableSelectorOptions(workflows), [
-        workflows
-    ]);
+export function useWorkflowSelectorOptions(workflows: Workflow[]) {
+    return useMemo(
+        () => {
+            const options = workflowsToSearchableSelectorOptions(workflows);
+            if (options.length > 0) {
+                options[0].description = 'latest';
+            }
+            return options;
+        },
+        [workflows]
+    );
 }
 
 function useLaunchPlanSelectorOptions(launchPlans: LaunchPlan[]) {
@@ -194,10 +203,17 @@ function useLaunchPlansForWorkflow(workflowId: WorkflowId | null = null) {
  * definitions, current input values, and errors.
  */
 export function useLaunchWorkflowFormState({
+    onClose,
     workflowId
 }: LaunchWorkflowFormProps): LaunchWorkflowFormState {
     const { createWorkflowExecution } = useAPIContext();
-    const workflows = useWorkflows(workflowId, { limit: 10 });
+    const workflows = useWorkflows(workflowId, {
+        limit: 10,
+        sort: {
+            key: workflowSortFields.createdAt,
+            direction: SortDirection.DESCENDING
+        }
+    });
     const workflowSelectorOptions = useWorkflowSelectorOptions(workflows.value);
     const [selectedWorkflow, setWorkflow] = useState<
         SearchableSelectorOption<WorkflowId>
@@ -263,9 +279,7 @@ export function useLaunchWorkflowFormState({
     });
 
     const onSubmit = submissionState.fetch;
-    const onCancel = () => {
-        console.log('cancel');
-    };
+    const onCancel = onClose;
 
     useEffect(
         () => {

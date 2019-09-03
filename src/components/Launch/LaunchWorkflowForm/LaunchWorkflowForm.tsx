@@ -1,6 +1,7 @@
 import {
     Button,
     DialogActions,
+    DialogContent,
     FormHelperText,
     Typography
 } from '@material-ui/core';
@@ -9,7 +10,12 @@ import { WaitForData } from 'components/common';
 import { ButtonCircularProgress } from 'components/common/ButtonCircularProgress';
 import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import { smallFontSize } from 'components/Theme';
-import { FilterOperationName, WorkflowId } from 'models';
+import {
+    FilterOperationName,
+    NamedEntityIdentifier,
+    SortDirection,
+    workflowSortFields
+} from 'models';
 import * as React from 'react';
 import { SearchableSelector } from './SearchableSelector';
 import { SimpleInput } from './SimpleInput';
@@ -20,18 +26,17 @@ import { workflowsToSearchableSelectorOptions } from './utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
     footer: {
-        borderTop: `1px solid ${theme.palette.divider}`,
         padding: theme.spacing(2)
     },
     formControl: {
         padding: `${theme.spacing(1.5)}px 0`
     },
     header: {
-        borderBottom: `1px solid ${theme.palette.divider}`,
         padding: theme.spacing(2),
         width: '100%'
     },
     inputsSection: {
+        minHeight: theme.spacing(75),
         padding: theme.spacing(2)
     },
     inputLabel: {
@@ -60,7 +65,7 @@ function getComponentForInput(input: InputProps) {
 
 function generateFetchSearchResults(
     { listWorkflows }: APIContextValue,
-    workflowId: WorkflowId
+    workflowId: NamedEntityIdentifier
 ) {
     return async (query: string) => {
         const { entities: workflows } = await listWorkflows(workflowId, {
@@ -70,13 +75,13 @@ function generateFetchSearchResults(
                     operation: FilterOperationName.CONTAINS,
                     value: query
                 }
-            ]
+            ],
+            sort: {
+                key: workflowSortFields.createdAt,
+                direction: SortDirection.DESCENDING
+            }
         });
-        const options = workflowsToSearchableSelectorOptions(workflows);
-        if (options.length > 0) {
-            options[0].description = 'latest';
-        }
-        return options;
+        return workflowsToSearchableSelectorOptions(workflows);
     };
 }
 
@@ -102,7 +107,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                 <div className={styles.inputLabel}>Launch Workflow</div>
                 <Typography variant="h6">{state.workflowName}</Typography>
             </header>
-            <section className={styles.inputsSection}>
+            <DialogContent dividers={true} className={styles.inputsSection}>
                 <WaitForData
                     spinnerVariant="medium"
                     {...state.workflowOptionsLoadingState}
@@ -145,7 +150,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                         </WaitForData>
                     ) : null}
                 </WaitForData>
-            </section>
+            </DialogContent>
             <div className={styles.footer}>
                 {!!submissionState.lastError && (
                     <FormHelperText error={true}>
