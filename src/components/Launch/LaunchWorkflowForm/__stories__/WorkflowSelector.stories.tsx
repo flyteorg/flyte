@@ -45,7 +45,6 @@ stories.add('Basic', () => {
             onSelectionChanged={setSelectedItem}
             selectedItem={selectedItem}
             options={options}
-            workflowId={mockWorkflow.id}
         />
     );
 });
