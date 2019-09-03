@@ -1,5 +1,4 @@
 import { default as momentDateUtils } from '@date-io/moment'; // choose your lib
-import { makeStyles, Theme } from '@material-ui/core/styles';
 import {
     KeyboardDateTimePicker,
     MuiPickersUtilsProvider
