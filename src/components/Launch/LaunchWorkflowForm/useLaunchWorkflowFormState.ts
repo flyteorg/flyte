@@ -215,6 +215,9 @@ export function useLaunchWorkflowFormState({
     const [selectedLaunchPlan, setLaunchPlan] = useState<
         SearchableSelectorOption<LaunchPlan>
     >();
+    const launchPlanData = selectedLaunchPlan
+        ? selectedLaunchPlan.data
+        : undefined;
 
     const workflowOptionsLoadingState = waitForAllFetchables([workflows]);
     const launchPlanOptionsLoadingState = waitForAllFetchables([launchPlans]);
@@ -233,10 +236,10 @@ export function useLaunchWorkflowFormState({
     };
 
     const launchWorkflow = async () => {
-        if (!selectedLaunchPlan) {
+        if (!launchPlanData) {
             throw new Error('Attempting to launch with no LaunchPlan');
         }
-        const launchPlanId = selectedLaunchPlan.data.id;
+        const launchPlanId = launchPlanData.id;
         const { domain, project } = workflowId;
         const response = await createWorkflowExecution({
             domain,
@@ -267,12 +270,12 @@ export function useLaunchWorkflowFormState({
     useEffect(
         () => {
             const parsedInputs =
-                selectedLaunchPlan && workflow.hasLoaded
-                    ? getInputs(workflow.value, selectedLaunchPlan.data)
+                launchPlanData && workflow.hasLoaded
+                    ? getInputs(workflow.value, launchPlanData)
                     : [];
             setParsedInputs(parsedInputs);
         },
-        [workflow.hasLoaded, workflow.value, selectedLaunchPlan]
+        [workflow.hasLoaded, workflow.value, launchPlanData]
     );
 
     // Once launch plans have been loaded, attempt to select the default
