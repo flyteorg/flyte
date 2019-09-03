@@ -39,7 +39,6 @@ export const DatetimeInput: React.FC<InputProps> = props => {
                 ampm={false}
                 format="MM/DD/YYYY HH:mm:ss"
                 helperText={helperText}
-                InputLabelProps={{ shrink: true }}
                 inputVariant="outlined"
                 label={label}
                 onChange={handleChange}
