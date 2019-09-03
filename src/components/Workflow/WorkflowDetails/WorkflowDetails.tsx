@@ -77,7 +77,12 @@ export const WorkflowDetailsContainer: React.FC<WorkflowDetailsRouteParams> = ({
                 <div className={styles.executionsContainer}>
                     <WorkflowExecutions workflowId={workflowId} />
                 </div>
-                <Dialog maxWidth="sm" fullWidth={true} open={showLaunchForm}>
+                <Dialog
+                    scroll="body"
+                    maxWidth="sm"
+                    fullWidth={true}
+                    open={showLaunchForm}
+                >
                     <LaunchWorkflowForm
                         onClose={onCancelLaunch}
                         workflowId={workflowId}

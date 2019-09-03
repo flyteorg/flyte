@@ -292,6 +292,16 @@ export function useLaunchWorkflowFormState({
         [workflow.hasLoaded, workflow.value, launchPlanData]
     );
 
+    // Once workflows have loaded, attempt to select the first option
+    useEffect(
+        () => {
+            if (workflowSelectorOptions.length > 0 && !selectedWorkflow) {
+                setWorkflow(workflowSelectorOptions[0]);
+            }
+        },
+        [workflows.value]
+    );
+
     // Once launch plans have been loaded, attempt to select the default
     // launch plan
     useEffect(
