@@ -80,7 +80,7 @@ function generateDefaultFetch<DataType>(
     options: SearchableSelectorOption<DataType>[]
 ): FetchFn<SearchableSelectorOption<DataType>[], string> {
     return (query: string) =>
-        Promise.resolve(options.filter(option => option.id.includes(query)));
+        Promise.resolve(options.filter(option => option.name.includes(query)));
 }
 
 function useSearchableSelectorState<DataType>({
