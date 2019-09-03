@@ -223,6 +223,13 @@ export function useLaunchWorkflowFormState({
     const { inputs } = useFormInputsState(parsedInputs);
     const workflowName = workflowId.name;
 
+    const onSelectWorkflow = (
+        newWorkflow: SearchableSelectorOption<WorkflowId>
+    ) => {
+        setLaunchPlan(undefined);
+        setWorkflow(newWorkflow);
+    };
+
     const launchWorkflow = () => {
         const literalMap = convertFormInputsToLiteralMap(inputs);
         console.log('launch', literalMap);
@@ -254,6 +261,8 @@ export function useLaunchWorkflowFormState({
         [workflow.hasLoaded, workflow.value, selectedLaunchPlan]
     );
 
+    // Once launch plans have been loaded, attempt to select the default
+    // launch plan
     useEffect(
         () => {
             if (!launchPlanSelectorOptions.length) {
@@ -273,6 +282,7 @@ export function useLaunchWorkflowFormState({
         launchPlanOptionsLoadingState,
         launchPlanSelectorOptions,
         onCancel,
+        onSelectWorkflow,
         onSubmit,
         selectedLaunchPlan,
         selectedWorkflow,
@@ -280,7 +290,6 @@ export function useLaunchWorkflowFormState({
         workflowName,
         workflowOptionsLoadingState,
         workflowSelectorOptions,
-        onSelectLaunchPlan: setLaunchPlan,
-        onSelectWorkflow: setWorkflow
+        onSelectLaunchPlan: setLaunchPlan
     };
 }
