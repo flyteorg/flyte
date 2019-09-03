@@ -3,6 +3,9 @@ import { useFetchableData } from 'components/hooks';
 import { NotFoundError } from 'errors';
 import { LaunchPlan, WorkflowId } from 'models';
 
+/** Returns a fetchable for the default launch plan whose project/domain/name/version
+ * match the values in the given WorkflowId.
+ */
 export function useDefaultLaunchPlan(workflowId: WorkflowId | null = null) {
     const { getLaunchPlan } = useAPIContext();
 

@@ -4,34 +4,34 @@ import * as Long from 'long';
 import * as moment from 'moment';
 import { InputType } from './types';
 
-export function booleanToLiteral(value: string): Core.ILiteral {
+function booleanToLiteral(value: string): Core.ILiteral {
     return { scalar: { primitive: { boolean: Boolean(value) } } };
 }
 
-export function stringToLiteral(stringValue: string): Core.ILiteral {
+function stringToLiteral(stringValue: string): Core.ILiteral {
     return { scalar: { primitive: { stringValue } } };
 }
 
-export function integerToLiteral(value: string): Core.ILiteral {
+function integerToLiteral(value: string): Core.ILiteral {
     return {
         scalar: { primitive: { integer: Long.fromString(value) } }
     };
 }
 
-export function floatToLiteral(value: string): Core.ILiteral {
+function floatToLiteral(value: string): Core.ILiteral {
     return {
         scalar: { primitive: { floatValue: parseFloat(value) } }
     };
 }
 
-export function dateToLiteral(value: string): Core.ILiteral {
+function dateToLiteral(value: string): Core.ILiteral {
     const datetime = dateToTimestamp(moment.utc(value).toDate());
     return {
         scalar: { primitive: { datetime } }
     };
 }
 
-export function durationToLiteral(value: string): Core.ILiteral {
+function durationToLiteral(value: string): Core.ILiteral {
     const duration = millisecondsToDuration(parseInt(value, 10));
     return {
         scalar: { primitive: { duration } }
@@ -41,6 +41,8 @@ export function durationToLiteral(value: string): Core.ILiteral {
 const unsupportedInput = () => undefined;
 
 type ConverterFn = (value: string) => Core.ILiteral | undefined;
+
+/** Maps an `InputType` to a function which will convert its value into a `Literal` */
 export const inputTypeConverters: Record<InputType, ConverterFn> = {
     [InputType.Binary]: unsupportedInput,
     [InputType.Blob]: unsupportedInput,

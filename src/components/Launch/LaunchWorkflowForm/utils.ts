@@ -51,6 +51,7 @@ export function formatLabelWithType(label: string, type: InputTypeDefinition) {
     return `${label}${typeString ? ` (${typeString})` : ''}`;
 }
 
+/** Formats a list of `Workflow` records for use in a `WorkflowSelector` */
 export function workflowsToWorkflowSelectorOptions(
     workflows: Workflow[]
 ): WorkflowSelectorOption[] {
@@ -76,6 +77,9 @@ function inputToLiteral(input: InputProps) {
     return converter(value);
 }
 
+/** Converts a list of Launch form inputs to values that can be submitted with
+ * a CreateExecutionRequest.
+ */
 export function convertFormInputsToLiteralMap(
     inputs: InputProps[]
 ): LiteralMap {

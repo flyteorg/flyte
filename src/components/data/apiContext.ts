@@ -23,6 +23,10 @@ export const defaultAPIContextValue = {
     ...WorkflowAPI
 };
 
+/** Exposes all of the model layer api functions for use by data fetching
+ * hooks. Using this context is preferred over directly importing the api functions,
+ * as this will allow mocking of the API in stories/tests.
+ */
 export const APIContext = React.createContext<APIContextValue>(
     defaultAPIContextValue
 );
