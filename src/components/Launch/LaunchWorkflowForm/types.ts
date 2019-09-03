@@ -1,6 +1,6 @@
 import { FetchableData, MultiFetchableState } from 'components/hooks';
 import { LaunchPlan, WorkflowExecutionIdentifier, WorkflowId } from 'models';
-import { WorkflowSelectorOption } from './WorkflowSelector';
+import { SearchableSelectorOption } from './SearchableSelector';
 
 export interface LaunchWorkflowFormProps {
     workflowId: WorkflowId;
@@ -13,12 +13,12 @@ export interface LaunchWorkflowFormState {
     launchPlans: FetchableData<LaunchPlan[]>;
     selectedLaunchPlan?: LaunchPlan;
     submissionState: FetchableData<WorkflowExecutionIdentifier>;
-    selectedWorkflow?: WorkflowSelectorOption;
+    selectedWorkflow?: SearchableSelectorOption<WorkflowId>;
     workflowName: string;
     workflowOptionsLoadingState: MultiFetchableState;
-    workflowSelectorOptions: WorkflowSelectorOption[];
+    workflowSelectorOptions: SearchableSelectorOption<WorkflowId>[];
     onCancel(): void;
-    onSelectWorkflow(selected: WorkflowSelectorOption): void;
+    onSelectWorkflow(selected: SearchableSelectorOption<WorkflowId>): void;
     onSubmit(): void;
     setLaunchPlan(launchPlan: LaunchPlan): void;
 }

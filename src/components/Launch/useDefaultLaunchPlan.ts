@@ -27,7 +27,7 @@ export function useDefaultLaunchPlan(workflowId: WorkflowId | null = null) {
     return useFetchableData<LaunchPlan | undefined, WorkflowId | null>(
         {
             doFetch,
-            defaultValue: {} as LaunchPlan,
+            defaultValue: undefined,
             debugName: 'useDefaultLaunchPlan',
             autoFetch: workflowId !== null
         },

@@ -2,6 +2,8 @@ import {
     Button,
     DialogActions,
     FormHelperText,
+    MenuItem,
+    TextField,
     Typography
 } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
@@ -11,12 +13,12 @@ import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import { smallFontSize } from 'components/Theme';
 import { FilterOperationName, WorkflowId } from 'models';
 import * as React from 'react';
+import { SearchableSelector } from './SearchableSelector';
 import { SimpleInput } from './SimpleInput';
 import { InputProps, InputType, LaunchWorkflowFormProps } from './types';
 import { UnsupportedInput } from './UnsupportedInput';
 import { useLaunchWorkflowFormState } from './useLaunchWorkflowFormState';
-import { workflowsToWorkflowSelectorOptions } from './utils';
-import { WorkflowSelector } from './WorkflowSelector';
+import { workflowsToSearchableSelectorOptions } from './utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
     footer: {
@@ -72,7 +74,7 @@ function generateFetchSearchResults(
                 }
             ]
         });
-        const options = workflowsToWorkflowSelectorOptions(workflows);
+        const options = workflowsToSearchableSelectorOptions(workflows);
         if (options.length > 0) {
             options[0].description = 'latest';
         }
@@ -107,13 +109,15 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     {...state.workflowOptionsLoadingState}
                 >
                     <div className={styles.formControl}>
-                        <WorkflowSelector
+                        <SearchableSelector
+                            label="Workflow Version"
                             onSelectionChanged={state.onSelectWorkflow}
                             options={state.workflowSelectorOptions}
                             fetchSearchResults={fetchSearchResults}
                             selectedItem={state.selectedWorkflow}
                         />
                     </div>
+
                     <WaitForData
                         spinnerVariant="medium"
                         {...state.inputLoadingState}

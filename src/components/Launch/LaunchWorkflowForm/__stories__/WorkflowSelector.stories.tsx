@@ -4,9 +4,13 @@ import {
     createMockWorkflow,
     createMockWorkflowVersions
 } from 'models/__mocks__/workflowData';
+import { WorkflowId } from 'models/Workflow/types';
 import * as moment from 'moment';
 import * as React from 'react';
-import { WorkflowSelector, WorkflowSelectorOption } from '../WorkflowSelector';
+import {
+    SearchableSelector,
+    SearchableSelectorOption
+} from '../SearchableSelector';
 
 const mockWorkflow = createMockWorkflow('MyWorkflow');
 const mockWorkflowVersions = createMockWorkflowVersions(
@@ -14,7 +18,7 @@ const mockWorkflowVersions = createMockWorkflowVersions(
     10
 );
 
-const options = mockWorkflowVersions.map<WorkflowSelectorOption>(
+const options = mockWorkflowVersions.map<SearchableSelectorOption<WorkflowId>>(
     (wf, index) => ({
         data: wf.id,
         id: wf.id.version,
@@ -40,7 +44,8 @@ stories.add('Basic', () => {
         resolveAfter(500, options.filter(({ name }) => name.includes(query)));
 
     return (
-        <WorkflowSelector
+        <SearchableSelector
+            label="Workflow Version"
             fetchSearchResults={fetch}
             onSelectionChanged={setSelectedItem}
             selectedItem={selectedItem}

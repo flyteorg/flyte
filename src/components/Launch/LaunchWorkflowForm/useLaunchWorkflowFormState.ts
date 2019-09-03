@@ -16,6 +16,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { useDefaultLaunchPlan } from '../useDefaultLaunchPlan';
 import { simpleTypeToInputType } from './constants';
+import { SearchableSelectorOption } from './SearchableSelector';
 import {
     InputProps,
     InputType,
@@ -28,9 +29,8 @@ import {
     convertFormInputsToLiteralMap,
     formatLabelWithType,
     getWorkflowInputs,
-    workflowsToWorkflowSelectorOptions
+    workflowsToSearchableSelectorOptions
 } from './utils';
-import { WorkflowSelectorOption } from './WorkflowSelector';
 
 // We use a non-empty string for the description to allow display components
 // to depend on the existence of a value
@@ -139,8 +139,8 @@ function useFormInputsState(parsedInputs: ParsedInput[]): FormInputsState {
     };
 }
 
-function useWorkflowSelectorOptions(workflows: Workflow[]) {
-    return useMemo(() => workflowsToWorkflowSelectorOptions(workflows), [
+function useSearchableSelectorOptions(workflows: Workflow[]) {
+    return useMemo(() => workflowsToSearchableSelectorOptions(workflows), [
         workflows
     ]);
 }
@@ -190,8 +190,12 @@ export function useLaunchWorkflowFormState({
     workflowId
 }: LaunchWorkflowFormProps): LaunchWorkflowFormState {
     const workflows = useWorkflows(workflowId, { limit: 10 });
-    const workflowSelectorOptions = useWorkflowSelectorOptions(workflows.value);
-    const [selectedWorkflow, setWorkflow] = useState<WorkflowSelectorOption>();
+    const workflowSelectorOptions = useSearchableSelectorOptions(
+        workflows.value
+    );
+    const [selectedWorkflow, setWorkflow] = useState<
+        SearchableSelectorOption<WorkflowId>
+    >();
     const selectedWorkflowId = selectedWorkflow ? selectedWorkflow.data : null;
     const defaultLaunchPlan = useDefaultLaunchPlan(selectedWorkflowId);
 
