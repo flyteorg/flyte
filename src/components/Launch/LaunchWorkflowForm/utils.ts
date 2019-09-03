@@ -1,8 +1,9 @@
 import { timestampToDate } from 'common/utils';
-import { Variable, Workflow } from 'models';
+import { Literal, LiteralMap, Variable, Workflow } from 'models';
 import * as moment from 'moment';
 import { typeLabels } from './constants';
-import { InputType, InputTypeDefinition } from './types';
+import { inputTypeConverters } from './inputConverters';
+import { InputProps, InputType, InputTypeDefinition } from './types';
 import { WorkflowSelectorOption } from './WorkflowSelector';
 
 /** Safely retrieves the input mapping stored in a workflow, or an empty
@@ -64,4 +65,27 @@ export function workflowsToWorkflowSelectorOptions(
                   )
                 : ''
     }));
+}
+
+function inputToLiteral(input: InputProps) {
+    if (!input.value) {
+        return undefined;
+    }
+    const converter = inputTypeConverters[input.typeDefinition.type];
+    const value = input.value.toString();
+    return converter(value);
+}
+
+export function convertFormInputsToLiteralMap(
+    inputs: InputProps[]
+): LiteralMap {
+    const literals = inputs.reduce<Record<string, Literal>>((out, input) => {
+        const converted = inputToLiteral(input);
+        return converted
+            ? Object.assign(out, { [input.name]: converted })
+            : out;
+    }, {});
+    return {
+        literals
+    };
 }

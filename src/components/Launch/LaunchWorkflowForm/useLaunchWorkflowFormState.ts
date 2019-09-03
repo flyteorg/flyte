@@ -25,6 +25,7 @@ import {
     LaunchWorkflowFormState
 } from './types';
 import {
+    convertFormInputsToLiteralMap,
     formatLabelWithType,
     getWorkflowInputs,
     workflowsToWorkflowSelectorOptions
@@ -217,7 +218,8 @@ export function useLaunchWorkflowFormState({
     const workflowName = workflowId.name;
 
     const launchWorkflow = () => {
-        console.log('launch', inputs);
+        const literalMap = convertFormInputsToLiteralMap(inputs);
+        console.log('launch', literalMap);
         return new Promise<WorkflowExecutionIdentifier>((resolve, reject) => {
             setTimeout(() => reject('Launching is not implemented'), 1500);
         });
