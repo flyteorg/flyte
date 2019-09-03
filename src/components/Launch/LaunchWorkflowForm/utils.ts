@@ -1,5 +1,12 @@
 import { timestampToDate } from 'common/utils';
-import { Literal, LiteralMap, Variable, Workflow, WorkflowId } from 'models';
+import {
+    LaunchPlan,
+    Literal,
+    LiteralMap,
+    Variable,
+    Workflow,
+    WorkflowId
+} from 'models';
 import * as moment from 'moment';
 import { typeLabels } from './constants';
 import { inputTypeConverters } from './inputConverters';
@@ -65,6 +72,18 @@ export function workflowsToSearchableSelectorOptions(
                       'DD MMM YYYY'
                   )
                 : ''
+    }));
+}
+
+/** Formats a list of `LaunchPlan` records for use in a `SearchableSelector` */
+export function launchPlansToSearchableSelectorOptions(
+    launchPlans: LaunchPlan[]
+): SearchableSelectorOption<LaunchPlan>[] {
+    return launchPlans.map<SearchableSelectorOption<LaunchPlan>>(lp => ({
+        data: lp,
+        id: lp.id.name,
+        name: lp.id.name,
+        description: ''
     }));
 }
 

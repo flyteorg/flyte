@@ -58,7 +58,7 @@ export interface SearchableSelectorProps<DataType> {
     label: string;
     options: SearchableSelectorOption<DataType>[];
     selectedItem?: SearchableSelectorOption<DataType>;
-    fetchSearchResults: FetchFn<SearchableSelectorOption<DataType>[], string>;
+    fetchSearchResults?: FetchFn<SearchableSelectorOption<DataType>[], string>;
     onSelectionChanged(newSelection: SearchableSelectorOption<DataType>): void;
 }
 
@@ -76,12 +76,20 @@ interface SearchableSelectorState<DataType> {
     setIsExpanded(expanded: boolean): void;
 }
 
+function generateDefaultFetch<DataType>(
+    options: SearchableSelectorOption<DataType>[]
+): FetchFn<SearchableSelectorOption<DataType>[], string> {
+    return (query: string) =>
+        Promise.resolve(options.filter(option => option.id.includes(query)));
+}
+
 function useSearchableSelectorState<DataType>({
     fetchSearchResults,
     options,
     selectedItem,
     onSelectionChanged
 }: SearchableSelectorProps<DataType>): SearchableSelectorState<DataType> {
+    const fetchResults = fetchSearchResults || generateDefaultFetch(options);
     const [rawSearchValue, setSearchValue] = React.useState('');
     const debouncedSearchValue = useDebouncedValue(
         rawSearchValue,
@@ -100,7 +108,7 @@ function useSearchableSelectorState<DataType>({
             defaultValue: [],
             autoFetch: minimumQueryMet,
             debugName: 'SearchableSelector Search',
-            doFetch: fetchSearchResults
+            doFetch: fetchResults
         },
         debouncedSearchValue
     );

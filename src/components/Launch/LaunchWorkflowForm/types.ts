@@ -7,11 +7,11 @@ export interface LaunchWorkflowFormProps {
 }
 
 export interface LaunchWorkflowFormState {
-    defaultLaunchPlan: FetchableData<LaunchPlan | undefined>;
     inputLoadingState: MultiFetchableState;
     inputs: InputProps[];
-    launchPlans: FetchableData<LaunchPlan[]>;
-    selectedLaunchPlan?: LaunchPlan;
+    launchPlanOptionsLoadingState: MultiFetchableState;
+    launchPlanSelectorOptions: SearchableSelectorOption<LaunchPlan>[];
+    selectedLaunchPlan?: SearchableSelectorOption<LaunchPlan>;
     submissionState: FetchableData<WorkflowExecutionIdentifier>;
     selectedWorkflow?: SearchableSelectorOption<WorkflowId>;
     workflowName: string;
@@ -20,7 +20,7 @@ export interface LaunchWorkflowFormState {
     onCancel(): void;
     onSelectWorkflow(selected: SearchableSelectorOption<WorkflowId>): void;
     onSubmit(): void;
-    setLaunchPlan(launchPlan: LaunchPlan): void;
+    onSelectLaunchPlan(selected: SearchableSelectorOption<LaunchPlan>): void;
 }
 
 export enum InputType {

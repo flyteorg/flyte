@@ -2,8 +2,6 @@ import {
     Button,
     DialogActions,
     FormHelperText,
-    MenuItem,
-    TextField,
     Typography
 } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
@@ -86,6 +84,7 @@ function generateFetchSearchResults(
 export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
     const state = useLaunchWorkflowFormState(props);
     const { submissionState } = state;
+    const launchPlanSelected = !!state.selectedLaunchPlan;
     const styles = useStyles();
     const fetchSearchResults = generateFetchSearchResults(
         useAPIContext(),
@@ -117,20 +116,34 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                             selectedItem={state.selectedWorkflow}
                         />
                     </div>
-
                     <WaitForData
+                        {...state.launchPlanOptionsLoadingState}
                         spinnerVariant="medium"
-                        {...state.inputLoadingState}
                     >
-                        {state.inputs.map(input => (
-                            <div
-                                key={input.label}
-                                className={styles.formControl}
-                            >
-                                {getComponentForInput(input)}
-                            </div>
-                        ))}
+                        <div className={styles.formControl}>
+                            <SearchableSelector
+                                label="Launch Plan"
+                                onSelectionChanged={state.onSelectLaunchPlan}
+                                options={state.launchPlanSelectorOptions}
+                                selectedItem={state.selectedLaunchPlan}
+                            />
+                        </div>
                     </WaitForData>
+                    {launchPlanSelected ? (
+                        <WaitForData
+                            spinnerVariant="medium"
+                            {...state.inputLoadingState}
+                        >
+                            {state.inputs.map(input => (
+                                <div
+                                    key={input.label}
+                                    className={styles.formControl}
+                                >
+                                    {getComponentForInput(input)}
+                                </div>
+                            ))}
+                        </WaitForData>
+                    ) : null}
                 </WaitForData>
             </section>
             <div className={styles.footer}>
