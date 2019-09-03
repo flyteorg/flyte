@@ -2,6 +2,7 @@ import {
     Button,
     DialogActions,
     DialogContent,
+    DialogTitle,
     FormHelperText,
     Typography
 } from '@material-ui/core';
@@ -102,11 +103,11 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
     };
 
     return (
-        <form className={styles.root}>
-            <header className={styles.header}>
+        <>
+            <DialogTitle disableTypography={true} className={styles.header}>
                 <div className={styles.inputLabel}>Launch Workflow</div>
                 <Typography variant="h6">{state.workflowName}</Typography>
-            </header>
+            </DialogTitle>
             <DialogContent dividers={true} className={styles.inputsSection}>
                 <WaitForData
                     spinnerVariant="medium"
@@ -183,6 +184,6 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     </Button>
                 </DialogActions>
             </div>
-        </form>
+        </>
     );
 };

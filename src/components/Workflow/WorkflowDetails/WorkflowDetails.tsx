@@ -78,7 +78,7 @@ export const WorkflowDetailsContainer: React.FC<WorkflowDetailsRouteParams> = ({
                     <WorkflowExecutions workflowId={workflowId} />
                 </div>
                 <Dialog
-                    scroll="body"
+                    scroll="paper"
                     maxWidth="sm"
                     fullWidth={true}
                     open={showLaunchForm}

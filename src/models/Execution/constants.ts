@@ -29,3 +29,5 @@ export const executionSortFields = {
     createdAt: 'created_at',
     startedAt: 'started_at'
 };
+
+export const defaultExecutionPrincipal = 'flyteconsole';

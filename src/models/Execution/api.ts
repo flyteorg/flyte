@@ -12,7 +12,7 @@ import {
     makeIdentifierPath,
     NameIdentifierScope
 } from 'models/Common';
-
+import { defaultExecutionPrincipal } from './constants';
 import {
     Execution,
     ExecutionData,
@@ -22,7 +22,6 @@ import {
     TaskExecutionIdentifier,
     WorkflowExecutionIdentifier
 } from './types';
-
 import {
     executionListTransformer,
     makeExecutionPath,
@@ -100,7 +99,15 @@ export const createWorkflowExecution = (
         Admin.ExecutionCreateResponse
     >(
         {
-            data: { project, domain, spec: { inputs, launchPlan } },
+            data: {
+                project,
+                domain,
+                spec: {
+                    inputs,
+                    launchPlan,
+                    metadata: { principal: defaultExecutionPrincipal }
+                }
+            },
             path: endpointPrefixes.execution,
             requestMessageType: Admin.ExecutionCreateRequest,
             responseMessageType: Admin.ExecutionCreateResponse
