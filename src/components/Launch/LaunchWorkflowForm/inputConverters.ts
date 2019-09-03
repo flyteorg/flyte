@@ -1,7 +1,7 @@
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Core } from 'flyteidl';
 import * as Long from 'long';
-import * as moment from 'moment';
+import { utc as moment } from 'moment';
 import { InputType } from './types';
 
 function booleanToLiteral(value: string): Core.ILiteral {
@@ -25,7 +25,7 @@ function floatToLiteral(value: string): Core.ILiteral {
 }
 
 function dateToLiteral(value: string): Core.ILiteral {
-    const datetime = dateToTimestamp(moment.utc(value).toDate());
+    const datetime = dateToTimestamp(moment(value).toDate());
     return {
         scalar: { primitive: { datetime } }
     };

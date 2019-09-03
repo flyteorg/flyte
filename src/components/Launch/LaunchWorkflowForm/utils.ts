@@ -1,10 +1,17 @@
 import { timestampToDate } from 'common/utils';
-import { Literal, LiteralMap, Variable, Workflow } from 'models';
+import {
+    LaunchPlan,
+    Literal,
+    LiteralMap,
+    Variable,
+    Workflow,
+    WorkflowId
+} from 'models';
 import * as moment from 'moment';
 import { typeLabels } from './constants';
 import { inputTypeConverters } from './inputConverters';
+import { SearchableSelectorOption } from './SearchableSelector';
 import { InputProps, InputType, InputTypeDefinition } from './types';
-import { WorkflowSelectorOption } from './WorkflowSelector';
 
 /** Safely retrieves the input mapping stored in a workflow, or an empty
  * logic if any optional property along the chain is undefined.
@@ -51,11 +58,11 @@ export function formatLabelWithType(label: string, type: InputTypeDefinition) {
     return `${label}${typeString ? ` (${typeString})` : ''}`;
 }
 
-/** Formats a list of `Workflow` records for use in a `WorkflowSelector` */
-export function workflowsToWorkflowSelectorOptions(
+/** Formats a list of `Workflow` records for use in a `SearchableSelector` */
+export function workflowsToSearchableSelectorOptions(
     workflows: Workflow[]
-): WorkflowSelectorOption[] {
-    return workflows.map<WorkflowSelectorOption>((wf, index) => ({
+): SearchableSelectorOption<WorkflowId>[] {
+    return workflows.map<SearchableSelectorOption<WorkflowId>>((wf, index) => ({
         data: wf.id,
         id: wf.id.version,
         name: wf.id.version,
@@ -65,6 +72,18 @@ export function workflowsToWorkflowSelectorOptions(
                       'DD MMM YYYY'
                   )
                 : ''
+    }));
+}
+
+/** Formats a list of `LaunchPlan` records for use in a `SearchableSelector` */
+export function launchPlansToSearchableSelectorOptions(
+    launchPlans: LaunchPlan[]
+): SearchableSelectorOption<LaunchPlan>[] {
+    return launchPlans.map<SearchableSelectorOption<LaunchPlan>>(lp => ({
+        data: lp,
+        id: lp.id.name,
+        name: lp.id.name,
+        description: ''
     }));
 }
 

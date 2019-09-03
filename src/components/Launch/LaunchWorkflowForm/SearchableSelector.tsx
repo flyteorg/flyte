@@ -10,9 +10,8 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import { escapeKeyListener } from 'components/common/keyboardEvents';
 import { useCommonStyles } from 'components/common/styles';
-import { FetchFn, useFetchableData } from 'components/hooks';
+import { FetchableData, FetchFn, useFetchableData } from 'components/hooks';
 import { useDebouncedValue } from 'components/hooks/useDebouncedValue';
-import { NamedEntityIdentifier, WorkflowId } from 'models';
 import * as React from 'react';
 import reactLoadingSkeleton from 'react-loading-skeleton';
 
@@ -48,26 +47,49 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-export interface WorkflowSelectorOption {
+export interface SearchableSelectorOption<DataType> {
     id: string;
-    data: WorkflowId;
+    data: DataType;
     name: string;
     description?: string;
 }
 
-export interface WorkflowSelectorProps {
-    options: WorkflowSelectorOption[];
-    selectedItem?: WorkflowSelectorOption;
-    fetchSearchResults: FetchFn<WorkflowSelectorOption[], string>;
-    onSelectionChanged(newSelection: WorkflowSelectorOption): void;
+export interface SearchableSelectorProps<DataType> {
+    label: string;
+    options: SearchableSelectorOption<DataType>[];
+    selectedItem?: SearchableSelectorOption<DataType>;
+    fetchSearchResults?: FetchFn<SearchableSelectorOption<DataType>[], string>;
+    onSelectionChanged(newSelection: SearchableSelectorOption<DataType>): void;
 }
 
-function useWorkflowSelectorState({
+interface SearchableSelectorState<DataType> {
+    isExpanded: boolean;
+    items: SearchableSelectorOption<DataType>[];
+    searchResults: FetchableData<SearchableSelectorOption<DataType>[]>;
+    selectedItem?: SearchableSelectorOption<DataType>;
+    showList: boolean;
+    inputValue: string;
+    onBlur(): void;
+    onChange(event: React.ChangeEvent<HTMLInputElement>): void;
+    onFocus(): void;
+    selectItem(item: SearchableSelectorOption<DataType>): void;
+    setIsExpanded(expanded: boolean): void;
+}
+
+function generateDefaultFetch<DataType>(
+    options: SearchableSelectorOption<DataType>[]
+): FetchFn<SearchableSelectorOption<DataType>[], string> {
+    return (query: string) =>
+        Promise.resolve(options.filter(option => option.name.includes(query)));
+}
+
+function useSearchableSelectorState<DataType>({
     fetchSearchResults,
     options,
     selectedItem,
     onSelectionChanged
-}: WorkflowSelectorProps) {
+}: SearchableSelectorProps<DataType>): SearchableSelectorState<DataType> {
+    const fetchResults = fetchSearchResults || generateDefaultFetch(options);
     const [rawSearchValue, setSearchValue] = React.useState('');
     const debouncedSearchValue = useDebouncedValue(
         rawSearchValue,
@@ -78,12 +100,15 @@ function useWorkflowSelectorState({
     const [focused, setFocused] = React.useState(false);
     const minimumQueryMet = debouncedSearchValue.length > minimumQuerySize;
 
-    const searchResults = useFetchableData<WorkflowSelectorOption[], string>(
+    const searchResults = useFetchableData<
+        SearchableSelectorOption<DataType>[],
+        string
+    >(
         {
             defaultValue: [],
             autoFetch: minimumQueryMet,
-            debugName: 'WorkflowSelector Search',
-            doFetch: fetchSearchResults
+            debugName: 'SearchableSelector Search',
+            doFetch: fetchResults
         },
         debouncedSearchValue
     );
@@ -110,7 +135,7 @@ function useWorkflowSelectorState({
         setSearchValue(value);
     };
 
-    const selectItem = (item: WorkflowSelectorOption) => {
+    const selectItem = (item: SearchableSelectorOption<DataType>) => {
         console.log(item.id);
         onSelectionChanged(item);
         setSearchValue('');
@@ -157,12 +182,12 @@ const LoadingContent: React.FC = () => (
     </MenuItem>
 );
 
-const SelectorItems: React.FC<ReturnType<typeof useWorkflowSelectorState>> = ({
+const SearchableSelectorItems = <DataType extends {}>({
     items,
     selectItem,
     selectedItem,
     searchResults
-}) => {
+}: SearchableSelectorState<DataType>) => {
     const styles = useStyles();
     const commonStyles = useCommonStyles();
     if (searchResults.loading) {
@@ -204,9 +229,11 @@ const SelectorItems: React.FC<ReturnType<typeof useWorkflowSelectorState>> = ({
 /** Combines a dropdown selector of default options with a searchable text input
  * that will fetch results using a provided function.
  */
-export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
+export const SearchableSelector = <DataType extends {}>(
+    props: SearchableSelectorProps<DataType>
+) => {
     const styles = useStyles();
-    const state = useWorkflowSelectorState(props);
+    const state = useSearchableSelectorState(props);
     const {
         inputValue,
         isExpanded,
@@ -224,7 +251,7 @@ export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
         }
     };
 
-    const selectItem = (item: WorkflowSelectorOption) => {
+    const selectItem = (item: SearchableSelectorOption<DataType>) => {
         state.selectItem(item);
         blurInput();
     };
@@ -256,14 +283,17 @@ export const WorkflowSelector: React.FC<WorkflowSelectorProps> = props => {
                         </InputAdornment>
                     )
                 }}
-                label="Workflow Version"
+                label={props.label}
                 onChange={onChange}
                 value={inputValue}
                 variant="outlined"
             />
             {showList ? (
                 <Paper className={styles.paper} elevation={1}>
-                    <SelectorItems {...state} selectItem={selectItem} />
+                    <SearchableSelectorItems
+                        {...state}
+                        selectItem={selectItem}
+                    />
                 </Paper>
             ) : null}
         </div>
