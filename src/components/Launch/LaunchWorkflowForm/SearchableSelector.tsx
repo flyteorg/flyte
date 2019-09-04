@@ -136,7 +136,6 @@ function useSearchableSelectorState<DataType>({
     };
 
     const selectItem = (item: SearchableSelectorOption<DataType>) => {
-        console.log(item.id);
         onSelectionChanged(item);
         setSearchValue('');
         setFocused(false);

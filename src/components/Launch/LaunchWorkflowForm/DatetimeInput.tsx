@@ -41,7 +41,6 @@ export const DatetimeInput: React.FC<InputProps> = props => {
                 inputVariant="outlined"
                 label={label}
                 onChange={handleChange}
-                onError={console.log}
                 showTodayButton={true}
                 value={value}
             />
