@@ -7,7 +7,8 @@ import {
     errorBackgroundColor,
     listhoverColor,
     nestedListColor,
-    separatorColor
+    separatorColor,
+    smallFontSize
 } from 'components/Theme';
 import * as copyToClipboard from 'copy-to-clipboard';
 import * as React from 'react';
@@ -83,7 +84,7 @@ export const useExpandableMonospaceTextStyles = makeStyles((theme: Theme) => ({
         bottom: theme.spacing(4),
         color: theme.palette.common.white,
         fontFamily: bodyFontFamily,
-        fontSize: '.75rem',
+        fontSize: smallFontSize,
         fontWeight: 'bold',
         left: '50%',
         padding: `${theme.spacing(1)}px ${theme.spacing(3)}px`,

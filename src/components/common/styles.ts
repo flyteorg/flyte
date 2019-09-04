@@ -4,7 +4,8 @@ import {
     dangerousButtonBorderColor,
     dangerousButtonColor,
     dangerousButtonHoverColor,
-    mutedPrimaryTextColor
+    mutedPrimaryTextColor,
+    smallFontSize
 } from 'components/Theme';
 
 const unstyledLinkProps = {
@@ -114,7 +115,7 @@ export const useCommonStyles = makeStyles((theme: Theme) => ({
     microHeader: {
         textTransform: 'uppercase',
         fontWeight: 'bold',
-        fontSize: '.75rem',
+        fontSize: smallFontSize,
         lineHeight: '.9375rem'
     },
     mutedHeader: {
@@ -145,7 +146,7 @@ export const useCommonStyles = makeStyles((theme: Theme) => ({
         color: theme.palette.grey[500]
     },
     textSmall: {
-        fontSize: '0.75rem',
+        fontSize: smallFontSize,
         lineHeight: 1.25
     },
     textWrapped: {

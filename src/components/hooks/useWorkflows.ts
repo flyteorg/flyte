@@ -1,17 +1,16 @@
+import { useAPIContext } from 'components/data/apiContext';
 import {
     IdentifierScope,
-    listIdentifiers,
-    listWorkflows,
     NamedEntityIdentifier,
     RequestConfig,
     ResourceType,
     Workflow
 } from 'models';
-
-import { PaginationConfig, usePagination } from './usePagination';
+import { usePagination } from './usePagination';
 
 /** A hook for fetching a paginated list of workflows */
 export function useWorkflows(scope: IdentifierScope, config: RequestConfig) {
+    const { listWorkflows } = useAPIContext();
     return usePagination<Workflow, IdentifierScope>(
         { ...config, cacheItems: true, fetchArg: scope },
         listWorkflows
@@ -20,6 +19,7 @@ export function useWorkflows(scope: IdentifierScope, config: RequestConfig) {
 
 /** A hook for fetching a paginated list of workflow ids */
 export function useWorkflowIds(scope: IdentifierScope, config: RequestConfig) {
+    const { listIdentifiers } = useAPIContext();
     return usePagination<NamedEntityIdentifier, IdentifierScope>(
         { ...config, fetchArg: scope },
         (scope, requestConfig) =>

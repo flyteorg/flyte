@@ -20,16 +20,11 @@ export interface Identifier extends Core.IIdentifier {
 export interface NamedEntityIdentifier
     extends RequiredNonNullable<Admin.INamedEntityIdentifier> {}
 export interface Notification extends Admin.INotification {}
-export interface ParameterMap extends RequiredNonNullable<Core.IParameterMap> {}
 export type ResourceType = Core.ResourceType;
 export const ResourceType = Core.ResourceType;
 export interface RetryStrategy extends Core.IRetryStrategy {}
 export interface RuntimeMetadata extends Core.IRuntimeMetadata {}
 export interface Schedule extends Admin.ISchedule {}
-export interface TypedInterface extends Core.ITypedInterface {}
-export interface UrlBlob extends Admin.IUrlBlob {}
-export interface VariableMap extends RequiredNonNullable<Core.IVariableMap> {}
-
 export type MessageFormat = Core.TaskLog.MessageFormat;
 export type TaskLog = RequiredNonNullable<Core.ITaskLog>;
 
@@ -50,6 +45,7 @@ export interface BlobMetadata extends Core.IBlobMetadata {
 export interface BlobType extends Core.IBlobType {
     dimensionality: BlobDimensionality;
 }
+export interface UrlBlob extends Admin.IUrlBlob {}
 
 export interface Error extends RequiredNonNullable<Core.IError> {}
 
@@ -102,6 +98,41 @@ export interface ProtobufStruct extends Protobuf.IStruct {
 
 export interface ProtobufValue extends Protobuf.IValue {
     kind: keyof Protobuf.IValue;
+}
+
+export interface TypedInterface extends Core.ITypedInterface {
+    inputs?: VariableMap;
+    outputs?: VariableMap;
+}
+
+export interface LiteralType extends Core.ILiteralType {
+    blob?: BlobType;
+    collectionType?: LiteralType;
+    mapValueType?: LiteralType;
+    metadata?: ProtobufStruct;
+    schema?: SchemaType;
+    simple?: SimpleType;
+}
+
+export type SimpleType = Core.SimpleType;
+export const SimpleType = Core.SimpleType;
+
+export interface Variable extends Core.IVariable {
+    type: LiteralType;
+    description?: string;
+}
+export interface VariableMap extends Core.IVariableMap {
+    variables: Record<string, Variable>;
+}
+
+export interface Parameter extends Core.IParameter {
+    var: Variable;
+    default?: Literal;
+    required?: boolean;
+}
+
+export interface ParameterMap extends Core.IParameterMap {
+    parameters: Record<string, Parameter>;
 }
 
 /* --- END flyteidl type aliases --- */
