@@ -27,6 +27,8 @@ class ServerContext;
 namespace flyteidl {
 namespace service {
 
+// The following defines an RPC service that is also served over HTTP via grpc-gateway.
+// Standard response codes for both are defined here: https://github.com/grpc-ecosystem/grpc-gateway/blob/master/runtime/errors.go
 class AdminService final {
  public:
   static constexpr char const* service_full_name() {

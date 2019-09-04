@@ -36,7 +36,7 @@ class AdminServiceApi(object):
     def create_execution(self, body, **kwargs):  # noqa: E501
         """create_execution  # noqa: E501
 
-        Create a workflow execution  # noqa: E501
+        Create a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_execution(body, async_req=True)
@@ -58,7 +58,7 @@ class AdminServiceApi(object):
     def create_execution_with_http_info(self, body, **kwargs):  # noqa: E501
         """create_execution  # noqa: E501
 
-        Create a workflow execution  # noqa: E501
+        Create a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_execution_with_http_info(body, async_req=True)
@@ -135,7 +135,7 @@ class AdminServiceApi(object):
     def create_launch_plan(self, body, **kwargs):  # noqa: E501
         """create_launch_plan  # noqa: E501
 
-        Create and register a launch plan definition  # noqa: E501
+        Create and register a launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_launch_plan(body, async_req=True)
@@ -157,7 +157,7 @@ class AdminServiceApi(object):
     def create_launch_plan_with_http_info(self, body, **kwargs):  # noqa: E501
         """create_launch_plan  # noqa: E501
 
-        Create and register a launch plan definition  # noqa: E501
+        Create and register a launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_launch_plan_with_http_info(body, async_req=True)
@@ -234,6 +234,7 @@ class AdminServiceApi(object):
     def create_node_event(self, body, **kwargs):  # noqa: E501
         """create_node_event  # noqa: E501
 
+        Create a node execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_node_event(body, async_req=True)
@@ -255,6 +256,7 @@ class AdminServiceApi(object):
     def create_node_event_with_http_info(self, body, **kwargs):  # noqa: E501
         """create_node_event  # noqa: E501
 
+        Create a node execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_node_event_with_http_info(body, async_req=True)
@@ -331,7 +333,7 @@ class AdminServiceApi(object):
     def create_task(self, body, **kwargs):  # noqa: E501
         """create_task  # noqa: E501
 
-        Create and register a task definition  # noqa: E501
+        Create and register a task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_task(body, async_req=True)
@@ -353,7 +355,7 @@ class AdminServiceApi(object):
     def create_task_with_http_info(self, body, **kwargs):  # noqa: E501
         """create_task  # noqa: E501
 
-        Create and register a task definition  # noqa: E501
+        Create and register a task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_task_with_http_info(body, async_req=True)
@@ -430,6 +432,7 @@ class AdminServiceApi(object):
     def create_task_event(self, body, **kwargs):  # noqa: E501
         """create_task_event  # noqa: E501
 
+        Create a task execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_task_event(body, async_req=True)
@@ -451,6 +454,7 @@ class AdminServiceApi(object):
     def create_task_event_with_http_info(self, body, **kwargs):  # noqa: E501
         """create_task_event  # noqa: E501
 
+        Create a task execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_task_event_with_http_info(body, async_req=True)
@@ -527,7 +531,7 @@ class AdminServiceApi(object):
     def create_workflow(self, body, **kwargs):  # noqa: E501
         """create_workflow  # noqa: E501
 
-        Create and register a workflow definition  # noqa: E501
+        Create and register a workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_workflow(body, async_req=True)
@@ -549,7 +553,7 @@ class AdminServiceApi(object):
     def create_workflow_with_http_info(self, body, **kwargs):  # noqa: E501
         """create_workflow  # noqa: E501
 
-        Create and register a workflow definition  # noqa: E501
+        Create and register a workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_workflow_with_http_info(body, async_req=True)
@@ -626,6 +630,7 @@ class AdminServiceApi(object):
     def create_workflow_event(self, body, **kwargs):  # noqa: E501
         """create_workflow_event  # noqa: E501
 
+        Create a workflow execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_workflow_event(body, async_req=True)
@@ -647,6 +652,7 @@ class AdminServiceApi(object):
     def create_workflow_event_with_http_info(self, body, **kwargs):  # noqa: E501
         """create_workflow_event  # noqa: E501
 
+        Create a workflow execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.create_workflow_event_with_http_info(body, async_req=True)
@@ -723,6 +729,7 @@ class AdminServiceApi(object):
     def get_active_launch_plan(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """get_active_launch_plan  # noqa: E501
 
+        Retrieve the active launch plan version specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_active_launch_plan(id_project, id_domain, id_name, async_req=True)
@@ -746,6 +753,7 @@ class AdminServiceApi(object):
     def get_active_launch_plan_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """get_active_launch_plan  # noqa: E501
 
+        Retrieve the active launch plan version specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_active_launch_plan_with_http_info(id_project, id_domain, id_name, async_req=True)
@@ -836,6 +844,7 @@ class AdminServiceApi(object):
     def get_execution(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """get_execution  # noqa: E501
 
+        Retrieve an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_execution(id_project, id_domain, id_name, async_req=True)
@@ -859,6 +868,7 @@ class AdminServiceApi(object):
     def get_execution_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """get_execution  # noqa: E501
 
+        Retrieve an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_execution_with_http_info(id_project, id_domain, id_name, async_req=True)
@@ -949,6 +959,7 @@ class AdminServiceApi(object):
     def get_execution_data(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """get_execution_data  # noqa: E501
 
+        Retrieve input and output data from an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_execution_data(id_project, id_domain, id_name, async_req=True)
@@ -972,6 +983,7 @@ class AdminServiceApi(object):
     def get_execution_data_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """get_execution_data  # noqa: E501
 
+        Retrieve input and output data from an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_execution_data_with_http_info(id_project, id_domain, id_name, async_req=True)
@@ -1062,6 +1074,7 @@ class AdminServiceApi(object):
     def get_launch_plan(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """get_launch_plan  # noqa: E501
 
+        Retrieve an existing launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_launch_plan(id_project, id_domain, id_name, id_version, async_req=True)
@@ -1087,6 +1100,7 @@ class AdminServiceApi(object):
     def get_launch_plan_with_http_info(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """get_launch_plan  # noqa: E501
 
+        Retrieve an existing launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, async_req=True)
@@ -1187,6 +1201,7 @@ class AdminServiceApi(object):
     def get_node_execution(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """get_node_execution  # noqa: E501
 
+        Retrieve an existing node execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_node_execution(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
@@ -1211,6 +1226,7 @@ class AdminServiceApi(object):
     def get_node_execution_with_http_info(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """get_node_execution  # noqa: E501
 
+        Retrieve an existing node execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_node_execution_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
@@ -1308,6 +1324,7 @@ class AdminServiceApi(object):
     def get_node_execution_data(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """get_node_execution_data  # noqa: E501
 
+        Retrieve input and output data from an existing node execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_node_execution_data(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
@@ -1332,6 +1349,7 @@ class AdminServiceApi(object):
     def get_node_execution_data_with_http_info(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """get_node_execution_data  # noqa: E501
 
+        Retrieve input and output data from an existing node execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_node_execution_data_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
@@ -1429,6 +1447,7 @@ class AdminServiceApi(object):
     def get_task(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """get_task  # noqa: E501
 
+        Retrieve an existing task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_task(id_project, id_domain, id_name, id_version, async_req=True)
@@ -1454,6 +1473,7 @@ class AdminServiceApi(object):
     def get_task_with_http_info(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """get_task  # noqa: E501
 
+        Retrieve an existing task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_task_with_http_info(id_project, id_domain, id_name, id_version, async_req=True)
@@ -1554,6 +1574,7 @@ class AdminServiceApi(object):
     def get_task_execution(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """get_task_execution  # noqa: E501
 
+        Retrieve an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_task_execution(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
@@ -1584,6 +1605,7 @@ class AdminServiceApi(object):
     def get_task_execution_with_http_info(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """get_task_execution  # noqa: E501
 
+        Retrieve an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_task_execution_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
@@ -1719,6 +1741,7 @@ class AdminServiceApi(object):
     def get_task_execution_data(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """get_task_execution_data  # noqa: E501
 
+        Retrieve input and output data from an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_task_execution_data(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
@@ -1749,6 +1772,7 @@ class AdminServiceApi(object):
     def get_task_execution_data_with_http_info(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """get_task_execution_data  # noqa: E501
 
+        Retrieve input and output data from an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_task_execution_data_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
@@ -1884,6 +1908,7 @@ class AdminServiceApi(object):
     def get_workflow(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """get_workflow  # noqa: E501
 
+        Retrieve an existing workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_workflow(id_project, id_domain, id_name, id_version, async_req=True)
@@ -1909,6 +1934,7 @@ class AdminServiceApi(object):
     def get_workflow_with_http_info(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """get_workflow  # noqa: E501
 
+        Retrieve an existing workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_workflow_with_http_info(id_project, id_domain, id_name, id_version, async_req=True)
@@ -2009,6 +2035,7 @@ class AdminServiceApi(object):
     def list_active_launch_plans(self, project, domain, **kwargs):  # noqa: E501
         """list_active_launch_plans  # noqa: E501
 
+        Fetch the active launch plan versions specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_active_launch_plans(project, domain, async_req=True)
@@ -2035,6 +2062,7 @@ class AdminServiceApi(object):
     def list_active_launch_plans_with_http_info(self, project, domain, **kwargs):  # noqa: E501
         """list_active_launch_plans  # noqa: E501
 
+        Fetch the active launch plan versions specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_active_launch_plans_with_http_info(project, domain, async_req=True)
@@ -2130,6 +2158,7 @@ class AdminServiceApi(object):
     def list_executions(self, id_project, id_domain, **kwargs):  # noqa: E501
         """list_executions  # noqa: E501
 
+        Fetch existing workflow executions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_executions(id_project, id_domain, async_req=True)
@@ -2158,6 +2187,7 @@ class AdminServiceApi(object):
     def list_executions_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
         """list_executions  # noqa: E501
 
+        Fetch existing workflow executions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_executions_with_http_info(id_project, id_domain, async_req=True)
@@ -2259,6 +2289,7 @@ class AdminServiceApi(object):
     def list_launch_plan_ids(self, project, domain, **kwargs):  # noqa: E501
         """list_launch_plan_ids  # noqa: E501
 
+        Fetch existing launch plan definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_launch_plan_ids(project, domain, async_req=True)
@@ -2285,6 +2316,7 @@ class AdminServiceApi(object):
     def list_launch_plan_ids_with_http_info(self, project, domain, **kwargs):  # noqa: E501
         """list_launch_plan_ids  # noqa: E501
 
+        Fetch existing launch plan definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_launch_plan_ids_with_http_info(project, domain, async_req=True)
@@ -2380,6 +2412,7 @@ class AdminServiceApi(object):
     def list_launch_plans(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """list_launch_plans  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_launch_plans(id_project, id_domain, id_name, async_req=True)
@@ -2408,6 +2441,7 @@ class AdminServiceApi(object):
     def list_launch_plans_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """list_launch_plans  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_launch_plans_with_http_info(id_project, id_domain, id_name, async_req=True)
@@ -2513,6 +2547,7 @@ class AdminServiceApi(object):
     def list_launch_plans2(self, id_project, id_domain, **kwargs):  # noqa: E501
         """list_launch_plans2  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_launch_plans2(id_project, id_domain, async_req=True)
@@ -2541,6 +2576,7 @@ class AdminServiceApi(object):
     def list_launch_plans2_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
         """list_launch_plans2  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_launch_plans2_with_http_info(id_project, id_domain, async_req=True)
@@ -2642,6 +2678,7 @@ class AdminServiceApi(object):
     def list_node_executions(self, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs):  # noqa: E501
         """list_node_executions  # noqa: E501
 
+        Fetch existing node executions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_node_executions(workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, async_req=True)
@@ -2670,6 +2707,7 @@ class AdminServiceApi(object):
     def list_node_executions_with_http_info(self, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs):  # noqa: E501
         """list_node_executions  # noqa: E501
 
+        Fetch existing node executions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_node_executions_with_http_info(workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, async_req=True)
@@ -2775,6 +2813,7 @@ class AdminServiceApi(object):
     def list_node_executions_for_task(self, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs):  # noqa: E501
         """list_node_executions_for_task  # noqa: E501
 
+        Fetch child node executions launched by the specified task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_node_executions_for_task(task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, async_req=True)
@@ -2810,6 +2849,7 @@ class AdminServiceApi(object):
     def list_node_executions_for_task_with_http_info(self, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs):  # noqa: E501
         """list_node_executions_for_task  # noqa: E501
 
+        Fetch child node executions launched by the specified task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_node_executions_for_task_with_http_info(task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, async_req=True)
@@ -2960,6 +3000,7 @@ class AdminServiceApi(object):
     def list_projects(self, **kwargs):  # noqa: E501
         """list_projects  # noqa: E501
 
+        Fetch registered projects.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_projects(async_req=True)
@@ -2980,6 +3021,7 @@ class AdminServiceApi(object):
     def list_projects_with_http_info(self, **kwargs):  # noqa: E501
         """list_projects  # noqa: E501
 
+        Fetch registered projects.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_projects_with_http_info(async_req=True)
@@ -3049,6 +3091,7 @@ class AdminServiceApi(object):
     def list_task_executions(self, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs):  # noqa: E501
         """list_task_executions  # noqa: E501
 
+        Fetch existing task executions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_task_executions(node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, async_req=True)
@@ -3078,6 +3121,7 @@ class AdminServiceApi(object):
     def list_task_executions_with_http_info(self, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs):  # noqa: E501
         """list_task_executions  # noqa: E501
 
+        Fetch existing task executions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_task_executions_with_http_info(node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, async_req=True)
@@ -3190,6 +3234,7 @@ class AdminServiceApi(object):
     def list_task_ids(self, project, domain, **kwargs):  # noqa: E501
         """list_task_ids  # noqa: E501
 
+        Fetch existing task definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_task_ids(project, domain, async_req=True)
@@ -3216,6 +3261,7 @@ class AdminServiceApi(object):
     def list_task_ids_with_http_info(self, project, domain, **kwargs):  # noqa: E501
         """list_task_ids  # noqa: E501
 
+        Fetch existing task definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_task_ids_with_http_info(project, domain, async_req=True)
@@ -3311,6 +3357,7 @@ class AdminServiceApi(object):
     def list_tasks(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """list_tasks  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_tasks(id_project, id_domain, id_name, async_req=True)
@@ -3339,6 +3386,7 @@ class AdminServiceApi(object):
     def list_tasks_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """list_tasks  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_tasks_with_http_info(id_project, id_domain, id_name, async_req=True)
@@ -3444,6 +3492,7 @@ class AdminServiceApi(object):
     def list_tasks2(self, id_project, id_domain, **kwargs):  # noqa: E501
         """list_tasks2  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_tasks2(id_project, id_domain, async_req=True)
@@ -3472,6 +3521,7 @@ class AdminServiceApi(object):
     def list_tasks2_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
         """list_tasks2  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_tasks2_with_http_info(id_project, id_domain, async_req=True)
@@ -3573,6 +3623,7 @@ class AdminServiceApi(object):
     def list_workflow_ids(self, project, domain, **kwargs):  # noqa: E501
         """list_workflow_ids  # noqa: E501
 
+        Fetch an existing workflow definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_workflow_ids(project, domain, async_req=True)
@@ -3599,6 +3650,7 @@ class AdminServiceApi(object):
     def list_workflow_ids_with_http_info(self, project, domain, **kwargs):  # noqa: E501
         """list_workflow_ids  # noqa: E501
 
+        Fetch an existing workflow definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_workflow_ids_with_http_info(project, domain, async_req=True)
@@ -3694,6 +3746,7 @@ class AdminServiceApi(object):
     def list_workflows(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """list_workflows  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_workflows(id_project, id_domain, id_name, async_req=True)
@@ -3722,6 +3775,7 @@ class AdminServiceApi(object):
     def list_workflows_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """list_workflows  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_workflows_with_http_info(id_project, id_domain, id_name, async_req=True)
@@ -3827,6 +3881,7 @@ class AdminServiceApi(object):
     def list_workflows2(self, id_project, id_domain, **kwargs):  # noqa: E501
         """list_workflows2  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_workflows2(id_project, id_domain, async_req=True)
@@ -3855,6 +3910,7 @@ class AdminServiceApi(object):
     def list_workflows2_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
         """list_workflows2  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.list_workflows2_with_http_info(id_project, id_domain, async_req=True)
@@ -3956,7 +4012,7 @@ class AdminServiceApi(object):
     def register_project(self, body, **kwargs):  # noqa: E501
         """register_project  # noqa: E501
 
-        Register a project along with valid domains  # noqa: E501
+        Register a project.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.register_project(body, async_req=True)
@@ -3978,7 +4034,7 @@ class AdminServiceApi(object):
     def register_project_with_http_info(self, body, **kwargs):  # noqa: E501
         """register_project  # noqa: E501
 
-        Register a project along with valid domains  # noqa: E501
+        Register a project.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.register_project_with_http_info(body, async_req=True)
@@ -4055,7 +4111,7 @@ class AdminServiceApi(object):
     def relaunch_execution(self, body, **kwargs):  # noqa: E501
         """relaunch_execution  # noqa: E501
 
-        Relaunch a workflow execution  # noqa: E501
+        Relaunch a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.relaunch_execution(body, async_req=True)
@@ -4077,7 +4133,7 @@ class AdminServiceApi(object):
     def relaunch_execution_with_http_info(self, body, **kwargs):  # noqa: E501
         """relaunch_execution  # noqa: E501
 
-        Relaunch a workflow execution  # noqa: E501
+        Relaunch a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.relaunch_execution_with_http_info(body, async_req=True)
@@ -4154,6 +4210,7 @@ class AdminServiceApi(object):
     def terminate_execution(self, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """terminate_execution  # noqa: E501
 
+        Terminate the active workflow execution specified in the request.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.terminate_execution(id_project, id_domain, id_name, body, async_req=True)
@@ -4178,6 +4235,7 @@ class AdminServiceApi(object):
     def terminate_execution_with_http_info(self, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """terminate_execution  # noqa: E501
 
+        Terminate the active workflow execution specified in the request.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.terminate_execution_with_http_info(id_project, id_domain, id_name, body, async_req=True)
@@ -4275,6 +4333,7 @@ class AdminServiceApi(object):
     def update_launch_plan(self, id_project, id_domain, id_name, id_version, body, **kwargs):  # noqa: E501
         """update_launch_plan  # noqa: E501
 
+        Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.update_launch_plan(id_project, id_domain, id_name, id_version, body, async_req=True)
@@ -4300,6 +4359,7 @@ class AdminServiceApi(object):
     def update_launch_plan_with_http_info(self, id_project, id_domain, id_name, id_version, body, **kwargs):  # noqa: E501
         """update_launch_plan  # noqa: E501
 
+        Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.update_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, body, async_req=True)

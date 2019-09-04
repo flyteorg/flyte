@@ -13,8 +13,9 @@ from flyteidl.admin import workflow_pb2 as flyteidl_dot_admin_dot_workflow__pb2
 
 
 class AdminServiceStub(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """The following defines an RPC service that is also served over HTTP via grpc-gateway.
+  Standard response codes for both are defined here: https://github.com/grpc-ecosystem/grpc-gateway/blob/master/runtime/errors.go
+  """
 
   def __init__(self, channel):
     """Constructor.
@@ -190,8 +191,9 @@ class AdminServiceStub(object):
 
 
 class AdminServiceServicer(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """The following defines an RPC service that is also served over HTTP via grpc-gateway.
+  Standard response codes for both are defined here: https://github.com/grpc-ecosystem/grpc-gateway/blob/master/runtime/errors.go
+  """
 
   def CreateTask(self, request, context):
     # missing associated documentation comment in .proto file

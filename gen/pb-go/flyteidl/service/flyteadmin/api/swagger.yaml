@@ -15,6 +15,8 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Retrieve the active launch plan version specified by input request\
+        \ filters."
       operationId: "GetActiveLaunchPlan"
       parameters:
       - name: "id.project"
@@ -47,6 +49,8 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch the active launch plan versions specified by input request\
+        \ filters."
       operationId: "ListActiveLaunchPlans"
       parameters:
       - name: "project"
@@ -106,6 +110,7 @@ paths:
   : get:
       tags:
       - "AdminService"
+      description: "Fetch child node executions launched by the specified task execution."
       operationId: "ListNodeExecutionsForTask"
       parameters:
       - name: "task_execution_id.node_execution_id.execution_id.project"
@@ -230,6 +235,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Retrieve input and output data from an existing workflow execution."
       operationId: "GetExecutionData"
       parameters:
       - name: "id.project"
@@ -260,6 +266,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Retrieve input and output data from an existing node execution."
       operationId: "GetNodeExecutionData"
       parameters:
       - name: "id.execution_id.project"
@@ -295,6 +302,7 @@ paths:
   : get:
       tags:
       - "AdminService"
+      description: "Retrieve input and output data from an existing task execution."
       operationId: "GetTaskExecutionData"
       parameters:
       - name: "id.node_execution_id.execution_id.project"
@@ -375,6 +383,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      description: "Create a node execution event recording a phase transition."
       operationId: "CreateNodeEvent"
       parameters:
       - in: "body"
@@ -392,6 +401,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      description: "Create a task execution event recording a phase transition."
       operationId: "CreateTaskEvent"
       parameters:
       - in: "body"
@@ -409,6 +419,7 @@ paths:
     post:
       tags:
       - "AdminService"
+      description: "Create a workflow execution event recording a phase transition."
       operationId: "CreateWorkflowEvent"
       parameters:
       - in: "body"
@@ -426,7 +437,7 @@ paths:
     post:
       tags:
       - "AdminService"
-      description: "Create a workflow execution"
+      description: "Create a workflow execution."
       operationId: "CreateExecution"
       parameters:
       - in: "body"
@@ -440,18 +451,11 @@ paths:
           description: ""
           schema:
             $ref: "#/definitions/adminExecutionCreateResponse"
-        400:
-          description: "Returned for bad request that may have failed validation."
-          schema: {}
-        409:
-          description: "Returned for a request that references an identical entity\
-            \ that has already been registered."
-          schema: {}
   /api/v1/executions/relaunch:
     post:
       tags:
       - "AdminService"
-      description: "Relaunch a workflow execution"
+      description: "Relaunch a workflow execution."
       operationId: "RelaunchExecution"
       parameters:
       - in: "body"
@@ -465,17 +469,11 @@ paths:
           description: ""
           schema:
             $ref: "#/definitions/adminExecutionCreateResponse"
-        400:
-          description: "Returned for bad request that may have failed validation."
-          schema: {}
-        409:
-          description: "Returned for a request that references an identical entity\
-            \ that has already been registered."
-          schema: {}
   /api/v1/executions/{id.project}/{id.domain}:
     get:
       tags:
       - "AdminService"
+      description: "Fetch existing workflow executions matching input filters."
       operationId: "ListExecutions"
       parameters:
       - name: "id.project"
@@ -553,6 +551,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Retrieve an existing workflow execution."
       operationId: "GetExecution"
       parameters:
       - name: "id.project"
@@ -582,6 +581,7 @@ paths:
     delete:
       tags:
       - "AdminService"
+      description: "Terminate the active workflow execution specified in the request."
       operationId: "TerminateExecution"
       parameters:
       - name: "id.project"
@@ -618,6 +618,8 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch existing launch plan definition identifiers matching input\
+        \ filters."
       operationId: "ListLaunchPlanIds"
       parameters:
       - name: "project"
@@ -677,7 +679,7 @@ paths:
     post:
       tags:
       - "AdminService"
-      description: "Create and register a launch plan definition"
+      description: "Create and register a launch plan definition."
       operationId: "CreateLaunchPlan"
       parameters:
       - in: "body"
@@ -702,6 +704,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch existing launch plan definitions matching input filters."
       operationId: "ListLaunchPlans2"
       parameters:
       - name: "id.project"
@@ -779,6 +782,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch existing launch plan definitions matching input filters."
       operationId: "ListLaunchPlans"
       parameters:
       - name: "id.project"
@@ -855,6 +859,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Retrieve an existing launch plan definition."
       operationId: "GetLaunchPlan"
       parameters:
       - name: "id.project"
@@ -904,6 +909,15 @@ paths:
     put:
       tags:
       - "AdminService"
+      description: "Update the status of an existing launch plan definition. At most\
+        \ one launch plan version for a given {project, domain, name} can be active\
+        \ at a time. If this call sets a launch plan to active and existing version\
+        \ is already active, the result of this call will be that the formerly active\
+        \ launch plan will be made inactive and specified launch plan in this request\
+        \ will be made active. In the event that the formerly active launch plan had\
+        \ a schedule associated it with it, this schedule will be disabled. If the\
+        \ reference launch plan in this request is being set to active and has a schedule\
+        \ associated with it, the schedule will be enabled."
       operationId: "UpdateLaunchPlan"
       parameters:
       - name: "id.project"
@@ -946,6 +960,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Retrieve an existing node execution."
       operationId: "GetNodeExecution"
       parameters:
       - name: "id.execution_id.project"
@@ -981,6 +996,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch existing node executions matching input filters."
       operationId: "ListNodeExecutions"
       parameters:
       - name: "workflow_execution_id.project"
@@ -1055,6 +1071,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch registered projects."
       operationId: "ListProjects"
       parameters: []
       responses:
@@ -1065,7 +1082,7 @@ paths:
     post:
       tags:
       - "AdminService"
-      description: "Register a project along with valid domains"
+      description: "Register a project."
       operationId: "RegisterProject"
       parameters:
       - in: "body"
@@ -1079,16 +1096,11 @@ paths:
           description: ""
           schema:
             $ref: "#/definitions/adminProjectRegisterResponse"
-        201:
-          description: "Returned for successful registration."
-          schema: {}
-        400:
-          description: "Returned for bad request that may have failed validation."
-          schema: {}
   ? /api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}
   : get:
       tags:
       - "AdminService"
+      description: "Retrieve an existing task execution."
       operationId: "GetTaskExecution"
       parameters:
       - name: "id.node_execution_id.execution_id.project"
@@ -1169,6 +1181,7 @@ paths:
   : get:
       tags:
       - "AdminService"
+      description: "Fetch existing task executions matching input filters."
       operationId: "ListTaskExecutions"
       parameters:
       - name: "node_execution_id.execution_id.project"
@@ -1248,6 +1261,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch existing task definition identifiers matching input filters."
       operationId: "ListTaskIds"
       parameters:
       - name: "project"
@@ -1307,7 +1321,7 @@ paths:
     post:
       tags:
       - "AdminService"
-      description: "Create and register a task definition"
+      description: "Create and register a task definition."
       operationId: "CreateTask"
       parameters:
       - in: "body"
@@ -1332,6 +1346,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch existing task definitions matching input filters."
       operationId: "ListTasks2"
       parameters:
       - name: "id.project"
@@ -1409,6 +1424,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch existing task definitions matching input filters."
       operationId: "ListTasks"
       parameters:
       - name: "id.project"
@@ -1485,6 +1501,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Retrieve an existing task definition."
       operationId: "GetTask"
       parameters:
       - name: "id.project"
@@ -1535,6 +1552,8 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch an existing workflow definition identifiers matching input\
+        \ filters."
       operationId: "ListWorkflowIds"
       parameters:
       - name: "project"
@@ -1594,7 +1613,7 @@ paths:
     post:
       tags:
       - "AdminService"
-      description: "Create and register a workflow definition"
+      description: "Create and register a workflow definition."
       operationId: "CreateWorkflow"
       parameters:
       - in: "body"
@@ -1619,6 +1638,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch existing workflow definitions matching input filters."
       operationId: "ListWorkflows2"
       parameters:
       - name: "id.project"
@@ -1696,6 +1716,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Fetch existing workflow definitions matching input filters."
       operationId: "ListWorkflows"
       parameters:
       - name: "id.project"
@@ -1772,6 +1793,7 @@ paths:
     get:
       tags:
       - "AdminService"
+      description: "Retrieve an existing workflow definition."
       operationId: "GetWorkflow"
       parameters:
       - name: "id.project"

@@ -28,7 +28,7 @@ type AdminServiceApiService service
 
 /* 
 AdminServiceApiService
-Create a workflow execution
+Create a workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
@@ -110,28 +110,6 @@ func (a *AdminServiceApiService) CreateExecution(ctx context.Context, body Admin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
-		if localVarHttpResponse.StatusCode == 400 {
-			var v interface{}
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
-				return localVarReturnValue, localVarHttpResponse, newErr
-		}
-		
-		if localVarHttpResponse.StatusCode == 409 {
-			var v interface{}
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
-				return localVarReturnValue, localVarHttpResponse, newErr
-		}
-		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
@@ -140,7 +118,7 @@ func (a *AdminServiceApiService) CreateExecution(ctx context.Context, body Admin
 
 /* 
 AdminServiceApiService
-Create and register a launch plan definition
+Create and register a launch plan definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
@@ -252,6 +230,7 @@ func (a *AdminServiceApiService) CreateLaunchPlan(ctx context.Context, body Admi
 
 /* 
 AdminServiceApiService
+Create a node execution event recording a phase transition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
@@ -341,7 +320,7 @@ func (a *AdminServiceApiService) CreateNodeEvent(ctx context.Context, body Admin
 
 /* 
 AdminServiceApiService
-Create and register a task definition
+Create and register a task definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
@@ -453,6 +432,7 @@ func (a *AdminServiceApiService) CreateTask(ctx context.Context, body AdminTaskC
 
 /* 
 AdminServiceApiService
+Create a task execution event recording a phase transition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
@@ -542,7 +522,7 @@ func (a *AdminServiceApiService) CreateTaskEvent(ctx context.Context, body Admin
 
 /* 
 AdminServiceApiService
-Create and register a workflow definition
+Create and register a workflow definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
@@ -654,6 +634,7 @@ func (a *AdminServiceApiService) CreateWorkflow(ctx context.Context, body AdminW
 
 /* 
 AdminServiceApiService
+Create a workflow execution event recording a phase transition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
@@ -743,6 +724,7 @@ func (a *AdminServiceApiService) CreateWorkflowEvent(ctx context.Context, body A
 
 /* 
 AdminServiceApiService
+Retrieve the active launch plan version specified by input request filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -835,6 +817,7 @@ func (a *AdminServiceApiService) GetActiveLaunchPlan(ctx context.Context, idProj
 
 /* 
 AdminServiceApiService
+Retrieve an existing workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -927,6 +910,7 @@ func (a *AdminServiceApiService) GetExecution(ctx context.Context, idProject str
 
 /* 
 AdminServiceApiService
+Retrieve input and output data from an existing workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -1019,6 +1003,7 @@ func (a *AdminServiceApiService) GetExecutionData(ctx context.Context, idProject
 
 /* 
 AdminServiceApiService
+Retrieve an existing launch plan definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -1123,6 +1108,7 @@ func (a *AdminServiceApiService) GetLaunchPlan(ctx context.Context, idProject st
 
 /* 
 AdminServiceApiService
+Retrieve an existing node execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idExecutionIdProject Name of the project the resource belongs to.
  * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -1217,6 +1203,7 @@ func (a *AdminServiceApiService) GetNodeExecution(ctx context.Context, idExecuti
 
 /* 
 AdminServiceApiService
+Retrieve input and output data from an existing node execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idExecutionIdProject Name of the project the resource belongs to.
  * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -1311,6 +1298,7 @@ func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExe
 
 /* 
 AdminServiceApiService
+Retrieve an existing task definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -1415,6 +1403,7 @@ func (a *AdminServiceApiService) GetTask(ctx context.Context, idProject string, 
 
 /* 
 AdminServiceApiService
+Retrieve an existing task execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
  * @param idNodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -1529,6 +1518,7 @@ func (a *AdminServiceApiService) GetTaskExecution(ctx context.Context, idNodeExe
 
 /* 
 AdminServiceApiService
+Retrieve input and output data from an existing task execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
  * @param idNodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -1643,6 +1633,7 @@ func (a *AdminServiceApiService) GetTaskExecutionData(ctx context.Context, idNod
 
 /* 
 AdminServiceApiService
+Retrieve an existing workflow definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -1747,6 +1738,7 @@ func (a *AdminServiceApiService) GetWorkflow(ctx context.Context, idProject stri
 
 /* 
 AdminServiceApiService
+Fetch the active launch plan versions specified by input request filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Name of the project that contains the identifiers.
  * @param domain Name of the domain the identifiers belongs to within the project.
@@ -1862,6 +1854,7 @@ func (a *AdminServiceApiService) ListActiveLaunchPlans(ctx context.Context, proj
 
 /* 
 AdminServiceApiService
+Fetch existing workflow executions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -1987,6 +1980,7 @@ func (a *AdminServiceApiService) ListExecutions(ctx context.Context, idProject s
 
 /* 
 AdminServiceApiService
+Fetch existing launch plan definition identifiers matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Name of the project that contains the identifiers.
  * @param domain Name of the domain the identifiers belongs to within the project.
@@ -2102,6 +2096,7 @@ func (a *AdminServiceApiService) ListLaunchPlanIds(ctx context.Context, project 
 
 /* 
 AdminServiceApiService
+Fetch existing launch plan definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -2224,6 +2219,7 @@ func (a *AdminServiceApiService) ListLaunchPlans(ctx context.Context, idProject 
 
 /* 
 AdminServiceApiService
+Fetch existing launch plan definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -2349,6 +2345,7 @@ func (a *AdminServiceApiService) ListLaunchPlans2(ctx context.Context, idProject
 
 /* 
 AdminServiceApiService
+Fetch existing node executions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param workflowExecutionIdProject Name of the project the resource belongs to.
  * @param workflowExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -2471,6 +2468,7 @@ func (a *AdminServiceApiService) ListNodeExecutions(ctx context.Context, workflo
 
 /* 
 AdminServiceApiService
+Fetch child node executions launched by the specified task execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param taskExecutionIdNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
  * @param taskExecutionIdNodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -2610,6 +2608,7 @@ func (a *AdminServiceApiService) ListNodeExecutionsForTask(ctx context.Context, 
 
 /* 
 AdminServiceApiService
+Fetch registered projects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 
 @return AdminProjects
@@ -2696,6 +2695,7 @@ func (a *AdminServiceApiService) ListProjects(ctx context.Context) (AdminProject
 
 /* 
 AdminServiceApiService
+Fetch existing task executions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param nodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
  * @param nodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -2820,6 +2820,7 @@ func (a *AdminServiceApiService) ListTaskExecutions(ctx context.Context, nodeExe
 
 /* 
 AdminServiceApiService
+Fetch existing task definition identifiers matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Name of the project that contains the identifiers.
  * @param domain Name of the domain the identifiers belongs to within the project.
@@ -2935,6 +2936,7 @@ func (a *AdminServiceApiService) ListTaskIds(ctx context.Context, project string
 
 /* 
 AdminServiceApiService
+Fetch existing task definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -3057,6 +3059,7 @@ func (a *AdminServiceApiService) ListTasks(ctx context.Context, idProject string
 
 /* 
 AdminServiceApiService
+Fetch existing task definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -3182,6 +3185,7 @@ func (a *AdminServiceApiService) ListTasks2(ctx context.Context, idProject strin
 
 /* 
 AdminServiceApiService
+Fetch an existing workflow definition identifiers matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Name of the project that contains the identifiers.
  * @param domain Name of the domain the identifiers belongs to within the project.
@@ -3297,6 +3301,7 @@ func (a *AdminServiceApiService) ListWorkflowIds(ctx context.Context, project st
 
 /* 
 AdminServiceApiService
+Fetch existing workflow definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -3419,6 +3424,7 @@ func (a *AdminServiceApiService) ListWorkflows(ctx context.Context, idProject st
 
 /* 
 AdminServiceApiService
+Fetch existing workflow definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -3544,7 +3550,7 @@ func (a *AdminServiceApiService) ListWorkflows2(ctx context.Context, idProject s
 
 /* 
 AdminServiceApiService
-Register a project along with valid domains
+Register a project.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
@@ -3626,28 +3632,6 @@ func (a *AdminServiceApiService) RegisterProject(ctx context.Context, body Admin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
-		if localVarHttpResponse.StatusCode == 201 {
-			var v interface{}
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
-				return localVarReturnValue, localVarHttpResponse, newErr
-		}
-		
-		if localVarHttpResponse.StatusCode == 400 {
-			var v interface{}
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
-				return localVarReturnValue, localVarHttpResponse, newErr
-		}
-		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
@@ -3656,7 +3640,7 @@ func (a *AdminServiceApiService) RegisterProject(ctx context.Context, body Admin
 
 /* 
 AdminServiceApiService
-Relaunch a workflow execution
+Relaunch a workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
@@ -3738,28 +3722,6 @@ func (a *AdminServiceApiService) RelaunchExecution(ctx context.Context, body Adm
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
-		if localVarHttpResponse.StatusCode == 400 {
-			var v interface{}
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
-				return localVarReturnValue, localVarHttpResponse, newErr
-		}
-		
-		if localVarHttpResponse.StatusCode == 409 {
-			var v interface{}
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
-				return localVarReturnValue, localVarHttpResponse, newErr
-		}
-		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
@@ -3768,6 +3730,7 @@ func (a *AdminServiceApiService) RelaunchExecution(ctx context.Context, body Adm
 
 /* 
 AdminServiceApiService
+Terminate the active workflow execution specified in the request.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -3863,6 +3826,7 @@ func (a *AdminServiceApiService) TerminateExecution(ctx context.Context, idProje
 
 /* 
 AdminServiceApiService
+Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.

@@ -17,6 +17,7 @@
   "paths": {
     "/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "description": "Retrieve the active launch plan version specified by input request filters.",
         "operationId": "GetActiveLaunchPlan",
         "responses": {
           "200": {
@@ -56,6 +57,7 @@
     },
     "/api/v1/active_launch_plans/{project}/{domain}": {
       "get": {
+        "description": "Fetch the active launch plan versions specified by input request filters.",
         "operationId": "ListActiveLaunchPlans",
         "responses": {
           "200": {
@@ -122,6 +124,7 @@
     },
     "/api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
       "get": {
+        "description": "Fetch child node executions launched by the specified task execution.",
         "operationId": "ListNodeExecutionsForTask",
         "responses": {
           "200": {
@@ -257,6 +260,7 @@
     },
     "/api/v1/data/executions/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "description": "Retrieve input and output data from an existing workflow execution.",
         "operationId": "GetExecutionData",
         "responses": {
           "200": {
@@ -296,6 +300,7 @@
     },
     "/api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
       "get": {
+        "description": "Retrieve input and output data from an existing node execution.",
         "operationId": "GetNodeExecutionData",
         "responses": {
           "200": {
@@ -341,6 +346,7 @@
     },
     "/api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
+        "description": "Retrieve input and output data from an existing task execution.",
         "operationId": "GetTaskExecutionData",
         "responses": {
           "200": {
@@ -435,6 +441,7 @@
     },
     "/api/v1/events/nodes": {
       "post": {
+        "description": "Create a node execution event recording a phase transition.",
         "operationId": "CreateNodeEvent",
         "responses": {
           "200": {
@@ -461,6 +468,7 @@
     },
     "/api/v1/events/tasks": {
       "post": {
+        "description": "Create a task execution event recording a phase transition.",
         "operationId": "CreateTaskEvent",
         "responses": {
           "200": {
@@ -487,6 +495,7 @@
     },
     "/api/v1/events/workflows": {
       "post": {
+        "description": "Create a workflow execution event recording a phase transition.",
         "operationId": "CreateWorkflowEvent",
         "responses": {
           "200": {
@@ -513,7 +522,7 @@
     },
     "/api/v1/executions": {
       "post": {
-        "description": "Create a workflow execution",
+        "description": "Create a workflow execution.",
         "operationId": "CreateExecution",
         "responses": {
           "200": {
@@ -521,14 +530,6 @@
             "schema": {
               "$ref": "#/definitions/adminExecutionCreateResponse"
             }
-          },
-          "400": {
-            "description": "Returned for bad request that may have failed validation.",
-            "schema": {}
-          },
-          "409": {
-            "description": "Returned for a request that references an identical entity that has already been registered.",
-            "schema": {}
           }
         },
         "parameters": [
@@ -548,7 +549,7 @@
     },
     "/api/v1/executions/relaunch": {
       "post": {
-        "description": "Relaunch a workflow execution",
+        "description": "Relaunch a workflow execution.",
         "operationId": "RelaunchExecution",
         "responses": {
           "200": {
@@ -556,14 +557,6 @@
             "schema": {
               "$ref": "#/definitions/adminExecutionCreateResponse"
             }
-          },
-          "400": {
-            "description": "Returned for bad request that may have failed validation.",
-            "schema": {}
-          },
-          "409": {
-            "description": "Returned for a request that references an identical entity that has already been registered.",
-            "schema": {}
           }
         },
         "parameters": [
@@ -583,6 +576,7 @@
     },
     "/api/v1/executions/{id.project}/{id.domain}": {
       "get": {
+        "description": "Fetch existing workflow executions matching input filters.",
         "operationId": "ListExecutions",
         "responses": {
           "200": {
@@ -663,6 +657,7 @@
     },
     "/api/v1/executions/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "description": "Retrieve an existing workflow execution.",
         "operationId": "GetExecution",
         "responses": {
           "200": {
@@ -700,6 +695,7 @@
         ]
       },
       "delete": {
+        "description": "Terminate the active workflow execution specified in the request.",
         "operationId": "TerminateExecution",
         "responses": {
           "200": {
@@ -747,6 +743,7 @@
     },
     "/api/v1/launch_plan_ids/{project}/{domain}": {
       "get": {
+        "description": "Fetch existing launch plan definition identifiers matching input filters.",
         "operationId": "ListLaunchPlanIds",
         "responses": {
           "200": {
@@ -813,7 +810,7 @@
     },
     "/api/v1/launch_plans": {
       "post": {
-        "description": "Create and register a launch plan definition",
+        "description": "Create and register a launch plan definition.",
         "operationId": "CreateLaunchPlan",
         "responses": {
           "200": {
@@ -848,6 +845,7 @@
     },
     "/api/v1/launch_plans/{id.project}/{id.domain}": {
       "get": {
+        "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "ListLaunchPlans2",
         "responses": {
           "200": {
@@ -928,6 +926,7 @@
     },
     "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "ListLaunchPlans",
         "responses": {
           "200": {
@@ -1008,6 +1007,7 @@
     },
     "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
+        "description": "Retrieve an existing launch plan definition.",
         "operationId": "GetLaunchPlan",
         "responses": {
           "200": {
@@ -1066,6 +1066,7 @@
         ]
       },
       "put": {
+        "description": "Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.",
         "operationId": "UpdateLaunchPlan",
         "responses": {
           "200": {
@@ -1120,6 +1121,7 @@
     },
     "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
       "get": {
+        "description": "Retrieve an existing node execution.",
         "operationId": "GetNodeExecution",
         "responses": {
           "200": {
@@ -1165,6 +1167,7 @@
     },
     "/api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "get": {
+        "description": "Fetch existing node executions matching input filters.",
         "operationId": "ListNodeExecutions",
         "responses": {
           "200": {
@@ -1245,6 +1248,7 @@
     },
     "/api/v1/projects": {
       "get": {
+        "description": "Fetch registered projects.",
         "operationId": "ListProjects",
         "responses": {
           "200": {
@@ -1259,7 +1263,7 @@
         ]
       },
       "post": {
-        "description": "Register a project along with valid domains",
+        "description": "Register a project.",
         "operationId": "RegisterProject",
         "responses": {
           "200": {
@@ -1267,14 +1271,6 @@
             "schema": {
               "$ref": "#/definitions/adminProjectRegisterResponse"
             }
-          },
-          "201": {
-            "description": "Returned for successful registration.",
-            "schema": {}
-          },
-          "400": {
-            "description": "Returned for bad request that may have failed validation.",
-            "schema": {}
           }
         },
         "parameters": [
@@ -1294,6 +1290,7 @@
     },
     "/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
+        "description": "Retrieve an existing task execution.",
         "operationId": "GetTaskExecution",
         "responses": {
           "200": {
@@ -1388,6 +1385,7 @@
     },
     "/api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}": {
       "get": {
+        "description": "Fetch existing task executions matching input filters.",
         "operationId": "ListTaskExecutions",
         "responses": {
           "200": {
@@ -1474,6 +1472,7 @@
     },
     "/api/v1/task_ids/{project}/{domain}": {
       "get": {
+        "description": "Fetch existing task definition identifiers matching input filters.",
         "operationId": "ListTaskIds",
         "responses": {
           "200": {
@@ -1540,7 +1539,7 @@
     },
     "/api/v1/tasks": {
       "post": {
-        "description": "Create and register a task definition",
+        "description": "Create and register a task definition.",
         "operationId": "CreateTask",
         "responses": {
           "200": {
@@ -1575,6 +1574,7 @@
     },
     "/api/v1/tasks/{id.project}/{id.domain}": {
       "get": {
+        "description": "Fetch existing task definitions matching input filters.",
         "operationId": "ListTasks2",
         "responses": {
           "200": {
@@ -1655,6 +1655,7 @@
     },
     "/api/v1/tasks/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "description": "Fetch existing task definitions matching input filters.",
         "operationId": "ListTasks",
         "responses": {
           "200": {
@@ -1735,6 +1736,7 @@
     },
     "/api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
+        "description": "Retrieve an existing task definition.",
         "operationId": "GetTask",
         "responses": {
           "200": {
@@ -1795,6 +1797,7 @@
     },
     "/api/v1/workflow_ids/{project}/{domain}": {
       "get": {
+        "description": "Fetch an existing workflow definition identifiers matching input filters.",
         "operationId": "ListWorkflowIds",
         "responses": {
           "200": {
@@ -1861,7 +1864,7 @@
     },
     "/api/v1/workflows": {
       "post": {
-        "description": "Create and register a workflow definition",
+        "description": "Create and register a workflow definition.",
         "operationId": "CreateWorkflow",
         "responses": {
           "200": {
@@ -1896,6 +1899,7 @@
     },
     "/api/v1/workflows/{id.project}/{id.domain}": {
       "get": {
+        "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "ListWorkflows2",
         "responses": {
           "200": {
@@ -1976,6 +1980,7 @@
     },
     "/api/v1/workflows/{id.project}/{id.domain}/{id.name}": {
       "get": {
+        "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "ListWorkflows",
         "responses": {
           "200": {
@@ -2056,6 +2061,7 @@
     },
     "/api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
+        "description": "Retrieve an existing workflow definition.",
         "operationId": "GetWorkflow",
         "responses": {
           "200": {
