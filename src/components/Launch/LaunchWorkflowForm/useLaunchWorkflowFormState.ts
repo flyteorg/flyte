@@ -9,11 +9,14 @@ import {
     FilterOperationName,
     LaunchPlan,
     LiteralType,
+    SortDirection,
     Workflow,
     WorkflowExecutionIdentifier,
-    WorkflowId
+    WorkflowId,
+    workflowSortFields
 } from 'models';
 import { useEffect, useMemo, useState } from 'react';
+import { history, Routes } from 'routes';
 import { simpleTypeToInputType } from './constants';
 import { SearchableSelectorOption } from './SearchableSelector';
 import {
@@ -139,10 +142,17 @@ function useFormInputsState(parsedInputs: ParsedInput[]): FormInputsState {
     };
 }
 
-function useWorkflowSelectorOptions(workflows: Workflow[]) {
-    return useMemo(() => workflowsToSearchableSelectorOptions(workflows), [
-        workflows
-    ]);
+export function useWorkflowSelectorOptions(workflows: Workflow[]) {
+    return useMemo(
+        () => {
+            const options = workflowsToSearchableSelectorOptions(workflows);
+            if (options.length > 0) {
+                options[0].description = 'latest';
+            }
+            return options;
+        },
+        [workflows]
+    );
 }
 
 function useLaunchPlanSelectorOptions(launchPlans: LaunchPlan[]) {
@@ -193,9 +203,17 @@ function useLaunchPlansForWorkflow(workflowId: WorkflowId | null = null) {
  * definitions, current input values, and errors.
  */
 export function useLaunchWorkflowFormState({
+    onClose,
     workflowId
 }: LaunchWorkflowFormProps): LaunchWorkflowFormState {
-    const workflows = useWorkflows(workflowId, { limit: 10 });
+    const { createWorkflowExecution } = useAPIContext();
+    const workflows = useWorkflows(workflowId, {
+        limit: 10,
+        sort: {
+            key: workflowSortFields.createdAt,
+            direction: SortDirection.DESCENDING
+        }
+    });
     const workflowSelectorOptions = useWorkflowSelectorOptions(workflows.value);
     const [selectedWorkflow, setWorkflow] = useState<
         SearchableSelectorOption<WorkflowId>
@@ -213,6 +231,9 @@ export function useLaunchWorkflowFormState({
     const [selectedLaunchPlan, setLaunchPlan] = useState<
         SearchableSelectorOption<LaunchPlan>
     >();
+    const launchPlanData = selectedLaunchPlan
+        ? selectedLaunchPlan.data
+        : undefined;
 
     const workflowOptionsLoadingState = waitForAllFetchables([workflows]);
     const launchPlanOptionsLoadingState = waitForAllFetchables([launchPlans]);
@@ -230,12 +251,24 @@ export function useLaunchWorkflowFormState({
         setWorkflow(newWorkflow);
     };
 
-    const launchWorkflow = () => {
-        const literalMap = convertFormInputsToLiteralMap(inputs);
-        console.log('launch', literalMap);
-        return new Promise<WorkflowExecutionIdentifier>((resolve, reject) => {
-            setTimeout(() => reject('Launching is not implemented'), 1500);
+    const launchWorkflow = async () => {
+        if (!launchPlanData) {
+            throw new Error('Attempting to launch with no LaunchPlan');
+        }
+        const launchPlanId = launchPlanData.id;
+        const { domain, project } = workflowId;
+        const response = await createWorkflowExecution({
+            domain,
+            launchPlanId,
+            project,
+            inputs: convertFormInputsToLiteralMap(inputs)
         });
+        const newExecutionId = response.id as WorkflowExecutionIdentifier;
+        if (!newExecutionId) {
+            throw new Error('API Response did not include new execution id');
+        }
+        history.push(Routes.ExecutionDetails.makeUrl(newExecutionId));
+        return newExecutionId;
     };
 
     const submissionState = useFetchableData<WorkflowExecutionIdentifier>({
@@ -246,19 +279,27 @@ export function useLaunchWorkflowFormState({
     });
 
     const onSubmit = submissionState.fetch;
-    const onCancel = () => {
-        console.log('cancel');
-    };
+    const onCancel = onClose;
 
     useEffect(
         () => {
             const parsedInputs =
-                selectedLaunchPlan && workflow.hasLoaded
-                    ? getInputs(workflow.value, selectedLaunchPlan.data)
+                launchPlanData && workflow.hasLoaded
+                    ? getInputs(workflow.value, launchPlanData)
                     : [];
             setParsedInputs(parsedInputs);
         },
-        [workflow.hasLoaded, workflow.value, selectedLaunchPlan]
+        [workflow.hasLoaded, workflow.value, launchPlanData]
+    );
+
+    // Once workflows have loaded, attempt to select the first option
+    useEffect(
+        () => {
+            if (workflowSelectorOptions.length > 0 && !selectedWorkflow) {
+                setWorkflow(workflowSelectorOptions[0]);
+            }
+        },
+        [workflows.value]
     );
 
     // Once launch plans have been loaded, attempt to select the default

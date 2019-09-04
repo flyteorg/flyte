@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginTop: theme.spacing(0.5),
         position: 'absolute',
         right: 0,
-        zIndex: 2
+        zIndex: theme.zIndex.tooltip
     },
     selectedItem: {
         fontWeight: 'bold'

@@ -1,9 +1,15 @@
 import { FetchableData, MultiFetchableState } from 'components/hooks';
-import { LaunchPlan, WorkflowExecutionIdentifier, WorkflowId } from 'models';
+import {
+    LaunchPlan,
+    NamedEntityIdentifier,
+    WorkflowExecutionIdentifier,
+    WorkflowId
+} from 'models';
 import { SearchableSelectorOption } from './SearchableSelector';
 
 export interface LaunchWorkflowFormProps {
-    workflowId: WorkflowId;
+    workflowId: NamedEntityIdentifier;
+    onClose(): void;
 }
 
 export interface LaunchWorkflowFormState {
