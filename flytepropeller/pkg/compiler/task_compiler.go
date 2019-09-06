@@ -1,0 +1,98 @@
+package compiler
+
+import (
+	"fmt"
+
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytepropeller/pkg/compiler/common"
+	"github.com/lyft/flytepropeller/pkg/compiler/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
+)
+
+func validateResource(resourceName core.Resources_ResourceName, resourceVal string, errs errors.CompileErrors) (ok bool) {
+	if _, err := resource.ParseQuantity(resourceVal); err != nil {
+		errs.Collect(errors.NewUnrecognizedValueErr(fmt.Sprintf("resources.%v", resourceName), resourceVal))
+		return true
+	}
+	return false
+}
+
+func validateKnownResources(resources []*core.Resources_ResourceEntry, errs errors.CompileErrors) (ok bool) {
+	for _, r := range resources {
+		validateResource(r.Name, r.Value, errs.NewScope())
+	}
+
+	return !errs.HasErrors()
+}
+
+func validateResources(resources *core.Resources, errs errors.CompileErrors) (ok bool) {
+	// Validate known resource keys.
+	validateKnownResources(resources.Requests, errs.NewScope())
+	validateKnownResources(resources.Limits, errs.NewScope())
+
+	return !errs.HasErrors()
+}
+
+func validateContainerCommand(task *core.TaskTemplate, errs errors.CompileErrors) (ok bool) {
+	if task.Interface == nil {
+		// Nothing to validate.
+		return
+	}
+	hasInputs := task.Interface.Inputs != nil && len(task.Interface.GetInputs().Variables) > 0
+	hasOutputs := task.Interface.Outputs != nil && len(task.Interface.GetOutputs().Variables) > 0
+	if !(hasInputs || hasOutputs) {
+		// Nothing to validate.
+		return
+	}
+	if task.GetContainer().Command == nil && task.GetContainer().Args == nil {
+		// When an interface with inputs or outputs is defined, the container command + args together must not be empty.
+		errs.Collect(errors.NewValueRequiredErr("container", "command"))
+	}
+
+	return !errs.HasErrors()
+}
+
+func validateContainer(task *core.TaskTemplate, errs errors.CompileErrors) (ok bool) {
+	if task.GetContainer() == nil {
+		errs.Collect(errors.NewValueRequiredErr("root", "container"))
+		return
+	}
+
+	validateContainerCommand(task, errs)
+
+	container := task.GetContainer()
+	if container.Image == "" {
+		errs.Collect(errors.NewValueRequiredErr("container", "image"))
+	}
+
+	if container.Resources != nil {
+		validateResources(container.Resources, errs.NewScope())
+	}
+
+	return !errs.HasErrors()
+}
+
+func compileTaskInternal(task *core.TaskTemplate, errs errors.CompileErrors) (common.Task, bool) {
+	if task.Id == nil {
+		errs.Collect(errors.NewValueRequiredErr("root", "Id"))
+	}
+
+	switch task.GetTarget().(type) {
+	case *core.TaskTemplate_Container:
+		validateContainer(task, errs.NewScope())
+	}
+
+	return taskBuilder{flyteTask: task}, !errs.HasErrors()
+}
+
+// Task compiler compiles a given Task into an executable Task. It validates all required parameters and ensures a Task
+// is well-formed.
+func CompileTask(task *core.TaskTemplate) (*core.CompiledTask, error) {
+	errs := errors.NewCompileErrors()
+	t, _ := compileTaskInternal(task, errs.NewScope())
+	if errs.HasErrors() {
+		return nil, errs
+	}
+
+	return &core.CompiledTask{Template: t.GetCoreTask()}, nil
+}

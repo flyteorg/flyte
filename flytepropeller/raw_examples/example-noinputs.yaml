@@ -1,0 +1,41 @@
+apiVersion: flyte.lyft.com/v1alpha1
+kind: FlyteWorkflow
+metadata:
+  name: test-fg
+  namespace: default
+tasks:
+  foo:
+    id: foo
+    # Enums are ints
+    category: 0
+    type: container
+    metadata:
+      name: foo
+      runtime:
+        # Enums are ints
+        type: 0
+        version: "1.18.0"
+        flavor: python
+      discoverable: true
+      description: "Test Task"
+    container:
+      image: alpine
+      command: ["ls", "${{inputs}}", "${{outputs}}"]
+spec:
+  id: test-wf
+  nodes:
+    start:
+      id: start
+      kind: start
+    foo1:
+      id: foo1
+      kind: task
+      resources:
+        requests:
+          cpu: 250m
+        limits:
+          cpu: 250m
+      task_ref: foo
+  connections:
+    start:
+      - foo1

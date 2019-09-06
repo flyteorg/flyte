@@ -1,0 +1,102 @@
+# Gopkg.toml example
+#
+# Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
+# for detailed Gopkg.toml documentation.
+#
+# required = ["github.com/user/thing/cmd/thing"]
+# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+#
+# [[constraint]]
+#   name = "github.com/user/project"
+#   version = "1.0.0"
+#
+# [[constraint]]
+#   name = "github.com/user/project2"
+#   branch = "dev"
+#   source = "github.com/myfork/project2"
+#
+# [[override]]
+#   name = "github.com/x/y"
+#   version = "2.4.0"
+#
+# [prune]
+#   non-go = false
+#   go-tests = true
+#   unused-packages = true
+
+required = [
+  "k8s.io/code-generator/cmd/defaulter-gen",
+  "k8s.io/code-generator/cmd/deepcopy-gen",
+  "k8s.io/code-generator/cmd/conversion-gen",
+  "k8s.io/code-generator/cmd/client-gen",
+  "k8s.io/code-generator/cmd/lister-gen",
+  "k8s.io/code-generator/cmd/informer-gen",
+  "k8s.io/gengo/args",
+]
+
+[[constraint]]
+  name = "github.com/fatih/color"
+  version = "1.7.0"
+
+[[override]]
+  name = "contrib.go.opencensus.io/exporter/ocagent"
+  version = "0.4.x"
+
+[[constraint]]
+  name = "github.com/golang/protobuf"
+  version = "1.1.0"
+
+[[constraint]]
+  name = "github.com/lyft/flyteidl"
+  source = "https://github.com/lyft/flyteidl"
+  version = "^0.1.x"
+
+[[constraint]]
+  name = "github.com/lyft/flyteplugins"
+  source = "https://github.com/lyft/flyteplugins"
+  version = "^0.1.0"
+
+[[override]]
+  name = "github.com/lyft/flytestdlib"
+  source = "https://github.com/lyft/flytestdlib"
+  version = "^0.2.16"
+
+# Spark has a dependency on 1.11.2, so we cannot upgrade yet
+[[override]]
+  name = "k8s.io/api"
+  revision = "27b77cf22008a0bf6e510b2a500b8885805a1b68"
+  source = "https://github.com/lyft/api"
+
+[[override]]
+  name = "k8s.io/apimachinery"
+  source = "https://github.com/lyft/apimachinery"
+  revision = "695912cabb3a9c08353fbe628115867d47f56b1f"
+
+[[override]]
+  name = "k8s.io/client-go"
+  version = "kubernetes-1.13.5"
+
+[[constraint]]
+  name = "github.com/DiSiqueira/GoTree"
+  version = "2.0.3"
+
+[[override]]
+  name = "k8s.io/code-generator"
+  # revision = "6702109cc68eb6fe6350b83e14407c8d7309fd1a"
+  version = "kubernetes-1.13.5"
+
+[[override]]
+  name = "github.com/graymeta/stow"
+  revision = "903027f87de7054953efcdb8ba70d5dc02df38c7"
+
+[[override]]
+  name = "github.com/json-iterator/go"
+  version = "^1.1.5"
+
+[[override]]
+  name = "sigs.k8s.io/controller-runtime"
+  version = "=v0.1.12"
+
+[[override]]
+  branch = "master"
+  name = "golang.org/x/net"
