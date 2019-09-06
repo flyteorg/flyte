@@ -1,0 +1,38 @@
+tasks:
+- container:
+    args:
+    - testArg
+    command:
+    - execute-task
+    image: myflyteimage:latest
+  id:
+    name: task-1
+  interface:
+    inputs:
+      variables: {}
+- container:
+    args:
+    - testArg
+    command:
+    - execute-task
+    image: myflyteimage:latest
+  id:
+    name: task-2
+  interface:
+    inputs:
+      variables: {}
+workflow:
+  id:
+    name: workflow-id-123
+  interface:
+    inputs:
+      variables: {}
+  nodes:
+  - id: node-1
+    taskNode:
+      referenceId:
+        name: task-1
+  - id: node-2
+    taskNode:
+      referenceId:
+        name: task-2
