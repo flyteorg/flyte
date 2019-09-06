@@ -20,7 +20,7 @@ type stackdriverLogPlugin struct {
 func (s *stackdriverLogPlugin) GetTaskLog(podName, namespace, containerName, containerID, logName string) (core.TaskLog, error) {
 	return core.TaskLog{
 		Uri: fmt.Sprintf(
-			"https://console.cloud.google.com/logs/viewer?project=%s&angularJsUrl=%%2Flogs%%2Fviewer%%3Fproject%%3D%s&authuser=1&resource=%s&advancedFilter=logName:%s",
+			"https://console.cloud.google.com/logs/viewer?project=%s&angularJsUrl=%%2Flogs%%2Fviewer%%3Fproject%%3D%s&resource=%s&advancedFilter=logName:%s",
 			s.gcpProject,
 			s.gcpProject,
 			s.logResource,
