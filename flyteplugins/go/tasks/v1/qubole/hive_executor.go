@@ -562,6 +562,16 @@ func NewHiveTaskExecutorWithCache(ctx context.Context) (*HiveExecutor, error) {
 	return &hiveExecutor, nil
 }
 
+func NewHiveTaskExecutor(ctx context.Context, executorId string, executorClient client.QuboleClient) (*HiveExecutor, error) {
+	hiveExecutor := HiveExecutor{
+		id:             executorId,
+		secretsManager: NewSecretsManager(),
+		quboleClient:   executorClient,
+	}
+
+	return &hiveExecutor, nil
+}
+
 func init() {
 	tasksV1.RegisterLoader(func(ctx context.Context) error {
 		hiveExecutor, err := NewHiveTaskExecutorWithCache(ctx)
