@@ -49,12 +49,12 @@ required = [
 [[constraint]]
   name = "github.com/lyft/flyteidl"
   source = "https://github.com/lyft/flyteidl"
-  version = "^0.1.x"
+  version = "^0.14.x"
 
 [[constraint]]
   name = "github.com/lyft/flyteplugins"
   source = "https://github.com/lyft/flyteplugins"
-  version = "^0.1.0"
+  version = "^0.1.3"
 
 [[override]]
   name = "github.com/lyft/flytestdlib"
