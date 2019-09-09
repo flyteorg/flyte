@@ -43,6 +43,8 @@ type QuboleWorkItem struct {
 	Query string `json:"query,omitempty"`
 
 	TimeoutSec uint32 `json:"timeout,omitempty"`
+
+	JobUri string `json:"job_uri,omitempty"`
 }
 
 // This ID will be used in a process-wide cache, so it needs to be unique across all concurrent work being done by
@@ -151,7 +153,7 @@ func constructEventInfoFromQuboleWorkItems(taskCtx types.TaskContext, quboleWork
 				Name:          fmt.Sprintf("Retry: %d Status: %s [%s]",
 					taskCtx.GetTaskExecutionID().GetID().RetryAttempt, workItem.Status, workItem.CommandId),
 				MessageFormat: core.TaskLog_UNKNOWN,
-				Uri:           fmt.Sprintf(client.QuboleLogLinkFormat, workItem.CommandId),
+				Uri:           workItem.JobUri,
 			})
 		}
 	}
