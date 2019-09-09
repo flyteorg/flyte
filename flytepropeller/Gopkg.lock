@@ -448,7 +448,7 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:2b5f0e6bc8fb862fed5bccf9fbb1ab819c8b3f8a21e813fe442c06aec3bb3e86"
+  digest = "1:ef7b24655c09b19a0b397e8a58f8f15fc402b349484afad6ce1de0a8f21bb292"
   name = "github.com/lyft/flyteidl"
   packages = [
     "clients/go/admin",
@@ -466,12 +466,12 @@
     "gen/pb-go/flyteidl/service",
   ]
   pruneopts = ""
-  revision = "793b09d190148236f41ad8160b5cec9a3325c16f"
+  revision = "211b8fe8c2c1d9ab168afd078b62d4f7834171d3"
   source = "https://github.com/lyft/flyteidl"
-  version = "v0.1.0"
+  version = "v0.14.0"
 
 [[projects]]
-  digest = "1:500471ee50c4141d3523c79615cc90529b3152f8aa5924b63122df6bf201a7a0"
+  digest = "1:1f4d377eba88e89d78761ad01caa205b214aeed0db4ead48f424538c9a8f7bcf"
   name = "github.com/lyft/flyteplugins"
   packages = [
     "go/tasks",
@@ -493,9 +493,9 @@
     "go/tasks/v1/utils",
   ]
   pruneopts = ""
-  revision = "8c85a7c9f19de4df4767de329c56a7f09d0a7bbc"
+  revision = "99d622cf0f0ca5041e46aad172101536079ea22a"
   source = "https://github.com/lyft/flyteplugins"
-  version = "v0.1.0"
+  version = "v0.1.3"
 
 [[projects]]
   digest = "1:77615fd7bcfd377c5e898c41d33be827f108166691cb91257d27113ee5d08650"
