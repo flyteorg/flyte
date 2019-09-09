@@ -448,6 +448,15 @@
   version = "v1.0.2"
 
 [[projects]]
+  digest = "1:eaef68aaa87572012b236975f558582a043044c21be3fda97921c4871fb4298f"
+  name = "github.com/lyft/datacatalog"
+  packages = ["protos/gen"]
+  pruneopts = ""
+  revision = "0da0ffbb4705efd5d5ecd04ea560b35d968beb86"
+  source = "https://github.com/lyft/datacatalog"
+  version = "v0.1.0"
+
+[[projects]]
   digest = "1:ef7b24655c09b19a0b397e8a58f8f15fc402b349484afad6ce1de0a8f21bb292"
   name = "github.com/lyft/flyteidl"
   packages = [
@@ -1338,12 +1347,15 @@
     "github.com/DiSiqueira/GoTree",
     "github.com/fatih/color",
     "github.com/ghodss/yaml",
+    "github.com/gogo/protobuf/proto",
     "github.com/golang/protobuf/jsonpb",
     "github.com/golang/protobuf/proto",
     "github.com/golang/protobuf/ptypes",
     "github.com/golang/protobuf/ptypes/struct",
     "github.com/golang/protobuf/ptypes/timestamp",
+    "github.com/google/uuid",
     "github.com/grpc-ecosystem/go-grpc-middleware/retry",
+    "github.com/lyft/datacatalog/protos/gen",
     "github.com/lyft/flyteidl/clients/go/admin",
     "github.com/lyft/flyteidl/clients/go/admin/mocks",
     "github.com/lyft/flyteidl/clients/go/coreutils",
@@ -1384,6 +1396,7 @@
     "golang.org/x/time/rate",
     "google.golang.org/grpc",
     "google.golang.org/grpc/codes",
+    "google.golang.org/grpc/credentials",
     "google.golang.org/grpc/status",
     "k8s.io/api/batch/v1",
     "k8s.io/api/core/v1",
@@ -1399,6 +1412,7 @@
     "k8s.io/apimachinery/pkg/util/rand",
     "k8s.io/apimachinery/pkg/util/runtime",
     "k8s.io/apimachinery/pkg/util/sets",
+    "k8s.io/apimachinery/pkg/util/uuid",
     "k8s.io/apimachinery/pkg/util/wait",
     "k8s.io/apimachinery/pkg/watch",
     "k8s.io/client-go/discovery",

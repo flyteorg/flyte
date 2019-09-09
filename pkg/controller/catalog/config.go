@@ -21,11 +21,13 @@ type DiscoveryType = string
 const (
 	NoOpDiscoveryType   DiscoveryType = "noop"
 	LegacyDiscoveryType DiscoveryType = "legacy"
+	DataCatalogType     DiscoveryType = "datacatalog"
 )
 
 type Config struct {
-	Type     DiscoveryType `json:"type" pflag:"\"noop\",Discovery Implementation to use"`
-	Endpoint string        `json:"endpoint" pflag:"\"\", Endpoint for discovery service"`
+	Type     DiscoveryType `json:"type" pflag:"\"noop\", Catalog Implementation to use"`
+	Endpoint string        `json:"endpoint" pflag:"\"\", Endpoint for catalog service"`
+	Secure   bool          `json:"secure" pflag:"true, Connect with TSL/SSL"`
 }
 
 // Gets loaded config for Discovery

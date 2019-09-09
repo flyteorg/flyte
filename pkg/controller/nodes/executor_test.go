@@ -59,7 +59,7 @@ func init() {
 func TestSetInputsForStartNode(t *testing.T) {
 	ctx := context.Background()
 	mockStorage := createInmemoryDataStore(t, testScope.NewSubScope("f"))
-	catalogClient := catalog.NewCatalogClient(mockStorage)
+	catalogClient, _ := catalog.NewCatalogClient(ctx, mockStorage)
 	enQWf := func(workflowID v1alpha1.WorkflowID) {}
 
 	factory := createSingletonTaskExecutorFactory()
@@ -138,7 +138,7 @@ func TestNodeExecutor_TransitionToPhase(t *testing.T) {
 	memStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	catalogClient := catalog.NewCatalogClient(memStore)
+	catalogClient, _ := catalog.NewCatalogClient(ctx, memStore)
 	execIface, err := NewExecutor(ctx, memStore, enQWf, time.Second, mockEventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 	exec := execIface.(*nodeExecutor)
@@ -349,7 +349,7 @@ func TestNodeExecutor_Initialize(t *testing.T) {
 	memStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	assert.NoError(t, err)
 
-	catalogClient := catalog.NewCatalogClient(memStore)
+	catalogClient, _ := catalog.NewCatalogClient(ctx, memStore)
 
 	execIface, err := NewExecutor(ctx, memStore, enQWf, time.Second, mockEventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -368,7 +368,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseStartNodes(t *testing.T) {
 	assert.True(t, task.IsTestModeEnabled())
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
-	catalogClient := catalog.NewCatalogClient(store)
+	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
 
 	execIface, err := NewExecutor(ctx, store, enQWf, time.Second, mockEventSink,
 		launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
@@ -472,7 +472,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 	assert.True(t, task.IsTestModeEnabled())
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
-	catalogClient := catalog.NewCatalogClient(store)
+	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
 
 	execIface, err := NewExecutor(ctx, store, enQWf, time.Second, mockEventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -660,7 +660,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 	assert.True(t, task.IsTestModeEnabled())
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
-	catalogClient := catalog.NewCatalogClient(store)
+	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
 
 	execIface, err := NewExecutor(ctx, store, enQWf, time.Second, mockEventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -961,7 +961,7 @@ func TestNodeExecutor_RecursiveNodeHandler_NoDownstream(t *testing.T) {
 	assert.True(t, task.IsTestModeEnabled())
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
-	catalogClient := catalog.NewCatalogClient(store)
+	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
 
 	execIface, err := NewExecutor(ctx, store, enQWf, time.Second, mockEventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -1334,7 +1334,7 @@ func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 	assert.True(t, task.IsTestModeEnabled())
 
 	store := createInmemoryDataStore(t, promutils.NewTestScope())
-	catalogClient := catalog.NewCatalogClient(store)
+	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
 
 	execIface, err := NewExecutor(ctx, store, enQWf, time.Second, mockEventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
 	assert.NoError(t, err)
