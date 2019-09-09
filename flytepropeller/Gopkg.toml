@@ -52,6 +52,11 @@ required = [
   version = "^0.14.x"
 
 [[constraint]]
+  name = "github.com/lyft/datacatalog"
+  source = "https://github.com/lyft/datacatalog"
+  version = "^0.1.x"
+
+[[constraint]]
   name = "github.com/lyft/flyteplugins"
   source = "https://github.com/lyft/flyteplugins"
   version = "^0.1.3"

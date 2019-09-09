@@ -215,25 +215,26 @@ func (h *taskHandler) StartNode(ctx context.Context, w v1alpha1.ExecutableWorkfl
 	}
 
 	logger.Infof(ctx, "Executor type: [%v]. Properties: finalizer[%v]. disable[%v].", reflect.TypeOf(t).String(), t.GetProperties().RequiresFinalizer, t.GetProperties().DisableNodeLevelCaching)
-	if task.CoreTask().Metadata.Discoverable {
+	if iface := task.CoreTask().Interface; task.CoreTask().Metadata.Discoverable && iface != nil && iface.Outputs != nil && len(iface.Outputs.Variables) > 0 {
 		if t.GetProperties().DisableNodeLevelCaching {
 			logger.Infof(ctx, "Executor has Node-Level caching disabled. Skipping.")
 		} else if resp, err := h.catalogClient.Get(ctx, task.CoreTask(), taskCtx.GetInputsFile()); err != nil {
 			if taskStatus, ok := status.FromError(err); ok && taskStatus.Code() == codes.NotFound {
 				h.metrics.discoveryMissCount.Inc(ctx)
-				logger.Infof(ctx, "Artifact not found in Discovery. Executing Task.")
+				logger.Infof(ctx, "Artifact not found in cache. Executing Task.")
 			} else {
 				h.metrics.discoveryGetFailureCount.Inc(ctx)
-				logger.Errorf(ctx, "Discovery check failed. Executing Task. Err: %v", err.Error())
+				logger.Errorf(ctx, "Catalog cache check failed. Executing Task. Err: %v", err.Error())
 			}
 		} else if resp != nil {
 			h.metrics.discoveryHitCount.Inc(ctx)
-			if iface := task.CoreTask().Interface; iface != nil && iface.Outputs != nil && len(iface.Outputs.Variables) > 0 {
-				if err := h.store.WriteProtobuf(ctx, taskCtx.GetOutputsFile(), storage.Options{}, resp); err != nil {
-					logger.Errorf(ctx, "failed to write data to Storage, err: %v", err.Error())
-					return handler.StatusUndefined, errors.Wrapf(errors.CausedByError, node.GetID(), err, "failed to copy cached results for task.")
-				}
+
+			logger.Debugf(ctx, "Outputs found in Catalog cache %+v", resp)
+			if err := h.store.WriteProtobuf(ctx, taskCtx.GetOutputsFile(), storage.Options{}, resp); err != nil {
+				logger.Errorf(ctx, "failed to write data to Storage, err: %v", err.Error())
+				return handler.StatusUndefined, errors.Wrapf(errors.CausedByError, node.GetID(), err, "failed to copy cached results for task.")
 			}
+
 			// SetCached.
 			w.GetNodeExecutionStatus(node.GetID()).SetCached()
 			return handler.StatusSuccess, nil
@@ -344,7 +345,7 @@ func (h *taskHandler) HandleNodeSuccess(ctx context.Context, w v1alpha1.Executab
 				h.metrics.discoveryPutFailureCount.Inc(ctx)
 				logger.Errorf(ctx, "Failed to write results to catalog. Err: %v", err2)
 			} else {
-				logger.Debugf(ctx, "Successfully cached results to discovery - Task [%s]", task.CoreTask().GetId())
+				logger.Debugf(ctx, "Successfully cached results - Task [%s]", task.CoreTask().GetId())
 			}
 		}
 	}
