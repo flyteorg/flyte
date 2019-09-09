@@ -554,13 +554,7 @@ func (h *HiveExecutor) SyncQuboleQuery(ctx context.Context, obj utils2.CacheItem
 }
 
 func NewHiveTaskExecutorWithCache(ctx context.Context) (*HiveExecutor, error) {
-	hiveExecutor := HiveExecutor{
-		id:             hiveExecutorId,
-		secretsManager: NewSecretsManager(),
-		quboleClient:   client.NewQuboleClient(),
-	}
-
-	return &hiveExecutor, nil
+	return NewHiveTaskExecutor(ctx, hiveExecutorId, client.NewQuboleClient())
 }
 
 func NewHiveTaskExecutor(ctx context.Context, executorId string, executorClient client.QuboleClient) (*HiveExecutor, error) {
