@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -10,6 +11,9 @@ import (
 )
 
 var jsonPbMarshaler = jsonpb.Marshaler{}
+var jsonPbUnmarshaler = &jsonpb.Unmarshaler{
+	AllowUnknownFields: true,
+}
 
 func UnmarshalStruct(structObj *structpb.Struct, msg proto.Message) error {
 	if structObj == nil {
@@ -21,7 +25,7 @@ func UnmarshalStruct(structObj *structpb.Struct, msg proto.Message) error {
 		return err
 	}
 
-	if err = jsonpb.UnmarshalString(jsonObj, msg); err != nil {
+	if err = jsonPbUnmarshaler.Unmarshal(strings.NewReader(jsonObj), msg); err != nil {
 		return err
 	}
 
