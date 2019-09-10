@@ -388,7 +388,7 @@ func TestCatalog_Put(t *testing.T) {
 		createDatasetCalled := false
 		mockClient.On("CreateDataset",
 			ctx,
-			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+			mock.MatchedBy(func(_ *datacatalog.CreateDatasetRequest) bool {
 				createDatasetCalled = true
 				return true
 			}),
