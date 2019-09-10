@@ -2,11 +2,12 @@ package qubole
 
 import (
 	"encoding/json"
+	"strings"
+	"testing"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	tasksMocks "github.com/lyft/flyteplugins/go/tasks/v1/types/mocks"
 	"github.com/stretchr/testify/assert"
-	"strings"
-	"testing"
 )
 
 func getMockTaskContext() *tasksMocks.TaskContext {
@@ -31,6 +32,7 @@ func TestConstructEventInfoFromQuboleWorkItems(t *testing.T) {
 			Status:             QuboleWorkSucceeded,
 			ClusterLabel:       "default",
 			Tags:               []string{},
+			CommandUri:         "https://api.qubole.com/command/",
 		},
 	}
 
@@ -156,12 +158,12 @@ func TestInterfaceConverter(t *testing.T) {
 	// This is a complicated step to reproduce what will ultimately be given to the function at runtime, the values
 	// inside the CustomState
 	item := QuboleWorkItem{
-		Status: QuboleWorkRunning,
-		CommandId: "123456",
-		Query: "",
+		Status:             QuboleWorkRunning,
+		CommandId:          "123456",
+		Query:              "",
 		UniqueWorkCacheKey: "fjdsakfjd",
 	}
-	raw, err := json.Marshal(map[string]interface{}{"":item})
+	raw, err := json.Marshal(map[string]interface{}{"": item})
 	assert.NoError(t, err)
 
 	// We can't unmarshal into a interface{} but we can unmarhsal into a interface{} if it's the value of a map.
