@@ -265,6 +265,7 @@ func (h HiveExecutor) CheckTaskStatus(ctx context.Context, taskCtx types.TaskCon
 						commandId := strconv.FormatInt(cmdDetails.ID, 10)
 						logger.Infof(ctx, "Created Qubole ID %s for %s", commandId, workCacheKey)
 						item.CommandId = commandId
+						item.CommandUri = cmdDetails.Uri
 						item.Status = QuboleWorkRunning
 						item.Query = "" // Clear the query to save space in etcd once we've successfully launched
 						err := h.executionBuffer.ConfirmExecution(ctx, workCacheKey, commandId)
@@ -553,10 +554,14 @@ func (h *HiveExecutor) SyncQuboleQuery(ctx context.Context, obj utils2.CacheItem
 }
 
 func NewHiveTaskExecutorWithCache(ctx context.Context) (*HiveExecutor, error) {
+	return NewHiveTaskExecutor(ctx, hiveExecutorId, client.NewQuboleClient())
+}
+
+func NewHiveTaskExecutor(ctx context.Context, executorId string, executorClient client.QuboleClient) (*HiveExecutor, error) {
 	hiveExecutor := HiveExecutor{
-		id:             hiveExecutorId,
+		id:             executorId,
 		secretsManager: NewSecretsManager(),
-		quboleClient:   client.NewQuboleClient(),
+		quboleClient:   executorClient,
 	}
 
 	return &hiveExecutor, nil
