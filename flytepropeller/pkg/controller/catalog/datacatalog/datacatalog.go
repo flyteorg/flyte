@@ -250,7 +250,7 @@ func (m *CatalogClient) Put(ctx context.Context, task *core.TaskTemplate, execID
 	return nil
 }
 
-func NewDataCatalog(ctx context.Context, endpoint string, secureConnection bool, datastore storage.ProtobufStore) (*CatalogClient, error) {
+func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, datastore storage.ProtobufStore) (*CatalogClient, error) {
 	var opts []grpc.DialOption
 
 	grpcOptions := []grpc_retry.CallOption{
@@ -259,7 +259,11 @@ func NewDataCatalog(ctx context.Context, endpoint string, secureConnection bool,
 		grpc_retry.WithMax(5),
 	}
 
-	if secureConnection {
+	if insecureConnection {
+		logger.Debug(ctx, "Establishing insecure connection to DataCatalog")
+		opts = append(opts, grpc.WithInsecure())
+	} else {
+		logger.Debug(ctx, "Establishing secure connection to DataCatalog")
 		pool, err := x509.SystemCertPool()
 		if err != nil {
 			return nil, err
