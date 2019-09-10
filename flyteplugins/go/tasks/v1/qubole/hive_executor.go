@@ -265,7 +265,7 @@ func (h HiveExecutor) CheckTaskStatus(ctx context.Context, taskCtx types.TaskCon
 						commandId := strconv.FormatInt(cmdDetails.ID, 10)
 						logger.Infof(ctx, "Created Qubole ID %s for %s", commandId, workCacheKey)
 						item.CommandId = commandId
-						item.JobUri = cmdDetails.JobUri
+						item.CommandUri = cmdDetails.Uri
 						item.Status = QuboleWorkRunning
 						item.Query = "" // Clear the query to save space in etcd once we've successfully launched
 						err := h.executionBuffer.ConfirmExecution(ctx, workCacheKey, commandId)
