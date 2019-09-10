@@ -17,7 +17,7 @@ import (
 
 const url = "https://api.qubole.com/api"
 const apiPath = "/v1.2/commands"
-const QuboleLogLinkFormat = "https://api.qubole.com/v2/analyze?command_id=%s"
+const QuboleLogLinkFormat = "https://api.qubole.com/v2/analyze?command_id=%d"
 
 const tokenKeyForAth = "X-AUTH-TOKEN"
 const acceptHeaderKey = "Accept"
@@ -35,9 +35,12 @@ type quboleCmdDetailsInternal struct {
 	Status string
 }
 
+type QuboleUri = string
+
 type QuboleCommandDetails struct {
 	ID     int64
 	Status QuboleStatus
+	Uri    QuboleUri
 }
 
 // QuboleClient API Request Body, meant to be passed into JSON.marshal
@@ -194,8 +197,8 @@ func (q *quboleClient) ExecuteHiveCommand(
 		return nil, err
 	}
 
-	status := newQuboleStatus(ctx, cmd.Status)
-	return &QuboleCommandDetails{ID: cmd.ID, Status: status}, nil
+	status := NewQuboleStatus(ctx, cmd.Status)
+	return &QuboleCommandDetails{ID: cmd.ID, Status: status, Uri: fmt.Sprintf(QuboleLogLinkFormat, cmd.ID)}, nil
 }
 
 /*
@@ -242,7 +245,7 @@ func (q *quboleClient) GetCommandStatus(ctx context.Context, commandID string, a
 		return QuboleStatusUnknown, err
 	}
 
-	cmdStatus := newQuboleStatus(ctx, cmd.Status)
+	cmdStatus := NewQuboleStatus(ctx, cmd.Status)
 	return cmdStatus, nil
 }
 

@@ -1,8 +1,9 @@
 package qubole
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteplugins/go/tasks/v1/events"
 	"github.com/lyft/flyteplugins/go/tasks/v1/qubole/client"
@@ -43,6 +44,8 @@ type QuboleWorkItem struct {
 	Query string `json:"query,omitempty"`
 
 	TimeoutSec uint32 `json:"timeout,omitempty"`
+
+	CommandUri string `json:"command_uri,omitempty"`
 }
 
 // This ID will be used in a process-wide cache, so it needs to be unique across all concurrent work being done by
@@ -148,10 +151,10 @@ func constructEventInfoFromQuboleWorkItems(taskCtx types.TaskContext, quboleWork
 		workItem := v.(QuboleWorkItem)
 		if workItem.CommandId != "" {
 			logs = append(logs, &core.TaskLog{
-				Name:          fmt.Sprintf("Retry: %d Status: %s [%s]",
+				Name: fmt.Sprintf("Retry: %d Status: %s [%s]",
 					taskCtx.GetTaskExecutionID().GetID().RetryAttempt, workItem.Status, workItem.CommandId),
 				MessageFormat: core.TaskLog_UNKNOWN,
-				Uri:           fmt.Sprintf(client.QuboleLogLinkFormat, workItem.CommandId),
+				Uri:           workItem.CommandUri,
 			})
 		}
 	}

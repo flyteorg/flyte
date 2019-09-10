@@ -28,7 +28,7 @@ var QuboleStatuses = map[QuboleStatus]struct{}{
 	QuboleStatusCancelled: {},
 }
 
-func newQuboleStatus(ctx context.Context, status string) QuboleStatus {
+func NewQuboleStatus(ctx context.Context, status string) QuboleStatus {
 	upperCased := strings.ToUpper(status)
 	if _, ok := QuboleStatuses[QuboleStatus(upperCased)]; ok {
 		return QuboleStatus(upperCased)
