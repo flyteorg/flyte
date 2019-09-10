@@ -60,6 +60,20 @@ func (_m *K8sResourceHandler) BuildResource(ctx context.Context, taskCtx types.T
 	return r0, r1
 }
 
+// GetProperties provides a mock function with given fields:
+func (_m *K8sResourceHandler) GetProperties() types.ExecutorProperties {
+	ret := _m.Called()
+
+	var r0 types.ExecutorProperties
+	if rf, ok := ret.Get(0).(func() types.ExecutorProperties); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(types.ExecutorProperties)
+	}
+
+	return r0
+}
+
 // GetTaskStatus provides a mock function with given fields: ctx, taskCtx, resource
 func (_m *K8sResourceHandler) GetTaskStatus(ctx context.Context, taskCtx types.TaskContext, resource flytek8s.K8sResource) (types.TaskStatus, *events.TaskEventInfo, error) {
 	ret := _m.Called(ctx, taskCtx, resource)

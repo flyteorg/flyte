@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	eventErrors "github.com/lyft/flyteidl/clients/go/events/errors"
 	"testing"
 	"time"
+
+	eventErrors "github.com/lyft/flyteidl/clients/go/events/errors"
 
 	k8serrs "k8s.io/apimachinery/pkg/api/errors"
 
@@ -21,7 +22,7 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/v1/flytek8s/mocks"
 	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/mock"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -49,6 +50,10 @@ func (k8sSampleHandler) BuildIdentityResource(ctx context.Context, taskCtx types
 }
 
 func (k8sSampleHandler) GetTaskStatus(ctx context.Context, taskCtx types.TaskContext, resource flytek8s.K8sResource) (types.TaskStatus, *events.TaskEventInfo, error) {
+	panic("implement me")
+}
+
+func (k8sSampleHandler) GetProperties() types.ExecutorProperties {
 	panic("implement me")
 }
 
@@ -290,7 +295,6 @@ func TestK8sTaskExecutor_CheckTaskStatus(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, expectedNewStatus, s)
 	})
-
 
 	t.Run("PhaseMismatch", func(t *testing.T) {
 

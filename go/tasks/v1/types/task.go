@@ -31,6 +31,10 @@ type ExecutorProperties struct {
 	// If set, the execution engine will not perform node-level task caching and retrieval. This can be useful for more
 	// fine-grained executors that implement their own logic for caching.
 	DisableNodeLevelCaching bool
+
+	// Determines if resources should be actively deleted when abort is attempted. The default behavior is to clear
+	// finalizers only. If a plugin's resource will automatically be freed by K8s, it should NOT set this field.
+	DeleteResourceOnAbort bool
 }
 
 // Defines the exposed interface for plugins to record task events.

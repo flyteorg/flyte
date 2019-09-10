@@ -88,7 +88,7 @@ func (sidecarResourceHandler) BuildResource(
 	err := utils.UnmarshalStruct(task.GetCustom(), &sidecarJob)
 	if err != nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification,
-			"invalid TaskSpecification [%v], Err: [%v]", task.GetCustom(), err.Error())
+		"invalid TaskSpecification [%v], Err: [%v]", task.GetCustom(), err.Error())
 	}
 
 	pod := flytek8s.BuildPodWithSpec(sidecarJob.PodSpec)
@@ -186,6 +186,12 @@ func (sidecarResourceHandler) GetTaskStatus(
 
 	status, err := determinePrimaryContainerStatus(primaryContainerName, pod.Status.ContainerStatuses)
 	return status, info, err
+}
+
+func (sidecarResourceHandler) GetProperties() types.ExecutorProperties {
+	return types.ExecutorProperties{
+		DeleteResourceOnAbort: true,
+	}
 }
 
 func init() {

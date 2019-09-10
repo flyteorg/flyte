@@ -187,6 +187,28 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_redisMaxRetries", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt, err := cmdFlags.GetInt("redisMaxRetries"); err == nil {
+				assert.Equal(t, int(defaultConfig.RedisMaxRetries), vInt)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("redisMaxRetries", testValue)
+			if vInt, err := cmdFlags.GetInt("redisMaxRetries"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.RedisMaxRetries)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_quboleLimit", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly

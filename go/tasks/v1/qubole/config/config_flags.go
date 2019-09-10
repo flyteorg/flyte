@@ -45,6 +45,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "resourceManagerType"), defaultConfig.ResourceManagerType, "Which resource manager to use")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "redisHostPath"), defaultConfig.RedisHostPath, "Redis host location")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "redisHostKey"), defaultConfig.RedisHostKey, "Key for local Redis access")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "redisMaxRetries"), defaultConfig.RedisMaxRetries, "See Redis client options for more info")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "quboleLimit"), defaultConfig.QuboleLimit, "Global limit for concurrent Qubole queries")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "lruCacheSize"), defaultConfig.LruCacheSize, "Size of the AutoRefreshCache")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "lookasideBufferPrefix"), defaultConfig.LookasideBufferPrefix, "Prefix used for lookaside buffer")
