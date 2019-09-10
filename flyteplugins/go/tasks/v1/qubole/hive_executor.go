@@ -3,9 +3,10 @@ package qubole
 import (
 	"context"
 	"fmt"
-	"github.com/go-redis/redis"
 	"strconv"
 	"time"
+
+	"github.com/go-redis/redis"
 
 	eventErrors "github.com/lyft/flyteidl/clients/go/events/errors"
 	"github.com/lyft/flyteplugins/go/tasks/v1/events"
@@ -126,6 +127,18 @@ func (h HiveExecutor) getUniqueCacheKey(taskCtx types.TaskContext, idx int) stri
 	return fmt.Sprintf("%s_%d", taskCtx.GetTaskExecutionID().GetGeneratedName(), idx)
 }
 
+func validateQuboleHiveJob(job *plugins.QuboleHiveJob) error {
+	if job == nil {
+		return fmt.Errorf("empty job")
+	}
+
+	if job.Query == nil && job.QueryCollection == nil {
+		return fmt.Errorf("either query or queryCollection must be set")
+	}
+
+	return nil
+}
+
 // This function is only ever called once, assuming it doesn't return in error.
 // Essentially, what this function does is translate the task's custom field into the TaskContext's CustomState
 // that's stored back into etcd
@@ -135,8 +148,13 @@ func (h HiveExecutor) StartTask(ctx context.Context, taskCtx types.TaskContext, 
 	hiveJob := plugins.QuboleHiveJob{}
 	err := utils.UnmarshalStruct(task.GetCustom(), &hiveJob)
 	if err != nil {
-		return types.TaskStatusPermanentFailure(errors.Errorf(errors.BadTaskSpecification,
-			"Invalid Job Specification in task: [%v]. Err: [%v]", task.GetCustom(), err)), nil
+		return types.TaskStatusPermanentFailure(errors.Wrapf(errors.BadTaskSpecification, err,
+			"Invalid Job Specification in task: [%v], failed to unmarshal", task.GetCustom())), nil
+	}
+
+	if err = validateQuboleHiveJob(&hiveJob); err != nil {
+		return types.TaskStatusPermanentFailure(errors.Wrapf(errors.BadTaskSpecification, err,
+			"Invalid Job Specification in task: [%v]", task.GetCustom())), nil
 	}
 
 	// TODO: Asserts around queries, like len > 0 or something.

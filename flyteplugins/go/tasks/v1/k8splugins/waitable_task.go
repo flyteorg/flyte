@@ -137,6 +137,11 @@ func discoverWaitableInputs(l *core.Literal) (literals []*core.Literal, waitable
 				return []*core.Literal{}, []*waitableWrapper{}
 			}
 
+			if err = validateWaitable(waitable); err != nil {
+				// skip, it's just a different type?
+				return []*core.Literal{}, []*waitableWrapper{}
+			}
+
 			return []*core.Literal{l}, []*waitableWrapper{{Waitable: waitable}}
 		}
 	}
@@ -309,6 +314,22 @@ func (w waitableTaskExecutor) getUpdatedWaitables(ctx context.Context, taskCtx t
 	return updatedWaitables, allDone, hasChanged, nil
 }
 
+func validateWaitable(waitable *plugins.Waitable) error {
+	if waitable == nil {
+		return fmt.Errorf("empty waitable")
+	}
+
+	if waitable.WfExecId == nil {
+		return fmt.Errorf("empty executionID")
+	}
+
+	if len(waitable.WfExecId.Name) == 0 {
+		return fmt.Errorf("empty executionID Name")
+	}
+
+	return nil
+}
+
 func updateWaitableLiterals(literals []*core.Literal, waitables []*waitableWrapper) error {
 	index := make(map[string]*plugins.Waitable, len(waitables))
 	for _, w := range waitables {
@@ -318,6 +339,10 @@ func updateWaitableLiterals(literals []*core.Literal, waitables []*waitableWrapp
 	for _, l := range literals {
 		orig := &plugins.Waitable{}
 		if err := utils.UnmarshalStruct(l.GetScalar().GetGeneric(), orig); err != nil {
+			return err
+		}
+
+		if err := validateWaitable(orig); err != nil {
 			return err
 		}
 
