@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	tasksV1 "github.com/lyft/flyteplugins/go/tasks/v1"
@@ -103,6 +103,10 @@ func (c containerTaskExecutor) BuildResource(ctx context.Context, taskCtx types.
 
 func (containerTaskExecutor) BuildIdentityResource(_ context.Context, taskCtx types.TaskContext) (flytek8s.K8sResource, error) {
 	return flytek8s.BuildIdentityPod(), nil
+}
+
+func (containerTaskExecutor) GetProperties() types.ExecutorProperties {
+	return types.ExecutorProperties{}
 }
 
 func init() {

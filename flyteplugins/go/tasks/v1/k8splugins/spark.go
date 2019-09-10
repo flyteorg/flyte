@@ -54,6 +54,10 @@ func setSparkConfig(cfg *SparkConfig) error {
 type sparkResourceHandler struct {
 }
 
+func (sparkResourceHandler) GetProperties() types.ExecutorProperties {
+	return types.ExecutorProperties{}
+}
+
 // Creates a new Job that will execute the main container as well as any generated types the result from the execution.
 func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx types.TaskContext, task *core.TaskTemplate, inputs *core.LiteralMap) (flytek8s.K8sResource, error) {
 
@@ -147,7 +151,7 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx types.Tas
 			HadoopConf:     sparkJob.GetHadoopConf(),
 			// SubmissionFailures handled here. Task Failures handled at Propeller/Job level.
 			RestartPolicy: sparkOp.RestartPolicy{
-				Type: sparkOp.OnFailure,
+				Type:                       sparkOp.OnFailure,
 				OnSubmissionFailureRetries: &submissionFailureRetries,
 			},
 		},
