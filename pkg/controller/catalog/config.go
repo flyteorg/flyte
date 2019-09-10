@@ -27,7 +27,7 @@ const (
 type Config struct {
 	Type     DiscoveryType `json:"type" pflag:"\"noop\", Catalog Implementation to use"`
 	Endpoint string        `json:"endpoint" pflag:"\"\", Endpoint for catalog service"`
-	Secure   bool          `json:"secure" pflag:"true, Connect with TSL/SSL"`
+	Insecure bool          `json:"insecure" pflag:"false, Use insecure grpc connection"`
 }
 
 // Gets loaded config for Discovery

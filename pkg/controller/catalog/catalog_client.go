@@ -25,7 +25,7 @@ func NewCatalogClient(ctx context.Context, store storage.ProtobufStore) (Client,
 	case LegacyDiscoveryType:
 		catalogClient = NewLegacyDiscovery(catalogConfig.Endpoint, store)
 	case DataCatalogType:
-		catalogClient, err = datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Secure, store)
+		catalogClient, err = datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Insecure, store)
 		if err != nil {
 			return nil, err
 		}
