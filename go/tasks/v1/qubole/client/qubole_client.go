@@ -35,10 +35,12 @@ type quboleCmdDetailsInternal struct {
 	Status string
 }
 
+type QuboleUri = string
+
 type QuboleCommandDetails struct {
 	ID     int64
 	Status QuboleStatus
-	JobUri string
+	Uri    QuboleUri
 }
 
 // QuboleClient API Request Body, meant to be passed into JSON.marshal
@@ -196,7 +198,7 @@ func (q *quboleClient) ExecuteHiveCommand(
 	}
 
 	status := NewQuboleStatus(ctx, cmd.Status)
-	return &QuboleCommandDetails{ID: cmd.ID, Status: status, JobUri: fmt.Sprintf(QuboleLogLinkFormat, cmd.ID)}, nil
+	return &QuboleCommandDetails{ID: cmd.ID, Status: status, Uri: fmt.Sprintf(QuboleLogLinkFormat, cmd.ID)}, nil
 }
 
 /*
