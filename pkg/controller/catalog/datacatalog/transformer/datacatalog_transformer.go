@@ -27,7 +27,9 @@ func getDatasetNameFromTask(task *core.TaskTemplate) string {
 	return fmt.Sprintf("%s-%s", taskNamespace, task.Id.Name)
 }
 
+// Transform the artifact Data into task execution outputs as a literal map
 func GenerateTaskOutputsFromArtifact(task *core.TaskTemplate, artifact *datacatalog.Artifact) (*core.LiteralMap, error) {
+
 	// if there are no outputs in the task, return empty map
 	if task.Interface.Outputs == nil || len(task.Interface.Outputs.Variables) == 0 {
 		return &emptyLiteralMap, nil
@@ -110,6 +112,7 @@ func generateTaskSignatureHash(ctx context.Context, task *core.TaskTemplate) (st
 	return fmt.Sprintf("%v-%v", inputHashString, outputHashString), nil
 }
 
+// Generate a tag by hashing the input values
 func GenerateArtifactTagName(ctx context.Context, inputs *core.LiteralMap) (string, error) {
 	if inputs == nil || len(inputs.Literals) == 0 {
 		inputs = &emptyLiteralMap

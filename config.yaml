@@ -91,6 +91,7 @@ admin:
 catalog-cache:
   type: catalog
   endpoint: datacatalog:8089
+  insecure: true
 errors:
   show-source: true
 logger:

@@ -31,6 +31,7 @@ type CatalogClient struct {
 	store  storage.ProtobufStore
 }
 
+// Helper method to retrieve an artifact by the tag
 func (m *CatalogClient) getArtifactByTag(ctx context.Context, tagName string, dataset *datacatalog.Dataset) (*datacatalog.Artifact, error) {
 	logger.Debugf(ctx, "Get Artifact by tag %v", tagName)
 	artifactQuery := &datacatalog.GetArtifactRequest{
@@ -47,6 +48,7 @@ func (m *CatalogClient) getArtifactByTag(ctx context.Context, tagName string, da
 	return response.Artifact, nil
 }
 
+// Helper method to retrieve a dataset that is associated with the task
 func (m *CatalogClient) getDataset(ctx context.Context, task *core.TaskTemplate) (*datacatalog.Dataset, error) {
 	datasetID, err := transformer.GenerateDatasetIDForTask(ctx, task)
 	if err != nil {
@@ -174,7 +176,6 @@ func (m *CatalogClient) Put(ctx context.Context, task *core.TaskTemplate, execID
 	logger.Debugf(ctx, "DataCatalog put into Catalog for DataSet %v", datasetID)
 
 	// Try creating the dataset in case it doesn't exist
-
 	metadata := &datacatalog.Metadata{
 		KeyMap: map[string]string{
 			taskVersionKey: task.Id.Version,
@@ -250,6 +251,7 @@ func (m *CatalogClient) Put(ctx context.Context, task *core.TaskTemplate, execID
 	return nil
 }
 
+// Create a new Datacatalog client for task execution caching
 func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, datastore storage.ProtobufStore) (*CatalogClient, error) {
 	var opts []grpc.DialOption
 
