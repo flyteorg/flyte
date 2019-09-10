@@ -58,13 +58,29 @@ func (sparkResourceHandler) GetProperties() types.ExecutorProperties {
 	return types.ExecutorProperties{}
 }
 
+func validateSparkJob(sparkJob *plugins.SparkJob) error {
+	if sparkJob == nil {
+		return fmt.Errorf("empty sparkJob")
+	}
+
+	if len(sparkJob.MainApplicationFile) == 0 && len(sparkJob.MainClass) == 0 {
+		return fmt.Errorf("either MainApplicationFile or MainClass must be set")
+	}
+
+	return nil
+}
+
 // Creates a new Job that will execute the main container as well as any generated types the result from the execution.
 func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx types.TaskContext, task *core.TaskTemplate, inputs *core.LiteralMap) (flytek8s.K8sResource, error) {
 
 	sparkJob := plugins.SparkJob{}
 	err := utils.UnmarshalStruct(task.GetCustom(), &sparkJob)
 	if err != nil {
-		return nil, errors.Errorf(errors.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", task.GetCustom(), err.Error())
+		return nil, errors.Wrapf(errors.BadTaskSpecification, err, "invalid TaskSpecification [%v], failed to unmarshal", task.GetCustom())
+	}
+
+	if err = validateSparkJob(&sparkJob); err != nil {
+		return nil, errors.Wrapf(errors.BadTaskSpecification, err, "invalid TaskSpecification [%v].", task.GetCustom())
 	}
 
 	annotations := flytek8s.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.GetAnnotations()))

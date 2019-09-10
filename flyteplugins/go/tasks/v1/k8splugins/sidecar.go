@@ -81,14 +81,35 @@ func validateAndFinalizeContainers(
 	return &pod, nil
 }
 
+func validateSidecarJob(sidecarJob *plugins.SidecarJob) error {
+	if sidecarJob == nil {
+		return fmt.Errorf("empty sidecarjob")
+	}
+
+	if sidecarJob.PodSpec == nil {
+		return fmt.Errorf("empty podspec")
+	}
+
+	if len(sidecarJob.PodSpec.Containers) == 0 {
+		return fmt.Errorf("empty containers")
+	}
+
+	return nil
+}
+
 func (sidecarResourceHandler) BuildResource(
 	ctx context.Context, taskCtx types.TaskContext, task *core.TaskTemplate, inputs *core.LiteralMap) (
 	flytek8s.K8sResource, error) {
 	sidecarJob := plugins.SidecarJob{}
 	err := utils.UnmarshalStruct(task.GetCustom(), &sidecarJob)
 	if err != nil {
-		return nil, errors.Errorf(errors.BadTaskSpecification,
-		"invalid TaskSpecification [%v], Err: [%v]", task.GetCustom(), err.Error())
+		return nil, errors.Wrapf(errors.BadTaskSpecification, err,
+			"invalid TaskSpecification [%v], failed to unmarshal", task.GetCustom())
+	}
+
+	if err = validateSidecarJob(&sidecarJob); err != nil {
+		return nil, errors.Wrapf(errors.BadTaskSpecification, err,
+			"invalid TaskSpecification [%v]", task.GetCustom())
 	}
 
 	pod := flytek8s.BuildPodWithSpec(sidecarJob.PodSpec)
