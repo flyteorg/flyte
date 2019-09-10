@@ -21,11 +21,11 @@ import (
 )
 
 const (
-	taskVersionKey  = "task-version"
-	taskExecKey     = "execution-name"
-	taskExecVersion = "execution-version"
+	taskVersionKey = "task-version"
+	taskExecKey    = "execution-name"
 )
 
+// This is the client that caches task executions to DataCatalog service.
 type CatalogClient struct {
 	client datacatalog.DataCatalogClient
 	store  storage.ProtobufStore
@@ -174,14 +174,16 @@ func (m *CatalogClient) Put(ctx context.Context, task *core.TaskTemplate, execID
 	logger.Debugf(ctx, "DataCatalog put into Catalog for DataSet %v", datasetID)
 
 	// Try creating the dataset in case it doesn't exist
-	newDataset := &datacatalog.Dataset{
-		Id: datasetID,
-		Metadata: &datacatalog.Metadata{
-			KeyMap: map[string]string{
-				taskVersionKey: task.Id.Version,
-				taskExecKey:    execID.TaskId.Name,
-			},
+
+	metadata := &datacatalog.Metadata{
+		KeyMap: map[string]string{
+			taskVersionKey: task.Id.Version,
+			taskExecKey:    execID.NodeExecutionId.NodeId,
 		},
+	}
+	newDataset := &datacatalog.Dataset{
+		Id:       datasetID,
+		Metadata: metadata,
 	}
 
 	_, err = m.client.CreateDataset(ctx, &datacatalog.CreateDatasetRequest{Dataset: newDataset})
@@ -206,18 +208,11 @@ func (m *CatalogClient) Put(ctx context.Context, task *core.TaskTemplate, execID
 		artifactDataList = append(artifactDataList, artifactData)
 	}
 
-	artifactMetadata := &datacatalog.Metadata{
-		KeyMap: map[string]string{
-			taskExecVersion: execID.TaskId.Version,
-			taskExecKey:     execID.TaskId.Name,
-		},
-	}
-
 	cachedArtifact := &datacatalog.Artifact{
 		Id:       string(uuid.NewUUID()),
 		Dataset:  datasetID,
 		Data:     artifactDataList,
-		Metadata: artifactMetadata,
+		Metadata: metadata,
 	}
 
 	createArtifactRequest := &datacatalog.CreateArtifactRequest{Artifact: cachedArtifact}
