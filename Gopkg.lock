@@ -24,6 +24,7 @@
     "autorest",
     "autorest/adal",
     "autorest/azure",
+    "autorest/date",
     "logger",
     "tracing",
   ]
@@ -60,7 +61,7 @@
   version = "1.0.0"
 
 [[projects]]
-  digest = "1:95314c6de2df70e7564c960f7edd6c128c9bb2e46800bc40ca48462057648b13"
+  digest = "1:9f8615d7907ba737b89895391626f81e9dd7776f48ea062d5bea77b46bdcfc89"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -104,8 +105,8 @@
     "service/sts/stsiface",
   ]
   pruneopts = ""
-  revision = "e51c7493711a6595b86496dc3f6229bae1354c1c"
-  version = "v1.23.19"
+  revision = "8c6586204ba7e9a887fb4cb6ffca2428e6c6dc7c"
+  version = "v1.23.20"
 
 [[projects]]
   branch = "master"
@@ -146,6 +147,14 @@
   pruneopts = ""
   revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
   version = "v1.1.1"
+
+[[projects]]
+  digest = "1:6098222470fe0172157ce9bbef5d2200df4edde17ee649c5d6e48330e4afa4c6"
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  pruneopts = ""
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
 
 [[projects]]
   digest = "1:46ddeb9dd35d875ac7568c4dc1fc96ce424e034bdbb984239d8ffc151398ec01"
@@ -434,7 +443,7 @@
   version = "v0.1.0"
 
 [[projects]]
-  digest = "1:ef7b24655c09b19a0b397e8a58f8f15fc402b349484afad6ce1de0a8f21bb292"
+  digest = "1:dec8d616f023c717c476cad2b30d5afebb4b6ed2f23d215bf309b9889c2a377b"
   name = "github.com/lyft/flyteidl"
   packages = [
     "clients/go/admin",
@@ -452,12 +461,12 @@
     "gen/pb-go/flyteidl/service",
   ]
   pruneopts = ""
-  revision = "211b8fe8c2c1d9ab168afd078b62d4f7834171d3"
+  revision = "fac461ff1d6926e98b48e2f3374419afdb69de18"
   source = "https://github.com/lyft/flyteidl"
   version = "v0.14.1"
 
 [[projects]]
-  digest = "1:77ccfc9618a05ffc14788ee562beb07c86f413fef7fb5421352437d18957eaef"
+  digest = "1:c6181f0bd353d2558f8b3b0128b0625f0982f6a428664c5fc4f3a69118172799"
   name = "github.com/lyft/flyteplugins"
   packages = [
     "go/tasks",
@@ -479,7 +488,7 @@
     "go/tasks/v1/utils",
   ]
   pruneopts = ""
-  revision = "01416c973482766e1fca181bbe61e42a6100e9df"
+  revision = "fcad09176702bc061d6e0422593834f266a88c13"
   source = "https://github.com/lyft/flyteplugins"
   version = "v0.1.6"
 
@@ -859,14 +868,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7340151bcf028f4deae54d53a3ab97840214b4b5dabaf1be7c9e16fae9c714ff"
+  digest = "1:0c8be8c385496c91dd86d6cc727041eafdc2f42537c9f58ec992e8efad0fa923"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = ""
-  revision = "bbd175535a8b9969bb0b33f1502f681ee0b122bd"
+  revision = "7ad0cfa0b7b5a50bdf0fb49923febdf3742a975c"
 
 [[projects]]
   digest = "1:740b51a55815493a8d0f2b1e0d0ae48fe48953bf7eaf3fcc4198823bf67768c0"
@@ -903,7 +912,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:012cf0ba83736a2f73f6d35e228a74834cfa66c894922c02b266cb1f4c98b348"
+  digest = "1:a779e74cb881ebe8626d4fee58ad262c4b0d41b5d97a8454e4dda97b638f6177"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -920,11 +929,11 @@
     "internal/semver",
   ]
   pruneopts = ""
-  revision = "4f2ddba30aff720d7cb90a510a695e622273ce77"
+  revision = "6bfd74cf029c99138aa1bb5b7e0d6b57c9d4eb49"
 
 [[projects]]
   branch = "master"
-  digest = "1:b00308a37526131ce24245e25c247112c86344d8cf9608c2f35d4812a09e99c6"
+  digest = "1:d8b3f0a0769b9c2694d4ca4fb4b2b6d971d1af008ce9ea9c3b188df76d9d77d6"
   name = "google.golang.org/api"
   packages = [
     "googleapi",
@@ -938,7 +947,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = ""
-  revision = "a93ff9fe2e76564e1c26f4691c5a75450d0955f0"
+  revision = "28eb3b1f27f6a4e7185acb5b5074a90b4cc04cc4"
 
 [[projects]]
   digest = "1:0568e577f790e9bd0420521cff50580f9b38165a38f217ce68f55c4bbaa97066"
@@ -973,7 +982,7 @@
   revision = "1774047e7e5133fa3573a4e51b37a586b6b0360c"
 
 [[projects]]
-  digest = "1:e8a4007e58ea9431f6460d1bc5c7f9dd29fdc0211ab780b6ad3d0581478f2076"
+  digest = "1:7ed022f305690d5843ba3f0bb94f9890a1f9c9459f0158a28304798213326d88"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -1011,8 +1020,8 @@
     "tap",
   ]
   pruneopts = ""
-  revision = "6eaf6f47437a6b4e2153a190160ef39a92c7eceb"
-  version = "v1.23.0"
+  revision = "39e8a7b072a67ca2a75f57fa2e0d50995f5b22f6"
+  version = "v1.23.1"
 
 [[projects]]
   digest = "1:75fb3fcfc73a8c723efde7777b40e8e8ff9babf30d8c56160d01beffea8a95a6"
