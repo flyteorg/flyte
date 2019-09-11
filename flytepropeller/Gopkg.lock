@@ -454,7 +454,7 @@
   pruneopts = ""
   revision = "211b8fe8c2c1d9ab168afd078b62d4f7834171d3"
   source = "https://github.com/lyft/flyteidl"
-  version = "v0.14.0"
+  version = "v0.14.1"
 
 [[projects]]
   digest = "1:77ccfc9618a05ffc14788ee562beb07c86f413fef7fb5421352437d18957eaef"
@@ -481,7 +481,7 @@
   pruneopts = ""
   revision = "01416c973482766e1fca181bbe61e42a6100e9df"
   source = "https://github.com/lyft/flyteplugins"
-  version = "v0.1.5"
+  version = "v0.1.6"
 
 [[projects]]
   digest = "1:77615fd7bcfd377c5e898c41d33be827f108166691cb91257d27113ee5d08650"
