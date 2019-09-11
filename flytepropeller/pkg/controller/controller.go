@@ -274,7 +274,10 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 	}
 
 	logger.Info(ctx, "Setting up Catalog client.")
-	catalogClient := catalog.NewCatalogClient(store)
+	catalogClient, err := catalog.NewCatalogClient(ctx, store)
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to create datacatalog client")
+	}
 
 	workQ, err := NewCompositeWorkQueue(ctx, cfg.Queue, scope)
 	if err != nil {
