@@ -54,6 +54,10 @@ func setSparkConfig(cfg *SparkConfig) error {
 type sparkResourceHandler struct {
 }
 
+func (sparkResourceHandler) GetProperties() types.ExecutorProperties {
+	return types.ExecutorProperties{}
+}
+
 func validateSparkJob(sparkJob *plugins.SparkJob) error {
 	if sparkJob == nil {
 		return fmt.Errorf("empty sparkJob")

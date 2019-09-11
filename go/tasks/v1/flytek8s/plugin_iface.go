@@ -29,6 +29,8 @@ type K8sResourceHandler interface {
 
 	// Analyses the k8s resource and reports the status as TaskPhase.
 	GetTaskStatus(ctx context.Context, taskCtx types.TaskContext, resource K8sResource) (types.TaskStatus, *events.TaskEventInfo, error)
+
+	GetProperties() types.ExecutorProperties
 }
 
 type K8sResource interface {
