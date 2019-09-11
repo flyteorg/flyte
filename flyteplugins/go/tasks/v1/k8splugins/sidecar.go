@@ -209,6 +209,12 @@ func (sidecarResourceHandler) GetTaskStatus(
 	return status, info, err
 }
 
+func (sidecarResourceHandler) GetProperties() types.ExecutorProperties {
+	return types.ExecutorProperties{
+		DeleteResourceOnAbort: true,
+	}
+}
+
 func init() {
 	v1.RegisterLoader(func(ctx context.Context) error {
 		return v1.K8sRegisterForTaskTypes(sidecarTaskType, &k8sv1.Pod{}, flytek8s.DefaultInformerResyncDuration,

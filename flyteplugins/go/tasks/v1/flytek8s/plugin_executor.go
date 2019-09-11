@@ -312,14 +312,26 @@ func (e *K8sTaskExecutor) KillTask(ctx context.Context, taskCtx types.TaskContex
 		logger.Warningf(ctx, "Failed to build the Resource with name: %v. Error: %v", taskCtx.GetTaskExecutionID().GetGeneratedName(), err)
 		return err
 	}
+
 	AddObjectMetadata(taskCtx, o)
+
 	// Retrieve the object from cache/etcd to get the last known version.
 	_, _, err = e.getResource(ctx, taskCtx, o)
 	if err != nil {
 		return err
 	}
 
-	return e.ClearFinalizers(ctx, o)
+	// Clear finalizers
+	err = e.ClearFinalizers(ctx, o)
+	if err != nil {
+		return err
+	}
+
+	if e.handler.GetProperties().DeleteResourceOnAbort {
+		return instance.kubeClient.Delete(ctx, o)
+	}
+
+	return nil
 }
 
 func (e *K8sTaskExecutor) ClearFinalizers(ctx context.Context, o K8sResource) error {

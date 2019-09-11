@@ -549,6 +549,10 @@ func (w waitableTaskExecutor) syncItem(ctx context.Context, obj utils2.CacheItem
 	return waitable, utils2.Unchanged, nil
 }
 
+func (waitableTaskExecutor) GetProperties() types.ExecutorProperties {
+	return types.ExecutorProperties{}
+}
+
 func newWaitableTaskExecutor(ctx context.Context) (executor *waitableTaskExecutor, err error) {
 	waitableExec := &waitableTaskExecutor{
 		containerTaskExecutor: containerTaskExecutor{},
