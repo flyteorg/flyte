@@ -11,6 +11,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
+//go:generate mockery -all -case=underscore
+
 // AutoRefreshCache with regular GetOrCreate and Delete along with background asynchronous refresh. Caller provides
 // callbacks for create, refresh and delete item.
 // The cache doesn't provide apis to update items.
