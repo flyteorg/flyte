@@ -179,7 +179,7 @@ func (m *CatalogClient) Put(ctx context.Context, task *core.TaskTemplate, execID
 	metadata := &datacatalog.Metadata{
 		KeyMap: map[string]string{
 			taskVersionKey: task.Id.Version,
-			taskExecKey:    execID.NodeExecutionId.NodeId,
+			taskExecKey:    execID.NodeExecutionId.ExecutionId.Name,
 		},
 	}
 	newDataset := &datacatalog.Dataset{
