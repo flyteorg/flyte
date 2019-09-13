@@ -22,7 +22,7 @@ import (
 
 const (
 	taskVersionKey = "task-version"
-	taskExecKey    = "execution-name"
+	wfExecNameKey  = "execution-name"
 )
 
 // This is the client that caches task executions to DataCatalog service.
@@ -179,7 +179,7 @@ func (m *CatalogClient) Put(ctx context.Context, task *core.TaskTemplate, execID
 	metadata := &datacatalog.Metadata{
 		KeyMap: map[string]string{
 			taskVersionKey: task.Id.Version,
-			taskExecKey:    execID.NodeExecutionId.ExecutionId.Name,
+			wfExecNameKey:  execID.NodeExecutionId.ExecutionId.Name,
 		},
 	}
 	newDataset := &datacatalog.Dataset{
