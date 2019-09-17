@@ -51,6 +51,7 @@ type K8sTaskExecutorMetrics struct {
 type ownerRegisteringHandler struct {
 	ownerKind    string
 	enqueueOwner types.EnqueueOwner
+	metricsScope promutils.Scope
 }
 
 // A common handle for all k8s-resource reliant task executors that push workflow id on the work queue.
@@ -113,7 +114,7 @@ func (e *K8sTaskExecutor) Initialize(ctx context.Context, params types.ExecutorI
 	return RegisterResource(ctx, e.resourceToWatch, ownerRegisteringHandler{
 		enqueueOwner: params.EnqueueOwner,
 		ownerKind:    params.OwnerKind,
-	})
+	}, metricScope)
 }
 
 func (e K8sTaskExecutor) HandleTaskSuccess(ctx context.Context, taskCtx types.TaskContext) (types.TaskStatus, error) {
