@@ -6,6 +6,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
+	"github.com/lyft/flytestdlib/promutils"
+
 	"github.com/lyft/flytestdlib/logger"
 
 	"sigs.k8s.io/controller-runtime/pkg/cache/informertest"
@@ -111,7 +116,7 @@ func Initialize(ctx context.Context, watchNamespace string, resyncPeriod time.Du
 	return nil
 }
 
-func RegisterResource(ctx context.Context, resourceToWatch runtime.Object, handler Handler) error {
+func RegisterResource(_ context.Context, resourceToWatch runtime.Object, handler Handler, metricsScope promutils.Scope) error {
 	if instance == nil {
 		return fmt.Errorf("instance not initialized")
 	}
@@ -132,30 +137,32 @@ func RegisterResource(ctx context.Context, resourceToWatch runtime.Object, handl
 	q := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(),
 		resourceToWatch.GetObjectKind().GroupVersionKind().Kind)
 
+	updateCount := labeled.NewCounter("informer_update", "Update events from informer", metricsScope)
+	droppedUpdateCount := labeled.NewCounter("informer_update_dropped", "Update events from informer that have the same resource version", metricsScope)
+
 	err := src.Start(ctrlHandler.Funcs{
 		CreateFunc: func(evt event.CreateEvent, q2 workqueue.RateLimitingInterface) {
-			err := handler.Handle(ctx, evt.Object)
-			if err != nil {
-				logger.Warnf(ctx, "Failed to handle Create event for object [%v]", evt.Object)
-			}
 		},
 		UpdateFunc: func(evt event.UpdateEvent, q2 workqueue.RateLimitingInterface) {
-			err := handler.Handle(ctx, evt.ObjectNew)
-			if err != nil {
-				logger.Warnf(ctx, "Failed to handle Update event for object [%v]", evt.ObjectNew)
+			if evt.MetaNew == nil {
+				logger.Warn(context.Background(), "Received an Update event with nil MetaNew.")
+			} else if evt.MetaOld == nil || evt.MetaOld.GetResourceVersion() != evt.MetaNew.GetResourceVersion() {
+				newCtx := contextutils.WithNamespace(context.Background(), evt.MetaNew.GetNamespace())
+				updateCount.Inc(newCtx)
+
+				logger.Debugf(newCtx, "Enqueueing owner for updated object [%v/%v]", evt.MetaNew.GetNamespace(), evt.MetaNew.GetName())
+				err := handler.Handle(newCtx, evt.ObjectNew)
+				if err != nil {
+					logger.Warnf(newCtx, "Failed to handle Update event for object [%v]", evt.ObjectNew)
+				}
+			} else {
+				newCtx := contextutils.WithNamespace(context.Background(), evt.MetaNew.GetNamespace())
+				droppedUpdateCount.Inc(newCtx)
 			}
 		},
 		DeleteFunc: func(evt event.DeleteEvent, q2 workqueue.RateLimitingInterface) {
-			err := handler.Handle(ctx, evt.Object)
-			if err != nil {
-				logger.Warnf(ctx, "Failed to handle Delete event for object [%v]", evt.Object)
-			}
 		},
 		GenericFunc: func(evt event.GenericEvent, q2 workqueue.RateLimitingInterface) {
-			err := handler.Handle(ctx, evt.Object)
-			if err != nil {
-				logger.Warnf(ctx, "Failed to handle Generic event for object [%v]", evt.Object)
-			}
 		},
 	}, q)
 
