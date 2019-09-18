@@ -36,7 +36,8 @@ type nodeMetrics struct {
 	TransitionLatency labeled.StopWatch
 	// Measures the latency between the time a node's been queued to the time the handler reported the executable moved
 	// to running state
-	QueuingLatency labeled.StopWatch
+	QueuingLatency    labeled.StopWatch
+	NodeExecutionTime labeled.StopWatch
 }
 
 type nodeExecutor struct {
@@ -455,6 +456,8 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, w v1alpha1.Exec
 	switch nodeStatus.GetPhase() {
 	case v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseSucceeding:
 		logger.Debugf(currentNodeCtx, "Handling node Status [%v]", nodeStatus.GetPhase().String())
+		t := c.metrics.NodeExecutionTime.Start(ctx)
+		defer t.Stop()
 		return c.executeNode(currentNodeCtx, w, currentNode)
 		// TODO we can optimize skip state handling by iterating down the graph and marking all as skipped
 		// Currently we treat either Skip or Success the same way. In this approach only one node will be skipped
@@ -521,6 +524,7 @@ func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1al
 			ResolutionFailure:  labeled.NewCounter("input_resolve_fail", "Indicates failure in resolving node inputs", nodeScope),
 			TransitionLatency:  labeled.NewStopWatch("transition_latency", "Measures the latency between the last parent node stoppedAt time and current node's queued time.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
 			QueuingLatency:     labeled.NewStopWatch("queueing_latency", "Measures the latency between the time a node's been queued to the time the handler reported the executable moved to running state", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+			NodeExecutionTime:  labeled.NewStopWatch("node_exec_latency", "Measures the time taken to execute one node, a node can be complex so it may encompass sub-node latency.", time.Microsecond, nodeScope, labeled.EmitUnlabeledMetric),
 		},
 	}
 	nodeHandlerFactory, err := NewHandlerFactory(
