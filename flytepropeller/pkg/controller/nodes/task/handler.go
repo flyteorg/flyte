@@ -126,6 +126,7 @@ type metrics struct {
 	discoveryGetFailureCount labeled.Counter
 	discoveryMissCount       labeled.Counter
 	discoveryHitCount        labeled.Counter
+	pluginExecutionLatency   labeled.StopWatch
 
 	// TODO We should have a metric to capture custom state size
 }
@@ -255,7 +256,9 @@ func (h *taskHandler) StartNode(ctx context.Context, w v1alpha1.ExecutableWorkfl
 				logger.Errorf(ctx, "Panic in plugin for TaskType [%s]", task.TaskType())
 			}
 		}()
+		t := h.metrics.pluginExecutionLatency.Start(ctx)
 		taskStatus, err = t.StartTask(ctx, taskCtx, task.CoreTask(), nodeInputs)
+		t.Stop()
 	}()
 
 	if err != nil {
@@ -306,7 +309,9 @@ func (h *taskHandler) CheckNodeStatus(ctx context.Context, w v1alpha1.Executable
 				logger.Errorf(ctx, "Panic in plugin for TaskType [%s]", task.TaskType())
 			}
 		}()
+		t := h.metrics.pluginExecutionLatency.Start(ctx)
 		taskStatus, err = t.CheckTaskStatus(ctx, taskCtx, task.CoreTask())
+		t.Stop()
 	}()
 
 	if err != nil {
@@ -428,6 +433,7 @@ func NewTaskHandlerForFactory(eventSink events.EventSink, store *storage.DataSto
 			discoveryMissCount:       labeled.NewCounter("discovery_miss_count", "Task not cached in Discovery", scope),
 			discoveryPutFailureCount: labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", scope),
 			discoveryGetFailureCount: labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", scope),
+			pluginExecutionLatency:   labeled.NewStopWatch("plugin_exec_latecny", "Time taken to invoke plugin for one round", time.Microsecond, scope),
 		},
 	}
 }
