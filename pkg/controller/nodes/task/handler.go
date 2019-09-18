@@ -256,9 +256,9 @@ func (h *taskHandler) StartNode(ctx context.Context, w v1alpha1.ExecutableWorkfl
 				logger.Errorf(ctx, "Panic in plugin for TaskType [%s]", task.TaskType())
 			}
 		}()
-		t := h.metrics.pluginExecutionLatency.Start(ctx)
+		s := h.metrics.pluginExecutionLatency.Start(ctx)
 		taskStatus, err = t.StartTask(ctx, taskCtx, task.CoreTask(), nodeInputs)
-		t.Stop()
+		s.Stop()
 	}()
 
 	if err != nil {
@@ -309,9 +309,9 @@ func (h *taskHandler) CheckNodeStatus(ctx context.Context, w v1alpha1.Executable
 				logger.Errorf(ctx, "Panic in plugin for TaskType [%s]", task.TaskType())
 			}
 		}()
-		t := h.metrics.pluginExecutionLatency.Start(ctx)
+		s := h.metrics.pluginExecutionLatency.Start(ctx)
 		taskStatus, err = t.CheckTaskStatus(ctx, taskCtx, task.CoreTask())
-		t.Stop()
+		s.Stop()
 	}()
 
 	if err != nil {
