@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"time"
 
 	"github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/datacatalog/pkg/manager/impl/validators"
@@ -22,6 +23,8 @@ import (
 
 type artifactMetrics struct {
 	scope                    promutils.Scope
+	createResponseTime       labeled.StopWatch
+	getResponseTime          labeled.StopWatch
 	createSuccessCounter     labeled.Counter
 	createFailureCounter     labeled.Counter
 	getSuccessCounter        labeled.Counter
@@ -42,6 +45,9 @@ type artifactManager struct {
 
 // Create an Artifact along with the associated ArtifactData. The ArtifactData will be stored in an offloaded location.
 func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalog.CreateArtifactRequest) (*datacatalog.CreateArtifactResponse, error) {
+	timer := m.systemMetrics.createResponseTime.Start(ctx)
+	defer timer.Stop()
+
 	artifact := request.Artifact
 	err := validators.ValidateArtifact(artifact)
 	if err != nil {
@@ -105,6 +111,9 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalo
 
 // Get the Artifact and its associated ArtifactData. The request can query by ArtifactID or TagName.
 func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.GetArtifactRequest) (*datacatalog.GetArtifactResponse, error) {
+	timer := m.systemMetrics.getResponseTime.Start(ctx)
+	defer timer.Stop()
+
 	datasetID := request.Dataset
 	err := validators.ValidateGetArtifactRequest(request)
 	if err != nil {
@@ -186,8 +195,10 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.G
 func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.DataStore, storagePrefix storage.DataReference, artifactScope promutils.Scope) interfaces.ArtifactManager {
 	artifactMetrics := artifactMetrics{
 		scope:                    artifactScope,
-		createSuccessCounter:     labeled.NewCounter("create_success_count", "The number of times create artifact was called", artifactScope, labeled.EmitUnlabeledMetric),
-		getSuccessCounter:        labeled.NewCounter("get_success_count", "The number of times get artifact was called", artifactScope, labeled.EmitUnlabeledMetric),
+		createResponseTime:       labeled.NewStopWatch("create_duration", "The duration of the create artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
+		getResponseTime:          labeled.NewStopWatch("get_duration", "The duration of the get artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
+		createSuccessCounter:     labeled.NewCounter("create_success_count", "The number of times create artifact suceeded", artifactScope, labeled.EmitUnlabeledMetric),
+		getSuccessCounter:        labeled.NewCounter("get_success_count", "The number of times get artifact suceeded", artifactScope, labeled.EmitUnlabeledMetric),
 		createFailureCounter:     labeled.NewCounter("create_failure_count", "The number of times create artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
 		getFailureCounter:        labeled.NewCounter("get_failure_count", "The number of times get artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
 		createDataFailureCounter: labeled.NewCounter("create_data_failure_count", "The number of times create artifact data failed", artifactScope, labeled.EmitUnlabeledMetric),
