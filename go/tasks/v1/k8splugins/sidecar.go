@@ -45,7 +45,7 @@ func validateAndFinalizeContainers(
 			utils.CommandLineTemplateArgs{
 				Input:        taskCtx.GetInputsFile().String(),
 				OutputPrefix: taskCtx.GetDataDir().String(),
-				Inputs:       utils.LiteralMapToTemplateArgs(ctx, inputs),
+				Inputs:       inputs,
 			})
 
 		if err != nil {
@@ -58,7 +58,7 @@ func validateAndFinalizeContainers(
 			utils.CommandLineTemplateArgs{
 				Input:        taskCtx.GetInputsFile().String(),
 				OutputPrefix: taskCtx.GetDataDir().String(),
-				Inputs:       utils.LiteralMapToTemplateArgs(ctx, inputs),
+				Inputs:       inputs,
 			})
 
 		if err != nil {

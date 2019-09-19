@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/lyft/flyteidl/clients/go/coreutils"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -27,8 +28,10 @@ func BenchmarkReplacements(b *testing.B) {
 	cmdTemplate := `abc {{ index .Inputs "x" }}`
 	cmdArgs := CommandLineTemplateArgs{
 		Input: "inputfile.pb",
-		Inputs: map[string]string{
-			"x": "1",
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"x": coreutils.MustMakePrimitiveLiteral(1),
+			},
 		},
 	}
 
@@ -180,8 +183,16 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 		}, CommandLineTemplateArgs{
 			Input:        "input/blah",
 			OutputPrefix: "output/blah",
-			Inputs: map[string]string{
-				"arr": "[a,b]",
+			Inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"arr": {
+						Value: &core.Literal_Collection{
+							Collection: &core.LiteralCollection{
+								Literals: []*core.Literal{coreutils.MustMakeLiteral("a"), coreutils.MustMakeLiteral("b")},
+							},
+						},
+					},
+				},
 			}})
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
@@ -191,49 +202,63 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			"output/blah",
 		}, actual)
 	})
-}
 
-func TestLiteralMapToTemplateArgs(t *testing.T) {
-	t.Run("Scalars", func(t *testing.T) {
-		expected := map[string]string{
-			"str":  "blah",
-			"int":  "5",
-			"date": "1900-01-01T01:01:01.000000001Z",
-		}
-
-		dd := time.Date(1900, 1, 1, 1, 1, 1, 1, time.UTC)
-		lit := coreutils.MustMakeLiteral(map[string]interface{}{
-			"str":  "blah",
-			"int":  5,
-			"date": dd,
-		})
-
-		actual := LiteralMapToTemplateArgs(context.TODO(), lit.GetMap())
-
-		assert.Equal(t, expected, actual)
+	t.Run("Date", func(t *testing.T) {
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+			"hello",
+			"world",
+			`--someArg {{ .Inputs.date }}`,
+			"{{ .OutputPrefix }}",
+		}, CommandLineTemplateArgs{
+			Input:        "input/blah",
+			OutputPrefix: "output/blah",
+			Inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"date": coreutils.MustMakeLiteral(time.Date(1900, 01, 01, 01, 01, 01, 000000001, time.UTC)),
+				},
+			}})
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"world",
+			"--someArg 1900-01-01T01:01:01.000000001Z",
+			"output/blah",
+		}, actual)
 	})
 
-	t.Run("1d array", func(t *testing.T) {
-		expected := map[string]string{
-			"arr": "[a,b]",
-		}
-
-		actual := LiteralMapToTemplateArgs(context.TODO(), coreutils.MustMakeLiteral(map[string]interface{}{
-			"arr": []interface{}{"a", "b"},
-		}).GetMap())
-
-		assert.Equal(t, expected, actual)
+	t.Run("2d Array arg", func(t *testing.T) {
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+			"hello",
+			"world",
+			`--someArg {{ .Inputs.arr }}`,
+			"{{ .OutputPrefix }}",
+		}, CommandLineTemplateArgs{
+			Input:        "input/blah",
+			OutputPrefix: "output/blah",
+			Inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
+				},
+			}})
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"world",
+			"--someArg [[a,b],[1,2]]",
+			"output/blah",
+		}, actual)
 	})
 
-	t.Run("2d array", func(t *testing.T) {
-		expected := map[string]string{
-			"arr": "[[a,b],[1,2]]",
-		}
-
-		actual := LiteralMapToTemplateArgs(context.TODO(), coreutils.MustMakeLiteral(map[string]interface{}{
-			"arr": []interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}},
-		}).GetMap())
-
-		assert.Equal(t, expected, actual)
+	t.Run("nil input", func(t *testing.T) {
+		_, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+			"hello",
+			"world",
+			`--someArg {{ .Inputs.arr }}`,
+			"{{ .OutputPrefix }}",
+		}, CommandLineTemplateArgs{
+			Input:        "input/blah",
+			OutputPrefix: "output/blah",
+			Inputs:       &core.LiteralMap{Literals: nil}})
+		assert.Error(t, err)
 	})
 }

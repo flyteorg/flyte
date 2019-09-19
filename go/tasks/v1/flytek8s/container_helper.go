@@ -78,7 +78,7 @@ func ToK8sContainer(ctx context.Context, taskCtx types.TaskContext, taskContaine
 	cmdLineArgs := utils.CommandLineTemplateArgs{
 		Input:        inputFile.String(),
 		OutputPrefix: taskCtx.GetDataDir().String(),
-		Inputs:       utils.LiteralMapToTemplateArgs(ctx, inputs),
+		Inputs:       inputs,
 	}
 
 	modifiedCommand, err := utils.ReplaceTemplateCommandArgs(ctx, taskContainer.GetCommand(), cmdLineArgs)

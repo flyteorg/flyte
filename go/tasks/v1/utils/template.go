@@ -9,7 +9,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/pkg/errors"
 )
 
 var inputFileRegex = regexp.MustCompile(`(?i){{\s*[\.$]Input\s*}}`)
@@ -18,9 +18,9 @@ var inputVarRegex = regexp.MustCompile(`(?i){{\s*[\.$]Inputs\.(?P<input_name>[^}
 
 // Contains arguments passed down to command line templates.
 type CommandLineTemplateArgs struct {
-	Input        string            `json:"input"`
-	OutputPrefix string            `json:"output"`
-	Inputs       map[string]string `json:"inputs"`
+	Input        string           `json:"input"`
+	OutputPrefix string           `json:"output"`
+	Inputs       *core.LiteralMap `json:"inputs"`
 }
 
 // Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive
@@ -48,7 +48,7 @@ func ReplaceTemplateCommandArgs(ctx context.Context, command []string, args Comm
 	return res, nil
 }
 
-func replaceTemplateCommandArgs(_ context.Context, commandTemplate string, args *CommandLineTemplateArgs) (string, error) {
+func replaceTemplateCommandArgs(ctx context.Context, commandTemplate string, args *CommandLineTemplateArgs) (string, error) {
 	val := inputFileRegex.ReplaceAllString(commandTemplate, args.Input)
 	val = outputRegex.ReplaceAllString(val, args.OutputPrefix)
 	groupMatches := inputVarRegex.FindAllStringSubmatchIndex(val, -1)
@@ -64,89 +64,75 @@ func replaceTemplateCommandArgs(_ context.Context, commandTemplate string, args 
 		inputStartIdx := groupMatches[0][2]
 		inputEndIdx := groupMatches[0][3]
 		inputName := val[inputStartIdx:inputEndIdx]
-		inputVal, exists := args.Inputs[inputName]
+
+		if args.Inputs == nil || args.Inputs.Literals == nil {
+			return val, fmt.Errorf("no inputs provided, cannot bind input name [%s]", inputName)
+		}
+		inputVal, exists := args.Inputs.Literals[inputName]
 		if !exists {
 			return val, fmt.Errorf("requested input is not found [%v] while processing template [%v]",
 				inputName, commandTemplate)
 		}
 
+		v, err := serializeLiteral(ctx, inputVal)
+		if err != nil {
+			return val, errors.Wrapf(err, "failed to bind a value to inputName [%s]", inputName)
+		}
 		if endIdx >= len(val) {
-			return val[:startIdx] + inputVal, nil
+			return val[:startIdx] + v, nil
 		}
 
-		return val[:startIdx] + inputVal + val[endIdx:], nil
+		return val[:startIdx] + v + val[endIdx:], nil
 	}
 }
 
-// Converts a literal map to a go map that can be used in templates. It drops literals that don't have a defined way to
-// be safely serialized into a string.
-func LiteralMapToTemplateArgs(ctx context.Context, m *core.LiteralMap) map[string]string {
-	if m == nil {
-		return map[string]string{}
-	}
-
-	res := make(map[string]string, len(m.Literals))
-
-	for key, val := range m.Literals {
-		serialized, ok := serializeLiteral(ctx, val)
-		if ok {
-			res[key] = serialized
-		}
-	}
-
-	return res
-}
-
-func serializePrimitive(ctx context.Context, p *core.Primitive) (string, bool) {
+func serializePrimitive(p *core.Primitive) (string, error) {
 	switch o := p.Value.(type) {
 	case *core.Primitive_Integer:
-		return fmt.Sprintf("%v", o.Integer), true
+		return fmt.Sprintf("%v", o.Integer), nil
 	case *core.Primitive_Boolean:
-		return fmt.Sprintf("%v", o.Boolean), true
+		return fmt.Sprintf("%v", o.Boolean), nil
 	case *core.Primitive_Datetime:
-		return ptypes.TimestampString(o.Datetime), true
+		return ptypes.TimestampString(o.Datetime), nil
 	case *core.Primitive_Duration:
-		return o.Duration.String(), true
+		return o.Duration.String(), nil
 	case *core.Primitive_FloatValue:
-		return fmt.Sprintf("%v", o.FloatValue), true
+		return fmt.Sprintf("%v", o.FloatValue), nil
 	case *core.Primitive_StringValue:
-		return o.StringValue, true
+		return o.StringValue, nil
 	default:
-		logger.Warnf(ctx, "Received an unexpected primitive type [%v]", reflect.TypeOf(p.Value))
-		return "", false
+		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(p.Value))
 	}
 }
 
-func serializeLiteralScalar(ctx context.Context, l *core.Scalar) (string, bool) {
+func serializeLiteralScalar(l *core.Scalar) (string, error) {
 	switch o := l.Value.(type) {
 	case *core.Scalar_Primitive:
-		return serializePrimitive(ctx, o.Primitive)
+		return serializePrimitive(o.Primitive)
 	case *core.Scalar_Blob:
-		return o.Blob.Uri, true
+		return o.Blob.Uri, nil
 	default:
-		logger.Warnf(ctx, "Received an unexpected scalar type [%v]", reflect.TypeOf(l.Value))
-		return "", false
+		return "", fmt.Errorf("received an unexpected scalar type [%v]", reflect.TypeOf(l.Value))
 	}
 }
 
-func serializeLiteral(ctx context.Context, l *core.Literal) (string, bool) {
+func serializeLiteral(ctx context.Context, l *core.Literal) (string, error) {
 	switch o := l.Value.(type) {
 	case *core.Literal_Collection:
 		res := make([]string, 0, len(o.Collection.Literals))
 		for _, sub := range o.Collection.Literals {
-			s, ok := serializeLiteral(ctx, sub)
-			if !ok {
-				return "", false
+			s, err := serializeLiteral(ctx, sub)
+			if err != nil {
+				return "", err
 			}
 
 			res = append(res, s)
 		}
 
-		return fmt.Sprintf("[%v]", strings.Join(res, ",")), true
+		return fmt.Sprintf("[%v]", strings.Join(res, ",")), nil
 	case *core.Literal_Scalar:
-		return serializeLiteralScalar(ctx, o.Scalar)
+		return serializeLiteralScalar(o.Scalar)
 	default:
-		logger.Warnf(ctx, "Received an unexpected primitive type [%v]", reflect.TypeOf(l.Value))
-		return "", false
+		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(l.Value))
 	}
 }

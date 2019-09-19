@@ -113,12 +113,12 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx types.Tas
 		},
 	}
 
-	modifiedArgs, err := utils.ReplaceTemplateCommandArgs(context.TODO(),
+	modifiedArgs, err := utils.ReplaceTemplateCommandArgs(ctx,
 		task.GetContainer().GetArgs(),
 		utils.CommandLineTemplateArgs{
 			Input:        taskCtx.GetInputsFile().String(),
 			OutputPrefix: taskCtx.GetDataDir().String(),
-			Inputs:       utils.LiteralMapToTemplateArgs(context.TODO(), inputs),
+			Inputs:       inputs,
 		})
 
 	if err != nil {
