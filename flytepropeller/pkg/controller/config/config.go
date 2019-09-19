@@ -31,6 +31,18 @@ type Config struct {
 	GCInterval          config.Duration      `json:"gc-interval" pflag:"\"30m\",Run periodic GC every 30 minutes"`
 	LeaderElection      LeaderElectionConfig `json:"leader-election,omitempty" pflag:",Config for leader election."`
 	PublishK8sEvents    bool                 `json:"publish-k8s-events" pflag:",Enable events publishing to K8s events API."`
+	KubeConfig          KubeClientConfig     `json:"kube-client-config" pflag:",Configuration to control the Kubernetes client"`
+}
+
+type KubeClientConfig struct {
+	// QPS indicates the maximum QPS to the master from this client.
+	// If it's zero, the created RESTClient will use DefaultQPS: 5
+	QPS float32 `json:"qps" pflag:",Max QPS to the master for requests to KubeAPI. 0 defaults to 5."`
+	// Maximum burst for throttle.
+	// If it's zero, the created RESTClient will use DefaultBurst: 10.
+	Burst int `json:"burst" pflag:",Max burst rate for throttle. 0 defaults to 10"`
+	// The maximum length of time to wait before giving up on a server request. A value of zero means no timeout.
+	Timeout config.Duration `json:"timeout" pflag:",Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout."`
 }
 
 type CompositeQueueType = string

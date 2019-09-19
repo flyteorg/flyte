@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
+
+	"github.com/lyft/flytepropeller/pkg/controller/executors"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -36,11 +37,12 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
+	restclient "k8s.io/client-go/rest"
+
 	clientset "github.com/lyft/flytepropeller/pkg/client/clientset/versioned"
 	informers "github.com/lyft/flytepropeller/pkg/client/informers/externalversions"
 	"github.com/lyft/flytepropeller/pkg/controller"
 	"github.com/lyft/flytepropeller/pkg/signals"
-	restclient "k8s.io/client-go/rest"
 )
 
 const (
@@ -133,6 +135,10 @@ func getKubeConfig(_ context.Context, cfg *config2.Config) (*kubernetes.Clientse
 			return nil, nil, errors.Wrapf(err, "Cannot get InCluster kubeconfig")
 		}
 	}
+
+	kubecfg.QPS = cfg.KubeConfig.QPS
+	kubecfg.Burst = cfg.KubeConfig.Burst
+	kubecfg.Timeout = cfg.KubeConfig.Timeout.Duration
 
 	kubeClient, err := kubernetes.NewForConfig(kubecfg)
 	if err != nil {
