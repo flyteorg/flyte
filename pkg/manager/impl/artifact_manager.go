@@ -186,12 +186,12 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.G
 func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.DataStore, storagePrefix storage.DataReference, artifactScope promutils.Scope) interfaces.ArtifactManager {
 	artifactMetrics := artifactMetrics{
 		scope:                    artifactScope,
-		createSuccessCounter:     labeled.NewCounter("create_artifact_success_count", "The number of times create artifact was called", artifactScope, labeled.EmitUnlabeledMetric),
-		getSuccessCounter:        labeled.NewCounter("get_artifact_success_count", "The number of times get artifact was called", artifactScope, labeled.EmitUnlabeledMetric),
-		createFailureCounter:     labeled.NewCounter("create_artifact_failure_count", "The number of times create artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
-		getFailureCounter:        labeled.NewCounter("get_artifact_failure_count", "The number of times get artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
-		createDataFailureCounter: labeled.NewCounter("create_artifact_data_failure_count", "The number of times create artifact data failed", artifactScope, labeled.EmitUnlabeledMetric),
-		createDataSuccessCounter: labeled.NewCounter("create_artifact_data_succeeded_count", "The number of times create artifact data succeeded", artifactScope, labeled.EmitUnlabeledMetric),
+		createSuccessCounter:     labeled.NewCounter("create_success_count", "The number of times create artifact was called", artifactScope, labeled.EmitUnlabeledMetric),
+		getSuccessCounter:        labeled.NewCounter("get_success_count", "The number of times get artifact was called", artifactScope, labeled.EmitUnlabeledMetric),
+		createFailureCounter:     labeled.NewCounter("create_failure_count", "The number of times create artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
+		getFailureCounter:        labeled.NewCounter("get_failure_count", "The number of times get artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
+		createDataFailureCounter: labeled.NewCounter("create_data_failure_count", "The number of times create artifact data failed", artifactScope, labeled.EmitUnlabeledMetric),
+		createDataSuccessCounter: labeled.NewCounter("create_data_succeeded_count", "The number of times create artifact data succeeded", artifactScope, labeled.EmitUnlabeledMetric),
 		transformerErrorCounter:  labeled.NewCounter("transformer_failed_count", "The number of times transformations failed", artifactScope, labeled.EmitUnlabeledMetric),
 		validationErrorCounter:   labeled.NewCounter("validation_failed_count", "The number of times validation failed", artifactScope, labeled.EmitUnlabeledMetric),
 		alreadyExistsCounter:     labeled.NewCounter("already_exists_count", "The number of times an artifact already exists", artifactScope, labeled.EmitUnlabeledMetric),
