@@ -37,12 +37,16 @@ type dynamicNodeHandler struct {
 type metrics struct {
 	buildDynamicWorkflow   labeled.StopWatch
 	retrieveDynamicJobSpec labeled.StopWatch
+	CacheHit               labeled.StopWatch
+	CacheError             labeled.Counter
 }
 
 func newMetrics(scope promutils.Scope) metrics {
 	return metrics{
 		buildDynamicWorkflow:   labeled.NewStopWatch("build_dynamic_workflow", "Overhead for building a dynamic workflow in memory.", time.Microsecond, scope),
 		retrieveDynamicJobSpec: labeled.NewStopWatch("retrieve_dynamic_spec", "Overhead of downloading and unmarshaling dynamic job spec", time.Microsecond, scope),
+		CacheHit:               labeled.NewStopWatch("dynamic_workflow_cache_hit", "A dynamic workflow was loaded from store.", time.Microsecond, scope),
+		CacheError:             labeled.NewCounter("cache_err", "A dynamic workflow failed to store or load from data store.", scope),
 	}
 }
 
@@ -56,11 +60,11 @@ func (e dynamicNodeHandler) ExtractOutput(ctx context.Context, w v1alpha1.Execut
 	return outputResolver.ExtractOutput(ctx, w, n, bindToVar)
 }
 
-func (e dynamicNodeHandler) getDynamicJobSpec(ctx context.Context, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) (*core.DynamicJobSpec, error) {
+func (e dynamicNodeHandler) getDynamicJobSpec(ctx context.Context, node v1alpha1.ExecutableNode, dataDir storage.DataReference) (*core.DynamicJobSpec, error) {
 	t := e.metrics.retrieveDynamicJobSpec.Start(ctx)
 	defer t.Stop()
 
-	futuresFilePath, err := e.store.ConstructReference(ctx, nodeStatus.GetDataDir(), v1alpha1.GetFutureFile())
+	futuresFilePath, err := e.store.ConstructReference(ctx, dataDir, v1alpha1.GetFutureFile())
 	if err != nil {
 		logger.Warnf(ctx, "Failed to construct data path for futures file. Error: %v", err)
 		return nil, err
@@ -218,22 +222,7 @@ func (e dynamicNodeHandler) CheckNodeStatus(ctx context.Context, w v1alpha1.Exec
 func (e dynamicNodeHandler) buildContextualDynamicWorkflow(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode,
 	previousNodeStatus v1alpha1.ExecutableNodeStatus) (dynamicWf v1alpha1.ExecutableWorkflow, status v1alpha1.ExecutableNodeStatus, isDynamic bool, err error) {
 
-	t := e.metrics.buildDynamicWorkflow.Start(ctx)
-	defer t.Stop()
-
 	var nStatus v1alpha1.ExecutableNodeStatus
-	// We will only get here if the Phase is success. The downside is that this is an overhead for all nodes that are
-	// not dynamic. But given that we will only check once, it should be ok.
-	// TODO: Check for node.is_dynamic once the IDL changes are in and SDK migration has happened.
-	djSpec, err := e.getDynamicJobSpec(ctx, node, previousNodeStatus)
-	if err != nil {
-		return nil, nil, false, err
-	}
-
-	if djSpec == nil {
-		return nil, status, false, nil
-	}
-
 	rootNodeStatus := w.GetNodeExecutionStatus(node.GetID())
 	if node.GetTaskID() != nil {
 		// TODO: This is a hack to set parent task execution id, we should move to node-node relationship.
@@ -253,29 +242,106 @@ func (e dynamicNodeHandler) buildContextualDynamicWorkflow(ctx context.Context, 
 		nStatus = w.GetNodeExecutionStatus(node.GetID())
 	}
 
+	subwf, isDynamic, err := e.loadOrBuildDynamicWorkflow(ctx, w, node, previousNodeStatus.GetDataDir(), nStatus)
+	if err != nil {
+		return nil, nStatus, false, err
+	}
+
+	if !isDynamic {
+		return nil, nil, false, nil
+	}
+
+	return newContextualWorkflow(w, subwf, nStatus, subwf.Tasks, subwf.SubWorkflows), nStatus, isDynamic, nil
+}
+
+func (e dynamicNodeHandler) buildFlyteWorkflow(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode,
+	dataDir storage.DataReference, nStatus v1alpha1.ExecutableNodeStatus) (compiledWf *v1alpha1.FlyteWorkflow, isDynamic bool, err error) {
+	t := e.metrics.buildDynamicWorkflow.Start(ctx)
+	defer t.Stop()
+
+	// We will only get here if the Phase is success. The downside is that this is an overhead for all nodes that are
+	// not dynamic. But given that we will only check once, it should be ok.
+	// TODO: Check for node.is_dynamic once the IDL changes are in and SDK migration has happened.
+	djSpec, err := e.getDynamicJobSpec(ctx, node, dataDir)
+	if err != nil {
+		return nil, false, err
+	}
+
+	if djSpec == nil {
+		return nil, false, nil
+	}
+
 	var closure *core.CompiledWorkflowClosure
 	wf, err := e.buildDynamicWorkflowTemplate(ctx, djSpec, w, node, nStatus)
 	if err != nil {
-		return nil, nil, true, err
+		return nil, true, err
 	}
 
 	compiledTasks, err := compileTasks(ctx, djSpec.Tasks)
 	if err != nil {
-		return nil, nil, true, err
+		return nil, true, err
 	}
 
 	// TODO: This will currently fail if the WF references any launch plans
 	closure, err = compiler.CompileWorkflow(wf, djSpec.Subworkflows, compiledTasks, []common2.InterfaceProvider{})
 	if err != nil {
-		return nil, nil, true, err
+		return nil, true, err
 	}
 
 	subwf, err := k8s.BuildFlyteWorkflow(closure, nil, nil, "")
 	if err != nil {
-		return nil, nil, true, err
+		return nil, false, err
 	}
 
-	return newContextualWorkflow(w, subwf, nStatus, subwf.Tasks, subwf.SubWorkflows), nStatus, true, nil
+	return subwf, true, nil
+}
+
+func (e dynamicNodeHandler) loadOrBuildDynamicWorkflow(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode,
+	dataDir storage.DataReference, nodeStatus v1alpha1.ExecutableNodeStatus) (compiledWf *v1alpha1.FlyteWorkflow, isDynamic bool, err error) {
+
+	cacheHitStopWatch := e.metrics.CacheHit.Start(ctx)
+	// Check if we have compiled the workflow before:
+	compiledFuturesFilePath, err := e.store.ConstructReference(ctx, nodeStatus.GetDataDir(), v1alpha1.GetCompiledFutureFile())
+	if err != nil {
+		logger.Warnf(ctx, "Failed to construct data path for futures file. Error: %v", err)
+		return nil, false, errors.Wrapf(errors.CausedByError, node.GetID(), err, "Failed to construct data path for futures file.")
+	}
+
+	// If there is a cached compiled Workflow, load and return it.
+	if metadata, err := e.store.Head(ctx, compiledFuturesFilePath); err != nil {
+		logger.Warnf(ctx, "Failed to call head on compiled futures file. Error: %v", err)
+		return nil, false, errors.Wrapf(errors.CausedByError, node.GetID(), err, "Failed to do HEAD on compiled futures file.")
+	} else if metadata.Exists() {
+		// It exists, load and return it
+		compiledWf, err = loadCachedFlyteWorkflow(ctx, e.store, compiledFuturesFilePath)
+		if err != nil {
+			logger.Warnf(ctx, "Failed to load cached flyte workflow from [%v], this will cause the dynamic workflow to be recompiled. Error: %v",
+				compiledFuturesFilePath, err)
+			e.metrics.CacheError.Inc(ctx)
+		} else {
+			cacheHitStopWatch.Stop()
+			return compiledWf, true, nil
+		}
+	}
+
+	// If we have not build this spec before, build it now and cache it.
+	compiledWf, isDynamic, err = e.buildFlyteWorkflow(ctx, w, node, dataDir, nodeStatus)
+	if err != nil {
+		return compiledWf, isDynamic, err
+	}
+
+	if !isDynamic {
+		return compiledWf, isDynamic, err
+	}
+
+	// Cache the built WF. Errors are swallowed.
+	err = cacheFlyteWorkflow(ctx, e.store, compiledWf, compiledFuturesFilePath)
+	if err != nil {
+		logger.Warnf(ctx, "Failed to cache flyte workflow, this will cause a cache miss next time and cause the dynamic workflow to be recompiled. Error: %v", err)
+		e.metrics.CacheError.Inc(ctx)
+	}
+
+	return compiledWf, true, nil
 }
 
 func (e dynamicNodeHandler) progressDynamicWorkflow(ctx context.Context, parentNodeStatus v1alpha1.ExecutableNodeStatus,
