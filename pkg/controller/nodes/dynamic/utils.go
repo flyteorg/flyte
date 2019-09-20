@@ -1,8 +1,11 @@
 package dynamic
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 
+	"github.com/lyft/flytestdlib/storage"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -102,4 +105,36 @@ func compileTasks(_ context.Context, tasks []*core.TaskTemplate) ([]*core.Compil
 	}
 
 	return compiledTasks, nil
+}
+
+func cacheFlyteWorkflow(ctx context.Context, store storage.RawStore, wf *v1alpha1.FlyteWorkflow, target storage.DataReference) error {
+	raw, err := json.Marshal(wf)
+	if err != nil {
+		return err
+	}
+
+	return store.WriteRaw(ctx, target, int64(len(raw)), storage.Options{}, bytes.NewReader(raw))
+}
+
+func loadCachedFlyteWorkflow(ctx context.Context, store storage.RawStore, source storage.DataReference) (
+	*v1alpha1.FlyteWorkflow, error) {
+
+	rawReader, err := store.ReadRaw(ctx, source)
+	if err != nil {
+		return nil, err
+	}
+
+	buf := bytes.NewBuffer(nil)
+	_, err = buf.ReadFrom(rawReader)
+	if err != nil {
+		return nil, err
+	}
+
+	err = rawReader.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	wf := &v1alpha1.FlyteWorkflow{}
+	return wf, json.Unmarshal(buf.Bytes(), wf)
 }
