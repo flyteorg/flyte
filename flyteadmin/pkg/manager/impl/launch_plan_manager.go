@@ -366,7 +366,7 @@ func (m *LaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request adm
 		InlineFilters: filters,
 	}
 
-	output, err := m.db.LaunchPlanRepo().ListLaunchPlanIdentifiers(ctx, listLaunchPlansInput)
+	output, err := m.db.LaunchPlanRepo().List(ctx, listLaunchPlansInput)
 
 	if err != nil {
 		logger.Debugf(ctx, "Failed to list active launch plan id for request [%+v] with err %v", request, err)
