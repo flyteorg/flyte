@@ -1,0 +1,11 @@
+cluster_resources:
+  templatePath: "/etc/flyte/clusterresource/templates"
+  templateData:
+    user:
+      value: "flyte_user"
+    secret:
+      valueFrom:
+        env: "TEST_SECRET"
+    file:
+      valueFrom:
+        filePath: "/etc/flyte/misc.txt"

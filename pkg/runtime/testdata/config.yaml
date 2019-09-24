@@ -1,0 +1,20 @@
+queues:
+- name: "critical"
+  attributes:
+  - critical
+- name: "gpu"
+  attributes:
+  - awesome
+  - gpu
+workflow_configs:
+- project: myProject
+  domain: production
+  workflowName: "foo"
+  tags:
+  - critical
+  - important
+- project: myProject2
+  domain: production
+  workflowName: "bar"
+  tags:
+  - gpu

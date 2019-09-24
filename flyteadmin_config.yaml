@@ -1,0 +1,141 @@
+# This is a sample configuration file.
+# Real configuration when running inside K8s (local or otherwise) lives in a ConfigMap
+# Look in the artifacts directory in the flyte repo for what's actually run
+# https://github.com/lyft/flyte/blob/b47565c9998cde32b0b5f995981e3f3c990fa7cd/artifacts/flyteadmin.yaml#L72
+application:
+  httpPort: 8088
+  grpcPort: 8089
+flyteadmin:
+  someBoolean: true
+  someOtherBoolean: false
+  runScheduler: false
+  roleNameKey: "iam.amazonaws.com/role"
+  metricsScope: "flyte:"
+  profilerPort: 10254
+  testing:
+    host: "http://localhost:8088"
+  # This last must be in order! For example, a file path would be prefixed with metadata/admin/...
+  metadataStoragePrefix:
+  - "metadata"
+  - "admin"
+database:
+  port: 5432
+  username: postgres
+  host: localhost
+  dbname: postgres
+  options: "sslmode=disable"
+scheduler:
+  eventScheduler:
+    scheme: local
+    region: "my-region"
+    scheduleRole: "arn:aws:iam::abc123:role/my-iam-role"
+    targetName: "arn:aws:sqs:my-region:abc123:my-queue"
+  workflowExecutor:
+    scheme: local
+    region: "my-region"
+    scheduleQueueName: "won't-work-locally"
+    accountId: "abc123"
+remoteData:
+  region: "my-region"
+  scheme: local
+  signedUrls:
+    durationMinutes: 3
+notifications:
+  type: local
+  region: "my-region"
+  publisher:
+    topicName: "foo"
+  processor:
+    queueName: "queue"
+    accountId: "bar"
+  emailer:
+    subject: "Notice: Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\"."
+    sender:  "flyte-notifications@example.com"
+    body: >
+      Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\". View details at
+      <a href=\http://example.com/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
+      http://example.com/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
+Logger:
+  show-source: true
+  level: 5
+storage:
+  type: minio
+  connection:
+    access-key: minio
+    auth-type: accesskey
+    secret-key: miniostorage
+    disable-ssl: true
+    endpoint: "http://localhost:9000"
+    region: my-region
+  cache:
+    max_size_mbs: 10
+    target_gc_percent: 100
+  container: "flyte"
+queues:
+  executionQueues:
+    - primary: "gpu_primary"
+      dynamic: "gpu_dynamic"
+      attributes:
+      - gpu
+    - primary: "critical"
+      dynamic: "critical"
+      attributes:
+      - critical
+    - primary: "default"
+      dynamic: "default"
+      attributes:
+      - defaultclusters
+    - primary: "my_queue_1"
+      domain: "production"
+      workflowName: "my_workflow_1"
+      tags:
+      - critical
+    - primary: "my_queue_1"
+      domain: "production"
+      workflowName: "my_workflow_2"
+      tags:
+      - gpu
+    - primary: "my_queue_3"
+      domain: "production"
+      workflowName: "my_workflow_3"
+      tags:
+      - critical
+    - tags:
+      - default
+task_resources:
+  defaults:
+    cpu: 100m
+    gpu: 20m
+    memory: 1Mi
+    storage: 10M
+  limits:
+    cpu: 500m
+    gpu: 100m
+    memory: 1Mi
+    storage: 10G
+task_type_whitelist:
+  sparkonk8s:
+    - project: my_queue_1
+      domain: production
+    - project: my_queue_2
+      domain: production
+  qubolespark:
+    - project: my_queue_2
+domains:
+  - id: development
+    name: development
+  - id: staging
+    name: staging
+  - id: production
+    name: production
+  - id: domain
+    name: domain
+cluster_resources:
+  templatePath: pkg/clusterresource/sampletemplates
+  templateData:
+    foo:
+      value: "bar"
+    foofoo:
+      valueFrom:
+        env: SHELL
+  refresh: 3s
