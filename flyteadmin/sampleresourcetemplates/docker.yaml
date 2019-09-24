@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dockerhub
+  namespace: {{ namespace }}
+stringData:
+  .dockerconfigjson: '{"auths":{"docker.io":{"username":"mydockerusername","password":"{{ dockerSecret }}","email":"none","auth":" {{ dockerAuth }}"}}}'
+type: kubernetes.io/dockerconfigjson

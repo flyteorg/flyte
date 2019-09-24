@@ -1,0 +1,42 @@
+package mocks
+
+import (
+	"context"
+
+	"github.com/lyft/flyteadmin/pkg/async/schedule/interfaces"
+
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+)
+
+type AddScheduleFunc func(ctx context.Context, input interfaces.AddScheduleInput) error
+type RemoveScheduleFunc func(ctx context.Context, identifier admin.NamedEntityIdentifier) error
+type MockEventScheduler struct {
+	addScheduleFunc    AddScheduleFunc
+	removeScheduleFunc RemoveScheduleFunc
+}
+
+func (s *MockEventScheduler) AddSchedule(ctx context.Context, input interfaces.AddScheduleInput) error {
+	if s.addScheduleFunc != nil {
+		return s.addScheduleFunc(ctx, input)
+	}
+	return nil
+}
+
+func (s *MockEventScheduler) SetAddScheduleFunc(addScheduleFunc AddScheduleFunc) {
+	s.addScheduleFunc = addScheduleFunc
+}
+
+func (s *MockEventScheduler) RemoveSchedule(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
+	if s.removeScheduleFunc != nil {
+		return s.removeScheduleFunc(ctx, identifier)
+	}
+	return nil
+}
+
+func (s *MockEventScheduler) SetRemoveScheduleFunc(removeScheduleFunc RemoveScheduleFunc) {
+	s.removeScheduleFunc = removeScheduleFunc
+}
+
+func NewMockEventScheduler() interfaces.EventScheduler {
+	return &MockEventScheduler{}
+}
