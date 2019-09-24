@@ -231,7 +231,7 @@ func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName)
 				logger.Debugf(ctx, "Resource [%+v] in namespace [%s] already exists - attempting update instead",
 					k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
 				c.metrics.AppliedTemplateExists.Inc()
-				err = c.kubeClient.Update(ctx, k8sObj)
+				err = c.kubeClient.Patch(ctx, k8sObj, client.MergeFrom(k8sObj))
 				if err != nil {
 					c.metrics.TemplateUpdateErrors.Inc()
 					logger.Infof(ctx, "Failed to update resource [%+v] in namespace [%s] with err :%v",
