@@ -98,7 +98,8 @@ func TestCachedRawStore(t *testing.T) {
 	d2 := []byte("xyz")
 	bigD := make([]byte, 1.5*1024*1024)
 	// #nosec G404
-	rand.Read(bigD)
+	_, err := rand.Read(bigD)
+	assert.NoError(t, err)
 	writeCalled := false
 	readCalled := false
 	store := &dummyStore{
