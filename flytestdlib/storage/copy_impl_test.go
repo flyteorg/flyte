@@ -93,7 +93,8 @@ func TestCopyRaw_CachingErrorHandling(t *testing.T) {
 		writerCalled := false
 		bigD := make([]byte, 1.5*1024*1024)
 		// #nosec G404
-		rand.Read(bigD)
+		_, err := rand.Read(bigD)
+		assert.NoError(t, err)
 		dummyErrorMsg := "Dummy caching error"
 
 		store := dummyStore{
@@ -118,7 +119,8 @@ func TestCopyRaw_CachingErrorHandling(t *testing.T) {
 		writerCalled := false
 		bigD := make([]byte, 1.5*1024*1024)
 		// #nosec G404
-		rand.Read(bigD)
+		_, err := rand.Read(bigD)
+		assert.NoError(t, err)
 		dummyErrorMsg := "Dummy non-caching error"
 
 		store := dummyStore{
@@ -133,7 +135,8 @@ func TestCopyRaw_CachingErrorHandling(t *testing.T) {
 		}
 
 		copier := newCopyImpl(&store, promutils.NewTestScope())
-		err := copier.CopyRaw(context.Background(), DataReference("source.pb"), DataReference("dest.pb"), Options{})
+		err = copier.CopyRaw(context.Background(), DataReference("source.pb"), DataReference("dest.pb"), Options{})
+		assert.Error(t, err)
 		assert.True(t, readerCalled)
 		// writerCalled should be false because CopyRaw should error out right after c.rawstore.ReadRaw() when the underlying error is a hard error
 		assert.False(t, writerCalled)
