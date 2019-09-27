@@ -27,6 +27,7 @@ type CreateExecutionModelInput struct {
 	Notifications         []*admin.Notification
 	WorkflowIdentifier    *core.Identifier
 	ParentNodeExecutionID uint
+	Cluster               string
 }
 
 // Transforms a ExecutionCreateRequest to a Execution model
@@ -70,6 +71,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		ExecutionCreatedAt:    &input.CreatedAt,
 		ExecutionUpdatedAt:    &input.CreatedAt,
 		ParentNodeExecutionID: input.ParentNodeExecutionID,
+		Cluster:               input.Cluster,
 	}
 	if input.RequestSpec.Metadata != nil {
 		executionModel.Mode = int32(input.RequestSpec.Metadata.Mode)

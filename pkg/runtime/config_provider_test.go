@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/lyft/flyteadmin/pkg/runtime/interfaces"
+
 	"path/filepath"
 
 	"github.com/lyft/flytestdlib/config"
@@ -33,10 +35,22 @@ func TestClusterConfig(t *testing.T) {
 
 	configProvider := NewConfigurationProvider()
 	clusterConfig := configProvider.ClusterConfiguration()
-	cluster := clusterConfig.GetCurrentCluster()
-	assert.Equal(t, "testcluster2", cluster.Name)
-	assert.Equal(t, "testcluster2_endpoint", cluster.Endpoint)
-	assert.Equal(t, "/path/to/testcluster2/cert", cluster.Auth.CertPath)
-	assert.Equal(t, "/path/to/testcluster2/token", cluster.Auth.TokenPath)
-	assert.Equal(t, "file_path", cluster.Auth.Type)
+	assert.Equal(t, interfaces.ClusterSelectionRandom, clusterConfig.GetClusterSelectionStrategy())
+	clusters := clusterConfig.GetClusterConfigs()
+	assert.Equal(t, 2, len(clusters))
+
+	assert.Equal(t, "testcluster", clusters[0].Name)
+	assert.Equal(t, "testcluster_endpoint", clusters[0].Endpoint)
+	assert.Equal(t, "/path/to/testcluster/cert", clusters[0].Auth.CertPath)
+	assert.Equal(t, "/path/to/testcluster/token", clusters[0].Auth.TokenPath)
+	assert.Equal(t, "file_path", clusters[0].Auth.Type)
+	assert.False(t, clusters[0].Enabled)
+
+	assert.Equal(t, "testcluster2", clusters[1].Name)
+	assert.Equal(t, "testcluster2_endpoint", clusters[1].Endpoint)
+	assert.Equal(t, "/path/to/testcluster2/cert", clusters[1].Auth.CertPath)
+	assert.Equal(t, "/path/to/testcluster2/token", clusters[1].Auth.TokenPath)
+	assert.True(t, clusters[1].Enabled)
+
+	assert.Equal(t, "file_path", clusters[1].Auth.Type)
 }

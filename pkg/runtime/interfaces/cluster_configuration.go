@@ -11,6 +11,7 @@ type ClusterConfig struct {
 	Name     string `json:"name"`
 	Endpoint string `json:"endpoint"`
 	Auth     Auth   `json:"auth"`
+	Enabled  bool   `json:"enabled"`
 }
 
 type Auth struct {
@@ -18,6 +19,12 @@ type Auth struct {
 	TokenPath string `json:"tokenPath"`
 	CertPath  string `json:"certPath"`
 }
+
+type ClusterSelectionStrategy string
+
+var (
+	ClusterSelectionRandom ClusterSelectionStrategy
+)
 
 func (auth Auth) GetCA() ([]byte, error) {
 	cert, err := ioutil.ReadFile(auth.CertPath)
@@ -36,8 +43,8 @@ func (auth Auth) GetToken() (string, error) {
 }
 
 type Clusters struct {
-	ClusterConfigs []ClusterConfig `json:"clusterConfigs"`
-	CurrentCluster string          `json:"currentCluster"`
+	ClusterConfigs   []ClusterConfig          `json:"clusterConfigs"`
+	ClusterSelection ClusterSelectionStrategy `json:"clusterSelectionStrategy"`
 }
 
 // Provides values set in runtime configuration files.
@@ -46,6 +53,6 @@ type ClusterConfiguration interface {
 	// Returns clusters defined in runtime configuration files.
 	GetClusterConfigs() []ClusterConfig
 
-	// The current cluster to run the load
-	GetCurrentCluster() *ClusterConfig
+	// The cluster selection strategy setting
+	GetClusterSelectionStrategy() ClusterSelectionStrategy
 }

@@ -187,7 +187,7 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 			},
 		}, nil
 	}
-	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetListLaunchPlanIdentifiersCallback(launchPlanListFunc)
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetListCallback(launchPlanListFunc)
 	response, err := lpManager.GetActiveLaunchPlan(context.Background(), admin.ActiveLaunchPlanRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: lpRequest.Id.Project,

@@ -4,37 +4,35 @@ import (
 	"context"
 
 	"github.com/lyft/flyteadmin/pkg/workflowengine/interfaces"
-
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-type CreateExecutionFunc func(inputs interfaces.ExecuteWorkflowInputs) error
-type TerminateWorkflowExecutionFunc func(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error
+type ExecuteWorkflowFunc func(input interfaces.ExecuteWorkflowInput) (*interfaces.ExecutionInfo, error)
+type TerminateWorkflowExecutionFunc func(ctx context.Context, input interfaces.TerminateWorkflowInput) error
 
 type MockExecutor struct {
-	executeWorkflowCallback    CreateExecutionFunc
+	executeWorkflowCallback    ExecuteWorkflowFunc
 	terminateExecutionCallback TerminateWorkflowExecutionFunc
 }
 
-func (c *MockExecutor) SetExecuteWorkflowCallback(callback CreateExecutionFunc) {
+func (c *MockExecutor) SetExecuteWorkflowCallback(callback ExecuteWorkflowFunc) {
 	c.executeWorkflowCallback = callback
 }
 
 func (c *MockExecutor) ExecuteWorkflow(
-	ctx context.Context, inputs interfaces.ExecuteWorkflowInputs) error {
+	ctx context.Context, inputs interfaces.ExecuteWorkflowInput) (*interfaces.ExecutionInfo, error) {
 	if c.executeWorkflowCallback != nil {
 		return c.executeWorkflowCallback(inputs)
 	}
-	return nil
+	return &interfaces.ExecutionInfo{}, nil
 }
 
 func (c *MockExecutor) SetTerminateExecutionCallback(callback TerminateWorkflowExecutionFunc) {
 	c.terminateExecutionCallback = callback
 }
 
-func (c *MockExecutor) TerminateWorkflowExecution(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
+func (c *MockExecutor) TerminateWorkflowExecution(ctx context.Context, input interfaces.TerminateWorkflowInput) error {
 	if c.terminateExecutionCallback != nil {
-		return c.terminateExecutionCallback(ctx, executionID)
+		return c.terminateExecutionCallback(ctx, input)
 	}
 	return nil
 }

@@ -3,9 +3,9 @@ package entrypoints
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/clusterresource"
+	"github.com/lyft/flyteadmin/pkg/executioncluster"
 
-	"github.com/lyft/flyteadmin/pkg/flytek8s"
+	"github.com/lyft/flyteadmin/pkg/clusterresource"
 
 	"github.com/lyft/flyteadmin/pkg/runtime"
 
@@ -53,15 +53,13 @@ var controllerRunCmd = &cobra.Command{
 			repositories.POSTGRES, dbConfig, scope.NewSubScope("database"))
 
 		cfg := config.GetConfig()
-		kubeClient, err := flytek8s.NewKubeClient(cfg.KubeConfig, cfg.Master, configuration.ClusterConfiguration())
-		if err != nil {
-			scope.NewSubScope("flytekubeconfig").MustNewCounter(
-				"kubeconfig_get_error",
-				"count of errors encountered fetching and initializing kube config").Inc()
-			logger.Fatalf(ctx, "Failed to initialize kubeClient: %+v", err)
-		}
+		executionCluster := executioncluster.GetExecutionCluster(
+			scope.NewSubScope("cluster"),
+			cfg.KubeConfig,
+			cfg.Master,
+			configuration.ClusterConfiguration())
 
-		clusterResourceController := clusterresource.NewClusterResourceController(db, kubeClient, scope)
+		clusterResourceController := clusterresource.NewClusterResourceController(db, executionCluster, scope)
 		clusterResourceController.Run()
 		logger.Infof(ctx, "ClusterResourceController started successfully")
 	},
@@ -87,16 +85,14 @@ var controllerSyncCmd = &cobra.Command{
 			repositories.POSTGRES, dbConfig, scope.NewSubScope("database"))
 
 		cfg := config.GetConfig()
-		kubeClient, err := flytek8s.NewKubeClient(cfg.KubeConfig, cfg.Master, configuration.ClusterConfiguration())
-		if err != nil {
-			scope.NewSubScope("flytekubeconfig").MustNewCounter(
-				"kubeconfig_get_error",
-				"count of errors encountered fetching and initializing kube config").Inc()
-			logger.Fatalf(ctx, "Failed to initialize kubeClient: %+v", err)
-		}
+		executionCluster := executioncluster.GetExecutionCluster(
+			scope.NewSubScope("cluster"),
+			cfg.KubeConfig,
+			cfg.Master,
+			configuration.ClusterConfiguration())
 
-		clusterResourceController := clusterresource.NewClusterResourceController(db, kubeClient, scope)
-		err = clusterResourceController.Sync(ctx)
+		clusterResourceController := clusterresource.NewClusterResourceController(db, executionCluster, scope)
+		err := clusterResourceController.Sync(ctx)
 		if err != nil {
 			logger.Fatalf(ctx, "Failed to sync cluster resources [%+v]", err)
 		}

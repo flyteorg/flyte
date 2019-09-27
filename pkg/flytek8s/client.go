@@ -35,13 +35,22 @@ func RemoteClusterConfig(host string, auth runtimeInterfaces.Auth) (*restclient.
 	}, nil
 }
 
+func GetRestClientConfigForCluster(cluster runtimeInterfaces.ClusterConfig) (*restclient.Config, error) {
+	kubeConfiguration, err := RemoteClusterConfig(cluster.Endpoint, cluster.Auth)
+
+	if err != nil {
+		return nil, err
+	}
+	logger.Debugf(context.Background(), "successfully loaded kube configuration from %v", cluster)
+	return kubeConfiguration, nil
+}
+
 // Initializes a config using a variety of configurable or default fallback options that can be passed to a Kubernetes client on
 // initialization.
 func GetRestClientConfig(kubeConfig, master string,
-	configuration runtimeInterfaces.ClusterConfiguration) (*restclient.Config, error) {
+	k8sCluster *runtimeInterfaces.ClusterConfig) (*restclient.Config, error) {
 	var kubeConfiguration *restclient.Config
 	var err error
-	k8sCluster := configuration.GetCurrentCluster()
 
 	if kubeConfig != "" {
 		kubeConfiguration, err = clientcmd.BuildConfigFromFlags(master, kubeConfig)
@@ -50,12 +59,7 @@ func GetRestClientConfig(kubeConfig, master string,
 		}
 		logger.Debugf(context.Background(), "successfully loaded kube config from %s", kubeConfig)
 	} else if k8sCluster != nil {
-		kubeConfiguration, err = RemoteClusterConfig(k8sCluster.Endpoint, k8sCluster.Auth)
-
-		if err != nil {
-			return nil, err
-		}
-		logger.Debugf(context.Background(), "successfully loaded kube configuration from %v", k8sCluster)
+		return GetRestClientConfigForCluster(*k8sCluster)
 	} else {
 		kubeConfiguration, err = restclient.InClusterConfig()
 		if err != nil {
@@ -66,9 +70,9 @@ func GetRestClientConfig(kubeConfig, master string,
 	return kubeConfiguration, nil
 }
 
-// Initializes a kubernetes Client which performs CRUD operations on Kubernetes objects
-func NewKubeClient(kubeConfig, master string, configuration runtimeInterfaces.ClusterConfiguration) (client.Client, error) {
-	kubeConfiguration, err := GetRestClientConfig(kubeConfig, master, configuration)
+// Initializes a kubernetes Client which performs CRD operations on Kubernetes objects
+func NewKubeClient(kubeConfig, master string, k8sCluster *runtimeInterfaces.ClusterConfig) (client.Client, error) {
+	kubeConfiguration, err := GetRestClientConfig(kubeConfig, master, k8sCluster)
 	if err != nil {
 		return nil, err
 	}

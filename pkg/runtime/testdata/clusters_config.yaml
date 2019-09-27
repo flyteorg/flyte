@@ -1,5 +1,4 @@
 clusters:
-  currentCluster: "testcluster2"
   clusterConfigs:
   - name: "testcluster"
     endpoint: "testcluster_endpoint"
@@ -9,6 +8,7 @@ clusters:
       certPath: "/path/to/testcluster/cert"
   - name: "testcluster2"
     endpoint: "testcluster2_endpoint"
+    enabled: true
     auth:
       type: "file_path"
       tokenPath: "/path/to/testcluster2/token"

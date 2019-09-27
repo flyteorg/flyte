@@ -17,6 +17,13 @@ var clusterConfig = config.MustRegisterSection(clustersKey, &interfaces.Clusters
 // Implementation of an interfaces.ClusterConfiguration
 type ClusterConfigurationProvider struct{}
 
+func (p *ClusterConfigurationProvider) GetClusterSelectionStrategy() interfaces.ClusterSelectionStrategy {
+	if clusterConfig != nil {
+		return clusterConfig.GetConfig().(*interfaces.Clusters).ClusterSelection
+	}
+	return interfaces.ClusterSelectionRandom
+}
+
 func (p *ClusterConfigurationProvider) GetClusterConfigs() []interfaces.ClusterConfig {
 	if clusterConfig != nil {
 		clusters := clusterConfig.GetConfig().(*interfaces.Clusters)
@@ -26,20 +33,14 @@ func (p *ClusterConfigurationProvider) GetClusterConfigs() []interfaces.ClusterC
 	return make([]interfaces.ClusterConfig, 0)
 }
 
-func (p *ClusterConfigurationProvider) GetCurrentCluster() *interfaces.ClusterConfig {
-	if clusterConfig != nil {
-		clusters := clusterConfig.GetConfig().(*interfaces.Clusters)
-		currentCluster := clusters.CurrentCluster
-		for _, cluster := range clusters.ClusterConfigs {
-			if cluster.Name == currentCluster {
-				return &cluster
-			}
-		}
-	}
-	logger.Warningf(context.Background(), "Failed to find current cluster in config.")
-	return nil
-}
-
 func NewClusterConfigurationProvider() interfaces.ClusterConfiguration {
-	return &ClusterConfigurationProvider{}
+	clusterConfigProvider := ClusterConfigurationProvider{}
+	clusterNameMap := make(map[string]bool)
+	for _, config := range clusterConfigProvider.GetClusterConfigs() {
+		if clusterNameMap[config.Name] {
+			panic("Duplicate cluster names in runtime config")
+		}
+		clusterNameMap[config.Name] = true
+	}
+	return &clusterConfigProvider
 }

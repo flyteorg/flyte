@@ -11,6 +11,10 @@ import (
 	"strings"
 	"time"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/lyft/flyteadmin/pkg/executioncluster"
+
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 
@@ -27,8 +31,6 @@ import (
 	"github.com/lyft/flyteadmin/pkg/repositories"
 	"github.com/lyft/flyteadmin/pkg/runtime"
 	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	"github.com/lyft/flytestdlib/promutils"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 )
@@ -66,7 +68,7 @@ type NamespaceCache = map[NamespaceName]LastModTimeCache
 type controller struct {
 	db                     repositories.RepositoryInterface
 	config                 runtimeInterfaces.Configuration
-	kubeClient             client.Client
+	executionCluster       executioncluster.ClusterInterface
 	poller                 chan struct{}
 	metrics                controllerMetrics
 	lastAppliedTemplateDir string
@@ -225,34 +227,36 @@ func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName)
 		if _, ok := c.appliedTemplates[namespace]; !ok {
 			c.appliedTemplates[namespace] = make(LastModTimeCache)
 		}
-		err = c.kubeClient.Create(ctx, k8sObj)
-		if err != nil {
-			if k8serrors.IsAlreadyExists(err) {
-				logger.Debugf(ctx, "Resource [%+v] in namespace [%s] already exists - attempting update instead",
-					k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
-				c.metrics.AppliedTemplateExists.Inc()
-				err = c.kubeClient.Patch(ctx, k8sObj, client.MergeFrom(k8sObj))
-				if err != nil {
-					c.metrics.TemplateUpdateErrors.Inc()
-					logger.Infof(ctx, "Failed to update resource [%+v] in namespace [%s] with err :%v",
-						k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace, err)
+		for _, target := range c.executionCluster.GetAllValidTargets() {
+			err = target.Client.Create(ctx, k8sObj)
+			if err != nil {
+				if k8serrors.IsAlreadyExists(err) {
+					logger.Debugf(ctx, "Resource [%+v] in namespace [%s] already exists - attempting update instead",
+						k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
+					c.metrics.AppliedTemplateExists.Inc()
+					err = target.Client.Patch(ctx, k8sObj, client.MergeFrom(k8sObj))
+					if err != nil {
+						c.metrics.TemplateUpdateErrors.Inc()
+						logger.Infof(ctx, "Failed to update resource [%+v] in namespace [%s] with err :%v",
+							k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace, err)
+						collectedErrs = append(collectedErrs, err)
+					}
+					c.appliedTemplates[namespace][templateFile.Name()] = templateFile.ModTime()
+				} else {
+					c.metrics.KubernetesResourcesCreateErrors.Inc()
+					logger.Warningf(ctx, "Failed to create kubernetes object from config template [%s] for namespace [%s] with err: %v",
+						templateFileName, namespace, err)
+					err := errors.NewFlyteAdminErrorf(codes.Internal,
+						"Failed to create kubernetes object from config template [%s] for namespace [%s] with err: %v",
+						templateFileName, namespace, err)
 					collectedErrs = append(collectedErrs, err)
 				}
-				c.appliedTemplates[namespace][templateFile.Name()] = templateFile.ModTime()
 			} else {
-				c.metrics.KubernetesResourcesCreateErrors.Inc()
-				logger.Warningf(ctx, "Failed to create kubernetes object from config template [%s] for namespace [%s] with err: %v",
-					templateFileName, namespace, err)
-				err := errors.NewFlyteAdminErrorf(codes.Internal,
-					"Failed to create kubernetes object from config template [%s] for namespace [%s] with err: %v",
-					templateFileName, namespace, err)
-				collectedErrs = append(collectedErrs, err)
+				logger.Infof(ctx, "Created resource [%+v] for namespace [%s] in kubernetes",
+					k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
+				c.metrics.KubernetesResourcesCreated.Inc()
+				c.appliedTemplates[namespace][templateFile.Name()] = templateFile.ModTime()
 			}
-		} else {
-			logger.Infof(ctx, "Created resource [%+v] for namespace [%s] in kubernetes",
-				k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
-			c.metrics.KubernetesResourcesCreated.Inc()
-			c.appliedTemplates[namespace][templateFile.Name()] = templateFile.ModTime()
 		}
 	}
 	if len(collectedErrs) > 0 {
@@ -335,12 +339,12 @@ func newMetrics(scope promutils.Scope) controllerMetrics {
 	}
 }
 
-func NewClusterResourceController(db repositories.RepositoryInterface, client client.Client, scope promutils.Scope) Controller {
+func NewClusterResourceController(db repositories.RepositoryInterface, executionCluster executioncluster.ClusterInterface, scope promutils.Scope) Controller {
 	config := runtime.NewConfigurationProvider()
 	return &controller{
 		db:               db,
 		config:           config,
-		kubeClient:       client,
+		executionCluster: executionCluster,
 		poller:           make(chan struct{}),
 		metrics:          newMetrics(scope),
 		appliedTemplates: make(map[string]map[string]time.Time),
