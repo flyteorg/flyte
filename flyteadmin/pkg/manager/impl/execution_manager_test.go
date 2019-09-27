@@ -56,6 +56,7 @@ var executionIdentifier = core.WorkflowExecutionIdentifier{
 var mockPublisher notificationMocks.MockPublisher
 var mockExecutionRemoteURL = dataMocks.NewMockRemoteURL()
 var requestedAt = time.Now()
+var testCluster = "C1"
 
 func getMockExecutionsConfigProvider() runtimeInterfaces.Configuration {
 	mockExecutionsConfigProvider := runtimeMocks.NewMockConfigurationProvider(
@@ -145,7 +146,7 @@ func TestCreateExecution(t *testing.T) {
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.NewMockExecutor()
 	mockExecutor.(*workflowengineMocks.MockExecutor).SetExecuteWorkflowCallback(
-		func(inputs workflowengineInterfaces.ExecuteWorkflowInputs) error {
+		func(inputs workflowengineInterfaces.ExecuteWorkflowInput) (*workflowengineInterfaces.ExecutionInfo, error) {
 			assert.EqualValues(t, map[string]string{
 				"label1": "1",
 				"label2": "2",
@@ -154,7 +155,9 @@ func TestCreateExecution(t *testing.T) {
 				"annotation3": "3",
 				"annotation4": "4",
 			}, inputs.Annotations)
-			return nil
+			return &workflowengineInterfaces.ExecutionInfo{
+				Cluster: testCluster,
+			}, nil
 		})
 	execManager := NewExecutionManager(
 		repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(), mockExecutor,
@@ -232,10 +235,12 @@ func TestCreateExecution_NoAssignedName(t *testing.T) {
 		})
 	mockExecutor := workflowengineMocks.NewMockExecutor()
 	mockExecutor.(*workflowengineMocks.MockExecutor).SetExecuteWorkflowCallback(
-		func(inputs workflowengineInterfaces.ExecuteWorkflowInputs) error {
+		func(inputs workflowengineInterfaces.ExecuteWorkflowInput) (*workflowengineInterfaces.ExecutionInfo, error) {
 			assert.NotEmpty(t, inputs.ExecutionID.Name)
 			assert.Equal(t, requestedAt, inputs.AcceptedAt)
-			return nil
+			return &workflowengineInterfaces.ExecutionInfo{
+				Cluster: testCluster,
+			}, nil
 		})
 	execManager := NewExecutionManager(
 		repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(), mockExecutor, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL)
@@ -277,7 +282,7 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 		runtimeMocks.NewMockRegistrationValidationProvider())
 	mockExecutor := workflowengineMocks.NewMockExecutor()
 	mockExecutor.(*workflowengineMocks.MockExecutor).SetExecuteWorkflowCallback(
-		func(inputs workflowengineInterfaces.ExecuteWorkflowInputs) error {
+		func(inputs workflowengineInterfaces.ExecuteWorkflowInput) (*workflowengineInterfaces.ExecutionInfo, error) {
 			assert.NotEmpty(t, inputs.WfClosure.Tasks)
 			for _, task := range inputs.WfClosure.Tasks {
 				assert.Len(t, task.Template.GetContainer().Config, 2)
@@ -287,7 +292,9 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 				assert.Contains(t, "dynamic Q", task.Template.GetContainer().Config[1].Value)
 			}
 			assert.Equal(t, requestedAt, inputs.AcceptedAt)
-			return nil
+			return &workflowengineInterfaces.ExecutionInfo{
+				Cluster: testCluster,
+			}, nil
 		})
 	execManager := NewExecutionManager(
 		repository, configProvider, getMockStorageForExecTest(), mockExecutor, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL)
@@ -355,9 +362,9 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 	mockExecutor := workflowengineMocks.NewMockExecutor()
 	expectedErr := flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, "ABC")
 
-	createFunc := func(inputs workflowengineInterfaces.ExecuteWorkflowInputs) error {
+	createFunc := func(inputs workflowengineInterfaces.ExecuteWorkflowInput) (*workflowengineInterfaces.ExecutionInfo, error) {
 		assert.Equal(t, requestedAt, inputs.AcceptedAt)
-		return expectedErr
+		return nil, expectedErr
 	}
 	mockExecutor.(*workflowengineMocks.MockExecutor).SetExecuteWorkflowCallback(createFunc)
 	execManager := NewExecutionManager(
@@ -595,7 +602,7 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.NewMockExecutor()
 	mockExecutor.(*workflowengineMocks.MockExecutor).SetExecuteWorkflowCallback(
-		func(inputs workflowengineInterfaces.ExecuteWorkflowInputs) error {
+		func(inputs workflowengineInterfaces.ExecuteWorkflowInput) (*workflowengineInterfaces.ExecutionInfo, error) {
 			assert.EqualValues(t, map[string]string{
 				"dynamiclabel1": "dynamic1",
 				"dynamiclabel2": "dynamic2",
@@ -604,7 +611,9 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 				"dynamicannotation3": "dynamic3",
 				"dynamicannotation4": "dynamic4",
 			}, inputs.Annotations)
-			return nil
+			return &workflowengineInterfaces.ExecutionInfo{
+				Cluster: testCluster,
+			}, nil
 		})
 	execManager := NewExecutionManager(
 		repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(), mockExecutor,
@@ -653,6 +662,7 @@ func makeExecutionGetFunc(
 			LaunchPlanID: uint(1),
 			WorkflowID:   uint(2),
 			StartedAt:    startTime,
+			Cluster:      testCluster,
 		}, nil
 	}
 }
@@ -1692,18 +1702,19 @@ func TestTerminateExecution(t *testing.T) {
 		assert.Equal(t, execution.ExecutionCreatedAt, execution.ExecutionUpdatedAt,
 			"an abort call should not change ExecutionUpdatedAt until a corresponding execution event is received")
 		assert.Equal(t, abortCause, execution.AbortCause)
+		assert.Equal(t, testCluster, execution.Cluster)
 		return nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateExecutionCallback(updateExecutionFunc)
 
 	mockExecutor := workflowengineMocks.NewMockExecutor()
 	mockExecutor.(*workflowengineMocks.MockExecutor).SetTerminateExecutionCallback(
-		func(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
+		func(ctx context.Context, input workflowengineInterfaces.TerminateWorkflowInput) error {
 			assert.True(t, proto.Equal(&core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
-			}, executionID))
+			}, input.ExecutionID))
 			return nil
 		})
 	execManager := NewExecutionManager(
@@ -1728,7 +1739,7 @@ func TestTerminateExecution_PropellerError(t *testing.T) {
 
 	mockExecutor := workflowengineMocks.NewMockExecutor()
 	mockExecutor.(*workflowengineMocks.MockExecutor).SetTerminateExecutionCallback(
-		func(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error {
+		func(ctx context.Context, input workflowengineInterfaces.TerminateWorkflowInput) error {
 			return expectedError
 		})
 	repository := repositoryMocks.NewMockRepository()
@@ -1869,7 +1880,7 @@ func TestAddLabelsAndAnnotationsRuntimeLimitsObserved(t *testing.T) {
 		},
 	}
 	launchPlanSpec := testutils.GetSampleLpSpecForTest()
-	err := execManager.(*ExecutionManager).addLabelsAndAnnotations(request.Spec, &workflowengineInterfaces.ExecuteWorkflowInputs{
+	err := execManager.(*ExecutionManager).addLabelsAndAnnotations(request.Spec, &workflowengineInterfaces.ExecuteWorkflowInput{
 		Reference: admin.LaunchPlan{
 			Spec: &launchPlanSpec,
 		},
@@ -1878,7 +1889,7 @@ func TestAddLabelsAndAnnotationsRuntimeLimitsObserved(t *testing.T) {
 
 	mockRegistrationValidationConfig.(*runtimeMocks.MockRegistrationValidationProvider).MaxAnnotationEntries = 0
 	mockRegistrationValidationConfig.(*runtimeMocks.MockRegistrationValidationProvider).MaxLabelEntries = 1
-	err = execManager.(*ExecutionManager).addLabelsAndAnnotations(request.Spec, &workflowengineInterfaces.ExecuteWorkflowInputs{
+	err = execManager.(*ExecutionManager).addLabelsAndAnnotations(request.Spec, &workflowengineInterfaces.ExecuteWorkflowInput{
 		Reference: admin.LaunchPlan{
 			Spec: &launchPlanSpec,
 		},

@@ -38,7 +38,6 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-// TODO: Should this be hard-coded
 const parentContainerQueueKey = "parent_queue"
 const childContainerQueueKey = "child_queue"
 const noSourceExecutionID = 0
@@ -122,7 +121,7 @@ func validateMapSize(maxEntries int, candidate map[string]string, candidateName 
 // Labels and annotations defined in the execution spec are preferred over those defined in the
 // reference launch plan spec.
 func (m *ExecutionManager) addLabelsAndAnnotations(requestSpec *admin.ExecutionSpec,
-	partiallyPopulatedInputs *workflowengineInterfaces.ExecuteWorkflowInputs) error {
+	partiallyPopulatedInputs *workflowengineInterfaces.ExecuteWorkflowInput) error {
 
 	var labels map[string]string
 	if requestSpec.Labels != nil && requestSpec.Labels.Values != nil {
@@ -217,7 +216,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, *workflow.Id, workflow.Closure.CompiledWorkflow)
 
-	executeWorkflowInputs := workflowengineInterfaces.ExecuteWorkflowInputs{
+	executeWorkflowInputs := workflowengineInterfaces.ExecuteWorkflowInput{
 		ExecutionID: &workflowExecutionID,
 		WfClosure:   *workflow.Closure.CompiledWorkflow,
 		Inputs:      executionInputs,
@@ -229,7 +228,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, err
 	}
 
-	err = m.workflowExecutor.ExecuteWorkflow(ctx, executeWorkflowInputs)
+	execInfo, err := m.workflowExecutor.ExecuteWorkflow(ctx, executeWorkflowInputs)
 	if err != nil {
 		m.systemMetrics.PropellerFailures.Inc()
 		logger.Infof(ctx, "Failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
@@ -265,6 +264,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		Notifications:         notificationsSettings,
 		WorkflowIdentifier:    workflow.Id,
 		ParentNodeExecutionID: parentNodeExecutionID,
+		Cluster:               execInfo.Cluster,
 	})
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
@@ -728,11 +728,6 @@ func (m *ExecutionManager) TerminateExecution(
 		logger.Debugf(ctx, "received terminate execution request: %v with invalid identifier: %v", request, err)
 		return nil, err
 	}
-	err := m.workflowExecutor.TerminateWorkflowExecution(ctx, request.Id)
-	if err != nil {
-		return nil, err
-	}
-
 	// Save the abort reason (best effort)
 	executionModel, err := m.db.ExecutionRepo().Get(ctx, repositoryInterfaces.GetResourceInput{
 		Project: request.Id.Project,
@@ -743,6 +738,15 @@ func (m *ExecutionManager) TerminateExecution(
 		logger.Infof(ctx, "couldn't find execution [%+v] to save termination cause", request.Id)
 		return nil, err
 	}
+
+	err = m.workflowExecutor.TerminateWorkflowExecution(ctx, workflowengineInterfaces.TerminateWorkflowInput{
+		ExecutionID: request.Id,
+		Cluster:     executionModel.Cluster,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	executionModel.AbortCause = request.Cause
 	err = m.db.ExecutionRepo().UpdateExecution(ctx, executionModel)
 	if err != nil {

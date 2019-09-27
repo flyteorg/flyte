@@ -9,7 +9,7 @@ import (
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-type ExecuteWorkflowInputs struct {
+type ExecuteWorkflowInput struct {
 	ExecutionID *core.WorkflowExecutionIdentifier
 	WfClosure   core.CompiledWorkflowClosure
 	Inputs      *core.LiteralMap
@@ -17,6 +17,15 @@ type ExecuteWorkflowInputs struct {
 	AcceptedAt  time.Time
 	Labels      map[string]string
 	Annotations map[string]string
+}
+
+type TerminateWorkflowInput struct {
+	ExecutionID *core.WorkflowExecutionIdentifier
+	Cluster     string
+}
+
+type ExecutionInfo struct {
+	Cluster string
 }
 
 type FlyteWorkflowInterface interface {
@@ -27,6 +36,6 @@ type FlyteWorkflowInterface interface {
 
 type Executor interface {
 	ExecuteWorkflow(
-		ctx context.Context, inputs ExecuteWorkflowInputs) error
-	TerminateWorkflowExecution(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) error
+		ctx context.Context, input ExecuteWorkflowInput) (*ExecutionInfo, error)
+	TerminateWorkflowExecution(ctx context.Context, input TerminateWorkflowInput) error
 }

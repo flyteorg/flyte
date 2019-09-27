@@ -43,4 +43,6 @@ type Execution struct {
 	DescendantExecution *Execution
 	// The parent node execution if this was launched by a node
 	ParentNodeExecutionID uint
+	// Cluster where execution was triggered
+	Cluster string
 }
