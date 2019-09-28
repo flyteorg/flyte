@@ -53,8 +53,8 @@ func NewPostgresRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scop
 		launchPlanRepo:    gormimpl.NewLaunchPlanRepo(db, errorTransformer, scope.NewSubScope("launch_plans")),
 		projectRepo:       gormimpl.NewProjectRepo(db, errorTransformer, scope.NewSubScope("namespace")),
 		nodeExecutionRepo: gormimpl.NewNodeExecutionRepo(db, errorTransformer, scope.NewSubScope("node_executions")),
-		taskRepo:          gormimpl.NewTaskRepo(db, errorTransformer, scope.NewSubScope("task_executions")),
-		taskExecutionRepo: gormimpl.NewTaskExecutionRepo(db, errorTransformer, scope.NewSubScope("tasks")),
+		taskRepo:          gormimpl.NewTaskRepo(db, errorTransformer, scope.NewSubScope("tasks")),
+		taskExecutionRepo: gormimpl.NewTaskExecutionRepo(db, errorTransformer, scope.NewSubScope("task_executions")),
 		workflowRepo:      gormimpl.NewWorkflowRepo(db, errorTransformer, scope.NewSubScope("workflows")),
 	}
 }
