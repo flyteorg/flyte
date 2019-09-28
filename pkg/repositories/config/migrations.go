@@ -109,4 +109,14 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Exec("update node_executions set parent_task_execution_id = NULL where parent_task_execution_id = 0").Error
 		},
 	},
+	// Update executions table to add cluster
+	{
+		ID: "2019-09-27-executions",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.Execution{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS cluster").Error 
+		},
+	},
 }
