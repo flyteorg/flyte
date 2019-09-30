@@ -59,7 +59,7 @@ func (r RedisResourceManager) AllocateResource(ctx context.Context, namespace st
 		return AllocationUndefined, err
 	}
 
-	if size > int64(config.GetQuboleConfig().QuboleLimit) {
+	if size >= int64(config.GetQuboleConfig().QuboleLimit) {
 		logger.Infof(ctx, "Too many allocations (total [%d]), rejecting [%s:%s]", size, namespace, allocationToken)
 		return AllocationStatusExhausted, nil
 	}
