@@ -65,7 +65,7 @@ func createTask(id string, ttype string, discoverable bool) *v1alpha1.TaskSpec {
 				Inputs: &core.VariableMap{},
 				Outputs: &core.VariableMap{
 					Variables: map[string]*core.Variable{
-						"out1": &core.Variable{
+						"out1": {
 							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
 						},
 					},
@@ -132,16 +132,90 @@ func createInmemoryDataStore(t testing.TB, scope promutils.Scope) *storage.DataS
 	return d
 }
 
+func createDynamicJobSpec() *core.DynamicJobSpec {
+	return &core.DynamicJobSpec{
+		MinSuccesses: 2,
+		Tasks: []*core.TaskTemplate{
+			{
+				Id:   &core.Identifier{Name: "task_1"},
+				Type: "container",
+				Interface: &core.TypedInterface{
+					Outputs: &core.VariableMap{
+						Variables: map[string]*core.Variable{
+							"x": {
+								Type: &core.LiteralType{
+									Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				Id:   &core.Identifier{Name: "task_2"},
+				Type: "container",
+			},
+		},
+		Nodes: []*core.Node{
+			{
+				Id: "Node_1",
+				Target: &core.Node_TaskNode{
+					TaskNode: &core.TaskNode{
+						Reference: &core.TaskNode_ReferenceId{
+							ReferenceId: &core.Identifier{Name: "task_1"},
+						},
+					},
+				},
+			},
+			{
+				Id: "Node_2",
+				Target: &core.Node_TaskNode{
+					TaskNode: &core.TaskNode{
+						Reference: &core.TaskNode_ReferenceId{
+							ReferenceId: &core.Identifier{Name: "task_1"},
+						},
+					},
+				},
+			},
+			{
+				Id: "Node_3",
+				Target: &core.Node_TaskNode{
+					TaskNode: &core.TaskNode{
+						Reference: &core.TaskNode_ReferenceId{
+							ReferenceId: &core.Identifier{Name: "task_2"},
+						},
+					},
+				},
+			},
+		},
+		Outputs: []*core.Binding{
+			{
+				Var: "x",
+				Binding: &core.BindingData{
+					Value: &core.BindingData_Promise{
+						Promise: &core.OutputReference{
+							Var:    "x",
+							NodeId: "Node_1",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func TestTaskHandler_CheckNodeStatusDiscovery(t *testing.T) {
 	ctx := context.Background()
 
 	taskID := "t1"
 	tk := createTask(taskID, "container", true)
 	tk.Id.Project = "flytekit"
+
 	w := createWf("w1", "w2-exec", "projTest", "domainTest", "checkNodeTestName")
 	w.Tasks = map[v1alpha1.TaskID]*v1alpha1.TaskSpec{
 		taskID: tk,
 	}
+
 	n := createStartNode()
 	n.TaskRef = &taskID
 
@@ -258,4 +332,63 @@ func TestTaskHandler_CheckNodeStatusDiscovery(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, handler.StatusSuccess, s)
 	})
+}
+
+func TestBuildFlyteWorkflow(t *testing.T) {
+	ctx := context.Background()
+
+	dynamicSpec := createDynamicJobSpec()
+	tk := dynamicSpec.Tasks[0]
+	w := createWf("w1", "w2-exec", "projTest", "domainTest", "checkNodeTestName")
+	w.Tasks = map[v1alpha1.TaskID]*v1alpha1.TaskSpec{
+		tk.Id.String(): {TaskTemplate: tk},
+	}
+
+	n := createStartNode()
+	taskID := tk.Id.String()
+	n.TaskRef = &taskID
+
+	w.Nodes = map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+		NodeID: n,
+	}
+
+	taskExec := &mocks.Executor{}
+	taskExec.On("GetProperties").Return(pluginsV1.ExecutorProperties{})
+	taskExec.On("CheckTaskStatus",
+		ctx,
+		mock.MatchedBy(func(o pluginsV1.TaskContext) bool { return true }),
+		mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
+	).Return(pluginsV1.TaskStatusSucceeded, nil)
+	d := &task.FactoryFuncs{
+		GetTaskExecutorCb: func(taskType v1alpha1.TaskType) (pluginsV1.Executor, error) {
+			if taskType == tk.Type {
+				return taskExec, nil
+			}
+			return nil, fmt.Errorf("no match")
+		},
+	}
+	store := createInmemoryDataStore(t, promutils.NewTestScope())
+	assert.NoError(t, store.WriteProtobuf(ctx, "/test-data/futures.pb", storage.Options{}, dynamicSpec))
+
+	paramsMap := make(map[string]*core.Literal)
+	paramsMap["out1"] = newIntegerLiteral(100)
+	assert.NoError(t, store.WriteProtobuf(ctx, "/test-data/inputs.pb", storage.Options{}, &core.LiteralMap{Literals: paramsMap}))
+	assert.NoError(t, store.WriteProtobuf(ctx, "/test-data/outputs.pb", storage.Options{}, &core.LiteralMap{Literals: paramsMap}))
+
+	th := New(
+		task.NewTaskHandlerForFactory(events.NewMockEventSink(), store, enqueueWfFunc, d, mockCatalogClient(), fakeKubeClient, promutils.NewTestScope()),
+		nil,
+		enqueueWfFunc,
+		store,
+		promutils.NewTestScope(),
+	).(dynamicNodeHandler)
+
+	prevNodeStatus := &v1alpha1.NodeStatus{Phase: v1alpha1.NodePhaseRunning}
+
+	n2, found := w.GetNode(NodeID)
+	assert.True(t, found)
+
+	_, isdynamic, err := th.buildFlyteWorkflow(ctx, w, n2, "/test-data/", prevNodeStatus)
+	assert.NoError(t, err)
+	assert.True(t, isdynamic)
 }

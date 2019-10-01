@@ -288,7 +288,7 @@ func (e dynamicNodeHandler) buildFlyteWorkflow(ctx context.Context, w v1alpha1.E
 		return nil, true, err
 	}
 
-	subwf, err := k8s.BuildFlyteWorkflow(closure, nil, nil, "")
+	subwf, err := k8s.BuildFlyteWorkflow(closure, &core.LiteralMap{}, nil, "")
 	if err != nil {
 		return nil, false, err
 	}
