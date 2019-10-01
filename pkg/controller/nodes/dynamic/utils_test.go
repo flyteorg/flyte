@@ -104,6 +104,7 @@ func Test_cacheFlyteWorkflow(t *testing.T) {
 				UpstreamEdges:   map[v1alpha1.NodeID][]v1alpha1.NodeID{},
 			},
 		},
+		Inputs: &v1alpha1.Inputs{LiteralMap: &core.LiteralMap{}},
 	}
 
 	location := storage.DataReference("somekey/file.json")
