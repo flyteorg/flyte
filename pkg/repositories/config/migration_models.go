@@ -47,7 +47,7 @@ type NodeExecution struct {
 	Duration               time.Duration
 	NodeExecutionEvents    []models.NodeExecutionEvent
 	// The task execution (if any) which launched this node execution.
-	ParentTaskExecutionID uint `sql:"default:null"`
+	ParentTaskExecutionID uint `sql:"default:null" gorm:"index"`
 	// The workflow execution (if any) which this node execution launched
 	LaunchedExecution models.Execution `gorm:"foreignkey:ParentNodeExecutionID"`
 }
