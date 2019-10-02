@@ -34,7 +34,7 @@ func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequiremen
 	}
 	
 	if _, found := resources.Requests[v1.ResourceCPU]; !found {
-		// use cpu limit if set else use default from config
+		// use cpu limit if set else default to config
 		if _, limitSet := resources.Limits[v1.ResourceCPU]; limitSet {
 			resources.Requests[v1.ResourceCPU] = resources.Limits[v1.ResourceCPU]
 		} else {
@@ -42,7 +42,7 @@ func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequiremen
 		}
 	}
 	if _, found := resources.Requests[v1.ResourceMemory]; !found {
-		// use memory limit if set else use default from config
+		// use memory limit if set else default to config
 		if _, limitSet := resources.Limits[v1.ResourceCPU]; limitSet {
 			resources.Requests[v1.ResourceMemory] = resources.Limits[v1.ResourceMemory]
 		} else {
