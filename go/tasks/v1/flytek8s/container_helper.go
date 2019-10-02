@@ -29,19 +29,27 @@ func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequiremen
 	if len(resources.Requests) == 0 {
 		resources.Requests = make(v1.ResourceList)
 	}
-	if _, found := resources.Requests[v1.ResourceCPU]; !found {
-		resources.Requests[v1.ResourceCPU] = resource.MustParse(config.GetK8sPluginConfig().DefaultCpuRequest)
-	}
-	if _, found := resources.Requests[v1.ResourceMemory]; !found {
-		resources.Requests[v1.ResourceMemory] = resource.MustParse(config.GetK8sPluginConfig().DefaultMemoryRequest)
-	}
-
 	if len(resources.Limits) == 0 {
 		resources.Limits = make(v1.ResourceList)
 	}
-	if len(resources.Requests) == 0 {
-		resources.Requests = make(v1.ResourceList)
+	
+	if _, found := resources.Requests[v1.ResourceCPU]; !found {
+		// use cpu limit if set else use default from config
+		if _, limitSet := resources.Limits[v1.ResourceCPU]; limitSet {
+			resources.Requests[v1.ResourceCPU] = resources.Limits[v1.ResourceCPU]
+		} else {
+			resources.Requests[v1.ResourceCPU] = resource.MustParse(config.GetK8sPluginConfig().DefaultCpuRequest)
+		}
 	}
+	if _, found := resources.Requests[v1.ResourceMemory]; !found {
+		// use memory limit if set else use default from config
+		if _, limitSet := resources.Limits[v1.ResourceCPU]; limitSet {
+			resources.Requests[v1.ResourceMemory] = resources.Limits[v1.ResourceMemory]
+		} else {
+			resources.Requests[v1.ResourceMemory] = resource.MustParse(config.GetK8sPluginConfig().DefaultMemoryRequest)
+		}
+	}
+
 	if _, found := resources.Limits[v1.ResourceCPU]; !found {
 		logger.Infof(ctx, "found cpu limit missing, setting limit to the requested value %v", resources.Requests[v1.ResourceCPU])
 		resources.Limits[v1.ResourceCPU] = resources.Requests[v1.ResourceCPU]
