@@ -63,6 +63,10 @@ export const getExecution = (
         config
     );
 
+const emptyExecutionData: ExecutionData = {
+    inputs: {},
+    outputs: {}
+};
 /** Fetches data URLs for an `Execution` record */
 export const getExecutionData = (
     id: WorkflowExecutionIdentifier,
@@ -71,7 +75,11 @@ export const getExecutionData = (
     getAdminEntity<Admin.WorkflowExecutionGetDataResponse, ExecutionData>(
         {
             path: `/data${makeExecutionPath(id)}`,
-            messageType: Admin.WorkflowExecutionGetDataResponse
+            messageType: Admin.WorkflowExecutionGetDataResponse,
+            // Admin isn't guaranteed to populate both inputs and outputs,
+            // so ensure that a safe access is possible for each
+            transform: result =>
+                ({ ...emptyExecutionData, ...result } as ExecutionData)
         },
         config
     );
