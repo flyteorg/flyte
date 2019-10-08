@@ -47,3 +47,29 @@ func TestIsFailedWriteToCache(t *testing.T) {
 	assert.True(t, IsFailedWriteToCache(failedToWriteCacheError))
 	assert.False(t, IsFailedWriteToCache(sysError))
 }
+
+func TestMapStrings(t *testing.T) {
+	t.Run("nothing", func(t *testing.T) {
+		assert.Equal(t, []string{}, MapStrings(func(s string) string {
+			return s
+		}))
+	})
+
+	t.Run("one item", func(t *testing.T) {
+		assert.Equal(t, []string{"item"}, MapStrings(func(s string) string {
+			return s
+		}, "item"))
+	})
+
+	t.Run("const", func(t *testing.T) {
+		assert.Equal(t, []string{"something"}, MapStrings(func(s string) string {
+			return "something"
+		}, "item"))
+	})
+
+	t.Run("half string", func(t *testing.T) {
+		assert.Equal(t, []string{"thing", "some"}, MapStrings(func(s string) string {
+			return s[len(s)/2:]
+		}, "something", "somesome"))
+	})
+}

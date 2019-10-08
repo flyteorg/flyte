@@ -44,3 +44,15 @@ func IsExceedsLimit(err error) bool {
 func IsFailedWriteToCache(err error) bool {
 	return errors2.IsCausedBy(err, ErrFailedToWriteCache)
 }
+
+func MapStrings(mapper func(string) string, strings ...string) []string {
+	if strings == nil {
+		return []string{}
+	}
+
+	for i, str := range strings {
+		strings[i] = mapper(str)
+	}
+
+	return strings
+}
