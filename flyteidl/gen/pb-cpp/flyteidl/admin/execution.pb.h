@@ -308,6 +308,15 @@ class ExecutionCreateRequest : public ::google::protobuf::Message /* @@protoc_in
   ::flyteidl::admin::ExecutionSpec* mutable_spec();
   void set_allocated_spec(::flyteidl::admin::ExecutionSpec* spec);
 
+  // .flyteidl.core.LiteralMap inputs = 5;
+  bool has_inputs() const;
+  void clear_inputs();
+  static const int kInputsFieldNumber = 5;
+  const ::flyteidl::core::LiteralMap& inputs() const;
+  ::flyteidl::core::LiteralMap* release_inputs();
+  ::flyteidl::core::LiteralMap* mutable_inputs();
+  void set_allocated_inputs(::flyteidl::core::LiteralMap* inputs);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.ExecutionCreateRequest)
  private:
 
@@ -316,6 +325,7 @@ class ExecutionCreateRequest : public ::google::protobuf::Message /* @@protoc_in
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::flyteidl::admin::ExecutionSpec* spec_;
+  ::flyteidl::core::LiteralMap* inputs_;
   mutable int _cached_size_;
   friend struct ::protobuf_flyteidl_2fadmin_2fexecution_2eproto::TableStruct;
   friend void ::protobuf_flyteidl_2fadmin_2fexecution_2eproto::InitDefaultsExecutionCreateRequestImpl();
@@ -1124,14 +1134,14 @@ class ExecutionClosure : public ::google::protobuf::Message /* @@protoc_insertio
   const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Notification >&
       notifications() const;
 
-  // .flyteidl.core.LiteralMap computed_inputs = 3;
-  bool has_computed_inputs() const;
-  void clear_computed_inputs();
-  static const int kComputedInputsFieldNumber = 3;
-  const ::flyteidl::core::LiteralMap& computed_inputs() const;
-  ::flyteidl::core::LiteralMap* release_computed_inputs();
-  ::flyteidl::core::LiteralMap* mutable_computed_inputs();
-  void set_allocated_computed_inputs(::flyteidl::core::LiteralMap* computed_inputs);
+  // .flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR bool has_computed_inputs() const;
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR void clear_computed_inputs();
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR static const int kComputedInputsFieldNumber = 3;
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR const ::flyteidl::core::LiteralMap& computed_inputs() const;
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR ::flyteidl::core::LiteralMap* release_computed_inputs();
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR ::flyteidl::core::LiteralMap* mutable_computed_inputs();
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR void set_allocated_computed_inputs(::flyteidl::core::LiteralMap* computed_inputs);
 
   // .google.protobuf.Timestamp started_at = 5;
   bool has_started_at() const;
@@ -1638,14 +1648,14 @@ class ExecutionSpec : public ::google::protobuf::Message /* @@protoc_insertion_p
   ::flyteidl::core::Identifier* mutable_launch_plan();
   void set_allocated_launch_plan(::flyteidl::core::Identifier* launch_plan);
 
-  // .flyteidl.core.LiteralMap inputs = 2;
-  bool has_inputs() const;
-  void clear_inputs();
-  static const int kInputsFieldNumber = 2;
-  const ::flyteidl::core::LiteralMap& inputs() const;
-  ::flyteidl::core::LiteralMap* release_inputs();
-  ::flyteidl::core::LiteralMap* mutable_inputs();
-  void set_allocated_inputs(::flyteidl::core::LiteralMap* inputs);
+  // .flyteidl.core.LiteralMap inputs = 2 [deprecated = true];
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR bool has_inputs() const;
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR void clear_inputs();
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR static const int kInputsFieldNumber = 2;
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR const ::flyteidl::core::LiteralMap& inputs() const;
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR ::flyteidl::core::LiteralMap* release_inputs();
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR ::flyteidl::core::LiteralMap* mutable_inputs();
+  GOOGLE_PROTOBUF_DEPRECATED_ATTR void set_allocated_inputs(::flyteidl::core::LiteralMap* inputs);
 
   // .flyteidl.admin.ExecutionMetadata metadata = 3;
   bool has_metadata() const;
@@ -2123,11 +2133,21 @@ class WorkflowExecutionGetDataResponse : public ::google::protobuf::Message /* @
   ::flyteidl::admin::UrlBlob* mutable_outputs();
   void set_allocated_outputs(::flyteidl::admin::UrlBlob* outputs);
 
+  // .flyteidl.admin.UrlBlob inputs = 2;
+  bool has_inputs() const;
+  void clear_inputs();
+  static const int kInputsFieldNumber = 2;
+  const ::flyteidl::admin::UrlBlob& inputs() const;
+  ::flyteidl::admin::UrlBlob* release_inputs();
+  ::flyteidl::admin::UrlBlob* mutable_inputs();
+  void set_allocated_inputs(::flyteidl::admin::UrlBlob* inputs);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowExecutionGetDataResponse)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::flyteidl::admin::UrlBlob* outputs_;
+  ::flyteidl::admin::UrlBlob* inputs_;
   mutable int _cached_size_;
   friend struct ::protobuf_flyteidl_2fadmin_2fexecution_2eproto::TableStruct;
   friend void ::protobuf_flyteidl_2fadmin_2fexecution_2eproto::InitDefaultsWorkflowExecutionGetDataResponseImpl();
@@ -2350,6 +2370,50 @@ inline void ExecutionCreateRequest::set_allocated_spec(::flyteidl::admin::Execut
   }
   spec_ = spec;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionCreateRequest.spec)
+}
+
+// .flyteidl.core.LiteralMap inputs = 5;
+inline bool ExecutionCreateRequest::has_inputs() const {
+  return this != internal_default_instance() && inputs_ != NULL;
+}
+inline const ::flyteidl::core::LiteralMap& ExecutionCreateRequest::inputs() const {
+  const ::flyteidl::core::LiteralMap* p = inputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionCreateRequest.inputs)
+  return p != NULL ? *p : *reinterpret_cast<const ::flyteidl::core::LiteralMap*>(
+      &::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* ExecutionCreateRequest::release_inputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionCreateRequest.inputs)
+  
+  ::flyteidl::core::LiteralMap* temp = inputs_;
+  inputs_ = NULL;
+  return temp;
+}
+inline ::flyteidl::core::LiteralMap* ExecutionCreateRequest::mutable_inputs() {
+  
+  if (inputs_ == NULL) {
+    inputs_ = new ::flyteidl::core::LiteralMap;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionCreateRequest.inputs)
+  return inputs_;
+}
+inline void ExecutionCreateRequest::set_allocated_inputs(::flyteidl::core::LiteralMap* inputs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(inputs_);
+  }
+  if (inputs) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      inputs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, inputs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  inputs_ = inputs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionCreateRequest.inputs)
 }
 
 // -------------------------------------------------------------------
@@ -3099,7 +3163,7 @@ inline void ExecutionClosure::set_allocated_abort_cause(::std::string* abort_cau
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionClosure.abort_cause)
 }
 
-// .flyteidl.core.LiteralMap computed_inputs = 3;
+// .flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];
 inline bool ExecutionClosure::has_computed_inputs() const {
   return this != internal_default_instance() && computed_inputs_ != NULL;
 }
@@ -3714,7 +3778,7 @@ inline void ExecutionSpec::set_allocated_launch_plan(::flyteidl::core::Identifie
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.launch_plan)
 }
 
-// .flyteidl.core.LiteralMap inputs = 2;
+// .flyteidl.core.LiteralMap inputs = 2 [deprecated = true];
 inline bool ExecutionSpec::has_inputs() const {
   return this != internal_default_instance() && inputs_ != NULL;
 }
@@ -4173,6 +4237,50 @@ inline void WorkflowExecutionGetDataResponse::set_allocated_outputs(::flyteidl::
   }
   outputs_ = outputs;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowExecutionGetDataResponse.outputs)
+}
+
+// .flyteidl.admin.UrlBlob inputs = 2;
+inline bool WorkflowExecutionGetDataResponse::has_inputs() const {
+  return this != internal_default_instance() && inputs_ != NULL;
+}
+inline const ::flyteidl::admin::UrlBlob& WorkflowExecutionGetDataResponse::inputs() const {
+  const ::flyteidl::admin::UrlBlob* p = inputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionGetDataResponse.inputs)
+  return p != NULL ? *p : *reinterpret_cast<const ::flyteidl::admin::UrlBlob*>(
+      &::flyteidl::admin::_UrlBlob_default_instance_);
+}
+inline ::flyteidl::admin::UrlBlob* WorkflowExecutionGetDataResponse::release_inputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowExecutionGetDataResponse.inputs)
+  
+  ::flyteidl::admin::UrlBlob* temp = inputs_;
+  inputs_ = NULL;
+  return temp;
+}
+inline ::flyteidl::admin::UrlBlob* WorkflowExecutionGetDataResponse::mutable_inputs() {
+  
+  if (inputs_ == NULL) {
+    inputs_ = new ::flyteidl::admin::UrlBlob;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowExecutionGetDataResponse.inputs)
+  return inputs_;
+}
+inline void WorkflowExecutionGetDataResponse::set_allocated_inputs(::flyteidl::admin::UrlBlob* inputs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(inputs_);
+  }
+  if (inputs) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      inputs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, inputs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  inputs_ = inputs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowExecutionGetDataResponse.inputs)
 }
 
 #ifdef __GNUC__

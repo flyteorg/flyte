@@ -33,21 +33,26 @@ class AdminWorkflowExecutionGetDataResponse(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'outputs': 'AdminUrlBlob'
+        'outputs': 'AdminUrlBlob',
+        'inputs': 'AdminUrlBlob'
     }
 
     attribute_map = {
-        'outputs': 'outputs'
+        'outputs': 'outputs',
+        'inputs': 'inputs'
     }
 
-    def __init__(self, outputs=None):  # noqa: E501
+    def __init__(self, outputs=None, inputs=None):  # noqa: E501
         """AdminWorkflowExecutionGetDataResponse - a model defined in Swagger"""  # noqa: E501
 
         self._outputs = None
+        self._inputs = None
         self.discriminator = None
 
         if outputs is not None:
             self.outputs = outputs
+        if inputs is not None:
+            self.inputs = inputs
 
     @property
     def outputs(self):
@@ -71,6 +76,29 @@ class AdminWorkflowExecutionGetDataResponse(object):
         """
 
         self._outputs = outputs
+
+    @property
+    def inputs(self):
+        """Gets the inputs of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
+
+        Signed url to fetch a core.LiteralMap of execution inputs.  # noqa: E501
+
+        :return: The inputs of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
+        :rtype: AdminUrlBlob
+        """
+        return self._inputs
+
+    @inputs.setter
+    def inputs(self, inputs):
+        """Sets the inputs of this AdminWorkflowExecutionGetDataResponse.
+
+        Signed url to fetch a core.LiteralMap of execution inputs.  # noqa: E501
+
+        :param inputs: The inputs of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
+        :type: AdminUrlBlob
+        """
+
+        self._inputs = inputs
 
     def to_dict(self):
         """Returns the model properties as a dict"""

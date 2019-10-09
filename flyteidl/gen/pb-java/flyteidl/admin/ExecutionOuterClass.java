@@ -102,6 +102,34 @@ public final class ExecutionOuterClass {
      * <code>.flyteidl.admin.ExecutionSpec spec = 4;</code>
      */
     flyteidl.admin.ExecutionOuterClass.ExecutionSpecOrBuilder getSpecOrBuilder();
+
+    /**
+     * <pre>
+     * The inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+     */
+    boolean hasInputs();
+    /**
+     * <pre>
+     * The inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+     */
+    flyteidl.core.Literals.LiteralMap getInputs();
+    /**
+     * <pre>
+     * The inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+     */
+    flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder();
   }
   /**
    * <pre>
@@ -183,6 +211,19 @@ public final class ExecutionOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(spec_);
                 spec_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 42: {
+              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
+              if (inputs_ != null) {
+                subBuilder = inputs_.toBuilder();
+              }
+              inputs_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(inputs_);
+                inputs_ = subBuilder.buildPartial();
               }
 
               break;
@@ -376,6 +417,42 @@ public final class ExecutionOuterClass {
       return getSpec();
     }
 
+    public static final int INPUTS_FIELD_NUMBER = 5;
+    private flyteidl.core.Literals.LiteralMap inputs_;
+    /**
+     * <pre>
+     * The inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+     */
+    public boolean hasInputs() {
+      return inputs_ != null;
+    }
+    /**
+     * <pre>
+     * The inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+     */
+    public flyteidl.core.Literals.LiteralMap getInputs() {
+      return inputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
+    }
+    /**
+     * <pre>
+     * The inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+     */
+    public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
+      return getInputs();
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -400,6 +477,9 @@ public final class ExecutionOuterClass {
       if (spec_ != null) {
         output.writeMessage(4, getSpec());
       }
+      if (inputs_ != null) {
+        output.writeMessage(5, getInputs());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -420,6 +500,10 @@ public final class ExecutionOuterClass {
       if (spec_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getSpec());
+      }
+      if (inputs_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getInputs());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -448,6 +532,11 @@ public final class ExecutionOuterClass {
         result = result && getSpec()
             .equals(other.getSpec());
       }
+      result = result && (hasInputs() == other.hasInputs());
+      if (hasInputs()) {
+        result = result && getInputs()
+            .equals(other.getInputs());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -468,6 +557,10 @@ public final class ExecutionOuterClass {
       if (hasSpec()) {
         hash = (37 * hash) + SPEC_FIELD_NUMBER;
         hash = (53 * hash) + getSpec().hashCode();
+      }
+      if (hasInputs()) {
+        hash = (37 * hash) + INPUTS_FIELD_NUMBER;
+        hash = (53 * hash) + getInputs().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -614,6 +707,12 @@ public final class ExecutionOuterClass {
           spec_ = null;
           specBuilder_ = null;
         }
+        if (inputsBuilder_ == null) {
+          inputs_ = null;
+        } else {
+          inputs_ = null;
+          inputsBuilder_ = null;
+        }
         return this;
       }
 
@@ -643,6 +742,11 @@ public final class ExecutionOuterClass {
           result.spec_ = spec_;
         } else {
           result.spec_ = specBuilder_.build();
+        }
+        if (inputsBuilder_ == null) {
+          result.inputs_ = inputs_;
+        } else {
+          result.inputs_ = inputsBuilder_.build();
         }
         onBuilt();
         return result;
@@ -699,6 +803,9 @@ public final class ExecutionOuterClass {
         }
         if (other.hasSpec()) {
           mergeSpec(other.getSpec());
+        }
+        if (other.hasInputs()) {
+          mergeInputs(other.getInputs());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1160,6 +1267,168 @@ public final class ExecutionOuterClass {
           spec_ = null;
         }
         return specBuilder_;
+      }
+
+      private flyteidl.core.Literals.LiteralMap inputs_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> inputsBuilder_;
+      /**
+       * <pre>
+       * The inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+       */
+      public boolean hasInputs() {
+        return inputsBuilder_ != null || inputs_ != null;
+      }
+      /**
+       * <pre>
+       * The inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap getInputs() {
+        if (inputsBuilder_ == null) {
+          return inputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
+        } else {
+          return inputsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * The inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+       */
+      public Builder setInputs(flyteidl.core.Literals.LiteralMap value) {
+        if (inputsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          inputs_ = value;
+          onChanged();
+        } else {
+          inputsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+       */
+      public Builder setInputs(
+          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
+        if (inputsBuilder_ == null) {
+          inputs_ = builderForValue.build();
+          onChanged();
+        } else {
+          inputsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+       */
+      public Builder mergeInputs(flyteidl.core.Literals.LiteralMap value) {
+        if (inputsBuilder_ == null) {
+          if (inputs_ != null) {
+            inputs_ =
+              flyteidl.core.Literals.LiteralMap.newBuilder(inputs_).mergeFrom(value).buildPartial();
+          } else {
+            inputs_ = value;
+          }
+          onChanged();
+        } else {
+          inputsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+       */
+      public Builder clearInputs() {
+        if (inputsBuilder_ == null) {
+          inputs_ = null;
+          onChanged();
+        } else {
+          inputs_ = null;
+          inputsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap.Builder getInputsBuilder() {
+        
+        onChanged();
+        return getInputsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * The inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+       */
+      public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
+        if (inputsBuilder_ != null) {
+          return inputsBuilder_.getMessageOrBuilder();
+        } else {
+          return inputs_ == null ?
+              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
+        }
+      }
+      /**
+       * <pre>
+       * The inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap inputs = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          getInputsFieldBuilder() {
+        if (inputsBuilder_ == null) {
+          inputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+                  getInputs(),
+                  getParentForChildren(),
+                  isClean());
+          inputs_ = null;
+        }
+        return inputsBuilder_;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -6426,27 +6695,27 @@ public final class ExecutionOuterClass {
      * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+     * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
      */
-    boolean hasComputedInputs();
+    @java.lang.Deprecated boolean hasComputedInputs();
     /**
      * <pre>
      * Inputs computed and passed for execution.
      * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+     * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.LiteralMap getComputedInputs();
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getComputedInputs();
     /**
      * <pre>
      * Inputs computed and passed for execution.
      * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+     * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getComputedInputsOrBuilder();
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getComputedInputsOrBuilder();
 
     /**
      * <pre>
@@ -7028,9 +7297,9 @@ public final class ExecutionOuterClass {
      * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+     * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
      */
-    public boolean hasComputedInputs() {
+    @java.lang.Deprecated public boolean hasComputedInputs() {
       return computedInputs_ != null;
     }
     /**
@@ -7039,9 +7308,9 @@ public final class ExecutionOuterClass {
      * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+     * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMap getComputedInputs() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getComputedInputs() {
       return computedInputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : computedInputs_;
     }
     /**
@@ -7050,9 +7319,9 @@ public final class ExecutionOuterClass {
      * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+     * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getComputedInputsOrBuilder() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getComputedInputsOrBuilder() {
       return getComputedInputs();
     }
 
@@ -8397,9 +8666,9 @@ public final class ExecutionOuterClass {
        * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+       * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
        */
-      public boolean hasComputedInputs() {
+      @java.lang.Deprecated public boolean hasComputedInputs() {
         return computedInputsBuilder_ != null || computedInputs_ != null;
       }
       /**
@@ -8408,9 +8677,9 @@ public final class ExecutionOuterClass {
        * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+       * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap getComputedInputs() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getComputedInputs() {
         if (computedInputsBuilder_ == null) {
           return computedInputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : computedInputs_;
         } else {
@@ -8423,9 +8692,9 @@ public final class ExecutionOuterClass {
        * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+       * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
        */
-      public Builder setComputedInputs(flyteidl.core.Literals.LiteralMap value) {
+      @java.lang.Deprecated public Builder setComputedInputs(flyteidl.core.Literals.LiteralMap value) {
         if (computedInputsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -8444,9 +8713,9 @@ public final class ExecutionOuterClass {
        * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+       * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
        */
-      public Builder setComputedInputs(
+      @java.lang.Deprecated public Builder setComputedInputs(
           flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
         if (computedInputsBuilder_ == null) {
           computedInputs_ = builderForValue.build();
@@ -8463,9 +8732,9 @@ public final class ExecutionOuterClass {
        * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+       * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
        */
-      public Builder mergeComputedInputs(flyteidl.core.Literals.LiteralMap value) {
+      @java.lang.Deprecated public Builder mergeComputedInputs(flyteidl.core.Literals.LiteralMap value) {
         if (computedInputsBuilder_ == null) {
           if (computedInputs_ != null) {
             computedInputs_ =
@@ -8486,9 +8755,9 @@ public final class ExecutionOuterClass {
        * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+       * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
        */
-      public Builder clearComputedInputs() {
+      @java.lang.Deprecated public Builder clearComputedInputs() {
         if (computedInputsBuilder_ == null) {
           computedInputs_ = null;
           onChanged();
@@ -8505,9 +8774,9 @@ public final class ExecutionOuterClass {
        * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+       * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getComputedInputsBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getComputedInputsBuilder() {
         
         onChanged();
         return getComputedInputsFieldBuilder().getBuilder();
@@ -8518,9 +8787,9 @@ public final class ExecutionOuterClass {
        * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+       * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getComputedInputsOrBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getComputedInputsOrBuilder() {
         if (computedInputsBuilder_ != null) {
           return computedInputsBuilder_.getMessageOrBuilder();
         } else {
@@ -8534,7 +8803,7 @@ public final class ExecutionOuterClass {
        * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap computed_inputs = 3;</code>
+       * <code>.flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
@@ -12314,25 +12583,25 @@ public final class ExecutionOuterClass {
      * Input values to be passed for the execution
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+     * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
      */
-    boolean hasInputs();
+    @java.lang.Deprecated boolean hasInputs();
     /**
      * <pre>
      * Input values to be passed for the execution
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+     * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.LiteralMap getInputs();
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getInputs();
     /**
      * <pre>
      * Input values to be passed for the execution
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+     * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder();
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder();
 
     /**
      * <pre>
@@ -12688,9 +12957,9 @@ public final class ExecutionOuterClass {
      * Input values to be passed for the execution
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+     * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
      */
-    public boolean hasInputs() {
+    @java.lang.Deprecated public boolean hasInputs() {
       return inputs_ != null;
     }
     /**
@@ -12698,9 +12967,9 @@ public final class ExecutionOuterClass {
      * Input values to be passed for the execution
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+     * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMap getInputs() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getInputs() {
       return inputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
     }
     /**
@@ -12708,9 +12977,9 @@ public final class ExecutionOuterClass {
      * Input values to be passed for the execution
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+     * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
       return getInputs();
     }
 
@@ -13539,9 +13808,9 @@ public final class ExecutionOuterClass {
        * Input values to be passed for the execution
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+       * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
        */
-      public boolean hasInputs() {
+      @java.lang.Deprecated public boolean hasInputs() {
         return inputsBuilder_ != null || inputs_ != null;
       }
       /**
@@ -13549,9 +13818,9 @@ public final class ExecutionOuterClass {
        * Input values to be passed for the execution
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+       * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap getInputs() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getInputs() {
         if (inputsBuilder_ == null) {
           return inputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
         } else {
@@ -13563,9 +13832,9 @@ public final class ExecutionOuterClass {
        * Input values to be passed for the execution
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+       * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
        */
-      public Builder setInputs(flyteidl.core.Literals.LiteralMap value) {
+      @java.lang.Deprecated public Builder setInputs(flyteidl.core.Literals.LiteralMap value) {
         if (inputsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -13583,9 +13852,9 @@ public final class ExecutionOuterClass {
        * Input values to be passed for the execution
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+       * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
        */
-      public Builder setInputs(
+      @java.lang.Deprecated public Builder setInputs(
           flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
         if (inputsBuilder_ == null) {
           inputs_ = builderForValue.build();
@@ -13601,9 +13870,9 @@ public final class ExecutionOuterClass {
        * Input values to be passed for the execution
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+       * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
        */
-      public Builder mergeInputs(flyteidl.core.Literals.LiteralMap value) {
+      @java.lang.Deprecated public Builder mergeInputs(flyteidl.core.Literals.LiteralMap value) {
         if (inputsBuilder_ == null) {
           if (inputs_ != null) {
             inputs_ =
@@ -13623,9 +13892,9 @@ public final class ExecutionOuterClass {
        * Input values to be passed for the execution
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+       * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
        */
-      public Builder clearInputs() {
+      @java.lang.Deprecated public Builder clearInputs() {
         if (inputsBuilder_ == null) {
           inputs_ = null;
           onChanged();
@@ -13641,9 +13910,9 @@ public final class ExecutionOuterClass {
        * Input values to be passed for the execution
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+       * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getInputsBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getInputsBuilder() {
         
         onChanged();
         return getInputsFieldBuilder().getBuilder();
@@ -13653,9 +13922,9 @@ public final class ExecutionOuterClass {
        * Input values to be passed for the execution
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+       * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
         if (inputsBuilder_ != null) {
           return inputsBuilder_.getMessageOrBuilder();
         } else {
@@ -13668,7 +13937,7 @@ public final class ExecutionOuterClass {
        * Input values to be passed for the execution
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 2;</code>
+       * <code>.flyteidl.core.LiteralMap inputs = 2 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
@@ -16327,6 +16596,31 @@ public final class ExecutionOuterClass {
      * <code>.flyteidl.admin.UrlBlob outputs = 1;</code>
      */
     flyteidl.admin.Common.UrlBlobOrBuilder getOutputsOrBuilder();
+
+    /**
+     * <pre>
+     * Signed url to fetch a core.LiteralMap of execution inputs.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+     */
+    boolean hasInputs();
+    /**
+     * <pre>
+     * Signed url to fetch a core.LiteralMap of execution inputs.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+     */
+    flyteidl.admin.Common.UrlBlob getInputs();
+    /**
+     * <pre>
+     * Signed url to fetch a core.LiteralMap of execution inputs.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+     */
+    flyteidl.admin.Common.UrlBlobOrBuilder getInputsOrBuilder();
   }
   /**
    * <pre>
@@ -16391,6 +16685,19 @@ public final class ExecutionOuterClass {
 
               break;
             }
+            case 18: {
+              flyteidl.admin.Common.UrlBlob.Builder subBuilder = null;
+              if (inputs_ != null) {
+                subBuilder = inputs_.toBuilder();
+              }
+              inputs_ = input.readMessage(flyteidl.admin.Common.UrlBlob.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(inputs_);
+                inputs_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -16448,6 +16755,39 @@ public final class ExecutionOuterClass {
       return getOutputs();
     }
 
+    public static final int INPUTS_FIELD_NUMBER = 2;
+    private flyteidl.admin.Common.UrlBlob inputs_;
+    /**
+     * <pre>
+     * Signed url to fetch a core.LiteralMap of execution inputs.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+     */
+    public boolean hasInputs() {
+      return inputs_ != null;
+    }
+    /**
+     * <pre>
+     * Signed url to fetch a core.LiteralMap of execution inputs.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+     */
+    public flyteidl.admin.Common.UrlBlob getInputs() {
+      return inputs_ == null ? flyteidl.admin.Common.UrlBlob.getDefaultInstance() : inputs_;
+    }
+    /**
+     * <pre>
+     * Signed url to fetch a core.LiteralMap of execution inputs.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+     */
+    public flyteidl.admin.Common.UrlBlobOrBuilder getInputsOrBuilder() {
+      return getInputs();
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -16463,6 +16803,9 @@ public final class ExecutionOuterClass {
       if (outputs_ != null) {
         output.writeMessage(1, getOutputs());
       }
+      if (inputs_ != null) {
+        output.writeMessage(2, getInputs());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -16474,6 +16817,10 @@ public final class ExecutionOuterClass {
       if (outputs_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getOutputs());
+      }
+      if (inputs_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getInputs());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -16496,6 +16843,11 @@ public final class ExecutionOuterClass {
         result = result && getOutputs()
             .equals(other.getOutputs());
       }
+      result = result && (hasInputs() == other.hasInputs());
+      if (hasInputs()) {
+        result = result && getInputs()
+            .equals(other.getInputs());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -16510,6 +16862,10 @@ public final class ExecutionOuterClass {
       if (hasOutputs()) {
         hash = (37 * hash) + OUTPUTS_FIELD_NUMBER;
         hash = (53 * hash) + getOutputs().hashCode();
+      }
+      if (hasInputs()) {
+        hash = (37 * hash) + INPUTS_FIELD_NUMBER;
+        hash = (53 * hash) + getInputs().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -16650,6 +17006,12 @@ public final class ExecutionOuterClass {
           outputs_ = null;
           outputsBuilder_ = null;
         }
+        if (inputsBuilder_ == null) {
+          inputs_ = null;
+        } else {
+          inputs_ = null;
+          inputsBuilder_ = null;
+        }
         return this;
       }
 
@@ -16676,6 +17038,11 @@ public final class ExecutionOuterClass {
           result.outputs_ = outputs_;
         } else {
           result.outputs_ = outputsBuilder_.build();
+        }
+        if (inputsBuilder_ == null) {
+          result.inputs_ = inputs_;
+        } else {
+          result.inputs_ = inputsBuilder_.build();
         }
         onBuilt();
         return result;
@@ -16720,6 +17087,9 @@ public final class ExecutionOuterClass {
         if (other == flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetDataResponse.getDefaultInstance()) return this;
         if (other.hasOutputs()) {
           mergeOutputs(other.getOutputs());
+        }
+        if (other.hasInputs()) {
+          mergeInputs(other.getInputs());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -16900,6 +17270,159 @@ public final class ExecutionOuterClass {
         }
         return outputsBuilder_;
       }
+
+      private flyteidl.admin.Common.UrlBlob inputs_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.UrlBlob, flyteidl.admin.Common.UrlBlob.Builder, flyteidl.admin.Common.UrlBlobOrBuilder> inputsBuilder_;
+      /**
+       * <pre>
+       * Signed url to fetch a core.LiteralMap of execution inputs.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+       */
+      public boolean hasInputs() {
+        return inputsBuilder_ != null || inputs_ != null;
+      }
+      /**
+       * <pre>
+       * Signed url to fetch a core.LiteralMap of execution inputs.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+       */
+      public flyteidl.admin.Common.UrlBlob getInputs() {
+        if (inputsBuilder_ == null) {
+          return inputs_ == null ? flyteidl.admin.Common.UrlBlob.getDefaultInstance() : inputs_;
+        } else {
+          return inputsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Signed url to fetch a core.LiteralMap of execution inputs.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+       */
+      public Builder setInputs(flyteidl.admin.Common.UrlBlob value) {
+        if (inputsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          inputs_ = value;
+          onChanged();
+        } else {
+          inputsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Signed url to fetch a core.LiteralMap of execution inputs.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+       */
+      public Builder setInputs(
+          flyteidl.admin.Common.UrlBlob.Builder builderForValue) {
+        if (inputsBuilder_ == null) {
+          inputs_ = builderForValue.build();
+          onChanged();
+        } else {
+          inputsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Signed url to fetch a core.LiteralMap of execution inputs.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+       */
+      public Builder mergeInputs(flyteidl.admin.Common.UrlBlob value) {
+        if (inputsBuilder_ == null) {
+          if (inputs_ != null) {
+            inputs_ =
+              flyteidl.admin.Common.UrlBlob.newBuilder(inputs_).mergeFrom(value).buildPartial();
+          } else {
+            inputs_ = value;
+          }
+          onChanged();
+        } else {
+          inputsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Signed url to fetch a core.LiteralMap of execution inputs.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+       */
+      public Builder clearInputs() {
+        if (inputsBuilder_ == null) {
+          inputs_ = null;
+          onChanged();
+        } else {
+          inputs_ = null;
+          inputsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Signed url to fetch a core.LiteralMap of execution inputs.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+       */
+      public flyteidl.admin.Common.UrlBlob.Builder getInputsBuilder() {
+        
+        onChanged();
+        return getInputsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Signed url to fetch a core.LiteralMap of execution inputs.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+       */
+      public flyteidl.admin.Common.UrlBlobOrBuilder getInputsOrBuilder() {
+        if (inputsBuilder_ != null) {
+          return inputsBuilder_.getMessageOrBuilder();
+        } else {
+          return inputs_ == null ?
+              flyteidl.admin.Common.UrlBlob.getDefaultInstance() : inputs_;
+        }
+      }
+      /**
+       * <pre>
+       * Signed url to fetch a core.LiteralMap of execution inputs.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.UrlBlob inputs = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.UrlBlob, flyteidl.admin.Common.UrlBlob.Builder, flyteidl.admin.Common.UrlBlobOrBuilder> 
+          getInputsFieldBuilder() {
+        if (inputsBuilder_ == null) {
+          inputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.UrlBlob, flyteidl.admin.Common.UrlBlob.Builder, flyteidl.admin.Common.UrlBlobOrBuilder>(
+                  getInputs(),
+                  getParentForChildren(),
+                  isClean());
+          inputs_ = null;
+        }
+        return inputsBuilder_;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -17038,69 +17561,72 @@ public final class ExecutionOuterClass {
       "lyteidl/core/literals.proto\032\035flyteidl/co" +
       "re/execution.proto\032\036flyteidl/core/identi" +
       "fier.proto\032\036google/protobuf/duration.pro" +
-      "to\032\037google/protobuf/timestamp.proto\"t\n\026E" +
-      "xecutionCreateRequest\022\017\n\007project\030\001 \001(\t\022\016" +
-      "\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\022+\n\004spec\030\004 \001" +
-      "(\0132\035.flyteidl.admin.ExecutionSpec\"`\n\030Exe" +
-      "cutionRelaunchRequest\0226\n\002id\030\001 \001(\0132*.flyt" +
-      "eidl.core.WorkflowExecutionIdentifier\022\014\n" +
-      "\004name\030\003 \001(\t\"Q\n\027ExecutionCreateResponse\0226" +
-      "\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowExecu" +
-      "tionIdentifier\"U\n\033WorkflowExecutionGetRe" +
-      "quest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workfl" +
-      "owExecutionIdentifier\"\243\001\n\tExecution\0226\n\002i" +
-      "d\030\001 \001(\0132*.flyteidl.core.WorkflowExecutio" +
-      "nIdentifier\022+\n\004spec\030\002 \001(\0132\035.flyteidl.adm" +
-      "in.ExecutionSpec\0221\n\007closure\030\003 \001(\0132 .flyt" +
-      "eidl.admin.ExecutionClosure\"M\n\rExecution" +
-      "List\022-\n\nexecutions\030\001 \003(\0132\031.flyteidl.admi" +
-      "n.Execution\022\r\n\005token\030\002 \001(\t\"T\n\016LiteralMap" +
-      "Blob\022+\n\006values\030\001 \001(\0132\031.flyteidl.core.Lit" +
-      "eralMapH\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"\252\004\n\020Exe" +
-      "cutionClosure\0221\n\007outputs\030\001 \001(\0132\036.flyteid" +
-      "l.admin.LiteralMapBlobH\000\022.\n\005error\030\002 \001(\0132" +
-      "\035.flyteidl.core.ExecutionErrorH\000\022\025\n\013abor" +
-      "t_cause\030\n \001(\tH\000\0222\n\017computed_inputs\030\003 \001(\013" +
-      "2\031.flyteidl.core.LiteralMap\0225\n\005phase\030\004 \001" +
-      "(\0162&.flyteidl.core.WorkflowExecution.Pha" +
-      "se\022.\n\nstarted_at\030\005 \001(\0132\032.google.protobuf" +
-      ".Timestamp\022+\n\010duration\030\006 \001(\0132\031.google.pr" +
-      "otobuf.Duration\022.\n\ncreated_at\030\007 \001(\0132\032.go" +
-      "ogle.protobuf.Timestamp\022.\n\nupdated_at\030\010 " +
-      "\001(\0132\032.google.protobuf.Timestamp\0223\n\rnotif" +
-      "ications\030\t \003(\0132\034.flyteidl.admin.Notifica" +
-      "tion\022.\n\013workflow_id\030\013 \001(\0132\031.flyteidl.cor" +
-      "e.IdentifierB\017\n\routput_result\"\222\003\n\021Execut" +
-      "ionMetadata\022=\n\004mode\030\001 \001(\0162/.flyteidl.adm" +
-      "in.ExecutionMetadata.ExecutionMode\022\021\n\tpr" +
-      "incipal\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220\n\014schedu" +
-      "led_at\030\004 \001(\0132\032.google.protobuf.Timestamp" +
-      "\022E\n\025parent_node_execution\030\005 \001(\0132&.flytei" +
-      "dl.core.NodeExecutionIdentifier\022G\n\023refer" +
-      "ence_execution\030\020 \001(\0132*.flyteidl.core.Wor" +
-      "kflowExecutionIdentifier\"X\n\rExecutionMod" +
-      "e\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006SYSTEM\020\002" +
-      "\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORKFLOW\020\004\"G\n\020No" +
-      "tificationList\0223\n\rnotifications\030\001 \003(\0132\034." +
-      "flyteidl.admin.Notification\"\353\002\n\rExecutio" +
-      "nSpec\022.\n\013launch_plan\030\001 \001(\0132\031.flyteidl.co" +
-      "re.Identifier\022)\n\006inputs\030\002 \001(\0132\031.flyteidl" +
-      ".core.LiteralMap\0223\n\010metadata\030\003 \001(\0132!.fly" +
-      "teidl.admin.ExecutionMetadata\0229\n\rnotific" +
-      "ations\030\005 \001(\0132 .flyteidl.admin.Notificati" +
-      "onListH\000\022\025\n\013disable_all\030\006 \001(\010H\000\022&\n\006label" +
-      "s\030\007 \001(\0132\026.flyteidl.admin.Labels\0220\n\013annot" +
-      "ations\030\010 \001(\0132\033.flyteidl.admin.Annotation" +
-      "sB\030\n\026notification_overridesJ\004\010\004\020\005\"b\n\031Exe" +
-      "cutionTerminateRequest\0226\n\002id\030\001 \001(\0132*.fly" +
-      "teidl.core.WorkflowExecutionIdentifier\022\r" +
-      "\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTerminateRespo" +
-      "nse\"Y\n\037WorkflowExecutionGetDataRequest\0226" +
-      "\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowExecu" +
-      "tionIdentifier\"L\n WorkflowExecutionGetDa" +
-      "taResponse\022(\n\007outputs\030\001 \001(\0132\027.flyteidl.a" +
-      "dmin.UrlBlobB3Z1github.com/lyft/flyteidl" +
-      "/gen/pb-go/flyteidl/adminb\006proto3"
+      "to\032\037google/protobuf/timestamp.proto\"\237\001\n\026" +
+      "ExecutionCreateRequest\022\017\n\007project\030\001 \001(\t\022" +
+      "\016\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\022+\n\004spec\030\004 " +
+      "\001(\0132\035.flyteidl.admin.ExecutionSpec\022)\n\006in" +
+      "puts\030\005 \001(\0132\031.flyteidl.core.LiteralMap\"`\n" +
+      "\030ExecutionRelaunchRequest\0226\n\002id\030\001 \001(\0132*." +
+      "flyteidl.core.WorkflowExecutionIdentifie" +
+      "r\022\014\n\004name\030\003 \001(\t\"Q\n\027ExecutionCreateRespon" +
+      "se\0226\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowE" +
+      "xecutionIdentifier\"U\n\033WorkflowExecutionG" +
+      "etRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wo" +
+      "rkflowExecutionIdentifier\"\243\001\n\tExecution\022" +
+      "6\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowExec" +
+      "utionIdentifier\022+\n\004spec\030\002 \001(\0132\035.flyteidl" +
+      ".admin.ExecutionSpec\0221\n\007closure\030\003 \001(\0132 ." +
+      "flyteidl.admin.ExecutionClosure\"M\n\rExecu" +
+      "tionList\022-\n\nexecutions\030\001 \003(\0132\031.flyteidl." +
+      "admin.Execution\022\r\n\005token\030\002 \001(\t\"T\n\016Litera" +
+      "lMapBlob\022+\n\006values\030\001 \001(\0132\031.flyteidl.core" +
+      ".LiteralMapH\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"\256\004\n" +
+      "\020ExecutionClosure\0221\n\007outputs\030\001 \001(\0132\036.fly" +
+      "teidl.admin.LiteralMapBlobH\000\022.\n\005error\030\002 " +
+      "\001(\0132\035.flyteidl.core.ExecutionErrorH\000\022\025\n\013" +
+      "abort_cause\030\n \001(\tH\000\0226\n\017computed_inputs\030\003" +
+      " \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001\0225\n\005p" +
+      "hase\030\004 \001(\0162&.flyteidl.core.WorkflowExecu" +
+      "tion.Phase\022.\n\nstarted_at\030\005 \001(\0132\032.google." +
+      "protobuf.Timestamp\022+\n\010duration\030\006 \001(\0132\031.g" +
+      "oogle.protobuf.Duration\022.\n\ncreated_at\030\007 " +
+      "\001(\0132\032.google.protobuf.Timestamp\022.\n\nupdat" +
+      "ed_at\030\010 \001(\0132\032.google.protobuf.Timestamp\022" +
+      "3\n\rnotifications\030\t \003(\0132\034.flyteidl.admin." +
+      "Notification\022.\n\013workflow_id\030\013 \001(\0132\031.flyt" +
+      "eidl.core.IdentifierB\017\n\routput_result\"\222\003" +
+      "\n\021ExecutionMetadata\022=\n\004mode\030\001 \001(\0162/.flyt" +
+      "eidl.admin.ExecutionMetadata.ExecutionMo" +
+      "de\022\021\n\tprincipal\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220" +
+      "\n\014scheduled_at\030\004 \001(\0132\032.google.protobuf.T" +
+      "imestamp\022E\n\025parent_node_execution\030\005 \001(\0132" +
+      "&.flyteidl.core.NodeExecutionIdentifier\022" +
+      "G\n\023reference_execution\030\020 \001(\0132*.flyteidl." +
+      "core.WorkflowExecutionIdentifier\"X\n\rExec" +
+      "utionMode\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006" +
+      "SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORKFLOW" +
+      "\020\004\"G\n\020NotificationList\0223\n\rnotifications\030" +
+      "\001 \003(\0132\034.flyteidl.admin.Notification\"\357\002\n\r" +
+      "ExecutionSpec\022.\n\013launch_plan\030\001 \001(\0132\031.fly" +
+      "teidl.core.Identifier\022-\n\006inputs\030\002 \001(\0132\031." +
+      "flyteidl.core.LiteralMapB\002\030\001\0223\n\010metadata" +
+      "\030\003 \001(\0132!.flyteidl.admin.ExecutionMetadat" +
+      "a\0229\n\rnotifications\030\005 \001(\0132 .flyteidl.admi" +
+      "n.NotificationListH\000\022\025\n\013disable_all\030\006 \001(" +
+      "\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyteidl.admin.Lab" +
+      "els\0220\n\013annotations\030\010 \001(\0132\033.flyteidl.admi" +
+      "n.AnnotationsB\030\n\026notification_overridesJ" +
+      "\004\010\004\020\005\"b\n\031ExecutionTerminateRequest\0226\n\002id" +
+      "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution" +
+      "Identifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTe" +
+      "rminateResponse\"Y\n\037WorkflowExecutionGetD" +
+      "ataRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.W" +
+      "orkflowExecutionIdentifier\"u\n WorkflowEx" +
+      "ecutionGetDataResponse\022(\n\007outputs\030\001 \001(\0132" +
+      "\027.flyteidl.admin.UrlBlob\022\'\n\006inputs\030\002 \001(\013" +
+      "2\027.flyteidl.admin.UrlBlobB3Z1github.com/" +
+      "lyft/flyteidl/gen/pb-go/flyteidl/adminb\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -17125,7 +17651,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionCreateRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionCreateRequest_descriptor,
-        new java.lang.String[] { "Project", "Domain", "Name", "Spec", });
+        new java.lang.String[] { "Project", "Domain", "Name", "Spec", "Inputs", });
     internal_static_flyteidl_admin_ExecutionRelaunchRequest_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_admin_ExecutionRelaunchRequest_fieldAccessorTable = new
@@ -17209,7 +17735,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_WorkflowExecutionGetDataResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_WorkflowExecutionGetDataResponse_descriptor,
-        new java.lang.String[] { "Outputs", });
+        new java.lang.String[] { "Outputs", "Inputs", });
     flyteidl.admin.Common.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.Execution.getDescriptor();

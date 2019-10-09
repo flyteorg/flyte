@@ -26,6 +26,10 @@ message ExecutionCreateRequest {
 
     // Additional fields necessary to launch the execution.
     ExecutionSpec spec  = 4;
+
+    // The inputs required to start the execution. All required inputs must be
+    // included in this map. If not required and not provided, defaults apply.
+    core.LiteralMap inputs   = 5;
 }
 
 // Request to relaunch the referenced execution.
@@ -102,10 +106,10 @@ message ExecutionClosure {
 
     // Inputs computed and passed for execution.
     // computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
-    core.LiteralMap computed_inputs      = 3;
+    core.LiteralMap computed_inputs                   = 3 [deprecated=true];
 
     // Most recent recorded phase for the execution.
-    core.WorkflowExecution.Phase phase                 = 4;
+    core.WorkflowExecution.Phase phase                = 4;
 
     // Reported ime at which the execution began running.
     google.protobuf.Timestamp started_at              = 5;
@@ -182,7 +186,7 @@ message ExecutionSpec {
     core.Identifier launch_plan        = 1;
 
     // Input values to be passed for the execution
-    core.LiteralMap inputs          = 2;
+    core.LiteralMap inputs          = 2 [deprecated=true];
 
     // Metadata for the execution
     ExecutionMetadata metadata    = 3;
@@ -234,4 +238,6 @@ message WorkflowExecutionGetDataRequest {
 message WorkflowExecutionGetDataResponse {
     // Signed url to fetch a core.LiteralMap of execution outputs.
     UrlBlob outputs                            = 1;
+    // Signed url to fetch a core.LiteralMap of execution inputs.
+    UrlBlob inputs                             = 2;
 }

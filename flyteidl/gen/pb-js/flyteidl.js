@@ -14059,6 +14059,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [domain] ExecutionCreateRequest domain
              * @property {string|null} [name] ExecutionCreateRequest name
              * @property {flyteidl.admin.IExecutionSpec|null} [spec] ExecutionCreateRequest spec
+             * @property {flyteidl.core.ILiteralMap|null} [inputs] ExecutionCreateRequest inputs
              */
 
             /**
@@ -14109,6 +14110,14 @@ export const flyteidl = $root.flyteidl = (() => {
             ExecutionCreateRequest.prototype.spec = null;
 
             /**
+             * ExecutionCreateRequest inputs.
+             * @member {flyteidl.core.ILiteralMap|null|undefined} inputs
+             * @memberof flyteidl.admin.ExecutionCreateRequest
+             * @instance
+             */
+            ExecutionCreateRequest.prototype.inputs = null;
+
+            /**
              * Creates a new ExecutionCreateRequest instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.ExecutionCreateRequest
@@ -14140,6 +14149,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 3, wireType 2 =*/26).string(message.name);
                 if (message.spec != null && message.hasOwnProperty("spec"))
                     $root.flyteidl.admin.ExecutionSpec.encode(message.spec, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                if (message.inputs != null && message.hasOwnProperty("inputs"))
+                    $root.flyteidl.core.LiteralMap.encode(message.inputs, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                 return writer;
             };
 
@@ -14173,6 +14184,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 4:
                         message.spec = $root.flyteidl.admin.ExecutionSpec.decode(reader, reader.uint32());
                         break;
+                    case 5:
+                        message.inputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -14205,6 +14219,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.ExecutionSpec.verify(message.spec);
                     if (error)
                         return "spec." + error;
+                }
+                if (message.inputs != null && message.hasOwnProperty("inputs")) {
+                    let error = $root.flyteidl.core.LiteralMap.verify(message.inputs);
+                    if (error)
+                        return "inputs." + error;
                 }
                 return null;
             };
@@ -16284,6 +16303,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @memberof flyteidl.admin
              * @interface IWorkflowExecutionGetDataResponse
              * @property {flyteidl.admin.IUrlBlob|null} [outputs] WorkflowExecutionGetDataResponse outputs
+             * @property {flyteidl.admin.IUrlBlob|null} [inputs] WorkflowExecutionGetDataResponse inputs
              */
 
             /**
@@ -16308,6 +16328,14 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              */
             WorkflowExecutionGetDataResponse.prototype.outputs = null;
+
+            /**
+             * WorkflowExecutionGetDataResponse inputs.
+             * @member {flyteidl.admin.IUrlBlob|null|undefined} inputs
+             * @memberof flyteidl.admin.WorkflowExecutionGetDataResponse
+             * @instance
+             */
+            WorkflowExecutionGetDataResponse.prototype.inputs = null;
 
             /**
              * Creates a new WorkflowExecutionGetDataResponse instance using the specified properties.
@@ -16335,6 +16363,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer = $Writer.create();
                 if (message.outputs != null && message.hasOwnProperty("outputs"))
                     $root.flyteidl.admin.UrlBlob.encode(message.outputs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.inputs != null && message.hasOwnProperty("inputs"))
+                    $root.flyteidl.admin.UrlBlob.encode(message.inputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                 return writer;
             };
 
@@ -16359,6 +16389,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 1:
                         message.outputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
                         break;
+                    case 2:
+                        message.inputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -16382,6 +16415,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.UrlBlob.verify(message.outputs);
                     if (error)
                         return "outputs." + error;
+                }
+                if (message.inputs != null && message.hasOwnProperty("inputs")) {
+                    let error = $root.flyteidl.admin.UrlBlob.verify(message.inputs);
+                    if (error)
+                        return "inputs." + error;
                 }
                 return null;
             };

@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.admin_execution_spec import AdminExecutionSpec  # noqa: F401,E501
+from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 
 
 class AdminExecutionCreateRequest(object):
@@ -36,23 +37,26 @@ class AdminExecutionCreateRequest(object):
         'project': 'str',
         'domain': 'str',
         'name': 'str',
-        'spec': 'AdminExecutionSpec'
+        'spec': 'AdminExecutionSpec',
+        'inputs': 'CoreLiteralMap'
     }
 
     attribute_map = {
         'project': 'project',
         'domain': 'domain',
         'name': 'name',
-        'spec': 'spec'
+        'spec': 'spec',
+        'inputs': 'inputs'
     }
 
-    def __init__(self, project=None, domain=None, name=None, spec=None):  # noqa: E501
+    def __init__(self, project=None, domain=None, name=None, spec=None, inputs=None):  # noqa: E501
         """AdminExecutionCreateRequest - a model defined in Swagger"""  # noqa: E501
 
         self._project = None
         self._domain = None
         self._name = None
         self._spec = None
+        self._inputs = None
         self.discriminator = None
 
         if project is not None:
@@ -63,6 +67,8 @@ class AdminExecutionCreateRequest(object):
             self.name = name
         if spec is not None:
             self.spec = spec
+        if inputs is not None:
+            self.inputs = inputs
 
     @property
     def project(self):
@@ -153,6 +159,29 @@ class AdminExecutionCreateRequest(object):
         """
 
         self._spec = spec
+
+    @property
+    def inputs(self):
+        """Gets the inputs of this AdminExecutionCreateRequest.  # noqa: E501
+
+        The inputs required to start the execution. All required inputs must be included in this map. If not required and not provided, defaults apply.  # noqa: E501
+
+        :return: The inputs of this AdminExecutionCreateRequest.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._inputs
+
+    @inputs.setter
+    def inputs(self, inputs):
+        """Sets the inputs of this AdminExecutionCreateRequest.
+
+        The inputs required to start the execution. All required inputs must be included in this map. If not required and not provided, defaults apply.  # noqa: E501
+
+        :param inputs: The inputs of this AdminExecutionCreateRequest.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._inputs = inputs
 
     def to_dict(self):
         """Returns the model properties as a dict"""
