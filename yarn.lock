@@ -1795,10 +1795,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^12.0.9"
 
-"@lyft/flyteidl@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@lyft/flyteidl/-/flyteidl-0.1.0.tgz#7fd7e882c5448f3eea49dc9b16f2d71cbe5ad46f"
-  integrity sha512-cyOgIrEep7YZ75HiYlsjKXrDX9Xc8RAy4qhABKBpHGzt6cKyEmO7UknvGcq9UtCcPIDSVrjZASQDlOaZ9lsocA==
+"@lyft/flyteidl@^0.16.0":
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/@lyft/flyteidl/-/flyteidl-0.16.0.tgz#60f4f195a847806a57726a5eab78e4cab7f92996"
+  integrity sha512-2Ps6LLv/F0J0IIesv+wY40luvc8f9+kuI1HdD4q1oGa/AZhfXjsKFmk8TvFoLw7cGd5K75L8QeGSSfGwZci7LQ==
 
 "@material-ui/core@^4.0.0":
   version "4.3.1"
