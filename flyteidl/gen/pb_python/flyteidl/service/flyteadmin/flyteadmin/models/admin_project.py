@@ -35,21 +35,24 @@ class AdminProject(object):
     swagger_types = {
         'id': 'str',
         'name': 'str',
-        'domains': 'list[AdminDomain]'
+        'domains': 'list[AdminDomain]',
+        'description': 'str'
     }
 
     attribute_map = {
         'id': 'id',
         'name': 'name',
-        'domains': 'domains'
+        'domains': 'domains',
+        'description': 'description'
     }
 
-    def __init__(self, id=None, name=None, domains=None):  # noqa: E501
+    def __init__(self, id=None, name=None, domains=None, description=None):  # noqa: E501
         """AdminProject - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
         self._name = None
         self._domains = None
+        self._description = None
         self.discriminator = None
 
         if id is not None:
@@ -58,6 +61,8 @@ class AdminProject(object):
             self.name = name
         if domains is not None:
             self.domains = domains
+        if description is not None:
+            self.description = description
 
     @property
     def id(self):
@@ -123,6 +128,27 @@ class AdminProject(object):
         """
 
         self._domains = domains
+
+    @property
+    def description(self):
+        """Gets the description of this AdminProject.  # noqa: E501
+
+
+        :return: The description of this AdminProject.  # noqa: E501
+        :rtype: str
+        """
+        return self._description
+
+    @description.setter
+    def description(self, description):
+        """Sets the description of this AdminProject.
+
+
+        :param description: The description of this AdminProject.  # noqa: E501
+        :type: str
+        """
+
+        self._description = description
 
     def to_dict(self):
         """Returns the model properties as a dict"""

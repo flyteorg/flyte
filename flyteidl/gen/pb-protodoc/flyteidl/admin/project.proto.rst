@@ -47,7 +47,8 @@ Top-level namespace used to classify different entities like workflows and execu
   {
     "id": "...",
     "name": "...",
-    "domains": []
+    "domains": [],
+    "description": "..."
   }
 
 .. _api_field_flyteidl.admin.Project.id:
@@ -66,6 +67,11 @@ name
 domains
   (:ref:`flyteidl.admin.Domain <api_msg_flyteidl.admin.Domain>`) 
   
+.. _api_field_flyteidl.admin.Project.description:
+
+description
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
 
 
 .. _api_msg_flyteidl.admin.Projects:
@@ -73,7 +79,7 @@ domains
 flyteidl.admin.Projects
 -----------------------
 
-`[flyteidl.admin.Projects proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L24>`_
+`[flyteidl.admin.Projects proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L26>`_
 
 
 .. code-block:: json
@@ -94,7 +100,7 @@ projects
 flyteidl.admin.ProjectListRequest
 ---------------------------------
 
-`[flyteidl.admin.ProjectListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L28>`_
+`[flyteidl.admin.ProjectListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L30>`_
 
 
 .. code-block:: json
@@ -109,7 +115,7 @@ flyteidl.admin.ProjectListRequest
 flyteidl.admin.ProjectRegisterRequest
 -------------------------------------
 
-`[flyteidl.admin.ProjectRegisterRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L31>`_
+`[flyteidl.admin.ProjectRegisterRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L33>`_
 
 
 .. code-block:: json
@@ -130,7 +136,7 @@ project
 flyteidl.admin.ProjectRegisterResponse
 --------------------------------------
 
-`[flyteidl.admin.ProjectRegisterResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L35>`_
+`[flyteidl.admin.ProjectRegisterResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L37>`_
 
 
 .. code-block:: json

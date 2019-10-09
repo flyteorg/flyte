@@ -334,6 +334,20 @@ class Project : public ::google::protobuf::Message /* @@protoc_insertion_point(c
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
+  // string description = 4;
+  void clear_description();
+  static const int kDescriptionFieldNumber = 4;
+  const ::std::string& description() const;
+  void set_description(const ::std::string& value);
+  #if LANG_CXX11
+  void set_description(::std::string&& value);
+  #endif
+  void set_description(const char* value);
+  void set_description(const char* value, size_t size);
+  ::std::string* mutable_description();
+  ::std::string* release_description();
+  void set_allocated_description(::std::string* description);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.Project)
  private:
 
@@ -341,6 +355,7 @@ class Project : public ::google::protobuf::Message /* @@protoc_insertion_point(c
   ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Domain > domains_;
   ::google::protobuf::internal::ArenaStringPtr id_;
   ::google::protobuf::internal::ArenaStringPtr name_;
+  ::google::protobuf::internal::ArenaStringPtr description_;
   mutable int _cached_size_;
   friend struct ::protobuf_flyteidl_2fadmin_2fproject_2eproto::TableStruct;
   friend void ::protobuf_flyteidl_2fadmin_2fproject_2eproto::InitDefaultsProjectImpl();
@@ -991,6 +1006,59 @@ inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Domain >&
 Project::domains() const {
   // @@protoc_insertion_point(field_list:flyteidl.admin.Project.domains)
   return domains_;
+}
+
+// string description = 4;
+inline void Project::clear_description() {
+  description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Project::description() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Project.description)
+  return description_.GetNoArena();
+}
+inline void Project::set_description(const ::std::string& value) {
+  
+  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Project.description)
+}
+#if LANG_CXX11
+inline void Project::set_description(::std::string&& value) {
+  
+  description_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Project.description)
+}
+#endif
+inline void Project::set_description(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Project.description)
+}
+inline void Project::set_description(const char* value, size_t size) {
+  
+  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Project.description)
+}
+inline ::std::string* Project::mutable_description() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Project.description)
+  return description_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Project::release_description() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Project.description)
+  
+  return description_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Project::set_allocated_description(::std::string* description) {
+  if (description != NULL) {
+    
+  } else {
+    
+  }
+  description_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), description);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Project.description)
 }
 
 // -------------------------------------------------------------------

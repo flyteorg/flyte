@@ -4186,6 +4186,8 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/adminDomain"
+      description:
+        type: "string"
     description: "Top-level namespace used to classify different entities like workflows\
       \ and executions."
     example:
@@ -4195,6 +4197,7 @@ definitions:
         id: "id"
       - name: "name"
         id: "id"
+      description: "description"
       id: "id"
   adminProjectRegisterRequest:
     type: "object"
@@ -4218,6 +4221,7 @@ definitions:
           id: "id"
         - name: "name"
           id: "id"
+        description: "description"
         id: "id"
       - name: "name"
         domains:
@@ -4225,6 +4229,7 @@ definitions:
           id: "id"
         - name: "name"
           id: "id"
+        description: "description"
         id: "id"
   adminSchedule:
     type: "object"
