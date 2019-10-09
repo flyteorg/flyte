@@ -13,4 +13,6 @@ package flyteadmin
 type AdminWorkflowExecutionGetDataResponse struct {
 	// Signed url to fetch a core.LiteralMap of execution outputs.
 	Outputs *AdminUrlBlob `json:"outputs,omitempty"`
+	// Signed url to fetch a core.LiteralMap of execution inputs.
+	Inputs *AdminUrlBlob `json:"inputs,omitempty"`
 }

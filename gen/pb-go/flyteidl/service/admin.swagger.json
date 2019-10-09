@@ -2395,6 +2395,10 @@
         "spec": {
           "$ref": "#/definitions/adminExecutionSpec",
           "description": "Additional fields necessary to launch the execution."
+        },
+        "inputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply."
         }
       },
       "description": "Request to launch an execution with the given project, domain and optionally name."
@@ -3233,6 +3237,10 @@
         "outputs": {
           "$ref": "#/definitions/adminUrlBlob",
           "description": "Signed url to fetch a core.LiteralMap of execution outputs."
+        },
+        "inputs": {
+          "$ref": "#/definitions/adminUrlBlob",
+          "description": "Signed url to fetch a core.LiteralMap of execution inputs."
         }
       },
       "description": "Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution."

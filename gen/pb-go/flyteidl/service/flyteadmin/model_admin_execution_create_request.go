@@ -18,4 +18,6 @@ type AdminExecutionCreateRequest struct {
 	Name string `json:"name,omitempty"`
 	// Additional fields necessary to launch the execution.
 	Spec *AdminExecutionSpec `json:"spec,omitempty"`
+	// The inputs required to start the execution. All required inputs must be included in this map. If not required and not provided, defaults apply.
+	Inputs *CoreLiteralMap `json:"inputs,omitempty"`
 }

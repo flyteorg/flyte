@@ -5874,6 +5874,9 @@ export namespace flyteidl {
 
             /** ExecutionCreateRequest spec */
             spec?: (flyteidl.admin.IExecutionSpec|null);
+
+            /** ExecutionCreateRequest inputs */
+            inputs?: (flyteidl.core.ILiteralMap|null);
         }
 
         /** Represents an ExecutionCreateRequest. */
@@ -5896,6 +5899,9 @@ export namespace flyteidl {
 
             /** ExecutionCreateRequest spec. */
             public spec?: (flyteidl.admin.IExecutionSpec|null);
+
+            /** ExecutionCreateRequest inputs. */
+            public inputs?: (flyteidl.core.ILiteralMap|null);
 
             /**
              * Creates a new ExecutionCreateRequest instance using the specified properties.
@@ -6788,6 +6794,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionGetDataResponse outputs */
             outputs?: (flyteidl.admin.IUrlBlob|null);
+
+            /** WorkflowExecutionGetDataResponse inputs */
+            inputs?: (flyteidl.admin.IUrlBlob|null);
         }
 
         /** Represents a WorkflowExecutionGetDataResponse. */
@@ -6801,6 +6810,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionGetDataResponse outputs. */
             public outputs?: (flyteidl.admin.IUrlBlob|null);
+
+            /** WorkflowExecutionGetDataResponse inputs. */
+            public inputs?: (flyteidl.admin.IUrlBlob|null);
 
             /**
              * Creates a new WorkflowExecutionGetDataResponse instance using the specified properties.

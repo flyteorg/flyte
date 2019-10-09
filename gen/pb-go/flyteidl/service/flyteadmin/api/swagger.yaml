@@ -2266,6 +2266,11 @@ definitions:
       spec:
         description: "Additional fields necessary to launch the execution."
         $ref: "#/definitions/adminExecutionSpec"
+      inputs:
+        description: "The inputs required to start the execution. All required inputs\
+          \ must be\nincluded in this map. If not required and not provided, defaults\
+          \ apply."
+        $ref: "#/definitions/coreLiteralMap"
     description: "Request to launch an execution with the given project, domain and\
       \ optionally name."
   adminExecutionCreateResponse:
@@ -10478,10 +10483,16 @@ definitions:
       outputs:
         description: "Signed url to fetch a core.LiteralMap of execution outputs."
         $ref: "#/definitions/adminUrlBlob"
+      inputs:
+        description: "Signed url to fetch a core.LiteralMap of execution inputs."
+        $ref: "#/definitions/adminUrlBlob"
     description: "Response structure for WorkflowExecutionGetDataRequest which contains\
       \ inputs and outputs for an execution."
     example:
       outputs:
+        bytes: "bytes"
+        url: "url"
+      inputs:
         bytes: "bytes"
         url: "url"
   adminWorkflowList:
