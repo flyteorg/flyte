@@ -60,6 +60,12 @@ message AddTagResponse {
 message Dataset {
     DatasetID id = 1;
     Metadata metadata = 2;
+    repeated string partitionKey = 3;
+}
+
+message Partition {
+    string key = 1;
+    string value = 2;
 }
 
 message DatasetID {
@@ -75,6 +81,7 @@ message Artifact {
     DatasetID dataset = 2;
     repeated ArtifactData data = 3;
     Metadata metadata = 4;
+    repeated Partition partitions = 5; // should this be a map of key/val strings instead?
 }
 
 message ArtifactData {
