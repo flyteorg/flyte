@@ -2915,6 +2915,9 @@
           "items": {
             "$ref": "#/definitions/adminDomain"
           }
+        },
+        "description": {
+          "type": "string"
         }
       },
       "description": "Top-level namespace used to classify different entities like workflows and executions."

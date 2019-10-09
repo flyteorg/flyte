@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='flyteidl/admin/project.proto',
   package='flyteidl.admin',
   syntax='proto3',
-  serialized_pb=_b('\n\x1c\x66lyteidl/admin/project.proto\x12\x0e\x66lyteidl.admin\"\"\n\x06\x44omain\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\"L\n\x07Project\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\'\n\x07\x64omains\x18\x03 \x03(\x0b\x32\x16.flyteidl.admin.Domain\"5\n\x08Projects\x12)\n\x08projects\x18\x01 \x03(\x0b\x32\x17.flyteidl.admin.Project\"\x14\n\x12ProjectListRequest\"B\n\x16ProjectRegisterRequest\x12(\n\x07project\x18\x01 \x01(\x0b\x32\x17.flyteidl.admin.Project\"\x19\n\x17ProjectRegisterResponseB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n\x1c\x66lyteidl/admin/project.proto\x12\x0e\x66lyteidl.admin\"\"\n\x06\x44omain\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\"a\n\x07Project\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\'\n\x07\x64omains\x18\x03 \x03(\x0b\x32\x16.flyteidl.admin.Domain\x12\x13\n\x0b\x64\x65scription\x18\x04 \x01(\t\"5\n\x08Projects\x12)\n\x08projects\x18\x01 \x03(\x0b\x32\x17.flyteidl.admin.Project\"\x14\n\x12ProjectListRequest\"B\n\x16ProjectRegisterRequest\x12(\n\x07project\x18\x01 \x01(\x0b\x32\x17.flyteidl.admin.Project\"\x19\n\x17ProjectRegisterResponseB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
 )
 
 
@@ -91,6 +91,13 @@ _PROJECT = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='description', full_name='flyteidl.admin.Project.description', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -104,7 +111,7 @@ _PROJECT = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=84,
-  serialized_end=160,
+  serialized_end=181,
 )
 
 
@@ -134,8 +141,8 @@ _PROJECTS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=162,
-  serialized_end=215,
+  serialized_start=183,
+  serialized_end=236,
 )
 
 
@@ -158,8 +165,8 @@ _PROJECTLISTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=217,
-  serialized_end=237,
+  serialized_start=238,
+  serialized_end=258,
 )
 
 
@@ -189,8 +196,8 @@ _PROJECTREGISTERREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=239,
-  serialized_end=305,
+  serialized_start=260,
+  serialized_end=326,
 )
 
 
@@ -213,8 +220,8 @@ _PROJECTREGISTERRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=307,
-  serialized_end=332,
+  serialized_start=328,
+  serialized_end=353,
 )
 
 _PROJECT.fields_by_name['domains'].message_type = _DOMAIN

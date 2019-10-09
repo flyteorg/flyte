@@ -15,4 +15,5 @@ type AdminProject struct {
 	// Display name.
 	Name string `json:"name,omitempty"`
 	Domains []AdminDomain `json:"domains,omitempty"`
+	Description string `json:"description,omitempty"`
 }

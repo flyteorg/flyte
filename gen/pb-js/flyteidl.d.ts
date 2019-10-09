@@ -8459,6 +8459,9 @@ export namespace flyteidl {
 
             /** Project domains */
             domains?: (flyteidl.admin.IDomain[]|null);
+
+            /** Project description */
+            description?: (string|null);
         }
 
         /** Represents a Project. */
@@ -8478,6 +8481,9 @@ export namespace flyteidl {
 
             /** Project domains. */
             public domains: flyteidl.admin.IDomain[];
+
+            /** Project description. */
+            public description: string;
 
             /**
              * Creates a new Project instance using the specified properties.

@@ -127,6 +127,8 @@ func (m *Project) Validate() error {
 
 	}
 
+	// no validation rules for Description
+
 	return nil
 }
 

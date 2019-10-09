@@ -20219,6 +20219,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [id] Project id
              * @property {string|null} [name] Project name
              * @property {Array.<flyteidl.admin.IDomain>|null} [domains] Project domains
+             * @property {string|null} [description] Project description
              */
 
             /**
@@ -20262,6 +20263,14 @@ export const flyteidl = $root.flyteidl = (() => {
             Project.prototype.domains = $util.emptyArray;
 
             /**
+             * Project description.
+             * @member {string} description
+             * @memberof flyteidl.admin.Project
+             * @instance
+             */
+            Project.prototype.description = "";
+
+            /**
              * Creates a new Project instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.Project
@@ -20292,6 +20301,8 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.domains != null && message.domains.length)
                     for (let i = 0; i < message.domains.length; ++i)
                         $root.flyteidl.admin.Domain.encode(message.domains[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                if (message.description != null && message.hasOwnProperty("description"))
+                    writer.uint32(/* id 4, wireType 2 =*/34).string(message.description);
                 return writer;
             };
 
@@ -20323,6 +20334,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         if (!(message.domains && message.domains.length))
                             message.domains = [];
                         message.domains.push($root.flyteidl.admin.Domain.decode(reader, reader.uint32()));
+                        break;
+                    case 4:
+                        message.description = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -20358,6 +20372,9 @@ export const flyteidl = $root.flyteidl = (() => {
                             return "domains." + error;
                     }
                 }
+                if (message.description != null && message.hasOwnProperty("description"))
+                    if (!$util.isString(message.description))
+                        return "description: string expected";
                 return null;
             };
 

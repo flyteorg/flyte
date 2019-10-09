@@ -20,6 +20,8 @@ message Project {
     string name             = 2;
 
     repeated Domain domains = 3;
+
+    string description      = 4;
 }
 
 message Projects {

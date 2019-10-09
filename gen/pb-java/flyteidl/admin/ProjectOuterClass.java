@@ -777,6 +777,16 @@ public final class ProjectOuterClass {
      */
     flyteidl.admin.ProjectOuterClass.DomainOrBuilder getDomainsOrBuilder(
         int index);
+
+    /**
+     * <code>string description = 4;</code>
+     */
+    java.lang.String getDescription();
+    /**
+     * <code>string description = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getDescriptionBytes();
   }
   /**
    * <pre>
@@ -798,6 +808,7 @@ public final class ProjectOuterClass {
       id_ = "";
       name_ = "";
       domains_ = java.util.Collections.emptyList();
+      description_ = "";
     }
 
     @java.lang.Override
@@ -850,6 +861,12 @@ public final class ProjectOuterClass {
               }
               domains_.add(
                   input.readMessage(flyteidl.admin.ProjectOuterClass.Domain.parser(), extensionRegistry));
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              description_ = s;
               break;
             }
           }
@@ -991,6 +1008,40 @@ public final class ProjectOuterClass {
       return domains_.get(index);
     }
 
+    public static final int DESCRIPTION_FIELD_NUMBER = 4;
+    private volatile java.lang.Object description_;
+    /**
+     * <code>string description = 4;</code>
+     */
+    public java.lang.String getDescription() {
+      java.lang.Object ref = description_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        description_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string description = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDescriptionBytes() {
+      java.lang.Object ref = description_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        description_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1012,6 +1063,9 @@ public final class ProjectOuterClass {
       for (int i = 0; i < domains_.size(); i++) {
         output.writeMessage(3, domains_.get(i));
       }
+      if (!getDescriptionBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, description_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1029,6 +1083,9 @@ public final class ProjectOuterClass {
       for (int i = 0; i < domains_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, domains_.get(i));
+      }
+      if (!getDescriptionBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, description_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1052,6 +1109,8 @@ public final class ProjectOuterClass {
           .equals(other.getName());
       result = result && getDomainsList()
           .equals(other.getDomainsList());
+      result = result && getDescription()
+          .equals(other.getDescription());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1071,6 +1130,8 @@ public final class ProjectOuterClass {
         hash = (37 * hash) + DOMAINS_FIELD_NUMBER;
         hash = (53 * hash) + getDomainsList().hashCode();
       }
+      hash = (37 * hash) + DESCRIPTION_FIELD_NUMBER;
+      hash = (53 * hash) + getDescription().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1215,6 +1276,8 @@ public final class ProjectOuterClass {
         } else {
           domainsBuilder_.clear();
         }
+        description_ = "";
+
         return this;
       }
 
@@ -1250,6 +1313,7 @@ public final class ProjectOuterClass {
         } else {
           result.domains_ = domainsBuilder_.build();
         }
+        result.description_ = description_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1325,6 +1389,10 @@ public final class ProjectOuterClass {
               domainsBuilder_.addAllMessages(other.domains_);
             }
           }
+        }
+        if (!other.getDescription().isEmpty()) {
+          description_ = other.description_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1750,6 +1818,75 @@ public final class ProjectOuterClass {
           domains_ = null;
         }
         return domainsBuilder_;
+      }
+
+      private java.lang.Object description_ = "";
+      /**
+       * <code>string description = 4;</code>
+       */
+      public java.lang.String getDescription() {
+        java.lang.Object ref = description_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          description_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string description = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDescriptionBytes() {
+        java.lang.Object ref = description_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          description_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string description = 4;</code>
+       */
+      public Builder setDescription(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        description_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string description = 4;</code>
+       */
+      public Builder clearDescription() {
+        
+        description_ = getDefaultInstance().getDescription();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string description = 4;</code>
+       */
+      public Builder setDescriptionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        description_ = value;
+        onChanged();
+        return this;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3954,14 +4091,15 @@ public final class ProjectOuterClass {
     java.lang.String[] descriptorData = {
       "\n\034flyteidl/admin/project.proto\022\016flyteidl" +
       ".admin\"\"\n\006Domain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001" +
-      "(\t\"L\n\007Project\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022" +
+      "(\t\"a\n\007Project\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022" +
       "\'\n\007domains\030\003 \003(\0132\026.flyteidl.admin.Domain" +
-      "\"5\n\010Projects\022)\n\010projects\030\001 \003(\0132\027.flyteid" +
-      "l.admin.Project\"\024\n\022ProjectListRequest\"B\n" +
-      "\026ProjectRegisterRequest\022(\n\007project\030\001 \001(\013" +
-      "2\027.flyteidl.admin.Project\"\031\n\027ProjectRegi" +
-      "sterResponseB3Z1github.com/lyft/flyteidl" +
-      "/gen/pb-go/flyteidl/adminb\006proto3"
+      "\022\023\n\013description\030\004 \001(\t\"5\n\010Projects\022)\n\010pro" +
+      "jects\030\001 \003(\0132\027.flyteidl.admin.Project\"\024\n\022" +
+      "ProjectListRequest\"B\n\026ProjectRegisterReq" +
+      "uest\022(\n\007project\030\001 \001(\0132\027.flyteidl.admin.P" +
+      "roject\"\031\n\027ProjectRegisterResponseB3Z1git" +
+      "hub.com/lyft/flyteidl/gen/pb-go/flyteidl" +
+      "/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3986,7 +4124,7 @@ public final class ProjectOuterClass {
     internal_static_flyteidl_admin_Project_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Project_descriptor,
-        new java.lang.String[] { "Id", "Name", "Domains", });
+        new java.lang.String[] { "Id", "Name", "Domains", "Description", });
     internal_static_flyteidl_admin_Projects_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_admin_Projects_fieldAccessorTable = new
