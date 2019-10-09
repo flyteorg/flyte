@@ -47,7 +47,7 @@ var customInfo = ptypesStruct.Struct{
 	},
 }
 
-func TestAddTaskSubmittedState(t *testing.T) {
+func TestAddTaskStartedState(t *testing.T) {
 	var startedAt = time.Now().UTC()
 	var startedAtProto, _ = ptypes.TimestampProto(startedAt)
 	request := admin.TaskExecutionEventRequest{
@@ -58,7 +58,7 @@ func TestAddTaskSubmittedState(t *testing.T) {
 	}
 	taskExecutionModel := models.TaskExecution{}
 	closure := &admin.TaskExecutionClosure{}
-	err := addTaskSubmittedState(&request, &taskExecutionModel, closure)
+	err := addTaskStartedState(&request, &taskExecutionModel, closure)
 	assert.Nil(t, err)
 
 	timestamp, err := ptypes.Timestamp(closure.StartedAt)
@@ -140,7 +140,7 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 
 	expectedClosure := &admin.TaskExecutionClosure{
 		Phase:     core.TaskExecution_QUEUED,
-		StartedAt: taskEventOccurredAtProto,
+		StartedAt: nil,
 		CreatedAt: taskEventOccurredAtProto,
 		UpdatedAt: taskEventOccurredAtProto,
 	}
@@ -169,7 +169,7 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 		Phase:                  "QUEUED",
 		InputURI:               "input uri",
 		Closure:                expectedClosureBytes,
-		StartedAt:              &taskEventOccurredAt,
+		StartedAt:              nil,
 		TaskExecutionCreatedAt: &taskEventOccurredAt,
 		TaskExecutionUpdatedAt: &taskEventOccurredAt,
 	}, taskExecutionModel)
