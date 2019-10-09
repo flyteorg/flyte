@@ -18,7 +18,7 @@ type CreateTaskExecutionModelInput struct {
 	Request *admin.TaskExecutionEventRequest
 }
 
-func addTaskSubmittedState(request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
+func addTaskStartedState(request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
 	closure *admin.TaskExecutionClosure) error {
 	occurredAt, err := ptypes.Timestamp(request.Event.OccurredAt)
 	if err != nil {
@@ -99,8 +99,8 @@ func CreateTaskExecutionModel(input CreateTaskExecutionModelInput) (*models.Task
 	// Different tasks may report different phases as their first event.
 	// If the first event we receive for this execution is a valid
 	// non-terminal phase, mark the execution start time.
-	if eventPhase == core.TaskExecution_QUEUED || eventPhase == core.TaskExecution_RUNNING {
-		err := addTaskSubmittedState(input.Request, taskExecution, closure)
+	if eventPhase == core.TaskExecution_RUNNING {
+		err := addTaskStartedState(input.Request, taskExecution, closure)
 		if err != nil {
 			return nil, err
 		}
@@ -136,11 +136,19 @@ func UpdateTaskExecutionModel(request *admin.TaskExecutionEventRequest, taskExec
 		return errors.NewFlyteAdminErrorf(codes.Internal,
 			"failed to unmarshal task execution closure with error: %+v", err)
 	}
+	existingTaskPhase := taskExecutionModel.Phase
 	taskExecutionModel.Phase = request.Event.Phase.String()
 	taskExecutionModel.PhaseVersion = request.Event.PhaseVersion
 	taskExecutionClosure.Phase = request.Event.Phase
 	taskExecutionClosure.UpdatedAt = request.Event.OccurredAt
 	taskExecutionClosure.Logs = request.Event.Logs
+	if (existingTaskPhase == core.TaskExecution_QUEUED.String() || existingTaskPhase == core.TaskExecution_UNDEFINED.String()) && taskExecutionModel.Phase == core.TaskExecution_RUNNING.String() {
+		err = addTaskStartedState(request, taskExecutionModel, &taskExecutionClosure)
+		if err != nil {
+			return err
+		}
+	}
+
 	if common.IsTaskExecutionTerminal(request.Event.Phase) {
 		err := addTaskTerminalState(request, taskExecutionModel, &taskExecutionClosure)
 		if err != nil {
