@@ -422,64 +422,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:870f6bb378b4f7dfab0be83fbd1ad17c2a380e05c62b0a934b9d258ced24c002"
-  name = "github.com/lyft/flyteadmin"
-  packages = [
-    "cmd/entrypoints",
-    "pkg/async/notifications",
-    "pkg/async/notifications/implementations",
-    "pkg/async/notifications/interfaces",
-    "pkg/async/notifications/mocks",
-    "pkg/async/schedule",
-    "pkg/async/schedule/aws",
-    "pkg/async/schedule/aws/interfaces",
-    "pkg/async/schedule/aws/mocks",
-    "pkg/async/schedule/interfaces",
-    "pkg/async/schedule/mocks",
-    "pkg/async/schedule/noop",
-    "pkg/clusterresource",
-    "pkg/common",
-    "pkg/common/mocks",
-    "pkg/config",
-    "pkg/data",
-    "pkg/data/implementations",
-    "pkg/data/interfaces",
-    "pkg/data/mocks",
-    "pkg/errors",
-    "pkg/executioncluster",
-    "pkg/executioncluster/mocks",
-    "pkg/flytek8s",
-    "pkg/manager/impl",
-    "pkg/manager/impl/executions",
-    "pkg/manager/impl/shared",
-    "pkg/manager/impl/testutils",
-    "pkg/manager/impl/util",
-    "pkg/manager/impl/validation",
-    "pkg/manager/interfaces",
-    "pkg/manager/mocks",
-    "pkg/repositories",
-    "pkg/repositories/config",
-    "pkg/repositories/errors",
-    "pkg/repositories/gormimpl",
-    "pkg/repositories/interfaces",
-    "pkg/repositories/mocks",
-    "pkg/repositories/models",
-    "pkg/repositories/transformers",
-    "pkg/rpc/adminservice",
-    "pkg/rpc/adminservice/util",
-    "pkg/runtime",
-    "pkg/runtime/interfaces",
-    "pkg/runtime/mocks",
-    "pkg/workflowengine/impl",
-    "pkg/workflowengine/interfaces",
-    "pkg/workflowengine/mocks",
-  ]
-  pruneopts = "UT"
-  revision = "cb881dd8b97d0183cbd89dc33231489f0b8f6b50"
-
-[[projects]]
-  digest = "1:4c02e347457c97ee8cfafb413554854fe236d715879ac0a43743017cd179de2e"
+  digest = "1:6fdab8881f20d41b91983d5aa104401be6b7d28e9cfd0a1a93337ec094d877ba"
   name = "github.com/lyft/flyteidl"
   packages = [
     "clients/go/admin",
@@ -492,9 +435,9 @@
     "gen/pb-go/flyteidl/service",
   ]
   pruneopts = "UT"
-  revision = "c92b79f5f448ec36420eb79bbebb2b372261b77f"
+  revision = "756e0b920f53eac84d6c86f53975167c5af72f1a"
   source = "https://github.com/lyft/flyteidl"
-  version = "v0.1.1"
+  version = "v0.16.0"
 
 [[projects]]
   digest = "1:09785a77f804b9b5524cfec6d6240ea0ce53251a38eb55abeb616bcfdd85de99"
@@ -1184,54 +1127,6 @@
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/lib/pq",
-    "github.com/lyft/flyteadmin/cmd/entrypoints",
-    "github.com/lyft/flyteadmin/pkg/async/notifications",
-    "github.com/lyft/flyteadmin/pkg/async/notifications/implementations",
-    "github.com/lyft/flyteadmin/pkg/async/notifications/interfaces",
-    "github.com/lyft/flyteadmin/pkg/async/notifications/mocks",
-    "github.com/lyft/flyteadmin/pkg/async/schedule",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/aws",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/aws/interfaces",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/aws/mocks",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/interfaces",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/mocks",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/noop",
-    "github.com/lyft/flyteadmin/pkg/clusterresource",
-    "github.com/lyft/flyteadmin/pkg/common",
-    "github.com/lyft/flyteadmin/pkg/common/mocks",
-    "github.com/lyft/flyteadmin/pkg/config",
-    "github.com/lyft/flyteadmin/pkg/data",
-    "github.com/lyft/flyteadmin/pkg/data/implementations",
-    "github.com/lyft/flyteadmin/pkg/data/interfaces",
-    "github.com/lyft/flyteadmin/pkg/data/mocks",
-    "github.com/lyft/flyteadmin/pkg/errors",
-    "github.com/lyft/flyteadmin/pkg/executioncluster",
-    "github.com/lyft/flyteadmin/pkg/executioncluster/mocks",
-    "github.com/lyft/flyteadmin/pkg/flytek8s",
-    "github.com/lyft/flyteadmin/pkg/manager/impl",
-    "github.com/lyft/flyteadmin/pkg/manager/impl/executions",
-    "github.com/lyft/flyteadmin/pkg/manager/impl/shared",
-    "github.com/lyft/flyteadmin/pkg/manager/impl/testutils",
-    "github.com/lyft/flyteadmin/pkg/manager/impl/util",
-    "github.com/lyft/flyteadmin/pkg/manager/impl/validation",
-    "github.com/lyft/flyteadmin/pkg/manager/interfaces",
-    "github.com/lyft/flyteadmin/pkg/manager/mocks",
-    "github.com/lyft/flyteadmin/pkg/repositories",
-    "github.com/lyft/flyteadmin/pkg/repositories/config",
-    "github.com/lyft/flyteadmin/pkg/repositories/errors",
-    "github.com/lyft/flyteadmin/pkg/repositories/gormimpl",
-    "github.com/lyft/flyteadmin/pkg/repositories/interfaces",
-    "github.com/lyft/flyteadmin/pkg/repositories/mocks",
-    "github.com/lyft/flyteadmin/pkg/repositories/models",
-    "github.com/lyft/flyteadmin/pkg/repositories/transformers",
-    "github.com/lyft/flyteadmin/pkg/rpc/adminservice",
-    "github.com/lyft/flyteadmin/pkg/rpc/adminservice/util",
-    "github.com/lyft/flyteadmin/pkg/runtime",
-    "github.com/lyft/flyteadmin/pkg/runtime/interfaces",
-    "github.com/lyft/flyteadmin/pkg/runtime/mocks",
-    "github.com/lyft/flyteadmin/pkg/workflowengine/impl",
-    "github.com/lyft/flyteadmin/pkg/workflowengine/interfaces",
-    "github.com/lyft/flyteadmin/pkg/workflowengine/mocks",
     "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin",
     "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core",
     "github.com/lyft/flyteidl/gen/pb-go/flyteidl/event",
