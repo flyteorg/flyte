@@ -3,11 +3,10 @@ package validation
 import (
 	"context"
 
-	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
 	"github.com/lyft/flyteadmin/pkg/repositories"
+	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/util/validation"
@@ -15,6 +14,8 @@ import (
 
 const projectID = "project_id"
 const projectName = "project_name"
+const projectDescription = "project_description"
+const maxDescriptionLength = 300
 
 func ValidateProjectRegisterRequest(request admin.ProjectRegisterRequest) error {
 	if request.Project == nil {
@@ -27,6 +28,9 @@ func ValidateProjectRegisterRequest(request admin.ProjectRegisterRequest) error 
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid project id [%s]: %v", request.Project.Id, errs)
 	}
 	if err := ValidateEmptyStringField(request.Project.Name, projectName); err != nil {
+		return err
+	}
+	if err := ValidateMaxLengthStringField(request.Project.Description, projectDescription, maxDescriptionLength); err != nil {
 		return err
 	}
 	if request.Project.Domains != nil {

@@ -26,6 +26,14 @@ func ValidateEmptyStringField(field, fieldName string) error {
 	return nil
 }
 
+// Validates that a string field does not exceed a certain character count
+func ValidateMaxLengthStringField(field string, fieldName string, limit int) error {
+	if len(field) > limit {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s cannot exceed %d characters", fieldName, limit)
+	}
+	return nil
+}
+
 // Validates that all required fields for an identifier are present.
 func ValidateIdentifier(id *core.Identifier, expectedType common.Entity) error {
 	if id == nil {

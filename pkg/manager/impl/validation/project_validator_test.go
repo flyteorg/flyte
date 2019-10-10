@@ -6,12 +6,10 @@ import (
 	"testing"
 
 	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
-
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/stretchr/testify/assert"
-
 	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestValidateProjectRegisterRequest_ValidRequest(t *testing.T) {
@@ -83,6 +81,17 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 				},
 			},
 			expectedError: "Domains are currently only set system wide. Please retry without domains included in your request.",
+		},
+		{
+			request: admin.ProjectRegisterRequest{
+				Project: &admin.Project{
+					Id:   "proj",
+					Name: "name",
+					// 301 character string
+					Description: "longnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamelongn",
+				},
+			},
+			expectedError: "project_description cannot exceed 300 characters",
 		},
 	}
 

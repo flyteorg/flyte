@@ -6,17 +6,13 @@ import (
 	"testing"
 
 	"github.com/lyft/flyteadmin/pkg/common"
-
 	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
-
+	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-
 	runtimeMocks "github.com/lyft/flyteadmin/pkg/runtime/mocks"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
-
-	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
 )
 
 var mockProjectConfigProvider = runtimeMocks.NewMockConfigurationProvider(
@@ -53,8 +49,9 @@ func TestListProjects(t *testing.T) {
 		ctx context.Context, parameter common.SortParameter) ([]models.Project, error) {
 		return []models.Project{
 			{
-				Identifier: "project",
-				Name:       "project",
+				Identifier:  "project",
+				Name:        "project",
+				Description: "project_description",
 			},
 		}, nil
 	}
@@ -78,6 +75,7 @@ func TestProjectManager_CreateProject(t *testing.T) {
 		createFuncCalled = true
 		assert.Equal(t, "flyte-project-id", namespace.Identifier)
 		assert.Equal(t, "flyte-project-name", namespace.Name)
+		assert.Equal(t, "flyte-project-description", namespace.Description)
 		return nil
 	}
 	projectManager := NewProjectManager(mockRepository,
@@ -85,8 +83,9 @@ func TestProjectManager_CreateProject(t *testing.T) {
 			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil))
 	_, err := projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
 		Project: &admin.Project{
-			Id:   "flyte-project-id",
-			Name: "flyte-project-name",
+			Id:          "flyte-project-id",
+			Name:        "flyte-project-name",
+			Description: "flyte-project-description",
 		},
 	})
 	assert.Nil(t, err)
@@ -104,16 +103,18 @@ func TestProjectManager_CreateProjectError(t *testing.T) {
 			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil))
 	_, err := projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
 		Project: &admin.Project{
-			Id:   "flyte-project-id",
-			Name: "flyte-project-name",
+			Id:          "flyte-project-id",
+			Name:        "flyte-project-name",
+			Description: "flyte-project-description",
 		},
 	})
 	assert.EqualError(t, err, "uh oh")
 
 	_, err = projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
 		Project: &admin.Project{
-			Id:   "flyte-project-id",
-			Name: "flyte-project-name",
+			Id:          "flyte-project-id",
+			Name:        "flyte-project-name",
+			Description: "flyte-project-description",
 			Domains: []*admin.Domain{
 				{
 					Id: "i-shouldn't-be-here",
