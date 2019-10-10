@@ -119,4 +119,14 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS cluster").Error
 		},
 	},
+	// Update projects table to add description column
+	{
+		ID: "2019-10-09-project-description",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.Project{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Exec("ALTER TABLE projects DROP COLUMN IF EXISTS description").Error
+		},
+	},
 }

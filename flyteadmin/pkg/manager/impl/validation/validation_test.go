@@ -4,13 +4,11 @@ import (
 	"testing"
 
 	"github.com/lyft/flyteadmin/pkg/common"
-
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/utils"
-
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytepropeller/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 )
@@ -18,6 +16,12 @@ import (
 func TestGetMissingArgumentError(t *testing.T) {
 	err := shared.GetMissingArgumentError("foo")
 	assert.EqualError(t, err, "missing foo")
+	assert.Equal(t, codes.InvalidArgument, err.(errors.FlyteAdminError).Code())
+}
+
+func TestValidateMaxLengthStringField(t *testing.T) {
+	err := ValidateMaxLengthStringField("abcdefg", "foo", 6)
+	assert.EqualError(t, err, "foo cannot exceed 6 characters")
 	assert.Equal(t, codes.InvalidArgument, err.(errors.FlyteAdminError).Code())
 }
 

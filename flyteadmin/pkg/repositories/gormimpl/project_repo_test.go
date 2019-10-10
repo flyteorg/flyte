@@ -4,13 +4,12 @@ import (
 	"context"
 	"testing"
 
-	mockScope "github.com/lyft/flytestdlib/promutils"
-
 	mocket "github.com/Selvatico/go-mocket"
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteadmin/pkg/repositories/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	mockScope "github.com/lyft/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,11 +19,12 @@ func TestCreateProject(t *testing.T) {
 
 	query := GlobalMock.NewMock()
 	query.WithQuery(
-		`INSERT  INTO "projects" ("created_at","updated_at","deleted_at","identifier","name") VALUES (?,?,?,?,?)`)
+		`INSERT  INTO "projects" ("created_at","updated_at","deleted_at","identifier","name","description") VALUES (?,?,?,?,?,?)`)
 
 	err := projectRepo.Create(context.Background(), models.Project{
-		Identifier: "proj",
-		Name:       "proj",
+		Identifier:  "proj",
+		Name:        "proj",
+		Description: "projDescription",
 	})
 	assert.NoError(t, err)
 	assert.True(t, query.Triggered)
@@ -37,6 +37,7 @@ func TestGetProject(t *testing.T) {
 	response := make(map[string]interface{})
 	response["identifier"] = "project_id"
 	response["name"] = "project_name"
+	response["description"] = "project_description"
 
 	query := GlobalMock.NewMock()
 	query.WithQuery(`SELECT * FROM "projects"  WHERE "projects"."deleted_at" IS NULL AND ` +
@@ -49,6 +50,7 @@ func TestGetProject(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "project_id", output.Identifier)
 	assert.Equal(t, "project_name", output.Name)
+	assert.Equal(t, "project_description", output.Description)
 }
 
 func TestListProjects(t *testing.T) {
@@ -57,11 +59,13 @@ func TestListProjects(t *testing.T) {
 	fooProject := make(map[string]interface{})
 	fooProject["identifier"] = "foo"
 	fooProject["name"] = "foo =)"
+	fooProject["description"] = "foo description"
 	projects[0] = fooProject
 
 	barProject := make(map[string]interface{})
 	barProject["identifier"] = "bar"
 	barProject["name"] = "Bar"
+	barProject["description"] = "Bar description"
 	projects[1] = barProject
 
 	GlobalMock := mocket.Catcher.Reset()
@@ -78,6 +82,8 @@ func TestListProjects(t *testing.T) {
 	assert.Len(t, output, 2)
 	assert.Equal(t, "foo", output[0].Identifier)
 	assert.Equal(t, "foo =)", output[0].Name)
+	assert.Equal(t, "foo description", output[0].Description)
 	assert.Equal(t, "bar", output[1].Identifier)
 	assert.Equal(t, "Bar", output[1].Name)
+	assert.Equal(t, "Bar description", output[1].Description)
 }

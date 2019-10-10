@@ -9,7 +9,6 @@ import (
 	"github.com/lyft/flyteadmin/pkg/repositories"
 	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
@@ -28,7 +27,7 @@ func (m *ProjectManager) CreateProject(ctx context.Context, request admin.Projec
 	if err := validation.ValidateProjectRegisterRequest(request); err != nil {
 		return nil, err
 	}
-	projectModel := transformers.CreateProjectModel(request.Project.Id, request.Project.Name)
+	projectModel := transformers.CreateProjectModel(request.Project)
 	err := m.db.ProjectRepo().Create(ctx, projectModel)
 	if err != nil {
 		return nil, err
