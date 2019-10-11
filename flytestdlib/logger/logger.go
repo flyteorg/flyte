@@ -16,8 +16,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//go:generate gotests -w -all $FILE
-
 const (
 	indentLevelKey contextutils.Key = "LoggerIndentLevel"
 	sourceCodeKey  string           = "src"
