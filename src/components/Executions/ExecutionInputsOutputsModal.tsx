@@ -36,6 +36,17 @@ enum TabId {
     OUTPUTS = 'outputs'
 }
 
+const RemoteExecutionInputs: React.FC<{ execution: Execution }> = ({
+    execution
+}) => {
+    const executionData = useWorkflowExecutionData(execution.id);
+    return (
+        <WaitForData {...executionData} spinnerVariant="none">
+            {() => <RemoteLiteralMapViewer blob={executionData.value.inputs} />}
+        </WaitForData>
+    );
+};
+
 const RemoteExecutionOutputs: React.FC<{ execution: Execution }> = ({
     execution
 }) => {
@@ -50,7 +61,13 @@ const RemoteExecutionOutputs: React.FC<{ execution: Execution }> = ({
 };
 
 const RenderInputs: React.FC<{ execution: Execution }> = ({ execution }) => {
-    return <LiteralMapViewer map={execution.closure.computedInputs} />;
+    // computedInputs is deprecated, but older data may still use that field.
+    // For new records, the inputs will always need to be fetched separately
+    return execution.closure.computedInputs ? (
+        <LiteralMapViewer map={execution.closure.computedInputs} />
+    ) : (
+        <RemoteExecutionInputs execution={execution} />
+    );
 };
 
 const RenderOutputs: React.FC<{ execution: Execution }> = ({ execution }) => {
