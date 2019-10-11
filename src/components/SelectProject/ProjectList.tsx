@@ -1,18 +1,27 @@
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
+import {
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    Typography
+} from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+import { ButtonLink } from 'components/common/ButtonLink';
 import { useCommonStyles } from 'components/common/styles';
 import { Project } from 'models/Project';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import { Routes } from 'routes/routes';
+import { defaultProjectDescription } from './constants';
 
 const useStyles = makeStyles((theme: Theme) => ({
     projectCard: {
         textAlign: 'left',
         marginBottom: theme.spacing(2),
-        width: theme.spacing(36)
+        minWidth: theme.spacing(36),
+        maxWidth: theme.spacing(48),
+        '&:first-of-type': {
+            marginTop: theme.spacing(1)
+        }
     },
     projectTitle: {
         paddingBottom: 0
@@ -24,38 +33,42 @@ export interface ProjectListProps {
     projects: Project[];
 }
 
-const DomainLinks: React.FC<{ project: Project }> = ({ project }) => {
+const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
+    const styles = useStyles();
+    const commonStyles = useCommonStyles();
+    const description = !!project.description
+        ? project.description
+        : defaultProjectDescription;
     return (
-        <section>
-            {project.domains.map(({ id: domainId, name }, idx) => (
-                <span key={domainId}>
-                    {idx > 0 && <span>&nbsp;|&nbsp;</span>}
-                    <Link
+        <Card className={styles.projectCard} elevation={1}>
+            <CardContent>
+                <Typography variant="h6" component="h2" gutterBottom={true}>
+                    {project.name}
+                </Typography>
+                <Typography
+                    className={commonStyles.textWrapped}
+                    variant="body2"
+                    color="textSecondary"
+                    component="p"
+                >
+                    {description}
+                </Typography>
+            </CardContent>
+            <CardActions>
+                {project.domains.map(({ id: domainId, name }) => (
+                    <Button
+                        color="primary"
+                        key={domainId}
+                        component={ButtonLink}
                         to={Routes.ProjectDetails.sections.workflows.makeUrl(
                             project.id,
                             domainId
                         )}
                     >
                         {name}
-                    </Link>
-                </span>
-            ))}
-        </section>
-    );
-};
-
-const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
-    const styles = useStyles();
-    return (
-        <Card className={styles.projectCard}>
-            <CardHeader
-                className={styles.projectTitle}
-                title={project.name}
-                titleTypographyProps={{ variant: 'body1' }}
-            />
-            <CardContent>
-                <DomainLinks project={project} />
-            </CardContent>
+                    </Button>
+                ))}
+            </CardActions>
         </Card>
     );
 };
