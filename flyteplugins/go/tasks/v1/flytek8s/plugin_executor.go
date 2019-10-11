@@ -15,6 +15,8 @@ import (
 
 	"strings"
 
+	"fmt"
+
 	eventErrors "github.com/lyft/flyteidl/clients/go/events/errors"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteplugins/go/tasks/v1/errors"
@@ -251,6 +253,38 @@ func (e *K8sTaskExecutor) CheckTaskStatus(ctx context.Context, taskCtx types.Tas
 		finalStatus = types.TaskStatusPermanentFailure(err)
 	} else {
 		AddObjectMetadata(taskCtx, o)
+
+		// NOTE: To ensure objects are cleaned up, the plugins need a persistent step in addition to upstream plugin executor
+		// state machine. Once the object reaches its terminal state, we commit the completion in two steps:
+		// Round1: mark the object as deleted in state store (object's custom state)
+		// Round2: instead of regular retrieval (which may fail in this case), just delete the object
+		objStatus, terminalPhase, err := retrieveK8sObjectState(taskCtx.GetCustomState())
+		if err != nil {
+			logger.Warningf(ctx, "Failed to retrieve object status: %v. Error: %v",
+				taskCtx.GetTaskExecutionID().GetGeneratedName(), err)
+			return types.TaskStatusUndefined, err
+		}
+
+		if objStatus == k8sObjectDeleted {
+			// kill the object execution if still alive
+			err = instance.kubeClient.Delete(ctx, o)
+
+			if err != nil {
+				if IsK8sObjectNotExists(err) {
+					logger.Debugf(ctx, "the k8s object %v was found to have successfully exited after completion", taskCtx.GetTaskExecutionID().GetGeneratedName())
+				} else {
+					return types.TaskStatusUndefined, err
+				}
+			} else {
+				logger.Debugf(ctx, "deleted the k8s object %v in terminal phase", taskCtx.GetTaskExecutionID().GetGeneratedName())
+			}
+			finalStatus.Phase = terminalPhase
+			if terminalPhase.IsPermanentFailure() {
+				finalStatus.Err = fmt.Errorf("k8s task failed, error info not available")
+			}
+			return finalStatus, nil
+		}
+
 		finalStatus, info, err = e.getResource(ctx, taskCtx, o)
 		if err != nil {
 			return types.TaskStatusUndefined, err
@@ -283,10 +317,20 @@ func (e *K8sTaskExecutor) CheckTaskStatus(ctx context.Context, taskCtx types.Tas
 	// This must happen after sending admin event. It's safe against partial failures because if the event failed, we will
 	// simply retry in the next round. If the event succeeded but this failed, we will try again the next round to send
 	// the same event (idempotent) and then come here again...
-	if finalStatus.Phase.IsTerminal() && len(o.GetFinalizers()) > 0 {
-		err = e.ClearFinalizers(ctx, o)
-		if err != nil {
-			return types.TaskStatusUndefined, err
+	if finalStatus.Phase.IsTerminal() {
+		if len(o.GetFinalizers()) > 0 {
+			err = e.ClearFinalizers(ctx, o)
+			if err != nil {
+				return types.TaskStatusUndefined, err
+			}
+		}
+
+		if e.handler.GetProperties().DeleteResourceOnAbort {
+			finalStatus = types.TaskStatus{
+				Phase:        taskCtx.GetPhase(),
+				PhaseVersion: taskCtx.GetPhaseVersion(),
+				State:        storeK8sObjectState(k8sObjectDeleted, finalStatus.Phase),
+			}
 		}
 	}
 

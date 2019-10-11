@@ -285,6 +285,7 @@ func TestK8sTaskExecutor_CheckTaskStatus(t *testing.T) {
 		expectedNewStatus.PhaseVersion = uint32(1)
 		tctx.On("GetPhase").Return(expectedOldPhase)
 		tctx.On("GetPhaseVersion").Return(uint32(1))
+		tctx.On("GetCustomState").Return(nil)
 		mockResourceHandler.On("GetTaskStatus", mock.Anything, mock.Anything, mock.MatchedBy(func(o *v1.Pod) bool { return true })).Return(expectedNewStatus, nil, nil)
 
 		evRecorder.On("RecordTaskEvent", mock.MatchedBy(func(c context.Context) bool { return true }),
@@ -326,6 +327,7 @@ func TestK8sTaskExecutor_CheckTaskStatus(t *testing.T) {
 		expectedNewStatus.PhaseVersion = uint32(1)
 		tctx.On("GetPhase").Return(expectedOldPhase)
 		tctx.On("GetPhaseVersion").Return(uint32(1))
+		tctx.On("GetCustomState").Return(nil)
 		mockResourceHandler.On("GetTaskStatus", mock.Anything, mock.Anything, mock.MatchedBy(func(o *v1.Pod) bool { return true })).Return(expectedNewStatus, nil, nil)
 
 		evRecorder.On("RecordTaskEvent", mock.MatchedBy(func(c context.Context) bool { return true }),
@@ -371,6 +373,7 @@ func TestK8sTaskExecutor_CheckTaskStatus(t *testing.T) {
 		expectedNewStatus.PhaseVersion = uint32(1)
 		tctx.On("GetPhase").Return(expectedOldPhase)
 		tctx.On("GetPhaseVersion").Return(uint32(1))
+		tctx.On("GetCustomState").Return(nil)
 		mockResourceHandler.On("GetTaskStatus", mock.Anything, mock.Anything, mock.MatchedBy(func(o *v1.Pod) bool { return true })).Return(expectedNewStatus, nil, nil)
 
 		s, err := k.CheckTaskStatus(ctx, tctx, nil)
@@ -395,6 +398,7 @@ func TestK8sTaskExecutor_CheckTaskStatus(t *testing.T) {
 		expectedOldPhase := types.TaskPhaseRunning
 		tctx.On("GetPhase").Return(expectedOldPhase)
 		tctx.On("GetPhaseVersion").Return(uint32(0))
+		tctx.On("GetCustomState").Return(nil)
 
 		evRecorder.On("RecordTaskEvent", mock.MatchedBy(func(c context.Context) bool { return true }),
 			mock.MatchedBy(func(e *event.TaskExecutionEvent) bool { return true })).Return(nil)
@@ -427,9 +431,6 @@ func TestK8sTaskExecutor_CheckTaskStatus(t *testing.T) {
 		}
 
 		assert.NoError(t, c.Create(ctx, testPod))
-		defer func() {
-			assert.NoError(t, c.Delete(ctx, testPod))
-		}()
 
 		assert.NoError(t, store.WriteProtobuf(ctx, tctx.GetErrorFile(), storage.Options{}, &core.ErrorDocument{
 			Error: &core.ContainerError{
@@ -444,14 +445,36 @@ func TestK8sTaskExecutor_CheckTaskStatus(t *testing.T) {
 		expectedOldPhase := types.TaskPhaseQueued
 		tctx.On("GetPhase").Return(expectedOldPhase)
 		tctx.On("GetPhaseVersion").Return(uint32(0))
+		tctx.On("GetCustomState").Return(nil)
 		mockResourceHandler.On("GetTaskStatus", mock.Anything, mock.Anything, mock.MatchedBy(func(o *v1.Pod) bool { return true })).Return(types.TaskStatusSucceeded, nil, nil)
+		mockResourceHandler.On("GetProperties").Return(types.ExecutorProperties{DeleteResourceOnAbort:true})
 
 		evRecorder.On("RecordTaskEvent", mock.MatchedBy(func(c context.Context) bool { return true }),
 			mock.MatchedBy(func(e *event.TaskExecutionEvent) bool { return true })).Return(nil)
 
 		s, err := k.CheckTaskStatus(ctx, tctx, nil)
-		assert.Nil(t, s.State)
+		// first time after termination, we expect phase to not change but have custom state populated
+		assert.NotNil(t, s.State)
+		assert.Equal(t, flytek8s.K8sObjectStatus(2), s.State["os"].(flytek8s.K8sObjectState).Status)
+		assert.Equal(t, types.TaskPhase(3), s.State["os"].(flytek8s.K8sObjectState).TerminalPhase)
 		assert.NoError(t, err)
+		assert.Equal(t, types.TaskPhaseQueued, s.Phase)
+
+		// another round of CheckTaskStatus with custom state from previous round
+		mockResourceHandler1 := &mocks.K8sResourceHandler{}
+		tctx1 := getMockTaskContext()
+		mockResourceHandler1.On("GetProperties").Return(types.ExecutorProperties{DeleteResourceOnAbort:true})
+		mockResourceHandler1.On("BuildIdentityResource", mock.Anything, tctx1).Return(&v1.Pod{}, nil)
+		mockResourceHandler1.On("GetTaskStatus", mock.Anything, mock.Anything, mock.MatchedBy(func(o *v1.Pod) bool { return true })).Return(types.TaskStatusSucceeded, nil, nil)
+
+		k1 := flytek8s.NewK8sTaskExecutorForResource("x1", &v1.Pod{}, mockResourceHandler1, time.Second)
+		assert.NoError(t, k1.Initialize(ctx, params))
+
+		tctx1.On("GetPhase").Return(expectedOldPhase)
+		tctx1.On("GetPhaseVersion").Return(uint32(0))
+		tctx1.On("GetCustomState").Return(s.State)
+		s, err = k1.CheckTaskStatus(ctx, tctx1, nil)
+		assert.Nil(t, s.State)
 		assert.Equal(t, types.TaskPhasePermanentFailure, s.Phase)
 	})
 
@@ -494,6 +517,7 @@ func TestK8sTaskExecutor_CheckTaskStatus(t *testing.T) {
 		expectedOldPhase := types.TaskPhaseQueued
 		tctx.On("GetPhase").Return(expectedOldPhase)
 		tctx.On("GetPhaseVersion").Return(uint32(0))
+		tctx.On("GetCustomState").Return(nil)
 		mockResourceHandler.On("GetTaskStatus", mock.Anything, mock.Anything, mock.MatchedBy(func(o *v1.Pod) bool { return true })).Return(types.TaskStatusSucceeded, nil, nil)
 
 		evRecorder.On("RecordTaskEvent", mock.MatchedBy(func(c context.Context) bool { return true }),
@@ -536,6 +560,7 @@ func TestK8sTaskExecutor_CheckTaskStatus(t *testing.T) {
 		expectedOldPhase := types.TaskPhaseQueued
 		tctx.On("GetPhase").Return(expectedOldPhase)
 		tctx.On("GetPhaseVersion").Return(uint32(0))
+		tctx.On("GetCustomState").Return(nil)
 		mockResourceHandler.On("GetTaskStatus", mock.Anything, mock.Anything, mock.MatchedBy(func(o *v1.Pod) bool { return true })).Return(types.TaskStatusQueued, nil, nil)
 
 		s, err := k.CheckTaskStatus(ctx, tctx, nil)
