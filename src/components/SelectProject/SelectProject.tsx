@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         margin: `${theme.spacing(2)} 0`
     },
     searchContainer: {
-        width: theme.spacing(36)
+        minWidth: theme.spacing(45)
     }
 }));
 
