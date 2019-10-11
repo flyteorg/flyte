@@ -74,7 +74,8 @@ func TestDefaultProtobufStore_BigDataReadAfterWrite(t *testing.T) {
 
 		bigD := make([]byte, 1.5*1024*1024)
 		// #nosec G404
-		rand.Read(bigD)
+		_, err = rand.Read(bigD)
+		assert.NoError(t, err)
 
 		mockMessage := &mockBigDataProtoMessage{X: bigD}
 
