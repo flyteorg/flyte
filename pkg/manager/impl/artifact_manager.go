@@ -132,7 +132,7 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.G
 			return nil, err
 		}
 	case *datacatalog.GetArtifactRequest_TagName:
-		logger.Debugf(ctx, "Get artifact by id %v", request.GetTagName())
+		logger.Debugf(ctx, "Get artifact by tag %v", request.GetTagName())
 		tagKey := transformers.ToTagKey(*datasetID, request.GetTagName())
 		tag, err := m.repo.TagRepo().Get(ctx, tagKey)
 

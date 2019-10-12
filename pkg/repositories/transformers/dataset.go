@@ -42,6 +42,7 @@ func FromDatasetModel(dataset models.Dataset) (*datacatalog.Dataset, error) {
 
 	return &datacatalog.Dataset{
 		Id: &datacatalog.DatasetID{
+			UUID:    dataset.DatasetUUID,
 			Project: dataset.Project,
 			Domain:  dataset.Domain,
 			Name:    dataset.Name,
