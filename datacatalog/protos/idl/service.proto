@@ -65,8 +65,9 @@ message Dataset {
 message DatasetID {
     string project = 1;  // The name of the project
     string name = 2;     // The name of the dataset
-    string domain = 3;   // The domain (eg. environment) in which it's desired to run (optional)
+    string domain = 3;   // The domain (eg. environment)
     string version = 4;  // Version of the data schema
+    string UUID = 5;     // UUID identifier for the dataset
 }
 
 message Artifact {

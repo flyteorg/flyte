@@ -30,6 +30,7 @@ func getTestDataset() *datacatalog.Dataset {
 			Domain:  "test-domain",
 			Name:    "test-name",
 			Version: "test-version",
+			UUID:    "test-uuid",
 		},
 		Metadata: &datacatalog.Metadata{
 			KeyMap: map[string]string{"key1": "value1"},
@@ -112,10 +113,11 @@ func TestGetDataset(t *testing.T) {
 		serializedMetadata, _ := proto.Marshal(expectedDataset.Metadata)
 		datasetModelResponse := models.Dataset{
 			DatasetKey: models.DatasetKey{
-				Project: expectedDataset.Id.Project,
-				Domain:  expectedDataset.Id.Domain,
-				Version: expectedDataset.Id.Version,
-				Name:    expectedDataset.Id.Name,
+				Project:     expectedDataset.Id.Project,
+				Domain:      expectedDataset.Id.Domain,
+				Version:     expectedDataset.Id.Version,
+				Name:        expectedDataset.Id.Name,
+				DatasetUUID: expectedDataset.Id.UUID,
 			},
 			SerializedMetadata: serializedMetadata,
 		}
