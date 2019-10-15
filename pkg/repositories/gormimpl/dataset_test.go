@@ -88,6 +88,36 @@ func TestGetDataset(t *testing.T) {
 	assert.Equal(t, dataset.Version, actualDataset.Version)
 }
 
+func TestGetDatasetWithUUID(t *testing.T) {
+	dataset := models.Dataset{
+		DatasetKey: models.DatasetKey{
+			UUID: "test-uuid",
+		},
+	}
+	expectedResponse := make([]map[string]interface{}, 0)
+	sampleDataset := make(map[string]interface{})
+	sampleDataset["project"] = dataset.Project
+	sampleDataset["domain"] = dataset.Domain
+	sampleDataset["name"] = dataset.Name
+	sampleDataset["version"] = dataset.Version
+
+	expectedResponse = append(expectedResponse, sampleDataset)
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	// Only match on queries that append expected filters
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL AND (("datasets"."uuid" = test-uuid)) ORDER BY "datasets"."project" ASC LIMIT 1`).WithReply(expectedResponse)
+
+	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	actualDataset, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
+	assert.NoError(t, err)
+	assert.Equal(t, dataset.Project, actualDataset.Project)
+	assert.Equal(t, dataset.Domain, actualDataset.Domain)
+	assert.Equal(t, dataset.Name, actualDataset.Name)
+	assert.Equal(t, dataset.Version, actualDataset.Version)
+}
+
 func TestGetDatasetNotFound(t *testing.T) {
 	dataset := getTestDataset()
 	sampleDataset := make(map[string]interface{})
