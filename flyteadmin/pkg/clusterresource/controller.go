@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	"github.com/lyft/flyteadmin/pkg/executioncluster/interfaces"
 
-	"github.com/lyft/flyteadmin/pkg/executioncluster"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
@@ -68,7 +68,7 @@ type NamespaceCache = map[NamespaceName]LastModTimeCache
 type controller struct {
 	db                     repositories.RepositoryInterface
 	config                 runtimeInterfaces.Configuration
-	executionCluster       executioncluster.ClusterInterface
+	executionCluster       interfaces.ClusterInterface
 	poller                 chan struct{}
 	metrics                controllerMetrics
 	lastAppliedTemplateDir string
@@ -340,7 +340,7 @@ func newMetrics(scope promutils.Scope) controllerMetrics {
 	}
 }
 
-func NewClusterResourceController(db repositories.RepositoryInterface, executionCluster executioncluster.ClusterInterface, scope promutils.Scope) Controller {
+func NewClusterResourceController(db repositories.RepositoryInterface, executionCluster interfaces.ClusterInterface, scope promutils.Scope) Controller {
 	config := runtime.NewConfigurationProvider()
 	return &controller{
 		db:               db,

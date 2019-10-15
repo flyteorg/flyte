@@ -1,0 +1,30 @@
+clusters:
+  clusterConfigs:
+  - name: "testcluster"
+    endpoint: "testcluster_endpoint"
+    auth:
+      type: "file_path"
+      tokenPath: "/path/to/testcluster/token"
+      certPath: "/path/to/testcluster/cert"
+  - name: "testcluster2"
+    endpoint: "testcluster2_endpoint"
+    weight: 0.5
+    enabled: true
+    allowedDomains:
+      - "d1"
+      - "d2"
+    auth:
+      type: "file_path"
+      tokenPath: "/path/to/testcluster2/token"
+      certPath: "/path/to/testcluster2/cert"
+  - name: "testcluster3"
+    endpoint: "testcluster3_endpoint"
+    enabled: true
+    weight: 0.5
+    allowedDomains:
+      - "d2"
+      - "d3"
+    auth:
+      type: "file_path"
+      tokenPath: "/path/to/testcluster3/token"
+      certPath: "/path/to/testcluster3/cert"

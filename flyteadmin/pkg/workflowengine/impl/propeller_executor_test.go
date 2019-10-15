@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	interfaces2 "github.com/lyft/flyteadmin/pkg/executioncluster/interfaces"
+
 	"github.com/lyft/flyteadmin/pkg/executioncluster"
 	cluster_mock "github.com/lyft/flyteadmin/pkg/executioncluster/mocks"
 
@@ -37,7 +39,7 @@ var clusterName = "C1"
 
 var acceptedAt = time.Now()
 
-func getFlytePropellerForTest(execCluster executioncluster.ClusterInterface, builder *FlyteWorkflowBuilderTest) *FlytePropeller {
+func getFlytePropellerForTest(execCluster interfaces2.ClusterInterface, builder *FlyteWorkflowBuilderTest) *FlytePropeller {
 	return &FlytePropeller{
 		executionCluster: execCluster,
 		builder:          builder,
@@ -107,7 +109,7 @@ func (b *FakeK8FlyteClient) FlyteworkflowV1alpha1() v1alpha12.FlyteworkflowV1alp
 	return &fakeFlyteWF
 }
 
-func getFakeExecutionCluster() executioncluster.ClusterInterface {
+func getFakeExecutionCluster() interfaces2.ClusterInterface {
 	fakeCluster := cluster_mock.MockCluster{}
 	fakeCluster.SetGetTargetCallback(func(spec *executioncluster.ExecutionTargetSpec) (target *executioncluster.ExecutionTarget, e error) {
 		return &executioncluster.ExecutionTarget{
@@ -119,7 +121,19 @@ func getFakeExecutionCluster() executioncluster.ClusterInterface {
 }
 
 func TestExecuteWorkflowHappyCase(t *testing.T) {
-	cluster := getFakeExecutionCluster()
+	cluster := cluster_mock.MockCluster{}
+	execID := core.WorkflowExecutionIdentifier{
+		Project: "p",
+		Domain:  "d",
+		Name:    "n",
+	}
+	cluster.SetGetTargetCallback(func(spec *executioncluster.ExecutionTargetSpec) (target *executioncluster.ExecutionTarget, e error) {
+		assert.Equal(t, execID, *spec.ExecutionID)
+		return &executioncluster.ExecutionTarget{
+			ID:          "C1",
+			FlyteClient: &FakeK8FlyteClient{},
+		}, nil
+	})
 	fakeFlyteWorkflow := FakeFlyteWorkflow{
 		createCallback: func(workflow *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
 			assert.EqualValues(t, map[string]string{
@@ -137,16 +151,12 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 		assert.Equal(t, "p-d", namespace)
 		return &fakeFlyteWorkflow
 	}
-	propeller := getFlytePropellerForTest(cluster, &FlyteWorkflowBuilderTest{})
+	propeller := getFlytePropellerForTest(&cluster, &FlyteWorkflowBuilderTest{})
 
 	execInfo, err := propeller.ExecuteWorkflow(
 		context.Background(),
 		interfaces.ExecuteWorkflowInput{
-			ExecutionID: &core.WorkflowExecutionIdentifier{
-				Project: "p",
-				Domain:  "d",
-				Name:    "n",
-			},
+			ExecutionID: &execID,
 			WfClosure: core.CompiledWorkflowClosure{
 				Primary: &core.CompiledWorkflow{
 					Template: &core.WorkflowTemplate{},

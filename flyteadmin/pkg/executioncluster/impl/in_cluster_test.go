@@ -1,14 +1,16 @@
-package executioncluster
+package impl
 
 import (
 	"testing"
+
+	"github.com/lyft/flyteadmin/pkg/executioncluster"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInClusterGetTarget(t *testing.T) {
 	cluster := InCluster{
-		target: ExecutionTarget{
+		target: executioncluster.ExecutionTarget{
 			ID: "t1",
 		},
 	}
@@ -19,15 +21,15 @@ func TestInClusterGetTarget(t *testing.T) {
 
 func TestInClusterGetRemoteTarget(t *testing.T) {
 	cluster := InCluster{
-		target: ExecutionTarget{},
+		target: executioncluster.ExecutionTarget{},
 	}
-	_, err := cluster.GetTarget(&ExecutionTargetSpec{TargetID: "t1"})
+	_, err := cluster.GetTarget(&executioncluster.ExecutionTargetSpec{TargetID: "t1"})
 	assert.EqualError(t, err, "remote target t1 is not supported")
 }
 
 func TestInClusterGetAllValidTargets(t *testing.T) {
 	cluster := InCluster{
-		target: ExecutionTarget{
+		target: executioncluster.ExecutionTarget{
 			ID: "t1",
 		},
 	}

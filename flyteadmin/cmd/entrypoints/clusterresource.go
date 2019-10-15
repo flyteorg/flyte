@@ -3,9 +3,8 @@ package entrypoints
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/executioncluster"
-
 	"github.com/lyft/flyteadmin/pkg/clusterresource"
+	executioncluster "github.com/lyft/flyteadmin/pkg/executioncluster/impl"
 
 	"github.com/lyft/flyteadmin/pkg/runtime"
 
@@ -57,7 +56,7 @@ var controllerRunCmd = &cobra.Command{
 			scope.NewSubScope("cluster"),
 			cfg.KubeConfig,
 			cfg.Master,
-			configuration.ClusterConfiguration())
+			configuration)
 
 		clusterResourceController := clusterresource.NewClusterResourceController(db, executionCluster, scope)
 		clusterResourceController.Run()
@@ -89,7 +88,7 @@ var controllerSyncCmd = &cobra.Command{
 			scope.NewSubScope("cluster"),
 			cfg.KubeConfig,
 			cfg.Master,
-			configuration.ClusterConfiguration())
+			configuration)
 
 		clusterResourceController := clusterresource.NewClusterResourceController(db, executionCluster, scope)
 		err := clusterResourceController.Sync(ctx)
