@@ -1,5 +1,11 @@
 import { Domain, Project } from '../Project';
 
+export const emptyProject = {
+    id: 'emptyproject',
+    name: 'emptyproject',
+    domains: [],
+    description: ''
+};
 export const mockDomainIds = ['development', 'production'];
 export const mockProjectIds = Array.from(Array(10).keys()).map(
     idx => `project number ${idx}`

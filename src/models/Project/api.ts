@@ -13,5 +13,7 @@ export const listProjects = () =>
         // We want the returned list to be sorted ascending by name, but the
         // admin endpoint doesn't support sorting for projects.
         transform: ({ projects }: Admin.Projects) =>
-            sortBy(projects, 'name') as Project[]
+            sortBy(projects, project =>
+                `${project.name}`.toLowerCase()
+            ) as Project[]
     });
