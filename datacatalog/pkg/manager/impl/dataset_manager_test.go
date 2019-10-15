@@ -113,11 +113,11 @@ func TestGetDataset(t *testing.T) {
 		serializedMetadata, _ := proto.Marshal(expectedDataset.Metadata)
 		datasetModelResponse := models.Dataset{
 			DatasetKey: models.DatasetKey{
-				Project:     expectedDataset.Id.Project,
-				Domain:      expectedDataset.Id.Domain,
-				Version:     expectedDataset.Id.Version,
-				Name:        expectedDataset.Id.Name,
-				DatasetUUID: expectedDataset.Id.UUID,
+				Project: expectedDataset.Id.Project,
+				Domain:  expectedDataset.Id.Domain,
+				Version: expectedDataset.Id.Version,
+				Name:    expectedDataset.Id.Name,
+				UUID:    expectedDataset.Id.UUID,
 			},
 			SerializedMetadata: serializedMetadata,
 		}
