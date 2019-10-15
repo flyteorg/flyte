@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/lyft/flyteadmin/pkg/executioncluster"
+	executionCluster "github.com/lyft/flyteadmin/pkg/executioncluster/impl"
 
 	"github.com/lyft/flytestdlib/profutils"
 
@@ -77,11 +77,11 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	db := repositories.GetRepository(
 		repositories.POSTGRES, dbConfig, adminScope.NewSubScope("database"))
 	storeConfig := storage.GetConfig()
-	executionCluster := executioncluster.GetExecutionCluster(
+	executionCluster := executionCluster.GetExecutionCluster(
 		adminScope.NewSubScope("executor").NewSubScope("cluster"),
 		kubeConfig,
 		master,
-		configuration.ClusterConfiguration())
+		configuration)
 	workflowExecutor := workflowengine.NewFlytePropeller(
 		applicationConfiguration.RoleNameKey,
 		executionCluster,

@@ -1,8 +1,10 @@
-package executioncluster
+package impl
 
 import (
 	"fmt"
 
+	"github.com/lyft/flyteadmin/pkg/executioncluster"
+	"github.com/lyft/flyteadmin/pkg/executioncluster/interfaces"
 	"github.com/lyft/flyteadmin/pkg/flytek8s"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/pkg/errors"
@@ -10,23 +12,23 @@ import (
 )
 
 type InCluster struct {
-	target ExecutionTarget
+	target executioncluster.ExecutionTarget
 }
 
-func (i InCluster) GetTarget(spec *ExecutionTargetSpec) (*ExecutionTarget, error) {
+func (i InCluster) GetTarget(spec *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error) {
 	if spec != nil && spec.TargetID != "" {
 		return nil, errors.New(fmt.Sprintf("remote target %s is not supported", spec.TargetID))
 	}
 	return &i.target, nil
 }
 
-func (i InCluster) GetAllValidTargets() []ExecutionTarget {
-	return []ExecutionTarget{
+func (i InCluster) GetAllValidTargets() []executioncluster.ExecutionTarget {
+	return []executioncluster.ExecutionTarget{
 		i.target,
 	}
 }
 
-func NewInCluster(scope promutils.Scope, kubeConfig, master string) (ClusterInterface, error) {
+func NewInCluster(scope promutils.Scope, kubeConfig, master string) (interfaces.ClusterInterface, error) {
 	clientConfig, err := flytek8s.GetRestClientConfig(kubeConfig, master, nil)
 	if err != nil {
 		return nil, err
@@ -40,7 +42,7 @@ func NewInCluster(scope promutils.Scope, kubeConfig, master string) (ClusterInte
 		return nil, err
 	}
 	return &InCluster{
-		target: ExecutionTarget{
+		target: executioncluster.ExecutionTarget{
 			Client:      client,
 			FlyteClient: flyteClient,
 		},

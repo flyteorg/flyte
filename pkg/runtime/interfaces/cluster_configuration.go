@@ -8,10 +8,12 @@ import (
 
 // Holds details about a cluster used for workflow execution.
 type ClusterConfig struct {
-	Name     string `json:"name"`
-	Endpoint string `json:"endpoint"`
-	Auth     Auth   `json:"auth"`
-	Enabled  bool   `json:"enabled"`
+	Name           string   `json:"name"`
+	Endpoint       string   `json:"endpoint"`
+	Auth           Auth     `json:"auth"`
+	Enabled        bool     `json:"enabled"`
+	Weight         float32  `json:"weight"`
+	AllowedDomains []string `json:"allowedDomains"`
 }
 
 type Auth struct {

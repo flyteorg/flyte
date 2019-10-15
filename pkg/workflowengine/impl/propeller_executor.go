@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	interfaces2 "github.com/lyft/flyteadmin/pkg/executioncluster/interfaces"
+
 	"github.com/lyft/flyteadmin/pkg/executioncluster"
 	"github.com/lyft/flyteadmin/pkg/workflowengine/interfaces"
 
@@ -38,7 +40,7 @@ type propellerMetrics struct {
 }
 
 type FlytePropeller struct {
-	executionCluster executioncluster.ClusterInterface
+	executionCluster interfaces2.ClusterInterface
 	builder          interfaces.FlyteWorkflowInterface
 	roleNameKey      string
 	metrics          propellerMetrics
@@ -115,7 +117,9 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
 	flyteWf.Annotations = annotations
 
-	var executionTargetSpec executioncluster.ExecutionTargetSpec
+	executionTargetSpec := executioncluster.ExecutionTargetSpec{
+		ExecutionID: input.ExecutionID,
+	}
 	targetCluster, err := c.executionCluster.GetTarget(&executionTargetSpec)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create workflow in propeller %v", err)
@@ -181,7 +185,7 @@ func newPropellerMetrics(scope promutils.Scope) propellerMetrics {
 	}
 }
 
-func NewFlytePropeller(roleNameKey string, executionCluster executioncluster.ClusterInterface,
+func NewFlytePropeller(roleNameKey string, executionCluster interfaces2.ClusterInterface,
 	scope promutils.Scope) interfaces.Executor {
 
 	return &FlytePropeller{
