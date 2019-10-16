@@ -87,18 +87,16 @@ func TestResolveKickoffTimeArg(t *testing.T) {
 		Project: testIdentifier.Project,
 		Domain:  testIdentifier.Domain,
 		Name:    testIdentifier.Name,
-		Spec: &admin.ExecutionSpec{
-			Inputs: &core.LiteralMap{
-				Literals: map[string]*core.Literal{},
-			},
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{},
 		},
 	}
 	testExecutor := newWorkflowExecutorForTest(nil, nil, nil)
 	err := testExecutor.resolveKickoffTimeArg(scheduleRequest, launchPlan, &executionRequest)
 	assert.Nil(t, err)
-	assert.Contains(t, executionRequest.Spec.Inputs.Literals, testKickoffTime)
+	assert.Contains(t, executionRequest.Inputs.Literals, testKickoffTime)
 	assert.Equal(t, testKickoffTimeProtoLiteral,
-		*executionRequest.Spec.Inputs.Literals[testKickoffTime])
+		*executionRequest.Inputs.Literals[testKickoffTime])
 }
 
 func TestResolveKickoffTimeArg_NoKickoffTimeArg(t *testing.T) {
@@ -119,16 +117,14 @@ func TestResolveKickoffTimeArg_NoKickoffTimeArg(t *testing.T) {
 		Project: testIdentifier.Project,
 		Domain:  testIdentifier.Domain,
 		Name:    testIdentifier.Name,
-		Spec: &admin.ExecutionSpec{
-			Inputs: &core.LiteralMap{
-				Literals: map[string]*core.Literal{},
-			},
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{},
 		},
 	}
 	testExecutor := newWorkflowExecutorForTest(nil, nil, nil)
 	err := testExecutor.resolveKickoffTimeArg(scheduleRequest, launchPlan, &executionRequest)
 	assert.Nil(t, err)
-	assert.NotContains(t, executionRequest.Spec.Inputs.Literals, testKickoffTime)
+	assert.NotContains(t, executionRequest.Inputs.Literals, testKickoffTime)
 }
 
 func TestGetActiveLaunchPlanVersion(t *testing.T) {
@@ -244,8 +240,8 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, "domain", request.Domain)
 		assert.Equal(t, "u1jjtbc5tj", request.Name)
 		if messagesSeen == 0 {
-			assert.Contains(t, request.Spec.Inputs.Literals, testKickoffTime)
-			assert.Equal(t, testKickoffTimeProtoLiteral, *request.Spec.Inputs.Literals[testKickoffTime])
+			assert.Contains(t, request.Inputs.Literals, testKickoffTime)
+			assert.Equal(t, testKickoffTimeProtoLiteral, *request.Inputs.Literals[testKickoffTime])
 		}
 		messagesSeen++
 		return &admin.ExecutionCreateResponse{}, nil

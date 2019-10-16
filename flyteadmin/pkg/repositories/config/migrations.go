@@ -129,4 +129,14 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Exec("ALTER TABLE projects DROP COLUMN IF EXISTS description").Error
 		},
 	},
+	// Add offloaded URIs to table
+	{
+		ID: "2019-10-15-offload-inputs",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.Execution{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS InputsUri, DROP COLUMN IF EXISTS UserInputsUri").Error
+		},
+	},
 }

@@ -193,11 +193,6 @@ func GetExecutionRequest() admin.ExecutionCreateRequest {
 				Name:         "name",
 				Version:      "version",
 			},
-			Inputs: &core.LiteralMap{
-				Literals: map[string]*core.Literal{
-					"foo": utils.MustMakeLiteral("foo-value-1"),
-				},
-			},
 			NotificationOverrides: &admin.ExecutionSpec_Notifications{
 				Notifications: &admin.NotificationList{
 					Notifications: []*admin.Notification{
@@ -215,6 +210,11 @@ func GetExecutionRequest() admin.ExecutionCreateRequest {
 						},
 					},
 				},
+			},
+		},
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": utils.MustMakeLiteral("foo-value-1"),
 			},
 		},
 	}
