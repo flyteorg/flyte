@@ -30,4 +30,5 @@ const (
 	OccurredAt            = "occurred_at"
 	Event                 = "event"
 	ParentTaskExecutionID = "parent_task_execution_id"
+	UserInputs            = "user_inputs"
 )

@@ -18,13 +18,12 @@
   version = "v10.2.1-beta"
 
 [[projects]]
-  digest = "1:0f857a863c24bb1c277a5f3f8cb8a30e65b841405f69590132ee23ed9e7e6fbe"
+  digest = "1:e3d8dd629da696c66c2275f911078ce51a420520346c73330a84b938401585b7"
   name = "github.com/Azure/go-autorest"
   packages = [
     "autorest",
     "autorest/adal",
     "autorest/azure",
-    "autorest/date",
     "logger",
     "tracing",
   ]
@@ -54,7 +53,7 @@
   version = "v1.0.7"
 
 [[projects]]
-  digest = "1:e490a9e2f55d80388dce0be4cc64a17c720aecf8ca0a067a92ba83949457ba14"
+  digest = "1:8242149eca9920ef3ac114d07791f8d7cc05b347ffc0b40141b1627a5b378011"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -107,8 +106,8 @@
     "service/sts/stsiface",
   ]
   pruneopts = "UT"
-  revision = "e42fa244c725b2a423a8e9cf1c86828c0bf9400a"
-  version = "v1.25.12"
+  revision = "e40068abd62ea29db38cb7ca59bf6f58489343bf"
+  version = "v1.25.13"
 
 [[projects]]
   branch = "master"
@@ -165,14 +164,6 @@
   pruneopts = "UT"
   revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
   version = "v1.1.1"
-
-[[projects]]
-  digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
-  name = "github.com/dgrijalva/jwt-go"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
-  version = "v3.2.0"
 
 [[projects]]
   digest = "1:ac425d784b13d49b37a5bbed3ce022677f8f3073b216f05d6adcb9303e27fa0f"
@@ -748,7 +739,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:bf89144f888e7e621c7eaba03e68c5426b22fb008bf70d2ebf417beea541bb58"
+  digest = "1:2ce67db9864088dee35dab5967f041d2b4ae1c7440dabb44542c1847933fd872"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -761,7 +752,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "491137f692577e390404f177a0515c9f86f79754"
+  revision = "da9a3fd4c5820e74b24a6cb7fb438dc9b0dd377c"
 
 [[projects]]
   branch = "master"
@@ -823,7 +814,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7f43c34476621e07944957f19514e61e3822acb1dd5cb8823e2717ccececf40a"
+  digest = "1:4b234cf90d8b57ad0794e6c9f3d76ce806aaa851adb658d25d9f78db458b2800"
   name = "google.golang.org/api"
   packages = [
     "googleapi",
@@ -837,7 +828,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "5e0e3f4a3bb8f1c7d2bf1465670c5c0b3c45c277"
+  revision = "4f26c6409ffa7b94f89d06aac760b63875d9b42c"
 
 [[projects]]
   digest = "1:3c03b58f57452764a4499c55c582346c0ee78c8a5033affe5bdfd9efd3da5bd1"

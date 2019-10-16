@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"github.com/lyft/flytestdlib/storage"
 )
 
 // IMPORTANT: If you update the model below, be sure to double check model definitions in
@@ -45,4 +47,8 @@ type Execution struct {
 	ParentNodeExecutionID uint
 	// Cluster where execution was triggered
 	Cluster string
+	// Offloaded location of inputs LiteralMap. These are the inputs evaluated and contain applied defaults.
+	InputsUri storage.DataReference
+	// User specified inputs. This map might be incomplete and not include defaults applied
+	UserInputsUri storage.DataReference
 }

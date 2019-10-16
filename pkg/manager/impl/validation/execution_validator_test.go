@@ -70,7 +70,7 @@ func TestGetExecutionInputs(t *testing.T) {
 	lpRequest := testutils.GetLaunchPlanRequest()
 
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Spec.Inputs,
+		executionRequest.Inputs,
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)
@@ -88,13 +88,13 @@ func TestGetExecutionInputs(t *testing.T) {
 func TestValidateExecInputsWrongType(t *testing.T) {
 	executionRequest := testutils.GetExecutionRequest()
 	lpRequest := testutils.GetLaunchPlanRequest()
-	executionRequest.Spec.Inputs = &core.LiteralMap{
+	executionRequest.Inputs = &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo": utils.MustMakeLiteral(1),
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Spec.Inputs,
+		executionRequest.Inputs,
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)
@@ -104,14 +104,14 @@ func TestValidateExecInputsWrongType(t *testing.T) {
 func TestValidateExecInputsExtraInputs(t *testing.T) {
 	executionRequest := testutils.GetExecutionRequest()
 	lpRequest := testutils.GetLaunchPlanRequest()
-	executionRequest.Spec.Inputs = &core.LiteralMap{
+	executionRequest.Inputs = &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo":       utils.MustMakeLiteral("foo-value-1"),
 			"foo-extra": utils.MustMakeLiteral("foo-value-1"),
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Spec.Inputs,
+		executionRequest.Inputs,
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)
@@ -121,14 +121,14 @@ func TestValidateExecInputsExtraInputs(t *testing.T) {
 func TestValidateExecInputsOverrideFixed(t *testing.T) {
 	executionRequest := testutils.GetExecutionRequest()
 	lpRequest := testutils.GetLaunchPlanRequest()
-	executionRequest.Spec.Inputs = &core.LiteralMap{
+	executionRequest.Inputs = &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo": utils.MustMakeLiteral("foo-value-1"),
 			"bar": utils.MustMakeLiteral("bar-value"),
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Spec.Inputs,
+		executionRequest.Inputs,
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)
@@ -138,9 +138,9 @@ func TestValidateExecInputsOverrideFixed(t *testing.T) {
 func TestValidateExecEmptyInputs(t *testing.T) {
 	executionRequest := testutils.GetExecutionRequest()
 	lpRequest := testutils.GetLaunchPlanRequest()
-	executionRequest.Spec.Inputs = nil
+	executionRequest.Inputs = nil
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Spec.Inputs,
+		executionRequest.Inputs,
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)

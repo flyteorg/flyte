@@ -21,6 +21,8 @@ type TestDataStore struct {
 	ReadProtobufCb  func(ctx context.Context, reference storage.DataReference, msg proto.Message) error
 	WriteProtobufCb func(
 		ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error
+
+	Store map[storage.DataReference][]byte
 }
 
 func (t *TestDataStore) Head(ctx context.Context, reference storage.DataReference) (storage.Metadata, error) {
@@ -59,11 +61,13 @@ func (t *TestDataStore) CopyRaw(ctx context.Context, source, destination storage
 func (t *TestDataStore) ConstructReference(
 	ctx context.Context, reference storage.DataReference, nestedKeys ...string) (storage.DataReference, error) {
 	nestedPath := strings.Join(nestedKeys, "/")
-	return storage.DataReference(fmt.Sprintf("%s/%v", "s3://bucket", nestedPath)), nil
+	return storage.DataReference(fmt.Sprintf("%s/%v", reference, nestedPath)), nil
 }
 
 func GetMockStorageClient() *storage.DataStore {
-	mockStorageClient := TestDataStore{}
+	mockStorageClient := TestDataStore{
+		Store: make(map[storage.DataReference][]byte),
+	}
 	return &storage.DataStore{
 		ComposedProtobufStore: &mockStorageClient,
 		ReferenceConstructor:  &mockStorageClient,

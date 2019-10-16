@@ -49,7 +49,7 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 	if err := ValidateIdentifier(request.Spec.LaunchPlan, common.LaunchPlan); err != nil {
 		return err
 	}
-	if err := validateLiteralMap(request.Spec.Inputs, shared.Inputs); err != nil {
+	if err := validateLiteralMap(request.Inputs, shared.Inputs); err != nil {
 		return err
 	}
 	// TODO: Remove redundant validation with the rest of the method.

@@ -78,7 +78,7 @@ func (e *workflowExecutor) resolveKickoffTimeArg(
 				return errors.NewFlyteAdminErrorf(
 					codes.Internal, "could not serialize kickoff time %+v to timestamp proto", request.KickoffTime)
 			}
-			executionRequest.Spec.Inputs.Literals[name] = &core.Literal{
+			executionRequest.Inputs.Literals[name] = &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Primitive{
@@ -157,11 +157,11 @@ func (e *workflowExecutor) formulateExecutionCreateRequest(
 				Mode:        admin.ExecutionMetadata_SCHEDULED,
 				ScheduledAt: kickoffTimeProto,
 			},
-			// No additional inputs beyond the to-be-filled-out kickoff time arg are specified.
-			Inputs: &core.LiteralMap{
-				Literals: map[string]*core.Literal{},
-			},
-			// Likewise, no dynamic notifications are configured either.
+			// No dynamic notifications are configured either.
+		},
+		// No additional inputs beyond the to-be-filled-out kickoff time arg are specified.
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{},
 		},
 	}
 	return executionRequest
