@@ -137,7 +137,7 @@ func (w *autoRefreshCache) sync(ctx context.Context) {
 		if value, ok := w.lruMap.Peek(k); ok {
 			newItem, result, err := w.syncCb(ctx, value.(CacheItem))
 			if err != nil {
-				logger.Error(ctx, "failed to get latest copy of the item %v", k)
+				logger.Errorf(ctx, "failed to get latest copy of the item %v, error: %s", k, err)
 			}
 
 			if result == Update {
