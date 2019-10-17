@@ -33,7 +33,7 @@ if [ -n "$RELEASE_SEMVER" ]; then
 fi
 
 # build the image
-docker build -t "$IMAGE_TAG_WITH_SHA" --build-arg GIT_SHA="${GIT_SHA}" .
+docker build -t "$IMAGE_TAG_WITH_SHA" --build-arg IMAGE_TAG="${IMAGE_TAG_WITH_SHA}" .
 echo "${IMAGE_TAG_WITH_SHA} built locally."
 
 # if REGISTRY specified, push the images to the remote registy
