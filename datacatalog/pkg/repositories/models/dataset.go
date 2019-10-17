@@ -5,6 +5,7 @@ type DatasetKey struct {
 	Name    string `gorm:"primary_key"`
 	Domain  string `gorm:"primary_key"`
 	Version string `gorm:"primary_key"`
+	UUID    string `gorm:"type:uuid;unique;default:uuid_generate_v4()"`
 }
 
 type Dataset struct {
