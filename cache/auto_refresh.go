@@ -32,7 +32,7 @@ const (
 // callbacks for create, refresh and delete item.
 // The cache doesn't provide apis to update items.
 type AutoRefresh interface {
-	// starts background refresh of items.
+	// Starts background refresh of items. To shutdown the cache, cancel the context.
 	Start(ctx context.Context) error
 
 	// Get item by id.
@@ -43,9 +43,12 @@ type AutoRefresh interface {
 }
 
 type metrics struct {
-	SystemErrors prometheus.Counter
-	Evictions    prometheus.Counter
-	scope        promutils.Scope
+	SyncErrors  prometheus.Counter
+	Evictions   prometheus.Counter
+	SyncLatency promutils.StopWatch
+	CacheHit    prometheus.Counter
+	CacheMiss   prometheus.Counter
+	scope       promutils.Scope
 }
 
 type Item interface{}
@@ -104,6 +107,7 @@ func (i itemWrapper) GetItem() Item {
 //
 // Sync is run as a fixed-interval-scheduled-task, and is skipped if sync from previous cycle is still running.
 type autoRefresh struct {
+	name            string
 	metrics         metrics
 	syncCb          SyncFunc
 	createBatchesCb CreateBatchesFunc
@@ -130,9 +134,12 @@ func SingleItemBatches(_ context.Context, snapshot []ItemWrapper) (batches []Bat
 
 func newMetrics(scope promutils.Scope) metrics {
 	return metrics{
-		Evictions:    scope.MustNewCounter("lru_evictions", "Counter for evictions from LRU."),
-		SystemErrors: scope.MustNewCounter("sync_errors", "Counter for sync errors."),
-		scope:        scope,
+		SyncErrors:  scope.MustNewCounter("sync_errors", "Counter for sync errors."),
+		Evictions:   scope.MustNewCounter("lru_evictions", "Counter for evictions from LRU."),
+		SyncLatency: scope.MustNewStopWatch("latency", "Latency for sync operations.", time.Millisecond),
+		CacheHit:    scope.MustNewCounter("cache_hit", "Counter for cache hits."),
+		CacheMiss:   scope.MustNewCounter("cache_miss", "Counter for cache misses."),
+		scope:       scope,
 	}
 }
 
@@ -143,24 +150,28 @@ func (w *autoRefresh) Start(ctx context.Context) error {
 			if err != nil {
 				logger.Errorf(ctx, "Failed to sync. Error: %v", err)
 			}
-		}(contextutils.WithGoroutineLabel(ctx, fmt.Sprintf("worker-%v", i)))
+		}(contextutils.WithGoroutineLabel(ctx, fmt.Sprintf("%v-worker-%v", w.name, i)))
 	}
 
+	enqueueCtx := contextutils.WithGoroutineLabel(ctx, fmt.Sprintf("%v-enqueue", w.name))
+
 	go wait.Until(func() {
-		err := w.enqueueBatches(ctx)
+		err := w.enqueueBatches(enqueueCtx)
 		if err != nil {
-			logger.Errorf(ctx, "Failed to sync. Error: %v", err)
+			logger.Errorf(enqueueCtx, "Failed to sync. Error: %v", err)
 		}
-	}, w.syncPeriod, ctx.Done())
+	}, w.syncPeriod, enqueueCtx.Done())
 
 	return nil
 }
 
 func (w *autoRefresh) Get(id ItemID) (Item, error) {
 	if val, ok := w.lruMap.Get(id); ok {
+		w.metrics.CacheHit.Inc()
 		return val.(Item), nil
 	}
 
+	w.metrics.CacheMiss.Inc()
 	return nil, errors.Errorf(ErrNotFound, "Item with id [%v] not found.", id)
 }
 
@@ -168,10 +179,12 @@ func (w *autoRefresh) Get(id ItemID) (Item, error) {
 // Create should be invoked only once. recreating the object is not supported.
 func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 	if val, ok := w.lruMap.Get(id); ok {
+		w.metrics.CacheHit.Inc()
 		return val.(Item), nil
 	}
 
 	w.lruMap.Add(id, item)
+	w.metrics.CacheMiss.Inc()
 	return item, nil
 }
 
@@ -218,28 +231,43 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 //  * Sync loop updates item 2, repeat
 func (w *autoRefresh) sync(ctx context.Context) error {
 	for {
-		item, shutdown := w.workqueue.Get()
-		if shutdown {
+		select {
+		case <-ctx.Done():
 			return nil
-		}
-
-		updatedBatch, err := w.syncCb(ctx, *item.(*Batch))
-		if err != nil {
-			logger.Error(ctx, "failed to get latest copy of a batch. Error: %v", err)
-			continue
-		}
-
-		for _, item := range updatedBatch {
-			if item.Action == Update {
-				// Add adds the item if it has been evicted or updates an existing one.
-				w.lruMap.Add(item.ID, item.Item)
+		default:
+			item, shutdown := w.workqueue.Get()
+			if shutdown {
+				return nil
 			}
+
+			t := w.metrics.SyncLatency.Start()
+			updatedBatch, err := w.syncCb(ctx, *item.(*Batch))
+
+			// Since we create batches every time we sync, we will just remove the item from the queue here
+			// regardless of whether it succeeded the sync or not.
+			w.workqueue.Forget(item)
+			w.workqueue.Done(item)
+
+			if err != nil {
+				w.metrics.SyncErrors.Inc()
+				logger.Errorf(ctx, "failed to get latest copy of a batch. Error: %v", err)
+				t.Stop()
+				continue
+			}
+
+			for _, item := range updatedBatch {
+				if item.Action == Update {
+					// Add adds the item if it has been evicted or updates an existing one.
+					w.lruMap.Add(item.ID, item.Item)
+				}
+			}
+			t.Stop()
 		}
 	}
 }
 
 // Instantiates a new AutoRefresh Cache that syncs items in batches.
-func NewAutoRefreshBatchedCache(createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
+func NewAutoRefreshBatchedCache(name string, createBatches CreateBatchesFunc, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter,
 	resyncPeriod time.Duration, parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
 
 	metrics := newMetrics(scope)
@@ -249,6 +277,7 @@ func NewAutoRefreshBatchedCache(createBatches CreateBatchesFunc, syncCb SyncFunc
 	}
 
 	cache := &autoRefresh{
+		name:            name,
 		metrics:         metrics,
 		parallelizm:     parallelizm,
 		createBatchesCb: createBatches,
@@ -262,8 +291,8 @@ func NewAutoRefreshBatchedCache(createBatches CreateBatchesFunc, syncCb SyncFunc
 }
 
 // Instantiates a new AutoRefresh Cache that syncs items periodically.
-func NewAutoRefreshCache(syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
+func NewAutoRefreshCache(name string, syncCb SyncFunc, syncRateLimiter workqueue.RateLimiter, resyncPeriod time.Duration,
 	parallelizm, size int, scope promutils.Scope) (AutoRefresh, error) {
 
-	return NewAutoRefreshBatchedCache(SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope)
+	return NewAutoRefreshBatchedCache(name, SingleItemBatches, syncCb, syncRateLimiter, resyncPeriod, parallelizm, size, scope)
 }
