@@ -67,7 +67,7 @@ message DatasetID {
     string name = 2;     // The name of the dataset
     string domain = 3;   // The domain (eg. environment)
     string version = 4;  // Version of the data schema
-    string UUID = 5;     // UUID for the dataset
+    string UUID = 5;     // UUID for the dataset (if set the above fields are optional)
 }
 
 message Artifact {
