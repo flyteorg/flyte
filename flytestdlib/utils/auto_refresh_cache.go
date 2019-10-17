@@ -16,6 +16,7 @@ import (
 // AutoRefreshCache with regular GetOrCreate and Delete along with background asynchronous refresh. Caller provides
 // callbacks for create, refresh and delete item.
 // The cache doesn't provide apis to update items.
+// Deprecated: This utility is deprecated, it has been refactored and moved into `cache` package.
 type AutoRefreshCache interface {
 	// starts background refresh of items
 	Start(ctx context.Context)
@@ -27,11 +28,13 @@ type AutoRefreshCache interface {
 	GetOrCreate(item CacheItem) (CacheItem, error)
 }
 
+// Deprecated: This utility is deprecated, it has been refactored and moved into `cache` package.
 type CacheItem interface {
 	ID() string
 }
 
 // Possible actions for the cache to take as a result of running the sync function on any given cache item
+// Deprecated: This utility is deprecated, it has been refactored and moved into `cache` package.
 type CacheSyncAction int
 
 const (
@@ -48,6 +51,7 @@ const (
 //   1. The new CacheItem, and
 //   2. What action should be taken.  The sync function has no insight into your object, and needs to be
 //      told explicitly if the new item is different from the old one.
+// Deprecated: This utility is deprecated, it has been refactored and moved into `cache` package.
 type CacheSyncItem func(ctx context.Context, obj CacheItem) (
 	newItem CacheItem, result CacheSyncAction, err error)
 
@@ -57,6 +61,7 @@ func getEvictionFunction(counter prometheus.Counter) func(key interface{}, value
 	}
 }
 
+// Deprecated: This utility is deprecated, it has been refactored and moved into `cache` package.
 func NewAutoRefreshCache(syncCb CacheSyncItem, syncRateLimiter RateLimiter, resyncPeriod time.Duration,
 	size int, scope promutils.Scope) (AutoRefreshCache, error) {
 

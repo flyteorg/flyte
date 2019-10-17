@@ -3,8 +3,12 @@ package cache
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"sync"
 	"testing"
 	"time"
+
+	"github.com/lyft/flytestdlib/atomic"
 
 	"k8s.io/client-go/util/workqueue"
 
@@ -48,7 +52,7 @@ func TestCacheTwo(t *testing.T) {
 
 	t.Run("normal operation", func(t *testing.T) {
 		// the size of the cache is at least as large as the number of items we're storing
-		cache, err := NewAutoRefreshCache(syncFakeItem, rateLimiter, testResyncPeriod, 10, 10, promutils.NewTestScope())
+		cache, err := NewAutoRefreshCache("fake1", syncFakeItem, rateLimiter, testResyncPeriod, 10, 10, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -74,7 +78,7 @@ func TestCacheTwo(t *testing.T) {
 
 	t.Run("Not Found", func(t *testing.T) {
 		// the size of the cache is at least as large as the number of items we're storing
-		cache, err := NewAutoRefreshCache(syncFakeItem, rateLimiter, testResyncPeriod, 10, 2, promutils.NewTestScope())
+		cache, err := NewAutoRefreshCache("fake2", syncFakeItem, rateLimiter, testResyncPeriod, 10, 2, promutils.NewTestScope())
 		assert.NoError(t, err)
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -100,4 +104,41 @@ func TestCacheTwo(t *testing.T) {
 
 		cancel()
 	})
+}
+
+func TestQueueBuildUp(t *testing.T) {
+	testResyncPeriod := time.Hour
+	rateLimiter := workqueue.DefaultControllerRateLimiter()
+
+	syncCount := atomic.NewInt32(0)
+	m := sync.Map{}
+	alwaysFailing := func(ctx context.Context, batch Batch) (
+		updatedBatch []ItemSyncResponse, err error) {
+		assert.Len(t, batch, 1)
+		_, existing := m.LoadOrStore(batch[0].GetID(), 0)
+		assert.False(t, existing, "Saw %v before", batch[0].GetID())
+		if existing {
+			t.FailNow()
+		}
+
+		syncCount.Inc()
+		return nil, fmt.Errorf("expected error")
+	}
+
+	size := 100
+	cache, err := NewAutoRefreshCache("fake2", alwaysFailing, rateLimiter, testResyncPeriod, 10, size, promutils.NewTestScope())
+	assert.NoError(t, err)
+
+	ctx := context.Background()
+	ctx, cancelNow := context.WithCancel(ctx)
+	defer cancelNow()
+
+	for i := 0; i < size; i++ {
+		_, err := cache.GetOrCreate(strconv.Itoa(i), "test")
+		assert.NoError(t, err)
+	}
+
+	assert.NoError(t, cache.Start(ctx))
+	time.Sleep(5 * time.Second)
+	assert.Equal(t, int32(size), syncCount.Load())
 }
