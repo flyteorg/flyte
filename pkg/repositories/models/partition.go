@@ -1,17 +1,12 @@
 package models
 
-type PartitionKey struct {
-	DatasetProject string `gorm:"primary_key"`
-	DatasetName    string `gorm:"primary_key"`
-	DatasetDomain  string `gorm:"primary_key"`
-	DatasetVersion string `gorm:"primary_key"`
-	PartitionKey   string `gorm:"primary_key"`
-	PartitionValue string `gorm:"primary_key"`
-}
-
+// Main Use cases:
+// 1. Filter artifacts by partition key/val in a dataset from UI [x]
+// 2. Get the artifact that has the partitions (x,y,z + tag_name) = latest [?]
 type Partition struct {
 	BaseModel
-	PartitionKey
-	ArtifactID string
-	Artifact   Artifact `gorm:"association_foreignkey:DatasetProject,DatasetName,DatasetDomain,DatasetVersion,ArtifactID;foreignkey:DatasetProject,DatasetName,DatasetDomain,DatasetVersion,ArtifactID"`
+	DatasetUUID    string `gorm:"primary_key"`
+	PartitionKey   string `gorm:"primary_key"`
+	PartitionValue string `gorm:"primary_key"`
+	ArtifactID     string
 }
