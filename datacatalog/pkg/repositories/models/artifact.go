@@ -13,6 +13,7 @@ type Artifact struct {
 	ArtifactKey
 	Dataset            Dataset        `gorm:"association_autocreate:false"`
 	ArtifactData       []ArtifactData `gorm:"association_foreignkey:DatasetProject,DatasetName,DatasetDomain,DatasetVersion,ArtifactID;foreignkey:DatasetProject,DatasetName,DatasetDomain,DatasetVersion,ArtifactID"`
+	Partitions         []Partition    `gorm:"association_foreignkey:ArtifactID;foreignkey:ArtifactID"`
 	SerializedMetadata []byte
 }
 
