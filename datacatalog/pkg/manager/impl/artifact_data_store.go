@@ -37,7 +37,7 @@ func (m *artifactDataStore) PutData(ctx context.Context, artifact datacatalog.Ar
 	}
 	err = m.store.WriteProtobuf(ctx, dataLocation, storage.Options{}, data.Value)
 	if err != nil {
-		return "", errors.NewDataCatalogErrorf(codes.Internal, "Unable to store artifact data in location %s, value %v, err %v", dataLocation.String(), data.Value, err)
+		return "", errors.NewDataCatalogErrorf(codes.Internal, "Unable to store artifact data in location %s, err %v", dataLocation.String(), err)
 	}
 
 	return dataLocation, nil
