@@ -57,7 +57,7 @@ notifications:
       http://example.com/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
 Logger:
   show-source: true
-  level: 5
+  level: 6
 storage:
   type: minio
   connection:

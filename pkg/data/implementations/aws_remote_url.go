@@ -53,6 +53,7 @@ func (a *AWSRemoteURL) splitURI(ctx context.Context, uri string) (AWSS3Object, e
 }
 
 func (a *AWSRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, error) {
+	logger.Debugf(ctx, "Getting signed url for - %s", uri)
 	s3URI, err := a.splitURI(ctx, uri)
 	if err != nil {
 		logger.Debugf(ctx, "failed to extract s3 bucket and key from uri: %s", uri)

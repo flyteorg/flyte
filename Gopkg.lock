@@ -18,12 +18,13 @@
   version = "v10.2.1-beta"
 
 [[projects]]
-  digest = "1:e3d8dd629da696c66c2275f911078ce51a420520346c73330a84b938401585b7"
+  digest = "1:0f857a863c24bb1c277a5f3f8cb8a30e65b841405f69590132ee23ed9e7e6fbe"
   name = "github.com/Azure/go-autorest"
   packages = [
     "autorest",
     "autorest/adal",
     "autorest/azure",
+    "autorest/date",
     "logger",
     "tracing",
   ]
@@ -53,7 +54,7 @@
   version = "v1.0.7"
 
 [[projects]]
-  digest = "1:8242149eca9920ef3ac114d07791f8d7cc05b347ffc0b40141b1627a5b378011"
+  digest = "1:c068593b2d873e3d100eb6fd1ea1715070ad588e8dcdb356b7c0d9530063e256"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -106,8 +107,8 @@
     "service/sts/stsiface",
   ]
   pruneopts = "UT"
-  revision = "e40068abd62ea29db38cb7ca59bf6f58489343bf"
-  version = "v1.25.13"
+  revision = "adf0d7dcf139d718ab18e46f6055735a27be867a"
+  version = "v1.25.15"
 
 [[projects]]
   branch = "master"
@@ -164,6 +165,14 @@
   pruneopts = "UT"
   revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
   version = "v1.1.1"
+
+[[projects]]
+  digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
 
 [[projects]]
   digest = "1:ac425d784b13d49b37a5bbed3ce022677f8f3073b216f05d6adcb9303e27fa0f"
@@ -374,12 +383,12 @@
   revision = "c2b33e84"
 
 [[projects]]
-  digest = "1:709cd2a2c29cc9b89732f6c24846bbb9d6270f28ef5ef2128cc73bd0d6d7bff9"
+  digest = "1:beb5b4f42a25056f0aa291b5eadd21e2f2903a05d15dfe7caf7eaee7e12fa972"
   name = "github.com/json-iterator/go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "27518f6661eba504be5a7a9a9f6d9460d892ade3"
-  version = "v1.1.7"
+  revision = "03217c3e97663914aec3faafde50d081f197a0a2"
+  version = "1.1.8"
 
 [[projects]]
   digest = "1:fd9bea48bbc5bba66d9891c72af7255fbebecdff845c37c679406174ece5ca1b"
@@ -480,9 +489,9 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "2a121b0e3bc7fb85e36a5088e23ef59d401a78be"
+  revision = "9d0448cd08805c3ae39938d8fcaec34d11db366c"
   source = "https://github.com/lyft/flytestdlib"
-  version = "v0.2.22"
+  version = "v0.2.24"
 
 [[projects]]
   digest = "1:2a0da3440db3f2892609d99cd0389c2776a3fef24435f7b7b58bfc9030aa86ca"
@@ -814,7 +823,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4b234cf90d8b57ad0794e6c9f3d76ce806aaa851adb658d25d9f78db458b2800"
+  digest = "1:2b7fccff5bf6caff757f5e468d580c8d3b763cc7b9354f127adf14fe54451428"
   name = "google.golang.org/api"
   packages = [
     "googleapi",
@@ -828,7 +837,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "4f26c6409ffa7b94f89d06aac760b63875d9b42c"
+  revision = "1c098db1e8d0c17c2819910afd08052313af7a44"
 
 [[projects]]
   digest = "1:3c03b58f57452764a4499c55c582346c0ee78c8a5033affe5bdfd9efd3da5bd1"
@@ -1097,6 +1106,7 @@
     "github.com/Selvatico/go-mocket",
     "github.com/aws/aws-sdk-go/aws",
     "github.com/aws/aws-sdk-go/aws/awserr",
+    "github.com/aws/aws-sdk-go/aws/credentials",
     "github.com/aws/aws-sdk-go/aws/request",
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/aws/aws-sdk-go/service/cloudwatchevents",
@@ -1112,6 +1122,8 @@
     "github.com/golang/protobuf/ptypes/duration",
     "github.com/golang/protobuf/ptypes/struct",
     "github.com/golang/protobuf/ptypes/timestamp",
+    "github.com/graymeta/stow",
+    "github.com/graymeta/stow/s3",
     "github.com/grpc-ecosystem/go-grpc-prometheus",
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
     "github.com/jinzhu/gorm",
