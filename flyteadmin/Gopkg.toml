@@ -116,3 +116,6 @@
   go-tests = true
   unused-packages = true
 
+[[constraint]]
+  name = "github.com/graymeta/stow"
+  revision = "903027f87de7054953efcdb8ba70d5dc02df38c7"

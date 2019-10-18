@@ -4,6 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/graymeta/stow"
+	"github.com/graymeta/stow/s3"
 	"github.com/lyft/flytestdlib/logger"
 
 	"github.com/lyft/flytestdlib/storage"
@@ -43,7 +46,35 @@ func GetRemoteDataHandler(cfg RemoteDataHandlerConfig) RemoteDataHandler {
 			remoteURL: implementations.NewAWSRemoteURL(awsConfig, presignedURLDuration),
 		}
 	case common.Local:
-		fallthrough
+		logger.Infof(context.TODO(), "setting up local signer ----- ")
+		// Since minio = aws s3, we are creating the same client but using the config primitives from aws
+		storageCfg := storage.GetConfig()
+		accessKeyID := ""
+		secret := ""
+		endpoint := ""
+		if storageCfg.Stow != nil {
+			stowCfg := stow.ConfigMap(storageCfg.Stow.Config)
+			accessKeyID, _ = stowCfg.Config(s3.ConfigAccessKeyID)
+			secret, _ = stowCfg.Config(s3.ConfigSecretKey)
+			endpoint, _ = stowCfg.Config(s3.ConfigEndpoint)
+		} else {
+			accessKeyID = storageCfg.Connection.AccessKey
+			secret = storageCfg.Connection.SecretKey
+			endpoint = storageCfg.Connection.Endpoint.String()
+		}
+		logger.Infof(context.TODO(), "setting up local signer - %s, %s, %s", accessKeyID, secret, endpoint)
+		creds := credentials.NewStaticCredentials(accessKeyID, secret, "")
+		awsConfig := aws.NewConfig().
+			WithRegion(cfg.Region).
+			WithMaxRetries(cfg.Retries).
+			WithCredentials(creds).
+			WithEndpoint(endpoint).
+			WithDisableSSL(true).
+			WithS3ForcePathStyle(true)
+		presignedURLDuration := time.Minute * time.Duration(cfg.SignedURLDurationMinutes)
+		return &remoteDataHandler{
+			remoteURL: implementations.NewAWSRemoteURL(awsConfig, presignedURLDuration),
+		}
 	default:
 		logger.Infof(context.Background(),
 			"Using default noop remote url implementation for cloud provider type [%s]", cfg.CloudProvider)
