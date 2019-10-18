@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"time"
 
 	"github.com/lyft/datacatalog/pkg/manager/impl/validators"
 	"github.com/lyft/datacatalog/pkg/manager/interfaces"
@@ -21,6 +22,7 @@ import (
 
 type tagMetrics struct {
 	scope                  promutils.Scope
+	createResponseTime     labeled.StopWatch
 	addTagSuccessCounter   labeled.Counter
 	addTagFailureCounter   labeled.Counter
 	validationErrorCounter labeled.Counter
@@ -34,6 +36,9 @@ type tagManager struct {
 }
 
 func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagRequest) (*datacatalog.AddTagResponse, error) {
+	timer := m.systemMetrics.createResponseTime.Start(ctx)
+	defer timer.Stop()
+
 	if err := validators.ValidateTag(request.Tag); err != nil {
 		logger.Warnf(ctx, "Invalid get tag request %+v err: %v", request, err)
 		m.systemMetrics.validationErrorCounter.Inc(ctx)
@@ -75,9 +80,10 @@ func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagReque
 func NewTagManager(repo repositories.RepositoryInterface, store *storage.DataStore, tagScope promutils.Scope) interfaces.TagManager {
 	systemMetrics := tagMetrics{
 		scope:                  tagScope,
-		addTagSuccessCounter:   labeled.NewCounter("add_tag_success_count", "The number of times an artifact was tagged successfully", tagScope, labeled.EmitUnlabeledMetric),
-		addTagFailureCounter:   labeled.NewCounter("add_tag_failure_count", "The number of times we failed  to tag an artifact", tagScope, labeled.EmitUnlabeledMetric),
-		validationErrorCounter: labeled.NewCounter("validation_error_count", "The number of times we failed validate a tag", tagScope, labeled.EmitUnlabeledMetric),
+		createResponseTime:     labeled.NewStopWatch("create_duration", "The duration of the add tag calls.", time.Millisecond, tagScope, labeled.EmitUnlabeledMetric),
+		addTagSuccessCounter:   labeled.NewCounter("create_success_count", "The number of times an artifact was tagged successfully", tagScope, labeled.EmitUnlabeledMetric),
+		addTagFailureCounter:   labeled.NewCounter("create_failure_count", "The number of times we failed  to tag an artifact", tagScope, labeled.EmitUnlabeledMetric),
+		validationErrorCounter: labeled.NewCounter("validation_failed_count", "The number of times we failed validate a tag", tagScope, labeled.EmitUnlabeledMetric),
 		alreadyExistsCounter:   labeled.NewCounter("already_exists_count", "The number of times an tag already exists", tagScope, labeled.EmitUnlabeledMetric),
 	}
 
