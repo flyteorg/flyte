@@ -34,10 +34,14 @@ func getTestDataset() models.Dataset {
 			Version: "testVersion",
 		},
 		SerializedMetadata: []byte{1, 2, 3},
+		PartitionKeys: []models.PartitionKey{
+			{KeyName: "key1"},
+			{KeyName: "key2"},
+		},
 	}
 }
 
-func TestCreateDataset(t *testing.T) {
+func TestCreateDatasetNoPartitions(t *testing.T) {
 	dataset := getTestDataset()
 	datasetCreated := false
 	GlobalMock := mocket.Catcher.Reset()
@@ -56,10 +60,51 @@ func TestCreateDataset(t *testing.T) {
 		},
 	)
 
+	dataset.PartitionKeys = nil
+
+	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	err := datasetRepo.Create(context.Background(), dataset)
+	assert.NoError(t, err)
+	assert.True(t, datasetCreated)
+}
+
+func TestCreateDataset(t *testing.T) {
+	dataset := getTestDataset()
+	datasetCreated := false
+	insertKeyQueryNum := 0
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	// Only match on queries that append expected filters
+	GlobalMock.NewMock().WithQuery(
+		`INSERT  INTO "datasets" ("created_at","updated_at","deleted_at","project","name","domain","version","serialized_metadata") VALUES (?,?,?,?,?,?,?,?)`).WithCallback(
+		func(s string, values []driver.NamedValue) {
+			assert.EqualValues(t, dataset.Project, values[3].Value)
+			assert.EqualValues(t, dataset.Name, values[4].Value)
+			assert.EqualValues(t, dataset.Domain, values[5].Value)
+			assert.EqualValues(t, dataset.Version, values[6].Value)
+			assert.EqualValues(t, dataset.SerializedMetadata, values[7].Value)
+			datasetCreated = true
+		},
+	)
+
+	GlobalMock.NewMock().WithQuery(
+		`SELECT "uuid" FROM "datasets"  WHERE (project = testProject) AND (name = testName) AND (domain = testDomain) AND (version = testVersion)`).WithReply([]map[string]interface{}{{"uuid": "test-uuid"}})
+
+	GlobalMock.NewMock().WithQuery(
+		`INSERT  INTO "partition_keys" ("created_at","updated_at","deleted_at","dataset_uuid","key_name") VALUES (?,?,?,?,?)`).WithCallback(
+		func(s string, values []driver.NamedValue) {
+			assert.EqualValues(t, "test-uuid", values[3].Value)
+			assert.EqualValues(t, dataset.PartitionKeys[insertKeyQueryNum].KeyName, values[4].Value)
+			insertKeyQueryNum++
+		},
+	)
+
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	err := datasetRepo.Create(context.Background(), getTestDataset())
 	assert.NoError(t, err)
 	assert.True(t, datasetCreated)
+	assert.Equal(t, insertKeyQueryNum, 2)
 }
 
 func TestGetDataset(t *testing.T) {
