@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -44,4 +45,24 @@ func TestIsCausedByError(t *testing.T) {
 	e2 := Wrapf("Code3", e1, "msg")
 	assert.True(t, IsCausedByError(e2, eRoot))
 	assert.True(t, IsCausedByError(e2, e1))
+}
+
+func TestErrorsIs(t *testing.T) {
+	eRoot := Errorf("Code1", "msg")
+	assert.True(t, errors.Is(eRoot, Errorf("Code1", "different msg")))
+
+	e1 := Wrapf("Code2", eRoot, "Wrapped error")
+	assert.True(t, errors.Is(e1, Errorf("Code1", "different msg")))
+}
+
+func TestErrorsUnwrap(t *testing.T) {
+	eRoot := Errorf("Code1", "msg")
+	e1 := Wrapf("Code2", eRoot, "Wrapped error")
+	assert.True(t, errors.Is(e1, Errorf("Code1", "different msg")))
+
+	newErr := &err{}
+	assert.True(t, errors.As(e1, &newErr))
+	assert.Equal(t, "Code1", newErr.Code())
+
+	assert.True(t, errors.Is(errors.Unwrap(e1), Errorf("Code1", "different msg")))
 }

@@ -23,6 +23,16 @@ func (e *err) Code() ErrorCode {
 	return e.code
 }
 
+// Overrides Is to check for error code only. This enables the default package's errors.Is().
+func (e *err) Is(target error) bool {
+	t, ok := target.(*err)
+	if !ok {
+		return false
+	}
+
+	return e.Code() == t.Code()
+}
+
 type errorWithCause struct {
 	*err
 	cause error
@@ -34,6 +44,11 @@ func (e *errorWithCause) Error() string {
 
 func (e *errorWithCause) Cause() error {
 	return e.cause
+}
+
+// Overrides Unwrap to retrieve the underlying error. This enables the default package's errors.Unwrap().
+func (e *errorWithCause) Unwrap() error {
+	return e.Cause()
 }
 
 // Creates a new error using an error code and a message.
