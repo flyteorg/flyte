@@ -1,0 +1,52 @@
+# Create the actual deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flytepropeller
+  namespace: flyte
+  labels:
+    app: flytepropeller
+spec:
+  selector:
+    matchLabels:
+      app: flytepropeller
+  template:
+    metadata:
+      labels:
+        app: flytepropeller
+        app.kubernetes.io/name: flytepropeller
+        app.kubernetes.io/version: 0.1.9
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: flytepropeller
+      volumes:
+      - name: config-volume
+        configMap:
+          name: flyte-propeller-config
+      - name: plugin-config-volume
+        configMap:
+          name: flyte-plugin-config
+      containers:
+      - name: flytepropeller
+        image: docker.io/lyft/flytepropeller:v0.1.9
+        command:
+        - flytepropeller
+        args:
+        - --config
+        - /etc/flyte/config*/config.yaml
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 10254
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/flyte/config
+        - name: plugin-config-volume
+          mountPath: /etc/flyte/config-plugin

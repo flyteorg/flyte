@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flytepropeller
+  namespace: flyte
+spec:
+  template:
+    spec:
+      volumes:
+      - name: waitable-config-volume
+        configMap:
+          name: flyte-waitable-config
+      containers:
+      - name: flytepropeller
+        volumeMounts:
+        - name: waitable-config-volume
+          mountPath: /etc/flyte/config-waitable

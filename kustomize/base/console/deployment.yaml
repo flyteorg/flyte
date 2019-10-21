@@ -1,0 +1,33 @@
+# Create the actual deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyteconsole
+  namespace: flyte
+  labels:
+    app: flyteconsole
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flyteconsole
+  template:
+    metadata:
+      labels:
+        app: flyteconsole
+    spec:
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+      containers:
+      - name: flyteconsole
+        image: docker.io/lyft/flyteconsole:v0.1.0
+        # args: []
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: shared-data
+          mountPath: /srv/flyte
+        envFrom:
+        - configMapRef:
+           name: flyte-console-config

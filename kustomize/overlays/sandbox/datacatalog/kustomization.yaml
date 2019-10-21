@@ -1,0 +1,12 @@
+bases:
+- ../../../base/datacatalog
+
+namespace: flyte
+
+configMapGenerator:
+- name: datacatalog-config
+  files:
+    - datacatalog_config.yaml
+
+patches:
+- datacatalog.yaml

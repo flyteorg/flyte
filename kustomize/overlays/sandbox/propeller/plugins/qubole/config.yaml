@@ -1,0 +1,10 @@
+plugins:
+  qubole:
+    # Either create this file with your username with the real token, or set the QUBOLE_API_KEY environment variable
+    # See the secrets_manager.go file in the plugins repo for usage.  Since the dev/test deployment of
+    # this has a dummy QUBOLE_API_KEY env var built in, this fake path won't break anything.
+    quboleTokenPath: "/Path/To/QUBOLE_CLIENT_TOKEN"
+    resourceManagerType: redis
+    redisHostPath: redis-resource-manager.flyte:6379
+    redisHostKey: mypassword
+    quboleLimit: 10

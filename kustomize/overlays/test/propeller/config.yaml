@@ -1,0 +1,50 @@
+propeller:
+  metadata-prefix: metadata/propeller
+  workers: 4
+  max-workflow-retries: 30
+  workflow-reeval-duration: 30s
+  downstream-eval-duration: 30s
+  limit-namespace: "all"
+  prof-port: 10254
+  metrics-prefix: flyte
+  enable-admin-launcher: true
+  leader-election:
+    lock-config-map:
+      name: propeller-leader
+      namespace: flyte
+    enabled: true
+    lease-duration: 15s
+    renew-deadline: 10s
+    retry-period: 2s
+  queue:
+    type: batch
+    batching-interval: 2s
+    batch-size: -1
+    queue:
+      type: bucket
+      rate: 10
+      capacity: 100
+    sub-queue:
+      type: bucket
+      rate: 10
+      capacity: 100
+logger:
+  show-source: true
+  level: 5
+storage:
+  connection:
+    access-key: minio
+    auth-type: accesskey
+    disable-ssl: true
+    endpoint: http://minio.flyte.svc.cluster.local:9000
+    region: us-east-1
+    secret-key: miniostorage
+  type: minio
+  container: my-s3-bucket
+event:
+  type: admin
+  rate: 500
+  capacity: 1000
+admin:
+  endpoint: flyteadmin:81
+  insecure: true

@@ -1,0 +1,4 @@
+resources:
+- spark-operator.yaml
+- spark-dummy-crd.yaml
+- deployment.yaml

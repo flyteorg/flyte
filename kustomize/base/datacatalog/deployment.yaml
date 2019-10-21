@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datacatalog
+  namespace: flyte
+  labels:
+    app: datacatalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datacatalog
+  template:
+    metadata:
+      labels:
+        app: datacatalog
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: datacatalog
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+      - name: config-volume
+        configMap:
+          name: datacatalog-config
+      initContainers:
+      - name: run-migrations
+        image: docker.io/lyft/datacatalog:v0.1.1
+        imagePullPolicy: IfNotPresent
+        command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/datacatalog_config.yaml", "migrate", "run"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/datacatalog/config
+      containers:
+      - name: datacatalog
+        image: docker.io/lyft/datacatalog:v0.1.1
+        imagePullPolicy: IfNotPresent
+        command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/datacatalog_config.yaml", "serve"]
+        ports:
+        - containerPort: 8088
+        - containerPort: 8089
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/datacatalog/config

@@ -1,0 +1,5 @@
+bases:
+- ../../../dependencies/redis
+
+patches:
+- storage.yaml

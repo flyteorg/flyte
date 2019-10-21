@@ -1,0 +1,21 @@
+bases:
+- ../../../base/admindeployment
+
+namespace: flyte
+
+resources:
+- cron.yaml
+
+configMapGenerator:
+# the main admin configmap
+- name: flyte-admin-config
+  files:
+    - flyteadmin_config.yaml
+# cluster resource templates
+- name: clusterresource-template
+  files:
+# Files are read in alphabetical order. To ensure that we create the namespace first, prefix the file name with "aa".
+    - clusterresource-templates/aa_namespace.yaml
+
+patches:
+- admindeployment.yaml

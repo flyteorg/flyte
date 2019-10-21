@@ -1,0 +1,70 @@
+# Create the actual deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels:
+    app: flyteadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flyteadmin
+  template:
+    metadata:
+      labels:
+        app: flyteadmin
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: flyteadmin
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+      - name: config-volume
+        configMap:
+          name: flyte-admin-config
+      initContainers:
+      - name: run-migrations
+        image: docker.io/lyft/flyteadmin:v0.1.1
+        imagePullPolicy: IfNotPresent
+        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "run"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/flyte/config
+      containers:
+      - name: flyteadmin
+        image: docker.io/lyft/flyteadmin:v0.1.1
+        imagePullPolicy: IfNotPresent
+        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "serve"]
+        ports:
+        - containerPort: 8088
+        - containerPort: 8089
+        volumeMounts:
+        - name: shared-data
+          mountPath: /srv/flyte
+        - name: config-volume
+          mountPath: /etc/flyte/config
+      - name: redoc
+        image: docker.io/redocly/redoc
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8087
+        resources:
+          limits:
+            memory: "200Mi"
+            cpu: "0.1"
+        command:
+        - sh
+        - -c
+        - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
+        env:
+        - name: PAGE_TITLE
+          value: "Flyte Admin OpenAPI"
+        - name: SPEC_URL
+          value: "/api/v1/openapi"
+        - name: PORT
+          value: "8087"

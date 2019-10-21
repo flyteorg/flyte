@@ -1,0 +1,13 @@
+# tests use mostly the dev configs
+# they do not need the console
+bases:
+- ../../../base/namespace
+- ../../../base/wf_crd
+- ../../../base/adminserviceaccount
+- ../../../dependencies/database
+- ../../../dependencies/storage
+- ../propeller
+- ../../sandbox/admindeployment
+- ../../../dependencies/contour_ingress_controller
+- ../../../base/ingress
+- ../redis

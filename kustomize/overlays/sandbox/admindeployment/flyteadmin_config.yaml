@@ -1,0 +1,102 @@
+logger:
+  show-source: true
+  level: 5
+application:
+  httpPort: 8088
+  grpcPort: 8089
+flyteadmin:
+  roleNameKey: "iam.amazonaws.com/role"
+  profilerPort: 10254
+  metricsScope: "flyte:"
+  metadataStoragePrefix:
+    - "metadata"
+    - "admin"
+  testing:
+    host: http://flyteadmin
+database:
+  port: 5432
+  username: postgres
+  host: postgres
+  dbname: postgres
+  options: sslmode=disable
+scheduler:
+  eventScheduler:
+    scheme: "local"
+    region: "us-east-1"
+    scheduleRole: "arn:aws:iam::abc123:role/my-schedule-role"
+    targetName: "arn:aws:sqs:my-region:abc123:my-queue"
+  workflowExecutor:
+    scheme: "local"
+    region: "us-east-1"
+    scheduleQueueName: "won't-work-locally"
+    accountId: "173840052742"
+remoteData:
+  region: "us-east-1"
+  scheme: "local"
+  signedUrls:
+    durationMinutes: 3
+notifications:
+  type: local
+  region: "us-east-1"
+  publisher:
+    topicName: "foo"
+  processor:
+    queueName: "queue"
+    accountId: "bar"
+queues:
+  executionQueues:
+  - parent: "FlyteNonProductionTaskCPU-staging-iad"
+    child: "FlyteNonProductionSubTaskCPU-staging-iad"
+    attributes:
+    - all
+workflowConfigs:
+  - project: flytekit
+    tags:
+      - all
+  - project: "flytetester"
+    domain: "development"
+    workflowName: "app-workflows-rich-workflow-rich-workflow"
+    tags:
+      - all
+  - project: "flytetester"
+    domain: "development"
+    workflowName: "app-workflows-batch-workflow-batch-tasks-workflow"
+    tags:
+      - all
+  - tags:
+      - all
+storage:
+  type: minio
+  connection:
+    access-key: minio
+    auth-type: accesskey
+    secret-key: miniostorage
+    disable-ssl: true
+    endpoint: http://minio.flyte.svc.cluster.local:9000
+    region: us-east-1
+  container: "my-s3-bucket"
+task_resources:
+  defaults:
+    cpu: 100m
+    memory: 100Mi
+    storage: 5Mi
+  limits:
+    cpu: 2
+    memory: 2G
+    storage: 20Mi
+task_type_whitelist:
+  spark:
+    - project: flytekit
+    - project: flytetester
+domains:
+  - id: development
+    name: development
+  - id: staging
+    name: staging
+  - id: production
+    name: production
+  - id: domain
+    name: domain
+cluster_resources:
+  templatePath: "/etc/flyte/clusterresource/templates"
+  refresh: 5m

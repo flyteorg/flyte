@@ -1,0 +1,28 @@
+logger:
+  show-source: true
+  level: 5
+datacatalog:
+  storage-prefix: metadata/datacatalog
+  metrics-scope: "datacatalog"
+  profiler-port: 10254
+application:
+  grpcPort: 8089
+storage:
+  connection:
+    access-key: minio
+    auth-type: accesskey
+    disable-ssl: true
+    endpoint: http://minio.flyte.svc.cluster.local:9000
+    region: us-east-1
+    secret-key: miniostorage
+  cache:
+    max_size_mbs: 10
+    target_gc_percent: 100
+  container: my-container
+  type: minio
+database:
+  port: 5432
+  username: postgres
+  host: postgres
+  dbname: datacatalog
+  options: sslmode=disable

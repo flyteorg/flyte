@@ -1,0 +1,44 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: sparkoperator
+  namespace: sparkoperator
+  labels:
+    app.kubernetes.io/name: sparkoperator
+    app.kubernetes.io/version: v2.4.0-v1alpha1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sparkoperator
+      app.kubernetes.io/version: v2.4.0-v1alpha1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+        prometheus.io/path: "/metrics"
+      labels:
+        app.kubernetes.io/name: sparkoperator
+        app.kubernetes.io/version: v2.4.0-v1alpha1
+      initializers:
+        pending: []
+    spec:
+      serviceAccountName: sparkoperator
+      containers:
+      - name: sparkoperator-unknown
+        image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0
+        imagePullPolicy: Always
+        command: ["/usr/bin/spark-operator"]
+        ports:
+          - containerPort: 10254
+        args:
+        - -logtostderr
+        - -v=2
+        - -controller-threads=20
+        - -enable-metrics=true
+        - "-metrics-prefix=service:"
+        - -metrics-labels=task_name
+        - -metrics-labels=workflow_name
