@@ -40,25 +40,25 @@ func newMockAccessor(options Options) Accessor {
 	return MockAccessor{}
 }
 
-func executeCommandC(root *cobra.Command, args ...string) (c *cobra.Command, output string, err error) {
+func executeCommandC(root *cobra.Command, args ...string) (output string, err error) {
 	buf := new(bytes.Buffer)
-	root.SetOutput(buf)
+	root.SetOut(buf)
 	root.SetArgs(args)
 
-	c, err = root.ExecuteC()
+	_, err = root.ExecuteC()
 
-	return c, buf.String(), err
+	return buf.String(), err
 }
 
 func TestNewConfigCommand(t *testing.T) {
 	cmd := NewConfigCommand(newMockAccessor)
 	assert.NotNil(t, cmd)
 
-	_, output, err := executeCommandC(cmd, CommandDiscover)
+	output, err := executeCommandC(cmd, CommandDiscover)
 	assert.NoError(t, err)
 	assert.Contains(t, output, "test")
 
-	_, output, err = executeCommandC(cmd, CommandValidate)
+	output, err = executeCommandC(cmd, CommandValidate)
 	assert.NoError(t, err)
 	assert.Contains(t, output, "test")
 }

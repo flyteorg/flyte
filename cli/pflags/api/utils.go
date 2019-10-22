@@ -21,28 +21,27 @@ func camelCase(str string) string {
 }
 
 func isJSONUnmarshaler(t types.Type) bool {
-	found, _ := implementsAnyOfMethods(t, "UnmarshalJSON")
-	return found
+	return implementsAnyOfMethods(t, "UnmarshalJSON")
 }
 
 func isStringer(t types.Type) bool {
-	found, _ := implementsAnyOfMethods(t, "String")
-	return found
+	return implementsAnyOfMethods(t, "String")
 }
 
-func implementsAnyOfMethods(t types.Type, methodNames ...string) (found, implementedByPtr bool) {
+func implementsAnyOfMethods(t types.Type, methodNames ...string) (found bool) {
 	mset := types.NewMethodSet(t)
 	for _, name := range methodNames {
 		if mset.Lookup(nil, name) != nil {
-			return true, false
-		}
-	}
-	mset = types.NewMethodSet(types.NewPointer(t))
-	for _, name := range methodNames {
-		if mset.Lookup(nil, name) != nil {
-			return true, true
+			return true
 		}
 	}
 
-	return false, false
+	mset = types.NewMethodSet(types.NewPointer(t))
+	for _, name := range methodNames {
+		if mset.Lookup(nil, name) != nil {
+			return true
+		}
+	}
+
+	return false
 }

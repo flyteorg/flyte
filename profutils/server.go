@@ -11,6 +11,7 @@ import (
 	"github.com/lyft/flytestdlib/version"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
+	// #nosec G108
 	_ "net/http/pprof" // Import for pprof server
 )
 

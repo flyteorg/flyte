@@ -229,7 +229,23 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 //  * Plugin asks for update on item 1 - cache evicts item 2, stores 1 and returns it unchanged
 //  * Plugin asks for update on item 2 - cache evicts item 1, stores 2 and returns it unchanged
 //  * Sync loop updates item 2, repeat
-func (w *autoRefresh) sync(ctx context.Context) error {
+func (w *autoRefresh) sync(ctx context.Context) (err error) {
+	defer func() {
+		var isErr bool
+		rVal := recover()
+		if rVal == nil {
+			return
+		}
+
+		if err, isErr = rVal.(error); isErr {
+			err = fmt.Errorf("worker panic'd and is shutting down. Error: %w", err)
+		} else {
+			err = fmt.Errorf("worker panic'd and is shutting down. Panic value: %v", rVal)
+		}
+
+		logger.Error(ctx, err)
+	}()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -261,6 +277,7 @@ func (w *autoRefresh) sync(ctx context.Context) error {
 					w.lruMap.Add(item.ID, item.Item)
 				}
 			}
+
 			t.Stop()
 		}
 	}
