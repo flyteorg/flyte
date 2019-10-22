@@ -136,7 +136,7 @@ var Migrations = []*gormigrate.Migration{
 			return tx.AutoMigrate(&models.Execution{}).Error
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS InputsUri, DROP COLUMN IF EXISTS UserInputsUri").Error
+			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS InputsURI, DROP COLUMN IF EXISTS UserInputsURI").Error
 		},
 	},
 }

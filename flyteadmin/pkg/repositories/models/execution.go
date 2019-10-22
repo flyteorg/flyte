@@ -48,7 +48,7 @@ type Execution struct {
 	// Cluster where execution was triggered
 	Cluster string
 	// Offloaded location of inputs LiteralMap. These are the inputs evaluated and contain applied defaults.
-	InputsUri storage.DataReference
+	InputsURI storage.DataReference
 	// User specified inputs. This map might be incomplete and not include defaults applied
-	UserInputsUri storage.DataReference
+	UserInputsURI storage.DataReference
 }
