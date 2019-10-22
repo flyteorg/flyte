@@ -9,4 +9,5 @@ type Configuration interface {
 	WhitelistConfiguration() WhitelistConfiguration
 	RegistrationValidationConfiguration() RegistrationValidationConfiguration
 	ClusterResourceConfiguration() ClusterResourceConfiguration
+	NamespaceMappingConfiguration() NamespaceMappingConfiguration
 }

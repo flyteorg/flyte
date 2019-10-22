@@ -43,6 +43,6 @@ func (p *ClusterResourceConfigurationProvider) GetRefreshInterval() time.Duratio
 	return time.Minute
 }
 
-func NewNamespaceConfigurationProvider() interfaces.ClusterResourceConfiguration {
+func NewClusterResourceConfigurationProvider() interfaces.ClusterResourceConfiguration {
 	return &ClusterResourceConfigurationProvider{}
 }

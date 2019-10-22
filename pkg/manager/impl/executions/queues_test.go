@@ -67,7 +67,7 @@ func TestGetQueue(t *testing.T) {
 	}
 	queueAllocator := NewQueueAllocator(runtimeMocks.NewMockConfigurationProvider(
 		nil, runtimeMocks.NewMockQueueConfigurationProvider(executionQueues, workflowConfigs),
-		nil, nil, nil))
+		nil, nil, nil, nil))
 	queueConfig := singleQueueConfiguration{
 		PrimaryQueue: "queue primary",
 		DynamicQueue: "queue dynamic",
@@ -139,7 +139,7 @@ func TestGetQueueDefaults(t *testing.T) {
 	}
 	queueAllocator := NewQueueAllocator(runtimeMocks.NewMockConfigurationProvider(
 		nil, runtimeMocks.NewMockQueueConfigurationProvider(executionQueues, workflowConfigs), nil,
-		nil, nil))
+		nil, nil, nil))
 	assert.Equal(t, singleQueueConfiguration{
 		PrimaryQueue: "default primary",
 		DynamicQueue: "default dynamic",

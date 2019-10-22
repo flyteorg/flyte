@@ -16,7 +16,7 @@ import (
 )
 
 var mockProjectConfigProvider = runtimeMocks.NewMockConfigurationProvider(
-	testutils.GetApplicationConfigWithDefaultProjects(), nil, nil, nil, nil)
+	testutils.GetApplicationConfigWithDefaultProjects(), nil, nil, nil, nil, nil)
 
 var testDomainsForProjManager = []string{"domain", "development", "staging", "production"}
 
@@ -80,7 +80,7 @@ func TestProjectManager_CreateProject(t *testing.T) {
 	}
 	projectManager := NewProjectManager(mockRepository,
 		runtimeMocks.NewMockConfigurationProvider(
-			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil))
+			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
 	_, err := projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
 		Project: &admin.Project{
 			Id:          "flyte-project-id",
@@ -100,7 +100,7 @@ func TestProjectManager_CreateProjectError(t *testing.T) {
 	}
 	projectManager := NewProjectManager(mockRepository,
 		runtimeMocks.NewMockConfigurationProvider(
-			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil))
+			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
 	_, err := projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
 		Project: &admin.Project{
 			Id:          "flyte-project-id",
