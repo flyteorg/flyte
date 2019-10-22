@@ -461,21 +461,25 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 func changeSymLink(targetPath, symLink string) error {
 	tmpLink := tempFileName("temp-sym-link-*")
 	if runtime.GOOS == "windows" {
+		// #nosec G204
 		err := exec.Command("mklink", filepath.Clean(tmpLink), filepath.Clean(targetPath)).Run()
 		if err != nil {
 			return err
 		}
 
+		// #nosec G204
 		err = exec.Command("copy", "/l", "/y", filepath.Clean(tmpLink), filepath.Clean(symLink)).Run()
 		if err != nil {
 			return err
 		}
 
+		// #nosec G204
 		return exec.Command("del", filepath.Clean(tmpLink)).Run()
 	}
 
 	//// ln -sfn is not an atomic operation. Under the hood, it first calls the system unlink then symlink calls. During
 	//// that, there will be a brief moment when there is no symlink at all.
+	// #nosec G204
 	return exec.Command("ln", "-sfn", filepath.Clean(targetPath), filepath.Clean(symLink)).Run()
 }
 

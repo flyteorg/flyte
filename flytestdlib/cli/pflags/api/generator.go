@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"go/token"
 	"go/types"
 	"path/filepath"
 	"strings"
@@ -300,7 +301,7 @@ func NewGenerator(pkg, targetTypeName, defaultVariableName string) (*PFlagProvid
 		pkg = gogenutil.StripGopath(pkg)
 	}
 
-	targetPackage, err := importer.For("source", nil).Import(pkg)
+	targetPackage, err := importer.ForCompiler(token.NewFileSet(), "source", nil).Import(pkg)
 	if err != nil {
 		return nil, err
 	}
