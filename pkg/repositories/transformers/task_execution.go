@@ -129,6 +129,29 @@ func CreateTaskExecutionModel(input CreateTaskExecutionModelInput) (*models.Task
 	return taskExecution, nil
 }
 
+// Returns the unique list of logs across an existing list and the latest list sent in a task execution event update.
+func mergeLogs(existing, latest []*core.TaskLog) []*core.TaskLog {
+	if len(latest) == 0 {
+		return existing
+	}
+	if len(existing) == 0 {
+		return latest
+	}
+	existingSet := make(map[string]*core.TaskLog, len(existing))
+	for _, existingLog := range existing {
+		existingSet[existingLog.Uri] = existingLog
+	}
+	// Copy over the existing logs from the input list so we preserve the original order.
+	logs := existing
+	for _, latestLog := range latest {
+		if _, ok := existingSet[latestLog.Uri]; !ok {
+			// We haven't seen this log before: add it to the output result list.
+			logs = append(logs, latestLog)
+		}
+	}
+	return logs
+}
+
 func UpdateTaskExecutionModel(request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution) error {
 	var taskExecutionClosure admin.TaskExecutionClosure
 	err := proto.Unmarshal(taskExecutionModel.Closure, &taskExecutionClosure)
@@ -141,7 +164,7 @@ func UpdateTaskExecutionModel(request *admin.TaskExecutionEventRequest, taskExec
 	taskExecutionModel.PhaseVersion = request.Event.PhaseVersion
 	taskExecutionClosure.Phase = request.Event.Phase
 	taskExecutionClosure.UpdatedAt = request.Event.OccurredAt
-	taskExecutionClosure.Logs = request.Event.Logs
+	taskExecutionClosure.Logs = mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
 	if (existingTaskPhase == core.TaskExecution_QUEUED.String() || existingTaskPhase == core.TaskExecution_UNDEFINED.String()) && taskExecutionModel.Phase == core.TaskExecution_RUNNING.String() {
 		err = addTaskStartedState(request, taskExecutionModel, &taskExecutionClosure)
 		if err != nil {

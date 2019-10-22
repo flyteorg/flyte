@@ -1,6 +1,7 @@
 package transformers
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -260,6 +261,14 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 		StartedAt: taskEventOccurredAtProto,
 		CreatedAt: taskEventOccurredAtProto,
 		UpdatedAt: taskEventOccurredAtProto,
+		Logs: []*core.TaskLog{
+			{
+				Uri: "uri_a",
+			},
+			{
+				Uri: "uri_b",
+			},
+		},
 	}
 
 	closureBytes, err := proto.Marshal(existingClosure)
@@ -312,12 +321,10 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 			OccurredAt: occuredAtProto,
 			Logs: []*core.TaskLog{
 				{
-					Name: "some_log",
-					Uri:  "some_uri",
+					Uri: "uri_b",
 				},
 				{
-					Name: "some_log2",
-					Uri:  "some_uri2",
+					Uri: "uri_c",
 				},
 			},
 			CustomInfo: &customInfo,
@@ -338,12 +345,13 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 		},
 		Logs: []*core.TaskLog{
 			{
-				Name: "some_log",
-				Uri:  "some_uri",
+				Uri: "uri_a",
 			},
 			{
-				Name: "some_log2",
-				Uri:  "some_uri2",
+				Uri: "uri_b",
+			},
+			{
+				Uri: "uri_c",
 			},
 		},
 		CustomInfo: &customInfo,
@@ -500,4 +508,101 @@ func TestFromTaskExecutionModels(t *testing.T) {
 		InputUri: "input uri",
 		Closure:  taskClosure,
 	}, taskExecutions[0]))
+}
+
+func TestMergeLogs(t *testing.T) {
+	type testCase struct {
+		existing []*core.TaskLog
+		latest   []*core.TaskLog
+		expected []*core.TaskLog
+		name     string
+	}
+
+	testCases := []testCase{
+		{
+			existing: []*core.TaskLog{
+				{
+					Uri:  "uri_a",
+					Name: "name_a",
+				},
+				{
+					Uri:  "uri_b",
+					Name: "name_b",
+				},
+				{
+					Uri:  "uri_c",
+					Name: "name_c",
+				},
+			},
+			latest: []*core.TaskLog{
+				{
+					Uri:  "uri_b",
+					Name: "name_b",
+				},
+				{
+					Uri:  "uri_d",
+					Name: "name_d",
+				},
+			},
+			expected: []*core.TaskLog{
+				{
+					Uri:  "uri_a",
+					Name: "name_a",
+				},
+				{
+					Uri:  "uri_b",
+					Name: "name_b",
+				},
+				{
+					Uri:  "uri_c",
+					Name: "name_c",
+				},
+				{
+					Uri:  "uri_d",
+					Name: "name_d",
+				},
+			},
+			name: "Merge unique logs",
+		},
+		{
+			latest: []*core.TaskLog{
+				{
+					Uri:  "uri_b",
+					Name: "name_b",
+				},
+			},
+			expected: []*core.TaskLog{
+				{
+					Uri:  "uri_b",
+					Name: "name_b",
+				},
+			},
+			name: "Empty existing logs",
+		},
+		{
+			existing: []*core.TaskLog{
+				{
+					Uri:  "uri_b",
+					Name: "name_b",
+				},
+			},
+			expected: []*core.TaskLog{
+				{
+					Uri:  "uri_b",
+					Name: "name_b",
+				},
+			},
+			name: "Empty latest logs",
+		},
+		{
+			name: "Nothing to do",
+		},
+	}
+	for _, mergeTestCase := range testCases {
+		actual := mergeLogs(mergeTestCase.existing, mergeTestCase.latest)
+		assert.Equal(t, len(mergeTestCase.expected), len(actual), fmt.Sprintf("%s failed", mergeTestCase.name))
+		for idx, expectedLog := range mergeTestCase.expected {
+			assert.True(t, proto.Equal(expectedLog, actual[idx]), fmt.Sprintf("%s failed", mergeTestCase.name))
+		}
+	}
 }
