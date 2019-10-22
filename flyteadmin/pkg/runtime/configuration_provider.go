@@ -13,6 +13,7 @@ type ConfigurationProvider struct {
 	whitelistConfiguration              interfaces.WhitelistConfiguration
 	registrationValidationConfiguration interfaces.RegistrationValidationConfiguration
 	clusterResourceConfiguration        interfaces.ClusterResourceConfiguration
+	namespaceMappingConfiguration       interfaces.NamespaceMappingConfiguration
 }
 
 func (p *ConfigurationProvider) ApplicationConfiguration() interfaces.ApplicationConfiguration {
@@ -43,6 +44,10 @@ func (p *ConfigurationProvider) ClusterResourceConfiguration() interfaces.Cluste
 	return p.clusterResourceConfiguration
 }
 
+func (p *ConfigurationProvider) NamespaceMappingConfiguration() interfaces.NamespaceMappingConfiguration {
+	return p.namespaceMappingConfiguration
+}
+
 func NewConfigurationProvider() interfaces.Configuration {
 	return &ConfigurationProvider{
 		applicationConfiguration:            NewApplicationConfigurationProvider(),
@@ -51,6 +56,7 @@ func NewConfigurationProvider() interfaces.Configuration {
 		taskResourceConfiguration:           NewTaskResourceProvider(),
 		whitelistConfiguration:              NewWhitelistConfigurationProvider(),
 		registrationValidationConfiguration: NewRegistrationValidationProvider(),
-		clusterResourceConfiguration:        NewNamespaceConfigurationProvider(),
+		clusterResourceConfiguration:        NewClusterResourceConfigurationProvider(),
+		namespaceMappingConfiguration:       NewNamespaceMappingConfigurationProvider(),
 	}
 }

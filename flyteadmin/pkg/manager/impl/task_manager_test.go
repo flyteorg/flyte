@@ -37,7 +37,7 @@ const limit = 100
 func getMockConfigForTaskTest() runtimeInterfaces.Configuration {
 	mockConfig := runtimeMocks.NewMockConfigurationProvider(
 		testutils.GetApplicationConfigWithDefaultProjects(), nil, nil, runtimeMocks.NewMockTaskResourceConfiguration(
-			runtimeInterfaces.TaskResourceSet{}, runtimeInterfaces.TaskResourceSet{}), runtimeMocks.NewMockWhitelistConfiguration())
+			runtimeInterfaces.TaskResourceSet{}, runtimeInterfaces.TaskResourceSet{}), runtimeMocks.NewMockWhitelistConfiguration(), nil)
 	return mockConfig
 }
 

@@ -98,7 +98,7 @@ func getMockExecutionsConfigProvider() runtimeInterfaces.Configuration {
 		testutils.GetApplicationConfigWithDefaultProjects(),
 		runtimeMocks.NewMockQueueConfigurationProvider(
 			[]runtimeInterfaces.ExecutionQueue{}, []runtimeInterfaces.WorkflowConfig{}),
-		nil, nil, nil)
+		nil, nil, nil, nil)
 	mockExecutionsConfigProvider.(*runtimeMocks.MockConfigurationProvider).AddRegistrationValidationConfiguration(
 		runtimeMocks.NewMockRegistrationValidationProvider())
 	return mockExecutionsConfigProvider
@@ -328,7 +328,7 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 				Tags:         []string{"tag"},
 			},
 		}),
-		nil, nil, nil)
+		nil, nil, nil, nil)
 	configProvider.(*runtimeMocks.MockConfigurationProvider).AddRegistrationValidationConfiguration(
 		runtimeMocks.NewMockRegistrationValidationProvider())
 	mockExecutor := workflowengineMocks.NewMockExecutor()
@@ -1548,7 +1548,7 @@ func TestExecutionManager_PublishNotifications(t *testing.T) {
 		&mockApplicationConfig,
 		runtimeMocks.NewMockQueueConfigurationProvider(
 			[]runtimeInterfaces.ExecutionQueue{}, []runtimeInterfaces.WorkflowConfig{}),
-		nil, nil, nil)
+		nil, nil, nil, nil)
 
 	var myExecManager = &ExecutionManager{
 		db:                 repository,
@@ -1681,7 +1681,7 @@ func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformErro
 		&mockApplicationConfig,
 		runtimeMocks.NewMockQueueConfigurationProvider(
 			[]runtimeInterfaces.ExecutionQueue{}, []runtimeInterfaces.WorkflowConfig{}),
-		nil, nil, nil)
+		nil, nil, nil, nil)
 
 	var myExecManager = &ExecutionManager{
 		db:                 repository,
