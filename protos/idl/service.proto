@@ -81,7 +81,7 @@ message Artifact {
     DatasetID dataset = 2;
     repeated ArtifactData data = 3;
     Metadata metadata = 4;
-    repeated Partition partitions = 5; // should this be a map of key/val strings instead?
+    repeated Partition partitions = 5;
 }
 
 message ArtifactData {

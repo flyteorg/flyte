@@ -44,7 +44,7 @@ func (h *dataSetRepo) Get(ctx context.Context, in models.DatasetKey) (models.Dat
 	defer timer.Stop()
 
 	var ds models.Dataset
-	result := h.db.Where(&models.Dataset{DatasetKey: in}).First(&ds)
+	result := h.db.Preload("PartitionKeys").First(&ds, &models.Dataset{DatasetKey: in})
 
 	if result.Error != nil {
 		logger.Debugf(ctx, "Unable to find Dataset: [%+v], err: %v", in, result.Error)

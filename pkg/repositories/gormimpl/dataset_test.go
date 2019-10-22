@@ -115,6 +115,7 @@ func TestGetDataset(t *testing.T) {
 	sampleDataset["domain"] = dataset.Domain
 	sampleDataset["name"] = dataset.Name
 	sampleDataset["version"] = dataset.Version
+	sampleDataset["uuid"] = dataset.UUID
 
 	expectedResponse = append(expectedResponse, sampleDataset)
 
@@ -131,6 +132,7 @@ func TestGetDataset(t *testing.T) {
 	assert.Equal(t, dataset.Domain, actualDataset.Domain)
 	assert.Equal(t, dataset.Name, actualDataset.Name)
 	assert.Equal(t, dataset.Version, actualDataset.Version)
+	assert.Equal(t, actualDataset.PartitionKeys, 2)
 }
 
 func TestGetDatasetWithUUID(t *testing.T) {

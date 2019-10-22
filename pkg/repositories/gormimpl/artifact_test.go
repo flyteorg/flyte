@@ -36,6 +36,15 @@ func getTestArtifact() models.Artifact {
 	}
 }
 
+func getTestPartition() models.Partition {
+	return models.Partition{
+		DatasetUUID: "test-uuid",
+		KeyName:     "region",
+		KeyValue:    "value",
+		ArtifactID:  "123",
+	}
+}
+
 func TestCreateArtifact(t *testing.T) {
 	artifact := getTestArtifact()
 
@@ -44,6 +53,7 @@ func TestCreateArtifact(t *testing.T) {
 	GlobalMock.Logging = true
 
 	numArtifactDataCreated := 0
+	numPartitionsCreated := 0
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
@@ -60,6 +70,13 @@ func TestCreateArtifact(t *testing.T) {
 		},
 	)
 
+	GlobalMock.NewMock().WithQuery(
+		`INSERT  INTO "partitions" ("created_at","updated_at","deleted_at","dataset_uuid","key_name","key_value","artifact_id") VALUES (?,?,?,?,?,?,?)`).WithCallback(
+		func(s string, values []driver.NamedValue) {
+			numPartitionsCreated++
+		},
+	)
+
 	data := make([]models.ArtifactData, 2)
 	data[0] = models.ArtifactData{
 		Name:     "test",
@@ -72,11 +89,17 @@ func TestCreateArtifact(t *testing.T) {
 
 	artifact.ArtifactData = data
 
+	partitions := make([]models.Partition, 1)
+	partitions[0] = getTestPartition()
+
+	artifact.Partitions = partitions
+
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	err := artifactRepo.Create(context.Background(), artifact)
 	assert.NoError(t, err)
 	assert.True(t, artifactCreated)
 	assert.Equal(t, 2, numArtifactDataCreated)
+	assert.Equal(t, 1, numPartitionsCreated)
 }
 
 func TestGetArtifact(t *testing.T) {
@@ -103,6 +126,14 @@ func TestGetArtifact(t *testing.T) {
 	sampleArtifact["artifact_id"] = artifact.ArtifactID
 	expectedArtifactResponse = append(expectedArtifactResponse, sampleArtifact)
 
+	expectedPartitionResponse := make([]map[string]interface{}, 0)
+	sampleParition := make(map[string]interface{})
+	sampleParition["key_name"] = "region"
+	sampleParition["key_value"] = "SEA"
+	sampleParition["artifact_id"] = artifact.ArtifactID
+	sampleParition["dataset_uuid"] = "uuid"
+	expectedPartitionResponse = append(expectedPartitionResponse, sampleParition)
+
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 
@@ -111,6 +142,8 @@ func TestGetArtifact(t *testing.T) {
 		`SELECT * FROM "artifacts"  WHERE "artifacts"."deleted_at" IS NULL AND (("artifacts"."dataset_project" = testProject) AND ("artifacts"."dataset_name" = testName) AND ("artifacts"."dataset_domain" = testDomain) AND ("artifacts"."dataset_version" = testVersion) AND ("artifacts"."artifact_id" = 123))`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123))))`).WithReply(expectedArtifactDataResponse)
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "partitions"  WHERE "partitions"."deleted_at" IS NULL AND (("artifact_id" IN (123))) ORDER BY "partitions"."dataset_uuid" ASC`).WithReply(expectedPartitionResponse)
 	getInput := models.ArtifactKey{
 		DatasetProject: artifact.DatasetProject,
 		DatasetDomain:  artifact.DatasetDomain,
@@ -129,6 +162,7 @@ func TestGetArtifact(t *testing.T) {
 	assert.Equal(t, artifact.DatasetVersion, response.DatasetVersion)
 
 	assert.Equal(t, 1, len(response.ArtifactData))
+	assert.Equal(t, 1, len(response.Partitions))
 }
 
 func TestGetArtifactDoesNotExist(t *testing.T) {
