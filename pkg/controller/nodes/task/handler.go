@@ -122,6 +122,7 @@ func (t *taskContext) GetK8sServiceAccount() string {
 type metrics struct {
 	pluginPanics             labeled.Counter
 	unsupportedTaskType      labeled.Counter
+	discoveryPutSuccessCount labeled.Counter
 	discoveryPutFailureCount labeled.Counter
 	discoveryGetFailureCount labeled.Counter
 	discoveryMissCount       labeled.Counter
@@ -350,6 +351,7 @@ func (h *taskHandler) HandleNodeSuccess(ctx context.Context, w v1alpha1.Executab
 				h.metrics.discoveryPutFailureCount.Inc(ctx)
 				logger.Errorf(ctx, "Failed to write results to catalog. Err: %v", err2)
 			} else {
+				h.metrics.discoveryPutSuccessCount.Inc(ctx)
 				logger.Debugf(ctx, "Successfully cached results - Task [%s]", task.CoreTask().GetId())
 			}
 		}
@@ -432,6 +434,7 @@ func NewTaskHandlerForFactory(eventSink events.EventSink, store *storage.DataSto
 			discoveryHitCount:        labeled.NewCounter("discovery_hit_count", "Task cached in Discovery", scope),
 			discoveryMissCount:       labeled.NewCounter("discovery_miss_count", "Task not cached in Discovery", scope),
 			discoveryPutFailureCount: labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", scope),
+			discoveryPutSuccessCount: labeled.NewCounter("discovery_put_success_count", "Discovery Put success count", scope),
 			discoveryGetFailureCount: labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", scope),
 			pluginExecutionLatency:   labeled.NewStopWatch("plugin_exec_latecny", "Time taken to invoke plugin for one round", time.Microsecond, scope),
 		},
