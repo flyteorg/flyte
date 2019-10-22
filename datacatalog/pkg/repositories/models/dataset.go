@@ -17,6 +17,6 @@ type Dataset struct {
 
 type PartitionKey struct {
 	BaseModel
-	DatasetUUID string `gorm:"primary_key"`
+	DatasetUUID string `gorm:"type:uuid;primary_key"`
 	KeyName     string `gorm:"primary_key"`
 }
