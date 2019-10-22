@@ -242,10 +242,10 @@ func (m *CatalogClient) Put(ctx context.Context, task *core.TaskTemplate, execID
 	if err != nil {
 		if status.Code(err) == codes.AlreadyExists {
 			logger.Warnf(ctx, "Tag %v already exists for Artifact %v (idempotent)", tagName, cachedArtifact.Id)
+		} else {
+			logger.Errorf(ctx, "Failed to add tag %+v for artifact %+v, err: %+v", tagName, cachedArtifact.Id, err)
+			return err
 		}
-
-		logger.Errorf(ctx, "Failed to add tag %+v for artifact %+v, err: %+v", tagName, cachedArtifact.Id, err)
-		return err
 	}
 
 	return nil
