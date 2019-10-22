@@ -60,6 +60,7 @@ var mockPublisher notificationMocks.MockPublisher
 var mockExecutionRemoteURL = dataMocks.NewMockRemoteURL()
 var requestedAt = time.Now()
 var testCluster = "C1"
+var outputURI = "output uri"
 
 func getLegacySpec() *admin.ExecutionSpec {
 	executionRequest := testutils.GetExecutionRequest()
@@ -150,7 +151,7 @@ func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 			_ = proto.Unmarshal(val, msg)
 			return nil
 		}
-		return errors.New(fmt.Sprintf("Could not find value in storage [%v]\n", reference.String()))
+		return fmt.Errorf("could not find value in storage [%v]", reference.String())
 	}
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(
 		ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
@@ -162,7 +163,9 @@ func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 		return nil
 	}
 	workflowClosure := testutils.GetWorkflowClosure()
-	mockStorage.WriteProtobuf(ctx, storage.DataReference(remoteClosureIdentifier), defaultStorageOptions, workflowClosure)
+	if err := mockStorage.WriteProtobuf(ctx, storage.DataReference(remoteClosureIdentifier), defaultStorageOptions, workflowClosure); err != nil {
+		return nil
+	}
 	return mockStorage
 }
 
@@ -475,10 +478,10 @@ func TestCreateExecutionVerifyDbModel(t *testing.T) {
 		assert.Nil(t, closureValue.ComputedInputs)
 
 		var userInputs, inputs core.LiteralMap
-		if err := storageClient.ReadProtobuf(ctx, storage.DataReference(input.UserInputsUri), &userInputs); err != nil {
+		if err := storageClient.ReadProtobuf(ctx, input.UserInputsURI, &userInputs); err != nil {
 			return err
 		}
-		if err := storageClient.ReadProtobuf(ctx, storage.DataReference(input.InputsUri), &inputs); err != nil {
+		if err := storageClient.ReadProtobuf(ctx, input.InputsURI, &inputs); err != nil {
 			return err
 		}
 		fooValue := utils.MustMakeLiteral("foo-value-1")
@@ -1884,7 +1887,7 @@ func TestGetExecutionData(t *testing.T) {
 		OutputResult: &admin.ExecutionClosure_Outputs{
 			Outputs: &admin.LiteralMapBlob{
 				Data: &admin.LiteralMapBlob_Uri{
-					Uri: "output uri",
+					Uri: outputURI,
 				},
 			},
 		},
@@ -1904,13 +1907,13 @@ func TestGetExecutionData(t *testing.T) {
 			LaunchPlanID: uint(1),
 			WorkflowID:   uint(2),
 			StartedAt:    &startedAt,
-			InputsUri:    shared.Inputs,
+			InputsURI:    shared.Inputs,
 		}, nil
 	}
 	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
 	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
 		ctx context.Context, uri string) (admin.UrlBlob, error) {
-		if uri == "output uri" {
+		if uri == outputURI {
 			return admin.UrlBlob{
 				Url:   "outputs",
 				Bytes: 200,
@@ -2042,8 +2045,8 @@ func TestGetExecution_LegacyClient_OffloadedData(t *testing.T) {
 			LaunchPlanID:  uint(1),
 			WorkflowID:    uint(2),
 			StartedAt:     &startedAt,
-			UserInputsUri: shared.UserInputs,
-			InputsUri:     shared.Inputs,
+			UserInputsURI: shared.UserInputs,
+			InputsURI:     shared.Inputs,
 		}, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
@@ -2069,7 +2072,7 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 	closure.OutputResult = &admin.ExecutionClosure_Outputs{
 		Outputs: &admin.LiteralMapBlob{
 			Data: &admin.LiteralMapBlob_Uri{
-				Uri: "output uri",
+				Uri: outputURI,
 			},
 		},
 	}
@@ -2093,7 +2096,7 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
 	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
 		ctx context.Context, uri string) (admin.UrlBlob, error) {
-		if uri == "output uri" {
+		if uri == outputURI {
 			return admin.UrlBlob{
 				Url:   "outputs",
 				Bytes: 200,
