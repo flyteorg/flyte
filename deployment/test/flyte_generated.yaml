@@ -739,8 +739,26 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
+      - command:
+        - flyteadmin
+        - --logtostderr
+        - --config
+        - /etc/flyte/config/flyteadmin_config.yaml
+        - clusterresource
+        - sync
+        image: docker.io/lyft/flyteadmin:v0.1.1
+        imagePullPolicy: IfNotPresent
+        name: sync-cluster-resources
+        volumeMounts:
+        - mountPath: /etc/flyte/clusterresource/templates
+          name: resource-templates
+        - mountPath: /etc/flyte/config
+          name: config-volume
       serviceAccountName: flyteadmin
       volumes:
+      - configMap:
+          name: clusterresource-template-dgc9fcm2kh
+        name: resource-templates
       - emptyDir: {}
         name: shared-data
       - configMap:
