@@ -35,16 +35,28 @@ func TestIsCausedBy(t *testing.T) {
 	e = Wrapf("Code2", e, "msg")
 	assert.True(t, IsCausedBy(e, "Code1"))
 	assert.True(t, IsCausedBy(e, "Code2"))
+
+	e = fmt.Errorf("new err caused by: %w", e)
+	assert.True(t, IsCausedBy(e, "Code1"))
+
+	e = fmt.Errorf("not sharing code err")
+	assert.False(t, IsCausedBy(e, "Code1"))
 }
 
 func TestIsCausedByError(t *testing.T) {
 	eRoot := Errorf("Code1", "msg")
 	assert.NotNil(t, eRoot)
+
 	e1 := Wrapf("Code2", eRoot, "msg")
 	assert.True(t, IsCausedByError(e1, eRoot))
+
 	e2 := Wrapf("Code3", e1, "msg")
 	assert.True(t, IsCausedByError(e2, eRoot))
 	assert.True(t, IsCausedByError(e2, e1))
+
+	e3 := fmt.Errorf("default errors. caused by: %w", e2)
+	assert.True(t, IsCausedByError(e3, eRoot))
+	assert.True(t, IsCausedByError(e3, e1))
 }
 
 func TestErrorsIs(t *testing.T) {
