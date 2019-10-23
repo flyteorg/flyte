@@ -13,6 +13,14 @@ func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData
 		return models.Artifact{}, err
 	}
 
+	partitions := make([]models.Partition, len(request.Artifact.Partitions))
+	for i, partition := range request.Artifact.GetPartitions() {
+		partitions[i] = models.Partition{
+			KeyName:  partition.Key,
+			KeyValue: partition.Value,
+		}
+	}
+
 	return models.Artifact{
 		ArtifactKey: models.ArtifactKey{
 			DatasetProject: datasetID.Project,
@@ -23,6 +31,7 @@ func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData
 		},
 		ArtifactData:       artifactData,
 		SerializedMetadata: serializedMetadata,
+		Partitions:         partitions,
 	}, nil
 }
 
@@ -30,6 +39,14 @@ func FromArtifactModel(artifact models.Artifact) (datacatalog.Artifact, error) {
 	metadata, err := unmarshalMetadata(artifact.SerializedMetadata)
 	if err != nil {
 		return datacatalog.Artifact{}, err
+	}
+
+	partitions := make([]*datacatalog.Partition, len(artifact.Partitions))
+	for i, partition := range artifact.Partitions {
+		partitions[i] = &datacatalog.Partition{
+			Key:   partition.KeyName,
+			Value: partition.KeyValue,
+		}
 	}
 
 	return datacatalog.Artifact{
@@ -40,7 +57,8 @@ func FromArtifactModel(artifact models.Artifact) (datacatalog.Artifact, error) {
 			Name:    artifact.DatasetName,
 			Version: artifact.DatasetVersion,
 		},
-		Metadata: metadata,
+		Metadata:   metadata,
+		Partitions: partitions,
 	}, nil
 }
 
