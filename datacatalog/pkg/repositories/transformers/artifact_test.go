@@ -31,6 +31,10 @@ func TestCreateArtifactModel(t *testing.T) {
 			Dataset:  &datasetID,
 			Data:     artifactDataList,
 			Metadata: &metadata,
+			Partitions: []*datacatalog.Partition{
+				{Key: "key1", Value: "value1"},
+				{Key: "key2", Value: "value2"},
+			},
 		},
 	}
 
@@ -38,6 +42,12 @@ func TestCreateArtifactModel(t *testing.T) {
 		{Name: "data1", Location: "s3://test1"},
 		{Name: "data3", Location: "s3://test2"},
 	}
+
+	testPartitions := []models.Partition{
+		{KeyName: "key1", KeyValue: "value1"},
+		{KeyName: "key2", KeyValue: "value2"},
+	}
+
 	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData)
 	assert.NoError(t, err)
 	assert.Equal(t, artifactModel.ArtifactID, createArtifactRequest.Artifact.Id)
@@ -46,6 +56,7 @@ func TestCreateArtifactModel(t *testing.T) {
 	assert.Equal(t, artifactModel.ArtifactKey.DatasetName, datasetID.Name)
 	assert.Equal(t, artifactModel.ArtifactKey.DatasetVersion, datasetID.Version)
 	assert.EqualValues(t, testArtifactData, artifactModel.ArtifactData)
+	assert.EqualValues(t, testPartitions, artifactModel.Partitions)
 }
 
 func TestCreateArtifactModelNoMetdata(t *testing.T) {
@@ -69,6 +80,7 @@ func TestCreateArtifactModelNoMetdata(t *testing.T) {
 	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData)
 	assert.NoError(t, err)
 	assert.Equal(t, []byte{}, artifactModel.SerializedMetadata)
+	assert.Len(t, artifactModel.Partitions, 0)
 }
 
 func TestFromArtifactModel(t *testing.T) {
@@ -81,6 +93,10 @@ func TestFromArtifactModel(t *testing.T) {
 			ArtifactID:     "id1",
 		},
 		SerializedMetadata: []byte{},
+		Partitions: []models.Partition{
+			{KeyName: "key1", KeyValue: "value1"},
+			{KeyName: "key2", KeyValue: "value2"},
+		},
 	}
 
 	actual, err := FromArtifactModel(artifactModel)
@@ -90,6 +106,7 @@ func TestFromArtifactModel(t *testing.T) {
 	assert.Equal(t, artifactModel.DatasetDomain, actual.Dataset.Domain)
 	assert.Equal(t, artifactModel.DatasetName, actual.Dataset.Name)
 	assert.Equal(t, artifactModel.DatasetVersion, actual.Dataset.Version)
+	assert.Len(t, actual.Partitions, 2)
 }
 
 func TestToArtifactKey(t *testing.T) {
