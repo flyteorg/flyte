@@ -2,9 +2,8 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
 )
 
 // A generic error code type.
@@ -25,12 +24,12 @@ func (e *err) Code() ErrorCode {
 
 // Overrides Is to check for error code only. This enables the default package's errors.Is().
 func (e *err) Is(target error) bool {
-	t, ok := target.(*err)
-	if !ok {
+	eCode, found := GetErrorCode(target)
+	if !found {
 		return false
 	}
 
-	return e.Code() == t.Code()
+	return e.Code() == eCode
 }
 
 type errorWithCause struct {
@@ -39,7 +38,7 @@ type errorWithCause struct {
 }
 
 func (e *errorWithCause) Error() string {
-	return fmt.Sprintf("%v, caused by: %v", e.err.Error(), errors.Cause(e))
+	return fmt.Sprintf("%v, caused by: %v", e.err.Error(), e.Cause())
 }
 
 func (e *errorWithCause) Cause() error {
@@ -90,17 +89,26 @@ func IsCausedBy(e error, errCode ErrorCode) bool {
 		Cause() error
 	}
 
+	type wrapped interface {
+		Unwrap() error
+	}
+
 	for e != nil {
 		if code, found := GetErrorCode(e); found && code == errCode {
 			return true
 		}
 
 		cause, ok := e.(causer)
-		if !ok {
-			break
-		}
+		if ok {
+			e = cause.Cause()
+		} else {
+			cause, ok := e.(wrapped)
+			if !ok {
+				break
+			}
 
-		e = cause.Cause()
+			e = cause.Unwrap()
+		}
 	}
 
 	return false
@@ -112,7 +120,7 @@ func IsCausedByError(e, e2 error) bool {
 	}
 
 	for e != nil {
-		if e == e2 {
+		if errors.Is(e, e2) {
 			return true
 		}
 

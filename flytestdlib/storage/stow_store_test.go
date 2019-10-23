@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/lyft/flytestdlib/promutils"
 
 	"github.com/graymeta/stow"
@@ -131,5 +133,6 @@ func TestStowStore_ReadRaw(t *testing.T) {
 		_, err = s.ReadRaw(context.TODO(), DataReference("s3://container/path"))
 		assert.Error(t, err)
 		assert.True(t, IsExceedsLimit(err))
+		assert.NotNil(t, errors.Cause(err))
 	})
 }
