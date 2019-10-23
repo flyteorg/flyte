@@ -48,6 +48,7 @@ type metrics struct {
 	SyncLatency promutils.StopWatch
 	CacheHit    prometheus.Counter
 	CacheMiss   prometheus.Counter
+	Size        prometheus.Gauge
 	scope       promutils.Scope
 }
 
@@ -139,6 +140,7 @@ func newMetrics(scope promutils.Scope) metrics {
 		SyncLatency: scope.MustNewStopWatch("latency", "Latency for sync operations.", time.Millisecond),
 		CacheHit:    scope.MustNewCounter("cache_hit", "Counter for cache hits."),
 		CacheMiss:   scope.MustNewCounter("cache_miss", "Counter for cache misses."),
+		Size:        scope.MustNewGauge("size", "Current size of the cache"),
 		scope:       scope,
 	}
 }
@@ -194,6 +196,8 @@ func (w *autoRefresh) GetOrCreate(id ItemID, item Item) (Item, error) {
 //  - Enqueue all the batches into the workqueue
 func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	keys := w.lruMap.Keys()
+	w.metrics.Size.Set(float64(len(keys)))
+
 	snapshot := make([]ItemWrapper, 0, len(keys))
 	for _, k := range keys {
 		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
