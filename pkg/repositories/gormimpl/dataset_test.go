@@ -108,23 +108,32 @@ func TestCreateDataset(t *testing.T) {
 }
 
 func TestGetDataset(t *testing.T) {
+	datasetUUID := "test-uuid" // sql will generate a uuid
 	dataset := getTestDataset()
-	expectedResponse := make([]map[string]interface{}, 0)
+
+	expectedDatasetResponse := make([]map[string]interface{}, 0)
 	sampleDataset := make(map[string]interface{})
 	sampleDataset["project"] = dataset.Project
 	sampleDataset["domain"] = dataset.Domain
 	sampleDataset["name"] = dataset.Name
 	sampleDataset["version"] = dataset.Version
-	sampleDataset["uuid"] = dataset.UUID
+	sampleDataset["uuid"] = datasetUUID
 
-	expectedResponse = append(expectedResponse, sampleDataset)
+	expectedDatasetResponse = append(expectedDatasetResponse, sampleDataset)
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL AND (("datasets"."project" = testProject) AND ("datasets"."name" = testName) AND ("datasets"."domain" = testDomain) AND ("datasets"."version" = testVersion)) ORDER BY "datasets"."project" ASC LIMIT 1`).WithReply(expectedResponse)
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL AND (("datasets"."project" = testProject) AND ("datasets"."name" = testName) AND ("datasets"."domain" = testDomain) AND ("datasets"."version" = testVersion)) ORDER BY "datasets"."project" ASC LIMIT 1`).WithReply(expectedDatasetResponse)
 
+	expectedPartitionKeyResponse := make([]map[string]interface{}, 0)
+	samplePartitionKey := make(map[string]interface{})
+	samplePartitionKey["key_name"] = "testKey1"
+	samplePartitionKey["dataset_uuid"] = datasetUUID
+	expectedPartitionKeyResponse = append(expectedPartitionKeyResponse, samplePartitionKey, samplePartitionKey)
+
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys"  WHERE "partition_keys"."deleted_at" IS NULL AND (("dataset_uuid" IN (test-uuid))) ORDER BY "partition_keys"."dataset_uuid" ASC`).WithReply(expectedPartitionKeyResponse)
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	actualDataset, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
 	assert.NoError(t, err)
@@ -132,7 +141,8 @@ func TestGetDataset(t *testing.T) {
 	assert.Equal(t, dataset.Domain, actualDataset.Domain)
 	assert.Equal(t, dataset.Name, actualDataset.Name)
 	assert.Equal(t, dataset.Version, actualDataset.Version)
-	assert.Equal(t, actualDataset.PartitionKeys, 2)
+	assert.Equal(t, "test-uuid", actualDataset.UUID)
+	assert.Len(t, actualDataset.PartitionKeys, 2)
 }
 
 func TestGetDatasetWithUUID(t *testing.T) {
