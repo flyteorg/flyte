@@ -1,6 +1,6 @@
 before:
   hooks:
-    - GO111MODULE=off dep ensure -vendor-only
+    - dep ensure -vendor-only
 builds:
   - env:
       - CGO_ENABLED=0

@@ -19,7 +19,7 @@ jobs:
 deploy:
 - provider: script
   skip_cleanup: true
-  script: curl -sL https://git.io/goreleaser | bash
+  script: curl -sL https://git.io/goreleaser | GO111MODULE=off bash
   on:
     tags: true
     condition: "$TRAVIS_OS_NAME = linux"
