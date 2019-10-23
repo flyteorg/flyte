@@ -39,8 +39,8 @@ func getTestArtifact() models.Artifact {
 func getTestPartition() models.Partition {
 	return models.Partition{
 		DatasetUUID: "test-uuid",
-		KeyName:     "region",
-		KeyValue:    "value",
+		Key:         "region",
+		Value:       "value",
 		ArtifactID:  "123",
 	}
 }
@@ -71,7 +71,7 @@ func TestCreateArtifact(t *testing.T) {
 	)
 
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "partitions" ("created_at","updated_at","deleted_at","dataset_uuid","key_name","key_value","artifact_id") VALUES (?,?,?,?,?,?,?)`).WithCallback(
+		`INSERT  INTO "partitions" ("created_at","updated_at","deleted_at","dataset_uuid","key","value","artifact_id") VALUES (?,?,?,?,?,?,?)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			numPartitionsCreated++
 		},
@@ -128,8 +128,8 @@ func TestGetArtifact(t *testing.T) {
 
 	expectedPartitionResponse := make([]map[string]interface{}, 0)
 	sampleParition := make(map[string]interface{})
-	sampleParition["key_name"] = "region"
-	sampleParition["key_value"] = "SEA"
+	sampleParition["key"] = "region"
+	sampleParition["value"] = "SEA"
 	sampleParition["artifact_id"] = artifact.ArtifactID
 	sampleParition["dataset_uuid"] = "uuid"
 	expectedPartitionResponse = append(expectedPartitionResponse, sampleParition)

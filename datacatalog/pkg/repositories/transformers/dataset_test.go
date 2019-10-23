@@ -62,8 +62,8 @@ func TestCreateDatasetModel(t *testing.T) {
 	assert.EqualValues(t, unmarshaledMetadata.KeyMap, metadata.KeyMap)
 
 	assert.Len(t, datasetModel.PartitionKeys, 2)
-	assert.Equal(t, datasetModel.PartitionKeys[0], models.PartitionKey{KeyName: dataset.PartitionKeys[0]})
-	assert.Equal(t, datasetModel.PartitionKeys[1], models.PartitionKey{KeyName: dataset.PartitionKeys[1]})
+	assert.Equal(t, datasetModel.PartitionKeys[0], models.PartitionKey{Name: dataset.PartitionKeys[0]})
+	assert.Equal(t, datasetModel.PartitionKeys[1], models.PartitionKey{Name: dataset.PartitionKeys[1]})
 }
 
 func TestFromDatasetID(t *testing.T) {
@@ -99,14 +99,14 @@ func TestFromDatasetModelWithPartitions(t *testing.T) {
 		},
 		SerializedMetadata: []byte{10, 22, 10, 8, 116, 101, 115, 116, 75, 101, 121, 49, 18, 10, 116, 101, 115, 116, 86, 97, 108, 117, 101, 49, 10, 22, 10, 8, 116, 101, 115, 116, 75, 101, 121, 50, 18, 10, 116, 101, 115, 116, 86, 97, 108, 117, 101, 50},
 		PartitionKeys: []models.PartitionKey{
-			{DatasetUUID: "test-uuid", KeyName: "key1"},
-			{DatasetUUID: "test-uuid", KeyName: "key2"},
+			{DatasetUUID: "test-uuid", Name: "key1"},
+			{DatasetUUID: "test-uuid", Name: "key2"},
 		},
 	}
 	dataset, err := FromDatasetModel(*datasetModel)
 	assert.NoError(t, err)
 	assertDatasetIDEqualsModel(t, dataset.Id, &datasetModel.DatasetKey)
 	assert.Len(t, dataset.Metadata.KeyMap, 2)
-	assert.EqualValues(t, dataset.Metadata, &metadata)
+	assert.EqualValues(t, dataset.Metadata.KeyMap, metadata.KeyMap)
 	assert.Len(t, dataset.PartitionKeys, 2)
 }
