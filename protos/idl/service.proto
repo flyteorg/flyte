@@ -60,7 +60,7 @@ message AddTagResponse {
 message Dataset {
     DatasetID id = 1;
     Metadata metadata = 2;
-    repeated string partitionKey = 3;
+    repeated string partitionKeys = 3;
 }
 
 message Partition {

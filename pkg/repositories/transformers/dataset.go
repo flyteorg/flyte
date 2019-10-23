@@ -12,6 +12,14 @@ func CreateDatasetModel(dataset *datacatalog.Dataset) (*models.Dataset, error) {
 		return nil, err
 	}
 
+	partitionKeys := make([]models.PartitionKey, len(dataset.PartitionKeys))
+
+	for i, partitionKey := range dataset.GetPartitionKeys() {
+		partitionKeys[i] = models.PartitionKey{
+			KeyName: partitionKey,
+		}
+	}
+
 	return &models.Dataset{
 		DatasetKey: models.DatasetKey{
 			Project: dataset.Id.Project,
@@ -20,6 +28,7 @@ func CreateDatasetModel(dataset *datacatalog.Dataset) (*models.Dataset, error) {
 			Version: dataset.Id.Version,
 		},
 		SerializedMetadata: serializedMetadata,
+		PartitionKeys:      partitionKeys,
 	}, nil
 }
 
@@ -40,6 +49,11 @@ func FromDatasetModel(dataset models.Dataset) (*datacatalog.Dataset, error) {
 		return nil, err
 	}
 
+	partitionKeys := make([]string, len(dataset.PartitionKeys))
+	for i, partitionKey := range dataset.PartitionKeys {
+		partitionKeys[i] = partitionKey.KeyName
+	}
+
 	return &datacatalog.Dataset{
 		Id: &datacatalog.DatasetID{
 			UUID:    dataset.UUID,
@@ -48,6 +62,7 @@ func FromDatasetModel(dataset models.Dataset) (*datacatalog.Dataset, error) {
 			Name:    dataset.Name,
 			Version: dataset.Version,
 		},
-		Metadata: metadata,
+		Metadata:      metadata,
+		PartitionKeys: partitionKeys,
 	}, nil
 }
