@@ -27,8 +27,8 @@ func getTestArtifactData() []*datacatalog.ArtifactData {
 
 func getTestPartitions() []models.Partition {
 	return []models.Partition{
-		{KeyName: "key1", KeyValue: "value1"},
-		{KeyName: "key2", KeyValue: "value2"},
+		{Key: "key1", Value: "value1"},
+		{Key: "key2", Value: "value2"},
 	}
 }
 
@@ -93,8 +93,8 @@ func TestFromArtifactModel(t *testing.T) {
 		},
 		SerializedMetadata: []byte{},
 		Partitions: []models.Partition{
-			{KeyName: "key1", KeyValue: "value1"},
-			{KeyName: "key2", KeyValue: "value2"},
+			{Key: "key1", Value: "value1"},
+			{Key: "key2", Value: "value2"},
 		},
 	}
 

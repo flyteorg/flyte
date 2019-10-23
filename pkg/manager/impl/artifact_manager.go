@@ -60,11 +60,37 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalo
 	datasetKey := transformers.FromDatasetID(*artifact.Dataset)
 
 	// The dataset must exist for the artifact, let's verify that first
-	_, err = m.repo.DatasetRepo().Get(ctx, datasetKey)
+	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
 	if err != nil {
 		logger.Warnf(ctx, "Failed to get dataset for artifact creation %v, err: %v", datasetKey, err)
 		m.systemMetrics.createFailureCounter.Inc(ctx)
 		return nil, err
+	}
+
+	// check that the artifact's partitions are the same partition values of the dataset
+	// TODO: test this
+	// TODO: when adding a tag, need to verify one tag per partition combo
+	if len(dataset.PartitionKeys) != len(artifact.Partitions) {
+		return nil, errors.NewDataCatalogErrorf(codes.InvalidArgument, "Artifact [%+v] must have %v partitions", request, len(dataset.PartitionKeys))
+	} else {
+		masterKeyset := make(map[string]bool, len(dataset.PartitionKeys))
+
+		for _, partitionKey := range dataset.PartitionKeys {
+			masterKeyset[partitionKey.Name] = false
+		}
+
+		for _, partitionKey := range artifact.Partitions {
+			_, ok := masterKeyset[partitionKey.Key]
+			if ok {
+				delete(masterKeyset, partitionKey.Key)
+			} else {
+				return nil, errors.NewDataCatalogErrorf(codes.InvalidArgument, "Artifact is in invalid partition key %v", partitionKey.Key)
+			}
+		}
+
+		if len(masterKeyset) > 0 {
+			return nil, errors.NewDataCatalogErrorf(codes.InvalidArgument, "Artifact needs partition values for :%+v", masterKeyset)
+		}
 	}
 
 	// create Artifact Data offloaded storage files

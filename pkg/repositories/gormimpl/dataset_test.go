@@ -35,8 +35,8 @@ func getTestDataset() models.Dataset {
 		},
 		SerializedMetadata: []byte{1, 2, 3},
 		PartitionKeys: []models.PartitionKey{
-			{KeyName: "key1"},
-			{KeyName: "key2"},
+			{Name: "key1"},
+			{Name: "key2"},
 		},
 	}
 }
@@ -92,10 +92,10 @@ func TestCreateDataset(t *testing.T) {
 		`SELECT "uuid" FROM "datasets"  WHERE (project = testProject) AND (name = testName) AND (domain = testDomain) AND (version = testVersion)`).WithReply([]map[string]interface{}{{"uuid": "test-uuid"}})
 
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "partition_keys" ("created_at","updated_at","deleted_at","dataset_uuid","key_name") VALUES (?,?,?,?,?)`).WithCallback(
+		`INSERT  INTO "partition_keys" ("created_at","updated_at","deleted_at","dataset_uuid","name") VALUES (?,?,?,?,?)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			assert.EqualValues(t, "test-uuid", values[3].Value)
-			assert.EqualValues(t, dataset.PartitionKeys[insertKeyQueryNum].KeyName, values[4].Value)
+			assert.EqualValues(t, dataset.PartitionKeys[insertKeyQueryNum].Name, values[4].Value)
 			insertKeyQueryNum++
 		},
 	)
@@ -129,7 +129,7 @@ func TestGetDataset(t *testing.T) {
 
 	expectedPartitionKeyResponse := make([]map[string]interface{}, 0)
 	samplePartitionKey := make(map[string]interface{})
-	samplePartitionKey["key_name"] = "testKey1"
+	samplePartitionKey["name"] = "testKey1"
 	samplePartitionKey["dataset_uuid"] = datasetUUID
 	expectedPartitionKeyResponse = append(expectedPartitionKeyResponse, samplePartitionKey, samplePartitionKey)
 

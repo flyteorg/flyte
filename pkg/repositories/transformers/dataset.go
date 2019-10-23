@@ -16,7 +16,7 @@ func CreateDatasetModel(dataset *datacatalog.Dataset) (*models.Dataset, error) {
 
 	for i, partitionKey := range dataset.GetPartitionKeys() {
 		partitionKeys[i] = models.PartitionKey{
-			KeyName: partitionKey,
+			Name: partitionKey,
 		}
 	}
 
@@ -51,7 +51,7 @@ func FromDatasetModel(dataset models.Dataset) (*datacatalog.Dataset, error) {
 
 	partitionKeys := make([]string, len(dataset.PartitionKeys))
 	for i, partitionKey := range dataset.PartitionKeys {
-		partitionKeys[i] = partitionKey.KeyName
+		partitionKeys[i] = partitionKey.Name
 	}
 
 	return &datacatalog.Dataset{

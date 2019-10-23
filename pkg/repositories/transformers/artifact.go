@@ -16,8 +16,8 @@ func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData
 	partitions := make([]models.Partition, len(request.Artifact.Partitions))
 	for i, partition := range request.Artifact.GetPartitions() {
 		partitions[i] = models.Partition{
-			KeyName:  partition.Key,
-			KeyValue: partition.Value,
+			Key:   partition.Key,
+			Value: partition.Value,
 		}
 	}
 
@@ -44,8 +44,8 @@ func FromArtifactModel(artifact models.Artifact) (datacatalog.Artifact, error) {
 	partitions := make([]*datacatalog.Partition, len(artifact.Partitions))
 	for i, partition := range artifact.Partitions {
 		partitions[i] = &datacatalog.Partition{
-			Key:   partition.KeyName,
-			Value: partition.KeyValue,
+			Key:   partition.Key,
+			Value: partition.Value,
 		}
 	}
 
