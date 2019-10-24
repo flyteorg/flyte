@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"fmt"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/mocks"
@@ -64,6 +66,10 @@ func getTestArtifact() *datacatalog.Artifact {
 				Value: getTestStringLiteral(),
 			},
 		},
+		Partitions: []*datacatalog.Partition{
+			{Key: "key1", Value: "value1"},
+			{Key: "key2", Value: "value2"},
+		},
 	}
 }
 
@@ -85,25 +91,34 @@ func TestCreateArtifact(t *testing.T) {
 	testStoragePrefix, err := datastore.ConstructReference(ctx, datastore.GetBaseContainerFQN(ctx), "test")
 	assert.NoError(t, err)
 
+	// Mock dataset to return for artifact lookups
+	expectedDataset := getTestDataset()
+	mockDatasetModel := models.Dataset{
+		DatasetKey: models.DatasetKey{
+			Project: expectedDataset.Id.Project,
+			Domain:  expectedDataset.Id.Domain,
+			Name:    expectedDataset.Id.Name,
+			Version: expectedDataset.Id.Version,
+		},
+		PartitionKeys: []models.PartitionKey{
+			{Name: expectedDataset.PartitionKeys[0]},
+			{Name: expectedDataset.PartitionKeys[1]},
+		},
+	}
+
 	t.Run("HappyPath", func(t *testing.T) {
 		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+		expectedDataset := getTestDataset()
+
 		ctx := context.Background()
 		dcRepo := newMockDataCatalogRepo()
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
 			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				expectedDataset := getTestDataset()
 				return dataset.Project == expectedDataset.Id.Project &&
 					dataset.Domain == expectedDataset.Id.Domain &&
 					dataset.Name == expectedDataset.Id.Name &&
 					dataset.Version == expectedDataset.Id.Version
-			})).Return(models.Dataset{
-			DatasetKey: models.DatasetKey{
-				Project: getTestDataset().Id.Project,
-				Domain:  getTestDataset().Id.Domain,
-				Name:    getTestDataset().Id.Name,
-				Version: getTestDataset().Id.Version,
-			},
-		}, nil)
+			})).Return(mockDatasetModel, nil)
 
 		dcRepo.MockArtifactRepo.On("Create",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
@@ -115,7 +130,11 @@ func TestCreateArtifact(t *testing.T) {
 					artifact.ArtifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
 					artifact.ArtifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
 					artifact.ArtifactKey.DatasetName == expectedArtifact.Dataset.Name &&
-					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version
+					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
+					artifact.Partitions[0].Key == expectedArtifact.Partitions[0].Key &&
+					artifact.Partitions[0].Value == expectedArtifact.Partitions[0].Value &&
+					artifact.Partitions[1].Key == expectedArtifact.Partitions[1].Key &&
+					artifact.Partitions[1].Value == expectedArtifact.Partitions[1].Value
 			})).Return(nil)
 
 		request := datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}
@@ -178,25 +197,9 @@ func TestCreateArtifact(t *testing.T) {
 	})
 
 	t.Run("Already exists", func(t *testing.T) {
-		dcRepo := &mocks.DataCatalogRepo{
-			MockDatasetRepo:  &mocks.DatasetRepo{},
-			MockArtifactRepo: &mocks.ArtifactRepo{},
-		}
-		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
-			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				expectedDataset := getTestDataset()
-				return dataset.Project == expectedDataset.Id.Project &&
-					dataset.Domain == expectedDataset.Id.Domain &&
-					dataset.Name == expectedDataset.Id.Name &&
-					dataset.Version == expectedDataset.Id.Version
-			})).Return(models.Dataset{
-			DatasetKey: models.DatasetKey{
-				Project: getTestDataset().Id.Project,
-				Domain:  getTestDataset().Id.Domain,
-				Name:    getTestDataset().Id.Name,
-				Version: getTestDataset().Id.Version,
-			},
-		}, nil)
+		dcRepo := newMockDataCatalogRepo()
+
+		dcRepo.MockDatasetRepo.On("Get", mock.Anything, mock.Anything).Return(mockDatasetModel, nil)
 
 		dcRepo.MockArtifactRepo.On("Create",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
@@ -219,6 +222,27 @@ func TestCreateArtifact(t *testing.T) {
 
 		responseCode := status.Code(err)
 		assert.Equal(t, codes.AlreadyExists, responseCode)
+	})
+
+	t.Run("Missing Partitions", func(t *testing.T) {
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockDatasetRepo.On("Get", mock.Anything, mock.Anything).Return(mockDatasetModel, nil)
+		artifact := getTestArtifact()
+		artifact.Partitions = nil
+		dcRepo.MockArtifactRepo.On("Create",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(artifact models.Artifact) bool {
+				return false
+			})).Return(fmt.Errorf("Validation should happen before this happens"))
+
+		request := datacatalog.CreateArtifactRequest{Artifact: artifact}
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
+		assert.Error(t, err)
+		assert.Nil(t, artifactResponse)
+
+		responseCode := status.Code(err)
+		assert.Equal(t, codes.InvalidArgument, responseCode)
 	})
 }
 
@@ -252,7 +276,7 @@ func TestGetArtifact(t *testing.T) {
 		Version: expectedDataset.Version,
 		Name:    expectedDataset.Name,
 	}
-	testArtifactModel := models.Artifact{
+	mockArtifactModel := models.Artifact{
 		ArtifactKey: models.ArtifactKey{
 			DatasetProject: expectedDataset.Project,
 			DatasetDomain:  expectedDataset.Domain,
@@ -268,6 +292,10 @@ func TestGetArtifact(t *testing.T) {
 			SerializedMetadata: serializedMetadata,
 		},
 		SerializedMetadata: serializedMetadata,
+		Partitions: []models.Partition{
+			{Key: "key1", Value: "value1"},
+			{Key: "key2", Value: "value2"},
+		},
 	}
 
 	t.Run("Get by Id", func(t *testing.T) {
@@ -279,7 +307,7 @@ func TestGetArtifact(t *testing.T) {
 					artifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
 					artifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
 					artifactKey.DatasetName == expectedArtifact.Dataset.Name
-			})).Return(testArtifactModel, nil)
+			})).Return(mockArtifactModel, nil)
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		artifactResponse, err := artifactManager.GetArtifact(ctx, datacatalog.GetArtifactRequest{
@@ -309,8 +337,8 @@ func TestGetArtifact(t *testing.T) {
 				DatasetVersion: expectedTag.DatasetVersion,
 				TagName:        expectedTag.TagName,
 			},
-			Artifact:   testArtifactModel,
-			ArtifactID: testArtifactModel.ArtifactID,
+			Artifact:   mockArtifactModel,
+			ArtifactID: mockArtifactModel.ArtifactID,
 		}, nil)
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())

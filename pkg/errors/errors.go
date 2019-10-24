@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"strings"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -42,6 +43,15 @@ func NewDataCatalogError(code codes.Code, message string) error {
 
 func NewDataCatalogErrorf(code codes.Code, format string, a ...interface{}) error {
 	return NewDataCatalogError(code, fmt.Sprintf(format, a...))
+}
+
+func NewCollectedErrors(code codes.Code, errors []error) error {
+	errorCollection := make([]string, len(errors))
+	for idx, err := range errors {
+		errorCollection[idx] = err.Error()
+	}
+
+	return NewDataCatalogError(code, strings.Join((errorCollection), ", "))
 }
 
 func IsAlreadyExistsError(err error) bool {
