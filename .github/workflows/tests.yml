@@ -1,4 +1,4 @@
-name: test
+name: tests
 on:
   push:
     branches:
@@ -7,7 +7,7 @@ on:
     branches:
     - master
 jobs:
-  tests:
+  end-to-end:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -19,6 +19,6 @@ jobs:
       uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go-version }}
-    - name: end-to-end
+    - name: Run end-to-end tests
       run: make end2end
 
