@@ -11,11 +11,6 @@ jobs:
       name: docker build
       install: true
       script: make docker_build
-    - if: fork = false
-      stage: test
-      name: docker build and push
-      install: true
-      script: make dockerhub_push
     - stage: test
       install: make install
       name: lint
