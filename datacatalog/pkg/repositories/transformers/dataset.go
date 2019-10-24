@@ -49,11 +49,7 @@ func FromDatasetModel(dataset models.Dataset) (*datacatalog.Dataset, error) {
 		return nil, err
 	}
 
-	partitionKeys := make([]string, len(dataset.PartitionKeys))
-	for i, partitionKey := range dataset.PartitionKeys {
-		partitionKeys[i] = partitionKey.Name
-	}
-
+	partitionKeyStrings := FromPartitionKeyModel(dataset.PartitionKeys)
 	return &datacatalog.Dataset{
 		Id: &datacatalog.DatasetID{
 			UUID:    dataset.UUID,
@@ -63,6 +59,6 @@ func FromDatasetModel(dataset models.Dataset) (*datacatalog.Dataset, error) {
 			Version: dataset.Version,
 		},
 		Metadata:      metadata,
-		PartitionKeys: partitionKeys,
+		PartitionKeys: partitionKeyStrings,
 	}, nil
 }

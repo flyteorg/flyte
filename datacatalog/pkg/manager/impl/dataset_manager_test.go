@@ -35,6 +35,7 @@ func getTestDataset() *datacatalog.Dataset {
 		Metadata: &datacatalog.Metadata{
 			KeyMap: map[string]string{"key1": "value1"},
 		},
+		PartitionKeys: []string{"key1", "key2"},
 	}
 }
 
@@ -48,7 +49,7 @@ func TestCreateDataset(t *testing.T) {
 
 	expectedDataset := getTestDataset()
 
-	t.Run("HappyPath", func(t *testing.T) {
+	t.Run("CreateDatasetWithPartitions", func(t *testing.T) {
 		dcRepo := getDataCatalogRepo()
 		datasetManager := NewDatasetManager(dcRepo, nil, mockScope.NewTestScope())
 		dcRepo.MockDatasetRepo.On("Create",
@@ -58,8 +59,32 @@ func TestCreateDataset(t *testing.T) {
 				return dataset.Name == expectedDataset.Id.Name &&
 					dataset.Project == expectedDataset.Id.Project &&
 					dataset.Domain == expectedDataset.Id.Domain &&
-					dataset.Version == expectedDataset.Id.Version
+					dataset.Version == expectedDataset.Id.Version &&
+					len(dataset.PartitionKeys) == len(expectedDataset.PartitionKeys) &&
+					dataset.PartitionKeys[0].Name == expectedDataset.PartitionKeys[0] &&
+					dataset.PartitionKeys[1].Name == expectedDataset.PartitionKeys[1]
 			})).Return(nil)
+		request := datacatalog.CreateDatasetRequest{Dataset: expectedDataset}
+		datasetResponse, err := datasetManager.CreateDataset(context.Background(), request)
+		assert.NoError(t, err)
+		assert.NotNil(t, datasetResponse)
+	})
+
+	t.Run("CreateDatasetNoPartitions", func(t *testing.T) {
+		dcRepo := getDataCatalogRepo()
+		datasetManager := NewDatasetManager(dcRepo, nil, mockScope.NewTestScope())
+		dcRepo.MockDatasetRepo.On("Create",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(dataset models.Dataset) bool {
+
+				return dataset.Name == expectedDataset.Id.Name &&
+					dataset.Project == expectedDataset.Id.Project &&
+					dataset.Domain == expectedDataset.Id.Domain &&
+					dataset.Version == expectedDataset.Id.Version &&
+					len(dataset.PartitionKeys) == 0
+			})).Return(nil)
+
+		expectedDataset.PartitionKeys = nil
 		request := datacatalog.CreateDatasetRequest{Dataset: expectedDataset}
 		datasetResponse, err := datasetManager.CreateDataset(context.Background(), request)
 		assert.NoError(t, err)
@@ -101,6 +126,24 @@ func TestCreateDataset(t *testing.T) {
 		responseCode := status.Code(err)
 		assert.Equal(t, codes.AlreadyExists, responseCode)
 	})
+
+	t.Run("DuplicatePartition", func(t *testing.T) {
+		dcRepo := getDataCatalogRepo()
+		badDataset := getTestDataset()
+		badDataset.PartitionKeys = append(badDataset.PartitionKeys, badDataset.PartitionKeys[0])
+		datasetManager := NewDatasetManager(dcRepo, nil, mockScope.NewTestScope())
+
+		dcRepo.MockDatasetRepo.On("Create",
+			mock.Anything,
+			mock.Anything).Return(status.Error(codes.AlreadyExists, "test already exists"))
+		request := datacatalog.CreateDatasetRequest{
+			Dataset: badDataset,
+		}
+		_, err := datasetManager.CreateDataset(context.Background(), request)
+		assert.Error(t, err)
+		responseCode := status.Code(err)
+		assert.Equal(t, codes.InvalidArgument, responseCode)
+	})
 }
 
 func TestGetDataset(t *testing.T) {
@@ -120,6 +163,7 @@ func TestGetDataset(t *testing.T) {
 				UUID:    expectedDataset.Id.UUID,
 			},
 			SerializedMetadata: serializedMetadata,
+			PartitionKeys:      []models.PartitionKey{{Name: expectedDataset.PartitionKeys[0]}, {Name: expectedDataset.PartitionKeys[1]}},
 		}
 
 		dcRepo.MockDatasetRepo.On("Get",
