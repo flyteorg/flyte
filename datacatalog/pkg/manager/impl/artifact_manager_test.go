@@ -244,6 +244,27 @@ func TestCreateArtifact(t *testing.T) {
 		responseCode := status.Code(err)
 		assert.Equal(t, codes.InvalidArgument, responseCode)
 	})
+
+	t.Run("No Partitions", func(t *testing.T) {
+		dcRepo := newMockDataCatalogRepo()
+		mockDatasetModel := models.Dataset{
+			DatasetKey: models.DatasetKey{
+				Project: expectedDataset.Id.Project,
+				Domain:  expectedDataset.Id.Domain,
+				Name:    expectedDataset.Id.Name,
+				Version: expectedDataset.Id.Version,
+			},
+		}
+		dcRepo.MockDatasetRepo.On("Get", mock.Anything, mock.Anything).Return(mockDatasetModel, nil)
+		artifact := getTestArtifact()
+		artifact.Partitions = []*datacatalog.Partition{}
+		dcRepo.MockArtifactRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
+
+		request := datacatalog.CreateArtifactRequest{Artifact: artifact}
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		_, err := artifactManager.CreateArtifact(ctx, request)
+		assert.NoError(t, err)
+	})
 }
 
 func TestGetArtifact(t *testing.T) {
