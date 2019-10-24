@@ -38,7 +38,7 @@ type datasetManager struct {
 	systemMetrics datasetMetrics
 }
 
-func (dm *datasetManager) validateCreateRequest(ctx context.Context, request datacatalog.CreateDatasetRequest) error {
+func (dm *datasetManager) validateCreateRequest(request datacatalog.CreateDatasetRequest) error {
 	errorSet := make([]error, 0)
 	err := validators.ValidateDatasetID(request.Dataset.Id)
 	if err != nil {
@@ -62,7 +62,7 @@ func (dm *datasetManager) CreateDataset(ctx context.Context, request datacatalog
 	timer := dm.systemMetrics.createResponseTime.Start(ctx)
 	defer timer.Stop()
 
-	err := dm.validateCreateRequest(ctx, request)
+	err := dm.validateCreateRequest(request)
 	if err != nil {
 		return nil, err
 	}
