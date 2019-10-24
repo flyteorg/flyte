@@ -23,5 +23,4 @@ docker run \
 
 # wait for the system to initalize, then run execute.sh
 docker exec \
-  -it \
   dockernetes /flyte/end2end/dockernetes_run.sh /flyte/end2end/execute.sh
