@@ -1,0 +1,24 @@
+name: test
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        go-version: [1.10]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Go@${{ matrix.go-version }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: end-to-end
+      run: make end2end
+
