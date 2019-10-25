@@ -26,7 +26,7 @@ In Flyte, workflows are organized into namespaces called "Projects". When you re
 
 Lets create a new project called ``myflyteproject``. Use the project creation endpoint to create the new project ::
 
-  curl -X POST localhost:30082/api/v1/projects -d '{"project": {"id": "myflyteproject", "name": "myflyteproject"} }'
+  curl -X POST localhost:30081/api/v1/projects -d '{"project": {"id": "myflyteproject", "name": "myflyteproject"} }'
 
 
 Writing a Task
