@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func TestCreateArtifact(t *testing.T) {
+func TestErrorHelpers(t *testing.T) {
 	alreadyExistsErr := NewDataCatalogError(codes.AlreadyExists, "already exists")
 	notFoundErr := NewDataCatalogError(codes.NotFound, "not found")
 

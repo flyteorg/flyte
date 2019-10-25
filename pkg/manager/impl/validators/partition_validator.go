@@ -19,7 +19,7 @@ func ValidatePartitions(datasetPartitionKeys []string, artifactPartitions []*dat
 	}
 
 	// Not all datasets need to be partitioned
-	if len(datasetPartitionKeys) == 0 && len(artifactPartitions) == 0 {
+	if len(datasetPartitionKeys) == 0 {
 		return nil
 	}
 
