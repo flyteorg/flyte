@@ -170,15 +170,8 @@ public final class Compiler {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 58: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 downstream_ = com.google.protobuf.MapField.newMapField(
                     DownstreamDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000001;
@@ -191,7 +184,7 @@ public final class Compiler {
               break;
             }
             case 66: {
-              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
                 upstream_ = com.google.protobuf.MapField.newMapField(
                     UpstreamDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000002;
@@ -201,6 +194,13 @@ public final class Compiler {
                   UpstreamDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
               upstream_.getMutableMap().put(
                   upstream__.getKey(), upstream__.getValue());
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -221,6 +221,7 @@ public final class Compiler {
     }
 
     @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
     protected com.google.protobuf.MapField internalGetMapField(
         int number) {
       switch (number) {
@@ -233,6 +234,7 @@ public final class Compiler {
               "Invalid map field number: " + number);
       }
     }
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Compiler.internal_static_flyteidl_core_ConnectionSet_fieldAccessorTable
@@ -303,20 +305,20 @@ public final class Compiler {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownFieldProto3(
-                    input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 java.lang.String s = input.readStringRequireUtf8();
-                if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                   ids_ = new com.google.protobuf.LazyStringArrayList();
                   mutable_bitField0_ |= 0x00000001;
                 }
                 ids_.add(s);
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -327,7 +329,7 @@ public final class Compiler {
           throw new com.google.protobuf.InvalidProtocolBufferException(
               e).setUnfinishedMessage(this);
         } finally {
-          if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          if (((mutable_bitField0_ & 0x00000001) != 0)) {
             ids_ = ids_.getUnmodifiableView();
           }
           this.unknownFields = unknownFields.build();
@@ -339,6 +341,7 @@ public final class Compiler {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_ConnectionSet_IdList_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_ConnectionSet_IdList_fieldAccessorTable
@@ -376,6 +379,7 @@ public final class Compiler {
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -385,6 +389,7 @@ public final class Compiler {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         for (int i = 0; i < ids_.size(); i++) {
@@ -393,6 +398,7 @@ public final class Compiler {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -421,11 +427,10 @@ public final class Compiler {
         }
         flyteidl.core.Compiler.ConnectionSet.IdList other = (flyteidl.core.Compiler.ConnectionSet.IdList) obj;
 
-        boolean result = true;
-        result = result && getIdsList()
-            .equals(other.getIdsList());
-        result = result && unknownFields.equals(other.unknownFields);
-        return result;
+        if (!getIdsList()
+            .equals(other.getIdsList())) return false;
+        if (!unknownFields.equals(other.unknownFields)) return false;
+        return true;
       }
 
       @java.lang.Override
@@ -514,6 +519,7 @@ public final class Compiler {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -521,6 +527,7 @@ public final class Compiler {
       public static Builder newBuilder(flyteidl.core.Compiler.ConnectionSet.IdList prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -544,6 +551,7 @@ public final class Compiler {
           return flyteidl.core.Compiler.internal_static_flyteidl_core_ConnectionSet_IdList_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return flyteidl.core.Compiler.internal_static_flyteidl_core_ConnectionSet_IdList_fieldAccessorTable
@@ -566,6 +574,7 @@ public final class Compiler {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           ids_ = com.google.protobuf.LazyStringArrayList.EMPTY;
@@ -573,15 +582,18 @@ public final class Compiler {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return flyteidl.core.Compiler.internal_static_flyteidl_core_ConnectionSet_IdList_descriptor;
         }
 
+        @java.lang.Override
         public flyteidl.core.Compiler.ConnectionSet.IdList getDefaultInstanceForType() {
           return flyteidl.core.Compiler.ConnectionSet.IdList.getDefaultInstance();
         }
 
+        @java.lang.Override
         public flyteidl.core.Compiler.ConnectionSet.IdList build() {
           flyteidl.core.Compiler.ConnectionSet.IdList result = buildPartial();
           if (!result.isInitialized()) {
@@ -590,10 +602,11 @@ public final class Compiler {
           return result;
         }
 
+        @java.lang.Override
         public flyteidl.core.Compiler.ConnectionSet.IdList buildPartial() {
           flyteidl.core.Compiler.ConnectionSet.IdList result = new flyteidl.core.Compiler.ConnectionSet.IdList(this);
           int from_bitField0_ = bitField0_;
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          if (((bitField0_ & 0x00000001) != 0)) {
             ids_ = ids_.getUnmodifiableView();
             bitField0_ = (bitField0_ & ~0x00000001);
           }
@@ -602,32 +615,39 @@ public final class Compiler {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
-          return (Builder) super.clone();
+          return super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
             java.lang.Object value) {
-          return (Builder) super.setField(field, value);
+          return super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
-          return (Builder) super.clearField(field);
+          return super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-          return (Builder) super.clearOneof(oneof);
+          return super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
             int index, java.lang.Object value) {
-          return (Builder) super.setRepeatedField(field, index, value);
+          return super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
             java.lang.Object value) {
-          return (Builder) super.addRepeatedField(field, value);
+          return super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof flyteidl.core.Compiler.ConnectionSet.IdList) {
             return mergeFrom((flyteidl.core.Compiler.ConnectionSet.IdList)other);
@@ -654,10 +674,12 @@ public final class Compiler {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -679,7 +701,7 @@ public final class Compiler {
 
         private com.google.protobuf.LazyStringList ids_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         private void ensureIdsIsMutable() {
-          if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          if (!((bitField0_ & 0x00000001) != 0)) {
             ids_ = new com.google.protobuf.LazyStringArrayList(ids_);
             bitField0_ |= 0x00000001;
            }
@@ -770,11 +792,13 @@ public final class Compiler {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
-          return super.setUnknownFieldsProto3(unknownFields);
+          return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -796,6 +820,7 @@ public final class Compiler {
 
       private static final com.google.protobuf.Parser<IdList>
           PARSER = new com.google.protobuf.AbstractParser<IdList>() {
+        @java.lang.Override
         public IdList parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -813,6 +838,7 @@ public final class Compiler {
         return PARSER;
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.ConnectionSet.IdList getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -1004,6 +1030,7 @@ public final class Compiler {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1013,6 +1040,7 @@ public final class Compiler {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       com.google.protobuf.GeneratedMessageV3
@@ -1030,6 +1058,7 @@ public final class Compiler {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1070,13 +1099,12 @@ public final class Compiler {
       }
       flyteidl.core.Compiler.ConnectionSet other = (flyteidl.core.Compiler.ConnectionSet) obj;
 
-      boolean result = true;
-      result = result && internalGetDownstream().equals(
-          other.internalGetDownstream());
-      result = result && internalGetUpstream().equals(
-          other.internalGetUpstream());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!internalGetDownstream().equals(
+          other.internalGetDownstream())) return false;
+      if (!internalGetUpstream().equals(
+          other.internalGetUpstream())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1169,6 +1197,7 @@ public final class Compiler {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1176,6 +1205,7 @@ public final class Compiler {
     public static Builder newBuilder(flyteidl.core.Compiler.ConnectionSet prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1230,6 +1260,7 @@ public final class Compiler {
                 "Invalid map field number: " + number);
         }
       }
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_ConnectionSet_fieldAccessorTable
@@ -1252,6 +1283,7 @@ public final class Compiler {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         internalGetMutableDownstream().clear();
@@ -1259,15 +1291,18 @@ public final class Compiler {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_ConnectionSet_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.ConnectionSet getDefaultInstanceForType() {
         return flyteidl.core.Compiler.ConnectionSet.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.ConnectionSet build() {
         flyteidl.core.Compiler.ConnectionSet result = buildPartial();
         if (!result.isInitialized()) {
@@ -1276,6 +1311,7 @@ public final class Compiler {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.ConnectionSet buildPartial() {
         flyteidl.core.Compiler.ConnectionSet result = new flyteidl.core.Compiler.ConnectionSet(this);
         int from_bitField0_ = bitField0_;
@@ -1287,32 +1323,39 @@ public final class Compiler {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Compiler.ConnectionSet) {
           return mergeFrom((flyteidl.core.Compiler.ConnectionSet)other);
@@ -1333,10 +1376,12 @@ public final class Compiler {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1657,11 +1702,13 @@ public final class Compiler {
             .putAll(values);
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1683,6 +1730,7 @@ public final class Compiler {
 
     private static final com.google.protobuf.Parser<ConnectionSet>
         PARSER = new com.google.protobuf.AbstractParser<ConnectionSet>() {
+      @java.lang.Override
       public ConnectionSet parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1700,6 +1748,7 @@ public final class Compiler {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Compiler.ConnectionSet getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1803,13 +1852,6 @@ public final class Compiler {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Workflow.WorkflowTemplate.Builder subBuilder = null;
               if (template_ != null) {
@@ -1836,6 +1878,13 @@ public final class Compiler {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1853,6 +1902,7 @@ public final class Compiler {
       return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledWorkflow_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledWorkflow_fieldAccessorTable
@@ -1927,6 +1977,7 @@ public final class Compiler {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1936,6 +1987,7 @@ public final class Compiler {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (template_ != null) {
@@ -1947,6 +1999,7 @@ public final class Compiler {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1975,19 +2028,18 @@ public final class Compiler {
       }
       flyteidl.core.Compiler.CompiledWorkflow other = (flyteidl.core.Compiler.CompiledWorkflow) obj;
 
-      boolean result = true;
-      result = result && (hasTemplate() == other.hasTemplate());
+      if (hasTemplate() != other.hasTemplate()) return false;
       if (hasTemplate()) {
-        result = result && getTemplate()
-            .equals(other.getTemplate());
+        if (!getTemplate()
+            .equals(other.getTemplate())) return false;
       }
-      result = result && (hasConnections() == other.hasConnections());
+      if (hasConnections() != other.hasConnections()) return false;
       if (hasConnections()) {
-        result = result && getConnections()
-            .equals(other.getConnections());
+        if (!getConnections()
+            .equals(other.getConnections())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2080,6 +2132,7 @@ public final class Compiler {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2087,6 +2140,7 @@ public final class Compiler {
     public static Builder newBuilder(flyteidl.core.Compiler.CompiledWorkflow prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2114,6 +2168,7 @@ public final class Compiler {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledWorkflow_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledWorkflow_fieldAccessorTable
@@ -2136,6 +2191,7 @@ public final class Compiler {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (templateBuilder_ == null) {
@@ -2153,15 +2209,18 @@ public final class Compiler {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledWorkflow_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.CompiledWorkflow getDefaultInstanceForType() {
         return flyteidl.core.Compiler.CompiledWorkflow.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.CompiledWorkflow build() {
         flyteidl.core.Compiler.CompiledWorkflow result = buildPartial();
         if (!result.isInitialized()) {
@@ -2170,6 +2229,7 @@ public final class Compiler {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.CompiledWorkflow buildPartial() {
         flyteidl.core.Compiler.CompiledWorkflow result = new flyteidl.core.Compiler.CompiledWorkflow(this);
         if (templateBuilder_ == null) {
@@ -2186,32 +2246,39 @@ public final class Compiler {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Compiler.CompiledWorkflow) {
           return mergeFrom((flyteidl.core.Compiler.CompiledWorkflow)other);
@@ -2234,10 +2301,12 @@ public final class Compiler {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2256,7 +2325,7 @@ public final class Compiler {
         return this;
       }
 
-      private flyteidl.core.Workflow.WorkflowTemplate template_ = null;
+      private flyteidl.core.Workflow.WorkflowTemplate template_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Workflow.WorkflowTemplate, flyteidl.core.Workflow.WorkflowTemplate.Builder, flyteidl.core.Workflow.WorkflowTemplateOrBuilder> templateBuilder_;
       /**
@@ -2409,7 +2478,7 @@ public final class Compiler {
         return templateBuilder_;
       }
 
-      private flyteidl.core.Compiler.ConnectionSet connections_ = null;
+      private flyteidl.core.Compiler.ConnectionSet connections_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Compiler.ConnectionSet, flyteidl.core.Compiler.ConnectionSet.Builder, flyteidl.core.Compiler.ConnectionSetOrBuilder> connectionsBuilder_;
       /**
@@ -2561,11 +2630,13 @@ public final class Compiler {
         }
         return connectionsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2587,6 +2658,7 @@ public final class Compiler {
 
     private static final com.google.protobuf.Parser<CompiledWorkflow>
         PARSER = new com.google.protobuf.AbstractParser<CompiledWorkflow>() {
+      @java.lang.Override
       public CompiledWorkflow parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2604,6 +2676,7 @@ public final class Compiler {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Compiler.CompiledWorkflow getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2682,13 +2755,6 @@ public final class Compiler {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Tasks.TaskTemplate.Builder subBuilder = null;
               if (template_ != null) {
@@ -2700,6 +2766,13 @@ public final class Compiler {
                 template_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -2719,6 +2792,7 @@ public final class Compiler {
       return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledTask_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledTask_fieldAccessorTable
@@ -2760,6 +2834,7 @@ public final class Compiler {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2769,6 +2844,7 @@ public final class Compiler {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (template_ != null) {
@@ -2777,6 +2853,7 @@ public final class Compiler {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2801,14 +2878,13 @@ public final class Compiler {
       }
       flyteidl.core.Compiler.CompiledTask other = (flyteidl.core.Compiler.CompiledTask) obj;
 
-      boolean result = true;
-      result = result && (hasTemplate() == other.hasTemplate());
+      if (hasTemplate() != other.hasTemplate()) return false;
       if (hasTemplate()) {
-        result = result && getTemplate()
-            .equals(other.getTemplate());
+        if (!getTemplate()
+            .equals(other.getTemplate())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2897,6 +2973,7 @@ public final class Compiler {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2904,6 +2981,7 @@ public final class Compiler {
     public static Builder newBuilder(flyteidl.core.Compiler.CompiledTask prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2931,6 +3009,7 @@ public final class Compiler {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledTask_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledTask_fieldAccessorTable
@@ -2953,6 +3032,7 @@ public final class Compiler {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (templateBuilder_ == null) {
@@ -2964,15 +3044,18 @@ public final class Compiler {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledTask_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.CompiledTask getDefaultInstanceForType() {
         return flyteidl.core.Compiler.CompiledTask.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.CompiledTask build() {
         flyteidl.core.Compiler.CompiledTask result = buildPartial();
         if (!result.isInitialized()) {
@@ -2981,6 +3064,7 @@ public final class Compiler {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.CompiledTask buildPartial() {
         flyteidl.core.Compiler.CompiledTask result = new flyteidl.core.Compiler.CompiledTask(this);
         if (templateBuilder_ == null) {
@@ -2992,32 +3076,39 @@ public final class Compiler {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Compiler.CompiledTask) {
           return mergeFrom((flyteidl.core.Compiler.CompiledTask)other);
@@ -3037,10 +3128,12 @@ public final class Compiler {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3059,7 +3152,7 @@ public final class Compiler {
         return this;
       }
 
-      private flyteidl.core.Tasks.TaskTemplate template_ = null;
+      private flyteidl.core.Tasks.TaskTemplate template_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Tasks.TaskTemplate, flyteidl.core.Tasks.TaskTemplate.Builder, flyteidl.core.Tasks.TaskTemplateOrBuilder> templateBuilder_;
       /**
@@ -3211,11 +3304,13 @@ public final class Compiler {
         }
         return templateBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3237,6 +3332,7 @@ public final class Compiler {
 
     private static final com.google.protobuf.Parser<CompiledTask>
         PARSER = new com.google.protobuf.AbstractParser<CompiledTask>() {
+      @java.lang.Override
       public CompiledTask parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3254,6 +3350,7 @@ public final class Compiler {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Compiler.CompiledTask getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3445,13 +3542,6 @@ public final class Compiler {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Compiler.CompiledWorkflow.Builder subBuilder = null;
               if (primary_ != null) {
@@ -3466,7 +3556,7 @@ public final class Compiler {
               break;
             }
             case 18: {
-              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
                 subWorkflows_ = new java.util.ArrayList<flyteidl.core.Compiler.CompiledWorkflow>();
                 mutable_bitField0_ |= 0x00000002;
               }
@@ -3475,12 +3565,19 @@ public final class Compiler {
               break;
             }
             case 26: {
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
                 tasks_ = new java.util.ArrayList<flyteidl.core.Compiler.CompiledTask>();
                 mutable_bitField0_ |= 0x00000004;
               }
               tasks_.add(
                   input.readMessage(flyteidl.core.Compiler.CompiledTask.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -3491,10 +3588,10 @@ public final class Compiler {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+        if (((mutable_bitField0_ & 0x00000002) != 0)) {
           subWorkflows_ = java.util.Collections.unmodifiableList(subWorkflows_);
         }
-        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+        if (((mutable_bitField0_ & 0x00000004) != 0)) {
           tasks_ = java.util.Collections.unmodifiableList(tasks_);
         }
         this.unknownFields = unknownFields.build();
@@ -3506,6 +3603,7 @@ public final class Compiler {
       return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledWorkflowClosure_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledWorkflowClosure_fieldAccessorTable
@@ -3678,6 +3776,7 @@ public final class Compiler {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3687,6 +3786,7 @@ public final class Compiler {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (primary_ != null) {
@@ -3701,6 +3801,7 @@ public final class Compiler {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3733,18 +3834,17 @@ public final class Compiler {
       }
       flyteidl.core.Compiler.CompiledWorkflowClosure other = (flyteidl.core.Compiler.CompiledWorkflowClosure) obj;
 
-      boolean result = true;
-      result = result && (hasPrimary() == other.hasPrimary());
+      if (hasPrimary() != other.hasPrimary()) return false;
       if (hasPrimary()) {
-        result = result && getPrimary()
-            .equals(other.getPrimary());
+        if (!getPrimary()
+            .equals(other.getPrimary())) return false;
       }
-      result = result && getSubWorkflowsList()
-          .equals(other.getSubWorkflowsList());
-      result = result && getTasksList()
-          .equals(other.getTasksList());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getSubWorkflowsList()
+          .equals(other.getSubWorkflowsList())) return false;
+      if (!getTasksList()
+          .equals(other.getTasksList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3841,6 +3941,7 @@ public final class Compiler {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3848,6 +3949,7 @@ public final class Compiler {
     public static Builder newBuilder(flyteidl.core.Compiler.CompiledWorkflowClosure prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3878,6 +3980,7 @@ public final class Compiler {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledWorkflowClosure_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledWorkflowClosure_fieldAccessorTable
@@ -3902,6 +4005,7 @@ public final class Compiler {
           getTasksFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (primaryBuilder_ == null) {
@@ -3925,15 +4029,18 @@ public final class Compiler {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledWorkflowClosure_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.CompiledWorkflowClosure getDefaultInstanceForType() {
         return flyteidl.core.Compiler.CompiledWorkflowClosure.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.CompiledWorkflowClosure build() {
         flyteidl.core.Compiler.CompiledWorkflowClosure result = buildPartial();
         if (!result.isInitialized()) {
@@ -3942,6 +4049,7 @@ public final class Compiler {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Compiler.CompiledWorkflowClosure buildPartial() {
         flyteidl.core.Compiler.CompiledWorkflowClosure result = new flyteidl.core.Compiler.CompiledWorkflowClosure(this);
         int from_bitField0_ = bitField0_;
@@ -3952,7 +4060,7 @@ public final class Compiler {
           result.primary_ = primaryBuilder_.build();
         }
         if (subWorkflowsBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          if (((bitField0_ & 0x00000002) != 0)) {
             subWorkflows_ = java.util.Collections.unmodifiableList(subWorkflows_);
             bitField0_ = (bitField0_ & ~0x00000002);
           }
@@ -3961,7 +4069,7 @@ public final class Compiler {
           result.subWorkflows_ = subWorkflowsBuilder_.build();
         }
         if (tasksBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          if (((bitField0_ & 0x00000004) != 0)) {
             tasks_ = java.util.Collections.unmodifiableList(tasks_);
             bitField0_ = (bitField0_ & ~0x00000004);
           }
@@ -3974,32 +4082,39 @@ public final class Compiler {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Compiler.CompiledWorkflowClosure) {
           return mergeFrom((flyteidl.core.Compiler.CompiledWorkflowClosure)other);
@@ -4071,10 +4186,12 @@ public final class Compiler {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4094,7 +4211,7 @@ public final class Compiler {
       }
       private int bitField0_;
 
-      private flyteidl.core.Compiler.CompiledWorkflow primary_ = null;
+      private flyteidl.core.Compiler.CompiledWorkflow primary_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Compiler.CompiledWorkflow, flyteidl.core.Compiler.CompiledWorkflow.Builder, flyteidl.core.Compiler.CompiledWorkflowOrBuilder> primaryBuilder_;
       /**
@@ -4250,7 +4367,7 @@ public final class Compiler {
       private java.util.List<flyteidl.core.Compiler.CompiledWorkflow> subWorkflows_ =
         java.util.Collections.emptyList();
       private void ensureSubWorkflowsIsMutable() {
-        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+        if (!((bitField0_ & 0x00000002) != 0)) {
           subWorkflows_ = new java.util.ArrayList<flyteidl.core.Compiler.CompiledWorkflow>(subWorkflows_);
           bitField0_ |= 0x00000002;
          }
@@ -4605,7 +4722,7 @@ public final class Compiler {
           subWorkflowsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Compiler.CompiledWorkflow, flyteidl.core.Compiler.CompiledWorkflow.Builder, flyteidl.core.Compiler.CompiledWorkflowOrBuilder>(
                   subWorkflows_,
-                  ((bitField0_ & 0x00000002) == 0x00000002),
+                  ((bitField0_ & 0x00000002) != 0),
                   getParentForChildren(),
                   isClean());
           subWorkflows_ = null;
@@ -4616,7 +4733,7 @@ public final class Compiler {
       private java.util.List<flyteidl.core.Compiler.CompiledTask> tasks_ =
         java.util.Collections.emptyList();
       private void ensureTasksIsMutable() {
-        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+        if (!((bitField0_ & 0x00000004) != 0)) {
           tasks_ = new java.util.ArrayList<flyteidl.core.Compiler.CompiledTask>(tasks_);
           bitField0_ |= 0x00000004;
          }
@@ -4935,18 +5052,20 @@ public final class Compiler {
           tasksBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Compiler.CompiledTask, flyteidl.core.Compiler.CompiledTask.Builder, flyteidl.core.Compiler.CompiledTaskOrBuilder>(
                   tasks_,
-                  ((bitField0_ & 0x00000004) == 0x00000004),
+                  ((bitField0_ & 0x00000004) != 0),
                   getParentForChildren(),
                   isClean());
           tasks_ = null;
         }
         return tasksBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -4968,6 +5087,7 @@ public final class Compiler {
 
     private static final com.google.protobuf.Parser<CompiledWorkflowClosure>
         PARSER = new com.google.protobuf.AbstractParser<CompiledWorkflowClosure>() {
+      @java.lang.Override
       public CompiledWorkflowClosure parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4985,6 +5105,7 @@ public final class Compiler {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Compiler.CompiledWorkflowClosure getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

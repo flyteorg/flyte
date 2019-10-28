@@ -6,47 +6,37 @@
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/port.h>
-#include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/extension_set.h>
 #include <google/protobuf/wire_format_lite_inl.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
-// This is a temporary google only hack
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-#include "third_party/protobuf/version.h"
-#endif
 // @@protoc_insertion_point(includes)
+#include <google/protobuf/port_def.inc>
+
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fqubole_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_HiveQuery_flyteidl_2fplugins_2fqubole_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fqubole_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_HiveQueryCollection_flyteidl_2fplugins_2fqubole_2eproto;
 namespace flyteidl {
 namespace plugins {
 class HiveQueryDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<HiveQuery>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<HiveQuery> _instance;
 } _HiveQuery_default_instance_;
 class HiveQueryCollectionDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<HiveQueryCollection>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<HiveQueryCollection> _instance;
 } _HiveQueryCollection_default_instance_;
 class QuboleHiveJobDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<QuboleHiveJob>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<QuboleHiveJob> _instance;
 } _QuboleHiveJob_default_instance_;
 }  // namespace plugins
 }  // namespace flyteidl
-namespace protobuf_flyteidl_2fplugins_2fqubole_2eproto {
-void InitDefaultsHiveQueryImpl() {
+static void InitDefaultsHiveQuery_flyteidl_2fplugins_2fqubole_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::flyteidl::plugins::_HiveQuery_default_instance_;
     new (ptr) ::flyteidl::plugins::HiveQuery();
@@ -55,20 +45,12 @@ void InitDefaultsHiveQueryImpl() {
   ::flyteidl::plugins::HiveQuery::InitAsDefaultInstance();
 }
 
-void InitDefaultsHiveQuery() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsHiveQueryImpl);
-}
+::google::protobuf::internal::SCCInfo<0> scc_info_HiveQuery_flyteidl_2fplugins_2fqubole_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsHiveQuery_flyteidl_2fplugins_2fqubole_2eproto}, {}};
 
-void InitDefaultsHiveQueryCollectionImpl() {
+static void InitDefaultsHiveQueryCollection_flyteidl_2fplugins_2fqubole_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsHiveQuery();
   {
     void* ptr = &::flyteidl::plugins::_HiveQueryCollection_default_instance_;
     new (ptr) ::flyteidl::plugins::HiveQueryCollection();
@@ -77,21 +59,13 @@ void InitDefaultsHiveQueryCollectionImpl() {
   ::flyteidl::plugins::HiveQueryCollection::InitAsDefaultInstance();
 }
 
-void InitDefaultsHiveQueryCollection() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsHiveQueryCollectionImpl);
-}
+::google::protobuf::internal::SCCInfo<1> scc_info_HiveQueryCollection_flyteidl_2fplugins_2fqubole_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsHiveQueryCollection_flyteidl_2fplugins_2fqubole_2eproto}, {
+      &scc_info_HiveQuery_flyteidl_2fplugins_2fqubole_2eproto.base,}};
 
-void InitDefaultsQuboleHiveJobImpl() {
+static void InitDefaultsQuboleHiveJob_flyteidl_2fplugins_2fqubole_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsHiveQueryCollection();
-  protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsHiveQuery();
   {
     void* ptr = &::flyteidl::plugins::_QuboleHiveJob_default_instance_;
     new (ptr) ::flyteidl::plugins::QuboleHiveJob();
@@ -100,39 +74,47 @@ void InitDefaultsQuboleHiveJobImpl() {
   ::flyteidl::plugins::QuboleHiveJob::InitAsDefaultInstance();
 }
 
-void InitDefaultsQuboleHiveJob() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsQuboleHiveJobImpl);
+::google::protobuf::internal::SCCInfo<2> scc_info_QuboleHiveJob_flyteidl_2fplugins_2fqubole_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsQuboleHiveJob_flyteidl_2fplugins_2fqubole_2eproto}, {
+      &scc_info_HiveQueryCollection_flyteidl_2fplugins_2fqubole_2eproto.base,
+      &scc_info_HiveQuery_flyteidl_2fplugins_2fqubole_2eproto.base,}};
+
+void InitDefaults_flyteidl_2fplugins_2fqubole_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_HiveQuery_flyteidl_2fplugins_2fqubole_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_HiveQueryCollection_flyteidl_2fplugins_2fqubole_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_QuboleHiveJob_flyteidl_2fplugins_2fqubole_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata[3];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fplugins_2fqubole_2eproto[3];
+constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fplugins_2fqubole_2eproto = nullptr;
+constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fplugins_2fqubole_2eproto = nullptr;
 
-const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fqubole_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::HiveQuery, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::HiveQuery, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::HiveQuery, query_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::HiveQuery, timeout_sec_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::HiveQuery, retrycount_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::HiveQuery, query_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::HiveQuery, timeout_sec_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::HiveQuery, retrycount_),
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::HiveQueryCollection, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::HiveQueryCollection, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::HiveQueryCollection, queries_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::HiveQueryCollection, queries_),
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, cluster_label_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, query_collection_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, tags_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, query_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, cluster_label_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, query_collection_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, tags_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::QuboleHiveJob, query_),
 };
-static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::plugins::HiveQuery)},
   { 8, -1, sizeof(::flyteidl::plugins::HiveQueryCollection)},
   { 14, -1, sizeof(::flyteidl::plugins::QuboleHiveJob)},
@@ -144,59 +126,42 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::_QuboleHiveJob_default_instance_),
 };
 
-void protobuf_AssignDescriptors() {
-  AddDescriptors();
-  ::google::protobuf::MessageFactory* factory = NULL;
-  AssignDescriptors(
-      "flyteidl/plugins/qubole.proto", schemas, file_default_instances, TableStruct::offsets, factory,
-      file_level_metadata, NULL, NULL);
-}
+::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fplugins_2fqubole_2eproto = {
+  {}, AddDescriptors_flyteidl_2fplugins_2fqubole_2eproto, "flyteidl/plugins/qubole.proto", schemas,
+  file_default_instances, TableStruct_flyteidl_2fplugins_2fqubole_2eproto::offsets,
+  file_level_metadata_flyteidl_2fplugins_2fqubole_2eproto, 3, file_level_enum_descriptors_flyteidl_2fplugins_2fqubole_2eproto, file_level_service_descriptors_flyteidl_2fplugins_2fqubole_2eproto,
+};
 
-void protobuf_AssignDescriptorsOnce() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &protobuf_AssignDescriptors);
-}
+const char descriptor_table_protodef_flyteidl_2fplugins_2fqubole_2eproto[] =
+  "\n\035flyteidl/plugins/qubole.proto\022\020flyteid"
+  "l.plugins\032\031flyteidl/core/tasks.proto\"C\n\t"
+  "HiveQuery\022\r\n\005query\030\001 \001(\t\022\023\n\013timeout_sec\030"
+  "\002 \001(\r\022\022\n\nretryCount\030\003 \001(\r\"C\n\023HiveQueryCo"
+  "llection\022,\n\007queries\030\002 \003(\0132\033.flyteidl.plu"
+  "gins.HiveQuery\"\245\001\n\rQuboleHiveJob\022\025\n\rclus"
+  "ter_label\030\001 \001(\t\022C\n\020query_collection\030\002 \001("
+  "\0132%.flyteidl.plugins.HiveQueryCollection"
+  "B\002\030\001\022\014\n\004tags\030\003 \003(\t\022*\n\005query\030\004 \001(\0132\033.flyt"
+  "eidl.plugins.HiveQueryB5Z3github.com/lyf"
+  "t/flyteidl/gen/pb-go/flyteidl/pluginsb\006p"
+  "roto3"
+  ;
+::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fqubole_2eproto = {
+  false, InitDefaults_flyteidl_2fplugins_2fqubole_2eproto, 
+  descriptor_table_protodef_flyteidl_2fplugins_2fqubole_2eproto,
+  "flyteidl/plugins/qubole.proto", &assign_descriptors_table_flyteidl_2fplugins_2fqubole_2eproto, 445,
+};
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
-void protobuf_RegisterTypes(const ::std::string&) {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 3);
-}
-
-void AddDescriptorsImpl() {
-  InitDefaults();
-  static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\035flyteidl/plugins/qubole.proto\022\020flyteid"
-      "l.plugins\032\031flyteidl/core/tasks.proto\"C\n\t"
-      "HiveQuery\022\r\n\005query\030\001 \001(\t\022\023\n\013timeout_sec\030"
-      "\002 \001(\r\022\022\n\nretryCount\030\003 \001(\r\"C\n\023HiveQueryCo"
-      "llection\022,\n\007queries\030\002 \003(\0132\033.flyteidl.plu"
-      "gins.HiveQuery\"\245\001\n\rQuboleHiveJob\022\025\n\rclus"
-      "ter_label\030\001 \001(\t\022C\n\020query_collection\030\002 \001("
-      "\0132%.flyteidl.plugins.HiveQueryCollection"
-      "B\002\030\001\022\014\n\004tags\030\003 \003(\t\022*\n\005query\030\004 \001(\0132\033.flyt"
-      "eidl.plugins.HiveQueryB5Z3github.com/lyf"
-      "t/flyteidl/gen/pb-go/flyteidl/pluginsb\006p"
-      "roto3"
+void AddDescriptors_flyteidl_2fplugins_2fqubole_2eproto() {
+  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
+  {
+    ::AddDescriptors_flyteidl_2fcore_2ftasks_2eproto,
   };
-  ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 445);
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
-    "flyteidl/plugins/qubole.proto", &protobuf_RegisterTypes);
-  ::protobuf_flyteidl_2fcore_2ftasks_2eproto::AddDescriptors();
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fplugins_2fqubole_2eproto, deps, 1);
 }
 
-void AddDescriptors() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &AddDescriptorsImpl);
-}
-// Force AddDescriptors() to be called at dynamic initialization time.
-struct StaticDescriptorInitializer {
-  StaticDescriptorInitializer() {
-    AddDescriptors();
-  }
-} static_descriptor_initializer;
-}  // namespace protobuf_flyteidl_2fplugins_2fqubole_2eproto
+// Force running AddDescriptors() at dynamic initialization time.
+static bool dynamic_init_dummy_flyteidl_2fplugins_2fqubole_2eproto = []() { AddDescriptors_flyteidl_2fplugins_2fqubole_2eproto(); return true; }();
 namespace flyteidl {
 namespace plugins {
 
@@ -204,6 +169,10 @@ namespace plugins {
 
 void HiveQuery::InitAsDefaultInstance() {
 }
+class HiveQuery::HasBitSetters {
+ public:
+};
+
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int HiveQuery::kQueryFieldNumber;
 const int HiveQuery::kTimeoutSecFieldNumber;
@@ -211,17 +180,13 @@ const int HiveQuery::kRetryCountFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 HiveQuery::HiveQuery()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsHiveQuery();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.plugins.HiveQuery)
 }
 HiveQuery::HiveQuery(const HiveQuery& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   query_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.query().size() > 0) {
@@ -234,11 +199,12 @@ HiveQuery::HiveQuery(const HiveQuery& from)
 }
 
 void HiveQuery::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_HiveQuery_flyteidl_2fplugins_2fqubole_2eproto.base);
   query_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&timeout_sec_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&retrycount_) -
       reinterpret_cast<char*>(&timeout_sec_)) + sizeof(retrycount_));
-  _cached_size_ = 0;
 }
 
 HiveQuery::~HiveQuery() {
@@ -251,27 +217,13 @@ void HiveQuery::SharedDtor() {
 }
 
 void HiveQuery::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* HiveQuery::descriptor() {
-  ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const HiveQuery& HiveQuery::default_instance() {
-  ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsHiveQuery();
+  ::google::protobuf::internal::InitSCC(&::scc_info_HiveQuery_flyteidl_2fplugins_2fqubole_2eproto.base);
   return *internal_default_instance();
 }
 
-HiveQuery* HiveQuery::New(::google::protobuf::Arena* arena) const {
-  HiveQuery* n = new HiveQuery;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void HiveQuery::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.plugins.HiveQuery)
@@ -286,20 +238,86 @@ void HiveQuery::Clear() {
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* HiveQuery::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<HiveQuery*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string query = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.plugins.HiveQuery.query");
+        object = msg->mutable_query();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // uint32 timeout_sec = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
+        msg->set_timeout_sec(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // uint32 retryCount = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
+        msg->set_retrycount(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool HiveQuery::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.plugins.HiveQuery)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // string query = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_query()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -314,8 +332,7 @@ bool HiveQuery::MergePartialFromCodedStream(
 
       // uint32 timeout_sec = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
@@ -328,8 +345,7 @@ bool HiveQuery::MergePartialFromCodedStream(
 
       // uint32 retryCount = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(24u /* 24 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
@@ -359,6 +375,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void HiveQuery::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -386,16 +403,15 @@ void HiveQuery::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->retrycount(), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.plugins.HiveQuery)
 }
 
 ::google::protobuf::uint8* HiveQuery::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.plugins.HiveQuery)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -421,9 +437,9 @@ void HiveQuery::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->retrycount(), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.plugins.HiveQuery)
   return target;
@@ -433,11 +449,15 @@ size_t HiveQuery::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.plugins.HiveQuery)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   // string query = 1;
   if (this->query().size() > 0) {
     total_size += 1 +
@@ -460,9 +480,7 @@ size_t HiveQuery::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -470,9 +488,9 @@ void HiveQuery::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.plugins.HiveQuery)
   GOOGLE_DCHECK_NE(&from, this);
   const HiveQuery* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const HiveQuery>(
+      ::google::protobuf::DynamicCastToGenerated<HiveQuery>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.plugins.HiveQuery)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -524,16 +542,16 @@ void HiveQuery::Swap(HiveQuery* other) {
 }
 void HiveQuery::InternalSwap(HiveQuery* other) {
   using std::swap;
-  query_.Swap(&other->query_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  query_.Swap(&other->query_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(timeout_sec_, other->timeout_sec_);
   swap(retrycount_, other->retrycount_);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata HiveQuery::GetMetadata() const {
-  protobuf_flyteidl_2fplugins_2fqubole_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fqubole_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fqubole_2eproto[kIndexInFileMessages];
 }
 
 
@@ -541,29 +559,30 @@ void HiveQuery::InternalSwap(HiveQuery* other) {
 
 void HiveQueryCollection::InitAsDefaultInstance() {
 }
+class HiveQueryCollection::HasBitSetters {
+ public:
+};
+
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int HiveQueryCollection::kQueriesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 HiveQueryCollection::HiveQueryCollection()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsHiveQueryCollection();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.plugins.HiveQueryCollection)
 }
 HiveQueryCollection::HiveQueryCollection(const HiveQueryCollection& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      queries_(from.queries_),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr),
+      queries_(from.queries_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:flyteidl.plugins.HiveQueryCollection)
 }
 
 void HiveQueryCollection::SharedCtor() {
-  _cached_size_ = 0;
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_HiveQueryCollection_flyteidl_2fplugins_2fqubole_2eproto.base);
 }
 
 HiveQueryCollection::~HiveQueryCollection() {
@@ -575,27 +594,13 @@ void HiveQueryCollection::SharedDtor() {
 }
 
 void HiveQueryCollection::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* HiveQueryCollection::descriptor() {
-  ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const HiveQueryCollection& HiveQueryCollection::default_instance() {
-  ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsHiveQueryCollection();
+  ::google::protobuf::internal::InitSCC(&::scc_info_HiveQueryCollection_flyteidl_2fplugins_2fqubole_2eproto.base);
   return *internal_default_instance();
 }
 
-HiveQueryCollection* HiveQueryCollection::New(::google::protobuf::Arena* arena) const {
-  HiveQueryCollection* n = new HiveQueryCollection;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void HiveQueryCollection::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.plugins.HiveQueryCollection)
@@ -607,21 +612,70 @@ void HiveQueryCollection::Clear() {
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* HiveQueryCollection::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<HiveQueryCollection*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // repeated .flyteidl.plugins.HiveQuery queries = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::flyteidl::plugins::HiveQuery::_InternalParse;
+          object = msg->add_queries();
+          if (size > end - ptr) goto len_delim_till_end;
+          ptr += size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+              {parser_till_end, object}, ptr - size, ptr));
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 18 && (ptr += 1));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool HiveQueryCollection::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.plugins.HiveQueryCollection)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // repeated .flyteidl.plugins.HiveQuery queries = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(input, add_queries()));
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+                input, add_queries()));
         } else {
           goto handle_unusual;
         }
@@ -647,6 +701,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void HiveQueryCollection::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -658,19 +713,20 @@ void HiveQueryCollection::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->queries_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, this->queries(static_cast<int>(i)), output);
+      2,
+      this->queries(static_cast<int>(i)),
+      output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.plugins.HiveQueryCollection)
 }
 
 ::google::protobuf::uint8* HiveQueryCollection::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.plugins.HiveQueryCollection)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -680,12 +736,12 @@ void HiveQueryCollection::SerializeWithCachedSizes(
       n = static_cast<unsigned int>(this->queries_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        2, this->queries(static_cast<int>(i)), deterministic, target);
+        2, this->queries(static_cast<int>(i)), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.plugins.HiveQueryCollection)
   return target;
@@ -695,11 +751,15 @@ size_t HiveQueryCollection::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.plugins.HiveQueryCollection)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   // repeated .flyteidl.plugins.HiveQuery queries = 2;
   {
     unsigned int count = static_cast<unsigned int>(this->queries_size());
@@ -712,9 +772,7 @@ size_t HiveQueryCollection::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -722,9 +780,9 @@ void HiveQueryCollection::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.plugins.HiveQueryCollection)
   GOOGLE_DCHECK_NE(&from, this);
   const HiveQueryCollection* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const HiveQueryCollection>(
+      ::google::protobuf::DynamicCastToGenerated<HiveQueryCollection>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.plugins.HiveQueryCollection)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -767,14 +825,13 @@ void HiveQueryCollection::Swap(HiveQueryCollection* other) {
 }
 void HiveQueryCollection::InternalSwap(HiveQueryCollection* other) {
   using std::swap;
-  queries_.InternalSwap(&other->queries_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
+  CastToBase(&queries_)->InternalSwap(CastToBase(&other->queries_));
 }
 
 ::google::protobuf::Metadata HiveQueryCollection::GetMetadata() const {
-  protobuf_flyteidl_2fplugins_2fqubole_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fqubole_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fqubole_2eproto[kIndexInFileMessages];
 }
 
 
@@ -786,6 +843,20 @@ void QuboleHiveJob::InitAsDefaultInstance() {
   ::flyteidl::plugins::_QuboleHiveJob_default_instance_._instance.get_mutable()->query_ = const_cast< ::flyteidl::plugins::HiveQuery*>(
       ::flyteidl::plugins::HiveQuery::internal_default_instance());
 }
+class QuboleHiveJob::HasBitSetters {
+ public:
+  static const ::flyteidl::plugins::HiveQueryCollection& query_collection(const QuboleHiveJob* msg);
+  static const ::flyteidl::plugins::HiveQuery& query(const QuboleHiveJob* msg);
+};
+
+const ::flyteidl::plugins::HiveQueryCollection&
+QuboleHiveJob::HasBitSetters::query_collection(const QuboleHiveJob* msg) {
+  return *msg->query_collection_;
+}
+const ::flyteidl::plugins::HiveQuery&
+QuboleHiveJob::HasBitSetters::query(const QuboleHiveJob* msg) {
+  return *msg->query_;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int QuboleHiveJob::kClusterLabelFieldNumber;
 const int QuboleHiveJob::kQueryCollectionFieldNumber;
@@ -794,18 +865,14 @@ const int QuboleHiveJob::kQueryFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 QuboleHiveJob::QuboleHiveJob()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsQuboleHiveJob();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.plugins.QuboleHiveJob)
 }
 QuboleHiveJob::QuboleHiveJob(const QuboleHiveJob& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      tags_(from.tags_),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr),
+      tags_(from.tags_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   cluster_label_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.cluster_label().size() > 0) {
@@ -814,22 +881,23 @@ QuboleHiveJob::QuboleHiveJob(const QuboleHiveJob& from)
   if (from.has_query_collection()) {
     query_collection_ = new ::flyteidl::plugins::HiveQueryCollection(*from.query_collection_);
   } else {
-    query_collection_ = NULL;
+    query_collection_ = nullptr;
   }
   if (from.has_query()) {
     query_ = new ::flyteidl::plugins::HiveQuery(*from.query_);
   } else {
-    query_ = NULL;
+    query_ = nullptr;
   }
   // @@protoc_insertion_point(copy_constructor:flyteidl.plugins.QuboleHiveJob)
 }
 
 void QuboleHiveJob::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_QuboleHiveJob_flyteidl_2fplugins_2fqubole_2eproto.base);
   cluster_label_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&query_collection_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&query_) -
       reinterpret_cast<char*>(&query_collection_)) + sizeof(query_));
-  _cached_size_ = 0;
 }
 
 QuboleHiveJob::~QuboleHiveJob() {
@@ -844,27 +912,13 @@ void QuboleHiveJob::SharedDtor() {
 }
 
 void QuboleHiveJob::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* QuboleHiveJob::descriptor() {
-  ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const QuboleHiveJob& QuboleHiveJob::default_instance() {
-  ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::InitDefaultsQuboleHiveJob();
+  ::google::protobuf::internal::InitSCC(&::scc_info_QuboleHiveJob_flyteidl_2fplugins_2fqubole_2eproto.base);
   return *internal_default_instance();
 }
 
-QuboleHiveJob* QuboleHiveJob::New(::google::protobuf::Arena* arena) const {
-  QuboleHiveJob* n = new QuboleHiveJob;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void QuboleHiveJob::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.plugins.QuboleHiveJob)
@@ -874,31 +928,128 @@ void QuboleHiveJob::Clear() {
 
   tags_.Clear();
   cluster_label_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (GetArenaNoVirtual() == NULL && query_collection_ != NULL) {
+  if (GetArenaNoVirtual() == nullptr && query_collection_ != nullptr) {
     delete query_collection_;
   }
-  query_collection_ = NULL;
-  if (GetArenaNoVirtual() == NULL && query_ != NULL) {
+  query_collection_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && query_ != nullptr) {
     delete query_;
   }
-  query_ = NULL;
+  query_ = nullptr;
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* QuboleHiveJob::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<QuboleHiveJob*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string cluster_label = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.plugins.QuboleHiveJob.cluster_label");
+        object = msg->mutable_cluster_label();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // .flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::plugins::HiveQueryCollection::_InternalParse;
+        object = msg->mutable_query_collection();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // repeated string tags = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("flyteidl.plugins.QuboleHiveJob.tags");
+          object = msg->add_tags();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 26 && (ptr += 1));
+        break;
+      }
+      // .flyteidl.plugins.HiveQuery query = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::plugins::HiveQuery::_InternalParse;
+        object = msg->mutable_query();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool QuboleHiveJob::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.plugins.QuboleHiveJob)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // string cluster_label = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_cluster_label()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -913,8 +1064,7 @@ bool QuboleHiveJob::MergePartialFromCodedStream(
 
       // .flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_query_collection()));
         } else {
@@ -925,8 +1075,7 @@ bool QuboleHiveJob::MergePartialFromCodedStream(
 
       // repeated string tags = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->add_tags()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -942,8 +1091,7 @@ bool QuboleHiveJob::MergePartialFromCodedStream(
 
       // .flyteidl.plugins.HiveQuery query = 4;
       case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_query()));
         } else {
@@ -971,6 +1119,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void QuboleHiveJob::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -991,7 +1140,7 @@ void QuboleHiveJob::SerializeWithCachedSizes(
   // .flyteidl.plugins.HiveQueryCollection query_collection = 2 [deprecated = true];
   if (this->has_query_collection()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, *this->query_collection_, output);
+      2, HasBitSetters::query_collection(this), output);
   }
 
   // repeated string tags = 3;
@@ -1007,19 +1156,18 @@ void QuboleHiveJob::SerializeWithCachedSizes(
   // .flyteidl.plugins.HiveQuery query = 4;
   if (this->has_query()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, *this->query_, output);
+      4, HasBitSetters::query(this), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.plugins.QuboleHiveJob)
 }
 
 ::google::protobuf::uint8* QuboleHiveJob::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.plugins.QuboleHiveJob)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -1039,7 +1187,7 @@ void QuboleHiveJob::SerializeWithCachedSizes(
   if (this->has_query_collection()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        2, *this->query_collection_, deterministic, target);
+        2, HasBitSetters::query_collection(this), target);
   }
 
   // repeated string tags = 3;
@@ -1056,12 +1204,12 @@ void QuboleHiveJob::SerializeWithCachedSizes(
   if (this->has_query()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        4, *this->query_, deterministic, target);
+        4, HasBitSetters::query(this), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.plugins.QuboleHiveJob)
   return target;
@@ -1071,11 +1219,15 @@ size_t QuboleHiveJob::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.plugins.QuboleHiveJob)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   // repeated string tags = 3;
   total_size += 1 *
       ::google::protobuf::internal::FromIntSize(this->tags_size());
@@ -1095,20 +1247,18 @@ size_t QuboleHiveJob::ByteSizeLong() const {
   if (this->has_query_collection()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *this->query_collection_);
+        *query_collection_);
   }
 
   // .flyteidl.plugins.HiveQuery query = 4;
   if (this->has_query()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *this->query_);
+        *query_);
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -1116,9 +1266,9 @@ void QuboleHiveJob::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.plugins.QuboleHiveJob)
   GOOGLE_DCHECK_NE(&from, this);
   const QuboleHiveJob* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const QuboleHiveJob>(
+      ::google::protobuf::DynamicCastToGenerated<QuboleHiveJob>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.plugins.QuboleHiveJob)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1171,22 +1321,36 @@ void QuboleHiveJob::Swap(QuboleHiveJob* other) {
 }
 void QuboleHiveJob::InternalSwap(QuboleHiveJob* other) {
   using std::swap;
-  tags_.InternalSwap(&other->tags_);
-  cluster_label_.Swap(&other->cluster_label_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  tags_.InternalSwap(CastToBase(&other->tags_));
+  cluster_label_.Swap(&other->cluster_label_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(query_collection_, other->query_collection_);
   swap(query_, other->query_);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata QuboleHiveJob::GetMetadata() const {
-  protobuf_flyteidl_2fplugins_2fqubole_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fqubole_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fqubole_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fqubole_2eproto[kIndexInFileMessages];
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace plugins
 }  // namespace flyteidl
+namespace google {
+namespace protobuf {
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::HiveQuery* Arena::CreateMaybeMessage< ::flyteidl::plugins::HiveQuery >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::HiveQuery >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::HiveQueryCollection* Arena::CreateMaybeMessage< ::flyteidl::plugins::HiveQueryCollection >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::HiveQueryCollection >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::QuboleHiveJob* Arena::CreateMaybeMessage< ::flyteidl::plugins::QuboleHiveJob >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::QuboleHiveJob >(arena);
+}
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
+#include <google/protobuf/port_undef.inc>

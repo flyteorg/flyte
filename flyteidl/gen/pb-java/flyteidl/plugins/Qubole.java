@@ -56,8 +56,6 @@ public final class Qubole {
     }
     private HiveQuery() {
       query_ = "";
-      timeoutSec_ = 0;
-      retryCount_ = 0;
     }
 
     @java.lang.Override
@@ -84,13 +82,6 @@ public final class Qubole {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -105,6 +96,13 @@ public final class Qubole {
             case 24: {
 
               retryCount_ = input.readUInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -124,6 +122,7 @@ public final class Qubole {
       return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_HiveQuery_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_HiveQuery_fieldAccessorTable
@@ -184,6 +183,7 @@ public final class Qubole {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -193,6 +193,7 @@ public final class Qubole {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getQueryBytes().isEmpty()) {
@@ -207,6 +208,7 @@ public final class Qubole {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -238,15 +240,14 @@ public final class Qubole {
       }
       flyteidl.plugins.Qubole.HiveQuery other = (flyteidl.plugins.Qubole.HiveQuery) obj;
 
-      boolean result = true;
-      result = result && getQuery()
-          .equals(other.getQuery());
-      result = result && (getTimeoutSec()
-          == other.getTimeoutSec());
-      result = result && (getRetryCount()
-          == other.getRetryCount());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getQuery()
+          .equals(other.getQuery())) return false;
+      if (getTimeoutSec()
+          != other.getTimeoutSec()) return false;
+      if (getRetryCount()
+          != other.getRetryCount()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -337,6 +338,7 @@ public final class Qubole {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -344,6 +346,7 @@ public final class Qubole {
     public static Builder newBuilder(flyteidl.plugins.Qubole.HiveQuery prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -371,6 +374,7 @@ public final class Qubole {
         return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_HiveQuery_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_HiveQuery_fieldAccessorTable
@@ -393,6 +397,7 @@ public final class Qubole {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         query_ = "";
@@ -404,15 +409,18 @@ public final class Qubole {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_HiveQuery_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Qubole.HiveQuery getDefaultInstanceForType() {
         return flyteidl.plugins.Qubole.HiveQuery.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Qubole.HiveQuery build() {
         flyteidl.plugins.Qubole.HiveQuery result = buildPartial();
         if (!result.isInitialized()) {
@@ -421,6 +429,7 @@ public final class Qubole {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Qubole.HiveQuery buildPartial() {
         flyteidl.plugins.Qubole.HiveQuery result = new flyteidl.plugins.Qubole.HiveQuery(this);
         result.query_ = query_;
@@ -430,32 +439,39 @@ public final class Qubole {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.plugins.Qubole.HiveQuery) {
           return mergeFrom((flyteidl.plugins.Qubole.HiveQuery)other);
@@ -482,10 +498,12 @@ public final class Qubole {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -624,11 +642,13 @@ public final class Qubole {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -650,6 +670,7 @@ public final class Qubole {
 
     private static final com.google.protobuf.Parser<HiveQuery>
         PARSER = new com.google.protobuf.AbstractParser<HiveQuery>() {
+      @java.lang.Override
       public HiveQuery parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -667,6 +688,7 @@ public final class Qubole {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.plugins.Qubole.HiveQuery getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -745,20 +767,20 @@ public final class Qubole {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 18: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 queries_ = new java.util.ArrayList<flyteidl.plugins.Qubole.HiveQuery>();
                 mutable_bitField0_ |= 0x00000001;
               }
               queries_.add(
                   input.readMessage(flyteidl.plugins.Qubole.HiveQuery.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -769,7 +791,7 @@ public final class Qubole {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
           queries_ = java.util.Collections.unmodifiableList(queries_);
         }
         this.unknownFields = unknownFields.build();
@@ -781,6 +803,7 @@ public final class Qubole {
       return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_HiveQueryCollection_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_HiveQueryCollection_fieldAccessorTable
@@ -824,6 +847,7 @@ public final class Qubole {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -833,6 +857,7 @@ public final class Qubole {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < queries_.size(); i++) {
@@ -841,6 +866,7 @@ public final class Qubole {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -865,11 +891,10 @@ public final class Qubole {
       }
       flyteidl.plugins.Qubole.HiveQueryCollection other = (flyteidl.plugins.Qubole.HiveQueryCollection) obj;
 
-      boolean result = true;
-      result = result && getQueriesList()
-          .equals(other.getQueriesList());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getQueriesList()
+          .equals(other.getQueriesList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -958,6 +983,7 @@ public final class Qubole {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -965,6 +991,7 @@ public final class Qubole {
     public static Builder newBuilder(flyteidl.plugins.Qubole.HiveQueryCollection prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -992,6 +1019,7 @@ public final class Qubole {
         return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_HiveQueryCollection_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_HiveQueryCollection_fieldAccessorTable
@@ -1015,6 +1043,7 @@ public final class Qubole {
           getQueriesFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (queriesBuilder_ == null) {
@@ -1026,15 +1055,18 @@ public final class Qubole {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_HiveQueryCollection_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Qubole.HiveQueryCollection getDefaultInstanceForType() {
         return flyteidl.plugins.Qubole.HiveQueryCollection.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Qubole.HiveQueryCollection build() {
         flyteidl.plugins.Qubole.HiveQueryCollection result = buildPartial();
         if (!result.isInitialized()) {
@@ -1043,11 +1075,12 @@ public final class Qubole {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Qubole.HiveQueryCollection buildPartial() {
         flyteidl.plugins.Qubole.HiveQueryCollection result = new flyteidl.plugins.Qubole.HiveQueryCollection(this);
         int from_bitField0_ = bitField0_;
         if (queriesBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          if (((bitField0_ & 0x00000001) != 0)) {
             queries_ = java.util.Collections.unmodifiableList(queries_);
             bitField0_ = (bitField0_ & ~0x00000001);
           }
@@ -1059,32 +1092,39 @@ public final class Qubole {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.plugins.Qubole.HiveQueryCollection) {
           return mergeFrom((flyteidl.plugins.Qubole.HiveQueryCollection)other);
@@ -1127,10 +1167,12 @@ public final class Qubole {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1153,7 +1195,7 @@ public final class Qubole {
       private java.util.List<flyteidl.plugins.Qubole.HiveQuery> queries_ =
         java.util.Collections.emptyList();
       private void ensureQueriesIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+        if (!((bitField0_ & 0x00000001) != 0)) {
           queries_ = new java.util.ArrayList<flyteidl.plugins.Qubole.HiveQuery>(queries_);
           bitField0_ |= 0x00000001;
          }
@@ -1382,18 +1424,20 @@ public final class Qubole {
           queriesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.plugins.Qubole.HiveQuery, flyteidl.plugins.Qubole.HiveQuery.Builder, flyteidl.plugins.Qubole.HiveQueryOrBuilder>(
                   queries_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  ((bitField0_ & 0x00000001) != 0),
                   getParentForChildren(),
                   isClean());
           queries_ = null;
         }
         return queriesBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1415,6 +1459,7 @@ public final class Qubole {
 
     private static final com.google.protobuf.Parser<HiveQueryCollection>
         PARSER = new com.google.protobuf.AbstractParser<HiveQueryCollection>() {
+      @java.lang.Override
       public HiveQueryCollection parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1432,6 +1477,7 @@ public final class Qubole {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.plugins.Qubole.HiveQueryCollection getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1543,13 +1589,6 @@ public final class Qubole {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -1571,7 +1610,7 @@ public final class Qubole {
             }
             case 26: {
               java.lang.String s = input.readStringRequireUtf8();
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
                 tags_ = new com.google.protobuf.LazyStringArrayList();
                 mutable_bitField0_ |= 0x00000004;
               }
@@ -1591,6 +1630,13 @@ public final class Qubole {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1599,7 +1645,7 @@ public final class Qubole {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+        if (((mutable_bitField0_ & 0x00000004) != 0)) {
           tags_ = tags_.getUnmodifiableView();
         }
         this.unknownFields = unknownFields.build();
@@ -1611,6 +1657,7 @@ public final class Qubole {
       return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_QuboleHiveJob_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_QuboleHiveJob_fieldAccessorTable
@@ -1725,6 +1772,7 @@ public final class Qubole {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1734,6 +1782,7 @@ public final class Qubole {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getClusterLabelBytes().isEmpty()) {
@@ -1751,6 +1800,7 @@ public final class Qubole {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1790,23 +1840,22 @@ public final class Qubole {
       }
       flyteidl.plugins.Qubole.QuboleHiveJob other = (flyteidl.plugins.Qubole.QuboleHiveJob) obj;
 
-      boolean result = true;
-      result = result && getClusterLabel()
-          .equals(other.getClusterLabel());
-      result = result && (hasQueryCollection() == other.hasQueryCollection());
+      if (!getClusterLabel()
+          .equals(other.getClusterLabel())) return false;
+      if (hasQueryCollection() != other.hasQueryCollection()) return false;
       if (hasQueryCollection()) {
-        result = result && getQueryCollection()
-            .equals(other.getQueryCollection());
+        if (!getQueryCollection()
+            .equals(other.getQueryCollection())) return false;
       }
-      result = result && getTagsList()
-          .equals(other.getTagsList());
-      result = result && (hasQuery() == other.hasQuery());
+      if (!getTagsList()
+          .equals(other.getTagsList())) return false;
+      if (hasQuery() != other.hasQuery()) return false;
       if (hasQuery()) {
-        result = result && getQuery()
-            .equals(other.getQuery());
+        if (!getQuery()
+            .equals(other.getQuery())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1905,6 +1954,7 @@ public final class Qubole {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1912,6 +1962,7 @@ public final class Qubole {
     public static Builder newBuilder(flyteidl.plugins.Qubole.QuboleHiveJob prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1940,6 +1991,7 @@ public final class Qubole {
         return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_QuboleHiveJob_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_QuboleHiveJob_fieldAccessorTable
@@ -1962,6 +2014,7 @@ public final class Qubole {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         clusterLabel_ = "";
@@ -1983,15 +2036,18 @@ public final class Qubole {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.plugins.Qubole.internal_static_flyteidl_plugins_QuboleHiveJob_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Qubole.QuboleHiveJob getDefaultInstanceForType() {
         return flyteidl.plugins.Qubole.QuboleHiveJob.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Qubole.QuboleHiveJob build() {
         flyteidl.plugins.Qubole.QuboleHiveJob result = buildPartial();
         if (!result.isInitialized()) {
@@ -2000,6 +2056,7 @@ public final class Qubole {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Qubole.QuboleHiveJob buildPartial() {
         flyteidl.plugins.Qubole.QuboleHiveJob result = new flyteidl.plugins.Qubole.QuboleHiveJob(this);
         int from_bitField0_ = bitField0_;
@@ -2010,7 +2067,7 @@ public final class Qubole {
         } else {
           result.queryCollection_ = queryCollectionBuilder_.build();
         }
-        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        if (((bitField0_ & 0x00000004) != 0)) {
           tags_ = tags_.getUnmodifiableView();
           bitField0_ = (bitField0_ & ~0x00000004);
         }
@@ -2025,32 +2082,39 @@ public final class Qubole {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.plugins.Qubole.QuboleHiveJob) {
           return mergeFrom((flyteidl.plugins.Qubole.QuboleHiveJob)other);
@@ -2087,10 +2151,12 @@ public final class Qubole {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2179,7 +2245,7 @@ public final class Qubole {
         return this;
       }
 
-      private flyteidl.plugins.Qubole.HiveQueryCollection queryCollection_ = null;
+      private flyteidl.plugins.Qubole.HiveQueryCollection queryCollection_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.plugins.Qubole.HiveQueryCollection, flyteidl.plugins.Qubole.HiveQueryCollection.Builder, flyteidl.plugins.Qubole.HiveQueryCollectionOrBuilder> queryCollectionBuilder_;
       /**
@@ -2298,7 +2364,7 @@ public final class Qubole {
 
       private com.google.protobuf.LazyStringList tags_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureTagsIsMutable() {
-        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+        if (!((bitField0_ & 0x00000004) != 0)) {
           tags_ = new com.google.protobuf.LazyStringArrayList(tags_);
           bitField0_ |= 0x00000004;
          }
@@ -2390,7 +2456,7 @@ public final class Qubole {
         return this;
       }
 
-      private flyteidl.plugins.Qubole.HiveQuery query_ = null;
+      private flyteidl.plugins.Qubole.HiveQuery query_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.plugins.Qubole.HiveQuery, flyteidl.plugins.Qubole.HiveQuery.Builder, flyteidl.plugins.Qubole.HiveQueryOrBuilder> queryBuilder_;
       /**
@@ -2506,11 +2572,13 @@ public final class Qubole {
         }
         return queryBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2532,6 +2600,7 @@ public final class Qubole {
 
     private static final com.google.protobuf.Parser<QuboleHiveJob>
         PARSER = new com.google.protobuf.AbstractParser<QuboleHiveJob>() {
+      @java.lang.Override
       public QuboleHiveJob parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2549,6 +2618,7 @@ public final class Qubole {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.plugins.Qubole.QuboleHiveJob getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

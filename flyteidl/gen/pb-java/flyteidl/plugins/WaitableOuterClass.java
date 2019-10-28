@@ -95,13 +95,6 @@ public final class WaitableOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder subBuilder = null;
               if (wfExecId_ != null) {
@@ -127,6 +120,13 @@ public final class WaitableOuterClass {
               workflowId_ = s;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -144,6 +144,7 @@ public final class WaitableOuterClass {
       return flyteidl.plugins.WaitableOuterClass.internal_static_flyteidl_plugins_Waitable_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.plugins.WaitableOuterClass.internal_static_flyteidl_plugins_Waitable_fieldAccessorTable
@@ -184,6 +185,7 @@ public final class WaitableOuterClass {
      * <code>.flyteidl.core.WorkflowExecution.Phase phase = 2;</code>
      */
     public flyteidl.core.Execution.WorkflowExecution.Phase getPhase() {
+      @SuppressWarnings("deprecation")
       flyteidl.core.Execution.WorkflowExecution.Phase result = flyteidl.core.Execution.WorkflowExecution.Phase.valueOf(phase_);
       return result == null ? flyteidl.core.Execution.WorkflowExecution.Phase.UNRECOGNIZED : result;
     }
@@ -223,6 +225,7 @@ public final class WaitableOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -232,6 +235,7 @@ public final class WaitableOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (wfExecId_ != null) {
@@ -246,6 +250,7 @@ public final class WaitableOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -277,17 +282,16 @@ public final class WaitableOuterClass {
       }
       flyteidl.plugins.WaitableOuterClass.Waitable other = (flyteidl.plugins.WaitableOuterClass.Waitable) obj;
 
-      boolean result = true;
-      result = result && (hasWfExecId() == other.hasWfExecId());
+      if (hasWfExecId() != other.hasWfExecId()) return false;
       if (hasWfExecId()) {
-        result = result && getWfExecId()
-            .equals(other.getWfExecId());
+        if (!getWfExecId()
+            .equals(other.getWfExecId())) return false;
       }
-      result = result && phase_ == other.phase_;
-      result = result && getWorkflowId()
-          .equals(other.getWorkflowId());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (phase_ != other.phase_) return false;
+      if (!getWorkflowId()
+          .equals(other.getWorkflowId())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -380,6 +384,7 @@ public final class WaitableOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -387,6 +392,7 @@ public final class WaitableOuterClass {
     public static Builder newBuilder(flyteidl.plugins.WaitableOuterClass.Waitable prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -414,6 +420,7 @@ public final class WaitableOuterClass {
         return flyteidl.plugins.WaitableOuterClass.internal_static_flyteidl_plugins_Waitable_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.plugins.WaitableOuterClass.internal_static_flyteidl_plugins_Waitable_fieldAccessorTable
@@ -436,6 +443,7 @@ public final class WaitableOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (wfExecIdBuilder_ == null) {
@@ -451,15 +459,18 @@ public final class WaitableOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.plugins.WaitableOuterClass.internal_static_flyteidl_plugins_Waitable_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.WaitableOuterClass.Waitable getDefaultInstanceForType() {
         return flyteidl.plugins.WaitableOuterClass.Waitable.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.plugins.WaitableOuterClass.Waitable build() {
         flyteidl.plugins.WaitableOuterClass.Waitable result = buildPartial();
         if (!result.isInitialized()) {
@@ -468,6 +479,7 @@ public final class WaitableOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.WaitableOuterClass.Waitable buildPartial() {
         flyteidl.plugins.WaitableOuterClass.Waitable result = new flyteidl.plugins.WaitableOuterClass.Waitable(this);
         if (wfExecIdBuilder_ == null) {
@@ -481,32 +493,39 @@ public final class WaitableOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.plugins.WaitableOuterClass.Waitable) {
           return mergeFrom((flyteidl.plugins.WaitableOuterClass.Waitable)other);
@@ -533,10 +552,12 @@ public final class WaitableOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -555,7 +576,7 @@ public final class WaitableOuterClass {
         return this;
       }
 
-      private flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier wfExecId_ = null;
+      private flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier wfExecId_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> wfExecIdBuilder_;
       /**
@@ -691,6 +712,7 @@ public final class WaitableOuterClass {
        * <code>.flyteidl.core.WorkflowExecution.Phase phase = 2;</code>
        */
       public flyteidl.core.Execution.WorkflowExecution.Phase getPhase() {
+        @SuppressWarnings("deprecation")
         flyteidl.core.Execution.WorkflowExecution.Phase result = flyteidl.core.Execution.WorkflowExecution.Phase.valueOf(phase_);
         return result == null ? flyteidl.core.Execution.WorkflowExecution.Phase.UNRECOGNIZED : result;
       }
@@ -784,11 +806,13 @@ public final class WaitableOuterClass {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -810,6 +834,7 @@ public final class WaitableOuterClass {
 
     private static final com.google.protobuf.Parser<Waitable>
         PARSER = new com.google.protobuf.AbstractParser<Waitable>() {
+      @java.lang.Override
       public Waitable parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -827,6 +852,7 @@ public final class WaitableOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.plugins.WaitableOuterClass.Waitable getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

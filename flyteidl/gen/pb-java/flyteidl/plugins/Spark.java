@@ -57,7 +57,7 @@ public final class Spark {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
+              if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
@@ -80,6 +80,7 @@ public final class Spark {
       return flyteidl.plugins.Spark.internal_static_flyteidl_plugins_SparkApplication_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.plugins.Spark.internal_static_flyteidl_plugins_SparkApplication_fieldAccessorTable
@@ -204,6 +205,7 @@ public final class Spark {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -213,11 +215,13 @@ public final class Spark {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -238,9 +242,8 @@ public final class Spark {
       }
       flyteidl.plugins.Spark.SparkApplication other = (flyteidl.plugins.Spark.SparkApplication) obj;
 
-      boolean result = true;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -325,6 +328,7 @@ public final class Spark {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -332,6 +336,7 @@ public final class Spark {
     public static Builder newBuilder(flyteidl.plugins.Spark.SparkApplication prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -355,6 +360,7 @@ public final class Spark {
         return flyteidl.plugins.Spark.internal_static_flyteidl_plugins_SparkApplication_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.plugins.Spark.internal_static_flyteidl_plugins_SparkApplication_fieldAccessorTable
@@ -377,20 +383,24 @@ public final class Spark {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.plugins.Spark.internal_static_flyteidl_plugins_SparkApplication_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Spark.SparkApplication getDefaultInstanceForType() {
         return flyteidl.plugins.Spark.SparkApplication.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Spark.SparkApplication build() {
         flyteidl.plugins.Spark.SparkApplication result = buildPartial();
         if (!result.isInitialized()) {
@@ -399,38 +409,46 @@ public final class Spark {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Spark.SparkApplication buildPartial() {
         flyteidl.plugins.Spark.SparkApplication result = new flyteidl.plugins.Spark.SparkApplication(this);
         onBuilt();
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.plugins.Spark.SparkApplication) {
           return mergeFrom((flyteidl.plugins.Spark.SparkApplication)other);
@@ -447,10 +465,12 @@ public final class Spark {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -468,11 +488,13 @@ public final class Spark {
         }
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -494,6 +516,7 @@ public final class Spark {
 
     private static final com.google.protobuf.Parser<SparkApplication>
         PARSER = new com.google.protobuf.AbstractParser<SparkApplication>() {
+      @java.lang.Override
       public SparkApplication parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -511,6 +534,7 @@ public final class Spark {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.plugins.Spark.SparkApplication getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -683,13 +707,6 @@ public final class Spark {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               int rawValue = input.readEnum();
 
@@ -709,7 +726,7 @@ public final class Spark {
               break;
             }
             case 34: {
-              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+              if (!((mutable_bitField0_ & 0x00000008) != 0)) {
                 sparkConf_ = com.google.protobuf.MapField.newMapField(
                     SparkConfDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000008;
@@ -722,7 +739,7 @@ public final class Spark {
               break;
             }
             case 42: {
-              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+              if (!((mutable_bitField0_ & 0x00000010) != 0)) {
                 hadoopConf_ = com.google.protobuf.MapField.newMapField(
                     HadoopConfDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000010;
@@ -738,6 +755,13 @@ public final class Spark {
               java.lang.String s = input.readStringRequireUtf8();
 
               executorPath_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -758,6 +782,7 @@ public final class Spark {
     }
 
     @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
     protected com.google.protobuf.MapField internalGetMapField(
         int number) {
       switch (number) {
@@ -770,6 +795,7 @@ public final class Spark {
               "Invalid map field number: " + number);
       }
     }
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.plugins.Spark.internal_static_flyteidl_plugins_SparkJob_fieldAccessorTable
@@ -790,6 +816,7 @@ public final class Spark {
      * <code>.flyteidl.plugins.SparkApplication.Type applicationType = 1;</code>
      */
     public flyteidl.plugins.Spark.SparkApplication.Type getApplicationType() {
+      @SuppressWarnings("deprecation")
       flyteidl.plugins.Spark.SparkApplication.Type result = flyteidl.plugins.Spark.SparkApplication.Type.valueOf(applicationType_);
       return result == null ? flyteidl.plugins.Spark.SparkApplication.Type.UNRECOGNIZED : result;
     }
@@ -1057,6 +1084,7 @@ public final class Spark {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1066,6 +1094,7 @@ public final class Spark {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (applicationType_ != flyteidl.plugins.Spark.SparkApplication.Type.PYTHON.getNumber()) {
@@ -1095,6 +1124,7 @@ public final class Spark {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1148,20 +1178,19 @@ public final class Spark {
       }
       flyteidl.plugins.Spark.SparkJob other = (flyteidl.plugins.Spark.SparkJob) obj;
 
-      boolean result = true;
-      result = result && applicationType_ == other.applicationType_;
-      result = result && getMainApplicationFile()
-          .equals(other.getMainApplicationFile());
-      result = result && getMainClass()
-          .equals(other.getMainClass());
-      result = result && internalGetSparkConf().equals(
-          other.internalGetSparkConf());
-      result = result && internalGetHadoopConf().equals(
-          other.internalGetHadoopConf());
-      result = result && getExecutorPath()
-          .equals(other.getExecutorPath());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (applicationType_ != other.applicationType_) return false;
+      if (!getMainApplicationFile()
+          .equals(other.getMainApplicationFile())) return false;
+      if (!getMainClass()
+          .equals(other.getMainClass())) return false;
+      if (!internalGetSparkConf().equals(
+          other.internalGetSparkConf())) return false;
+      if (!internalGetHadoopConf().equals(
+          other.internalGetHadoopConf())) return false;
+      if (!getExecutorPath()
+          .equals(other.getExecutorPath())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1262,6 +1291,7 @@ public final class Spark {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1269,6 +1299,7 @@ public final class Spark {
     public static Builder newBuilder(flyteidl.plugins.Spark.SparkJob prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1322,6 +1353,7 @@ public final class Spark {
                 "Invalid map field number: " + number);
         }
       }
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.plugins.Spark.internal_static_flyteidl_plugins_SparkJob_fieldAccessorTable
@@ -1344,6 +1376,7 @@ public final class Spark {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         applicationType_ = 0;
@@ -1359,15 +1392,18 @@ public final class Spark {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.plugins.Spark.internal_static_flyteidl_plugins_SparkJob_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Spark.SparkJob getDefaultInstanceForType() {
         return flyteidl.plugins.Spark.SparkJob.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Spark.SparkJob build() {
         flyteidl.plugins.Spark.SparkJob result = buildPartial();
         if (!result.isInitialized()) {
@@ -1376,6 +1412,7 @@ public final class Spark {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Spark.SparkJob buildPartial() {
         flyteidl.plugins.Spark.SparkJob result = new flyteidl.plugins.Spark.SparkJob(this);
         int from_bitField0_ = bitField0_;
@@ -1393,32 +1430,39 @@ public final class Spark {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.plugins.Spark.SparkJob) {
           return mergeFrom((flyteidl.plugins.Spark.SparkJob)other);
@@ -1454,10 +1498,12 @@ public final class Spark {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1496,6 +1542,7 @@ public final class Spark {
        * <code>.flyteidl.plugins.SparkApplication.Type applicationType = 1;</code>
        */
       public flyteidl.plugins.Spark.SparkApplication.Type getApplicationType() {
+        @SuppressWarnings("deprecation")
         flyteidl.plugins.Spark.SparkApplication.Type result = flyteidl.plugins.Spark.SparkApplication.Type.valueOf(applicationType_);
         return result == null ? flyteidl.plugins.Spark.SparkApplication.Type.UNRECOGNIZED : result;
       }
@@ -1993,11 +2040,13 @@ public final class Spark {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2019,6 +2068,7 @@ public final class Spark {
 
     private static final com.google.protobuf.Parser<SparkJob>
         PARSER = new com.google.protobuf.AbstractParser<SparkJob>() {
+      @java.lang.Override
       public SparkJob parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2036,6 +2086,7 @@ public final class Spark {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.plugins.Spark.SparkJob getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

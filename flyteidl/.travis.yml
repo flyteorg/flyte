@@ -1,7 +1,7 @@
 sudo: required
 language: go
 go:
-  - "1.12"
+  - "1.13"
 services:
   - docker
 jobs:
@@ -12,7 +12,7 @@ jobs:
       script: make test
     - stage: test
       name: unit tests
-      install: make install 
+      install: make install
       script: make test_unit
     - if: tag IS present AND fork = false
       stage: release

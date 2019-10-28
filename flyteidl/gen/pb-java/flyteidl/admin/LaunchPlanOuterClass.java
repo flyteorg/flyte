@@ -219,13 +219,6 @@ public final class LaunchPlanOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (id_ != null) {
@@ -252,6 +245,13 @@ public final class LaunchPlanOuterClass {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -269,6 +269,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanCreateRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanCreateRequest_fieldAccessorTable
@@ -343,6 +344,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -352,6 +354,7 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (id_ != null) {
@@ -363,6 +366,7 @@ public final class LaunchPlanOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -391,19 +395,18 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest other = (flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest) obj;
 
-      boolean result = true;
-      result = result && (hasId() == other.hasId());
+      if (hasId() != other.hasId()) return false;
       if (hasId()) {
-        result = result && getId()
-            .equals(other.getId());
+        if (!getId()
+            .equals(other.getId())) return false;
       }
-      result = result && (hasSpec() == other.hasSpec());
+      if (hasSpec() != other.hasSpec()) return false;
       if (hasSpec()) {
-        result = result && getSpec()
-            .equals(other.getSpec());
+        if (!getSpec()
+            .equals(other.getSpec())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -496,6 +499,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -503,6 +507,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -532,6 +537,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanCreateRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanCreateRequest_fieldAccessorTable
@@ -554,6 +560,7 @@ public final class LaunchPlanOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (idBuilder_ == null) {
@@ -571,15 +578,18 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanCreateRequest_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest build() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -588,6 +598,7 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest result = new flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest(this);
         if (idBuilder_ == null) {
@@ -604,32 +615,39 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest)other);
@@ -652,10 +670,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -674,7 +694,7 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
-      private flyteidl.core.IdentifierOuterClass.Identifier id_ = null;
+      private flyteidl.core.IdentifierOuterClass.Identifier id_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> idBuilder_;
       /**
@@ -827,7 +847,7 @@ public final class LaunchPlanOuterClass {
         return idBuilder_;
       }
 
-      private flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec spec_ = null;
+      private flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec spec_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec.Builder, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpecOrBuilder> specBuilder_;
       /**
@@ -979,11 +999,13 @@ public final class LaunchPlanOuterClass {
         }
         return specBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1005,6 +1027,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<LaunchPlanCreateRequest>
         PARSER = new com.google.protobuf.AbstractParser<LaunchPlanCreateRequest>() {
+      @java.lang.Override
       public LaunchPlanCreateRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1022,6 +1045,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1075,7 +1099,7 @@ public final class LaunchPlanOuterClass {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
+              if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
@@ -1098,6 +1122,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanCreateResponse_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanCreateResponse_fieldAccessorTable
@@ -1106,6 +1131,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1115,11 +1141,13 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1140,9 +1168,8 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse other = (flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse) obj;
 
-      boolean result = true;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1227,6 +1254,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1234,6 +1262,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1261,6 +1290,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanCreateResponse_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanCreateResponse_fieldAccessorTable
@@ -1283,20 +1313,24 @@ public final class LaunchPlanOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanCreateResponse_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse build() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse result = buildPartial();
         if (!result.isInitialized()) {
@@ -1305,38 +1339,46 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse result = new flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse(this);
         onBuilt();
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse)other);
@@ -1353,10 +1395,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1374,11 +1418,13 @@ public final class LaunchPlanOuterClass {
         }
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1400,6 +1446,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<LaunchPlanCreateResponse>
         PARSER = new com.google.protobuf.AbstractParser<LaunchPlanCreateResponse>() {
+      @java.lang.Override
       public LaunchPlanCreateResponse parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1417,6 +1464,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanCreateResponse getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1512,13 +1560,6 @@ public final class LaunchPlanOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (id_ != null) {
@@ -1558,6 +1599,13 @@ public final class LaunchPlanOuterClass {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1575,6 +1623,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlan_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlan_fieldAccessorTable
@@ -1646,6 +1695,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1655,6 +1705,7 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (id_ != null) {
@@ -1669,6 +1720,7 @@ public final class LaunchPlanOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1701,24 +1753,23 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlan other = (flyteidl.admin.LaunchPlanOuterClass.LaunchPlan) obj;
 
-      boolean result = true;
-      result = result && (hasId() == other.hasId());
+      if (hasId() != other.hasId()) return false;
       if (hasId()) {
-        result = result && getId()
-            .equals(other.getId());
+        if (!getId()
+            .equals(other.getId())) return false;
       }
-      result = result && (hasSpec() == other.hasSpec());
+      if (hasSpec() != other.hasSpec()) return false;
       if (hasSpec()) {
-        result = result && getSpec()
-            .equals(other.getSpec());
+        if (!getSpec()
+            .equals(other.getSpec())) return false;
       }
-      result = result && (hasClosure() == other.hasClosure());
+      if (hasClosure() != other.hasClosure()) return false;
       if (hasClosure()) {
-        result = result && getClosure()
-            .equals(other.getClosure());
+        if (!getClosure()
+            .equals(other.getClosure())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1815,6 +1866,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1822,6 +1874,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.LaunchPlan prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1852,6 +1905,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlan_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlan_fieldAccessorTable
@@ -1874,6 +1928,7 @@ public final class LaunchPlanOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (idBuilder_ == null) {
@@ -1897,15 +1952,18 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlan_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlan getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.LaunchPlan.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlan build() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlan result = buildPartial();
         if (!result.isInitialized()) {
@@ -1914,6 +1972,7 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlan buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlan result = new flyteidl.admin.LaunchPlanOuterClass.LaunchPlan(this);
         if (idBuilder_ == null) {
@@ -1935,32 +1994,39 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.LaunchPlan) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.LaunchPlan)other);
@@ -1986,10 +2052,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2008,7 +2076,7 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
-      private flyteidl.core.IdentifierOuterClass.Identifier id_ = null;
+      private flyteidl.core.IdentifierOuterClass.Identifier id_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> idBuilder_;
       /**
@@ -2125,7 +2193,7 @@ public final class LaunchPlanOuterClass {
         return idBuilder_;
       }
 
-      private flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec spec_ = null;
+      private flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec spec_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec.Builder, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpecOrBuilder> specBuilder_;
       /**
@@ -2242,7 +2310,7 @@ public final class LaunchPlanOuterClass {
         return specBuilder_;
       }
 
-      private flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure closure_ = null;
+      private flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure closure_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure.Builder, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosureOrBuilder> closureBuilder_;
       /**
@@ -2358,11 +2426,13 @@ public final class LaunchPlanOuterClass {
         }
         return closureBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2384,6 +2454,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<LaunchPlan>
         PARSER = new com.google.protobuf.AbstractParser<LaunchPlan>() {
+      @java.lang.Override
       public LaunchPlan parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2401,6 +2472,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlan getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2500,15 +2572,8 @@ public final class LaunchPlanOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 launchPlans_ = new java.util.ArrayList<flyteidl.admin.LaunchPlanOuterClass.LaunchPlan>();
                 mutable_bitField0_ |= 0x00000001;
               }
@@ -2522,6 +2587,13 @@ public final class LaunchPlanOuterClass {
               token_ = s;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -2530,7 +2602,7 @@ public final class LaunchPlanOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
           launchPlans_ = java.util.Collections.unmodifiableList(launchPlans_);
         }
         this.unknownFields = unknownFields.build();
@@ -2542,6 +2614,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanList_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanList_fieldAccessorTable
@@ -2630,6 +2703,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2639,6 +2713,7 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < launchPlans_.size(); i++) {
@@ -2650,6 +2725,7 @@ public final class LaunchPlanOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2677,13 +2753,12 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList other = (flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList) obj;
 
-      boolean result = true;
-      result = result && getLaunchPlansList()
-          .equals(other.getLaunchPlansList());
-      result = result && getToken()
-          .equals(other.getToken());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getLaunchPlansList()
+          .equals(other.getLaunchPlansList())) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2774,6 +2849,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2781,6 +2857,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2808,6 +2885,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanList_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanList_fieldAccessorTable
@@ -2831,6 +2909,7 @@ public final class LaunchPlanOuterClass {
           getLaunchPlansFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (launchPlansBuilder_ == null) {
@@ -2844,15 +2923,18 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanList_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList build() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList result = buildPartial();
         if (!result.isInitialized()) {
@@ -2861,12 +2943,13 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList result = new flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (launchPlansBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          if (((bitField0_ & 0x00000001) != 0)) {
             launchPlans_ = java.util.Collections.unmodifiableList(launchPlans_);
             bitField0_ = (bitField0_ & ~0x00000001);
           }
@@ -2880,32 +2963,39 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList)other);
@@ -2952,10 +3042,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2978,7 +3070,7 @@ public final class LaunchPlanOuterClass {
       private java.util.List<flyteidl.admin.LaunchPlanOuterClass.LaunchPlan> launchPlans_ =
         java.util.Collections.emptyList();
       private void ensureLaunchPlansIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+        if (!((bitField0_ & 0x00000001) != 0)) {
           launchPlans_ = new java.util.ArrayList<flyteidl.admin.LaunchPlanOuterClass.LaunchPlan>(launchPlans_);
           bitField0_ |= 0x00000001;
          }
@@ -3207,7 +3299,7 @@ public final class LaunchPlanOuterClass {
           launchPlansBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.admin.LaunchPlanOuterClass.LaunchPlan, flyteidl.admin.LaunchPlanOuterClass.LaunchPlan.Builder, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanOrBuilder>(
                   launchPlans_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  ((bitField0_ & 0x00000001) != 0),
                   getParentForChildren(),
                   isClean());
           launchPlans_ = null;
@@ -3308,11 +3400,13 @@ public final class LaunchPlanOuterClass {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3334,6 +3428,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<LaunchPlanList>
         PARSER = new com.google.protobuf.AbstractParser<LaunchPlanList>() {
+      @java.lang.Override
       public LaunchPlanList parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3351,6 +3446,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanList getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3426,13 +3522,6 @@ public final class LaunchPlanOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
               methodCase_ = 1;
@@ -3443,6 +3532,13 @@ public final class LaunchPlanOuterClass {
               java.lang.String s = input.readStringRequireUtf8();
               methodCase_ = 2;
               method_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -3462,6 +3558,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_Auth_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_Auth_fieldAccessorTable
@@ -3594,6 +3691,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3603,6 +3701,7 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (methodCase_ == 1) {
@@ -3614,6 +3713,7 @@ public final class LaunchPlanOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3640,24 +3740,21 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.Auth other = (flyteidl.admin.LaunchPlanOuterClass.Auth) obj;
 
-      boolean result = true;
-      result = result && getMethodCase().equals(
-          other.getMethodCase());
-      if (!result) return false;
+      if (!getMethodCase().equals(other.getMethodCase())) return false;
       switch (methodCase_) {
         case 1:
-          result = result && getAssumableIamRole()
-              .equals(other.getAssumableIamRole());
+          if (!getAssumableIamRole()
+              .equals(other.getAssumableIamRole())) return false;
           break;
         case 2:
-          result = result && getKubernetesServiceAccount()
-              .equals(other.getKubernetesServiceAccount());
+          if (!getKubernetesServiceAccount()
+              .equals(other.getKubernetesServiceAccount())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3754,6 +3851,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3761,6 +3859,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.Auth prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3788,6 +3887,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_Auth_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_Auth_fieldAccessorTable
@@ -3810,6 +3910,7 @@ public final class LaunchPlanOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         methodCase_ = 0;
@@ -3817,15 +3918,18 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_Auth_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.Auth getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.Auth.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.Auth build() {
         flyteidl.admin.LaunchPlanOuterClass.Auth result = buildPartial();
         if (!result.isInitialized()) {
@@ -3834,6 +3938,7 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.Auth buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.Auth result = new flyteidl.admin.LaunchPlanOuterClass.Auth(this);
         if (methodCase_ == 1) {
@@ -3847,32 +3952,39 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.Auth) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.Auth)other);
@@ -3906,10 +4018,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4102,11 +4216,13 @@ public final class LaunchPlanOuterClass {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -4128,6 +4244,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<Auth>
         PARSER = new com.google.protobuf.AbstractParser<Auth>() {
+      @java.lang.Override
       public Auth parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4145,6 +4262,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.Auth getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -4392,13 +4510,6 @@ public final class LaunchPlanOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (workflowId_ != null) {
@@ -4496,6 +4607,13 @@ public final class LaunchPlanOuterClass {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -4513,6 +4631,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanSpec_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanSpec_fieldAccessorTable
@@ -4794,6 +4913,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -4803,6 +4923,7 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (workflowId_ != null) {
@@ -4832,6 +4953,7 @@ public final class LaunchPlanOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -4883,46 +5005,45 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec other = (flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec) obj;
 
-      boolean result = true;
-      result = result && (hasWorkflowId() == other.hasWorkflowId());
+      if (hasWorkflowId() != other.hasWorkflowId()) return false;
       if (hasWorkflowId()) {
-        result = result && getWorkflowId()
-            .equals(other.getWorkflowId());
+        if (!getWorkflowId()
+            .equals(other.getWorkflowId())) return false;
       }
-      result = result && (hasEntityMetadata() == other.hasEntityMetadata());
+      if (hasEntityMetadata() != other.hasEntityMetadata()) return false;
       if (hasEntityMetadata()) {
-        result = result && getEntityMetadata()
-            .equals(other.getEntityMetadata());
+        if (!getEntityMetadata()
+            .equals(other.getEntityMetadata())) return false;
       }
-      result = result && (hasDefaultInputs() == other.hasDefaultInputs());
+      if (hasDefaultInputs() != other.hasDefaultInputs()) return false;
       if (hasDefaultInputs()) {
-        result = result && getDefaultInputs()
-            .equals(other.getDefaultInputs());
+        if (!getDefaultInputs()
+            .equals(other.getDefaultInputs())) return false;
       }
-      result = result && (hasFixedInputs() == other.hasFixedInputs());
+      if (hasFixedInputs() != other.hasFixedInputs()) return false;
       if (hasFixedInputs()) {
-        result = result && getFixedInputs()
-            .equals(other.getFixedInputs());
+        if (!getFixedInputs()
+            .equals(other.getFixedInputs())) return false;
       }
-      result = result && getRole()
-          .equals(other.getRole());
-      result = result && (hasLabels() == other.hasLabels());
+      if (!getRole()
+          .equals(other.getRole())) return false;
+      if (hasLabels() != other.hasLabels()) return false;
       if (hasLabels()) {
-        result = result && getLabels()
-            .equals(other.getLabels());
+        if (!getLabels()
+            .equals(other.getLabels())) return false;
       }
-      result = result && (hasAnnotations() == other.hasAnnotations());
+      if (hasAnnotations() != other.hasAnnotations()) return false;
       if (hasAnnotations()) {
-        result = result && getAnnotations()
-            .equals(other.getAnnotations());
+        if (!getAnnotations()
+            .equals(other.getAnnotations())) return false;
       }
-      result = result && (hasAuth() == other.hasAuth());
+      if (hasAuth() != other.hasAuth()) return false;
       if (hasAuth()) {
-        result = result && getAuth()
-            .equals(other.getAuth());
+        if (!getAuth()
+            .equals(other.getAuth())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -5037,6 +5158,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -5044,6 +5166,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -5071,6 +5194,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanSpec_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanSpec_fieldAccessorTable
@@ -5093,6 +5217,7 @@ public final class LaunchPlanOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (workflowIdBuilder_ == null) {
@@ -5142,15 +5267,18 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanSpec_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec build() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec result = buildPartial();
         if (!result.isInitialized()) {
@@ -5159,6 +5287,7 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec result = new flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec(this);
         if (workflowIdBuilder_ == null) {
@@ -5201,32 +5330,39 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec)other);
@@ -5268,10 +5404,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5290,7 +5428,7 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
-      private flyteidl.core.IdentifierOuterClass.Identifier workflowId_ = null;
+      private flyteidl.core.IdentifierOuterClass.Identifier workflowId_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> workflowIdBuilder_;
       /**
@@ -5443,7 +5581,7 @@ public final class LaunchPlanOuterClass {
         return workflowIdBuilder_;
       }
 
-      private flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata entityMetadata_ = null;
+      private flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata entityMetadata_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata.Builder, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadataOrBuilder> entityMetadataBuilder_;
       /**
@@ -5596,7 +5734,7 @@ public final class LaunchPlanOuterClass {
         return entityMetadataBuilder_;
       }
 
-      private flyteidl.core.Interface.ParameterMap defaultInputs_ = null;
+      private flyteidl.core.Interface.ParameterMap defaultInputs_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.ParameterMap, flyteidl.core.Interface.ParameterMap.Builder, flyteidl.core.Interface.ParameterMapOrBuilder> defaultInputsBuilder_;
       /**
@@ -5749,7 +5887,7 @@ public final class LaunchPlanOuterClass {
         return defaultInputsBuilder_;
       }
 
-      private flyteidl.core.Literals.LiteralMap fixedInputs_ = null;
+      private flyteidl.core.Literals.LiteralMap fixedInputs_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> fixedInputsBuilder_;
       /**
@@ -5991,7 +6129,7 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
-      private flyteidl.admin.Common.Labels labels_ = null;
+      private flyteidl.admin.Common.Labels labels_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.Labels, flyteidl.admin.Common.Labels.Builder, flyteidl.admin.Common.LabelsOrBuilder> labelsBuilder_;
       /**
@@ -6144,7 +6282,7 @@ public final class LaunchPlanOuterClass {
         return labelsBuilder_;
       }
 
-      private flyteidl.admin.Common.Annotations annotations_ = null;
+      private flyteidl.admin.Common.Annotations annotations_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.Annotations, flyteidl.admin.Common.Annotations.Builder, flyteidl.admin.Common.AnnotationsOrBuilder> annotationsBuilder_;
       /**
@@ -6297,7 +6435,7 @@ public final class LaunchPlanOuterClass {
         return annotationsBuilder_;
       }
 
-      private flyteidl.admin.LaunchPlanOuterClass.Auth auth_ = null;
+      private flyteidl.admin.LaunchPlanOuterClass.Auth auth_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.LaunchPlanOuterClass.Auth, flyteidl.admin.LaunchPlanOuterClass.Auth.Builder, flyteidl.admin.LaunchPlanOuterClass.AuthOrBuilder> authBuilder_;
       /**
@@ -6449,11 +6587,13 @@ public final class LaunchPlanOuterClass {
         }
         return authBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -6475,6 +6615,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<LaunchPlanSpec>
         PARSER = new com.google.protobuf.AbstractParser<LaunchPlanSpec>() {
+      @java.lang.Override
       public LaunchPlanSpec parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6492,6 +6633,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -6665,13 +6807,6 @@ public final class LaunchPlanOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               int rawValue = input.readEnum();
 
@@ -6730,6 +6865,13 @@ public final class LaunchPlanOuterClass {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -6747,6 +6889,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanClosure_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanClosure_fieldAccessorTable
@@ -6774,6 +6917,7 @@ public final class LaunchPlanOuterClass {
      * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
      */
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState getState() {
+      @SuppressWarnings("deprecation")
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState result = flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState.valueOf(state_);
       return result == null ? flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState.UNRECOGNIZED : result;
     }
@@ -6911,6 +7055,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -6920,6 +7065,7 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (state_ != flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState.INACTIVE.getNumber()) {
@@ -6940,6 +7086,7 @@ public final class LaunchPlanOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -6980,30 +7127,29 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure other = (flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure) obj;
 
-      boolean result = true;
-      result = result && state_ == other.state_;
-      result = result && (hasExpectedInputs() == other.hasExpectedInputs());
+      if (state_ != other.state_) return false;
+      if (hasExpectedInputs() != other.hasExpectedInputs()) return false;
       if (hasExpectedInputs()) {
-        result = result && getExpectedInputs()
-            .equals(other.getExpectedInputs());
+        if (!getExpectedInputs()
+            .equals(other.getExpectedInputs())) return false;
       }
-      result = result && (hasExpectedOutputs() == other.hasExpectedOutputs());
+      if (hasExpectedOutputs() != other.hasExpectedOutputs()) return false;
       if (hasExpectedOutputs()) {
-        result = result && getExpectedOutputs()
-            .equals(other.getExpectedOutputs());
+        if (!getExpectedOutputs()
+            .equals(other.getExpectedOutputs())) return false;
       }
-      result = result && (hasCreatedAt() == other.hasCreatedAt());
+      if (hasCreatedAt() != other.hasCreatedAt()) return false;
       if (hasCreatedAt()) {
-        result = result && getCreatedAt()
-            .equals(other.getCreatedAt());
+        if (!getCreatedAt()
+            .equals(other.getCreatedAt())) return false;
       }
-      result = result && (hasUpdatedAt() == other.hasUpdatedAt());
+      if (hasUpdatedAt() != other.hasUpdatedAt()) return false;
       if (hasUpdatedAt()) {
-        result = result && getUpdatedAt()
-            .equals(other.getUpdatedAt());
+        if (!getUpdatedAt()
+            .equals(other.getUpdatedAt())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -7106,6 +7252,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -7113,6 +7260,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -7142,6 +7290,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanClosure_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanClosure_fieldAccessorTable
@@ -7164,6 +7313,7 @@ public final class LaunchPlanOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         state_ = 0;
@@ -7195,15 +7345,18 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanClosure_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure build() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure result = buildPartial();
         if (!result.isInitialized()) {
@@ -7212,6 +7365,7 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure result = new flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure(this);
         result.state_ = state_;
@@ -7239,32 +7393,39 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure)other);
@@ -7296,10 +7457,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -7349,6 +7512,7 @@ public final class LaunchPlanOuterClass {
        * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
        */
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState getState() {
+        @SuppressWarnings("deprecation")
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState result = flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState.valueOf(state_);
         return result == null ? flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState.UNRECOGNIZED : result;
       }
@@ -7382,7 +7546,7 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
-      private flyteidl.core.Interface.ParameterMap expectedInputs_ = null;
+      private flyteidl.core.Interface.ParameterMap expectedInputs_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.ParameterMap, flyteidl.core.Interface.ParameterMap.Builder, flyteidl.core.Interface.ParameterMapOrBuilder> expectedInputsBuilder_;
       /**
@@ -7535,7 +7699,7 @@ public final class LaunchPlanOuterClass {
         return expectedInputsBuilder_;
       }
 
-      private flyteidl.core.Interface.VariableMap expectedOutputs_ = null;
+      private flyteidl.core.Interface.VariableMap expectedOutputs_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.VariableMap, flyteidl.core.Interface.VariableMap.Builder, flyteidl.core.Interface.VariableMapOrBuilder> expectedOutputsBuilder_;
       /**
@@ -7688,7 +7852,7 @@ public final class LaunchPlanOuterClass {
         return expectedOutputsBuilder_;
       }
 
-      private com.google.protobuf.Timestamp createdAt_ = null;
+      private com.google.protobuf.Timestamp createdAt_;
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> createdAtBuilder_;
       /**
@@ -7841,7 +8005,7 @@ public final class LaunchPlanOuterClass {
         return createdAtBuilder_;
       }
 
-      private com.google.protobuf.Timestamp updatedAt_ = null;
+      private com.google.protobuf.Timestamp updatedAt_;
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> updatedAtBuilder_;
       /**
@@ -7993,11 +8157,13 @@ public final class LaunchPlanOuterClass {
         }
         return updatedAtBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -8019,6 +8185,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<LaunchPlanClosure>
         PARSER = new com.google.protobuf.AbstractParser<LaunchPlanClosure>() {
+      @java.lang.Override
       public LaunchPlanClosure parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8036,6 +8203,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -8160,13 +8328,6 @@ public final class LaunchPlanOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.admin.ScheduleOuterClass.Schedule.Builder subBuilder = null;
               if (schedule_ != null) {
@@ -8181,12 +8342,19 @@ public final class LaunchPlanOuterClass {
               break;
             }
             case 18: {
-              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
                 notifications_ = new java.util.ArrayList<flyteidl.admin.Common.Notification>();
                 mutable_bitField0_ |= 0x00000002;
               }
               notifications_.add(
                   input.readMessage(flyteidl.admin.Common.Notification.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -8197,7 +8365,7 @@ public final class LaunchPlanOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+        if (((mutable_bitField0_ & 0x00000002) != 0)) {
           notifications_ = java.util.Collections.unmodifiableList(notifications_);
         }
         this.unknownFields = unknownFields.build();
@@ -8209,6 +8377,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanMetadata_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanMetadata_fieldAccessorTable
@@ -8306,6 +8475,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -8315,6 +8485,7 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (schedule_ != null) {
@@ -8326,6 +8497,7 @@ public final class LaunchPlanOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -8354,16 +8526,15 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata other = (flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata) obj;
 
-      boolean result = true;
-      result = result && (hasSchedule() == other.hasSchedule());
+      if (hasSchedule() != other.hasSchedule()) return false;
       if (hasSchedule()) {
-        result = result && getSchedule()
-            .equals(other.getSchedule());
+        if (!getSchedule()
+            .equals(other.getSchedule())) return false;
       }
-      result = result && getNotificationsList()
-          .equals(other.getNotificationsList());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getNotificationsList()
+          .equals(other.getNotificationsList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -8456,6 +8627,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -8463,6 +8635,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -8491,6 +8664,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanMetadata_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanMetadata_fieldAccessorTable
@@ -8514,6 +8688,7 @@ public final class LaunchPlanOuterClass {
           getNotificationsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (scheduleBuilder_ == null) {
@@ -8531,15 +8706,18 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanMetadata_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata build() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata result = buildPartial();
         if (!result.isInitialized()) {
@@ -8548,6 +8726,7 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata result = new flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata(this);
         int from_bitField0_ = bitField0_;
@@ -8558,7 +8737,7 @@ public final class LaunchPlanOuterClass {
           result.schedule_ = scheduleBuilder_.build();
         }
         if (notificationsBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          if (((bitField0_ & 0x00000002) != 0)) {
             notifications_ = java.util.Collections.unmodifiableList(notifications_);
             bitField0_ = (bitField0_ & ~0x00000002);
           }
@@ -8571,32 +8750,39 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata)other);
@@ -8642,10 +8828,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8665,7 +8853,7 @@ public final class LaunchPlanOuterClass {
       }
       private int bitField0_;
 
-      private flyteidl.admin.ScheduleOuterClass.Schedule schedule_ = null;
+      private flyteidl.admin.ScheduleOuterClass.Schedule schedule_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.ScheduleOuterClass.Schedule, flyteidl.admin.ScheduleOuterClass.Schedule.Builder, flyteidl.admin.ScheduleOuterClass.ScheduleOrBuilder> scheduleBuilder_;
       /**
@@ -8821,7 +9009,7 @@ public final class LaunchPlanOuterClass {
       private java.util.List<flyteidl.admin.Common.Notification> notifications_ =
         java.util.Collections.emptyList();
       private void ensureNotificationsIsMutable() {
-        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+        if (!((bitField0_ & 0x00000002) != 0)) {
           notifications_ = new java.util.ArrayList<flyteidl.admin.Common.Notification>(notifications_);
           bitField0_ |= 0x00000002;
          }
@@ -9122,18 +9310,20 @@ public final class LaunchPlanOuterClass {
           notificationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.admin.Common.Notification, flyteidl.admin.Common.Notification.Builder, flyteidl.admin.Common.NotificationOrBuilder>(
                   notifications_,
-                  ((bitField0_ & 0x00000002) == 0x00000002),
+                  ((bitField0_ & 0x00000002) != 0),
                   getParentForChildren(),
                   isClean());
           notifications_ = null;
         }
         return notificationsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -9155,6 +9345,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<LaunchPlanMetadata>
         PARSER = new com.google.protobuf.AbstractParser<LaunchPlanMetadata>() {
+      @java.lang.Override
       public LaunchPlanMetadata parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9172,6 +9363,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanMetadata getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -9268,13 +9460,6 @@ public final class LaunchPlanOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (id_ != null) {
@@ -9294,6 +9479,13 @@ public final class LaunchPlanOuterClass {
               state_ = rawValue;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -9311,6 +9503,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanUpdateRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanUpdateRequest_fieldAccessorTable
@@ -9371,11 +9564,13 @@ public final class LaunchPlanOuterClass {
      * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
      */
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState getState() {
+      @SuppressWarnings("deprecation")
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState result = flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState.valueOf(state_);
       return result == null ? flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState.UNRECOGNIZED : result;
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -9385,6 +9580,7 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (id_ != null) {
@@ -9396,6 +9592,7 @@ public final class LaunchPlanOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -9424,15 +9621,14 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest other = (flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest) obj;
 
-      boolean result = true;
-      result = result && (hasId() == other.hasId());
+      if (hasId() != other.hasId()) return false;
       if (hasId()) {
-        result = result && getId()
-            .equals(other.getId());
+        if (!getId()
+            .equals(other.getId())) return false;
       }
-      result = result && state_ == other.state_;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (state_ != other.state_) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -9523,6 +9719,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -9530,6 +9727,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -9557,6 +9755,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanUpdateRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanUpdateRequest_fieldAccessorTable
@@ -9579,6 +9778,7 @@ public final class LaunchPlanOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (idBuilder_ == null) {
@@ -9592,15 +9792,18 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanUpdateRequest_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest build() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -9609,6 +9812,7 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest result = new flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest(this);
         if (idBuilder_ == null) {
@@ -9621,32 +9825,39 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest)other);
@@ -9669,10 +9880,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9691,7 +9904,7 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
-      private flyteidl.core.IdentifierOuterClass.Identifier id_ = null;
+      private flyteidl.core.IdentifierOuterClass.Identifier id_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> idBuilder_;
       /**
@@ -9875,6 +10088,7 @@ public final class LaunchPlanOuterClass {
        * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
        */
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState getState() {
+        @SuppressWarnings("deprecation")
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState result = flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState.valueOf(state_);
         return result == null ? flyteidl.admin.LaunchPlanOuterClass.LaunchPlanState.UNRECOGNIZED : result;
       }
@@ -9907,11 +10121,13 @@ public final class LaunchPlanOuterClass {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -9933,6 +10149,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<LaunchPlanUpdateRequest>
         PARSER = new com.google.protobuf.AbstractParser<LaunchPlanUpdateRequest>() {
+      @java.lang.Override
       public LaunchPlanUpdateRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9950,6 +10167,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -10003,7 +10221,7 @@ public final class LaunchPlanOuterClass {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
+              if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
@@ -10026,6 +10244,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanUpdateResponse_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanUpdateResponse_fieldAccessorTable
@@ -10034,6 +10253,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -10043,11 +10263,13 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -10068,9 +10290,8 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse other = (flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse) obj;
 
-      boolean result = true;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -10155,6 +10376,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -10162,6 +10384,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -10189,6 +10412,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanUpdateResponse_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanUpdateResponse_fieldAccessorTable
@@ -10211,20 +10435,24 @@ public final class LaunchPlanOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_LaunchPlanUpdateResponse_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse build() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse result = buildPartial();
         if (!result.isInitialized()) {
@@ -10233,38 +10461,46 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse result = new flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse(this);
         onBuilt();
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse)other);
@@ -10281,10 +10517,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10302,11 +10540,13 @@ public final class LaunchPlanOuterClass {
         }
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -10328,6 +10568,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<LaunchPlanUpdateResponse>
         PARSER = new com.google.protobuf.AbstractParser<LaunchPlanUpdateResponse>() {
+      @java.lang.Override
       public LaunchPlanUpdateResponse parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10345,6 +10586,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanUpdateResponse getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -10411,13 +10653,6 @@ public final class LaunchPlanOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.admin.Common.NamedEntityIdentifier.Builder subBuilder = null;
               if (id_ != null) {
@@ -10429,6 +10664,13 @@ public final class LaunchPlanOuterClass {
                 id_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -10448,6 +10690,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanRequest_fieldAccessorTable
@@ -10477,6 +10720,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -10486,6 +10730,7 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (id_ != null) {
@@ -10494,6 +10739,7 @@ public final class LaunchPlanOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -10518,14 +10764,13 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest other = (flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest) obj;
 
-      boolean result = true;
-      result = result && (hasId() == other.hasId());
+      if (hasId() != other.hasId()) return false;
       if (hasId()) {
-        result = result && getId()
-            .equals(other.getId());
+        if (!getId()
+            .equals(other.getId())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -10614,6 +10859,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -10621,6 +10867,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -10648,6 +10895,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanRequest_fieldAccessorTable
@@ -10670,6 +10918,7 @@ public final class LaunchPlanOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (idBuilder_ == null) {
@@ -10681,15 +10930,18 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanRequest_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest build() {
         flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -10698,6 +10950,7 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest result = new flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest(this);
         if (idBuilder_ == null) {
@@ -10709,32 +10962,39 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest)other);
@@ -10754,10 +11014,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10776,7 +11038,7 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
-      private flyteidl.admin.Common.NamedEntityIdentifier id_ = null;
+      private flyteidl.admin.Common.NamedEntityIdentifier id_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.NamedEntityIdentifier, flyteidl.admin.Common.NamedEntityIdentifier.Builder, flyteidl.admin.Common.NamedEntityIdentifierOrBuilder> idBuilder_;
       /**
@@ -10892,11 +11154,13 @@ public final class LaunchPlanOuterClass {
         }
         return idBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -10918,6 +11182,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<ActiveLaunchPlanRequest>
         PARSER = new com.google.protobuf.AbstractParser<ActiveLaunchPlanRequest>() {
+      @java.lang.Override
       public ActiveLaunchPlanRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10935,6 +11200,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -11059,7 +11325,6 @@ public final class LaunchPlanOuterClass {
     private ActiveLaunchPlanListRequest() {
       project_ = "";
       domain_ = "";
-      limit_ = 0;
       token_ = "";
     }
 
@@ -11087,13 +11352,6 @@ public final class LaunchPlanOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -11130,6 +11388,13 @@ public final class LaunchPlanOuterClass {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -11147,6 +11412,7 @@ public final class LaunchPlanOuterClass {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_fieldAccessorTable
@@ -11334,6 +11600,7 @@ public final class LaunchPlanOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -11343,6 +11610,7 @@ public final class LaunchPlanOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getProjectBytes().isEmpty()) {
@@ -11363,6 +11631,7 @@ public final class LaunchPlanOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -11400,22 +11669,21 @@ public final class LaunchPlanOuterClass {
       }
       flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest other = (flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest) obj;
 
-      boolean result = true;
-      result = result && getProject()
-          .equals(other.getProject());
-      result = result && getDomain()
-          .equals(other.getDomain());
-      result = result && (getLimit()
-          == other.getLimit());
-      result = result && getToken()
-          .equals(other.getToken());
-      result = result && (hasSortBy() == other.hasSortBy());
+      if (!getProject()
+          .equals(other.getProject())) return false;
+      if (!getDomain()
+          .equals(other.getDomain())) return false;
+      if (getLimit()
+          != other.getLimit()) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
+      if (hasSortBy() != other.hasSortBy()) return false;
       if (hasSortBy()) {
-        result = result && getSortBy()
-            .equals(other.getSortBy());
+        if (!getSortBy()
+            .equals(other.getSortBy())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -11512,6 +11780,7 @@ public final class LaunchPlanOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -11519,6 +11788,7 @@ public final class LaunchPlanOuterClass {
     public static Builder newBuilder(flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -11546,6 +11816,7 @@ public final class LaunchPlanOuterClass {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_fieldAccessorTable
@@ -11568,6 +11839,7 @@ public final class LaunchPlanOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         project_ = "";
@@ -11587,15 +11859,18 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.LaunchPlanOuterClass.internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest getDefaultInstanceForType() {
         return flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest build() {
         flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -11604,6 +11879,7 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest buildPartial() {
         flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest result = new flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest(this);
         result.project_ = project_;
@@ -11619,32 +11895,39 @@ public final class LaunchPlanOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest) {
           return mergeFrom((flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest)other);
@@ -11679,10 +11962,12 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12016,7 +12301,7 @@ public final class LaunchPlanOuterClass {
         return this;
       }
 
-      private flyteidl.admin.Common.Sort sortBy_ = null;
+      private flyteidl.admin.Common.Sort sortBy_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.Sort, flyteidl.admin.Common.Sort.Builder, flyteidl.admin.Common.SortOrBuilder> sortByBuilder_;
       /**
@@ -12177,11 +12462,13 @@ public final class LaunchPlanOuterClass {
         }
         return sortByBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -12203,6 +12490,7 @@ public final class LaunchPlanOuterClass {
 
     private static final com.google.protobuf.Parser<ActiveLaunchPlanListRequest>
         PARSER = new com.google.protobuf.AbstractParser<ActiveLaunchPlanListRequest>() {
+      @java.lang.Override
       public ActiveLaunchPlanListRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12220,6 +12508,7 @@ public final class LaunchPlanOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.LaunchPlanOuterClass.ActiveLaunchPlanListRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

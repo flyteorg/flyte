@@ -2,7 +2,7 @@
 
 DIR=`pwd`
 rm -rf $DIR/gen
-LYFT_IMAGE="lyft/protocgenerator:d53ce1490e235bf765c93b4a8cfcdd07a1325024"
+LYFT_IMAGE="lyft/protocgenerator:5e6a3be18db77a8862365a19711428c2f66284ef"
 SWAGGER_CLI_IMAGE="docker.io/lyft/swagger-codegen-cli:dc5ce6ec6d7d4d980fa882d6bd13a83cba3be3c3"
 
 docker run -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/service --with_gateway -l go --go_source_relative

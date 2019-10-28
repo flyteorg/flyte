@@ -92,13 +92,6 @@ public final class ProjectOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -109,6 +102,13 @@ public final class ProjectOuterClass {
               java.lang.String s = input.readStringRequireUtf8();
 
               name_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -128,6 +128,7 @@ public final class ProjectOuterClass {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Domain_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Domain_fieldAccessorTable
@@ -212,6 +213,7 @@ public final class ProjectOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -221,6 +223,7 @@ public final class ProjectOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getIdBytes().isEmpty()) {
@@ -232,6 +235,7 @@ public final class ProjectOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -258,13 +262,12 @@ public final class ProjectOuterClass {
       }
       flyteidl.admin.ProjectOuterClass.Domain other = (flyteidl.admin.ProjectOuterClass.Domain) obj;
 
-      boolean result = true;
-      result = result && getId()
-          .equals(other.getId());
-      result = result && getName()
-          .equals(other.getName());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getId()
+          .equals(other.getId())) return false;
+      if (!getName()
+          .equals(other.getName())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -353,6 +356,7 @@ public final class ProjectOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -360,6 +364,7 @@ public final class ProjectOuterClass {
     public static Builder newBuilder(flyteidl.admin.ProjectOuterClass.Domain prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -388,6 +393,7 @@ public final class ProjectOuterClass {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Domain_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Domain_fieldAccessorTable
@@ -410,6 +416,7 @@ public final class ProjectOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = "";
@@ -419,15 +426,18 @@ public final class ProjectOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Domain_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.Domain getDefaultInstanceForType() {
         return flyteidl.admin.ProjectOuterClass.Domain.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.Domain build() {
         flyteidl.admin.ProjectOuterClass.Domain result = buildPartial();
         if (!result.isInitialized()) {
@@ -436,6 +446,7 @@ public final class ProjectOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.Domain buildPartial() {
         flyteidl.admin.ProjectOuterClass.Domain result = new flyteidl.admin.ProjectOuterClass.Domain(this);
         result.id_ = id_;
@@ -444,32 +455,39 @@ public final class ProjectOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.ProjectOuterClass.Domain) {
           return mergeFrom((flyteidl.admin.ProjectOuterClass.Domain)other);
@@ -494,10 +512,12 @@ public final class ProjectOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -673,11 +693,13 @@ public final class ProjectOuterClass {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -699,6 +721,7 @@ public final class ProjectOuterClass {
 
     private static final com.google.protobuf.Parser<Domain>
         PARSER = new com.google.protobuf.AbstractParser<Domain>() {
+      @java.lang.Override
       public Domain parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -716,6 +739,7 @@ public final class ProjectOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.ProjectOuterClass.Domain getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -835,13 +859,6 @@ public final class ProjectOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -855,7 +872,7 @@ public final class ProjectOuterClass {
               break;
             }
             case 26: {
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
                 domains_ = new java.util.ArrayList<flyteidl.admin.ProjectOuterClass.Domain>();
                 mutable_bitField0_ |= 0x00000004;
               }
@@ -869,6 +886,13 @@ public final class ProjectOuterClass {
               description_ = s;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -877,7 +901,7 @@ public final class ProjectOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+        if (((mutable_bitField0_ & 0x00000004) != 0)) {
           domains_ = java.util.Collections.unmodifiableList(domains_);
         }
         this.unknownFields = unknownFields.build();
@@ -889,6 +913,7 @@ public final class ProjectOuterClass {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Project_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Project_fieldAccessorTable
@@ -1043,6 +1068,7 @@ public final class ProjectOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1052,6 +1078,7 @@ public final class ProjectOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getIdBytes().isEmpty()) {
@@ -1069,6 +1096,7 @@ public final class ProjectOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1102,17 +1130,16 @@ public final class ProjectOuterClass {
       }
       flyteidl.admin.ProjectOuterClass.Project other = (flyteidl.admin.ProjectOuterClass.Project) obj;
 
-      boolean result = true;
-      result = result && getId()
-          .equals(other.getId());
-      result = result && getName()
-          .equals(other.getName());
-      result = result && getDomainsList()
-          .equals(other.getDomainsList());
-      result = result && getDescription()
-          .equals(other.getDescription());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getId()
+          .equals(other.getId())) return false;
+      if (!getName()
+          .equals(other.getName())) return false;
+      if (!getDomainsList()
+          .equals(other.getDomainsList())) return false;
+      if (!getDescription()
+          .equals(other.getDescription())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1207,6 +1234,7 @@ public final class ProjectOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1214,6 +1242,7 @@ public final class ProjectOuterClass {
     public static Builder newBuilder(flyteidl.admin.ProjectOuterClass.Project prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1241,6 +1270,7 @@ public final class ProjectOuterClass {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Project_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Project_fieldAccessorTable
@@ -1264,6 +1294,7 @@ public final class ProjectOuterClass {
           getDomainsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = "";
@@ -1281,15 +1312,18 @@ public final class ProjectOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Project_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.Project getDefaultInstanceForType() {
         return flyteidl.admin.ProjectOuterClass.Project.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.Project build() {
         flyteidl.admin.ProjectOuterClass.Project result = buildPartial();
         if (!result.isInitialized()) {
@@ -1298,6 +1332,7 @@ public final class ProjectOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.Project buildPartial() {
         flyteidl.admin.ProjectOuterClass.Project result = new flyteidl.admin.ProjectOuterClass.Project(this);
         int from_bitField0_ = bitField0_;
@@ -1305,7 +1340,7 @@ public final class ProjectOuterClass {
         result.id_ = id_;
         result.name_ = name_;
         if (domainsBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          if (((bitField0_ & 0x00000004) != 0)) {
             domains_ = java.util.Collections.unmodifiableList(domains_);
             bitField0_ = (bitField0_ & ~0x00000004);
           }
@@ -1319,32 +1354,39 @@ public final class ProjectOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.ProjectOuterClass.Project) {
           return mergeFrom((flyteidl.admin.ProjectOuterClass.Project)other);
@@ -1399,10 +1441,12 @@ public final class ProjectOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1583,7 +1627,7 @@ public final class ProjectOuterClass {
       private java.util.List<flyteidl.admin.ProjectOuterClass.Domain> domains_ =
         java.util.Collections.emptyList();
       private void ensureDomainsIsMutable() {
-        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+        if (!((bitField0_ & 0x00000004) != 0)) {
           domains_ = new java.util.ArrayList<flyteidl.admin.ProjectOuterClass.Domain>(domains_);
           bitField0_ |= 0x00000004;
          }
@@ -1812,7 +1856,7 @@ public final class ProjectOuterClass {
           domainsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.admin.ProjectOuterClass.Domain, flyteidl.admin.ProjectOuterClass.Domain.Builder, flyteidl.admin.ProjectOuterClass.DomainOrBuilder>(
                   domains_,
-                  ((bitField0_ & 0x00000004) == 0x00000004),
+                  ((bitField0_ & 0x00000004) != 0),
                   getParentForChildren(),
                   isClean());
           domains_ = null;
@@ -1888,11 +1932,13 @@ public final class ProjectOuterClass {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1914,6 +1960,7 @@ public final class ProjectOuterClass {
 
     private static final com.google.protobuf.Parser<Project>
         PARSER = new com.google.protobuf.AbstractParser<Project>() {
+      @java.lang.Override
       public Project parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1931,6 +1978,7 @@ public final class ProjectOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.ProjectOuterClass.Project getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2005,20 +2053,20 @@ public final class ProjectOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 projects_ = new java.util.ArrayList<flyteidl.admin.ProjectOuterClass.Project>();
                 mutable_bitField0_ |= 0x00000001;
               }
               projects_.add(
                   input.readMessage(flyteidl.admin.ProjectOuterClass.Project.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -2029,7 +2077,7 @@ public final class ProjectOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
           projects_ = java.util.Collections.unmodifiableList(projects_);
         }
         this.unknownFields = unknownFields.build();
@@ -2041,6 +2089,7 @@ public final class ProjectOuterClass {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Projects_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Projects_fieldAccessorTable
@@ -2084,6 +2133,7 @@ public final class ProjectOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2093,6 +2143,7 @@ public final class ProjectOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < projects_.size(); i++) {
@@ -2101,6 +2152,7 @@ public final class ProjectOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2125,11 +2177,10 @@ public final class ProjectOuterClass {
       }
       flyteidl.admin.ProjectOuterClass.Projects other = (flyteidl.admin.ProjectOuterClass.Projects) obj;
 
-      boolean result = true;
-      result = result && getProjectsList()
-          .equals(other.getProjectsList());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getProjectsList()
+          .equals(other.getProjectsList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2218,6 +2269,7 @@ public final class ProjectOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2225,6 +2277,7 @@ public final class ProjectOuterClass {
     public static Builder newBuilder(flyteidl.admin.ProjectOuterClass.Projects prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2248,6 +2301,7 @@ public final class ProjectOuterClass {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Projects_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Projects_fieldAccessorTable
@@ -2271,6 +2325,7 @@ public final class ProjectOuterClass {
           getProjectsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (projectsBuilder_ == null) {
@@ -2282,15 +2337,18 @@ public final class ProjectOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_Projects_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.Projects getDefaultInstanceForType() {
         return flyteidl.admin.ProjectOuterClass.Projects.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.Projects build() {
         flyteidl.admin.ProjectOuterClass.Projects result = buildPartial();
         if (!result.isInitialized()) {
@@ -2299,11 +2357,12 @@ public final class ProjectOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.Projects buildPartial() {
         flyteidl.admin.ProjectOuterClass.Projects result = new flyteidl.admin.ProjectOuterClass.Projects(this);
         int from_bitField0_ = bitField0_;
         if (projectsBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          if (((bitField0_ & 0x00000001) != 0)) {
             projects_ = java.util.Collections.unmodifiableList(projects_);
             bitField0_ = (bitField0_ & ~0x00000001);
           }
@@ -2315,32 +2374,39 @@ public final class ProjectOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.ProjectOuterClass.Projects) {
           return mergeFrom((flyteidl.admin.ProjectOuterClass.Projects)other);
@@ -2383,10 +2449,12 @@ public final class ProjectOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2409,7 +2477,7 @@ public final class ProjectOuterClass {
       private java.util.List<flyteidl.admin.ProjectOuterClass.Project> projects_ =
         java.util.Collections.emptyList();
       private void ensureProjectsIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+        if (!((bitField0_ & 0x00000001) != 0)) {
           projects_ = new java.util.ArrayList<flyteidl.admin.ProjectOuterClass.Project>(projects_);
           bitField0_ |= 0x00000001;
          }
@@ -2638,18 +2706,20 @@ public final class ProjectOuterClass {
           projectsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.admin.ProjectOuterClass.Project, flyteidl.admin.ProjectOuterClass.Project.Builder, flyteidl.admin.ProjectOuterClass.ProjectOrBuilder>(
                   projects_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  ((bitField0_ & 0x00000001) != 0),
                   getParentForChildren(),
                   isClean());
           projects_ = null;
         }
         return projectsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2671,6 +2741,7 @@ public final class ProjectOuterClass {
 
     private static final com.google.protobuf.Parser<Projects>
         PARSER = new com.google.protobuf.AbstractParser<Projects>() {
+      @java.lang.Override
       public Projects parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2688,6 +2759,7 @@ public final class ProjectOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.ProjectOuterClass.Projects getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2737,7 +2809,7 @@ public final class ProjectOuterClass {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
+              if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
@@ -2760,6 +2832,7 @@ public final class ProjectOuterClass {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectListRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectListRequest_fieldAccessorTable
@@ -2768,6 +2841,7 @@ public final class ProjectOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2777,11 +2851,13 @@ public final class ProjectOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2802,9 +2878,8 @@ public final class ProjectOuterClass {
       }
       flyteidl.admin.ProjectOuterClass.ProjectListRequest other = (flyteidl.admin.ProjectOuterClass.ProjectListRequest) obj;
 
-      boolean result = true;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2889,6 +2964,7 @@ public final class ProjectOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2896,6 +2972,7 @@ public final class ProjectOuterClass {
     public static Builder newBuilder(flyteidl.admin.ProjectOuterClass.ProjectListRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2919,6 +2996,7 @@ public final class ProjectOuterClass {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectListRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectListRequest_fieldAccessorTable
@@ -2941,20 +3019,24 @@ public final class ProjectOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectListRequest_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.ProjectListRequest getDefaultInstanceForType() {
         return flyteidl.admin.ProjectOuterClass.ProjectListRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.ProjectListRequest build() {
         flyteidl.admin.ProjectOuterClass.ProjectListRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -2963,38 +3045,46 @@ public final class ProjectOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.ProjectListRequest buildPartial() {
         flyteidl.admin.ProjectOuterClass.ProjectListRequest result = new flyteidl.admin.ProjectOuterClass.ProjectListRequest(this);
         onBuilt();
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.ProjectOuterClass.ProjectListRequest) {
           return mergeFrom((flyteidl.admin.ProjectOuterClass.ProjectListRequest)other);
@@ -3011,10 +3101,12 @@ public final class ProjectOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3032,11 +3124,13 @@ public final class ProjectOuterClass {
         }
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3058,6 +3152,7 @@ public final class ProjectOuterClass {
 
     private static final com.google.protobuf.Parser<ProjectListRequest>
         PARSER = new com.google.protobuf.AbstractParser<ProjectListRequest>() {
+      @java.lang.Override
       public ProjectListRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3075,6 +3170,7 @@ public final class ProjectOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.ProjectOuterClass.ProjectListRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3137,13 +3233,6 @@ public final class ProjectOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.admin.ProjectOuterClass.Project.Builder subBuilder = null;
               if (project_ != null) {
@@ -3155,6 +3244,13 @@ public final class ProjectOuterClass {
                 project_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -3174,6 +3270,7 @@ public final class ProjectOuterClass {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectRegisterRequest_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectRegisterRequest_fieldAccessorTable
@@ -3203,6 +3300,7 @@ public final class ProjectOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3212,6 +3310,7 @@ public final class ProjectOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (project_ != null) {
@@ -3220,6 +3319,7 @@ public final class ProjectOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3244,14 +3344,13 @@ public final class ProjectOuterClass {
       }
       flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest other = (flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest) obj;
 
-      boolean result = true;
-      result = result && (hasProject() == other.hasProject());
+      if (hasProject() != other.hasProject()) return false;
       if (hasProject()) {
-        result = result && getProject()
-            .equals(other.getProject());
+        if (!getProject()
+            .equals(other.getProject())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3340,6 +3439,7 @@ public final class ProjectOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3347,6 +3447,7 @@ public final class ProjectOuterClass {
     public static Builder newBuilder(flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3370,6 +3471,7 @@ public final class ProjectOuterClass {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectRegisterRequest_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectRegisterRequest_fieldAccessorTable
@@ -3392,6 +3494,7 @@ public final class ProjectOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (projectBuilder_ == null) {
@@ -3403,15 +3506,18 @@ public final class ProjectOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectRegisterRequest_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest getDefaultInstanceForType() {
         return flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest build() {
         flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -3420,6 +3526,7 @@ public final class ProjectOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest buildPartial() {
         flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest result = new flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest(this);
         if (projectBuilder_ == null) {
@@ -3431,32 +3538,39 @@ public final class ProjectOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest) {
           return mergeFrom((flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest)other);
@@ -3476,10 +3590,12 @@ public final class ProjectOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3498,7 +3614,7 @@ public final class ProjectOuterClass {
         return this;
       }
 
-      private flyteidl.admin.ProjectOuterClass.Project project_ = null;
+      private flyteidl.admin.ProjectOuterClass.Project project_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.ProjectOuterClass.Project, flyteidl.admin.ProjectOuterClass.Project.Builder, flyteidl.admin.ProjectOuterClass.ProjectOrBuilder> projectBuilder_;
       /**
@@ -3614,11 +3730,13 @@ public final class ProjectOuterClass {
         }
         return projectBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3640,6 +3758,7 @@ public final class ProjectOuterClass {
 
     private static final com.google.protobuf.Parser<ProjectRegisterRequest>
         PARSER = new com.google.protobuf.AbstractParser<ProjectRegisterRequest>() {
+      @java.lang.Override
       public ProjectRegisterRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3657,6 +3776,7 @@ public final class ProjectOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.ProjectOuterClass.ProjectRegisterRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3706,7 +3826,7 @@ public final class ProjectOuterClass {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
+              if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
@@ -3729,6 +3849,7 @@ public final class ProjectOuterClass {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectRegisterResponse_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectRegisterResponse_fieldAccessorTable
@@ -3737,6 +3858,7 @@ public final class ProjectOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3746,11 +3868,13 @@ public final class ProjectOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3771,9 +3895,8 @@ public final class ProjectOuterClass {
       }
       flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse other = (flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse) obj;
 
-      boolean result = true;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3858,6 +3981,7 @@ public final class ProjectOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3865,6 +3989,7 @@ public final class ProjectOuterClass {
     public static Builder newBuilder(flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3888,6 +4013,7 @@ public final class ProjectOuterClass {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectRegisterResponse_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectRegisterResponse_fieldAccessorTable
@@ -3910,20 +4036,24 @@ public final class ProjectOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectRegisterResponse_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse getDefaultInstanceForType() {
         return flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse build() {
         flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse result = buildPartial();
         if (!result.isInitialized()) {
@@ -3932,38 +4062,46 @@ public final class ProjectOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse buildPartial() {
         flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse result = new flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse(this);
         onBuilt();
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse) {
           return mergeFrom((flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse)other);
@@ -3980,10 +4118,12 @@ public final class ProjectOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4001,11 +4141,13 @@ public final class ProjectOuterClass {
         }
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -4027,6 +4169,7 @@ public final class ProjectOuterClass {
 
     private static final com.google.protobuf.Parser<ProjectRegisterResponse>
         PARSER = new com.google.protobuf.AbstractParser<ProjectRegisterResponse>() {
+      @java.lang.Override
       public ProjectRegisterResponse parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4044,6 +4187,7 @@ public final class ProjectOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.ProjectOuterClass.ProjectRegisterResponse getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

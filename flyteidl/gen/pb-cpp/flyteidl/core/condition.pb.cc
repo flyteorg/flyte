@@ -6,57 +6,47 @@
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/port.h>
-#include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/extension_set.h>
 #include <google/protobuf/wire_format_lite_inl.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
-// This is a temporary google only hack
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-#include "third_party/protobuf/version.h"
-#endif
 // @@protoc_insertion_point(includes)
+#include <google/protobuf/port_def.inc>
+
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_BooleanExpression_flyteidl_2fcore_2fcondition_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ComparisonExpression_flyteidl_2fcore_2fcondition_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_Primitive_flyteidl_2fcore_2fliterals_2eproto;
 namespace flyteidl {
 namespace core {
 class ComparisonExpressionDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<ComparisonExpression>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<ComparisonExpression> _instance;
 } _ComparisonExpression_default_instance_;
 class OperandDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<Operand>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<Operand> _instance;
   const ::flyteidl::core::Primitive* primitive_;
   ::google::protobuf::internal::ArenaStringPtr var_;
 } _Operand_default_instance_;
 class BooleanExpressionDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<BooleanExpression>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<BooleanExpression> _instance;
   const ::flyteidl::core::ConjunctionExpression* conjunction_;
   const ::flyteidl::core::ComparisonExpression* comparison_;
 } _BooleanExpression_default_instance_;
 class ConjunctionExpressionDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<ConjunctionExpression>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<ConjunctionExpression> _instance;
 } _ConjunctionExpression_default_instance_;
 }  // namespace core
 }  // namespace flyteidl
-namespace protobuf_flyteidl_2fcore_2fcondition_2eproto {
-void InitDefaultsComparisonExpressionImpl() {
+static void InitDefaultsComparisonExpression_flyteidl_2fcore_2fcondition_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_flyteidl_2fcore_2fcondition_2eproto::InitDefaultsOperand();
   {
     void* ptr = &::flyteidl::core::_ComparisonExpression_default_instance_;
     new (ptr) ::flyteidl::core::ComparisonExpression();
@@ -65,20 +55,13 @@ void InitDefaultsComparisonExpressionImpl() {
   ::flyteidl::core::ComparisonExpression::InitAsDefaultInstance();
 }
 
-void InitDefaultsComparisonExpression() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsComparisonExpressionImpl);
-}
+::google::protobuf::internal::SCCInfo<1> scc_info_ComparisonExpression_flyteidl_2fcore_2fcondition_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsComparisonExpression_flyteidl_2fcore_2fcondition_2eproto}, {
+      &scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto.base,}};
 
-void InitDefaultsOperandImpl() {
+static void InitDefaultsOperand_flyteidl_2fcore_2fcondition_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_flyteidl_2fcore_2fliterals_2eproto::InitDefaultsPrimitive();
   {
     void* ptr = &::flyteidl::core::_Operand_default_instance_;
     new (ptr) ::flyteidl::core::Operand();
@@ -87,20 +70,13 @@ void InitDefaultsOperandImpl() {
   ::flyteidl::core::Operand::InitAsDefaultInstance();
 }
 
-void InitDefaultsOperand() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsOperandImpl);
-}
+::google::protobuf::internal::SCCInfo<1> scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsOperand_flyteidl_2fcore_2fcondition_2eproto}, {
+      &scc_info_Primitive_flyteidl_2fcore_2fliterals_2eproto.base,}};
 
-void InitDefaultsBooleanExpressionImpl() {
+static void InitDefaultsBooleanExpression_flyteidl_2fcore_2fcondition_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_flyteidl_2fcore_2fcondition_2eproto::InitDefaultsComparisonExpression();
   {
     void* ptr = &::flyteidl::core::_BooleanExpression_default_instance_;
     new (ptr) ::flyteidl::core::BooleanExpression();
@@ -115,49 +91,55 @@ void InitDefaultsBooleanExpressionImpl() {
   ::flyteidl::core::ConjunctionExpression::InitAsDefaultInstance();
 }
 
-void InitDefaultsBooleanExpression() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsBooleanExpressionImpl);
+::google::protobuf::internal::SCCInfo<1> scc_info_BooleanExpression_flyteidl_2fcore_2fcondition_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsBooleanExpression_flyteidl_2fcore_2fcondition_2eproto}, {
+      &scc_info_ComparisonExpression_flyteidl_2fcore_2fcondition_2eproto.base,}};
+
+void InitDefaults_flyteidl_2fcore_2fcondition_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_ComparisonExpression_flyteidl_2fcore_2fcondition_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_BooleanExpression_flyteidl_2fcore_2fcondition_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata[4];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[2];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fcondition_2eproto[4];
+const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fcore_2fcondition_2eproto[2];
+constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fcore_2fcondition_2eproto = nullptr;
 
-const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fcondition_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::ComparisonExpression, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ComparisonExpression, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::ComparisonExpression, operator__),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::ComparisonExpression, left_value_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::ComparisonExpression, right_value_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ComparisonExpression, operator__),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ComparisonExpression, left_value_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ComparisonExpression, right_value_),
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::Operand, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::Operand, _internal_metadata_),
   ~0u,  // no _extensions_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::Operand, _oneof_case_[0]),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::Operand, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   offsetof(::flyteidl::core::OperandDefaultTypeInternal, primitive_),
   offsetof(::flyteidl::core::OperandDefaultTypeInternal, var_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::Operand, val_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::Operand, val_),
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::BooleanExpression, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::BooleanExpression, _internal_metadata_),
   ~0u,  // no _extensions_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::BooleanExpression, _oneof_case_[0]),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::BooleanExpression, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   offsetof(::flyteidl::core::BooleanExpressionDefaultTypeInternal, conjunction_),
   offsetof(::flyteidl::core::BooleanExpressionDefaultTypeInternal, comparison_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::BooleanExpression, expr_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::BooleanExpression, expr_),
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::ConjunctionExpression, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ConjunctionExpression, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::ConjunctionExpression, operator__),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::ConjunctionExpression, left_expression_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::core::ConjunctionExpression, right_expression_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ConjunctionExpression, operator__),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ConjunctionExpression, left_expression_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ConjunctionExpression, right_expression_),
 };
-static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::core::ComparisonExpression)},
   { 8, -1, sizeof(::flyteidl::core::Operand)},
   { 16, -1, sizeof(::flyteidl::core::BooleanExpression)},
@@ -171,74 +153,57 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_ConjunctionExpression_default_instance_),
 };
 
-void protobuf_AssignDescriptors() {
-  AddDescriptors();
-  ::google::protobuf::MessageFactory* factory = NULL;
-  AssignDescriptors(
-      "flyteidl/core/condition.proto", schemas, file_default_instances, TableStruct::offsets, factory,
-      file_level_metadata, file_level_enum_descriptors, NULL);
-}
+::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto = {
+  {}, AddDescriptors_flyteidl_2fcore_2fcondition_2eproto, "flyteidl/core/condition.proto", schemas,
+  file_default_instances, TableStruct_flyteidl_2fcore_2fcondition_2eproto::offsets,
+  file_level_metadata_flyteidl_2fcore_2fcondition_2eproto, 4, file_level_enum_descriptors_flyteidl_2fcore_2fcondition_2eproto, file_level_service_descriptors_flyteidl_2fcore_2fcondition_2eproto,
+};
 
-void protobuf_AssignDescriptorsOnce() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &protobuf_AssignDescriptors);
-}
+const char descriptor_table_protodef_flyteidl_2fcore_2fcondition_2eproto[] =
+  "\n\035flyteidl/core/condition.proto\022\rflyteid"
+  "l.core\032\034flyteidl/core/literals.proto\"\356\001\n"
+  "\024ComparisonExpression\022>\n\010operator\030\001 \001(\0162"
+  ",.flyteidl.core.ComparisonExpression.Ope"
+  "rator\022*\n\nleft_value\030\002 \001(\0132\026.flyteidl.cor"
+  "e.Operand\022+\n\013right_value\030\003 \001(\0132\026.flyteid"
+  "l.core.Operand\"=\n\010Operator\022\006\n\002EQ\020\000\022\007\n\003NE"
+  "Q\020\001\022\006\n\002GT\020\002\022\007\n\003GTE\020\003\022\006\n\002LT\020\004\022\007\n\003LTE\020\005\"N\n"
+  "\007Operand\022-\n\tprimitive\030\001 \001(\0132\030.flyteidl.c"
+  "ore.PrimitiveH\000\022\r\n\003var\030\002 \001(\tH\000B\005\n\003val\"\223\001"
+  "\n\021BooleanExpression\022;\n\013conjunction\030\001 \001(\013"
+  "2$.flyteidl.core.ConjunctionExpressionH\000"
+  "\0229\n\ncomparison\030\002 \001(\0132#.flyteidl.core.Com"
+  "parisonExpressionH\000B\006\n\004expr\"\372\001\n\025Conjunct"
+  "ionExpression\022F\n\010operator\030\001 \001(\01624.flytei"
+  "dl.core.ConjunctionExpression.LogicalOpe"
+  "rator\0229\n\017left_expression\030\002 \001(\0132 .flyteid"
+  "l.core.BooleanExpression\022:\n\020right_expres"
+  "sion\030\003 \001(\0132 .flyteidl.core.BooleanExpres"
+  "sion\"\"\n\017LogicalOperator\022\007\n\003AND\020\000\022\006\n\002OR\020\001"
+  "B2Z0github.com/lyft/flyteidl/gen/pb-go/f"
+  "lyteidl/coreb\006proto3"
+  ;
+::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fcondition_2eproto = {
+  false, InitDefaults_flyteidl_2fcore_2fcondition_2eproto, 
+  descriptor_table_protodef_flyteidl_2fcore_2fcondition_2eproto,
+  "flyteidl/core/condition.proto", &assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto, 860,
+};
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
-void protobuf_RegisterTypes(const ::std::string&) {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 4);
-}
-
-void AddDescriptorsImpl() {
-  InitDefaults();
-  static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\035flyteidl/core/condition.proto\022\rflyteid"
-      "l.core\032\034flyteidl/core/literals.proto\"\356\001\n"
-      "\024ComparisonExpression\022>\n\010operator\030\001 \001(\0162"
-      ",.flyteidl.core.ComparisonExpression.Ope"
-      "rator\022*\n\nleft_value\030\002 \001(\0132\026.flyteidl.cor"
-      "e.Operand\022+\n\013right_value\030\003 \001(\0132\026.flyteid"
-      "l.core.Operand\"=\n\010Operator\022\006\n\002EQ\020\000\022\007\n\003NE"
-      "Q\020\001\022\006\n\002GT\020\002\022\007\n\003GTE\020\003\022\006\n\002LT\020\004\022\007\n\003LTE\020\005\"N\n"
-      "\007Operand\022-\n\tprimitive\030\001 \001(\0132\030.flyteidl.c"
-      "ore.PrimitiveH\000\022\r\n\003var\030\002 \001(\tH\000B\005\n\003val\"\223\001"
-      "\n\021BooleanExpression\022;\n\013conjunction\030\001 \001(\013"
-      "2$.flyteidl.core.ConjunctionExpressionH\000"
-      "\0229\n\ncomparison\030\002 \001(\0132#.flyteidl.core.Com"
-      "parisonExpressionH\000B\006\n\004expr\"\372\001\n\025Conjunct"
-      "ionExpression\022F\n\010operator\030\001 \001(\01624.flytei"
-      "dl.core.ConjunctionExpression.LogicalOpe"
-      "rator\0229\n\017left_expression\030\002 \001(\0132 .flyteid"
-      "l.core.BooleanExpression\022:\n\020right_expres"
-      "sion\030\003 \001(\0132 .flyteidl.core.BooleanExpres"
-      "sion\"\"\n\017LogicalOperator\022\007\n\003AND\020\000\022\006\n\002OR\020\001"
-      "B2Z0github.com/lyft/flyteidl/gen/pb-go/f"
-      "lyteidl/coreb\006proto3"
+void AddDescriptors_flyteidl_2fcore_2fcondition_2eproto() {
+  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
+  {
+    ::AddDescriptors_flyteidl_2fcore_2fliterals_2eproto,
   };
-  ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 860);
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
-    "flyteidl/core/condition.proto", &protobuf_RegisterTypes);
-  ::protobuf_flyteidl_2fcore_2fliterals_2eproto::AddDescriptors();
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2fcondition_2eproto, deps, 1);
 }
 
-void AddDescriptors() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &AddDescriptorsImpl);
-}
-// Force AddDescriptors() to be called at dynamic initialization time.
-struct StaticDescriptorInitializer {
-  StaticDescriptorInitializer() {
-    AddDescriptors();
-  }
-} static_descriptor_initializer;
-}  // namespace protobuf_flyteidl_2fcore_2fcondition_2eproto
+// Force running AddDescriptors() at dynamic initialization time.
+static bool dynamic_init_dummy_flyteidl_2fcore_2fcondition_2eproto = []() { AddDescriptors_flyteidl_2fcore_2fcondition_2eproto(); return true; }();
 namespace flyteidl {
 namespace core {
 const ::google::protobuf::EnumDescriptor* ComparisonExpression_Operator_descriptor() {
-  protobuf_flyteidl_2fcore_2fcondition_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_flyteidl_2fcore_2fcondition_2eproto::file_level_enum_descriptors[0];
+  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto);
+  return file_level_enum_descriptors_flyteidl_2fcore_2fcondition_2eproto[0];
 }
 bool ComparisonExpression_Operator_IsValid(int value) {
   switch (value) {
@@ -266,8 +231,8 @@ const ComparisonExpression_Operator ComparisonExpression::Operator_MAX;
 const int ComparisonExpression::Operator_ARRAYSIZE;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 const ::google::protobuf::EnumDescriptor* ConjunctionExpression_LogicalOperator_descriptor() {
-  protobuf_flyteidl_2fcore_2fcondition_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_flyteidl_2fcore_2fcondition_2eproto::file_level_enum_descriptors[1];
+  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto);
+  return file_level_enum_descriptors_flyteidl_2fcore_2fcondition_2eproto[1];
 }
 bool ConjunctionExpression_LogicalOperator_IsValid(int value) {
   switch (value) {
@@ -295,6 +260,20 @@ void ComparisonExpression::InitAsDefaultInstance() {
   ::flyteidl::core::_ComparisonExpression_default_instance_._instance.get_mutable()->right_value_ = const_cast< ::flyteidl::core::Operand*>(
       ::flyteidl::core::Operand::internal_default_instance());
 }
+class ComparisonExpression::HasBitSetters {
+ public:
+  static const ::flyteidl::core::Operand& left_value(const ComparisonExpression* msg);
+  static const ::flyteidl::core::Operand& right_value(const ComparisonExpression* msg);
+};
+
+const ::flyteidl::core::Operand&
+ComparisonExpression::HasBitSetters::left_value(const ComparisonExpression* msg) {
+  return *msg->left_value_;
+}
+const ::flyteidl::core::Operand&
+ComparisonExpression::HasBitSetters::right_value(const ComparisonExpression* msg) {
+  return *msg->right_value_;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int ComparisonExpression::kOperatorFieldNumber;
 const int ComparisonExpression::kLeftValueFieldNumber;
@@ -302,37 +281,34 @@ const int ComparisonExpression::kRightValueFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ComparisonExpression::ComparisonExpression()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fcore_2fcondition_2eproto::InitDefaultsComparisonExpression();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.core.ComparisonExpression)
 }
 ComparisonExpression::ComparisonExpression(const ComparisonExpression& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   if (from.has_left_value()) {
     left_value_ = new ::flyteidl::core::Operand(*from.left_value_);
   } else {
-    left_value_ = NULL;
+    left_value_ = nullptr;
   }
   if (from.has_right_value()) {
     right_value_ = new ::flyteidl::core::Operand(*from.right_value_);
   } else {
-    right_value_ = NULL;
+    right_value_ = nullptr;
   }
   operator__ = from.operator__;
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.ComparisonExpression)
 }
 
 void ComparisonExpression::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_ComparisonExpression_flyteidl_2fcore_2fcondition_2eproto.base);
   ::memset(&left_value_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&operator__) -
       reinterpret_cast<char*>(&left_value_)) + sizeof(operator__));
-  _cached_size_ = 0;
 }
 
 ComparisonExpression::~ComparisonExpression() {
@@ -346,27 +322,13 @@ void ComparisonExpression::SharedDtor() {
 }
 
 void ComparisonExpression::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* ComparisonExpression::descriptor() {
-  ::protobuf_flyteidl_2fcore_2fcondition_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fcore_2fcondition_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const ComparisonExpression& ComparisonExpression::default_instance() {
-  ::protobuf_flyteidl_2fcore_2fcondition_2eproto::InitDefaultsComparisonExpression();
+  ::google::protobuf::internal::InitSCC(&::scc_info_ComparisonExpression_flyteidl_2fcore_2fcondition_2eproto.base);
   return *internal_default_instance();
 }
 
-ComparisonExpression* ComparisonExpression::New(::google::protobuf::Arena* arena) const {
-  ComparisonExpression* n = new ComparisonExpression;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void ComparisonExpression::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.core.ComparisonExpression)
@@ -374,33 +336,99 @@ void ComparisonExpression::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  if (GetArenaNoVirtual() == NULL && left_value_ != NULL) {
+  if (GetArenaNoVirtual() == nullptr && left_value_ != nullptr) {
     delete left_value_;
   }
-  left_value_ = NULL;
-  if (GetArenaNoVirtual() == NULL && right_value_ != NULL) {
+  left_value_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && right_value_ != nullptr) {
     delete right_value_;
   }
-  right_value_ = NULL;
+  right_value_ = nullptr;
   operator__ = 0;
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* ComparisonExpression::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<ComparisonExpression*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // .flyteidl.core.ComparisonExpression.Operator operator = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_operator_(static_cast<::flyteidl::core::ComparisonExpression_Operator>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // .flyteidl.core.Operand left_value = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::Operand::_InternalParse;
+        object = msg->mutable_left_value();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.Operand right_value = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::Operand::_InternalParse;
+        object = msg->mutable_right_value();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool ComparisonExpression::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.core.ComparisonExpression)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // .flyteidl.core.ComparisonExpression.Operator operator = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          int value;
+        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
+          int value = 0;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
@@ -413,8 +441,7 @@ bool ComparisonExpression::MergePartialFromCodedStream(
 
       // .flyteidl.core.Operand left_value = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_left_value()));
         } else {
@@ -425,8 +452,7 @@ bool ComparisonExpression::MergePartialFromCodedStream(
 
       // .flyteidl.core.Operand right_value = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_right_value()));
         } else {
@@ -454,6 +480,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void ComparisonExpression::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -470,25 +497,24 @@ void ComparisonExpression::SerializeWithCachedSizes(
   // .flyteidl.core.Operand left_value = 2;
   if (this->has_left_value()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, *this->left_value_, output);
+      2, HasBitSetters::left_value(this), output);
   }
 
   // .flyteidl.core.Operand right_value = 3;
   if (this->has_right_value()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, *this->right_value_, output);
+      3, HasBitSetters::right_value(this), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.core.ComparisonExpression)
 }
 
 ::google::protobuf::uint8* ComparisonExpression::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.core.ComparisonExpression)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -503,19 +529,19 @@ void ComparisonExpression::SerializeWithCachedSizes(
   if (this->has_left_value()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        2, *this->left_value_, deterministic, target);
+        2, HasBitSetters::left_value(this), target);
   }
 
   // .flyteidl.core.Operand right_value = 3;
   if (this->has_right_value()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        3, *this->right_value_, deterministic, target);
+        3, HasBitSetters::right_value(this), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.core.ComparisonExpression)
   return target;
@@ -525,23 +551,27 @@ size_t ComparisonExpression::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.core.ComparisonExpression)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   // .flyteidl.core.Operand left_value = 2;
   if (this->has_left_value()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *this->left_value_);
+        *left_value_);
   }
 
   // .flyteidl.core.Operand right_value = 3;
   if (this->has_right_value()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *this->right_value_);
+        *right_value_);
   }
 
   // .flyteidl.core.ComparisonExpression.Operator operator = 1;
@@ -551,9 +581,7 @@ size_t ComparisonExpression::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -561,9 +589,9 @@ void ComparisonExpression::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.core.ComparisonExpression)
   GOOGLE_DCHECK_NE(&from, this);
   const ComparisonExpression* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const ComparisonExpression>(
+      ::google::protobuf::DynamicCastToGenerated<ComparisonExpression>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.core.ComparisonExpression)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -614,16 +642,15 @@ void ComparisonExpression::Swap(ComparisonExpression* other) {
 }
 void ComparisonExpression::InternalSwap(ComparisonExpression* other) {
   using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(left_value_, other->left_value_);
   swap(right_value_, other->right_value_);
   swap(operator__, other->operator__);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata ComparisonExpression::GetMetadata() const {
-  protobuf_flyteidl_2fcore_2fcondition_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fcore_2fcondition_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto);
+  return ::file_level_metadata_flyteidl_2fcore_2fcondition_2eproto[kIndexInFileMessages];
 }
 
 
@@ -635,11 +662,20 @@ void Operand::InitAsDefaultInstance() {
   ::flyteidl::core::_Operand_default_instance_.var_.UnsafeSetDefault(
       &::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
+class Operand::HasBitSetters {
+ public:
+  static const ::flyteidl::core::Primitive& primitive(const Operand* msg);
+};
+
+const ::flyteidl::core::Primitive&
+Operand::HasBitSetters::primitive(const Operand* msg) {
+  return *msg->val_.primitive_;
+}
 void Operand::set_allocated_primitive(::flyteidl::core::Primitive* primitive) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   clear_val();
   if (primitive) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena = nullptr;
     if (message_arena != submessage_arena) {
       primitive = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, primitive, submessage_arena);
@@ -661,17 +697,13 @@ const int Operand::kVarFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Operand::Operand()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fcore_2fcondition_2eproto::InitDefaultsOperand();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.core.Operand)
 }
 Operand::Operand(const Operand& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   clear_has_val();
   switch (from.val_case()) {
@@ -691,8 +723,9 @@ Operand::Operand(const Operand& from)
 }
 
 void Operand::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto.base);
   clear_has_val();
-  _cached_size_ = 0;
 }
 
 Operand::~Operand() {
@@ -707,27 +740,13 @@ void Operand::SharedDtor() {
 }
 
 void Operand::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* Operand::descriptor() {
-  ::protobuf_flyteidl_2fcore_2fcondition_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fcore_2fcondition_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const Operand& Operand::default_instance() {
-  ::protobuf_flyteidl_2fcore_2fcondition_2eproto::InitDefaultsOperand();
+  ::google::protobuf::internal::InitSCC(&::scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto.base);
   return *internal_default_instance();
 }
 
-Operand* Operand::New(::google::protobuf::Arena* arena) const {
-  Operand* n = new Operand;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Operand::clear_val() {
 // @@protoc_insertion_point(one_of_clear_start:flyteidl.core.Operand)
@@ -758,20 +777,85 @@ void Operand::Clear() {
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* Operand::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<Operand*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // .flyteidl.core.Primitive primitive = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::Primitive::_InternalParse;
+        object = msg->mutable_primitive();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // string var = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.core.Operand.var");
+        object = msg->mutable_var();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool Operand::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.core.Operand)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // .flyteidl.core.Primitive primitive = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_primitive()));
         } else {
@@ -782,8 +866,7 @@ bool Operand::MergePartialFromCodedStream(
 
       // string var = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_var()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -815,6 +898,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void Operand::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -825,7 +909,7 @@ void Operand::SerializeWithCachedSizes(
   // .flyteidl.core.Primitive primitive = 1;
   if (has_primitive()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, *val_.primitive_, output);
+      1, HasBitSetters::primitive(this), output);
   }
 
   // string var = 2;
@@ -838,16 +922,15 @@ void Operand::SerializeWithCachedSizes(
       2, this->var(), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.core.Operand)
 }
 
 ::google::protobuf::uint8* Operand::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.core.Operand)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -856,7 +939,7 @@ void Operand::SerializeWithCachedSizes(
   if (has_primitive()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        1, *val_.primitive_, deterministic, target);
+        1, HasBitSetters::primitive(this), target);
   }
 
   // string var = 2;
@@ -870,9 +953,9 @@ void Operand::SerializeWithCachedSizes(
         2, this->var(), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.core.Operand)
   return target;
@@ -882,11 +965,15 @@ size_t Operand::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.core.Operand)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   switch (val_case()) {
     // .flyteidl.core.Primitive primitive = 1;
     case kPrimitive: {
@@ -907,9 +994,7 @@ size_t Operand::ByteSizeLong() const {
     }
   }
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -917,9 +1002,9 @@ void Operand::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.core.Operand)
   GOOGLE_DCHECK_NE(&from, this);
   const Operand* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const Operand>(
+      ::google::protobuf::DynamicCastToGenerated<Operand>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.core.Operand)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -974,15 +1059,14 @@ void Operand::Swap(Operand* other) {
 }
 void Operand::InternalSwap(Operand* other) {
   using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(val_, other->val_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata Operand::GetMetadata() const {
-  protobuf_flyteidl_2fcore_2fcondition_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fcore_2fcondition_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto);
+  return ::file_level_metadata_flyteidl_2fcore_2fcondition_2eproto[kIndexInFileMessages];
 }
 
 
@@ -994,11 +1078,25 @@ void BooleanExpression::InitAsDefaultInstance() {
   ::flyteidl::core::_BooleanExpression_default_instance_.comparison_ = const_cast< ::flyteidl::core::ComparisonExpression*>(
       ::flyteidl::core::ComparisonExpression::internal_default_instance());
 }
+class BooleanExpression::HasBitSetters {
+ public:
+  static const ::flyteidl::core::ConjunctionExpression& conjunction(const BooleanExpression* msg);
+  static const ::flyteidl::core::ComparisonExpression& comparison(const BooleanExpression* msg);
+};
+
+const ::flyteidl::core::ConjunctionExpression&
+BooleanExpression::HasBitSetters::conjunction(const BooleanExpression* msg) {
+  return *msg->expr_.conjunction_;
+}
+const ::flyteidl::core::ComparisonExpression&
+BooleanExpression::HasBitSetters::comparison(const BooleanExpression* msg) {
+  return *msg->expr_.comparison_;
+}
 void BooleanExpression::set_allocated_conjunction(::flyteidl::core::ConjunctionExpression* conjunction) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   clear_expr();
   if (conjunction) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena = nullptr;
     if (message_arena != submessage_arena) {
       conjunction = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, conjunction, submessage_arena);
@@ -1012,7 +1110,7 @@ void BooleanExpression::set_allocated_comparison(::flyteidl::core::ComparisonExp
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   clear_expr();
   if (comparison) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena = nullptr;
     if (message_arena != submessage_arena) {
       comparison = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, comparison, submessage_arena);
@@ -1028,17 +1126,13 @@ const int BooleanExpression::kComparisonFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 BooleanExpression::BooleanExpression()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fcore_2fcondition_2eproto::InitDefaultsBooleanExpression();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.core.BooleanExpression)
 }
 BooleanExpression::BooleanExpression(const BooleanExpression& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   clear_has_expr();
   switch (from.expr_case()) {
@@ -1058,8 +1152,9 @@ BooleanExpression::BooleanExpression(const BooleanExpression& from)
 }
 
 void BooleanExpression::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_BooleanExpression_flyteidl_2fcore_2fcondition_2eproto.base);
   clear_has_expr();
-  _cached_size_ = 0;
 }
 
 BooleanExpression::~BooleanExpression() {
@@ -1074,27 +1169,13 @@ void BooleanExpression::SharedDtor() {
 }
 
 void BooleanExpression::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* BooleanExpression::descriptor() {
-  ::protobuf_flyteidl_2fcore_2fcondition_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fcore_2fcondition_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const BooleanExpression& BooleanExpression::default_instance() {
-  ::protobuf_flyteidl_2fcore_2fcondition_2eproto::InitDefaultsBooleanExpression();
+  ::google::protobuf::internal::InitSCC(&::scc_info_BooleanExpression_flyteidl_2fcore_2fcondition_2eproto.base);
   return *internal_default_instance();
 }
 
-BooleanExpression* BooleanExpression::New(::google::protobuf::Arena* arena) const {
-  BooleanExpression* n = new BooleanExpression;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void BooleanExpression::clear_expr() {
 // @@protoc_insertion_point(one_of_clear_start:flyteidl.core.BooleanExpression)
@@ -1125,20 +1206,78 @@ void BooleanExpression::Clear() {
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* BooleanExpression::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<BooleanExpression*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // .flyteidl.core.ConjunctionExpression conjunction = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::ConjunctionExpression::_InternalParse;
+        object = msg->mutable_conjunction();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.ComparisonExpression comparison = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::ComparisonExpression::_InternalParse;
+        object = msg->mutable_comparison();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool BooleanExpression::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.core.BooleanExpression)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // .flyteidl.core.ConjunctionExpression conjunction = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_conjunction()));
         } else {
@@ -1149,8 +1288,7 @@ bool BooleanExpression::MergePartialFromCodedStream(
 
       // .flyteidl.core.ComparisonExpression comparison = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_comparison()));
         } else {
@@ -1178,6 +1316,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void BooleanExpression::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -1188,25 +1327,24 @@ void BooleanExpression::SerializeWithCachedSizes(
   // .flyteidl.core.ConjunctionExpression conjunction = 1;
   if (has_conjunction()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, *expr_.conjunction_, output);
+      1, HasBitSetters::conjunction(this), output);
   }
 
   // .flyteidl.core.ComparisonExpression comparison = 2;
   if (has_comparison()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, *expr_.comparison_, output);
+      2, HasBitSetters::comparison(this), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.core.BooleanExpression)
 }
 
 ::google::protobuf::uint8* BooleanExpression::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.core.BooleanExpression)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -1215,19 +1353,19 @@ void BooleanExpression::SerializeWithCachedSizes(
   if (has_conjunction()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        1, *expr_.conjunction_, deterministic, target);
+        1, HasBitSetters::conjunction(this), target);
   }
 
   // .flyteidl.core.ComparisonExpression comparison = 2;
   if (has_comparison()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        2, *expr_.comparison_, deterministic, target);
+        2, HasBitSetters::comparison(this), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.core.BooleanExpression)
   return target;
@@ -1237,11 +1375,15 @@ size_t BooleanExpression::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.core.BooleanExpression)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   switch (expr_case()) {
     // .flyteidl.core.ConjunctionExpression conjunction = 1;
     case kConjunction: {
@@ -1262,9 +1404,7 @@ size_t BooleanExpression::ByteSizeLong() const {
     }
   }
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -1272,9 +1412,9 @@ void BooleanExpression::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.core.BooleanExpression)
   GOOGLE_DCHECK_NE(&from, this);
   const BooleanExpression* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const BooleanExpression>(
+      ::google::protobuf::DynamicCastToGenerated<BooleanExpression>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.core.BooleanExpression)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1329,15 +1469,14 @@ void BooleanExpression::Swap(BooleanExpression* other) {
 }
 void BooleanExpression::InternalSwap(BooleanExpression* other) {
   using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(expr_, other->expr_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata BooleanExpression::GetMetadata() const {
-  protobuf_flyteidl_2fcore_2fcondition_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fcore_2fcondition_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto);
+  return ::file_level_metadata_flyteidl_2fcore_2fcondition_2eproto[kIndexInFileMessages];
 }
 
 
@@ -1349,6 +1488,20 @@ void ConjunctionExpression::InitAsDefaultInstance() {
   ::flyteidl::core::_ConjunctionExpression_default_instance_._instance.get_mutable()->right_expression_ = const_cast< ::flyteidl::core::BooleanExpression*>(
       ::flyteidl::core::BooleanExpression::internal_default_instance());
 }
+class ConjunctionExpression::HasBitSetters {
+ public:
+  static const ::flyteidl::core::BooleanExpression& left_expression(const ConjunctionExpression* msg);
+  static const ::flyteidl::core::BooleanExpression& right_expression(const ConjunctionExpression* msg);
+};
+
+const ::flyteidl::core::BooleanExpression&
+ConjunctionExpression::HasBitSetters::left_expression(const ConjunctionExpression* msg) {
+  return *msg->left_expression_;
+}
+const ::flyteidl::core::BooleanExpression&
+ConjunctionExpression::HasBitSetters::right_expression(const ConjunctionExpression* msg) {
+  return *msg->right_expression_;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int ConjunctionExpression::kOperatorFieldNumber;
 const int ConjunctionExpression::kLeftExpressionFieldNumber;
@@ -1356,37 +1509,34 @@ const int ConjunctionExpression::kRightExpressionFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ConjunctionExpression::ConjunctionExpression()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fcore_2fcondition_2eproto::InitDefaultsBooleanExpression();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.core.ConjunctionExpression)
 }
 ConjunctionExpression::ConjunctionExpression(const ConjunctionExpression& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   if (from.has_left_expression()) {
     left_expression_ = new ::flyteidl::core::BooleanExpression(*from.left_expression_);
   } else {
-    left_expression_ = NULL;
+    left_expression_ = nullptr;
   }
   if (from.has_right_expression()) {
     right_expression_ = new ::flyteidl::core::BooleanExpression(*from.right_expression_);
   } else {
-    right_expression_ = NULL;
+    right_expression_ = nullptr;
   }
   operator__ = from.operator__;
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.ConjunctionExpression)
 }
 
 void ConjunctionExpression::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_BooleanExpression_flyteidl_2fcore_2fcondition_2eproto.base);
   ::memset(&left_expression_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&operator__) -
       reinterpret_cast<char*>(&left_expression_)) + sizeof(operator__));
-  _cached_size_ = 0;
 }
 
 ConjunctionExpression::~ConjunctionExpression() {
@@ -1400,27 +1550,13 @@ void ConjunctionExpression::SharedDtor() {
 }
 
 void ConjunctionExpression::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* ConjunctionExpression::descriptor() {
-  ::protobuf_flyteidl_2fcore_2fcondition_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fcore_2fcondition_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const ConjunctionExpression& ConjunctionExpression::default_instance() {
-  ::protobuf_flyteidl_2fcore_2fcondition_2eproto::InitDefaultsBooleanExpression();
+  ::google::protobuf::internal::InitSCC(&::scc_info_BooleanExpression_flyteidl_2fcore_2fcondition_2eproto.base);
   return *internal_default_instance();
 }
 
-ConjunctionExpression* ConjunctionExpression::New(::google::protobuf::Arena* arena) const {
-  ConjunctionExpression* n = new ConjunctionExpression;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void ConjunctionExpression::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.core.ConjunctionExpression)
@@ -1428,33 +1564,99 @@ void ConjunctionExpression::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  if (GetArenaNoVirtual() == NULL && left_expression_ != NULL) {
+  if (GetArenaNoVirtual() == nullptr && left_expression_ != nullptr) {
     delete left_expression_;
   }
-  left_expression_ = NULL;
-  if (GetArenaNoVirtual() == NULL && right_expression_ != NULL) {
+  left_expression_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && right_expression_ != nullptr) {
     delete right_expression_;
   }
-  right_expression_ = NULL;
+  right_expression_ = nullptr;
   operator__ = 0;
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* ConjunctionExpression::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<ConjunctionExpression*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // .flyteidl.core.ConjunctionExpression.LogicalOperator operator = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_operator_(static_cast<::flyteidl::core::ConjunctionExpression_LogicalOperator>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // .flyteidl.core.BooleanExpression left_expression = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::BooleanExpression::_InternalParse;
+        object = msg->mutable_left_expression();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.BooleanExpression right_expression = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::BooleanExpression::_InternalParse;
+        object = msg->mutable_right_expression();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool ConjunctionExpression::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.core.ConjunctionExpression)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // .flyteidl.core.ConjunctionExpression.LogicalOperator operator = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          int value;
+        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
+          int value = 0;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
@@ -1467,8 +1669,7 @@ bool ConjunctionExpression::MergePartialFromCodedStream(
 
       // .flyteidl.core.BooleanExpression left_expression = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_left_expression()));
         } else {
@@ -1479,8 +1680,7 @@ bool ConjunctionExpression::MergePartialFromCodedStream(
 
       // .flyteidl.core.BooleanExpression right_expression = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_right_expression()));
         } else {
@@ -1508,6 +1708,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void ConjunctionExpression::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -1524,25 +1725,24 @@ void ConjunctionExpression::SerializeWithCachedSizes(
   // .flyteidl.core.BooleanExpression left_expression = 2;
   if (this->has_left_expression()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, *this->left_expression_, output);
+      2, HasBitSetters::left_expression(this), output);
   }
 
   // .flyteidl.core.BooleanExpression right_expression = 3;
   if (this->has_right_expression()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, *this->right_expression_, output);
+      3, HasBitSetters::right_expression(this), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.core.ConjunctionExpression)
 }
 
 ::google::protobuf::uint8* ConjunctionExpression::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.core.ConjunctionExpression)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -1557,19 +1757,19 @@ void ConjunctionExpression::SerializeWithCachedSizes(
   if (this->has_left_expression()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        2, *this->left_expression_, deterministic, target);
+        2, HasBitSetters::left_expression(this), target);
   }
 
   // .flyteidl.core.BooleanExpression right_expression = 3;
   if (this->has_right_expression()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        3, *this->right_expression_, deterministic, target);
+        3, HasBitSetters::right_expression(this), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.core.ConjunctionExpression)
   return target;
@@ -1579,23 +1779,27 @@ size_t ConjunctionExpression::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.core.ConjunctionExpression)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   // .flyteidl.core.BooleanExpression left_expression = 2;
   if (this->has_left_expression()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *this->left_expression_);
+        *left_expression_);
   }
 
   // .flyteidl.core.BooleanExpression right_expression = 3;
   if (this->has_right_expression()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *this->right_expression_);
+        *right_expression_);
   }
 
   // .flyteidl.core.ConjunctionExpression.LogicalOperator operator = 1;
@@ -1605,9 +1809,7 @@ size_t ConjunctionExpression::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -1615,9 +1817,9 @@ void ConjunctionExpression::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.core.ConjunctionExpression)
   GOOGLE_DCHECK_NE(&from, this);
   const ConjunctionExpression* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const ConjunctionExpression>(
+      ::google::protobuf::DynamicCastToGenerated<ConjunctionExpression>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.core.ConjunctionExpression)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1668,21 +1870,37 @@ void ConjunctionExpression::Swap(ConjunctionExpression* other) {
 }
 void ConjunctionExpression::InternalSwap(ConjunctionExpression* other) {
   using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(left_expression_, other->left_expression_);
   swap(right_expression_, other->right_expression_);
   swap(operator__, other->operator__);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata ConjunctionExpression::GetMetadata() const {
-  protobuf_flyteidl_2fcore_2fcondition_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fcore_2fcondition_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto);
+  return ::file_level_metadata_flyteidl_2fcore_2fcondition_2eproto[kIndexInFileMessages];
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace core
 }  // namespace flyteidl
+namespace google {
+namespace protobuf {
+template<> PROTOBUF_NOINLINE ::flyteidl::core::ComparisonExpression* Arena::CreateMaybeMessage< ::flyteidl::core::ComparisonExpression >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::core::ComparisonExpression >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::core::Operand* Arena::CreateMaybeMessage< ::flyteidl::core::Operand >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::core::Operand >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::core::BooleanExpression* Arena::CreateMaybeMessage< ::flyteidl::core::BooleanExpression >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::core::BooleanExpression >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::core::ConjunctionExpression* Arena::CreateMaybeMessage< ::flyteidl::core::ConjunctionExpression >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::core::ConjunctionExpression >(arena);
+}
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
+#include <google/protobuf/port_undef.inc>

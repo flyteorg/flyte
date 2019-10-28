@@ -6,52 +6,41 @@
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/port.h>
-#include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/extension_set.h>
 #include <google/protobuf/wire_format_lite_inl.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
-// This is a temporary google only hack
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-#include "third_party/protobuf/version.h"
-#endif
 // @@protoc_insertion_point(includes)
+#include <google/protobuf/port_def.inc>
+
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fspark_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_SparkJob_HadoopConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fspark_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_SparkJob_SparkConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto;
 namespace flyteidl {
 namespace plugins {
 class SparkApplicationDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<SparkApplication>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<SparkApplication> _instance;
 } _SparkApplication_default_instance_;
 class SparkJob_SparkConfEntry_DoNotUseDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<SparkJob_SparkConfEntry_DoNotUse>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<SparkJob_SparkConfEntry_DoNotUse> _instance;
 } _SparkJob_SparkConfEntry_DoNotUse_default_instance_;
 class SparkJob_HadoopConfEntry_DoNotUseDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<SparkJob_HadoopConfEntry_DoNotUse>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<SparkJob_HadoopConfEntry_DoNotUse> _instance;
 } _SparkJob_HadoopConfEntry_DoNotUse_default_instance_;
 class SparkJobDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<SparkJob>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<SparkJob> _instance;
 } _SparkJob_default_instance_;
 }  // namespace plugins
 }  // namespace flyteidl
-namespace protobuf_flyteidl_2fplugins_2fspark_2eproto {
-void InitDefaultsSparkApplicationImpl() {
+static void InitDefaultsSparkApplication_flyteidl_2fplugins_2fspark_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::flyteidl::plugins::_SparkApplication_default_instance_;
     new (ptr) ::flyteidl::plugins::SparkApplication();
@@ -60,19 +49,12 @@ void InitDefaultsSparkApplicationImpl() {
   ::flyteidl::plugins::SparkApplication::InitAsDefaultInstance();
 }
 
-void InitDefaultsSparkApplication() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsSparkApplicationImpl);
-}
+::google::protobuf::internal::SCCInfo<0> scc_info_SparkApplication_flyteidl_2fplugins_2fspark_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsSparkApplication_flyteidl_2fplugins_2fspark_2eproto}, {}};
 
-void InitDefaultsSparkJob_SparkConfEntry_DoNotUseImpl() {
+static void InitDefaultsSparkJob_SparkConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::flyteidl::plugins::_SparkJob_SparkConfEntry_DoNotUse_default_instance_;
     new (ptr) ::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse();
@@ -80,19 +62,12 @@ void InitDefaultsSparkJob_SparkConfEntry_DoNotUseImpl() {
   ::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse::InitAsDefaultInstance();
 }
 
-void InitDefaultsSparkJob_SparkConfEntry_DoNotUse() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsSparkJob_SparkConfEntry_DoNotUseImpl);
-}
+::google::protobuf::internal::SCCInfo<0> scc_info_SparkJob_SparkConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsSparkJob_SparkConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto}, {}};
 
-void InitDefaultsSparkJob_HadoopConfEntry_DoNotUseImpl() {
+static void InitDefaultsSparkJob_HadoopConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::flyteidl::plugins::_SparkJob_HadoopConfEntry_DoNotUse_default_instance_;
     new (ptr) ::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse();
@@ -100,21 +75,12 @@ void InitDefaultsSparkJob_HadoopConfEntry_DoNotUseImpl() {
   ::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse::InitAsDefaultInstance();
 }
 
-void InitDefaultsSparkJob_HadoopConfEntry_DoNotUse() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsSparkJob_HadoopConfEntry_DoNotUseImpl);
-}
+::google::protobuf::internal::SCCInfo<0> scc_info_SparkJob_HadoopConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsSparkJob_HadoopConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto}, {}};
 
-void InitDefaultsSparkJobImpl() {
+static void InitDefaultsSparkJob_flyteidl_2fplugins_2fspark_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_flyteidl_2fplugins_2fspark_2eproto::InitDefaultsSparkJob_SparkConfEntry_DoNotUse();
-  protobuf_flyteidl_2fplugins_2fspark_2eproto::InitDefaultsSparkJob_HadoopConfEntry_DoNotUse();
   {
     void* ptr = &::flyteidl::plugins::_SparkJob_default_instance_;
     new (ptr) ::flyteidl::plugins::SparkJob();
@@ -123,51 +89,59 @@ void InitDefaultsSparkJobImpl() {
   ::flyteidl::plugins::SparkJob::InitAsDefaultInstance();
 }
 
-void InitDefaultsSparkJob() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsSparkJobImpl);
+::google::protobuf::internal::SCCInfo<2> scc_info_SparkJob_flyteidl_2fplugins_2fspark_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsSparkJob_flyteidl_2fplugins_2fspark_2eproto}, {
+      &scc_info_SparkJob_SparkConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto.base,
+      &scc_info_SparkJob_HadoopConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto.base,}};
+
+void InitDefaults_flyteidl_2fplugins_2fspark_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_SparkApplication_flyteidl_2fplugins_2fspark_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_SparkJob_SparkConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_SparkJob_HadoopConfEntry_DoNotUse_flyteidl_2fplugins_2fspark_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_SparkJob_flyteidl_2fplugins_2fspark_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata[4];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[1];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fplugins_2fspark_2eproto[4];
+const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fplugins_2fspark_2eproto[1];
+constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fplugins_2fspark_2eproto = nullptr;
 
-const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fspark_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkApplication, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkApplication, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse, _has_bits_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse, key_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse, value_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse, value_),
   0,
   1,
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse, _has_bits_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse, key_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse, value_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse, value_),
   0,
   1,
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob, applicationtype_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob, mainapplicationfile_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob, mainclass_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob, sparkconf_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob, hadoopconf_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::SparkJob, executorpath_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob, applicationtype_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob, mainapplicationfile_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob, mainclass_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob, sparkconf_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob, hadoopconf_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SparkJob, executorpath_),
 };
-static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::plugins::SparkApplication)},
   { 5, 12, sizeof(::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse)},
   { 14, 21, sizeof(::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse)},
@@ -181,65 +155,48 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::_SparkJob_default_instance_),
 };
 
-void protobuf_AssignDescriptors() {
-  AddDescriptors();
-  ::google::protobuf::MessageFactory* factory = NULL;
-  AssignDescriptors(
-      "flyteidl/plugins/spark.proto", schemas, file_default_instances, TableStruct::offsets, factory,
-      file_level_metadata, file_level_enum_descriptors, NULL);
-}
+::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fplugins_2fspark_2eproto = {
+  {}, AddDescriptors_flyteidl_2fplugins_2fspark_2eproto, "flyteidl/plugins/spark.proto", schemas,
+  file_default_instances, TableStruct_flyteidl_2fplugins_2fspark_2eproto::offsets,
+  file_level_metadata_flyteidl_2fplugins_2fspark_2eproto, 4, file_level_enum_descriptors_flyteidl_2fplugins_2fspark_2eproto, file_level_service_descriptors_flyteidl_2fplugins_2fspark_2eproto,
+};
 
-void protobuf_AssignDescriptorsOnce() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &protobuf_AssignDescriptors);
-}
+const char descriptor_table_protodef_flyteidl_2fplugins_2fspark_2eproto[] =
+  "\n\034flyteidl/plugins/spark.proto\022\020flyteidl"
+  ".plugins\"B\n\020SparkApplication\".\n\004Type\022\n\n\006"
+  "PYTHON\020\000\022\010\n\004JAVA\020\001\022\t\n\005SCALA\020\002\022\005\n\001R\020\003\"\365\002\n"
+  "\010SparkJob\022@\n\017applicationType\030\001 \001(\0162\'.fly"
+  "teidl.plugins.SparkApplication.Type\022\033\n\023m"
+  "ainApplicationFile\030\002 \001(\t\022\021\n\tmainClass\030\003 "
+  "\001(\t\022<\n\tsparkConf\030\004 \003(\0132).flyteidl.plugin"
+  "s.SparkJob.SparkConfEntry\022>\n\nhadoopConf\030"
+  "\005 \003(\0132*.flyteidl.plugins.SparkJob.Hadoop"
+  "ConfEntry\022\024\n\014executorPath\030\006 \001(\t\0320\n\016Spark"
+  "ConfEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028"
+  "\001\0321\n\017HadoopConfEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005val"
+  "ue\030\002 \001(\t:\0028\001B5Z3github.com/lyft/flyteidl"
+  "/gen/pb-go/flyteidl/pluginsb\006proto3"
+  ;
+::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fspark_2eproto = {
+  false, InitDefaults_flyteidl_2fplugins_2fspark_2eproto, 
+  descriptor_table_protodef_flyteidl_2fplugins_2fspark_2eproto,
+  "flyteidl/plugins/spark.proto", &assign_descriptors_table_flyteidl_2fplugins_2fspark_2eproto, 555,
+};
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
-void protobuf_RegisterTypes(const ::std::string&) {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 4);
-}
-
-void AddDescriptorsImpl() {
-  InitDefaults();
-  static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\034flyteidl/plugins/spark.proto\022\020flyteidl"
-      ".plugins\"B\n\020SparkApplication\".\n\004Type\022\n\n\006"
-      "PYTHON\020\000\022\010\n\004JAVA\020\001\022\t\n\005SCALA\020\002\022\005\n\001R\020\003\"\365\002\n"
-      "\010SparkJob\022@\n\017applicationType\030\001 \001(\0162\'.fly"
-      "teidl.plugins.SparkApplication.Type\022\033\n\023m"
-      "ainApplicationFile\030\002 \001(\t\022\021\n\tmainClass\030\003 "
-      "\001(\t\022<\n\tsparkConf\030\004 \003(\0132).flyteidl.plugin"
-      "s.SparkJob.SparkConfEntry\022>\n\nhadoopConf\030"
-      "\005 \003(\0132*.flyteidl.plugins.SparkJob.Hadoop"
-      "ConfEntry\022\024\n\014executorPath\030\006 \001(\t\0320\n\016Spark"
-      "ConfEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028"
-      "\001\0321\n\017HadoopConfEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005val"
-      "ue\030\002 \001(\t:\0028\001B5Z3github.com/lyft/flyteidl"
-      "/gen/pb-go/flyteidl/pluginsb\006proto3"
+void AddDescriptors_flyteidl_2fplugins_2fspark_2eproto() {
+  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
+  {
   };
-  ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 555);
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
-    "flyteidl/plugins/spark.proto", &protobuf_RegisterTypes);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fplugins_2fspark_2eproto, deps, 0);
 }
 
-void AddDescriptors() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &AddDescriptorsImpl);
-}
-// Force AddDescriptors() to be called at dynamic initialization time.
-struct StaticDescriptorInitializer {
-  StaticDescriptorInitializer() {
-    AddDescriptors();
-  }
-} static_descriptor_initializer;
-}  // namespace protobuf_flyteidl_2fplugins_2fspark_2eproto
+// Force running AddDescriptors() at dynamic initialization time.
+static bool dynamic_init_dummy_flyteidl_2fplugins_2fspark_2eproto = []() { AddDescriptors_flyteidl_2fplugins_2fspark_2eproto(); return true; }();
 namespace flyteidl {
 namespace plugins {
 const ::google::protobuf::EnumDescriptor* SparkApplication_Type_descriptor() {
-  protobuf_flyteidl_2fplugins_2fspark_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_flyteidl_2fplugins_2fspark_2eproto::file_level_enum_descriptors[0];
+  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fplugins_2fspark_2eproto);
+  return file_level_enum_descriptors_flyteidl_2fplugins_2fspark_2eproto[0];
 }
 bool SparkApplication_Type_IsValid(int value) {
   switch (value) {
@@ -267,27 +224,26 @@ const int SparkApplication::Type_ARRAYSIZE;
 
 void SparkApplication::InitAsDefaultInstance() {
 }
+class SparkApplication::HasBitSetters {
+ public:
+};
+
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 SparkApplication::SparkApplication()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fplugins_2fspark_2eproto::InitDefaultsSparkApplication();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.plugins.SparkApplication)
 }
 SparkApplication::SparkApplication(const SparkApplication& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:flyteidl.plugins.SparkApplication)
 }
 
 void SparkApplication::SharedCtor() {
-  _cached_size_ = 0;
 }
 
 SparkApplication::~SparkApplication() {
@@ -299,27 +255,13 @@ void SparkApplication::SharedDtor() {
 }
 
 void SparkApplication::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* SparkApplication::descriptor() {
-  ::protobuf_flyteidl_2fplugins_2fspark_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fspark_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const SparkApplication& SparkApplication::default_instance() {
-  ::protobuf_flyteidl_2fplugins_2fspark_2eproto::InitDefaultsSparkApplication();
+  ::google::protobuf::internal::InitSCC(&::scc_info_SparkApplication_flyteidl_2fplugins_2fspark_2eproto.base);
   return *internal_default_instance();
 }
 
-SparkApplication* SparkApplication::New(::google::protobuf::Arena* arena) const {
-  SparkApplication* n = new SparkApplication;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void SparkApplication::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.plugins.SparkApplication)
@@ -330,13 +272,42 @@ void SparkApplication::Clear() {
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* SparkApplication::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<SparkApplication*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      default: {
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool SparkApplication::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.plugins.SparkApplication)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
   handle_unusual:
@@ -354,6 +325,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void SparkApplication::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -361,23 +333,22 @@ void SparkApplication::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.plugins.SparkApplication)
 }
 
 ::google::protobuf::uint8* SparkApplication::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.plugins.SparkApplication)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.plugins.SparkApplication)
   return target;
@@ -387,15 +358,17 @@ size_t SparkApplication::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.plugins.SparkApplication)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -403,9 +376,9 @@ void SparkApplication::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.plugins.SparkApplication)
   GOOGLE_DCHECK_NE(&from, this);
   const SparkApplication* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const SparkApplication>(
+      ::google::protobuf::DynamicCastToGenerated<SparkApplication>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.plugins.SparkApplication)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -448,53 +421,104 @@ void SparkApplication::Swap(SparkApplication* other) {
 void SparkApplication::InternalSwap(SparkApplication* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata SparkApplication::GetMetadata() const {
-  protobuf_flyteidl_2fplugins_2fspark_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fspark_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fspark_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fspark_2eproto[kIndexInFileMessages];
 }
 
 
 // ===================================================================
 
 SparkJob_SparkConfEntry_DoNotUse::SparkJob_SparkConfEntry_DoNotUse() {}
-SparkJob_SparkConfEntry_DoNotUse::SparkJob_SparkConfEntry_DoNotUse(::google::protobuf::Arena* arena) : SuperType(arena) {}
+SparkJob_SparkConfEntry_DoNotUse::SparkJob_SparkConfEntry_DoNotUse(::google::protobuf::Arena* arena)
+    : SuperType(arena) {}
 void SparkJob_SparkConfEntry_DoNotUse::MergeFrom(const SparkJob_SparkConfEntry_DoNotUse& other) {
   MergeFromInternal(other);
 }
 ::google::protobuf::Metadata SparkJob_SparkConfEntry_DoNotUse::GetMetadata() const {
-  ::protobuf_flyteidl_2fplugins_2fspark_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fspark_2eproto::file_level_metadata[1];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fspark_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fspark_2eproto[1];
 }
 void SparkJob_SparkConfEntry_DoNotUse::MergeFrom(
     const ::google::protobuf::Message& other) {
   ::google::protobuf::Message::MergeFrom(other);
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool SparkJob_SparkConfEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
+  using MF = ::google::protobuf::internal::MapField<
+      SparkJob_SparkConfEntry_DoNotUse, EntryKeyType, EntryValueType,
+      kEntryKeyFieldType, kEntryValueFieldType,
+      kEntryDefaultEnumValue>;
+  auto mf = static_cast<MF*>(object);
+  Parser<MF, ::google::protobuf::Map<EntryKeyType, EntryValueType>> parser(mf);
+#define DO_(x) if (!(x)) return false
+  DO_(parser.ParseMap(begin, end));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.key().data(), static_cast<int>(parser.key().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.SparkJob.SparkConfEntry.key"));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.value().data(), static_cast<int>(parser.value().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.SparkJob.SparkConfEntry.value"));
+#undef DO_
+  return true;
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
 
 // ===================================================================
 
 SparkJob_HadoopConfEntry_DoNotUse::SparkJob_HadoopConfEntry_DoNotUse() {}
-SparkJob_HadoopConfEntry_DoNotUse::SparkJob_HadoopConfEntry_DoNotUse(::google::protobuf::Arena* arena) : SuperType(arena) {}
+SparkJob_HadoopConfEntry_DoNotUse::SparkJob_HadoopConfEntry_DoNotUse(::google::protobuf::Arena* arena)
+    : SuperType(arena) {}
 void SparkJob_HadoopConfEntry_DoNotUse::MergeFrom(const SparkJob_HadoopConfEntry_DoNotUse& other) {
   MergeFromInternal(other);
 }
 ::google::protobuf::Metadata SparkJob_HadoopConfEntry_DoNotUse::GetMetadata() const {
-  ::protobuf_flyteidl_2fplugins_2fspark_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fspark_2eproto::file_level_metadata[2];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fspark_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fspark_2eproto[2];
 }
 void SparkJob_HadoopConfEntry_DoNotUse::MergeFrom(
     const ::google::protobuf::Message& other) {
   ::google::protobuf::Message::MergeFrom(other);
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool SparkJob_HadoopConfEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
+  using MF = ::google::protobuf::internal::MapField<
+      SparkJob_HadoopConfEntry_DoNotUse, EntryKeyType, EntryValueType,
+      kEntryKeyFieldType, kEntryValueFieldType,
+      kEntryDefaultEnumValue>;
+  auto mf = static_cast<MF*>(object);
+  Parser<MF, ::google::protobuf::Map<EntryKeyType, EntryValueType>> parser(mf);
+#define DO_(x) if (!(x)) return false
+  DO_(parser.ParseMap(begin, end));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.key().data(), static_cast<int>(parser.key().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.SparkJob.HadoopConfEntry.key"));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.value().data(), static_cast<int>(parser.value().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.SparkJob.HadoopConfEntry.value"));
+#undef DO_
+  return true;
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
 
 // ===================================================================
 
 void SparkJob::InitAsDefaultInstance() {
 }
+class SparkJob::HasBitSetters {
+ public:
+};
+
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int SparkJob::kApplicationTypeFieldNumber;
 const int SparkJob::kMainApplicationFileFieldNumber;
@@ -505,17 +529,13 @@ const int SparkJob::kExecutorPathFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 SparkJob::SparkJob()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fplugins_2fspark_2eproto::InitDefaultsSparkJob();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.plugins.SparkJob)
 }
 SparkJob::SparkJob(const SparkJob& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   sparkconf_.MergeFrom(from.sparkconf_);
   hadoopconf_.MergeFrom(from.hadoopconf_);
@@ -536,11 +556,12 @@ SparkJob::SparkJob(const SparkJob& from)
 }
 
 void SparkJob::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_SparkJob_flyteidl_2fplugins_2fspark_2eproto.base);
   mainapplicationfile_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   mainclass_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   executorpath_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   applicationtype_ = 0;
-  _cached_size_ = 0;
 }
 
 SparkJob::~SparkJob() {
@@ -555,27 +576,13 @@ void SparkJob::SharedDtor() {
 }
 
 void SparkJob::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* SparkJob::descriptor() {
-  ::protobuf_flyteidl_2fplugins_2fspark_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fspark_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const SparkJob& SparkJob::default_instance() {
-  ::protobuf_flyteidl_2fplugins_2fspark_2eproto::InitDefaultsSparkJob();
+  ::google::protobuf::internal::InitSCC(&::scc_info_SparkJob_flyteidl_2fplugins_2fspark_2eproto.base);
   return *internal_default_instance();
 }
 
-SparkJob* SparkJob::New(::google::protobuf::Arena* arena) const {
-  SparkJob* n = new SparkJob;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void SparkJob::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.plugins.SparkJob)
@@ -592,21 +599,151 @@ void SparkJob::Clear() {
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* SparkJob::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<SparkJob*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // .flyteidl.plugins.SparkApplication.Type applicationType = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_applicationtype(static_cast<::flyteidl::plugins::SparkApplication_Type>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string mainApplicationFile = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.plugins.SparkJob.mainApplicationFile");
+        object = msg->mutable_mainapplicationfile();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string mainClass = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.plugins.SparkJob.mainClass");
+        object = msg->mutable_mainclass();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // map<string, string> sparkConf = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::google::protobuf::internal::SlowMapEntryParser;
+          auto parse_map = ::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse::_ParseMap;
+          ctx->extra_parse_data().payload.clear();
+          ctx->extra_parse_data().parse_map = parse_map;
+          object = &msg->sparkconf_;
+          if (size > end - ptr) goto len_delim_till_end;
+          auto newend = ptr + size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(parse_map(ptr, newend, object, ctx));
+          ptr = newend;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
+        break;
+      }
+      // map<string, string> hadoopConf = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::google::protobuf::internal::SlowMapEntryParser;
+          auto parse_map = ::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse::_ParseMap;
+          ctx->extra_parse_data().payload.clear();
+          ctx->extra_parse_data().parse_map = parse_map;
+          object = &msg->hadoopconf_;
+          if (size > end - ptr) goto len_delim_till_end;
+          auto newend = ptr + size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(parse_map(ptr, newend, object, ctx));
+          ptr = newend;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 42 && (ptr += 1));
+        break;
+      }
+      // string executorPath = 6;
+      case 6: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 50) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.plugins.SparkJob.executorPath");
+        object = msg->mutable_executorpath();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool SparkJob::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.plugins.SparkJob)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // .flyteidl.plugins.SparkApplication.Type applicationType = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          int value;
+        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
+          int value = 0;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
@@ -619,8 +756,7 @@ bool SparkJob::MergePartialFromCodedStream(
 
       // string mainApplicationFile = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_mainapplicationfile()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -635,8 +771,7 @@ bool SparkJob::MergePartialFromCodedStream(
 
       // string mainClass = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_mainclass()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -651,8 +786,7 @@ bool SparkJob::MergePartialFromCodedStream(
 
       // map<string, string> sparkConf = 4;
       case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
           SparkJob_SparkConfEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
               SparkJob_SparkConfEntry_DoNotUse,
               ::std::string, ::std::string,
@@ -678,8 +812,7 @@ bool SparkJob::MergePartialFromCodedStream(
 
       // map<string, string> hadoopConf = 5;
       case 5: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(42u /* 42 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
           SparkJob_HadoopConfEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
               SparkJob_HadoopConfEntry_DoNotUse,
               ::std::string, ::std::string,
@@ -705,8 +838,7 @@ bool SparkJob::MergePartialFromCodedStream(
 
       // string executorPath = 6;
       case 6: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(50u /* 50 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (50 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_executorpath()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -738,6 +870,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void SparkJob::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -792,7 +925,7 @@ void SparkJob::SerializeWithCachedSizes(
 
     if (output->IsSerializationDeterministic() &&
         this->sparkconf().size() > 1) {
-      ::google::protobuf::scoped_array<SortItem> items(
+      ::std::unique_ptr<SortItem[]> items(
           new SortItem[this->sparkconf().size()]);
       typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
       size_type n = 0;
@@ -802,24 +935,20 @@ void SparkJob::SerializeWithCachedSizes(
         items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
-      ::google::protobuf::scoped_ptr<SparkJob_SparkConfEntry_DoNotUse> entry;
+      ::std::unique_ptr<SparkJob_SparkConfEntry_DoNotUse> entry;
       for (size_type i = 0; i < n; i++) {
-        entry.reset(sparkconf_.NewEntryWrapper(
-            items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
-        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-            4, *entry, output);
-        Utf8Check::Check(items[static_cast<ptrdiff_t>(i)]);
+        entry.reset(sparkconf_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(4, *entry, output);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
-      ::google::protobuf::scoped_ptr<SparkJob_SparkConfEntry_DoNotUse> entry;
+      ::std::unique_ptr<SparkJob_SparkConfEntry_DoNotUse> entry;
       for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
           it = this->sparkconf().begin();
           it != this->sparkconf().end(); ++it) {
-        entry.reset(sparkconf_.NewEntryWrapper(
-            it->first, it->second));
-        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-            4, *entry, output);
-        Utf8Check::Check(&*it);
+        entry.reset(sparkconf_.NewEntryWrapper(it->first, it->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(4, *entry, output);
+        Utf8Check::Check(&(*it));
       }
     }
   }
@@ -845,7 +974,7 @@ void SparkJob::SerializeWithCachedSizes(
 
     if (output->IsSerializationDeterministic() &&
         this->hadoopconf().size() > 1) {
-      ::google::protobuf::scoped_array<SortItem> items(
+      ::std::unique_ptr<SortItem[]> items(
           new SortItem[this->hadoopconf().size()]);
       typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
       size_type n = 0;
@@ -855,24 +984,20 @@ void SparkJob::SerializeWithCachedSizes(
         items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
-      ::google::protobuf::scoped_ptr<SparkJob_HadoopConfEntry_DoNotUse> entry;
+      ::std::unique_ptr<SparkJob_HadoopConfEntry_DoNotUse> entry;
       for (size_type i = 0; i < n; i++) {
-        entry.reset(hadoopconf_.NewEntryWrapper(
-            items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
-        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-            5, *entry, output);
-        Utf8Check::Check(items[static_cast<ptrdiff_t>(i)]);
+        entry.reset(hadoopconf_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(5, *entry, output);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
-      ::google::protobuf::scoped_ptr<SparkJob_HadoopConfEntry_DoNotUse> entry;
+      ::std::unique_ptr<SparkJob_HadoopConfEntry_DoNotUse> entry;
       for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
           it = this->hadoopconf().begin();
           it != this->hadoopconf().end(); ++it) {
-        entry.reset(hadoopconf_.NewEntryWrapper(
-            it->first, it->second));
-        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-            5, *entry, output);
-        Utf8Check::Check(&*it);
+        entry.reset(hadoopconf_.NewEntryWrapper(it->first, it->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(5, *entry, output);
+        Utf8Check::Check(&(*it));
       }
     }
   }
@@ -887,16 +1012,15 @@ void SparkJob::SerializeWithCachedSizes(
       6, this->executorpath(), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.plugins.SparkJob)
 }
 
 ::google::protobuf::uint8* SparkJob::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.plugins.SparkJob)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -948,9 +1072,9 @@ void SparkJob::SerializeWithCachedSizes(
       }
     };
 
-    if (deterministic &&
+    if (false &&
         this->sparkconf().size() > 1) {
-      ::google::protobuf::scoped_array<SortItem> items(
+      ::std::unique_ptr<SortItem[]> items(
           new SortItem[this->sparkconf().size()]);
       typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
       size_type n = 0;
@@ -960,28 +1084,20 @@ void SparkJob::SerializeWithCachedSizes(
         items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
-      ::google::protobuf::scoped_ptr<SparkJob_SparkConfEntry_DoNotUse> entry;
+      ::std::unique_ptr<SparkJob_SparkConfEntry_DoNotUse> entry;
       for (size_type i = 0; i < n; i++) {
-        entry.reset(sparkconf_.NewEntryWrapper(
-            items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
-        target = ::google::protobuf::internal::WireFormatLite::
-                   InternalWriteMessageNoVirtualToArray(
-                       4, *entry, deterministic, target);
-;
-        Utf8Check::Check(items[static_cast<ptrdiff_t>(i)]);
+        entry.reset(sparkconf_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(4, *entry, target);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
-      ::google::protobuf::scoped_ptr<SparkJob_SparkConfEntry_DoNotUse> entry;
+      ::std::unique_ptr<SparkJob_SparkConfEntry_DoNotUse> entry;
       for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
           it = this->sparkconf().begin();
           it != this->sparkconf().end(); ++it) {
-        entry.reset(sparkconf_.NewEntryWrapper(
-            it->first, it->second));
-        target = ::google::protobuf::internal::WireFormatLite::
-                   InternalWriteMessageNoVirtualToArray(
-                       4, *entry, deterministic, target);
-;
-        Utf8Check::Check(&*it);
+        entry.reset(sparkconf_.NewEntryWrapper(it->first, it->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(4, *entry, target);
+        Utf8Check::Check(&(*it));
       }
     }
   }
@@ -1005,9 +1121,9 @@ void SparkJob::SerializeWithCachedSizes(
       }
     };
 
-    if (deterministic &&
+    if (false &&
         this->hadoopconf().size() > 1) {
-      ::google::protobuf::scoped_array<SortItem> items(
+      ::std::unique_ptr<SortItem[]> items(
           new SortItem[this->hadoopconf().size()]);
       typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
       size_type n = 0;
@@ -1017,28 +1133,20 @@ void SparkJob::SerializeWithCachedSizes(
         items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
-      ::google::protobuf::scoped_ptr<SparkJob_HadoopConfEntry_DoNotUse> entry;
+      ::std::unique_ptr<SparkJob_HadoopConfEntry_DoNotUse> entry;
       for (size_type i = 0; i < n; i++) {
-        entry.reset(hadoopconf_.NewEntryWrapper(
-            items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
-        target = ::google::protobuf::internal::WireFormatLite::
-                   InternalWriteMessageNoVirtualToArray(
-                       5, *entry, deterministic, target);
-;
-        Utf8Check::Check(items[static_cast<ptrdiff_t>(i)]);
+        entry.reset(hadoopconf_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(5, *entry, target);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
-      ::google::protobuf::scoped_ptr<SparkJob_HadoopConfEntry_DoNotUse> entry;
+      ::std::unique_ptr<SparkJob_HadoopConfEntry_DoNotUse> entry;
       for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
           it = this->hadoopconf().begin();
           it != this->hadoopconf().end(); ++it) {
-        entry.reset(hadoopconf_.NewEntryWrapper(
-            it->first, it->second));
-        target = ::google::protobuf::internal::WireFormatLite::
-                   InternalWriteMessageNoVirtualToArray(
-                       5, *entry, deterministic, target);
-;
-        Utf8Check::Check(&*it);
+        entry.reset(hadoopconf_.NewEntryWrapper(it->first, it->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(5, *entry, target);
+        Utf8Check::Check(&(*it));
       }
     }
   }
@@ -1054,9 +1162,9 @@ void SparkJob::SerializeWithCachedSizes(
         6, this->executorpath(), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.plugins.SparkJob)
   return target;
@@ -1066,16 +1174,20 @@ size_t SparkJob::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.plugins.SparkJob)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   // map<string, string> sparkConf = 4;
   total_size += 1 *
       ::google::protobuf::internal::FromIntSize(this->sparkconf_size());
   {
-    ::google::protobuf::scoped_ptr<SparkJob_SparkConfEntry_DoNotUse> entry;
+    ::std::unique_ptr<SparkJob_SparkConfEntry_DoNotUse> entry;
     for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
         it = this->sparkconf().begin();
         it != this->sparkconf().end(); ++it) {
@@ -1089,7 +1201,7 @@ size_t SparkJob::ByteSizeLong() const {
   total_size += 1 *
       ::google::protobuf::internal::FromIntSize(this->hadoopconf_size());
   {
-    ::google::protobuf::scoped_ptr<SparkJob_HadoopConfEntry_DoNotUse> entry;
+    ::std::unique_ptr<SparkJob_HadoopConfEntry_DoNotUse> entry;
     for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
         it = this->hadoopconf().begin();
         it != this->hadoopconf().end(); ++it) {
@@ -1127,9 +1239,7 @@ size_t SparkJob::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -1137,9 +1247,9 @@ void SparkJob::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.plugins.SparkJob)
   GOOGLE_DCHECK_NE(&from, this);
   const SparkJob* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const SparkJob>(
+      ::google::protobuf::DynamicCastToGenerated<SparkJob>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.plugins.SparkJob)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -1198,24 +1308,43 @@ void SparkJob::Swap(SparkJob* other) {
 }
 void SparkJob::InternalSwap(SparkJob* other) {
   using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
   sparkconf_.Swap(&other->sparkconf_);
   hadoopconf_.Swap(&other->hadoopconf_);
-  mainapplicationfile_.Swap(&other->mainapplicationfile_);
-  mainclass_.Swap(&other->mainclass_);
-  executorpath_.Swap(&other->executorpath_);
+  mainapplicationfile_.Swap(&other->mainapplicationfile_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  mainclass_.Swap(&other->mainclass_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  executorpath_.Swap(&other->executorpath_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(applicationtype_, other->applicationtype_);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata SparkJob::GetMetadata() const {
-  protobuf_flyteidl_2fplugins_2fspark_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fspark_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fspark_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fspark_2eproto[kIndexInFileMessages];
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace plugins
 }  // namespace flyteidl
+namespace google {
+namespace protobuf {
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::SparkApplication* Arena::CreateMaybeMessage< ::flyteidl::plugins::SparkApplication >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::SparkApplication >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse* Arena::CreateMaybeMessage< ::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::SparkJob_SparkConfEntry_DoNotUse >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse* Arena::CreateMaybeMessage< ::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::SparkJob_HadoopConfEntry_DoNotUse >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::SparkJob* Arena::CreateMaybeMessage< ::flyteidl::plugins::SparkJob >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::SparkJob >(arena);
+}
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
+#include <google/protobuf/port_undef.inc>

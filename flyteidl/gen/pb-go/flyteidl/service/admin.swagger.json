@@ -21,7 +21,7 @@
         "operationId": "GetActiveLaunchPlan",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminLaunchPlan"
             }
@@ -61,7 +61,7 @@
         "operationId": "ListActiveLaunchPlans",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminLaunchPlanList"
             }
@@ -128,7 +128,7 @@
         "operationId": "ListNodeExecutionsForTask",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminNodeExecutionList"
             }
@@ -264,7 +264,7 @@
         "operationId": "GetExecutionData",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminWorkflowExecutionGetDataResponse"
             }
@@ -304,7 +304,7 @@
         "operationId": "GetNodeExecutionData",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminNodeExecutionGetDataResponse"
             }
@@ -350,7 +350,7 @@
         "operationId": "GetTaskExecutionData",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminTaskExecutionGetDataResponse"
             }
@@ -445,7 +445,7 @@
         "operationId": "CreateNodeEvent",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminNodeExecutionEventResponse"
             }
@@ -472,7 +472,7 @@
         "operationId": "CreateTaskEvent",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminTaskExecutionEventResponse"
             }
@@ -499,7 +499,7 @@
         "operationId": "CreateWorkflowEvent",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminWorkflowExecutionEventResponse"
             }
@@ -526,7 +526,7 @@
         "operationId": "CreateExecution",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminExecutionCreateResponse"
             }
@@ -553,7 +553,7 @@
         "operationId": "RelaunchExecution",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminExecutionCreateResponse"
             }
@@ -580,7 +580,7 @@
         "operationId": "ListExecutions",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminExecutionList"
             }
@@ -661,7 +661,7 @@
         "operationId": "GetExecution",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminExecution"
             }
@@ -699,7 +699,7 @@
         "operationId": "TerminateExecution",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminExecutionTerminateResponse"
             }
@@ -747,7 +747,7 @@
         "operationId": "ListLaunchPlanIds",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminNamedEntityIdentifierList"
             }
@@ -814,7 +814,7 @@
         "operationId": "CreateLaunchPlan",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminLaunchPlanCreateResponse"
             }
@@ -849,7 +849,7 @@
         "operationId": "ListLaunchPlans2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminLaunchPlanList"
             }
@@ -930,7 +930,7 @@
         "operationId": "ListLaunchPlans",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminLaunchPlanList"
             }
@@ -1011,7 +1011,7 @@
         "operationId": "GetLaunchPlan",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminLaunchPlan"
             }
@@ -1070,7 +1070,7 @@
         "operationId": "UpdateLaunchPlan",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminLaunchPlanUpdateResponse"
             }
@@ -1125,7 +1125,7 @@
         "operationId": "GetNodeExecution",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/flyteidladminNodeExecution"
             }
@@ -1171,7 +1171,7 @@
         "operationId": "ListNodeExecutions",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminNodeExecutionList"
             }
@@ -1252,7 +1252,7 @@
         "operationId": "ListProjects",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminProjects"
             }
@@ -1267,7 +1267,7 @@
         "operationId": "RegisterProject",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminProjectRegisterResponse"
             }
@@ -1294,7 +1294,7 @@
         "operationId": "GetTaskExecution",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/flyteidladminTaskExecution"
             }
@@ -1389,7 +1389,7 @@
         "operationId": "ListTaskExecutions",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminTaskExecutionList"
             }
@@ -1476,7 +1476,7 @@
         "operationId": "ListTaskIds",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminNamedEntityIdentifierList"
             }
@@ -1543,7 +1543,7 @@
         "operationId": "CreateTask",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminTaskCreateResponse"
             }
@@ -1578,7 +1578,7 @@
         "operationId": "ListTasks2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminTaskList"
             }
@@ -1659,7 +1659,7 @@
         "operationId": "ListTasks",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminTaskList"
             }
@@ -1740,7 +1740,7 @@
         "operationId": "GetTask",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminTask"
             }
@@ -1801,7 +1801,7 @@
         "operationId": "ListWorkflowIds",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminNamedEntityIdentifierList"
             }
@@ -1868,7 +1868,7 @@
         "operationId": "CreateWorkflow",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminWorkflowCreateResponse"
             }
@@ -1903,7 +1903,7 @@
         "operationId": "ListWorkflows2",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminWorkflowList"
             }
@@ -1984,7 +1984,7 @@
         "operationId": "ListWorkflows",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminWorkflowList"
             }
@@ -2065,7 +2065,7 @@
         "operationId": "GetWorkflow",
         "responses": {
           "200": {
-            "description": "",
+            "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminWorkflow"
             }

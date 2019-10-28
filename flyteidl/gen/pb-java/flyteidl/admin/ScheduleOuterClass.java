@@ -160,7 +160,6 @@ public final class ScheduleOuterClass {
       super(builder);
     }
     private FixedRate() {
-      value_ = 0;
       unit_ = 0;
     }
 
@@ -188,13 +187,6 @@ public final class ScheduleOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               value_ = input.readUInt32();
@@ -204,6 +196,13 @@ public final class ScheduleOuterClass {
               int rawValue = input.readEnum();
 
               unit_ = rawValue;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -223,6 +222,7 @@ public final class ScheduleOuterClass {
       return flyteidl.admin.ScheduleOuterClass.internal_static_flyteidl_admin_FixedRate_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.ScheduleOuterClass.internal_static_flyteidl_admin_FixedRate_fieldAccessorTable
@@ -251,11 +251,13 @@ public final class ScheduleOuterClass {
      * <code>.flyteidl.admin.FixedRateUnit unit = 2;</code>
      */
     public flyteidl.admin.ScheduleOuterClass.FixedRateUnit getUnit() {
+      @SuppressWarnings("deprecation")
       flyteidl.admin.ScheduleOuterClass.FixedRateUnit result = flyteidl.admin.ScheduleOuterClass.FixedRateUnit.valueOf(unit_);
       return result == null ? flyteidl.admin.ScheduleOuterClass.FixedRateUnit.UNRECOGNIZED : result;
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -265,6 +267,7 @@ public final class ScheduleOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (value_ != 0) {
@@ -276,6 +279,7 @@ public final class ScheduleOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -304,12 +308,11 @@ public final class ScheduleOuterClass {
       }
       flyteidl.admin.ScheduleOuterClass.FixedRate other = (flyteidl.admin.ScheduleOuterClass.FixedRate) obj;
 
-      boolean result = true;
-      result = result && (getValue()
-          == other.getValue());
-      result = result && unit_ == other.unit_;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getValue()
+          != other.getValue()) return false;
+      if (unit_ != other.unit_) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -398,6 +401,7 @@ public final class ScheduleOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -405,6 +409,7 @@ public final class ScheduleOuterClass {
     public static Builder newBuilder(flyteidl.admin.ScheduleOuterClass.FixedRate prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -432,6 +437,7 @@ public final class ScheduleOuterClass {
         return flyteidl.admin.ScheduleOuterClass.internal_static_flyteidl_admin_FixedRate_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.ScheduleOuterClass.internal_static_flyteidl_admin_FixedRate_fieldAccessorTable
@@ -454,6 +460,7 @@ public final class ScheduleOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         value_ = 0;
@@ -463,15 +470,18 @@ public final class ScheduleOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.ScheduleOuterClass.internal_static_flyteidl_admin_FixedRate_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ScheduleOuterClass.FixedRate getDefaultInstanceForType() {
         return flyteidl.admin.ScheduleOuterClass.FixedRate.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.ScheduleOuterClass.FixedRate build() {
         flyteidl.admin.ScheduleOuterClass.FixedRate result = buildPartial();
         if (!result.isInitialized()) {
@@ -480,6 +490,7 @@ public final class ScheduleOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ScheduleOuterClass.FixedRate buildPartial() {
         flyteidl.admin.ScheduleOuterClass.FixedRate result = new flyteidl.admin.ScheduleOuterClass.FixedRate(this);
         result.value_ = value_;
@@ -488,32 +499,39 @@ public final class ScheduleOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.ScheduleOuterClass.FixedRate) {
           return mergeFrom((flyteidl.admin.ScheduleOuterClass.FixedRate)other);
@@ -536,10 +554,12 @@ public final class ScheduleOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -603,6 +623,7 @@ public final class ScheduleOuterClass {
        * <code>.flyteidl.admin.FixedRateUnit unit = 2;</code>
        */
       public flyteidl.admin.ScheduleOuterClass.FixedRateUnit getUnit() {
+        @SuppressWarnings("deprecation")
         flyteidl.admin.ScheduleOuterClass.FixedRateUnit result = flyteidl.admin.ScheduleOuterClass.FixedRateUnit.valueOf(unit_);
         return result == null ? flyteidl.admin.ScheduleOuterClass.FixedRateUnit.UNRECOGNIZED : result;
       }
@@ -627,11 +648,13 @@ public final class ScheduleOuterClass {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -653,6 +676,7 @@ public final class ScheduleOuterClass {
 
     private static final com.google.protobuf.Parser<FixedRate>
         PARSER = new com.google.protobuf.AbstractParser<FixedRate>() {
+      @java.lang.Override
       public FixedRate parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -670,6 +694,7 @@ public final class ScheduleOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.ScheduleOuterClass.FixedRate getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -777,13 +802,6 @@ public final class ScheduleOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
               scheduleExpressionCase_ = 1;
@@ -810,6 +828,13 @@ public final class ScheduleOuterClass {
               kickoffTimeInputArg_ = s;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -827,6 +852,7 @@ public final class ScheduleOuterClass {
       return flyteidl.admin.ScheduleOuterClass.internal_static_flyteidl_admin_Schedule_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.admin.ScheduleOuterClass.internal_static_flyteidl_admin_Schedule_fieldAccessorTable
@@ -994,6 +1020,7 @@ public final class ScheduleOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1003,6 +1030,7 @@ public final class ScheduleOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (scheduleExpressionCase_ == 1) {
@@ -1017,6 +1045,7 @@ public final class ScheduleOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1047,26 +1076,23 @@ public final class ScheduleOuterClass {
       }
       flyteidl.admin.ScheduleOuterClass.Schedule other = (flyteidl.admin.ScheduleOuterClass.Schedule) obj;
 
-      boolean result = true;
-      result = result && getKickoffTimeInputArg()
-          .equals(other.getKickoffTimeInputArg());
-      result = result && getScheduleExpressionCase().equals(
-          other.getScheduleExpressionCase());
-      if (!result) return false;
+      if (!getKickoffTimeInputArg()
+          .equals(other.getKickoffTimeInputArg())) return false;
+      if (!getScheduleExpressionCase().equals(other.getScheduleExpressionCase())) return false;
       switch (scheduleExpressionCase_) {
         case 1:
-          result = result && getCronExpression()
-              .equals(other.getCronExpression());
+          if (!getCronExpression()
+              .equals(other.getCronExpression())) return false;
           break;
         case 2:
-          result = result && getRate()
-              .equals(other.getRate());
+          if (!getRate()
+              .equals(other.getRate())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1165,6 +1191,7 @@ public final class ScheduleOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1172,6 +1199,7 @@ public final class ScheduleOuterClass {
     public static Builder newBuilder(flyteidl.admin.ScheduleOuterClass.Schedule prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1199,6 +1227,7 @@ public final class ScheduleOuterClass {
         return flyteidl.admin.ScheduleOuterClass.internal_static_flyteidl_admin_Schedule_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.admin.ScheduleOuterClass.internal_static_flyteidl_admin_Schedule_fieldAccessorTable
@@ -1221,6 +1250,7 @@ public final class ScheduleOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         kickoffTimeInputArg_ = "";
@@ -1230,15 +1260,18 @@ public final class ScheduleOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.admin.ScheduleOuterClass.internal_static_flyteidl_admin_Schedule_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ScheduleOuterClass.Schedule getDefaultInstanceForType() {
         return flyteidl.admin.ScheduleOuterClass.Schedule.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.admin.ScheduleOuterClass.Schedule build() {
         flyteidl.admin.ScheduleOuterClass.Schedule result = buildPartial();
         if (!result.isInitialized()) {
@@ -1247,6 +1280,7 @@ public final class ScheduleOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.admin.ScheduleOuterClass.Schedule buildPartial() {
         flyteidl.admin.ScheduleOuterClass.Schedule result = new flyteidl.admin.ScheduleOuterClass.Schedule(this);
         if (scheduleExpressionCase_ == 1) {
@@ -1265,32 +1299,39 @@ public final class ScheduleOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.admin.ScheduleOuterClass.Schedule) {
           return mergeFrom((flyteidl.admin.ScheduleOuterClass.Schedule)other);
@@ -1326,10 +1367,12 @@ public final class ScheduleOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1692,11 +1735,13 @@ public final class ScheduleOuterClass {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1718,6 +1763,7 @@ public final class ScheduleOuterClass {
 
     private static final com.google.protobuf.Parser<Schedule>
         PARSER = new com.google.protobuf.AbstractParser<Schedule>() {
+      @java.lang.Override
       public Schedule parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1735,6 +1781,7 @@ public final class ScheduleOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.admin.ScheduleOuterClass.Schedule getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
