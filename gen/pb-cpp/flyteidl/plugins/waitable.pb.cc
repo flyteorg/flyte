@@ -6,38 +6,28 @@
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/port.h>
-#include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/extension_set.h>
 #include <google/protobuf/wire_format_lite_inl.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
-// This is a temporary google only hack
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-#include "third_party/protobuf/version.h"
-#endif
 // @@protoc_insertion_point(includes)
+#include <google/protobuf/port_def.inc>
+
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto;
 namespace flyteidl {
 namespace plugins {
 class WaitableDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<Waitable>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<Waitable> _instance;
 } _Waitable_default_instance_;
 }  // namespace plugins
 }  // namespace flyteidl
-namespace protobuf_flyteidl_2fplugins_2fwaitable_2eproto {
-void InitDefaultsWaitableImpl() {
+static void InitDefaultsWaitable_flyteidl_2fplugins_2fwaitable_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_flyteidl_2fcore_2fidentifier_2eproto::InitDefaultsWorkflowExecutionIdentifier();
   {
     void* ptr = &::flyteidl::plugins::_Waitable_default_instance_;
     new (ptr) ::flyteidl::plugins::Waitable();
@@ -46,24 +36,29 @@ void InitDefaultsWaitableImpl() {
   ::flyteidl::plugins::Waitable::InitAsDefaultInstance();
 }
 
-void InitDefaultsWaitable() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsWaitableImpl);
+::google::protobuf::internal::SCCInfo<1> scc_info_Waitable_flyteidl_2fplugins_2fwaitable_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsWaitable_flyteidl_2fplugins_2fwaitable_2eproto}, {
+      &scc_info_WorkflowExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto.base,}};
+
+void InitDefaults_flyteidl_2fplugins_2fwaitable_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_Waitable_flyteidl_2fplugins_2fwaitable_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata[1];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fplugins_2fwaitable_2eproto[1];
+constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fplugins_2fwaitable_2eproto = nullptr;
+constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fplugins_2fwaitable_2eproto = nullptr;
 
-const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fwaitable_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::Waitable, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::Waitable, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::Waitable, wf_exec_id_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::Waitable, phase_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::Waitable, workflow_id_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::Waitable, wf_exec_id_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::Waitable, phase_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::Waitable, workflow_id_),
 };
-static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::plugins::Waitable)},
 };
 
@@ -71,57 +66,40 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::_Waitable_default_instance_),
 };
 
-void protobuf_AssignDescriptors() {
-  AddDescriptors();
-  ::google::protobuf::MessageFactory* factory = NULL;
-  AssignDescriptors(
-      "flyteidl/plugins/waitable.proto", schemas, file_default_instances, TableStruct::offsets, factory,
-      file_level_metadata, NULL, NULL);
-}
+::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fplugins_2fwaitable_2eproto = {
+  {}, AddDescriptors_flyteidl_2fplugins_2fwaitable_2eproto, "flyteidl/plugins/waitable.proto", schemas,
+  file_default_instances, TableStruct_flyteidl_2fplugins_2fwaitable_2eproto::offsets,
+  file_level_metadata_flyteidl_2fplugins_2fwaitable_2eproto, 1, file_level_enum_descriptors_flyteidl_2fplugins_2fwaitable_2eproto, file_level_service_descriptors_flyteidl_2fplugins_2fwaitable_2eproto,
+};
 
-void protobuf_AssignDescriptorsOnce() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &protobuf_AssignDescriptors);
-}
+const char descriptor_table_protodef_flyteidl_2fplugins_2fwaitable_2eproto[] =
+  "\n\037flyteidl/plugins/waitable.proto\022\020flyte"
+  "idl.plugins\032\035flyteidl/core/execution.pro"
+  "to\032\036flyteidl/core/identifier.proto\"\226\001\n\010W"
+  "aitable\022>\n\nwf_exec_id\030\001 \001(\0132*.flyteidl.c"
+  "ore.WorkflowExecutionIdentifier\0225\n\005phase"
+  "\030\002 \001(\0162&.flyteidl.core.WorkflowExecution"
+  ".Phase\022\023\n\013workflow_id\030\003 \001(\tB5Z3github.co"
+  "m/lyft/flyteidl/gen/pb-go/flyteidl/plugi"
+  "nsb\006proto3"
+  ;
+::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fwaitable_2eproto = {
+  false, InitDefaults_flyteidl_2fplugins_2fwaitable_2eproto, 
+  descriptor_table_protodef_flyteidl_2fplugins_2fwaitable_2eproto,
+  "flyteidl/plugins/waitable.proto", &assign_descriptors_table_flyteidl_2fplugins_2fwaitable_2eproto, 330,
+};
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
-void protobuf_RegisterTypes(const ::std::string&) {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 1);
-}
-
-void AddDescriptorsImpl() {
-  InitDefaults();
-  static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\037flyteidl/plugins/waitable.proto\022\020flyte"
-      "idl.plugins\032\035flyteidl/core/execution.pro"
-      "to\032\036flyteidl/core/identifier.proto\"\226\001\n\010W"
-      "aitable\022>\n\nwf_exec_id\030\001 \001(\0132*.flyteidl.c"
-      "ore.WorkflowExecutionIdentifier\0225\n\005phase"
-      "\030\002 \001(\0162&.flyteidl.core.WorkflowExecution"
-      ".Phase\022\023\n\013workflow_id\030\003 \001(\tB5Z3github.co"
-      "m/lyft/flyteidl/gen/pb-go/flyteidl/plugi"
-      "nsb\006proto3"
+void AddDescriptors_flyteidl_2fplugins_2fwaitable_2eproto() {
+  static constexpr ::google::protobuf::internal::InitFunc deps[2] =
+  {
+    ::AddDescriptors_flyteidl_2fcore_2fexecution_2eproto,
+    ::AddDescriptors_flyteidl_2fcore_2fidentifier_2eproto,
   };
-  ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 330);
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
-    "flyteidl/plugins/waitable.proto", &protobuf_RegisterTypes);
-  ::protobuf_flyteidl_2fcore_2fexecution_2eproto::AddDescriptors();
-  ::protobuf_flyteidl_2fcore_2fidentifier_2eproto::AddDescriptors();
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fplugins_2fwaitable_2eproto, deps, 2);
 }
 
-void AddDescriptors() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &AddDescriptorsImpl);
-}
-// Force AddDescriptors() to be called at dynamic initialization time.
-struct StaticDescriptorInitializer {
-  StaticDescriptorInitializer() {
-    AddDescriptors();
-  }
-} static_descriptor_initializer;
-}  // namespace protobuf_flyteidl_2fplugins_2fwaitable_2eproto
+// Force running AddDescriptors() at dynamic initialization time.
+static bool dynamic_init_dummy_flyteidl_2fplugins_2fwaitable_2eproto = []() { AddDescriptors_flyteidl_2fplugins_2fwaitable_2eproto(); return true; }();
 namespace flyteidl {
 namespace plugins {
 
@@ -131,11 +109,20 @@ void Waitable::InitAsDefaultInstance() {
   ::flyteidl::plugins::_Waitable_default_instance_._instance.get_mutable()->wf_exec_id_ = const_cast< ::flyteidl::core::WorkflowExecutionIdentifier*>(
       ::flyteidl::core::WorkflowExecutionIdentifier::internal_default_instance());
 }
+class Waitable::HasBitSetters {
+ public:
+  static const ::flyteidl::core::WorkflowExecutionIdentifier& wf_exec_id(const Waitable* msg);
+};
+
+const ::flyteidl::core::WorkflowExecutionIdentifier&
+Waitable::HasBitSetters::wf_exec_id(const Waitable* msg) {
+  return *msg->wf_exec_id_;
+}
 void Waitable::clear_wf_exec_id() {
-  if (GetArenaNoVirtual() == NULL && wf_exec_id_ != NULL) {
+  if (GetArenaNoVirtual() == nullptr && wf_exec_id_ != nullptr) {
     delete wf_exec_id_;
   }
-  wf_exec_id_ = NULL;
+  wf_exec_id_ = nullptr;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Waitable::kWfExecIdFieldNumber;
@@ -144,17 +131,13 @@ const int Waitable::kWorkflowIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Waitable::Waitable()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fplugins_2fwaitable_2eproto::InitDefaultsWaitable();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.plugins.Waitable)
 }
 Waitable::Waitable(const Waitable& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   workflow_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.workflow_id().size() > 0) {
@@ -163,18 +146,19 @@ Waitable::Waitable(const Waitable& from)
   if (from.has_wf_exec_id()) {
     wf_exec_id_ = new ::flyteidl::core::WorkflowExecutionIdentifier(*from.wf_exec_id_);
   } else {
-    wf_exec_id_ = NULL;
+    wf_exec_id_ = nullptr;
   }
   phase_ = from.phase_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.plugins.Waitable)
 }
 
 void Waitable::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_Waitable_flyteidl_2fplugins_2fwaitable_2eproto.base);
   workflow_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&wf_exec_id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&phase_) -
       reinterpret_cast<char*>(&wf_exec_id_)) + sizeof(phase_));
-  _cached_size_ = 0;
 }
 
 Waitable::~Waitable() {
@@ -188,27 +172,13 @@ void Waitable::SharedDtor() {
 }
 
 void Waitable::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* Waitable::descriptor() {
-  ::protobuf_flyteidl_2fplugins_2fwaitable_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fwaitable_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const Waitable& Waitable::default_instance() {
-  ::protobuf_flyteidl_2fplugins_2fwaitable_2eproto::InitDefaultsWaitable();
+  ::google::protobuf::internal::InitSCC(&::scc_info_Waitable_flyteidl_2fplugins_2fwaitable_2eproto.base);
   return *internal_default_instance();
 }
 
-Waitable* Waitable::New(::google::protobuf::Arena* arena) const {
-  Waitable* n = new Waitable;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Waitable::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.plugins.Waitable)
@@ -217,28 +187,101 @@ void Waitable::Clear() {
   (void) cached_has_bits;
 
   workflow_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (GetArenaNoVirtual() == NULL && wf_exec_id_ != NULL) {
+  if (GetArenaNoVirtual() == nullptr && wf_exec_id_ != nullptr) {
     delete wf_exec_id_;
   }
-  wf_exec_id_ = NULL;
+  wf_exec_id_ = nullptr;
   phase_ = 0;
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* Waitable::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<Waitable*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // .flyteidl.core.WorkflowExecutionIdentifier wf_exec_id = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::WorkflowExecutionIdentifier::_InternalParse;
+        object = msg->mutable_wf_exec_id();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.WorkflowExecution.Phase phase = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_phase(static_cast<::flyteidl::core::WorkflowExecution_Phase>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string workflow_id = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.plugins.Waitable.workflow_id");
+        object = msg->mutable_workflow_id();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool Waitable::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.plugins.Waitable)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // .flyteidl.core.WorkflowExecutionIdentifier wf_exec_id = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_wf_exec_id()));
         } else {
@@ -249,9 +292,8 @@ bool Waitable::MergePartialFromCodedStream(
 
       // .flyteidl.core.WorkflowExecution.Phase phase = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
-          int value;
+        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
+          int value = 0;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
@@ -264,8 +306,7 @@ bool Waitable::MergePartialFromCodedStream(
 
       // string workflow_id = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_workflow_id()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -297,6 +338,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void Waitable::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -307,7 +349,7 @@ void Waitable::SerializeWithCachedSizes(
   // .flyteidl.core.WorkflowExecutionIdentifier wf_exec_id = 1;
   if (this->has_wf_exec_id()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, *this->wf_exec_id_, output);
+      1, HasBitSetters::wf_exec_id(this), output);
   }
 
   // .flyteidl.core.WorkflowExecution.Phase phase = 2;
@@ -326,16 +368,15 @@ void Waitable::SerializeWithCachedSizes(
       3, this->workflow_id(), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.plugins.Waitable)
 }
 
 ::google::protobuf::uint8* Waitable::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.plugins.Waitable)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -344,7 +385,7 @@ void Waitable::SerializeWithCachedSizes(
   if (this->has_wf_exec_id()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        1, *this->wf_exec_id_, deterministic, target);
+        1, HasBitSetters::wf_exec_id(this), target);
   }
 
   // .flyteidl.core.WorkflowExecution.Phase phase = 2;
@@ -364,9 +405,9 @@ void Waitable::SerializeWithCachedSizes(
         3, this->workflow_id(), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.plugins.Waitable)
   return target;
@@ -376,11 +417,15 @@ size_t Waitable::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.plugins.Waitable)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   // string workflow_id = 3;
   if (this->workflow_id().size() > 0) {
     total_size += 1 +
@@ -392,7 +437,7 @@ size_t Waitable::ByteSizeLong() const {
   if (this->has_wf_exec_id()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *this->wf_exec_id_);
+        *wf_exec_id_);
   }
 
   // .flyteidl.core.WorkflowExecution.Phase phase = 2;
@@ -402,9 +447,7 @@ size_t Waitable::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -412,9 +455,9 @@ void Waitable::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.plugins.Waitable)
   GOOGLE_DCHECK_NE(&from, this);
   const Waitable* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const Waitable>(
+      ::google::protobuf::DynamicCastToGenerated<Waitable>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.plugins.Waitable)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -466,21 +509,29 @@ void Waitable::Swap(Waitable* other) {
 }
 void Waitable::InternalSwap(Waitable* other) {
   using std::swap;
-  workflow_id_.Swap(&other->workflow_id_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  workflow_id_.Swap(&other->workflow_id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(wf_exec_id_, other->wf_exec_id_);
   swap(phase_, other->phase_);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata Waitable::GetMetadata() const {
-  protobuf_flyteidl_2fplugins_2fwaitable_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2fwaitable_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fwaitable_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fwaitable_2eproto[kIndexInFileMessages];
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace plugins
 }  // namespace flyteidl
+namespace google {
+namespace protobuf {
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::Waitable* Arena::CreateMaybeMessage< ::flyteidl::plugins::Waitable >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::Waitable >(arena);
+}
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
+#include <google/protobuf/port_undef.inc>

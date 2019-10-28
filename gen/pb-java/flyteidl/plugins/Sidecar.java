@@ -87,13 +87,6 @@ public final class Sidecar {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               k8s.io.api.core.v1.Generated.PodSpec.Builder subBuilder = null;
               if (podSpec_ != null) {
@@ -113,6 +106,13 @@ public final class Sidecar {
               primaryContainerName_ = s;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -130,6 +130,7 @@ public final class Sidecar {
       return flyteidl.plugins.Sidecar.internal_static_flyteidl_plugins_SidecarJob_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.plugins.Sidecar.internal_static_flyteidl_plugins_SidecarJob_fieldAccessorTable
@@ -193,6 +194,7 @@ public final class Sidecar {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -202,6 +204,7 @@ public final class Sidecar {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (podSpec_ != null) {
@@ -213,6 +216,7 @@ public final class Sidecar {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -240,16 +244,15 @@ public final class Sidecar {
       }
       flyteidl.plugins.Sidecar.SidecarJob other = (flyteidl.plugins.Sidecar.SidecarJob) obj;
 
-      boolean result = true;
-      result = result && (hasPodSpec() == other.hasPodSpec());
+      if (hasPodSpec() != other.hasPodSpec()) return false;
       if (hasPodSpec()) {
-        result = result && getPodSpec()
-            .equals(other.getPodSpec());
+        if (!getPodSpec()
+            .equals(other.getPodSpec())) return false;
       }
-      result = result && getPrimaryContainerName()
-          .equals(other.getPrimaryContainerName());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getPrimaryContainerName()
+          .equals(other.getPrimaryContainerName())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -340,6 +343,7 @@ public final class Sidecar {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -347,6 +351,7 @@ public final class Sidecar {
     public static Builder newBuilder(flyteidl.plugins.Sidecar.SidecarJob prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -376,6 +381,7 @@ public final class Sidecar {
         return flyteidl.plugins.Sidecar.internal_static_flyteidl_plugins_SidecarJob_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.plugins.Sidecar.internal_static_flyteidl_plugins_SidecarJob_fieldAccessorTable
@@ -398,6 +404,7 @@ public final class Sidecar {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (podSpecBuilder_ == null) {
@@ -411,15 +418,18 @@ public final class Sidecar {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.plugins.Sidecar.internal_static_flyteidl_plugins_SidecarJob_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Sidecar.SidecarJob getDefaultInstanceForType() {
         return flyteidl.plugins.Sidecar.SidecarJob.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Sidecar.SidecarJob build() {
         flyteidl.plugins.Sidecar.SidecarJob result = buildPartial();
         if (!result.isInitialized()) {
@@ -428,6 +438,7 @@ public final class Sidecar {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.Sidecar.SidecarJob buildPartial() {
         flyteidl.plugins.Sidecar.SidecarJob result = new flyteidl.plugins.Sidecar.SidecarJob(this);
         if (podSpecBuilder_ == null) {
@@ -440,32 +451,39 @@ public final class Sidecar {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.plugins.Sidecar.SidecarJob) {
           return mergeFrom((flyteidl.plugins.Sidecar.SidecarJob)other);
@@ -489,10 +507,12 @@ public final class Sidecar {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -511,7 +531,7 @@ public final class Sidecar {
         return this;
       }
 
-      private k8s.io.api.core.v1.Generated.PodSpec podSpec_ = null;
+      private k8s.io.api.core.v1.Generated.PodSpec podSpec_;
       private com.google.protobuf.SingleFieldBuilderV3<
           k8s.io.api.core.v1.Generated.PodSpec, k8s.io.api.core.v1.Generated.PodSpec.Builder, k8s.io.api.core.v1.Generated.PodSpecOrBuilder> podSpecBuilder_;
       /**
@@ -696,11 +716,13 @@ public final class Sidecar {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -722,6 +744,7 @@ public final class Sidecar {
 
     private static final com.google.protobuf.Parser<SidecarJob>
         PARSER = new com.google.protobuf.AbstractParser<SidecarJob>() {
+      @java.lang.Override
       public SidecarJob parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -739,6 +762,7 @@ public final class Sidecar {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.plugins.Sidecar.SidecarJob getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

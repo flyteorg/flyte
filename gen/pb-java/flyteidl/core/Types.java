@@ -280,20 +280,20 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 26: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 columns_ = new java.util.ArrayList<flyteidl.core.Types.SchemaType.SchemaColumn>();
                 mutable_bitField0_ |= 0x00000001;
               }
               columns_.add(
                   input.readMessage(flyteidl.core.Types.SchemaType.SchemaColumn.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -304,7 +304,7 @@ public final class Types {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
           columns_ = java.util.Collections.unmodifiableList(columns_);
         }
         this.unknownFields = unknownFields.build();
@@ -316,6 +316,7 @@ public final class Types {
       return flyteidl.core.Types.internal_static_flyteidl_core_SchemaType_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Types.internal_static_flyteidl_core_SchemaType_fieldAccessorTable
@@ -403,13 +404,6 @@ public final class Types {
               case 0:
                 done = true;
                 break;
-              default: {
-                if (!parseUnknownFieldProto3(
-                    input, unknownFields, extensionRegistry, tag)) {
-                  done = true;
-                }
-                break;
-              }
               case 10: {
                 java.lang.String s = input.readStringRequireUtf8();
 
@@ -420,6 +414,13 @@ public final class Types {
                 int rawValue = input.readEnum();
 
                 type_ = rawValue;
+                break;
+              }
+              default: {
+                if (!parseUnknownField(
+                    input, unknownFields, extensionRegistry, tag)) {
+                  done = true;
+                }
                 break;
               }
             }
@@ -439,6 +440,7 @@ public final class Types {
         return flyteidl.core.Types.internal_static_flyteidl_core_SchemaType_SchemaColumn_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Types.internal_static_flyteidl_core_SchemaType_SchemaColumn_fieldAccessorTable
@@ -642,11 +644,13 @@ public final class Types {
        * <code>.flyteidl.core.SchemaType.SchemaColumn.SchemaColumnType type = 2;</code>
        */
       public flyteidl.core.Types.SchemaType.SchemaColumn.SchemaColumnType getType() {
+        @SuppressWarnings("deprecation")
         flyteidl.core.Types.SchemaType.SchemaColumn.SchemaColumnType result = flyteidl.core.Types.SchemaType.SchemaColumn.SchemaColumnType.valueOf(type_);
         return result == null ? flyteidl.core.Types.SchemaType.SchemaColumn.SchemaColumnType.UNRECOGNIZED : result;
       }
 
       private byte memoizedIsInitialized = -1;
+      @java.lang.Override
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
         if (isInitialized == 1) return true;
@@ -656,6 +660,7 @@ public final class Types {
         return true;
       }
 
+      @java.lang.Override
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
         if (!getNameBytes().isEmpty()) {
@@ -667,6 +672,7 @@ public final class Types {
         unknownFields.writeTo(output);
       }
 
+      @java.lang.Override
       public int getSerializedSize() {
         int size = memoizedSize;
         if (size != -1) return size;
@@ -694,12 +700,11 @@ public final class Types {
         }
         flyteidl.core.Types.SchemaType.SchemaColumn other = (flyteidl.core.Types.SchemaType.SchemaColumn) obj;
 
-        boolean result = true;
-        result = result && getName()
-            .equals(other.getName());
-        result = result && type_ == other.type_;
-        result = result && unknownFields.equals(other.unknownFields);
-        return result;
+        if (!getName()
+            .equals(other.getName())) return false;
+        if (type_ != other.type_) return false;
+        if (!unknownFields.equals(other.unknownFields)) return false;
+        return true;
       }
 
       @java.lang.Override
@@ -788,6 +793,7 @@ public final class Types {
             .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
+      @java.lang.Override
       public Builder newBuilderForType() { return newBuilder(); }
       public static Builder newBuilder() {
         return DEFAULT_INSTANCE.toBuilder();
@@ -795,6 +801,7 @@ public final class Types {
       public static Builder newBuilder(flyteidl.core.Types.SchemaType.SchemaColumn prototype) {
         return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
       }
+      @java.lang.Override
       public Builder toBuilder() {
         return this == DEFAULT_INSTANCE
             ? new Builder() : new Builder().mergeFrom(this);
@@ -818,6 +825,7 @@ public final class Types {
           return flyteidl.core.Types.internal_static_flyteidl_core_SchemaType_SchemaColumn_descriptor;
         }
 
+        @java.lang.Override
         protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return flyteidl.core.Types.internal_static_flyteidl_core_SchemaType_SchemaColumn_fieldAccessorTable
@@ -840,6 +848,7 @@ public final class Types {
                   .alwaysUseFieldBuilders) {
           }
         }
+        @java.lang.Override
         public Builder clear() {
           super.clear();
           name_ = "";
@@ -849,15 +858,18 @@ public final class Types {
           return this;
         }
 
+        @java.lang.Override
         public com.google.protobuf.Descriptors.Descriptor
             getDescriptorForType() {
           return flyteidl.core.Types.internal_static_flyteidl_core_SchemaType_SchemaColumn_descriptor;
         }
 
+        @java.lang.Override
         public flyteidl.core.Types.SchemaType.SchemaColumn getDefaultInstanceForType() {
           return flyteidl.core.Types.SchemaType.SchemaColumn.getDefaultInstance();
         }
 
+        @java.lang.Override
         public flyteidl.core.Types.SchemaType.SchemaColumn build() {
           flyteidl.core.Types.SchemaType.SchemaColumn result = buildPartial();
           if (!result.isInitialized()) {
@@ -866,6 +878,7 @@ public final class Types {
           return result;
         }
 
+        @java.lang.Override
         public flyteidl.core.Types.SchemaType.SchemaColumn buildPartial() {
           flyteidl.core.Types.SchemaType.SchemaColumn result = new flyteidl.core.Types.SchemaType.SchemaColumn(this);
           result.name_ = name_;
@@ -874,32 +887,39 @@ public final class Types {
           return result;
         }
 
+        @java.lang.Override
         public Builder clone() {
-          return (Builder) super.clone();
+          return super.clone();
         }
+        @java.lang.Override
         public Builder setField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
             java.lang.Object value) {
-          return (Builder) super.setField(field, value);
+          return super.setField(field, value);
         }
+        @java.lang.Override
         public Builder clearField(
             com.google.protobuf.Descriptors.FieldDescriptor field) {
-          return (Builder) super.clearField(field);
+          return super.clearField(field);
         }
+        @java.lang.Override
         public Builder clearOneof(
             com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-          return (Builder) super.clearOneof(oneof);
+          return super.clearOneof(oneof);
         }
+        @java.lang.Override
         public Builder setRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
             int index, java.lang.Object value) {
-          return (Builder) super.setRepeatedField(field, index, value);
+          return super.setRepeatedField(field, index, value);
         }
+        @java.lang.Override
         public Builder addRepeatedField(
             com.google.protobuf.Descriptors.FieldDescriptor field,
             java.lang.Object value) {
-          return (Builder) super.addRepeatedField(field, value);
+          return super.addRepeatedField(field, value);
         }
+        @java.lang.Override
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof flyteidl.core.Types.SchemaType.SchemaColumn) {
             return mergeFrom((flyteidl.core.Types.SchemaType.SchemaColumn)other);
@@ -923,10 +943,12 @@ public final class Types {
           return this;
         }
 
+        @java.lang.Override
         public final boolean isInitialized() {
           return true;
         }
 
+        @java.lang.Override
         public Builder mergeFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1065,6 +1087,7 @@ public final class Types {
          * <code>.flyteidl.core.SchemaType.SchemaColumn.SchemaColumnType type = 2;</code>
          */
         public flyteidl.core.Types.SchemaType.SchemaColumn.SchemaColumnType getType() {
+          @SuppressWarnings("deprecation")
           flyteidl.core.Types.SchemaType.SchemaColumn.SchemaColumnType result = flyteidl.core.Types.SchemaType.SchemaColumn.SchemaColumnType.valueOf(type_);
           return result == null ? flyteidl.core.Types.SchemaType.SchemaColumn.SchemaColumnType.UNRECOGNIZED : result;
         }
@@ -1097,11 +1120,13 @@ public final class Types {
           onChanged();
           return this;
         }
+        @java.lang.Override
         public final Builder setUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
-          return super.setUnknownFieldsProto3(unknownFields);
+          return super.setUnknownFields(unknownFields);
         }
 
+        @java.lang.Override
         public final Builder mergeUnknownFields(
             final com.google.protobuf.UnknownFieldSet unknownFields) {
           return super.mergeUnknownFields(unknownFields);
@@ -1123,6 +1148,7 @@ public final class Types {
 
       private static final com.google.protobuf.Parser<SchemaColumn>
           PARSER = new com.google.protobuf.AbstractParser<SchemaColumn>() {
+        @java.lang.Override
         public SchemaColumn parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1140,6 +1166,7 @@ public final class Types {
         return PARSER;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.SchemaType.SchemaColumn getDefaultInstanceForType() {
         return DEFAULT_INSTANCE;
       }
@@ -1202,6 +1229,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1211,6 +1239,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < columns_.size(); i++) {
@@ -1219,6 +1248,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1243,11 +1273,10 @@ public final class Types {
       }
       flyteidl.core.Types.SchemaType other = (flyteidl.core.Types.SchemaType) obj;
 
-      boolean result = true;
-      result = result && getColumnsList()
-          .equals(other.getColumnsList());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getColumnsList()
+          .equals(other.getColumnsList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1336,6 +1365,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1343,6 +1373,7 @@ public final class Types {
     public static Builder newBuilder(flyteidl.core.Types.SchemaType prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1370,6 +1401,7 @@ public final class Types {
         return flyteidl.core.Types.internal_static_flyteidl_core_SchemaType_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Types.internal_static_flyteidl_core_SchemaType_fieldAccessorTable
@@ -1393,6 +1425,7 @@ public final class Types {
           getColumnsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (columnsBuilder_ == null) {
@@ -1404,15 +1437,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Types.internal_static_flyteidl_core_SchemaType_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.SchemaType getDefaultInstanceForType() {
         return flyteidl.core.Types.SchemaType.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.SchemaType build() {
         flyteidl.core.Types.SchemaType result = buildPartial();
         if (!result.isInitialized()) {
@@ -1421,11 +1457,12 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.SchemaType buildPartial() {
         flyteidl.core.Types.SchemaType result = new flyteidl.core.Types.SchemaType(this);
         int from_bitField0_ = bitField0_;
         if (columnsBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          if (((bitField0_ & 0x00000001) != 0)) {
             columns_ = java.util.Collections.unmodifiableList(columns_);
             bitField0_ = (bitField0_ & ~0x00000001);
           }
@@ -1437,32 +1474,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Types.SchemaType) {
           return mergeFrom((flyteidl.core.Types.SchemaType)other);
@@ -1505,10 +1549,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1531,7 +1577,7 @@ public final class Types {
       private java.util.List<flyteidl.core.Types.SchemaType.SchemaColumn> columns_ =
         java.util.Collections.emptyList();
       private void ensureColumnsIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+        if (!((bitField0_ & 0x00000001) != 0)) {
           columns_ = new java.util.ArrayList<flyteidl.core.Types.SchemaType.SchemaColumn>(columns_);
           bitField0_ |= 0x00000001;
          }
@@ -1832,18 +1878,20 @@ public final class Types {
           columnsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Types.SchemaType.SchemaColumn, flyteidl.core.Types.SchemaType.SchemaColumn.Builder, flyteidl.core.Types.SchemaType.SchemaColumnOrBuilder>(
                   columns_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  ((bitField0_ & 0x00000001) != 0),
                   getParentForChildren(),
                   isClean());
           columns_ = null;
         }
         return columnsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1865,6 +1913,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<SchemaType>
         PARSER = new com.google.protobuf.AbstractParser<SchemaType>() {
+      @java.lang.Override
       public SchemaType parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1882,6 +1931,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Types.SchemaType getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1966,13 +2016,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -1983,6 +2026,13 @@ public final class Types {
               int rawValue = input.readEnum();
 
               dimensionality_ = rawValue;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -2002,6 +2052,7 @@ public final class Types {
       return flyteidl.core.Types.internal_static_flyteidl_core_BlobType_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Types.internal_static_flyteidl_core_BlobType_fieldAccessorTable
@@ -2163,11 +2214,13 @@ public final class Types {
      * <code>.flyteidl.core.BlobType.BlobDimensionality dimensionality = 2;</code>
      */
     public flyteidl.core.Types.BlobType.BlobDimensionality getDimensionality() {
+      @SuppressWarnings("deprecation")
       flyteidl.core.Types.BlobType.BlobDimensionality result = flyteidl.core.Types.BlobType.BlobDimensionality.valueOf(dimensionality_);
       return result == null ? flyteidl.core.Types.BlobType.BlobDimensionality.UNRECOGNIZED : result;
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2177,6 +2230,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getFormatBytes().isEmpty()) {
@@ -2188,6 +2242,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2215,12 +2270,11 @@ public final class Types {
       }
       flyteidl.core.Types.BlobType other = (flyteidl.core.Types.BlobType) obj;
 
-      boolean result = true;
-      result = result && getFormat()
-          .equals(other.getFormat());
-      result = result && dimensionality_ == other.dimensionality_;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getFormat()
+          .equals(other.getFormat())) return false;
+      if (dimensionality_ != other.dimensionality_) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2309,6 +2363,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2316,6 +2371,7 @@ public final class Types {
     public static Builder newBuilder(flyteidl.core.Types.BlobType prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2343,6 +2399,7 @@ public final class Types {
         return flyteidl.core.Types.internal_static_flyteidl_core_BlobType_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Types.internal_static_flyteidl_core_BlobType_fieldAccessorTable
@@ -2365,6 +2422,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         format_ = "";
@@ -2374,15 +2432,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Types.internal_static_flyteidl_core_BlobType_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.BlobType getDefaultInstanceForType() {
         return flyteidl.core.Types.BlobType.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.BlobType build() {
         flyteidl.core.Types.BlobType result = buildPartial();
         if (!result.isInitialized()) {
@@ -2391,6 +2452,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.BlobType buildPartial() {
         flyteidl.core.Types.BlobType result = new flyteidl.core.Types.BlobType(this);
         result.format_ = format_;
@@ -2399,32 +2461,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Types.BlobType) {
           return mergeFrom((flyteidl.core.Types.BlobType)other);
@@ -2448,10 +2517,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2583,6 +2654,7 @@ public final class Types {
        * <code>.flyteidl.core.BlobType.BlobDimensionality dimensionality = 2;</code>
        */
       public flyteidl.core.Types.BlobType.BlobDimensionality getDimensionality() {
+        @SuppressWarnings("deprecation")
         flyteidl.core.Types.BlobType.BlobDimensionality result = flyteidl.core.Types.BlobType.BlobDimensionality.valueOf(dimensionality_);
         return result == null ? flyteidl.core.Types.BlobType.BlobDimensionality.UNRECOGNIZED : result;
       }
@@ -2607,11 +2679,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2633,6 +2707,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<BlobType>
         PARSER = new com.google.protobuf.AbstractParser<BlobType>() {
+      @java.lang.Override
       public BlobType parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2650,6 +2725,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Types.BlobType getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2850,13 +2926,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               int rawValue = input.readEnum();
               typeCase_ = 1;
@@ -2932,6 +3001,13 @@ public final class Types {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -2949,6 +3025,7 @@ public final class Types {
       return flyteidl.core.Types.internal_static_flyteidl_core_LiteralType_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Types.internal_static_flyteidl_core_LiteralType_fieldAccessorTable
@@ -3023,6 +3100,7 @@ public final class Types {
      */
     public flyteidl.core.Types.SimpleType getSimple() {
       if (typeCase_ == 1) {
+        @SuppressWarnings("deprecation")
         flyteidl.core.Types.SimpleType result = flyteidl.core.Types.SimpleType.valueOf(
             (java.lang.Integer) type_);
         return result == null ? flyteidl.core.Types.SimpleType.UNRECOGNIZED : result;
@@ -3219,6 +3297,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3228,6 +3307,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (typeCase_ == 1) {
@@ -3251,6 +3331,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3295,41 +3376,38 @@ public final class Types {
       }
       flyteidl.core.Types.LiteralType other = (flyteidl.core.Types.LiteralType) obj;
 
-      boolean result = true;
-      result = result && (hasMetadata() == other.hasMetadata());
+      if (hasMetadata() != other.hasMetadata()) return false;
       if (hasMetadata()) {
-        result = result && getMetadata()
-            .equals(other.getMetadata());
+        if (!getMetadata()
+            .equals(other.getMetadata())) return false;
       }
-      result = result && getTypeCase().equals(
-          other.getTypeCase());
-      if (!result) return false;
+      if (!getTypeCase().equals(other.getTypeCase())) return false;
       switch (typeCase_) {
         case 1:
-          result = result && getSimpleValue()
-              == other.getSimpleValue();
+          if (getSimpleValue()
+              != other.getSimpleValue()) return false;
           break;
         case 2:
-          result = result && getSchema()
-              .equals(other.getSchema());
+          if (!getSchema()
+              .equals(other.getSchema())) return false;
           break;
         case 3:
-          result = result && getCollectionType()
-              .equals(other.getCollectionType());
+          if (!getCollectionType()
+              .equals(other.getCollectionType())) return false;
           break;
         case 4:
-          result = result && getMapValueType()
-              .equals(other.getMapValueType());
+          if (!getMapValueType()
+              .equals(other.getMapValueType())) return false;
           break;
         case 5:
-          result = result && getBlob()
-              .equals(other.getBlob());
+          if (!getBlob()
+              .equals(other.getBlob())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3442,6 +3520,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3449,6 +3528,7 @@ public final class Types {
     public static Builder newBuilder(flyteidl.core.Types.LiteralType prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3476,6 +3556,7 @@ public final class Types {
         return flyteidl.core.Types.internal_static_flyteidl_core_LiteralType_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Types.internal_static_flyteidl_core_LiteralType_fieldAccessorTable
@@ -3498,6 +3579,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (metadataBuilder_ == null) {
@@ -3511,15 +3593,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Types.internal_static_flyteidl_core_LiteralType_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.LiteralType getDefaultInstanceForType() {
         return flyteidl.core.Types.LiteralType.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.LiteralType build() {
         flyteidl.core.Types.LiteralType result = buildPartial();
         if (!result.isInitialized()) {
@@ -3528,6 +3613,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.LiteralType buildPartial() {
         flyteidl.core.Types.LiteralType result = new flyteidl.core.Types.LiteralType(this);
         if (typeCase_ == 1) {
@@ -3571,32 +3657,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Types.LiteralType) {
           return mergeFrom((flyteidl.core.Types.LiteralType)other);
@@ -3641,10 +3734,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3713,6 +3808,7 @@ public final class Types {
        */
       public flyteidl.core.Types.SimpleType getSimple() {
         if (typeCase_ == 1) {
+          @SuppressWarnings("deprecation")
           flyteidl.core.Types.SimpleType result = flyteidl.core.Types.SimpleType.valueOf(
               (java.lang.Integer) type_);
           return result == null ? flyteidl.core.Types.SimpleType.UNRECOGNIZED : result;
@@ -4439,7 +4535,7 @@ public final class Types {
         return blobBuilder_;
       }
 
-      private com.google.protobuf.Struct metadata_ = null;
+      private com.google.protobuf.Struct metadata_;
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> metadataBuilder_;
       /**
@@ -4600,11 +4696,13 @@ public final class Types {
         }
         return metadataBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -4626,6 +4724,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<LiteralType>
         PARSER = new com.google.protobuf.AbstractParser<LiteralType>() {
+      @java.lang.Override
       public LiteralType parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4643,6 +4742,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Types.LiteralType getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -4735,13 +4835,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -4752,6 +4845,13 @@ public final class Types {
               java.lang.String s = input.readStringRequireUtf8();
 
               var_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -4771,6 +4871,7 @@ public final class Types {
       return flyteidl.core.Types.internal_static_flyteidl_core_OutputReference_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Types.internal_static_flyteidl_core_OutputReference_fieldAccessorTable
@@ -4863,6 +4964,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -4872,6 +4974,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getNodeIdBytes().isEmpty()) {
@@ -4883,6 +4986,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -4909,13 +5013,12 @@ public final class Types {
       }
       flyteidl.core.Types.OutputReference other = (flyteidl.core.Types.OutputReference) obj;
 
-      boolean result = true;
-      result = result && getNodeId()
-          .equals(other.getNodeId());
-      result = result && getVar()
-          .equals(other.getVar());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getNodeId()
+          .equals(other.getNodeId())) return false;
+      if (!getVar()
+          .equals(other.getVar())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -5004,6 +5107,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -5011,6 +5115,7 @@ public final class Types {
     public static Builder newBuilder(flyteidl.core.Types.OutputReference prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -5039,6 +5144,7 @@ public final class Types {
         return flyteidl.core.Types.internal_static_flyteidl_core_OutputReference_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Types.internal_static_flyteidl_core_OutputReference_fieldAccessorTable
@@ -5061,6 +5167,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         nodeId_ = "";
@@ -5070,15 +5177,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Types.internal_static_flyteidl_core_OutputReference_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.OutputReference getDefaultInstanceForType() {
         return flyteidl.core.Types.OutputReference.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.OutputReference build() {
         flyteidl.core.Types.OutputReference result = buildPartial();
         if (!result.isInitialized()) {
@@ -5087,6 +5197,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.OutputReference buildPartial() {
         flyteidl.core.Types.OutputReference result = new flyteidl.core.Types.OutputReference(this);
         result.nodeId_ = nodeId_;
@@ -5095,32 +5206,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Types.OutputReference) {
           return mergeFrom((flyteidl.core.Types.OutputReference)other);
@@ -5145,10 +5263,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5344,11 +5464,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -5370,6 +5492,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<OutputReference>
         PARSER = new com.google.protobuf.AbstractParser<OutputReference>() {
+      @java.lang.Override
       public OutputReference parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5387,6 +5510,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Types.OutputReference getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -5478,13 +5602,6 @@ public final class Types {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -5495,6 +5612,13 @@ public final class Types {
               java.lang.String s = input.readStringRequireUtf8();
 
               message_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -5514,6 +5638,7 @@ public final class Types {
       return flyteidl.core.Types.internal_static_flyteidl_core_Error_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Types.internal_static_flyteidl_core_Error_fieldAccessorTable
@@ -5606,6 +5731,7 @@ public final class Types {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -5615,6 +5741,7 @@ public final class Types {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getFailedNodeIdBytes().isEmpty()) {
@@ -5626,6 +5753,7 @@ public final class Types {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -5652,13 +5780,12 @@ public final class Types {
       }
       flyteidl.core.Types.Error other = (flyteidl.core.Types.Error) obj;
 
-      boolean result = true;
-      result = result && getFailedNodeId()
-          .equals(other.getFailedNodeId());
-      result = result && getMessage()
-          .equals(other.getMessage());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getFailedNodeId()
+          .equals(other.getFailedNodeId())) return false;
+      if (!getMessage()
+          .equals(other.getMessage())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -5747,6 +5874,7 @@ public final class Types {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -5754,6 +5882,7 @@ public final class Types {
     public static Builder newBuilder(flyteidl.core.Types.Error prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -5781,6 +5910,7 @@ public final class Types {
         return flyteidl.core.Types.internal_static_flyteidl_core_Error_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Types.internal_static_flyteidl_core_Error_fieldAccessorTable
@@ -5803,6 +5933,7 @@ public final class Types {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         failedNodeId_ = "";
@@ -5812,15 +5943,18 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Types.internal_static_flyteidl_core_Error_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.Error getDefaultInstanceForType() {
         return flyteidl.core.Types.Error.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.Error build() {
         flyteidl.core.Types.Error result = buildPartial();
         if (!result.isInitialized()) {
@@ -5829,6 +5963,7 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Types.Error buildPartial() {
         flyteidl.core.Types.Error result = new flyteidl.core.Types.Error(this);
         result.failedNodeId_ = failedNodeId_;
@@ -5837,32 +5972,39 @@ public final class Types {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Types.Error) {
           return mergeFrom((flyteidl.core.Types.Error)other);
@@ -5887,10 +6029,12 @@ public final class Types {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6086,11 +6230,13 @@ public final class Types {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -6112,6 +6258,7 @@ public final class Types {
 
     private static final com.google.protobuf.Parser<Error>
         PARSER = new com.google.protobuf.AbstractParser<Error>() {
+      @java.lang.Override
       public Error parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6129,6 +6276,7 @@ public final class Types {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Types.Error getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

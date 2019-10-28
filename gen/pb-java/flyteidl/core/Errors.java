@@ -118,13 +118,6 @@ public final class Errors {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -141,6 +134,13 @@ public final class Errors {
               int rawValue = input.readEnum();
 
               kind_ = rawValue;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -160,6 +160,7 @@ public final class Errors {
       return flyteidl.core.Errors.internal_static_flyteidl_core_ContainerError_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Errors.internal_static_flyteidl_core_ContainerError_fieldAccessorTable
@@ -373,11 +374,13 @@ public final class Errors {
      * <code>.flyteidl.core.ContainerError.Kind kind = 3;</code>
      */
     public flyteidl.core.Errors.ContainerError.Kind getKind() {
+      @SuppressWarnings("deprecation")
       flyteidl.core.Errors.ContainerError.Kind result = flyteidl.core.Errors.ContainerError.Kind.valueOf(kind_);
       return result == null ? flyteidl.core.Errors.ContainerError.Kind.UNRECOGNIZED : result;
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -387,6 +390,7 @@ public final class Errors {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getCodeBytes().isEmpty()) {
@@ -401,6 +405,7 @@ public final class Errors {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -431,14 +436,13 @@ public final class Errors {
       }
       flyteidl.core.Errors.ContainerError other = (flyteidl.core.Errors.ContainerError) obj;
 
-      boolean result = true;
-      result = result && getCode()
-          .equals(other.getCode());
-      result = result && getMessage()
-          .equals(other.getMessage());
-      result = result && kind_ == other.kind_;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getCode()
+          .equals(other.getCode())) return false;
+      if (!getMessage()
+          .equals(other.getMessage())) return false;
+      if (kind_ != other.kind_) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -529,6 +533,7 @@ public final class Errors {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -536,6 +541,7 @@ public final class Errors {
     public static Builder newBuilder(flyteidl.core.Errors.ContainerError prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -564,6 +570,7 @@ public final class Errors {
         return flyteidl.core.Errors.internal_static_flyteidl_core_ContainerError_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Errors.internal_static_flyteidl_core_ContainerError_fieldAccessorTable
@@ -586,6 +593,7 @@ public final class Errors {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         code_ = "";
@@ -597,15 +605,18 @@ public final class Errors {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Errors.internal_static_flyteidl_core_ContainerError_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Errors.ContainerError getDefaultInstanceForType() {
         return flyteidl.core.Errors.ContainerError.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Errors.ContainerError build() {
         flyteidl.core.Errors.ContainerError result = buildPartial();
         if (!result.isInitialized()) {
@@ -614,6 +625,7 @@ public final class Errors {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Errors.ContainerError buildPartial() {
         flyteidl.core.Errors.ContainerError result = new flyteidl.core.Errors.ContainerError(this);
         result.code_ = code_;
@@ -623,32 +635,39 @@ public final class Errors {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Errors.ContainerError) {
           return mergeFrom((flyteidl.core.Errors.ContainerError)other);
@@ -676,10 +695,12 @@ public final class Errors {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -907,6 +928,7 @@ public final class Errors {
        * <code>.flyteidl.core.ContainerError.Kind kind = 3;</code>
        */
       public flyteidl.core.Errors.ContainerError.Kind getKind() {
+        @SuppressWarnings("deprecation")
         flyteidl.core.Errors.ContainerError.Kind result = flyteidl.core.Errors.ContainerError.Kind.valueOf(kind_);
         return result == null ? flyteidl.core.Errors.ContainerError.Kind.UNRECOGNIZED : result;
       }
@@ -939,11 +961,13 @@ public final class Errors {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -965,6 +989,7 @@ public final class Errors {
 
     private static final com.google.protobuf.Parser<ContainerError>
         PARSER = new com.google.protobuf.AbstractParser<ContainerError>() {
+      @java.lang.Override
       public ContainerError parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -982,6 +1007,7 @@ public final class Errors {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Errors.ContainerError getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1061,13 +1087,6 @@ public final class Errors {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Errors.ContainerError.Builder subBuilder = null;
               if (error_ != null) {
@@ -1079,6 +1098,13 @@ public final class Errors {
                 error_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -1098,6 +1124,7 @@ public final class Errors {
       return flyteidl.core.Errors.internal_static_flyteidl_core_ErrorDocument_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Errors.internal_static_flyteidl_core_ErrorDocument_fieldAccessorTable
@@ -1139,6 +1166,7 @@ public final class Errors {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1148,6 +1176,7 @@ public final class Errors {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (error_ != null) {
@@ -1156,6 +1185,7 @@ public final class Errors {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1180,14 +1210,13 @@ public final class Errors {
       }
       flyteidl.core.Errors.ErrorDocument other = (flyteidl.core.Errors.ErrorDocument) obj;
 
-      boolean result = true;
-      result = result && (hasError() == other.hasError());
+      if (hasError() != other.hasError()) return false;
       if (hasError()) {
-        result = result && getError()
-            .equals(other.getError());
+        if (!getError()
+            .equals(other.getError())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1276,6 +1305,7 @@ public final class Errors {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1283,6 +1313,7 @@ public final class Errors {
     public static Builder newBuilder(flyteidl.core.Errors.ErrorDocument prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1311,6 +1342,7 @@ public final class Errors {
         return flyteidl.core.Errors.internal_static_flyteidl_core_ErrorDocument_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Errors.internal_static_flyteidl_core_ErrorDocument_fieldAccessorTable
@@ -1333,6 +1365,7 @@ public final class Errors {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (errorBuilder_ == null) {
@@ -1344,15 +1377,18 @@ public final class Errors {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Errors.internal_static_flyteidl_core_ErrorDocument_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Errors.ErrorDocument getDefaultInstanceForType() {
         return flyteidl.core.Errors.ErrorDocument.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Errors.ErrorDocument build() {
         flyteidl.core.Errors.ErrorDocument result = buildPartial();
         if (!result.isInitialized()) {
@@ -1361,6 +1397,7 @@ public final class Errors {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Errors.ErrorDocument buildPartial() {
         flyteidl.core.Errors.ErrorDocument result = new flyteidl.core.Errors.ErrorDocument(this);
         if (errorBuilder_ == null) {
@@ -1372,32 +1409,39 @@ public final class Errors {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Errors.ErrorDocument) {
           return mergeFrom((flyteidl.core.Errors.ErrorDocument)other);
@@ -1417,10 +1461,12 @@ public final class Errors {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1439,7 +1485,7 @@ public final class Errors {
         return this;
       }
 
-      private flyteidl.core.Errors.ContainerError error_ = null;
+      private flyteidl.core.Errors.ContainerError error_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Errors.ContainerError, flyteidl.core.Errors.ContainerError.Builder, flyteidl.core.Errors.ContainerErrorOrBuilder> errorBuilder_;
       /**
@@ -1591,11 +1637,13 @@ public final class Errors {
         }
         return errorBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1617,6 +1665,7 @@ public final class Errors {
 
     private static final com.google.protobuf.Parser<ErrorDocument>
         PARSER = new com.google.protobuf.AbstractParser<ErrorDocument>() {
+      @java.lang.Override
       public ErrorDocument parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1634,6 +1683,7 @@ public final class Errors {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Errors.ErrorDocument getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

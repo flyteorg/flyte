@@ -42,7 +42,7 @@ paths:
         x-exportParamName: "IdName"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminLaunchPlan"
   /api/v1/active_launch_plans/{project}/{domain}:
@@ -103,7 +103,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminLaunchPlanList"
   ? /api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}
@@ -228,7 +228,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminNodeExecutionList"
   /api/v1/data/executions/{id.project}/{id.domain}/{id.name}:
@@ -259,7 +259,7 @@ paths:
         x-exportParamName: "IdName"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminWorkflowExecutionGetDataResponse"
   /api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}:
@@ -295,7 +295,7 @@ paths:
         x-exportParamName: "IdNodeId"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminNodeExecutionGetDataResponse"
   ? /api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}
@@ -376,7 +376,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminTaskExecutionGetDataResponse"
   /api/v1/events/nodes:
@@ -394,7 +394,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminNodeExecutionEventResponse"
   /api/v1/events/tasks:
@@ -412,7 +412,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminTaskExecutionEventResponse"
   /api/v1/events/workflows:
@@ -430,7 +430,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminWorkflowExecutionEventResponse"
   /api/v1/executions:
@@ -448,7 +448,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminExecutionCreateResponse"
   /api/v1/executions/relaunch:
@@ -466,7 +466,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminExecutionCreateResponse"
   /api/v1/executions/{id.project}/{id.domain}:
@@ -544,7 +544,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminExecutionList"
   /api/v1/executions/{id.project}/{id.domain}/{id.name}:
@@ -575,7 +575,7 @@ paths:
         x-exportParamName: "IdName"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminExecution"
     delete:
@@ -611,7 +611,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminExecutionTerminateResponse"
   /api/v1/launch_plan_ids/{project}/{domain}:
@@ -672,7 +672,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminNamedEntityIdentifierList"
   /api/v1/launch_plans:
@@ -690,7 +690,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminLaunchPlanCreateResponse"
         400:
@@ -775,7 +775,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminLaunchPlanList"
   /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}:
@@ -852,7 +852,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminLaunchPlanList"
   /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}:
@@ -903,7 +903,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminLaunchPlan"
     put:
@@ -953,7 +953,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminLaunchPlanUpdateResponse"
   /api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}:
@@ -989,7 +989,7 @@ paths:
         x-exportParamName: "IdNodeId"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/flyteidladminNodeExecution"
   /api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}:
@@ -1064,7 +1064,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminNodeExecutionList"
   /api/v1/projects:
@@ -1076,7 +1076,7 @@ paths:
       parameters: []
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminProjects"
     post:
@@ -1093,7 +1093,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminProjectRegisterResponse"
   ? /api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}
@@ -1174,7 +1174,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/flyteidladminTaskExecution"
   ? /api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}
@@ -1254,7 +1254,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminTaskExecutionList"
   /api/v1/task_ids/{project}/{domain}:
@@ -1314,7 +1314,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminNamedEntityIdentifierList"
   /api/v1/tasks:
@@ -1332,7 +1332,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminTaskCreateResponse"
         400:
@@ -1417,7 +1417,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminTaskList"
   /api/v1/tasks/{id.project}/{id.domain}/{id.name}:
@@ -1494,7 +1494,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminTaskList"
   /api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version}:
@@ -1545,7 +1545,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminTask"
   /api/v1/workflow_ids/{project}/{domain}:
@@ -1606,7 +1606,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminNamedEntityIdentifierList"
   /api/v1/workflows:
@@ -1624,7 +1624,7 @@ paths:
         x-exportParamName: "Body"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminWorkflowCreateResponse"
         400:
@@ -1709,7 +1709,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminWorkflowList"
   /api/v1/workflows/{id.project}/{id.domain}/{id.name}:
@@ -1786,7 +1786,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminWorkflowList"
   /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}:
@@ -1837,7 +1837,7 @@ paths:
         x-optionalDataType: "String"
       responses:
         200:
-          description: ""
+          description: "A successful response."
           schema:
             $ref: "#/definitions/adminWorkflow"
 definitions:

@@ -6,21 +6,34 @@
 
 #include "flyteidl/service/admin.pb.h"
 
+#include <functional>
 #include <grpcpp/impl/codegen/async_generic_service.h>
 #include <grpcpp/impl/codegen/async_stream.h>
 #include <grpcpp/impl/codegen/async_unary_call.h>
+#include <grpcpp/impl/codegen/client_callback.h>
 #include <grpcpp/impl/codegen/method_handler_impl.h>
 #include <grpcpp/impl/codegen/proto_utils.h>
 #include <grpcpp/impl/codegen/rpc_method.h>
+#include <grpcpp/impl/codegen/server_callback.h>
 #include <grpcpp/impl/codegen/service_type.h>
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/impl/codegen/stub_options.h>
 #include <grpcpp/impl/codegen/sync_stream.h>
 
-namespace grpc {
-class CompletionQueue;
+namespace grpc_impl {
 class Channel;
+class CompletionQueue;
 class ServerCompletionQueue;
+}  // namespace grpc_impl
+
+namespace grpc {
+namespace experimental {
+template <typename RequestT, typename ResponseT>
+class MessageAllocator;
+}  // namespace experimental
+}  // namespace grpc_impl
+
+namespace grpc {
 class ServerContext;
 }  // namespace grpc
 
@@ -268,6 +281,143 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionGetDataResponse>> PrepareAsyncGetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskExecutionGetDataResponse>>(PrepareAsyncGetTaskExecutionDataRaw(context, request, cq));
     }
+    class experimental_async_interface {
+     public:
+      virtual ~experimental_async_interface() {}
+      virtual void CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Task* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Task* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListTaskIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListTaskIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListTasks(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListTasks(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListTasks(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListTasks(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Workflow* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListWorkflowIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListWorkflowIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListWorkflows(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::WorkflowList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListWorkflows(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListWorkflows(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::WorkflowList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListWorkflows(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListLaunchPlanIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListLaunchPlanIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void UpdateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void UpdateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void UpdateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void UpdateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionCreateRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionCreateRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void RelaunchExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void RelaunchExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void RelaunchExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void RelaunchExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetExecution(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::flyteidl::admin::Execution* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Execution* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetExecution(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::flyteidl::admin::Execution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Execution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::ExecutionList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::ExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void TerminateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void TerminateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionTerminateResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void TerminateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void TerminateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionTerminateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetNodeExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecution* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetNodeExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListNodeExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListNodeExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetNodeExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetNodeExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetNodeExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetNodeExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void RegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void RegisterProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectRegisterResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void RegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void RegisterProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectRegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListProjects(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Projects* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListProjects(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Projects* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateWorkflowEvent(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateWorkflowEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateWorkflowEvent(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateWorkflowEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateNodeEvent(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionEventRequest* request, ::flyteidl::admin::NodeExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateNodeEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateNodeEvent(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionEventRequest* request, ::flyteidl::admin::NodeExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateNodeEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateTaskEvent(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionEventRequest* request, ::flyteidl::admin::TaskExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateTaskEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionEventResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void CreateTaskEvent(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionEventRequest* request, ::flyteidl::admin::TaskExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void CreateTaskEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetTaskExecution(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetRequest* request, ::flyteidl::admin::TaskExecution* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetTaskExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecution* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetTaskExecution(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetRequest* request, ::flyteidl::admin::TaskExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetTaskExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListTaskExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionListRequest* request, ::flyteidl::admin::TaskExecutionList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListTaskExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionList* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListTaskExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionListRequest* request, ::flyteidl::admin::TaskExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListTaskExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetTaskExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetTaskExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+    };
+    virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskCreateResponse>* AsyncCreateTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::TaskCreateResponse>* PrepareAsyncCreateTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -570,9 +720,152 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::TaskExecutionGetDataResponse>> PrepareAsyncGetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::TaskExecutionGetDataResponse>>(PrepareAsyncGetTaskExecutionDataRaw(context, request, cq));
     }
+    class experimental_async final :
+      public StubInterface::experimental_async_interface {
+     public:
+      void CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskCreateResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response, std::function<void(::grpc::Status)>) override;
+      void GetTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Task* response, std::function<void(::grpc::Status)>) override;
+      void GetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Task* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) override;
+      void ListTaskIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) override;
+      void ListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListTaskIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListTasks(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response, std::function<void(::grpc::Status)>) override;
+      void ListTasks(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskList* response, std::function<void(::grpc::Status)>) override;
+      void ListTasks(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListTasks(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowCreateResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response, std::function<void(::grpc::Status)>) override;
+      void GetWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Workflow* response, std::function<void(::grpc::Status)>) override;
+      void GetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) override;
+      void ListWorkflowIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) override;
+      void ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListWorkflowIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListWorkflows(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::WorkflowList* response, std::function<void(::grpc::Status)>) override;
+      void ListWorkflows(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowList* response, std::function<void(::grpc::Status)>) override;
+      void ListWorkflows(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::WorkflowList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListWorkflows(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) override;
+      void GetLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) override;
+      void GetLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) override;
+      void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, std::function<void(::grpc::Status)>) override;
+      void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetActiveLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) override;
+      void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) override;
+      void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListActiveLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) override;
+      void ListLaunchPlanIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) override;
+      void ListLaunchPlanIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListLaunchPlanIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) override;
+      void ListLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, std::function<void(::grpc::Status)>) override;
+      void ListLaunchPlans(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListLaunchPlans(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void UpdateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, std::function<void(::grpc::Status)>) override;
+      void UpdateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, std::function<void(::grpc::Status)>) override;
+      void UpdateLaunchPlan(::grpc::ClientContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void UpdateLaunchPlan(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionCreateRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionCreateRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void RelaunchExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) override;
+      void RelaunchExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, std::function<void(::grpc::Status)>) override;
+      void RelaunchExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void RelaunchExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetExecution(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::flyteidl::admin::Execution* response, std::function<void(::grpc::Status)>) override;
+      void GetExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Execution* response, std::function<void(::grpc::Status)>) override;
+      void GetExecution(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::flyteidl::admin::Execution* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Execution* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::ExecutionList* response, std::function<void(::grpc::Status)>) override;
+      void ListExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionList* response, std::function<void(::grpc::Status)>) override;
+      void ListExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::ExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void TerminateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response, std::function<void(::grpc::Status)>) override;
+      void TerminateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionTerminateResponse* response, std::function<void(::grpc::Status)>) override;
+      void TerminateExecution(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void TerminateExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ExecutionTerminateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response, std::function<void(::grpc::Status)>) override;
+      void GetNodeExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecution* response, std::function<void(::grpc::Status)>) override;
+      void GetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetNodeExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) override;
+      void ListNodeExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) override;
+      void ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListNodeExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) override;
+      void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) override;
+      void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListNodeExecutionsForTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetNodeExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetNodeExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetNodeExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetNodeExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void RegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response, std::function<void(::grpc::Status)>) override;
+      void RegisterProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectRegisterResponse* response, std::function<void(::grpc::Status)>) override;
+      void RegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void RegisterProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectRegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response, std::function<void(::grpc::Status)>) override;
+      void ListProjects(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Projects* response, std::function<void(::grpc::Status)>) override;
+      void ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListProjects(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Projects* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateWorkflowEvent(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateWorkflowEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateWorkflowEvent(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateWorkflowEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateNodeEvent(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionEventRequest* request, ::flyteidl::admin::NodeExecutionEventResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateNodeEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionEventResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateNodeEvent(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionEventRequest* request, ::flyteidl::admin::NodeExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateNodeEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateTaskEvent(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionEventRequest* request, ::flyteidl::admin::TaskExecutionEventResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateTaskEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionEventResponse* response, std::function<void(::grpc::Status)>) override;
+      void CreateTaskEvent(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionEventRequest* request, ::flyteidl::admin::TaskExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void CreateTaskEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetTaskExecution(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetRequest* request, ::flyteidl::admin::TaskExecution* response, std::function<void(::grpc::Status)>) override;
+      void GetTaskExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecution* response, std::function<void(::grpc::Status)>) override;
+      void GetTaskExecution(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetRequest* request, ::flyteidl::admin::TaskExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetTaskExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListTaskExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionListRequest* request, ::flyteidl::admin::TaskExecutionList* response, std::function<void(::grpc::Status)>) override;
+      void ListTaskExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionList* response, std::function<void(::grpc::Status)>) override;
+      void ListTaskExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionListRequest* request, ::flyteidl::admin::TaskExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListTaskExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetTaskExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetTaskExecutionData(::grpc::ClientContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetTaskExecutionData(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+     private:
+      friend class Stub;
+      explicit experimental_async(Stub* stub): stub_(stub) { }
+      Stub* stub() { return stub_; }
+      Stub* stub_;
+    };
+    class experimental_async_interface* experimental_async() override { return &async_stub_; }
 
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
+    class experimental_async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::TaskCreateResponse>* AsyncCreateTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::TaskCreateResponse>* PrepareAsyncCreateTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Task>* AsyncGetTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) override;
@@ -1374,6 +1667,1030 @@ class AdminService final {
     }
   };
   typedef WithAsyncMethod_CreateTask<WithAsyncMethod_GetTask<WithAsyncMethod_ListTaskIds<WithAsyncMethod_ListTasks<WithAsyncMethod_CreateWorkflow<WithAsyncMethod_GetWorkflow<WithAsyncMethod_ListWorkflowIds<WithAsyncMethod_ListWorkflows<WithAsyncMethod_CreateLaunchPlan<WithAsyncMethod_GetLaunchPlan<WithAsyncMethod_GetActiveLaunchPlan<WithAsyncMethod_ListActiveLaunchPlans<WithAsyncMethod_ListLaunchPlanIds<WithAsyncMethod_ListLaunchPlans<WithAsyncMethod_UpdateLaunchPlan<WithAsyncMethod_CreateExecution<WithAsyncMethod_RelaunchExecution<WithAsyncMethod_GetExecution<WithAsyncMethod_GetExecutionData<WithAsyncMethod_ListExecutions<WithAsyncMethod_TerminateExecution<WithAsyncMethod_GetNodeExecution<WithAsyncMethod_ListNodeExecutions<WithAsyncMethod_ListNodeExecutionsForTask<WithAsyncMethod_GetNodeExecutionData<WithAsyncMethod_RegisterProject<WithAsyncMethod_ListProjects<WithAsyncMethod_CreateWorkflowEvent<WithAsyncMethod_CreateNodeEvent<WithAsyncMethod_CreateTaskEvent<WithAsyncMethod_GetTaskExecution<WithAsyncMethod_ListTaskExecutions<WithAsyncMethod_GetTaskExecutionData<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > AsyncService;
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_CreateTask : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_CreateTask() {
+      ::grpc::Service::experimental().MarkMethodCallback(0,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::TaskCreateRequest, ::flyteidl::admin::TaskCreateResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::TaskCreateRequest* request,
+                 ::flyteidl::admin::TaskCreateResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->CreateTask(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_CreateTask(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::TaskCreateRequest, ::flyteidl::admin::TaskCreateResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::TaskCreateRequest, ::flyteidl::admin::TaskCreateResponse>*>(
+          ::grpc::Service::experimental().GetHandler(0))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_CreateTask() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateTask(::grpc::ServerContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateTask(::grpc::ServerContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetTask : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetTask() {
+      ::grpc::Service::experimental().MarkMethodCallback(1,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::Task>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ObjectGetRequest* request,
+                 ::flyteidl::admin::Task* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetTask(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetTask(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::Task>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::Task>*>(
+          ::grpc::Service::experimental().GetHandler(1))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetTask() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTask(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetTask(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListTaskIds : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListTaskIds() {
+      ::grpc::Service::experimental().MarkMethodCallback(2,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::NamedEntityIdentifierListRequest* request,
+                 ::flyteidl::admin::NamedEntityIdentifierList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListTaskIds(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListTaskIds(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>*>(
+          ::grpc::Service::experimental().GetHandler(2))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListTaskIds() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListTaskIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListTaskIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListTasks : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListTasks() {
+      ::grpc::Service::experimental().MarkMethodCallback(3,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::TaskList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ResourceListRequest* request,
+                 ::flyteidl::admin::TaskList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListTasks(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListTasks(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::TaskList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::TaskList>*>(
+          ::grpc::Service::experimental().GetHandler(3))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListTasks() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListTasks(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListTasks(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_CreateWorkflow : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_CreateWorkflow() {
+      ::grpc::Service::experimental().MarkMethodCallback(4,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowCreateRequest, ::flyteidl::admin::WorkflowCreateResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::WorkflowCreateRequest* request,
+                 ::flyteidl::admin::WorkflowCreateResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->CreateWorkflow(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_CreateWorkflow(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::WorkflowCreateRequest, ::flyteidl::admin::WorkflowCreateResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowCreateRequest, ::flyteidl::admin::WorkflowCreateResponse>*>(
+          ::grpc::Service::experimental().GetHandler(4))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_CreateWorkflow() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetWorkflow : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetWorkflow() {
+      ::grpc::Service::experimental().MarkMethodCallback(5,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::Workflow>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ObjectGetRequest* request,
+                 ::flyteidl::admin::Workflow* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetWorkflow(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetWorkflow(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::Workflow>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::Workflow>*>(
+          ::grpc::Service::experimental().GetHandler(5))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetWorkflow() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListWorkflowIds : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListWorkflowIds() {
+      ::grpc::Service::experimental().MarkMethodCallback(6,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::NamedEntityIdentifierListRequest* request,
+                 ::flyteidl::admin::NamedEntityIdentifierList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListWorkflowIds(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListWorkflowIds(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>*>(
+          ::grpc::Service::experimental().GetHandler(6))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListWorkflowIds() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListWorkflowIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListWorkflowIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListWorkflows : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListWorkflows() {
+      ::grpc::Service::experimental().MarkMethodCallback(7,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::WorkflowList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ResourceListRequest* request,
+                 ::flyteidl::admin::WorkflowList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListWorkflows(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListWorkflows(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::WorkflowList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::WorkflowList>*>(
+          ::grpc::Service::experimental().GetHandler(7))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListWorkflows() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListWorkflows(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::WorkflowList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListWorkflows(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::WorkflowList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_CreateLaunchPlan : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_CreateLaunchPlan() {
+      ::grpc::Service::experimental().MarkMethodCallback(8,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::LaunchPlanCreateRequest, ::flyteidl::admin::LaunchPlanCreateResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::LaunchPlanCreateRequest* request,
+                 ::flyteidl::admin::LaunchPlanCreateResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->CreateLaunchPlan(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_CreateLaunchPlan(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::LaunchPlanCreateRequest, ::flyteidl::admin::LaunchPlanCreateResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::LaunchPlanCreateRequest, ::flyteidl::admin::LaunchPlanCreateResponse>*>(
+          ::grpc::Service::experimental().GetHandler(8))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_CreateLaunchPlan() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetLaunchPlan : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetLaunchPlan() {
+      ::grpc::Service::experimental().MarkMethodCallback(9,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::LaunchPlan>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ObjectGetRequest* request,
+                 ::flyteidl::admin::LaunchPlan* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetLaunchPlan(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetLaunchPlan(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::LaunchPlan>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::LaunchPlan>*>(
+          ::grpc::Service::experimental().GetHandler(9))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetLaunchPlan() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetActiveLaunchPlan : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetActiveLaunchPlan() {
+      ::grpc::Service::experimental().MarkMethodCallback(10,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanRequest, ::flyteidl::admin::LaunchPlan>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ActiveLaunchPlanRequest* request,
+                 ::flyteidl::admin::LaunchPlan* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetActiveLaunchPlan(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetActiveLaunchPlan(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ActiveLaunchPlanRequest, ::flyteidl::admin::LaunchPlan>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanRequest, ::flyteidl::admin::LaunchPlan>*>(
+          ::grpc::Service::experimental().GetHandler(10))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetActiveLaunchPlan() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetActiveLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetActiveLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListActiveLaunchPlans : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListActiveLaunchPlans() {
+      ::grpc::Service::experimental().MarkMethodCallback(11,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanListRequest, ::flyteidl::admin::LaunchPlanList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ActiveLaunchPlanListRequest* request,
+                 ::flyteidl::admin::LaunchPlanList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListActiveLaunchPlans(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListActiveLaunchPlans(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ActiveLaunchPlanListRequest, ::flyteidl::admin::LaunchPlanList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanListRequest, ::flyteidl::admin::LaunchPlanList>*>(
+          ::grpc::Service::experimental().GetHandler(11))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListActiveLaunchPlans() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListLaunchPlanIds : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListLaunchPlanIds() {
+      ::grpc::Service::experimental().MarkMethodCallback(12,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::NamedEntityIdentifierListRequest* request,
+                 ::flyteidl::admin::NamedEntityIdentifierList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListLaunchPlanIds(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListLaunchPlanIds(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>*>(
+          ::grpc::Service::experimental().GetHandler(12))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListLaunchPlanIds() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListLaunchPlanIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListLaunchPlanIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListLaunchPlans : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListLaunchPlans() {
+      ::grpc::Service::experimental().MarkMethodCallback(13,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::LaunchPlanList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ResourceListRequest* request,
+                 ::flyteidl::admin::LaunchPlanList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListLaunchPlans(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListLaunchPlans(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::LaunchPlanList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::LaunchPlanList>*>(
+          ::grpc::Service::experimental().GetHandler(13))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListLaunchPlans() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_UpdateLaunchPlan : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_UpdateLaunchPlan() {
+      ::grpc::Service::experimental().MarkMethodCallback(14,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::LaunchPlanUpdateRequest, ::flyteidl::admin::LaunchPlanUpdateResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::LaunchPlanUpdateRequest* request,
+                 ::flyteidl::admin::LaunchPlanUpdateResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->UpdateLaunchPlan(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_UpdateLaunchPlan(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::LaunchPlanUpdateRequest, ::flyteidl::admin::LaunchPlanUpdateResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::LaunchPlanUpdateRequest, ::flyteidl::admin::LaunchPlanUpdateResponse>*>(
+          ::grpc::Service::experimental().GetHandler(14))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_UpdateLaunchPlan() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status UpdateLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void UpdateLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_CreateExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_CreateExecution() {
+      ::grpc::Service::experimental().MarkMethodCallback(15,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionCreateRequest, ::flyteidl::admin::ExecutionCreateResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ExecutionCreateRequest* request,
+                 ::flyteidl::admin::ExecutionCreateResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->CreateExecution(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_CreateExecution(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ExecutionCreateRequest, ::flyteidl::admin::ExecutionCreateResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionCreateRequest, ::flyteidl::admin::ExecutionCreateResponse>*>(
+          ::grpc::Service::experimental().GetHandler(15))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_CreateExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionCreateRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionCreateRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_RelaunchExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_RelaunchExecution() {
+      ::grpc::Service::experimental().MarkMethodCallback(16,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionRelaunchRequest, ::flyteidl::admin::ExecutionCreateResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ExecutionRelaunchRequest* request,
+                 ::flyteidl::admin::ExecutionCreateResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->RelaunchExecution(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_RelaunchExecution(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ExecutionRelaunchRequest, ::flyteidl::admin::ExecutionCreateResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionRelaunchRequest, ::flyteidl::admin::ExecutionCreateResponse>*>(
+          ::grpc::Service::experimental().GetHandler(16))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_RelaunchExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status RelaunchExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void RelaunchExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetExecution() {
+      ::grpc::Service::experimental().MarkMethodCallback(17,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowExecutionGetRequest, ::flyteidl::admin::Execution>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::WorkflowExecutionGetRequest* request,
+                 ::flyteidl::admin::Execution* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetExecution(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetExecution(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::WorkflowExecutionGetRequest, ::flyteidl::admin::Execution>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowExecutionGetRequest, ::flyteidl::admin::Execution>*>(
+          ::grpc::Service::experimental().GetHandler(17))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetExecution(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::flyteidl::admin::Execution* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetExecution(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::flyteidl::admin::Execution* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetExecutionData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetExecutionData() {
+      ::grpc::Service::experimental().MarkMethodCallback(18,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowExecutionGetDataRequest, ::flyteidl::admin::WorkflowExecutionGetDataResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request,
+                 ::flyteidl::admin::WorkflowExecutionGetDataResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetExecutionData(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetExecutionData(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::WorkflowExecutionGetDataRequest, ::flyteidl::admin::WorkflowExecutionGetDataResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowExecutionGetDataRequest, ::flyteidl::admin::WorkflowExecutionGetDataResponse>*>(
+          ::grpc::Service::experimental().GetHandler(18))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetExecutionData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListExecutions : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListExecutions() {
+      ::grpc::Service::experimental().MarkMethodCallback(19,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::ExecutionList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ResourceListRequest* request,
+                 ::flyteidl::admin::ExecutionList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListExecutions(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListExecutions(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::ExecutionList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::ExecutionList>*>(
+          ::grpc::Service::experimental().GetHandler(19))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListExecutions() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::ExecutionList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::ExecutionList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_TerminateExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_TerminateExecution() {
+      ::grpc::Service::experimental().MarkMethodCallback(20,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionTerminateRequest, ::flyteidl::admin::ExecutionTerminateResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ExecutionTerminateRequest* request,
+                 ::flyteidl::admin::ExecutionTerminateResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->TerminateExecution(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_TerminateExecution(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ExecutionTerminateRequest, ::flyteidl::admin::ExecutionTerminateResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionTerminateRequest, ::flyteidl::admin::ExecutionTerminateResponse>*>(
+          ::grpc::Service::experimental().GetHandler(20))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_TerminateExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status TerminateExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void TerminateExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetNodeExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetNodeExecution() {
+      ::grpc::Service::experimental().MarkMethodCallback(21,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionGetRequest, ::flyteidl::admin::NodeExecution>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::NodeExecutionGetRequest* request,
+                 ::flyteidl::admin::NodeExecution* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetNodeExecution(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetNodeExecution(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NodeExecutionGetRequest, ::flyteidl::admin::NodeExecution>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionGetRequest, ::flyteidl::admin::NodeExecution>*>(
+          ::grpc::Service::experimental().GetHandler(21))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetNodeExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetNodeExecution(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetNodeExecution(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListNodeExecutions : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListNodeExecutions() {
+      ::grpc::Service::experimental().MarkMethodCallback(22,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionListRequest, ::flyteidl::admin::NodeExecutionList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::NodeExecutionListRequest* request,
+                 ::flyteidl::admin::NodeExecutionList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListNodeExecutions(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListNodeExecutions(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NodeExecutionListRequest, ::flyteidl::admin::NodeExecutionList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionListRequest, ::flyteidl::admin::NodeExecutionList>*>(
+          ::grpc::Service::experimental().GetHandler(22))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListNodeExecutions() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListNodeExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListNodeExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListNodeExecutionsForTask : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListNodeExecutionsForTask() {
+      ::grpc::Service::experimental().MarkMethodCallback(23,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionForTaskListRequest, ::flyteidl::admin::NodeExecutionList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::NodeExecutionForTaskListRequest* request,
+                 ::flyteidl::admin::NodeExecutionList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListNodeExecutionsForTask(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListNodeExecutionsForTask(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NodeExecutionForTaskListRequest, ::flyteidl::admin::NodeExecutionList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionForTaskListRequest, ::flyteidl::admin::NodeExecutionList>*>(
+          ::grpc::Service::experimental().GetHandler(23))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListNodeExecutionsForTask() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListNodeExecutionsForTask(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest* request, ::flyteidl::admin::NodeExecutionList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListNodeExecutionsForTask(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetNodeExecutionData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetNodeExecutionData() {
+      ::grpc::Service::experimental().MarkMethodCallback(24,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionGetDataRequest, ::flyteidl::admin::NodeExecutionGetDataResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::NodeExecutionGetDataRequest* request,
+                 ::flyteidl::admin::NodeExecutionGetDataResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetNodeExecutionData(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetNodeExecutionData(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NodeExecutionGetDataRequest, ::flyteidl::admin::NodeExecutionGetDataResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionGetDataRequest, ::flyteidl::admin::NodeExecutionGetDataResponse>*>(
+          ::grpc::Service::experimental().GetHandler(24))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetNodeExecutionData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetNodeExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetNodeExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_RegisterProject : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_RegisterProject() {
+      ::grpc::Service::experimental().MarkMethodCallback(25,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ProjectRegisterRequest, ::flyteidl::admin::ProjectRegisterResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ProjectRegisterRequest* request,
+                 ::flyteidl::admin::ProjectRegisterResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->RegisterProject(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_RegisterProject(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ProjectRegisterRequest, ::flyteidl::admin::ProjectRegisterResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ProjectRegisterRequest, ::flyteidl::admin::ProjectRegisterResponse>*>(
+          ::grpc::Service::experimental().GetHandler(25))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_RegisterProject() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status RegisterProject(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void RegisterProject(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListProjects : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListProjects() {
+      ::grpc::Service::experimental().MarkMethodCallback(26,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ProjectListRequest, ::flyteidl::admin::Projects>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ProjectListRequest* request,
+                 ::flyteidl::admin::Projects* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListProjects(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListProjects(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ProjectListRequest, ::flyteidl::admin::Projects>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ProjectListRequest, ::flyteidl::admin::Projects>*>(
+          ::grpc::Service::experimental().GetHandler(26))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListProjects() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListProjects(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListProjects(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_CreateWorkflowEvent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_CreateWorkflowEvent() {
+      ::grpc::Service::experimental().MarkMethodCallback(27,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowExecutionEventRequest, ::flyteidl::admin::WorkflowExecutionEventResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::WorkflowExecutionEventRequest* request,
+                 ::flyteidl::admin::WorkflowExecutionEventResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->CreateWorkflowEvent(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_CreateWorkflowEvent(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::WorkflowExecutionEventRequest, ::flyteidl::admin::WorkflowExecutionEventResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowExecutionEventRequest, ::flyteidl::admin::WorkflowExecutionEventResponse>*>(
+          ::grpc::Service::experimental().GetHandler(27))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_CreateWorkflowEvent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateWorkflowEvent(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateWorkflowEvent(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_CreateNodeEvent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_CreateNodeEvent() {
+      ::grpc::Service::experimental().MarkMethodCallback(28,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionEventRequest, ::flyteidl::admin::NodeExecutionEventResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::NodeExecutionEventRequest* request,
+                 ::flyteidl::admin::NodeExecutionEventResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->CreateNodeEvent(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_CreateNodeEvent(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NodeExecutionEventRequest, ::flyteidl::admin::NodeExecutionEventResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionEventRequest, ::flyteidl::admin::NodeExecutionEventResponse>*>(
+          ::grpc::Service::experimental().GetHandler(28))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_CreateNodeEvent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateNodeEvent(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionEventRequest* request, ::flyteidl::admin::NodeExecutionEventResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateNodeEvent(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionEventRequest* request, ::flyteidl::admin::NodeExecutionEventResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_CreateTaskEvent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_CreateTaskEvent() {
+      ::grpc::Service::experimental().MarkMethodCallback(29,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::TaskExecutionEventRequest, ::flyteidl::admin::TaskExecutionEventResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::TaskExecutionEventRequest* request,
+                 ::flyteidl::admin::TaskExecutionEventResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->CreateTaskEvent(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_CreateTaskEvent(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::TaskExecutionEventRequest, ::flyteidl::admin::TaskExecutionEventResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::TaskExecutionEventRequest, ::flyteidl::admin::TaskExecutionEventResponse>*>(
+          ::grpc::Service::experimental().GetHandler(29))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_CreateTaskEvent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateTaskEvent(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionEventRequest* request, ::flyteidl::admin::TaskExecutionEventResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateTaskEvent(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionEventRequest* request, ::flyteidl::admin::TaskExecutionEventResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetTaskExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetTaskExecution() {
+      ::grpc::Service::experimental().MarkMethodCallback(30,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::TaskExecutionGetRequest, ::flyteidl::admin::TaskExecution>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::TaskExecutionGetRequest* request,
+                 ::flyteidl::admin::TaskExecution* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetTaskExecution(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetTaskExecution(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::TaskExecutionGetRequest, ::flyteidl::admin::TaskExecution>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::TaskExecutionGetRequest, ::flyteidl::admin::TaskExecution>*>(
+          ::grpc::Service::experimental().GetHandler(30))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetTaskExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskExecution(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionGetRequest* request, ::flyteidl::admin::TaskExecution* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetTaskExecution(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionGetRequest* request, ::flyteidl::admin::TaskExecution* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListTaskExecutions : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListTaskExecutions() {
+      ::grpc::Service::experimental().MarkMethodCallback(31,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::TaskExecutionListRequest, ::flyteidl::admin::TaskExecutionList>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::TaskExecutionListRequest* request,
+                 ::flyteidl::admin::TaskExecutionList* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListTaskExecutions(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListTaskExecutions(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::TaskExecutionListRequest, ::flyteidl::admin::TaskExecutionList>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::TaskExecutionListRequest, ::flyteidl::admin::TaskExecutionList>*>(
+          ::grpc::Service::experimental().GetHandler(31))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListTaskExecutions() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListTaskExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionListRequest* request, ::flyteidl::admin::TaskExecutionList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListTaskExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionListRequest* request, ::flyteidl::admin::TaskExecutionList* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetTaskExecutionData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetTaskExecutionData() {
+      ::grpc::Service::experimental().MarkMethodCallback(32,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::TaskExecutionGetDataRequest, ::flyteidl::admin::TaskExecutionGetDataResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::TaskExecutionGetDataRequest* request,
+                 ::flyteidl::admin::TaskExecutionGetDataResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetTaskExecutionData(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetTaskExecutionData(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::TaskExecutionGetDataRequest, ::flyteidl::admin::TaskExecutionGetDataResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::TaskExecutionGetDataRequest, ::flyteidl::admin::TaskExecutionGetDataResponse>*>(
+          ::grpc::Service::experimental().GetHandler(32))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetTaskExecutionData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetTaskExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  typedef ExperimentalWithCallbackMethod_CreateTask<ExperimentalWithCallbackMethod_GetTask<ExperimentalWithCallbackMethod_ListTaskIds<ExperimentalWithCallbackMethod_ListTasks<ExperimentalWithCallbackMethod_CreateWorkflow<ExperimentalWithCallbackMethod_GetWorkflow<ExperimentalWithCallbackMethod_ListWorkflowIds<ExperimentalWithCallbackMethod_ListWorkflows<ExperimentalWithCallbackMethod_CreateLaunchPlan<ExperimentalWithCallbackMethod_GetLaunchPlan<ExperimentalWithCallbackMethod_GetActiveLaunchPlan<ExperimentalWithCallbackMethod_ListActiveLaunchPlans<ExperimentalWithCallbackMethod_ListLaunchPlanIds<ExperimentalWithCallbackMethod_ListLaunchPlans<ExperimentalWithCallbackMethod_UpdateLaunchPlan<ExperimentalWithCallbackMethod_CreateExecution<ExperimentalWithCallbackMethod_RelaunchExecution<ExperimentalWithCallbackMethod_GetExecution<ExperimentalWithCallbackMethod_GetExecutionData<ExperimentalWithCallbackMethod_ListExecutions<ExperimentalWithCallbackMethod_TerminateExecution<ExperimentalWithCallbackMethod_GetNodeExecution<ExperimentalWithCallbackMethod_ListNodeExecutions<ExperimentalWithCallbackMethod_ListNodeExecutionsForTask<ExperimentalWithCallbackMethod_GetNodeExecutionData<ExperimentalWithCallbackMethod_RegisterProject<ExperimentalWithCallbackMethod_ListProjects<ExperimentalWithCallbackMethod_CreateWorkflowEvent<ExperimentalWithCallbackMethod_CreateNodeEvent<ExperimentalWithCallbackMethod_CreateTaskEvent<ExperimentalWithCallbackMethod_GetTaskExecution<ExperimentalWithCallbackMethod_ListTaskExecutions<ExperimentalWithCallbackMethod_GetTaskExecutionData<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_CreateTask : public BaseClass {
    private:
@@ -2594,6 +3911,831 @@ class AdminService final {
     void RequestGetTaskExecutionData(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(32, context, request, response, new_call_cq, notification_cq, tag);
     }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_CreateTask : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_CreateTask() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(0,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->CreateTask(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_CreateTask() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateTask(::grpc::ServerContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateTask(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetTask : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetTask() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(1,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetTask(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetTask() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTask(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetTask(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListTaskIds : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListTaskIds() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(2,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListTaskIds(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListTaskIds() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListTaskIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListTaskIds(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListTasks : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListTasks() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(3,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListTasks(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListTasks() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListTasks(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListTasks(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_CreateWorkflow : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_CreateWorkflow() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(4,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->CreateWorkflow(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_CreateWorkflow() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateWorkflow(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetWorkflow : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetWorkflow() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(5,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetWorkflow(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetWorkflow() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetWorkflow(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListWorkflowIds : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListWorkflowIds() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(6,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListWorkflowIds(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListWorkflowIds() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListWorkflowIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListWorkflowIds(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListWorkflows : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListWorkflows() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(7,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListWorkflows(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListWorkflows() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListWorkflows(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::WorkflowList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListWorkflows(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_CreateLaunchPlan : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_CreateLaunchPlan() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(8,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->CreateLaunchPlan(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_CreateLaunchPlan() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::LaunchPlanCreateRequest* request, ::flyteidl::admin::LaunchPlanCreateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateLaunchPlan(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetLaunchPlan : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetLaunchPlan() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(9,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetLaunchPlan(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetLaunchPlan() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::LaunchPlan* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetLaunchPlan(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetActiveLaunchPlan : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetActiveLaunchPlan() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(10,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetActiveLaunchPlan(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetActiveLaunchPlan() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetActiveLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::flyteidl::admin::LaunchPlan* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetActiveLaunchPlan(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListActiveLaunchPlans : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListActiveLaunchPlans() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(11,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListActiveLaunchPlans(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListActiveLaunchPlans() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListActiveLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListActiveLaunchPlans(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListLaunchPlanIds : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListLaunchPlanIds() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(12,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListLaunchPlanIds(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListLaunchPlanIds() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListLaunchPlanIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListLaunchPlanIds(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListLaunchPlans : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListLaunchPlans() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(13,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListLaunchPlans(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListLaunchPlans() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListLaunchPlans(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::LaunchPlanList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListLaunchPlans(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_UpdateLaunchPlan : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_UpdateLaunchPlan() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(14,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->UpdateLaunchPlan(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_UpdateLaunchPlan() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status UpdateLaunchPlan(::grpc::ServerContext* context, const ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::flyteidl::admin::LaunchPlanUpdateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void UpdateLaunchPlan(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_CreateExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_CreateExecution() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(15,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->CreateExecution(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_CreateExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionCreateRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateExecution(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_RelaunchExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_RelaunchExecution() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(16,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->RelaunchExecution(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_RelaunchExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status RelaunchExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionRelaunchRequest* request, ::flyteidl::admin::ExecutionCreateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void RelaunchExecution(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetExecution() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(17,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetExecution(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetExecution(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::flyteidl::admin::Execution* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetExecution(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetExecutionData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetExecutionData() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(18,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetExecutionData(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetExecutionData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::flyteidl::admin::WorkflowExecutionGetDataResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetExecutionData(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListExecutions : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListExecutions() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(19,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListExecutions(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListExecutions() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::ExecutionList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListExecutions(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_TerminateExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_TerminateExecution() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(20,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->TerminateExecution(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_TerminateExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status TerminateExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void TerminateExecution(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetNodeExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetNodeExecution() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(21,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetNodeExecution(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetNodeExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetNodeExecution(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetNodeExecution(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListNodeExecutions : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListNodeExecutions() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(22,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListNodeExecutions(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListNodeExecutions() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListNodeExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListNodeExecutions(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListNodeExecutionsForTask : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListNodeExecutionsForTask() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(23,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListNodeExecutionsForTask(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListNodeExecutionsForTask() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListNodeExecutionsForTask(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest* request, ::flyteidl::admin::NodeExecutionList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListNodeExecutionsForTask(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetNodeExecutionData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetNodeExecutionData() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(24,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetNodeExecutionData(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetNodeExecutionData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetNodeExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetNodeExecutionData(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_RegisterProject : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_RegisterProject() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(25,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->RegisterProject(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_RegisterProject() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status RegisterProject(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void RegisterProject(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListProjects : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListProjects() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(26,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListProjects(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListProjects() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListProjects(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListProjects(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_CreateWorkflowEvent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_CreateWorkflowEvent() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(27,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->CreateWorkflowEvent(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_CreateWorkflowEvent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateWorkflowEvent(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateWorkflowEvent(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_CreateNodeEvent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_CreateNodeEvent() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(28,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->CreateNodeEvent(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_CreateNodeEvent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateNodeEvent(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionEventRequest* request, ::flyteidl::admin::NodeExecutionEventResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateNodeEvent(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_CreateTaskEvent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_CreateTaskEvent() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(29,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->CreateTaskEvent(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_CreateTaskEvent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status CreateTaskEvent(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionEventRequest* request, ::flyteidl::admin::TaskExecutionEventResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void CreateTaskEvent(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetTaskExecution : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetTaskExecution() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(30,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetTaskExecution(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetTaskExecution() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskExecution(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionGetRequest* request, ::flyteidl::admin::TaskExecution* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetTaskExecution(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListTaskExecutions : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListTaskExecutions() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(31,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListTaskExecutions(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListTaskExecutions() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListTaskExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionListRequest* request, ::flyteidl::admin::TaskExecutionList* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListTaskExecutions(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetTaskExecutionData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetTaskExecutionData() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(32,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetTaskExecutionData(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetTaskExecutionData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetTaskExecutionData(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_CreateTask : public BaseClass {

@@ -69,9 +69,6 @@ public final class ArrayJobOuterClass {
       super(builder);
     }
     private ArrayJob() {
-      parallelism_ = 0L;
-      size_ = 0L;
-      minSuccesses_ = 0L;
     }
 
     @java.lang.Override
@@ -98,13 +95,6 @@ public final class ArrayJobOuterClass {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
 
               parallelism_ = input.readInt64();
@@ -118,6 +108,13 @@ public final class ArrayJobOuterClass {
             case 24: {
 
               minSuccesses_ = input.readInt64();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -137,6 +134,7 @@ public final class ArrayJobOuterClass {
       return flyteidl.plugins.ArrayJobOuterClass.internal_static_flyteidl_plugins_ArrayJob_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.plugins.ArrayJobOuterClass.internal_static_flyteidl_plugins_ArrayJob_fieldAccessorTable
@@ -190,6 +188,7 @@ public final class ArrayJobOuterClass {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -199,6 +198,7 @@ public final class ArrayJobOuterClass {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (parallelism_ != 0L) {
@@ -213,6 +213,7 @@ public final class ArrayJobOuterClass {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -245,15 +246,14 @@ public final class ArrayJobOuterClass {
       }
       flyteidl.plugins.ArrayJobOuterClass.ArrayJob other = (flyteidl.plugins.ArrayJobOuterClass.ArrayJob) obj;
 
-      boolean result = true;
-      result = result && (getParallelism()
-          == other.getParallelism());
-      result = result && (getSize()
-          == other.getSize());
-      result = result && (getMinSuccesses()
-          == other.getMinSuccesses());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getParallelism()
+          != other.getParallelism()) return false;
+      if (getSize()
+          != other.getSize()) return false;
+      if (getMinSuccesses()
+          != other.getMinSuccesses()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -347,6 +347,7 @@ public final class ArrayJobOuterClass {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -354,6 +355,7 @@ public final class ArrayJobOuterClass {
     public static Builder newBuilder(flyteidl.plugins.ArrayJobOuterClass.ArrayJob prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -382,6 +384,7 @@ public final class ArrayJobOuterClass {
         return flyteidl.plugins.ArrayJobOuterClass.internal_static_flyteidl_plugins_ArrayJob_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.plugins.ArrayJobOuterClass.internal_static_flyteidl_plugins_ArrayJob_fieldAccessorTable
@@ -404,6 +407,7 @@ public final class ArrayJobOuterClass {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         parallelism_ = 0L;
@@ -415,15 +419,18 @@ public final class ArrayJobOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.plugins.ArrayJobOuterClass.internal_static_flyteidl_plugins_ArrayJob_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.ArrayJobOuterClass.ArrayJob getDefaultInstanceForType() {
         return flyteidl.plugins.ArrayJobOuterClass.ArrayJob.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.plugins.ArrayJobOuterClass.ArrayJob build() {
         flyteidl.plugins.ArrayJobOuterClass.ArrayJob result = buildPartial();
         if (!result.isInitialized()) {
@@ -432,6 +439,7 @@ public final class ArrayJobOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.plugins.ArrayJobOuterClass.ArrayJob buildPartial() {
         flyteidl.plugins.ArrayJobOuterClass.ArrayJob result = new flyteidl.plugins.ArrayJobOuterClass.ArrayJob(this);
         result.parallelism_ = parallelism_;
@@ -441,32 +449,39 @@ public final class ArrayJobOuterClass {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.plugins.ArrayJobOuterClass.ArrayJob) {
           return mergeFrom((flyteidl.plugins.ArrayJobOuterClass.ArrayJob)other);
@@ -492,10 +507,12 @@ public final class ArrayJobOuterClass {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -645,11 +662,13 @@ public final class ArrayJobOuterClass {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -671,6 +690,7 @@ public final class ArrayJobOuterClass {
 
     private static final com.google.protobuf.Parser<ArrayJob>
         PARSER = new com.google.protobuf.AbstractParser<ArrayJob>() {
+      @java.lang.Override
       public ArrayJob parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -688,6 +708,7 @@ public final class ArrayJobOuterClass {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.plugins.ArrayJobOuterClass.ArrayJob getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

@@ -105,13 +105,6 @@ public final class Interface {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Types.LiteralType.Builder subBuilder = null;
               if (type_ != null) {
@@ -131,6 +124,13 @@ public final class Interface {
               description_ = s;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -148,6 +148,7 @@ public final class Interface {
       return flyteidl.core.Interface.internal_static_flyteidl_core_Variable_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Interface.internal_static_flyteidl_core_Variable_fieldAccessorTable
@@ -231,6 +232,7 @@ public final class Interface {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -240,6 +242,7 @@ public final class Interface {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (type_ != null) {
@@ -251,6 +254,7 @@ public final class Interface {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -278,16 +282,15 @@ public final class Interface {
       }
       flyteidl.core.Interface.Variable other = (flyteidl.core.Interface.Variable) obj;
 
-      boolean result = true;
-      result = result && (hasType() == other.hasType());
+      if (hasType() != other.hasType()) return false;
       if (hasType()) {
-        result = result && getType()
-            .equals(other.getType());
+        if (!getType()
+            .equals(other.getType())) return false;
       }
-      result = result && getDescription()
-          .equals(other.getDescription());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getDescription()
+          .equals(other.getDescription())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -378,6 +381,7 @@ public final class Interface {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -385,6 +389,7 @@ public final class Interface {
     public static Builder newBuilder(flyteidl.core.Interface.Variable prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -412,6 +417,7 @@ public final class Interface {
         return flyteidl.core.Interface.internal_static_flyteidl_core_Variable_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Interface.internal_static_flyteidl_core_Variable_fieldAccessorTable
@@ -434,6 +440,7 @@ public final class Interface {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (typeBuilder_ == null) {
@@ -447,15 +454,18 @@ public final class Interface {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Interface.internal_static_flyteidl_core_Variable_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.Variable getDefaultInstanceForType() {
         return flyteidl.core.Interface.Variable.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.Variable build() {
         flyteidl.core.Interface.Variable result = buildPartial();
         if (!result.isInitialized()) {
@@ -464,6 +474,7 @@ public final class Interface {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.Variable buildPartial() {
         flyteidl.core.Interface.Variable result = new flyteidl.core.Interface.Variable(this);
         if (typeBuilder_ == null) {
@@ -476,32 +487,39 @@ public final class Interface {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Interface.Variable) {
           return mergeFrom((flyteidl.core.Interface.Variable)other);
@@ -525,10 +543,12 @@ public final class Interface {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -547,7 +567,7 @@ public final class Interface {
         return this;
       }
 
-      private flyteidl.core.Types.LiteralType type_ = null;
+      private flyteidl.core.Types.LiteralType type_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Types.LiteralType, flyteidl.core.Types.LiteralType.Builder, flyteidl.core.Types.LiteralTypeOrBuilder> typeBuilder_;
       /**
@@ -788,11 +808,13 @@ public final class Interface {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -814,6 +836,7 @@ public final class Interface {
 
     private static final com.google.protobuf.Parser<Variable>
         PARSER = new com.google.protobuf.AbstractParser<Variable>() {
+      @java.lang.Override
       public Variable parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -831,6 +854,7 @@ public final class Interface {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Interface.Variable getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -938,15 +962,8 @@ public final class Interface {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 variables_ = com.google.protobuf.MapField.newMapField(
                     VariablesDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000001;
@@ -956,6 +973,13 @@ public final class Interface {
                   VariablesDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
               variables_.getMutableMap().put(
                   variables__.getKey(), variables__.getValue());
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -976,6 +1000,7 @@ public final class Interface {
     }
 
     @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
     protected com.google.protobuf.MapField internalGetMapField(
         int number) {
       switch (number) {
@@ -986,6 +1011,7 @@ public final class Interface {
               "Invalid map field number: " + number);
       }
     }
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Interface.internal_static_flyteidl_core_VariableMap_fieldAccessorTable
@@ -1086,6 +1112,7 @@ public final class Interface {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1095,6 +1122,7 @@ public final class Interface {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       com.google.protobuf.GeneratedMessageV3
@@ -1106,6 +1134,7 @@ public final class Interface {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1136,11 +1165,10 @@ public final class Interface {
       }
       flyteidl.core.Interface.VariableMap other = (flyteidl.core.Interface.VariableMap) obj;
 
-      boolean result = true;
-      result = result && internalGetVariables().equals(
-          other.internalGetVariables());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!internalGetVariables().equals(
+          other.internalGetVariables())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1229,6 +1257,7 @@ public final class Interface {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1236,6 +1265,7 @@ public final class Interface {
     public static Builder newBuilder(flyteidl.core.Interface.VariableMap prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1285,6 +1315,7 @@ public final class Interface {
                 "Invalid map field number: " + number);
         }
       }
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Interface.internal_static_flyteidl_core_VariableMap_fieldAccessorTable
@@ -1307,21 +1338,25 @@ public final class Interface {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         internalGetMutableVariables().clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Interface.internal_static_flyteidl_core_VariableMap_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.VariableMap getDefaultInstanceForType() {
         return flyteidl.core.Interface.VariableMap.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.VariableMap build() {
         flyteidl.core.Interface.VariableMap result = buildPartial();
         if (!result.isInitialized()) {
@@ -1330,6 +1365,7 @@ public final class Interface {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.VariableMap buildPartial() {
         flyteidl.core.Interface.VariableMap result = new flyteidl.core.Interface.VariableMap(this);
         int from_bitField0_ = bitField0_;
@@ -1339,32 +1375,39 @@ public final class Interface {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Interface.VariableMap) {
           return mergeFrom((flyteidl.core.Interface.VariableMap)other);
@@ -1383,10 +1426,12 @@ public final class Interface {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1556,11 +1601,13 @@ public final class Interface {
             .putAll(values);
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1582,6 +1629,7 @@ public final class Interface {
 
     private static final com.google.protobuf.Parser<VariableMap>
         PARSER = new com.google.protobuf.AbstractParser<VariableMap>() {
+      @java.lang.Override
       public VariableMap parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1599,6 +1647,7 @@ public final class Interface {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Interface.VariableMap getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1678,13 +1727,6 @@ public final class Interface {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Interface.VariableMap.Builder subBuilder = null;
               if (inputs_ != null) {
@@ -1711,6 +1753,13 @@ public final class Interface {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1728,6 +1777,7 @@ public final class Interface {
       return flyteidl.core.Interface.internal_static_flyteidl_core_TypedInterface_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Interface.internal_static_flyteidl_core_TypedInterface_fieldAccessorTable
@@ -1778,6 +1828,7 @@ public final class Interface {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1787,6 +1838,7 @@ public final class Interface {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (inputs_ != null) {
@@ -1798,6 +1850,7 @@ public final class Interface {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1826,19 +1879,18 @@ public final class Interface {
       }
       flyteidl.core.Interface.TypedInterface other = (flyteidl.core.Interface.TypedInterface) obj;
 
-      boolean result = true;
-      result = result && (hasInputs() == other.hasInputs());
+      if (hasInputs() != other.hasInputs()) return false;
       if (hasInputs()) {
-        result = result && getInputs()
-            .equals(other.getInputs());
+        if (!getInputs()
+            .equals(other.getInputs())) return false;
       }
-      result = result && (hasOutputs() == other.hasOutputs());
+      if (hasOutputs() != other.hasOutputs()) return false;
       if (hasOutputs()) {
-        result = result && getOutputs()
-            .equals(other.getOutputs());
+        if (!getOutputs()
+            .equals(other.getOutputs())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1931,6 +1983,7 @@ public final class Interface {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1938,6 +1991,7 @@ public final class Interface {
     public static Builder newBuilder(flyteidl.core.Interface.TypedInterface prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1965,6 +2019,7 @@ public final class Interface {
         return flyteidl.core.Interface.internal_static_flyteidl_core_TypedInterface_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Interface.internal_static_flyteidl_core_TypedInterface_fieldAccessorTable
@@ -1987,6 +2042,7 @@ public final class Interface {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (inputsBuilder_ == null) {
@@ -2004,15 +2060,18 @@ public final class Interface {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Interface.internal_static_flyteidl_core_TypedInterface_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.TypedInterface getDefaultInstanceForType() {
         return flyteidl.core.Interface.TypedInterface.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.TypedInterface build() {
         flyteidl.core.Interface.TypedInterface result = buildPartial();
         if (!result.isInitialized()) {
@@ -2021,6 +2080,7 @@ public final class Interface {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.TypedInterface buildPartial() {
         flyteidl.core.Interface.TypedInterface result = new flyteidl.core.Interface.TypedInterface(this);
         if (inputsBuilder_ == null) {
@@ -2037,32 +2097,39 @@ public final class Interface {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Interface.TypedInterface) {
           return mergeFrom((flyteidl.core.Interface.TypedInterface)other);
@@ -2085,10 +2152,12 @@ public final class Interface {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2107,7 +2176,7 @@ public final class Interface {
         return this;
       }
 
-      private flyteidl.core.Interface.VariableMap inputs_ = null;
+      private flyteidl.core.Interface.VariableMap inputs_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.VariableMap, flyteidl.core.Interface.VariableMap.Builder, flyteidl.core.Interface.VariableMapOrBuilder> inputsBuilder_;
       /**
@@ -2224,7 +2293,7 @@ public final class Interface {
         return inputsBuilder_;
       }
 
-      private flyteidl.core.Interface.VariableMap outputs_ = null;
+      private flyteidl.core.Interface.VariableMap outputs_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.VariableMap, flyteidl.core.Interface.VariableMap.Builder, flyteidl.core.Interface.VariableMapOrBuilder> outputsBuilder_;
       /**
@@ -2340,11 +2409,13 @@ public final class Interface {
         }
         return outputsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2366,6 +2437,7 @@ public final class Interface {
 
     private static final com.google.protobuf.Parser<TypedInterface>
         PARSER = new com.google.protobuf.AbstractParser<TypedInterface>() {
+      @java.lang.Override
       public TypedInterface parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2383,6 +2455,7 @@ public final class Interface {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Interface.TypedInterface getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2498,13 +2571,6 @@ public final class Interface {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Interface.Variable.Builder subBuilder = null;
               if (var_ != null) {
@@ -2537,6 +2603,13 @@ public final class Interface {
               behavior_ = input.readBool();
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -2554,6 +2627,7 @@ public final class Interface {
       return flyteidl.core.Interface.internal_static_flyteidl_core_Parameter_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Interface.internal_static_flyteidl_core_Parameter_fieldAccessorTable
@@ -2686,6 +2760,7 @@ public final class Interface {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2695,6 +2770,7 @@ public final class Interface {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (var_ != null) {
@@ -2710,6 +2786,7 @@ public final class Interface {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2743,29 +2820,26 @@ public final class Interface {
       }
       flyteidl.core.Interface.Parameter other = (flyteidl.core.Interface.Parameter) obj;
 
-      boolean result = true;
-      result = result && (hasVar() == other.hasVar());
+      if (hasVar() != other.hasVar()) return false;
       if (hasVar()) {
-        result = result && getVar()
-            .equals(other.getVar());
+        if (!getVar()
+            .equals(other.getVar())) return false;
       }
-      result = result && getBehaviorCase().equals(
-          other.getBehaviorCase());
-      if (!result) return false;
+      if (!getBehaviorCase().equals(other.getBehaviorCase())) return false;
       switch (behaviorCase_) {
         case 2:
-          result = result && getDefault()
-              .equals(other.getDefault());
+          if (!getDefault()
+              .equals(other.getDefault())) return false;
           break;
         case 3:
-          result = result && (getRequired()
-              == other.getRequired());
+          if (getRequired()
+              != other.getRequired()) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2867,6 +2941,7 @@ public final class Interface {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2874,6 +2949,7 @@ public final class Interface {
     public static Builder newBuilder(flyteidl.core.Interface.Parameter prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2902,6 +2978,7 @@ public final class Interface {
         return flyteidl.core.Interface.internal_static_flyteidl_core_Parameter_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Interface.internal_static_flyteidl_core_Parameter_fieldAccessorTable
@@ -2924,6 +3001,7 @@ public final class Interface {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (varBuilder_ == null) {
@@ -2937,15 +3015,18 @@ public final class Interface {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Interface.internal_static_flyteidl_core_Parameter_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.Parameter getDefaultInstanceForType() {
         return flyteidl.core.Interface.Parameter.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.Parameter build() {
         flyteidl.core.Interface.Parameter result = buildPartial();
         if (!result.isInitialized()) {
@@ -2954,6 +3035,7 @@ public final class Interface {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.Parameter buildPartial() {
         flyteidl.core.Interface.Parameter result = new flyteidl.core.Interface.Parameter(this);
         if (varBuilder_ == null) {
@@ -2976,32 +3058,39 @@ public final class Interface {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Interface.Parameter) {
           return mergeFrom((flyteidl.core.Interface.Parameter)other);
@@ -3034,10 +3123,12 @@ public final class Interface {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3071,7 +3162,7 @@ public final class Interface {
       }
 
 
-      private flyteidl.core.Interface.Variable var_ = null;
+      private flyteidl.core.Interface.Variable var_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.Variable, flyteidl.core.Interface.Variable.Builder, flyteidl.core.Interface.VariableOrBuilder> varBuilder_;
       /**
@@ -3437,11 +3528,13 @@ public final class Interface {
         }
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3463,6 +3556,7 @@ public final class Interface {
 
     private static final com.google.protobuf.Parser<Parameter>
         PARSER = new com.google.protobuf.AbstractParser<Parameter>() {
+      @java.lang.Override
       public Parameter parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3480,6 +3574,7 @@ public final class Interface {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Interface.Parameter getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3587,15 +3682,8 @@ public final class Interface {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 parameters_ = com.google.protobuf.MapField.newMapField(
                     ParametersDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000001;
@@ -3605,6 +3693,13 @@ public final class Interface {
                   ParametersDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
               parameters_.getMutableMap().put(
                   parameters__.getKey(), parameters__.getValue());
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -3625,6 +3720,7 @@ public final class Interface {
     }
 
     @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
     protected com.google.protobuf.MapField internalGetMapField(
         int number) {
       switch (number) {
@@ -3635,6 +3731,7 @@ public final class Interface {
               "Invalid map field number: " + number);
       }
     }
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Interface.internal_static_flyteidl_core_ParameterMap_fieldAccessorTable
@@ -3735,6 +3832,7 @@ public final class Interface {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3744,6 +3842,7 @@ public final class Interface {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       com.google.protobuf.GeneratedMessageV3
@@ -3755,6 +3854,7 @@ public final class Interface {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3785,11 +3885,10 @@ public final class Interface {
       }
       flyteidl.core.Interface.ParameterMap other = (flyteidl.core.Interface.ParameterMap) obj;
 
-      boolean result = true;
-      result = result && internalGetParameters().equals(
-          other.internalGetParameters());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!internalGetParameters().equals(
+          other.internalGetParameters())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3878,6 +3977,7 @@ public final class Interface {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3885,6 +3985,7 @@ public final class Interface {
     public static Builder newBuilder(flyteidl.core.Interface.ParameterMap prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3934,6 +4035,7 @@ public final class Interface {
                 "Invalid map field number: " + number);
         }
       }
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Interface.internal_static_flyteidl_core_ParameterMap_fieldAccessorTable
@@ -3956,21 +4058,25 @@ public final class Interface {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         internalGetMutableParameters().clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Interface.internal_static_flyteidl_core_ParameterMap_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.ParameterMap getDefaultInstanceForType() {
         return flyteidl.core.Interface.ParameterMap.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.ParameterMap build() {
         flyteidl.core.Interface.ParameterMap result = buildPartial();
         if (!result.isInitialized()) {
@@ -3979,6 +4085,7 @@ public final class Interface {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Interface.ParameterMap buildPartial() {
         flyteidl.core.Interface.ParameterMap result = new flyteidl.core.Interface.ParameterMap(this);
         int from_bitField0_ = bitField0_;
@@ -3988,32 +4095,39 @@ public final class Interface {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Interface.ParameterMap) {
           return mergeFrom((flyteidl.core.Interface.ParameterMap)other);
@@ -4032,10 +4146,12 @@ public final class Interface {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4205,11 +4321,13 @@ public final class Interface {
             .putAll(values);
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -4231,6 +4349,7 @@ public final class Interface {
 
     private static final com.google.protobuf.Parser<ParameterMap>
         PARSER = new com.google.protobuf.AbstractParser<ParameterMap>() {
+      @java.lang.Override
       public ParameterMap parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4248,6 +4367,7 @@ public final class Interface {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Interface.ParameterMap getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

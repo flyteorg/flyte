@@ -6,44 +6,34 @@
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/port.h>
-#include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/extension_set.h>
 #include <google/protobuf/wire_format_lite_inl.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
-// This is a temporary google only hack
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-#include "third_party/protobuf/version.h"
-#endif
 // @@protoc_insertion_point(includes)
+#include <google/protobuf/port_def.inc>
+
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fschedule_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_FixedRate_flyteidl_2fadmin_2fschedule_2eproto;
 namespace flyteidl {
 namespace admin {
 class FixedRateDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<FixedRate>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<FixedRate> _instance;
 } _FixedRate_default_instance_;
 class ScheduleDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<Schedule>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<Schedule> _instance;
   ::google::protobuf::internal::ArenaStringPtr cron_expression_;
   const ::flyteidl::admin::FixedRate* rate_;
 } _Schedule_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
-namespace protobuf_flyteidl_2fadmin_2fschedule_2eproto {
-void InitDefaultsFixedRateImpl() {
+static void InitDefaultsFixedRate_flyteidl_2fadmin_2fschedule_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::flyteidl::admin::_FixedRate_default_instance_;
     new (ptr) ::flyteidl::admin::FixedRate();
@@ -52,20 +42,12 @@ void InitDefaultsFixedRateImpl() {
   ::flyteidl::admin::FixedRate::InitAsDefaultInstance();
 }
 
-void InitDefaultsFixedRate() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsFixedRateImpl);
-}
+::google::protobuf::internal::SCCInfo<0> scc_info_FixedRate_flyteidl_2fadmin_2fschedule_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsFixedRate_flyteidl_2fadmin_2fschedule_2eproto}, {}};
 
-void InitDefaultsScheduleImpl() {
+static void InitDefaultsSchedule_flyteidl_2fadmin_2fschedule_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  protobuf_flyteidl_2fadmin_2fschedule_2eproto::InitDefaultsFixedRate();
   {
     void* ptr = &::flyteidl::admin::_Schedule_default_instance_;
     new (ptr) ::flyteidl::admin::Schedule();
@@ -74,33 +56,38 @@ void InitDefaultsScheduleImpl() {
   ::flyteidl::admin::Schedule::InitAsDefaultInstance();
 }
 
-void InitDefaultsSchedule() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsScheduleImpl);
+::google::protobuf::internal::SCCInfo<1> scc_info_Schedule_flyteidl_2fadmin_2fschedule_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsSchedule_flyteidl_2fadmin_2fschedule_2eproto}, {
+      &scc_info_FixedRate_flyteidl_2fadmin_2fschedule_2eproto.base,}};
+
+void InitDefaults_flyteidl_2fadmin_2fschedule_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_FixedRate_flyteidl_2fadmin_2fschedule_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_Schedule_flyteidl_2fadmin_2fschedule_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata[2];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors[1];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fschedule_2eproto[2];
+const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fadmin_2fschedule_2eproto[1];
+constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fadmin_2fschedule_2eproto = nullptr;
 
-const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fschedule_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::FixedRate, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::FixedRate, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::FixedRate, value_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::FixedRate, unit_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::FixedRate, value_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::FixedRate, unit_),
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::Schedule, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Schedule, _internal_metadata_),
   ~0u,  // no _extensions_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::Schedule, _oneof_case_[0]),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Schedule, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   offsetof(::flyteidl::admin::ScheduleDefaultTypeInternal, cron_expression_),
   offsetof(::flyteidl::admin::ScheduleDefaultTypeInternal, rate_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::Schedule, kickoff_time_input_arg_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::admin::Schedule, ScheduleExpression_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Schedule, kickoff_time_input_arg_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Schedule, ScheduleExpression_),
 };
-static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::admin::FixedRate)},
   { 7, -1, sizeof(::flyteidl::admin::Schedule)},
 };
@@ -110,61 +97,44 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_Schedule_default_instance_),
 };
 
-void protobuf_AssignDescriptors() {
-  AddDescriptors();
-  ::google::protobuf::MessageFactory* factory = NULL;
-  AssignDescriptors(
-      "flyteidl/admin/schedule.proto", schemas, file_default_instances, TableStruct::offsets, factory,
-      file_level_metadata, file_level_enum_descriptors, NULL);
-}
+::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto = {
+  {}, AddDescriptors_flyteidl_2fadmin_2fschedule_2eproto, "flyteidl/admin/schedule.proto", schemas,
+  file_default_instances, TableStruct_flyteidl_2fadmin_2fschedule_2eproto::offsets,
+  file_level_metadata_flyteidl_2fadmin_2fschedule_2eproto, 2, file_level_enum_descriptors_flyteidl_2fadmin_2fschedule_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fschedule_2eproto,
+};
 
-void protobuf_AssignDescriptorsOnce() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &protobuf_AssignDescriptors);
-}
+const char descriptor_table_protodef_flyteidl_2fadmin_2fschedule_2eproto[] =
+  "\n\035flyteidl/admin/schedule.proto\022\016flyteid"
+  "l.admin\"G\n\tFixedRate\022\r\n\005value\030\001 \001(\r\022+\n\004u"
+  "nit\030\002 \001(\0162\035.flyteidl.admin.FixedRateUnit"
+  "\"\206\001\n\010Schedule\022\031\n\017cron_expression\030\001 \001(\tH\000"
+  "\022)\n\004rate\030\002 \001(\0132\031.flyteidl.admin.FixedRat"
+  "eH\000\022\036\n\026kickoff_time_input_arg\030\003 \001(\tB\024\n\022S"
+  "cheduleExpression*.\n\rFixedRateUnit\022\n\n\006MI"
+  "NUTE\020\000\022\010\n\004HOUR\020\001\022\007\n\003DAY\020\002B3Z1github.com/"
+  "lyft/flyteidl/gen/pb-go/flyteidl/adminb\006"
+  "proto3"
+  ;
+::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fschedule_2eproto = {
+  false, InitDefaults_flyteidl_2fadmin_2fschedule_2eproto, 
+  descriptor_table_protodef_flyteidl_2fadmin_2fschedule_2eproto,
+  "flyteidl/admin/schedule.proto", &assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto, 366,
+};
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
-void protobuf_RegisterTypes(const ::std::string&) {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 2);
-}
-
-void AddDescriptorsImpl() {
-  InitDefaults();
-  static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\035flyteidl/admin/schedule.proto\022\016flyteid"
-      "l.admin\"G\n\tFixedRate\022\r\n\005value\030\001 \001(\r\022+\n\004u"
-      "nit\030\002 \001(\0162\035.flyteidl.admin.FixedRateUnit"
-      "\"\206\001\n\010Schedule\022\031\n\017cron_expression\030\001 \001(\tH\000"
-      "\022)\n\004rate\030\002 \001(\0132\031.flyteidl.admin.FixedRat"
-      "eH\000\022\036\n\026kickoff_time_input_arg\030\003 \001(\tB\024\n\022S"
-      "cheduleExpression*.\n\rFixedRateUnit\022\n\n\006MI"
-      "NUTE\020\000\022\010\n\004HOUR\020\001\022\007\n\003DAY\020\002B3Z1github.com/"
-      "lyft/flyteidl/gen/pb-go/flyteidl/adminb\006"
-      "proto3"
+void AddDescriptors_flyteidl_2fadmin_2fschedule_2eproto() {
+  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
+  {
   };
-  ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 366);
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
-    "flyteidl/admin/schedule.proto", &protobuf_RegisterTypes);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fadmin_2fschedule_2eproto, deps, 0);
 }
 
-void AddDescriptors() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &AddDescriptorsImpl);
-}
-// Force AddDescriptors() to be called at dynamic initialization time.
-struct StaticDescriptorInitializer {
-  StaticDescriptorInitializer() {
-    AddDescriptors();
-  }
-} static_descriptor_initializer;
-}  // namespace protobuf_flyteidl_2fadmin_2fschedule_2eproto
+// Force running AddDescriptors() at dynamic initialization time.
+static bool dynamic_init_dummy_flyteidl_2fadmin_2fschedule_2eproto = []() { AddDescriptors_flyteidl_2fadmin_2fschedule_2eproto(); return true; }();
 namespace flyteidl {
 namespace admin {
 const ::google::protobuf::EnumDescriptor* FixedRateUnit_descriptor() {
-  protobuf_flyteidl_2fadmin_2fschedule_2eproto::protobuf_AssignDescriptorsOnce();
-  return protobuf_flyteidl_2fadmin_2fschedule_2eproto::file_level_enum_descriptors[0];
+  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto);
+  return file_level_enum_descriptors_flyteidl_2fadmin_2fschedule_2eproto[0];
 }
 bool FixedRateUnit_IsValid(int value) {
   switch (value) {
@@ -182,23 +152,23 @@ bool FixedRateUnit_IsValid(int value) {
 
 void FixedRate::InitAsDefaultInstance() {
 }
+class FixedRate::HasBitSetters {
+ public:
+};
+
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int FixedRate::kValueFieldNumber;
 const int FixedRate::kUnitFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 FixedRate::FixedRate()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fadmin_2fschedule_2eproto::InitDefaultsFixedRate();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.admin.FixedRate)
 }
 FixedRate::FixedRate(const FixedRate& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::memcpy(&value_, &from.value_,
     static_cast<size_t>(reinterpret_cast<char*>(&unit_) -
@@ -210,7 +180,6 @@ void FixedRate::SharedCtor() {
   ::memset(&value_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&unit_) -
       reinterpret_cast<char*>(&value_)) + sizeof(unit_));
-  _cached_size_ = 0;
 }
 
 FixedRate::~FixedRate() {
@@ -222,27 +191,13 @@ void FixedRate::SharedDtor() {
 }
 
 void FixedRate::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* FixedRate::descriptor() {
-  ::protobuf_flyteidl_2fadmin_2fschedule_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fadmin_2fschedule_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const FixedRate& FixedRate::default_instance() {
-  ::protobuf_flyteidl_2fadmin_2fschedule_2eproto::InitDefaultsFixedRate();
+  ::google::protobuf::internal::InitSCC(&::scc_info_FixedRate_flyteidl_2fadmin_2fschedule_2eproto.base);
   return *internal_default_instance();
 }
 
-FixedRate* FixedRate::New(::google::protobuf::Arena* arena) const {
-  FixedRate* n = new FixedRate;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void FixedRate::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.admin.FixedRate)
@@ -256,20 +211,64 @@ void FixedRate::Clear() {
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* FixedRate::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<FixedRate*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // uint32 value = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        msg->set_value(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // .flyteidl.admin.FixedRateUnit unit = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_unit(static_cast<::flyteidl::admin::FixedRateUnit>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool FixedRate::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.admin.FixedRate)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // uint32 value = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
@@ -282,9 +281,8 @@ bool FixedRate::MergePartialFromCodedStream(
 
       // .flyteidl.admin.FixedRateUnit unit = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
-          int value;
+        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
+          int value = 0;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
@@ -314,6 +312,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void FixedRate::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -332,16 +331,15 @@ void FixedRate::SerializeWithCachedSizes(
       2, this->unit(), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.admin.FixedRate)
 }
 
 ::google::protobuf::uint8* FixedRate::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.FixedRate)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -357,9 +355,9 @@ void FixedRate::SerializeWithCachedSizes(
       2, this->unit(), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.FixedRate)
   return target;
@@ -369,11 +367,15 @@ size_t FixedRate::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.FixedRate)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   // uint32 value = 1;
   if (this->value() != 0) {
     total_size += 1 +
@@ -388,9 +390,7 @@ size_t FixedRate::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -398,9 +398,9 @@ void FixedRate::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.FixedRate)
   GOOGLE_DCHECK_NE(&from, this);
   const FixedRate* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const FixedRate>(
+      ::google::protobuf::DynamicCastToGenerated<FixedRate>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.FixedRate)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -448,15 +448,14 @@ void FixedRate::Swap(FixedRate* other) {
 }
 void FixedRate::InternalSwap(FixedRate* other) {
   using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(value_, other->value_);
   swap(unit_, other->unit_);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata FixedRate::GetMetadata() const {
-  protobuf_flyteidl_2fadmin_2fschedule_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fadmin_2fschedule_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto);
+  return ::file_level_metadata_flyteidl_2fadmin_2fschedule_2eproto[kIndexInFileMessages];
 }
 
 
@@ -468,11 +467,20 @@ void Schedule::InitAsDefaultInstance() {
   ::flyteidl::admin::_Schedule_default_instance_.rate_ = const_cast< ::flyteidl::admin::FixedRate*>(
       ::flyteidl::admin::FixedRate::internal_default_instance());
 }
+class Schedule::HasBitSetters {
+ public:
+  static const ::flyteidl::admin::FixedRate& rate(const Schedule* msg);
+};
+
+const ::flyteidl::admin::FixedRate&
+Schedule::HasBitSetters::rate(const Schedule* msg) {
+  return *msg->ScheduleExpression_.rate_;
+}
 void Schedule::set_allocated_rate(::flyteidl::admin::FixedRate* rate) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   clear_ScheduleExpression();
   if (rate) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena = nullptr;
     if (message_arena != submessage_arena) {
       rate = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, rate, submessage_arena);
@@ -489,17 +497,13 @@ const int Schedule::kKickoffTimeInputArgFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Schedule::Schedule()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fadmin_2fschedule_2eproto::InitDefaultsSchedule();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.admin.Schedule)
 }
 Schedule::Schedule(const Schedule& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   kickoff_time_input_arg_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.kickoff_time_input_arg().size() > 0) {
@@ -523,9 +527,10 @@ Schedule::Schedule(const Schedule& from)
 }
 
 void Schedule::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_Schedule_flyteidl_2fadmin_2fschedule_2eproto.base);
   kickoff_time_input_arg_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   clear_has_ScheduleExpression();
-  _cached_size_ = 0;
 }
 
 Schedule::~Schedule() {
@@ -541,27 +546,13 @@ void Schedule::SharedDtor() {
 }
 
 void Schedule::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* Schedule::descriptor() {
-  ::protobuf_flyteidl_2fadmin_2fschedule_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fadmin_2fschedule_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const Schedule& Schedule::default_instance() {
-  ::protobuf_flyteidl_2fadmin_2fschedule_2eproto::InitDefaultsSchedule();
+  ::google::protobuf::internal::InitSCC(&::scc_info_Schedule_flyteidl_2fadmin_2fschedule_2eproto.base);
   return *internal_default_instance();
 }
 
-Schedule* Schedule::New(::google::protobuf::Arena* arena) const {
-  Schedule* n = new Schedule;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Schedule::clear_ScheduleExpression() {
 // @@protoc_insertion_point(one_of_clear_start:flyteidl.admin.Schedule)
@@ -593,20 +584,101 @@ void Schedule::Clear() {
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* Schedule::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<Schedule*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string cron_expression = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.Schedule.cron_expression");
+        object = msg->mutable_cron_expression();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // .flyteidl.admin.FixedRate rate = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::admin::FixedRate::_InternalParse;
+        object = msg->mutable_rate();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // string kickoff_time_input_arg = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.Schedule.kickoff_time_input_arg");
+        object = msg->mutable_kickoff_time_input_arg();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool Schedule::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.admin.Schedule)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // string cron_expression = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_cron_expression()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -621,8 +693,7 @@ bool Schedule::MergePartialFromCodedStream(
 
       // .flyteidl.admin.FixedRate rate = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_rate()));
         } else {
@@ -633,8 +704,7 @@ bool Schedule::MergePartialFromCodedStream(
 
       // string kickoff_time_input_arg = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_kickoff_time_input_arg()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -666,6 +736,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void Schedule::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -686,7 +757,7 @@ void Schedule::SerializeWithCachedSizes(
   // .flyteidl.admin.FixedRate rate = 2;
   if (has_rate()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, *ScheduleExpression_.rate_, output);
+      2, HasBitSetters::rate(this), output);
   }
 
   // string kickoff_time_input_arg = 3;
@@ -699,16 +770,15 @@ void Schedule::SerializeWithCachedSizes(
       3, this->kickoff_time_input_arg(), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.admin.Schedule)
 }
 
 ::google::protobuf::uint8* Schedule::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.Schedule)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -728,7 +798,7 @@ void Schedule::SerializeWithCachedSizes(
   if (has_rate()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        2, *ScheduleExpression_.rate_, deterministic, target);
+        2, HasBitSetters::rate(this), target);
   }
 
   // string kickoff_time_input_arg = 3;
@@ -742,9 +812,9 @@ void Schedule::SerializeWithCachedSizes(
         3, this->kickoff_time_input_arg(), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.Schedule)
   return target;
@@ -754,11 +824,15 @@ size_t Schedule::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.Schedule)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   // string kickoff_time_input_arg = 3;
   if (this->kickoff_time_input_arg().size() > 0) {
     total_size += 1 +
@@ -786,9 +860,7 @@ size_t Schedule::ByteSizeLong() const {
     }
   }
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -796,9 +868,9 @@ void Schedule::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.Schedule)
   GOOGLE_DCHECK_NE(&from, this);
   const Schedule* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const Schedule>(
+      ::google::protobuf::DynamicCastToGenerated<Schedule>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.Schedule)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -857,21 +929,32 @@ void Schedule::Swap(Schedule* other) {
 }
 void Schedule::InternalSwap(Schedule* other) {
   using std::swap;
-  kickoff_time_input_arg_.Swap(&other->kickoff_time_input_arg_);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  kickoff_time_input_arg_.Swap(&other->kickoff_time_input_arg_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(ScheduleExpression_, other->ScheduleExpression_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata Schedule::GetMetadata() const {
-  protobuf_flyteidl_2fadmin_2fschedule_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fadmin_2fschedule_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto);
+  return ::file_level_metadata_flyteidl_2fadmin_2fschedule_2eproto[kIndexInFileMessages];
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace admin
 }  // namespace flyteidl
+namespace google {
+namespace protobuf {
+template<> PROTOBUF_NOINLINE ::flyteidl::admin::FixedRate* Arena::CreateMaybeMessage< ::flyteidl::admin::FixedRate >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::admin::FixedRate >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::admin::Schedule* Arena::CreateMaybeMessage< ::flyteidl::admin::Schedule >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::admin::Schedule >(arena);
+}
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
+#include <google/protobuf/port_undef.inc>

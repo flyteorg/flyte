@@ -6,329 +6,320 @@
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/port.h>
-#include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/extension_set.h>
 #include <google/protobuf/wire_format_lite_inl.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
-// This is a temporary google only hack
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-#include "third_party/protobuf/version.h"
-#endif
 // @@protoc_insertion_point(includes)
+#include <google/protobuf/port_def.inc>
+
 namespace flyteidl {
 namespace service {
 }  // namespace service
 }  // namespace flyteidl
-namespace protobuf_flyteidl_2fservice_2fadmin_2eproto {
-const ::google::protobuf::uint32 TableStruct::offsets[1] = {};
-static const ::google::protobuf::internal::MigrationSchema* schemas = NULL;
-static const ::google::protobuf::Message* const* file_default_instances = NULL;
-
-void protobuf_AssignDescriptors() {
-  AddDescriptors();
-  ::google::protobuf::MessageFactory* factory = NULL;
-  AssignDescriptors(
-      "flyteidl/service/admin.proto", schemas, file_default_instances, TableStruct::offsets, factory,
-      NULL, NULL, NULL);
+void InitDefaults_flyteidl_2fservice_2fadmin_2eproto() {
 }
 
-void protobuf_AssignDescriptorsOnce() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &protobuf_AssignDescriptors);
-}
+constexpr ::google::protobuf::Metadata* file_level_metadata_flyteidl_2fservice_2fadmin_2eproto = nullptr;
+constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fservice_2fadmin_2eproto = nullptr;
+constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fservice_2fadmin_2eproto = nullptr;
+const ::google::protobuf::uint32 TableStruct_flyteidl_2fservice_2fadmin_2eproto::offsets[1] = {};
+static constexpr ::google::protobuf::internal::MigrationSchema* schemas = nullptr;
+static constexpr ::google::protobuf::Message* const* file_default_instances = nullptr;
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
-void protobuf_RegisterTypes(const ::std::string&) {
-  protobuf_AssignDescriptorsOnce();
-}
+::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fservice_2fadmin_2eproto = {
+  {}, AddDescriptors_flyteidl_2fservice_2fadmin_2eproto, "flyteidl/service/admin.proto", schemas,
+  file_default_instances, TableStruct_flyteidl_2fservice_2fadmin_2eproto::offsets,
+  file_level_metadata_flyteidl_2fservice_2fadmin_2eproto, 0, file_level_enum_descriptors_flyteidl_2fservice_2fadmin_2eproto, file_level_service_descriptors_flyteidl_2fservice_2fadmin_2eproto,
+};
 
-void AddDescriptorsImpl() {
-  InitDefaults();
-  static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\034flyteidl/service/admin.proto\022\020flyteidl"
-      ".service\032\034google/api/annotations.proto\032\034"
-      "flyteidl/admin/project.proto\032\031flyteidl/a"
-      "dmin/task.proto\032\035flyteidl/admin/workflow"
-      ".proto\032 flyteidl/admin/launch_plan.proto"
-      "\032\032flyteidl/admin/event.proto\032\036flyteidl/a"
-      "dmin/execution.proto\032#flyteidl/admin/nod"
-      "e_execution.proto\032#flyteidl/admin/task_e"
-      "xecution.proto\032\033flyteidl/admin/common.pr"
-      "oto\032,protoc-gen-swagger/options/annotati"
-      "ons.proto2\370H\n\014AdminService\022\305\002\n\nCreateTas"
-      "k\022!.flyteidl.admin.TaskCreateRequest\032\".f"
-      "lyteidl.admin.TaskCreateResponse\"\357\001\202\323\344\223\002"
-      "\022\"\r/api/v1/tasks:\001*\222A\323\001\032&Create and regi"
-      "ster a task definition.JB\n\003400\022;\n9Return"
-      "ed for bad request that may have failed "
-      "validation.Je\n\003409\022^\n\\Returned for a req"
-      "uest that references an identical entity"
-      " that has already been registered.\022\262\001\n\007G"
-      "etTask\022 .flyteidl.admin.ObjectGetRequest"
-      "\032\024.flyteidl.admin.Task\"o\202\323\344\223\002\?\022=/api/v1/"
-      "tasks/{id.project}/{id.domain}/{id.name}"
-      "/{id.version}\222A\'\032%Retrieve an existing t"
-      "ask definition.\022\336\001\n\013ListTaskIds\0220.flytei"
-      "dl.admin.NamedEntityIdentifierListReques"
-      "t\032).flyteidl.admin.NamedEntityIdentifier"
-      "List\"r\202\323\344\223\002%\022#/api/v1/task_ids/{project}"
-      "/{domain}\222AD\032BFetch existing task defini"
-      "tion identifiers matching input filters."
-      "\022\353\001\n\tListTasks\022#.flyteidl.admin.Resource"
-      "ListRequest\032\030.flyteidl.admin.TaskList\"\236\001"
-      "\202\323\344\223\002\\\0220/api/v1/tasks/{id.project}/{id.d"
-      "omain}/{id.name}Z(\022&/api/v1/tasks/{id.pr"
-      "oject}/{id.domain}\222A9\0327Fetch existing ta"
-      "sk definitions matching input filters.\022\331"
-      "\002\n\016CreateWorkflow\022%.flyteidl.admin.Workf"
-      "lowCreateRequest\032&.flyteidl.admin.Workfl"
-      "owCreateResponse\"\367\001\202\323\344\223\002\026\"\021/api/v1/workf"
-      "lows:\001*\222A\327\001\032*Create and register a workf"
-      "low definition.JB\n\003400\022;\n9Returned for b"
-      "ad request that may have failed validati"
-      "on.Je\n\003409\022^\n\\Returned for a request tha"
-      "t references an identical entity that ha"
-      "s already been registered.\022\302\001\n\013GetWorkfl"
-      "ow\022 .flyteidl.admin.ObjectGetRequest\032\030.f"
-      "lyteidl.admin.Workflow\"w\202\323\344\223\002C\022A/api/v1/"
-      "workflows/{id.project}/{id.domain}/{id.n"
-      "ame}/{id.version}\222A+\032)Retrieve an existi"
-      "ng workflow definition.\022\355\001\n\017ListWorkflow"
-      "Ids\0220.flyteidl.admin.NamedEntityIdentifi"
-      "erListRequest\032).flyteidl.admin.NamedEnti"
-      "tyIdentifierList\"}\202\323\344\223\002)\022\'/api/v1/workfl"
-      "ow_ids/{project}/{domain}\222AK\032IFetch an e"
-      "xisting workflow definition identifiers "
-      "matching input filters.\022\377\001\n\rListWorkflow"
-      "s\022#.flyteidl.admin.ResourceListRequest\032\034"
-      ".flyteidl.admin.WorkflowList\"\252\001\202\323\344\223\002d\0224/"
-      "api/v1/workflows/{id.project}/{id.domain"
-      "}/{id.name}Z,\022*/api/v1/workflows/{id.pro"
-      "ject}/{id.domain}\222A=\032;Fetch existing wor"
-      "kflow definitions matching input filters"
-      ".\022\345\002\n\020CreateLaunchPlan\022\'.flyteidl.admin."
-      "LaunchPlanCreateRequest\032(.flyteidl.admin"
-      ".LaunchPlanCreateResponse\"\375\001\202\323\344\223\002\031\"\024/api"
-      "/v1/launch_plans:\001*\222A\332\001\032-Create and regi"
-      "ster a launch plan definition.JB\n\003400\022;\n"
-      "9Returned for bad request that may have "
-      "failed validation.Je\n\003409\022^\n\\Returned fo"
-      "r a request that references an identical"
-      " entity that has already been registered"
-      ".\022\314\001\n\rGetLaunchPlan\022 .flyteidl.admin.Obj"
-      "ectGetRequest\032\032.flyteidl.admin.LaunchPla"
-      "n\"}\202\323\344\223\002F\022D/api/v1/launch_plans/{id.proj"
-      "ect}/{id.domain}/{id.name}/{id.version}\222"
-      "A.\032,Retrieve an existing launch plan def"
-      "inition.\022\363\001\n\023GetActiveLaunchPlan\022\'.flyte"
-      "idl.admin.ActiveLaunchPlanRequest\032\032.flyt"
-      "eidl.admin.LaunchPlan\"\226\001\202\323\344\223\002@\022>/api/v1/"
-      "active_launch_plans/{id.project}/{id.dom"
-      "ain}/{id.name}\222AM\032KRetrieve the active l"
-      "aunch plan version specified by input re"
-      "quest filters.\022\353\001\n\025ListActiveLaunchPlans"
-      "\022+.flyteidl.admin.ActiveLaunchPlanListRe"
-      "quest\032\036.flyteidl.admin.LaunchPlanList\"\204\001"
-      "\202\323\344\223\0020\022./api/v1/active_launch_plans/{pro"
-      "ject}/{domain}\222AK\032IFetch the active laun"
-      "ch plan versions specified by input requ"
-      "est filters.\022\363\001\n\021ListLaunchPlanIds\0220.fly"
-      "teidl.admin.NamedEntityIdentifierListReq"
-      "uest\032).flyteidl.admin.NamedEntityIdentif"
-      "ierList\"\200\001\202\323\344\223\002,\022*/api/v1/launch_plan_id"
-      "s/{project}/{domain}\222AK\032IFetch existing "
-      "launch plan definition identifiers match"
-      "ing input filters.\022\214\002\n\017ListLaunchPlans\022#"
-      ".flyteidl.admin.ResourceListRequest\032\036.fl"
-      "yteidl.admin.LaunchPlanList\"\263\001\202\323\344\223\002j\0227/a"
-      "pi/v1/launch_plans/{id.project}/{id.doma"
-      "in}/{id.name}Z/\022-/api/v1/launch_plans/{i"
-      "d.project}/{id.domain}\222A@\032>Fetch existin"
-      "g launch plan definitions matching input"
-      " filters.\022\300\006\n\020UpdateLaunchPlan\022\'.flyteid"
-      "l.admin.LaunchPlanUpdateRequest\032(.flytei"
-      "dl.admin.LaunchPlanUpdateResponse\"\330\005\202\323\344\223"
-      "\002I\032D/api/v1/launch_plans/{id.project}/{i"
-      "d.domain}/{id.name}/{id.version}:\001*\222A\205\005\032"
-      "\202\005Update the status of an existing launc"
-      "h plan definition. At most one launch pl"
-      "an version for a given {project, domain,"
-      " name} can be active at a time. If this "
-      "call sets a launch plan to active and ex"
-      "isting version is already active, the re"
-      "sult of this call will be that the forme"
-      "rly active launch plan will be made inac"
-      "tive and specified launch plan in this r"
-      "equest will be made active. In the event"
-      " that the formerly active launch plan ha"
-      "d a schedule associated it with it, this"
-      " schedule will be disabled. If the refer"
-      "ence launch plan in this request is bein"
-      "g set to active and has a schedule assoc"
-      "iated with it, the schedule will be enab"
-      "led.\022\242\001\n\017CreateExecution\022&.flyteidl.admi"
-      "n.ExecutionCreateRequest\032\'.flyteidl.admi"
-      "n.ExecutionCreateResponse\">\202\323\344\223\002\027\"\022/api/"
-      "v1/executions:\001*\222A\036\032\034Create a workflow e"
-      "xecution.\022\261\001\n\021RelaunchExecution\022(.flytei"
-      "dl.admin.ExecutionRelaunchRequest\032\'.flyt"
-      "eidl.admin.ExecutionCreateResponse\"I\202\323\344\223"
-      "\002 \"\033/api/v1/executions/relaunch:\001*\222A \032\036R"
-      "elaunch a workflow execution.\022\302\001\n\014GetExe"
-      "cution\022+.flyteidl.admin.WorkflowExecutio"
-      "nGetRequest\032\031.flyteidl.admin.Execution\"j"
-      "\202\323\344\223\0027\0225/api/v1/executions/{id.project}/"
-      "{id.domain}/{id.name}\222A*\032(Retrieve an ex"
-      "isting workflow execution.\022\202\002\n\020GetExecut"
-      "ionData\022/.flyteidl.admin.WorkflowExecuti"
-      "onGetDataRequest\0320.flyteidl.admin.Workfl"
-      "owExecutionGetDataResponse\"\212\001\202\323\344\223\002<\022:/ap"
-      "i/v1/data/executions/{id.project}/{id.do"
-      "main}/{id.name}\222AE\032CRetrieve input and o"
-      "utput data from an existing workflow exe"
-      "cution.\022\310\001\n\016ListExecutions\022#.flyteidl.ad"
-      "min.ResourceListRequest\032\035.flyteidl.admin"
-      ".ExecutionList\"r\202\323\344\223\002-\022+/api/v1/executio"
-      "ns/{id.project}/{id.domain}\222A<\032:Fetch ex"
-      "isting workflow executions matching inpu"
-      "t filters.\022\364\001\n\022TerminateExecution\022).flyt"
-      "eidl.admin.ExecutionTerminateRequest\032*.f"
-      "lyteidl.admin.ExecutionTerminateResponse"
-      "\"\206\001\202\323\344\223\002:*5/api/v1/executions/{id.projec"
-      "t}/{id.domain}/{id.name}:\001*\222AC\032ATerminat"
-      "e the active workflow execution specifie"
-      "d in the request.\022\374\001\n\020GetNodeExecution\022\'"
-      ".flyteidl.admin.NodeExecutionGetRequest\032"
-      "\035.flyteidl.admin.NodeExecution\"\237\001\202\323\344\223\002p\022"
-      "n/api/v1/node_executions/{id.execution_i"
-      "d.project}/{id.execution_id.domain}/{id."
-      "execution_id.name}/{id.node_id}\222A&\032$Retr"
-      "ieve an existing node execution.\022\232\002\n\022Lis"
-      "tNodeExecutions\022(.flyteidl.admin.NodeExe"
-      "cutionListRequest\032!.flyteidl.admin.NodeE"
-      "xecutionList\"\266\001\202\323\344\223\002u\022s/api/v1/node_exec"
-      "utions/{workflow_execution_id.project}/{"
-      "workflow_execution_id.domain}/{workflow_"
-      "execution_id.name}\222A8\0326Fetch existing no"
-      "de executions matching input filters.\022\357\004"
-      "\n\031ListNodeExecutionsForTask\022/.flyteidl.a"
-      "dmin.NodeExecutionForTaskListRequest\032!.f"
-      "lyteidl.admin.NodeExecutionList\"\375\003\202\323\344\223\002\254"
-      "\003\022\251\003/api/v1/children/task_executions/{ta"
-      "sk_execution_id.node_execution_id.execut"
-      "ion_id.project}/{task_execution_id.node_"
-      "execution_id.execution_id.domain}/{task_"
-      "execution_id.node_execution_id.execution"
-      "_id.name}/{task_execution_id.node_execut"
-      "ion_id.node_id}/{task_execution_id.task_"
-      "id.project}/{task_execution_id.task_id.d"
-      "omain}/{task_execution_id.task_id.name}/"
-      "{task_execution_id.task_id.version}/{tas"
-      "k_execution_id.retry_attempt}\222AG\032EFetch "
-      "child node executions launched by the sp"
-      "ecified task execution.\022\263\002\n\024GetNodeExecu"
-      "tionData\022+.flyteidl.admin.NodeExecutionG"
-      "etDataRequest\032,.flyteidl.admin.NodeExecu"
-      "tionGetDataResponse\"\277\001\202\323\344\223\002u\022s/api/v1/da"
-      "ta/node_executions/{id.execution_id.proj"
-      "ect}/{id.execution_id.domain}/{id.execut"
-      "ion_id.name}/{id.node_id}\222AA\032\?Retrieve i"
-      "nput and output data from an existing no"
-      "de execution.\022\227\001\n\017RegisterProject\022&.flyt"
-      "eidl.admin.ProjectRegisterRequest\032\'.flyt"
-      "eidl.admin.ProjectRegisterResponse\"3\202\323\344\223"
-      "\002\025\"\020/api/v1/projects:\001*\222A\025\032\023Register a p"
-      "roject.\022\205\001\n\014ListProjects\022\".flyteidl.admi"
-      "n.ProjectListRequest\032\030.flyteidl.admin.Pr"
-      "ojects\"7\202\323\344\223\002\022\022\020/api/v1/projects\222A\034\032\032Fet"
-      "ch registered projects.\022\335\001\n\023CreateWorkfl"
-      "owEvent\022-.flyteidl.admin.WorkflowExecuti"
-      "onEventRequest\032..flyteidl.admin.Workflow"
-      "ExecutionEventResponse\"g\202\323\344\223\002\035\"\030/api/v1/"
-      "events/workflows:\001*\222AA\032\?Create a workflo"
-      "w execution event recording a phase tran"
-      "sition.\022\311\001\n\017CreateNodeEvent\022).flyteidl.a"
-      "dmin.NodeExecutionEventRequest\032*.flyteid"
-      "l.admin.NodeExecutionEventResponse\"_\202\323\344\223"
-      "\002\031\"\024/api/v1/events/nodes:\001*\222A=\032;Create a"
-      " node execution event recording a phase "
-      "transition.\022\311\001\n\017CreateTaskEvent\022).flytei"
-      "dl.admin.TaskExecutionEventRequest\032*.fly"
-      "teidl.admin.TaskExecutionEventResponse\"_"
-      "\202\323\344\223\002\031\"\024/api/v1/events/tasks:\001*\222A=\032;Crea"
-      "te a task execution event recording a ph"
-      "ase transition.\022\251\003\n\020GetTaskExecution\022\'.f"
-      "lyteidl.admin.TaskExecutionGetRequest\032\035."
-      "flyteidl.admin.TaskExecution\"\314\002\202\323\344\223\002\234\002\022\231"
-      "\002/api/v1/task_executions/{id.node_execut"
-      "ion_id.execution_id.project}/{id.node_ex"
-      "ecution_id.execution_id.domain}/{id.node"
-      "_execution_id.execution_id.name}/{id.nod"
-      "e_execution_id.node_id}/{id.task_id.proj"
-      "ect}/{id.task_id.domain}/{id.task_id.nam"
-      "e}/{id.task_id.version}/{id.retry_attemp"
-      "t}\222A&\032$Retrieve an existing task executi"
-      "on.\022\323\002\n\022ListTaskExecutions\022(.flyteidl.ad"
-      "min.TaskExecutionListRequest\032!.flyteidl."
-      "admin.TaskExecutionList\"\357\001\202\323\344\223\002\255\001\022\252\001/api"
-      "/v1/task_executions/{node_execution_id.e"
-      "xecution_id.project}/{node_execution_id."
-      "execution_id.domain}/{node_execution_id."
-      "execution_id.name}/{node_execution_id.no"
-      "de_id}\222A8\0326Fetch existing task execution"
-      "s matching input filters.\022\340\003\n\024GetTaskExe"
-      "cutionData\022+.flyteidl.admin.TaskExecutio"
-      "nGetDataRequest\032,.flyteidl.admin.TaskExe"
-      "cutionGetDataResponse\"\354\002\202\323\344\223\002\241\002\022\236\002/api/v"
-      "1/data/task_executions/{id.node_executio"
-      "n_id.execution_id.project}/{id.node_exec"
-      "ution_id.execution_id.domain}/{id.node_e"
-      "xecution_id.execution_id.name}/{id.node_"
-      "execution_id.node_id}/{id.task_id.projec"
-      "t}/{id.task_id.domain}/{id.task_id.name}"
-      "/{id.task_id.version}/{id.retry_attempt}"
-      "\222AA\032\?Retrieve input and output data from"
-      " an existing task execution.B5Z3github.c"
-      "om/lyft/flyteidl/gen/pb-go/flyteidl/serv"
-      "iceb\006proto3"
+const char descriptor_table_protodef_flyteidl_2fservice_2fadmin_2eproto[] =
+  "\n\034flyteidl/service/admin.proto\022\020flyteidl"
+  ".service\032\034google/api/annotations.proto\032\034"
+  "flyteidl/admin/project.proto\032\031flyteidl/a"
+  "dmin/task.proto\032\035flyteidl/admin/workflow"
+  ".proto\032 flyteidl/admin/launch_plan.proto"
+  "\032\032flyteidl/admin/event.proto\032\036flyteidl/a"
+  "dmin/execution.proto\032#flyteidl/admin/nod"
+  "e_execution.proto\032#flyteidl/admin/task_e"
+  "xecution.proto\032\033flyteidl/admin/common.pr"
+  "oto\032,protoc-gen-swagger/options/annotati"
+  "ons.proto2\370H\n\014AdminService\022\305\002\n\nCreateTas"
+  "k\022!.flyteidl.admin.TaskCreateRequest\032\".f"
+  "lyteidl.admin.TaskCreateResponse\"\357\001\202\323\344\223\002"
+  "\022\"\r/api/v1/tasks:\001*\222A\323\001\032&Create and regi"
+  "ster a task definition.JB\n\003400\022;\n9Return"
+  "ed for bad request that may have failed "
+  "validation.Je\n\003409\022^\n\\Returned for a req"
+  "uest that references an identical entity"
+  " that has already been registered.\022\262\001\n\007G"
+  "etTask\022 .flyteidl.admin.ObjectGetRequest"
+  "\032\024.flyteidl.admin.Task\"o\202\323\344\223\002\?\022=/api/v1/"
+  "tasks/{id.project}/{id.domain}/{id.name}"
+  "/{id.version}\222A\'\032%Retrieve an existing t"
+  "ask definition.\022\336\001\n\013ListTaskIds\0220.flytei"
+  "dl.admin.NamedEntityIdentifierListReques"
+  "t\032).flyteidl.admin.NamedEntityIdentifier"
+  "List\"r\202\323\344\223\002%\022#/api/v1/task_ids/{project}"
+  "/{domain}\222AD\032BFetch existing task defini"
+  "tion identifiers matching input filters."
+  "\022\353\001\n\tListTasks\022#.flyteidl.admin.Resource"
+  "ListRequest\032\030.flyteidl.admin.TaskList\"\236\001"
+  "\202\323\344\223\002\\\0220/api/v1/tasks/{id.project}/{id.d"
+  "omain}/{id.name}Z(\022&/api/v1/tasks/{id.pr"
+  "oject}/{id.domain}\222A9\0327Fetch existing ta"
+  "sk definitions matching input filters.\022\331"
+  "\002\n\016CreateWorkflow\022%.flyteidl.admin.Workf"
+  "lowCreateRequest\032&.flyteidl.admin.Workfl"
+  "owCreateResponse\"\367\001\202\323\344\223\002\026\"\021/api/v1/workf"
+  "lows:\001*\222A\327\001\032*Create and register a workf"
+  "low definition.JB\n\003400\022;\n9Returned for b"
+  "ad request that may have failed validati"
+  "on.Je\n\003409\022^\n\\Returned for a request tha"
+  "t references an identical entity that ha"
+  "s already been registered.\022\302\001\n\013GetWorkfl"
+  "ow\022 .flyteidl.admin.ObjectGetRequest\032\030.f"
+  "lyteidl.admin.Workflow\"w\202\323\344\223\002C\022A/api/v1/"
+  "workflows/{id.project}/{id.domain}/{id.n"
+  "ame}/{id.version}\222A+\032)Retrieve an existi"
+  "ng workflow definition.\022\355\001\n\017ListWorkflow"
+  "Ids\0220.flyteidl.admin.NamedEntityIdentifi"
+  "erListRequest\032).flyteidl.admin.NamedEnti"
+  "tyIdentifierList\"}\202\323\344\223\002)\022\'/api/v1/workfl"
+  "ow_ids/{project}/{domain}\222AK\032IFetch an e"
+  "xisting workflow definition identifiers "
+  "matching input filters.\022\377\001\n\rListWorkflow"
+  "s\022#.flyteidl.admin.ResourceListRequest\032\034"
+  ".flyteidl.admin.WorkflowList\"\252\001\202\323\344\223\002d\0224/"
+  "api/v1/workflows/{id.project}/{id.domain"
+  "}/{id.name}Z,\022*/api/v1/workflows/{id.pro"
+  "ject}/{id.domain}\222A=\032;Fetch existing wor"
+  "kflow definitions matching input filters"
+  ".\022\345\002\n\020CreateLaunchPlan\022\'.flyteidl.admin."
+  "LaunchPlanCreateRequest\032(.flyteidl.admin"
+  ".LaunchPlanCreateResponse\"\375\001\202\323\344\223\002\031\"\024/api"
+  "/v1/launch_plans:\001*\222A\332\001\032-Create and regi"
+  "ster a launch plan definition.JB\n\003400\022;\n"
+  "9Returned for bad request that may have "
+  "failed validation.Je\n\003409\022^\n\\Returned fo"
+  "r a request that references an identical"
+  " entity that has already been registered"
+  ".\022\314\001\n\rGetLaunchPlan\022 .flyteidl.admin.Obj"
+  "ectGetRequest\032\032.flyteidl.admin.LaunchPla"
+  "n\"}\202\323\344\223\002F\022D/api/v1/launch_plans/{id.proj"
+  "ect}/{id.domain}/{id.name}/{id.version}\222"
+  "A.\032,Retrieve an existing launch plan def"
+  "inition.\022\363\001\n\023GetActiveLaunchPlan\022\'.flyte"
+  "idl.admin.ActiveLaunchPlanRequest\032\032.flyt"
+  "eidl.admin.LaunchPlan\"\226\001\202\323\344\223\002@\022>/api/v1/"
+  "active_launch_plans/{id.project}/{id.dom"
+  "ain}/{id.name}\222AM\032KRetrieve the active l"
+  "aunch plan version specified by input re"
+  "quest filters.\022\353\001\n\025ListActiveLaunchPlans"
+  "\022+.flyteidl.admin.ActiveLaunchPlanListRe"
+  "quest\032\036.flyteidl.admin.LaunchPlanList\"\204\001"
+  "\202\323\344\223\0020\022./api/v1/active_launch_plans/{pro"
+  "ject}/{domain}\222AK\032IFetch the active laun"
+  "ch plan versions specified by input requ"
+  "est filters.\022\363\001\n\021ListLaunchPlanIds\0220.fly"
+  "teidl.admin.NamedEntityIdentifierListReq"
+  "uest\032).flyteidl.admin.NamedEntityIdentif"
+  "ierList\"\200\001\202\323\344\223\002,\022*/api/v1/launch_plan_id"
+  "s/{project}/{domain}\222AK\032IFetch existing "
+  "launch plan definition identifiers match"
+  "ing input filters.\022\214\002\n\017ListLaunchPlans\022#"
+  ".flyteidl.admin.ResourceListRequest\032\036.fl"
+  "yteidl.admin.LaunchPlanList\"\263\001\202\323\344\223\002j\0227/a"
+  "pi/v1/launch_plans/{id.project}/{id.doma"
+  "in}/{id.name}Z/\022-/api/v1/launch_plans/{i"
+  "d.project}/{id.domain}\222A@\032>Fetch existin"
+  "g launch plan definitions matching input"
+  " filters.\022\300\006\n\020UpdateLaunchPlan\022\'.flyteid"
+  "l.admin.LaunchPlanUpdateRequest\032(.flytei"
+  "dl.admin.LaunchPlanUpdateResponse\"\330\005\202\323\344\223"
+  "\002I\032D/api/v1/launch_plans/{id.project}/{i"
+  "d.domain}/{id.name}/{id.version}:\001*\222A\205\005\032"
+  "\202\005Update the status of an existing launc"
+  "h plan definition. At most one launch pl"
+  "an version for a given {project, domain,"
+  " name} can be active at a time. If this "
+  "call sets a launch plan to active and ex"
+  "isting version is already active, the re"
+  "sult of this call will be that the forme"
+  "rly active launch plan will be made inac"
+  "tive and specified launch plan in this r"
+  "equest will be made active. In the event"
+  " that the formerly active launch plan ha"
+  "d a schedule associated it with it, this"
+  " schedule will be disabled. If the refer"
+  "ence launch plan in this request is bein"
+  "g set to active and has a schedule assoc"
+  "iated with it, the schedule will be enab"
+  "led.\022\242\001\n\017CreateExecution\022&.flyteidl.admi"
+  "n.ExecutionCreateRequest\032\'.flyteidl.admi"
+  "n.ExecutionCreateResponse\">\202\323\344\223\002\027\"\022/api/"
+  "v1/executions:\001*\222A\036\032\034Create a workflow e"
+  "xecution.\022\261\001\n\021RelaunchExecution\022(.flytei"
+  "dl.admin.ExecutionRelaunchRequest\032\'.flyt"
+  "eidl.admin.ExecutionCreateResponse\"I\202\323\344\223"
+  "\002 \"\033/api/v1/executions/relaunch:\001*\222A \032\036R"
+  "elaunch a workflow execution.\022\302\001\n\014GetExe"
+  "cution\022+.flyteidl.admin.WorkflowExecutio"
+  "nGetRequest\032\031.flyteidl.admin.Execution\"j"
+  "\202\323\344\223\0027\0225/api/v1/executions/{id.project}/"
+  "{id.domain}/{id.name}\222A*\032(Retrieve an ex"
+  "isting workflow execution.\022\202\002\n\020GetExecut"
+  "ionData\022/.flyteidl.admin.WorkflowExecuti"
+  "onGetDataRequest\0320.flyteidl.admin.Workfl"
+  "owExecutionGetDataResponse\"\212\001\202\323\344\223\002<\022:/ap"
+  "i/v1/data/executions/{id.project}/{id.do"
+  "main}/{id.name}\222AE\032CRetrieve input and o"
+  "utput data from an existing workflow exe"
+  "cution.\022\310\001\n\016ListExecutions\022#.flyteidl.ad"
+  "min.ResourceListRequest\032\035.flyteidl.admin"
+  ".ExecutionList\"r\202\323\344\223\002-\022+/api/v1/executio"
+  "ns/{id.project}/{id.domain}\222A<\032:Fetch ex"
+  "isting workflow executions matching inpu"
+  "t filters.\022\364\001\n\022TerminateExecution\022).flyt"
+  "eidl.admin.ExecutionTerminateRequest\032*.f"
+  "lyteidl.admin.ExecutionTerminateResponse"
+  "\"\206\001\202\323\344\223\002:*5/api/v1/executions/{id.projec"
+  "t}/{id.domain}/{id.name}:\001*\222AC\032ATerminat"
+  "e the active workflow execution specifie"
+  "d in the request.\022\374\001\n\020GetNodeExecution\022\'"
+  ".flyteidl.admin.NodeExecutionGetRequest\032"
+  "\035.flyteidl.admin.NodeExecution\"\237\001\202\323\344\223\002p\022"
+  "n/api/v1/node_executions/{id.execution_i"
+  "d.project}/{id.execution_id.domain}/{id."
+  "execution_id.name}/{id.node_id}\222A&\032$Retr"
+  "ieve an existing node execution.\022\232\002\n\022Lis"
+  "tNodeExecutions\022(.flyteidl.admin.NodeExe"
+  "cutionListRequest\032!.flyteidl.admin.NodeE"
+  "xecutionList\"\266\001\202\323\344\223\002u\022s/api/v1/node_exec"
+  "utions/{workflow_execution_id.project}/{"
+  "workflow_execution_id.domain}/{workflow_"
+  "execution_id.name}\222A8\0326Fetch existing no"
+  "de executions matching input filters.\022\357\004"
+  "\n\031ListNodeExecutionsForTask\022/.flyteidl.a"
+  "dmin.NodeExecutionForTaskListRequest\032!.f"
+  "lyteidl.admin.NodeExecutionList\"\375\003\202\323\344\223\002\254"
+  "\003\022\251\003/api/v1/children/task_executions/{ta"
+  "sk_execution_id.node_execution_id.execut"
+  "ion_id.project}/{task_execution_id.node_"
+  "execution_id.execution_id.domain}/{task_"
+  "execution_id.node_execution_id.execution"
+  "_id.name}/{task_execution_id.node_execut"
+  "ion_id.node_id}/{task_execution_id.task_"
+  "id.project}/{task_execution_id.task_id.d"
+  "omain}/{task_execution_id.task_id.name}/"
+  "{task_execution_id.task_id.version}/{tas"
+  "k_execution_id.retry_attempt}\222AG\032EFetch "
+  "child node executions launched by the sp"
+  "ecified task execution.\022\263\002\n\024GetNodeExecu"
+  "tionData\022+.flyteidl.admin.NodeExecutionG"
+  "etDataRequest\032,.flyteidl.admin.NodeExecu"
+  "tionGetDataResponse\"\277\001\202\323\344\223\002u\022s/api/v1/da"
+  "ta/node_executions/{id.execution_id.proj"
+  "ect}/{id.execution_id.domain}/{id.execut"
+  "ion_id.name}/{id.node_id}\222AA\032\?Retrieve i"
+  "nput and output data from an existing no"
+  "de execution.\022\227\001\n\017RegisterProject\022&.flyt"
+  "eidl.admin.ProjectRegisterRequest\032\'.flyt"
+  "eidl.admin.ProjectRegisterResponse\"3\202\323\344\223"
+  "\002\025\"\020/api/v1/projects:\001*\222A\025\032\023Register a p"
+  "roject.\022\205\001\n\014ListProjects\022\".flyteidl.admi"
+  "n.ProjectListRequest\032\030.flyteidl.admin.Pr"
+  "ojects\"7\202\323\344\223\002\022\022\020/api/v1/projects\222A\034\032\032Fet"
+  "ch registered projects.\022\335\001\n\023CreateWorkfl"
+  "owEvent\022-.flyteidl.admin.WorkflowExecuti"
+  "onEventRequest\032..flyteidl.admin.Workflow"
+  "ExecutionEventResponse\"g\202\323\344\223\002\035\"\030/api/v1/"
+  "events/workflows:\001*\222AA\032\?Create a workflo"
+  "w execution event recording a phase tran"
+  "sition.\022\311\001\n\017CreateNodeEvent\022).flyteidl.a"
+  "dmin.NodeExecutionEventRequest\032*.flyteid"
+  "l.admin.NodeExecutionEventResponse\"_\202\323\344\223"
+  "\002\031\"\024/api/v1/events/nodes:\001*\222A=\032;Create a"
+  " node execution event recording a phase "
+  "transition.\022\311\001\n\017CreateTaskEvent\022).flytei"
+  "dl.admin.TaskExecutionEventRequest\032*.fly"
+  "teidl.admin.TaskExecutionEventResponse\"_"
+  "\202\323\344\223\002\031\"\024/api/v1/events/tasks:\001*\222A=\032;Crea"
+  "te a task execution event recording a ph"
+  "ase transition.\022\251\003\n\020GetTaskExecution\022\'.f"
+  "lyteidl.admin.TaskExecutionGetRequest\032\035."
+  "flyteidl.admin.TaskExecution\"\314\002\202\323\344\223\002\234\002\022\231"
+  "\002/api/v1/task_executions/{id.node_execut"
+  "ion_id.execution_id.project}/{id.node_ex"
+  "ecution_id.execution_id.domain}/{id.node"
+  "_execution_id.execution_id.name}/{id.nod"
+  "e_execution_id.node_id}/{id.task_id.proj"
+  "ect}/{id.task_id.domain}/{id.task_id.nam"
+  "e}/{id.task_id.version}/{id.retry_attemp"
+  "t}\222A&\032$Retrieve an existing task executi"
+  "on.\022\323\002\n\022ListTaskExecutions\022(.flyteidl.ad"
+  "min.TaskExecutionListRequest\032!.flyteidl."
+  "admin.TaskExecutionList\"\357\001\202\323\344\223\002\255\001\022\252\001/api"
+  "/v1/task_executions/{node_execution_id.e"
+  "xecution_id.project}/{node_execution_id."
+  "execution_id.domain}/{node_execution_id."
+  "execution_id.name}/{node_execution_id.no"
+  "de_id}\222A8\0326Fetch existing task execution"
+  "s matching input filters.\022\340\003\n\024GetTaskExe"
+  "cutionData\022+.flyteidl.admin.TaskExecutio"
+  "nGetDataRequest\032,.flyteidl.admin.TaskExe"
+  "cutionGetDataResponse\"\354\002\202\323\344\223\002\241\002\022\236\002/api/v"
+  "1/data/task_executions/{id.node_executio"
+  "n_id.execution_id.project}/{id.node_exec"
+  "ution_id.execution_id.domain}/{id.node_e"
+  "xecution_id.execution_id.name}/{id.node_"
+  "execution_id.node_id}/{id.task_id.projec"
+  "t}/{id.task_id.domain}/{id.task_id.name}"
+  "/{id.task_id.version}/{id.retry_attempt}"
+  "\222AA\032\?Retrieve input and output data from"
+  " an existing task execution.B5Z3github.c"
+  "om/lyft/flyteidl/gen/pb-go/flyteidl/serv"
+  "iceb\006proto3"
+  ;
+::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fadmin_2eproto = {
+  false, InitDefaults_flyteidl_2fservice_2fadmin_2eproto, 
+  descriptor_table_protodef_flyteidl_2fservice_2fadmin_2eproto,
+  "flyteidl/service/admin.proto", &assign_descriptors_table_flyteidl_2fservice_2fadmin_2eproto, 9811,
+};
+
+void AddDescriptors_flyteidl_2fservice_2fadmin_2eproto() {
+  static constexpr ::google::protobuf::internal::InitFunc deps[11] =
+  {
+    ::AddDescriptors_google_2fapi_2fannotations_2eproto,
+    ::AddDescriptors_flyteidl_2fadmin_2fproject_2eproto,
+    ::AddDescriptors_flyteidl_2fadmin_2ftask_2eproto,
+    ::AddDescriptors_flyteidl_2fadmin_2fworkflow_2eproto,
+    ::AddDescriptors_flyteidl_2fadmin_2flaunch_5fplan_2eproto,
+    ::AddDescriptors_flyteidl_2fadmin_2fevent_2eproto,
+    ::AddDescriptors_flyteidl_2fadmin_2fexecution_2eproto,
+    ::AddDescriptors_flyteidl_2fadmin_2fnode_5fexecution_2eproto,
+    ::AddDescriptors_flyteidl_2fadmin_2ftask_5fexecution_2eproto,
+    ::AddDescriptors_flyteidl_2fadmin_2fcommon_2eproto,
+    ::AddDescriptors_protoc_2dgen_2dswagger_2foptions_2fannotations_2eproto,
   };
-  ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 9811);
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
-    "flyteidl/service/admin.proto", &protobuf_RegisterTypes);
-  ::protobuf_google_2fapi_2fannotations_2eproto::AddDescriptors();
-  ::protobuf_flyteidl_2fadmin_2fproject_2eproto::AddDescriptors();
-  ::protobuf_flyteidl_2fadmin_2ftask_2eproto::AddDescriptors();
-  ::protobuf_flyteidl_2fadmin_2fworkflow_2eproto::AddDescriptors();
-  ::protobuf_flyteidl_2fadmin_2flaunch_5fplan_2eproto::AddDescriptors();
-  ::protobuf_flyteidl_2fadmin_2fevent_2eproto::AddDescriptors();
-  ::protobuf_flyteidl_2fadmin_2fexecution_2eproto::AddDescriptors();
-  ::protobuf_flyteidl_2fadmin_2fnode_5fexecution_2eproto::AddDescriptors();
-  ::protobuf_flyteidl_2fadmin_2ftask_5fexecution_2eproto::AddDescriptors();
-  ::protobuf_flyteidl_2fadmin_2fcommon_2eproto::AddDescriptors();
-  ::protobuf_protoc_2dgen_2dswagger_2foptions_2fannotations_2eproto::AddDescriptors();
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fservice_2fadmin_2eproto, deps, 11);
 }
 
-void AddDescriptors() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &AddDescriptorsImpl);
-}
-// Force AddDescriptors() to be called at dynamic initialization time.
-struct StaticDescriptorInitializer {
-  StaticDescriptorInitializer() {
-    AddDescriptors();
-  }
-} static_descriptor_initializer;
-}  // namespace protobuf_flyteidl_2fservice_2fadmin_2eproto
+// Force running AddDescriptors() at dynamic initialization time.
+static bool dynamic_init_dummy_flyteidl_2fservice_2fadmin_2eproto = []() { AddDescriptors_flyteidl_2fservice_2fadmin_2eproto(); return true; }();
 namespace flyteidl {
 namespace service {
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace service
 }  // namespace flyteidl
+namespace google {
+namespace protobuf {
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
+#include <google/protobuf/port_undef.inc>

@@ -98,13 +98,6 @@ public final class Condition {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               int rawValue = input.readEnum();
 
@@ -137,6 +130,13 @@ public final class Condition {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -154,6 +154,7 @@ public final class Condition {
       return flyteidl.core.Condition.internal_static_flyteidl_core_ComparisonExpression_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Condition.internal_static_flyteidl_core_ComparisonExpression_fieldAccessorTable
@@ -327,6 +328,7 @@ public final class Condition {
      * <code>.flyteidl.core.ComparisonExpression.Operator operator = 1;</code>
      */
     public flyteidl.core.Condition.ComparisonExpression.Operator getOperator() {
+      @SuppressWarnings("deprecation")
       flyteidl.core.Condition.ComparisonExpression.Operator result = flyteidl.core.Condition.ComparisonExpression.Operator.valueOf(operator_);
       return result == null ? flyteidl.core.Condition.ComparisonExpression.Operator.UNRECOGNIZED : result;
     }
@@ -374,6 +376,7 @@ public final class Condition {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -383,6 +386,7 @@ public final class Condition {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (operator_ != flyteidl.core.Condition.ComparisonExpression.Operator.EQ.getNumber()) {
@@ -397,6 +401,7 @@ public final class Condition {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -429,20 +434,19 @@ public final class Condition {
       }
       flyteidl.core.Condition.ComparisonExpression other = (flyteidl.core.Condition.ComparisonExpression) obj;
 
-      boolean result = true;
-      result = result && operator_ == other.operator_;
-      result = result && (hasLeftValue() == other.hasLeftValue());
+      if (operator_ != other.operator_) return false;
+      if (hasLeftValue() != other.hasLeftValue()) return false;
       if (hasLeftValue()) {
-        result = result && getLeftValue()
-            .equals(other.getLeftValue());
+        if (!getLeftValue()
+            .equals(other.getLeftValue())) return false;
       }
-      result = result && (hasRightValue() == other.hasRightValue());
+      if (hasRightValue() != other.hasRightValue()) return false;
       if (hasRightValue()) {
-        result = result && getRightValue()
-            .equals(other.getRightValue());
+        if (!getRightValue()
+            .equals(other.getRightValue())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -537,6 +541,7 @@ public final class Condition {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -544,6 +549,7 @@ public final class Condition {
     public static Builder newBuilder(flyteidl.core.Condition.ComparisonExpression prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -572,6 +578,7 @@ public final class Condition {
         return flyteidl.core.Condition.internal_static_flyteidl_core_ComparisonExpression_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Condition.internal_static_flyteidl_core_ComparisonExpression_fieldAccessorTable
@@ -594,6 +601,7 @@ public final class Condition {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         operator_ = 0;
@@ -613,15 +621,18 @@ public final class Condition {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Condition.internal_static_flyteidl_core_ComparisonExpression_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.ComparisonExpression getDefaultInstanceForType() {
         return flyteidl.core.Condition.ComparisonExpression.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.ComparisonExpression build() {
         flyteidl.core.Condition.ComparisonExpression result = buildPartial();
         if (!result.isInitialized()) {
@@ -630,6 +641,7 @@ public final class Condition {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.ComparisonExpression buildPartial() {
         flyteidl.core.Condition.ComparisonExpression result = new flyteidl.core.Condition.ComparisonExpression(this);
         result.operator_ = operator_;
@@ -647,32 +659,39 @@ public final class Condition {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Condition.ComparisonExpression) {
           return mergeFrom((flyteidl.core.Condition.ComparisonExpression)other);
@@ -698,10 +717,12 @@ public final class Condition {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -739,6 +760,7 @@ public final class Condition {
        * <code>.flyteidl.core.ComparisonExpression.Operator operator = 1;</code>
        */
       public flyteidl.core.Condition.ComparisonExpression.Operator getOperator() {
+        @SuppressWarnings("deprecation")
         flyteidl.core.Condition.ComparisonExpression.Operator result = flyteidl.core.Condition.ComparisonExpression.Operator.valueOf(operator_);
         return result == null ? flyteidl.core.Condition.ComparisonExpression.Operator.UNRECOGNIZED : result;
       }
@@ -764,7 +786,7 @@ public final class Condition {
         return this;
       }
 
-      private flyteidl.core.Condition.Operand leftValue_ = null;
+      private flyteidl.core.Condition.Operand leftValue_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Condition.Operand, flyteidl.core.Condition.Operand.Builder, flyteidl.core.Condition.OperandOrBuilder> leftValueBuilder_;
       /**
@@ -881,7 +903,7 @@ public final class Condition {
         return leftValueBuilder_;
       }
 
-      private flyteidl.core.Condition.Operand rightValue_ = null;
+      private flyteidl.core.Condition.Operand rightValue_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Condition.Operand, flyteidl.core.Condition.Operand.Builder, flyteidl.core.Condition.OperandOrBuilder> rightValueBuilder_;
       /**
@@ -997,11 +1019,13 @@ public final class Condition {
         }
         return rightValueBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1023,6 +1047,7 @@ public final class Condition {
 
     private static final com.google.protobuf.Parser<ComparisonExpression>
         PARSER = new com.google.protobuf.AbstractParser<ComparisonExpression>() {
+      @java.lang.Override
       public ComparisonExpression parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1040,6 +1065,7 @@ public final class Condition {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Condition.ComparisonExpression getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1138,13 +1164,6 @@ public final class Condition {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Literals.Primitive.Builder subBuilder = null;
               if (valCase_ == 1) {
@@ -1165,6 +1184,13 @@ public final class Condition {
               val_ = s;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1182,6 +1208,7 @@ public final class Condition {
       return flyteidl.core.Condition.internal_static_flyteidl_core_Operand_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Condition.internal_static_flyteidl_core_Operand_fieldAccessorTable
@@ -1317,6 +1344,7 @@ public final class Condition {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1326,6 +1354,7 @@ public final class Condition {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (valCase_ == 1) {
@@ -1337,6 +1366,7 @@ public final class Condition {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1364,24 +1394,21 @@ public final class Condition {
       }
       flyteidl.core.Condition.Operand other = (flyteidl.core.Condition.Operand) obj;
 
-      boolean result = true;
-      result = result && getValCase().equals(
-          other.getValCase());
-      if (!result) return false;
+      if (!getValCase().equals(other.getValCase())) return false;
       switch (valCase_) {
         case 1:
-          result = result && getPrimitive()
-              .equals(other.getPrimitive());
+          if (!getPrimitive()
+              .equals(other.getPrimitive())) return false;
           break;
         case 2:
-          result = result && getVar()
-              .equals(other.getVar());
+          if (!getVar()
+              .equals(other.getVar())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1478,6 +1505,7 @@ public final class Condition {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1485,6 +1513,7 @@ public final class Condition {
     public static Builder newBuilder(flyteidl.core.Condition.Operand prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1512,6 +1541,7 @@ public final class Condition {
         return flyteidl.core.Condition.internal_static_flyteidl_core_Operand_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Condition.internal_static_flyteidl_core_Operand_fieldAccessorTable
@@ -1534,6 +1564,7 @@ public final class Condition {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         valCase_ = 0;
@@ -1541,15 +1572,18 @@ public final class Condition {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Condition.internal_static_flyteidl_core_Operand_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.Operand getDefaultInstanceForType() {
         return flyteidl.core.Condition.Operand.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.Operand build() {
         flyteidl.core.Condition.Operand result = buildPartial();
         if (!result.isInitialized()) {
@@ -1558,6 +1592,7 @@ public final class Condition {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.Operand buildPartial() {
         flyteidl.core.Condition.Operand result = new flyteidl.core.Condition.Operand(this);
         if (valCase_ == 1) {
@@ -1575,32 +1610,39 @@ public final class Condition {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Condition.Operand) {
           return mergeFrom((flyteidl.core.Condition.Operand)other);
@@ -1632,10 +1674,12 @@ public final class Condition {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1940,11 +1984,13 @@ public final class Condition {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1966,6 +2012,7 @@ public final class Condition {
 
     private static final com.google.protobuf.Parser<Operand>
         PARSER = new com.google.protobuf.AbstractParser<Operand>() {
+      @java.lang.Override
       public Operand parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1983,6 +2030,7 @@ public final class Condition {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Condition.Operand getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2065,13 +2113,6 @@ public final class Condition {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Condition.ConjunctionExpression.Builder subBuilder = null;
               if (exprCase_ == 1) {
@@ -2100,6 +2141,13 @@ public final class Condition {
               exprCase_ = 2;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -2117,6 +2165,7 @@ public final class Condition {
       return flyteidl.core.Condition.internal_static_flyteidl_core_BooleanExpression_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Condition.internal_static_flyteidl_core_BooleanExpression_fieldAccessorTable
@@ -2215,6 +2264,7 @@ public final class Condition {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2224,6 +2274,7 @@ public final class Condition {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (exprCase_ == 1) {
@@ -2235,6 +2286,7 @@ public final class Condition {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2263,24 +2315,21 @@ public final class Condition {
       }
       flyteidl.core.Condition.BooleanExpression other = (flyteidl.core.Condition.BooleanExpression) obj;
 
-      boolean result = true;
-      result = result && getExprCase().equals(
-          other.getExprCase());
-      if (!result) return false;
+      if (!getExprCase().equals(other.getExprCase())) return false;
       switch (exprCase_) {
         case 1:
-          result = result && getConjunction()
-              .equals(other.getConjunction());
+          if (!getConjunction()
+              .equals(other.getConjunction())) return false;
           break;
         case 2:
-          result = result && getComparison()
-              .equals(other.getComparison());
+          if (!getComparison()
+              .equals(other.getComparison())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2377,6 +2426,7 @@ public final class Condition {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2384,6 +2434,7 @@ public final class Condition {
     public static Builder newBuilder(flyteidl.core.Condition.BooleanExpression prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2412,6 +2463,7 @@ public final class Condition {
         return flyteidl.core.Condition.internal_static_flyteidl_core_BooleanExpression_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Condition.internal_static_flyteidl_core_BooleanExpression_fieldAccessorTable
@@ -2434,6 +2486,7 @@ public final class Condition {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         exprCase_ = 0;
@@ -2441,15 +2494,18 @@ public final class Condition {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Condition.internal_static_flyteidl_core_BooleanExpression_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.BooleanExpression getDefaultInstanceForType() {
         return flyteidl.core.Condition.BooleanExpression.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.BooleanExpression build() {
         flyteidl.core.Condition.BooleanExpression result = buildPartial();
         if (!result.isInitialized()) {
@@ -2458,6 +2514,7 @@ public final class Condition {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.BooleanExpression buildPartial() {
         flyteidl.core.Condition.BooleanExpression result = new flyteidl.core.Condition.BooleanExpression(this);
         if (exprCase_ == 1) {
@@ -2479,32 +2536,39 @@ public final class Condition {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Condition.BooleanExpression) {
           return mergeFrom((flyteidl.core.Condition.BooleanExpression)other);
@@ -2534,10 +2598,12 @@ public final class Condition {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2842,11 +2908,13 @@ public final class Condition {
         onChanged();;
         return comparisonBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2868,6 +2936,7 @@ public final class Condition {
 
     private static final com.google.protobuf.Parser<BooleanExpression>
         PARSER = new com.google.protobuf.AbstractParser<BooleanExpression>() {
+      @java.lang.Override
       public BooleanExpression parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2885,6 +2954,7 @@ public final class Condition {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Condition.BooleanExpression getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2974,13 +3044,6 @@ public final class Condition {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               int rawValue = input.readEnum();
 
@@ -3013,6 +3076,13 @@ public final class Condition {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -3030,6 +3100,7 @@ public final class Condition {
       return flyteidl.core.Condition.internal_static_flyteidl_core_ConjunctionExpression_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Condition.internal_static_flyteidl_core_ConjunctionExpression_fieldAccessorTable
@@ -3160,6 +3231,7 @@ public final class Condition {
      * <code>.flyteidl.core.ConjunctionExpression.LogicalOperator operator = 1;</code>
      */
     public flyteidl.core.Condition.ConjunctionExpression.LogicalOperator getOperator() {
+      @SuppressWarnings("deprecation")
       flyteidl.core.Condition.ConjunctionExpression.LogicalOperator result = flyteidl.core.Condition.ConjunctionExpression.LogicalOperator.valueOf(operator_);
       return result == null ? flyteidl.core.Condition.ConjunctionExpression.LogicalOperator.UNRECOGNIZED : result;
     }
@@ -3207,6 +3279,7 @@ public final class Condition {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3216,6 +3289,7 @@ public final class Condition {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (operator_ != flyteidl.core.Condition.ConjunctionExpression.LogicalOperator.AND.getNumber()) {
@@ -3230,6 +3304,7 @@ public final class Condition {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3262,20 +3337,19 @@ public final class Condition {
       }
       flyteidl.core.Condition.ConjunctionExpression other = (flyteidl.core.Condition.ConjunctionExpression) obj;
 
-      boolean result = true;
-      result = result && operator_ == other.operator_;
-      result = result && (hasLeftExpression() == other.hasLeftExpression());
+      if (operator_ != other.operator_) return false;
+      if (hasLeftExpression() != other.hasLeftExpression()) return false;
       if (hasLeftExpression()) {
-        result = result && getLeftExpression()
-            .equals(other.getLeftExpression());
+        if (!getLeftExpression()
+            .equals(other.getLeftExpression())) return false;
       }
-      result = result && (hasRightExpression() == other.hasRightExpression());
+      if (hasRightExpression() != other.hasRightExpression()) return false;
       if (hasRightExpression()) {
-        result = result && getRightExpression()
-            .equals(other.getRightExpression());
+        if (!getRightExpression()
+            .equals(other.getRightExpression())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3370,6 +3444,7 @@ public final class Condition {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3377,6 +3452,7 @@ public final class Condition {
     public static Builder newBuilder(flyteidl.core.Condition.ConjunctionExpression prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3404,6 +3480,7 @@ public final class Condition {
         return flyteidl.core.Condition.internal_static_flyteidl_core_ConjunctionExpression_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Condition.internal_static_flyteidl_core_ConjunctionExpression_fieldAccessorTable
@@ -3426,6 +3503,7 @@ public final class Condition {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         operator_ = 0;
@@ -3445,15 +3523,18 @@ public final class Condition {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Condition.internal_static_flyteidl_core_ConjunctionExpression_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.ConjunctionExpression getDefaultInstanceForType() {
         return flyteidl.core.Condition.ConjunctionExpression.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.ConjunctionExpression build() {
         flyteidl.core.Condition.ConjunctionExpression result = buildPartial();
         if (!result.isInitialized()) {
@@ -3462,6 +3543,7 @@ public final class Condition {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Condition.ConjunctionExpression buildPartial() {
         flyteidl.core.Condition.ConjunctionExpression result = new flyteidl.core.Condition.ConjunctionExpression(this);
         result.operator_ = operator_;
@@ -3479,32 +3561,39 @@ public final class Condition {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Condition.ConjunctionExpression) {
           return mergeFrom((flyteidl.core.Condition.ConjunctionExpression)other);
@@ -3530,10 +3619,12 @@ public final class Condition {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3571,6 +3662,7 @@ public final class Condition {
        * <code>.flyteidl.core.ConjunctionExpression.LogicalOperator operator = 1;</code>
        */
       public flyteidl.core.Condition.ConjunctionExpression.LogicalOperator getOperator() {
+        @SuppressWarnings("deprecation")
         flyteidl.core.Condition.ConjunctionExpression.LogicalOperator result = flyteidl.core.Condition.ConjunctionExpression.LogicalOperator.valueOf(operator_);
         return result == null ? flyteidl.core.Condition.ConjunctionExpression.LogicalOperator.UNRECOGNIZED : result;
       }
@@ -3596,7 +3688,7 @@ public final class Condition {
         return this;
       }
 
-      private flyteidl.core.Condition.BooleanExpression leftExpression_ = null;
+      private flyteidl.core.Condition.BooleanExpression leftExpression_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Condition.BooleanExpression, flyteidl.core.Condition.BooleanExpression.Builder, flyteidl.core.Condition.BooleanExpressionOrBuilder> leftExpressionBuilder_;
       /**
@@ -3713,7 +3805,7 @@ public final class Condition {
         return leftExpressionBuilder_;
       }
 
-      private flyteidl.core.Condition.BooleanExpression rightExpression_ = null;
+      private flyteidl.core.Condition.BooleanExpression rightExpression_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Condition.BooleanExpression, flyteidl.core.Condition.BooleanExpression.Builder, flyteidl.core.Condition.BooleanExpressionOrBuilder> rightExpressionBuilder_;
       /**
@@ -3829,11 +3921,13 @@ public final class Condition {
         }
         return rightExpressionBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3855,6 +3949,7 @@ public final class Condition {
 
     private static final com.google.protobuf.Parser<ConjunctionExpression>
         PARSER = new com.google.protobuf.AbstractParser<ConjunctionExpression>() {
+      @java.lang.Override
       public ConjunctionExpression parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3872,6 +3967,7 @@ public final class Condition {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Condition.ConjunctionExpression getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

@@ -818,6 +818,8 @@ google.protobuf.FileOptions
     "swift_prefix": "...",
     "php_class_prefix": "...",
     "php_namespace": "...",
+    "php_metadata_namespace": "...",
+    "ruby_package": "...",
     "uninterpreted_option": []
   }
 
@@ -966,6 +968,22 @@ php_namespace
   determining the namespace.
   
   
+.. _api_field_google.protobuf.FileOptions.php_metadata_namespace:
+
+php_metadata_namespace
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Use this option to change the namespace of php generated metadata classes.
+  Default is empty. When this option is empty, the proto file name will be used
+  for determining the namespace.
+  
+  
+.. _api_field_google.protobuf.FileOptions.ruby_package:
+
+ruby_package
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Use this option to change the package of ruby generated classes. Default
+  is empty. When this option is not set, the package name will be used for
+  determining the ruby package.
+  
+  
 .. _api_field_google.protobuf.FileOptions.uninterpreted_option:
 
 uninterpreted_option
@@ -1005,7 +1023,7 @@ LITE_RUNTIME
 google.protobuf.MessageOptions
 ------------------------------
 
-`[google.protobuf.MessageOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L430>`_
+`[google.protobuf.MessageOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L441>`_
 
 
 .. code-block:: json
@@ -1097,7 +1115,7 @@ uninterpreted_option
 google.protobuf.FieldOptions
 ----------------------------
 
-`[google.protobuf.FieldOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L495>`_
+`[google.protobuf.FieldOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L506>`_
 
 
 .. code-block:: json
@@ -1207,7 +1225,7 @@ uninterpreted_option
 Enum google.protobuf.FieldOptions.CType
 ---------------------------------------
 
-`[google.protobuf.FieldOptions.CType proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L501>`_
+`[google.protobuf.FieldOptions.CType proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L512>`_
 
 
 .. _api_enum_value_google.protobuf.FieldOptions.CType.STRING:
@@ -1232,7 +1250,7 @@ STRING_PIECE
 Enum google.protobuf.FieldOptions.JSType
 ----------------------------------------
 
-`[google.protobuf.FieldOptions.JSType proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L528>`_
+`[google.protobuf.FieldOptions.JSType proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L539>`_
 
 
 .. _api_enum_value_google.protobuf.FieldOptions.JSType.JS_NORMAL:
@@ -1259,7 +1277,7 @@ JS_NUMBER
 google.protobuf.OneofOptions
 ----------------------------
 
-`[google.protobuf.OneofOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L588>`_
+`[google.protobuf.OneofOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L599>`_
 
 
 .. code-block:: json
@@ -1281,7 +1299,7 @@ uninterpreted_option
 google.protobuf.EnumOptions
 ---------------------------
 
-`[google.protobuf.EnumOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L596>`_
+`[google.protobuf.EnumOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L607>`_
 
 
 .. code-block:: json
@@ -1321,7 +1339,7 @@ uninterpreted_option
 google.protobuf.EnumValueOptions
 --------------------------------
 
-`[google.protobuf.EnumValueOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L617>`_
+`[google.protobuf.EnumValueOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L628>`_
 
 
 .. code-block:: json
@@ -1353,7 +1371,7 @@ uninterpreted_option
 google.protobuf.ServiceOptions
 ------------------------------
 
-`[google.protobuf.ServiceOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L631>`_
+`[google.protobuf.ServiceOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L642>`_
 
 
 .. code-block:: json
@@ -1385,7 +1403,7 @@ uninterpreted_option
 google.protobuf.MethodOptions
 -----------------------------
 
-`[google.protobuf.MethodOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L651>`_
+`[google.protobuf.MethodOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L662>`_
 
 
 .. code-block:: json
@@ -1422,7 +1440,7 @@ uninterpreted_option
 Enum google.protobuf.MethodOptions.IdempotencyLevel
 ---------------------------------------------------
 
-`[google.protobuf.MethodOptions.IdempotencyLevel proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L667>`_
+`[google.protobuf.MethodOptions.IdempotencyLevel proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L678>`_
 
 Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
 or neither? HTTP based RPC implementation may choose GET verb for safe
@@ -1449,7 +1467,7 @@ IDEMPOTENT
 google.protobuf.UninterpretedOption
 -----------------------------------
 
-`[google.protobuf.UninterpretedOption proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L689>`_
+`[google.protobuf.UninterpretedOption proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L700>`_
 
 A message representing a option the parser does not recognize. This only
 appears in options protos created by the compiler::Parser class.
@@ -1512,7 +1530,7 @@ aggregate_value
 google.protobuf.UninterpretedOption.NamePart
 --------------------------------------------
 
-`[google.protobuf.UninterpretedOption.NamePart proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L695>`_
+`[google.protobuf.UninterpretedOption.NamePart proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L706>`_
 
 The name of the uninterpreted option.  Each string represents a segment in
 a dot-separated name.  is_extension is true iff a segment represents an
@@ -1545,7 +1563,7 @@ is_extension
 google.protobuf.SourceCodeInfo
 ------------------------------
 
-`[google.protobuf.SourceCodeInfo proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L716>`_
+`[google.protobuf.SourceCodeInfo proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L727>`_
 
 Encapsulates information about the original source file from which a
 FileDescriptorProto was generated.
@@ -1609,7 +1627,7 @@ location
 google.protobuf.SourceCodeInfo.Location
 ---------------------------------------
 
-`[google.protobuf.SourceCodeInfo.Location proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L761>`_
+`[google.protobuf.SourceCodeInfo.Location proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L772>`_
 
 
 .. code-block:: json
@@ -1730,7 +1748,7 @@ leading_detached_comments
 google.protobuf.GeneratedCodeInfo
 ---------------------------------
 
-`[google.protobuf.GeneratedCodeInfo proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L850>`_
+`[google.protobuf.GeneratedCodeInfo proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L861>`_
 
 Describes the relationship between generated code and its original source
 file. A GeneratedCodeInfo message is associated with only one generated
@@ -1754,7 +1772,7 @@ annotation
 google.protobuf.GeneratedCodeInfo.Annotation
 --------------------------------------------
 
-`[google.protobuf.GeneratedCodeInfo.Annotation proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L854>`_
+`[google.protobuf.GeneratedCodeInfo.Annotation proto] <https://github.com/lyft/flyteidl/blob/master/protos/google/protobuf/descriptor.proto#L865>`_
 
 
 .. code-block:: json

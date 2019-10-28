@@ -87,13 +87,6 @@ public final class Workflow {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Condition.BooleanExpression.Builder subBuilder = null;
               if (condition_ != null) {
@@ -120,6 +113,13 @@ public final class Workflow {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -137,6 +137,7 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_IfBlock_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_IfBlock_fieldAccessorTable
@@ -187,6 +188,7 @@ public final class Workflow {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -196,6 +198,7 @@ public final class Workflow {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (condition_ != null) {
@@ -207,6 +210,7 @@ public final class Workflow {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -235,19 +239,18 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.IfBlock other = (flyteidl.core.Workflow.IfBlock) obj;
 
-      boolean result = true;
-      result = result && (hasCondition() == other.hasCondition());
+      if (hasCondition() != other.hasCondition()) return false;
       if (hasCondition()) {
-        result = result && getCondition()
-            .equals(other.getCondition());
+        if (!getCondition()
+            .equals(other.getCondition())) return false;
       }
-      result = result && (hasThenNode() == other.hasThenNode());
+      if (hasThenNode() != other.hasThenNode()) return false;
       if (hasThenNode()) {
-        result = result && getThenNode()
-            .equals(other.getThenNode());
+        if (!getThenNode()
+            .equals(other.getThenNode())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -340,6 +343,7 @@ public final class Workflow {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -347,6 +351,7 @@ public final class Workflow {
     public static Builder newBuilder(flyteidl.core.Workflow.IfBlock prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -374,6 +379,7 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_IfBlock_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_IfBlock_fieldAccessorTable
@@ -396,6 +402,7 @@ public final class Workflow {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (conditionBuilder_ == null) {
@@ -413,15 +420,18 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_IfBlock_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.IfBlock getDefaultInstanceForType() {
         return flyteidl.core.Workflow.IfBlock.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.IfBlock build() {
         flyteidl.core.Workflow.IfBlock result = buildPartial();
         if (!result.isInitialized()) {
@@ -430,6 +440,7 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.IfBlock buildPartial() {
         flyteidl.core.Workflow.IfBlock result = new flyteidl.core.Workflow.IfBlock(this);
         if (conditionBuilder_ == null) {
@@ -446,32 +457,39 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Workflow.IfBlock) {
           return mergeFrom((flyteidl.core.Workflow.IfBlock)other);
@@ -494,10 +512,12 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -516,7 +536,7 @@ public final class Workflow {
         return this;
       }
 
-      private flyteidl.core.Condition.BooleanExpression condition_ = null;
+      private flyteidl.core.Condition.BooleanExpression condition_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Condition.BooleanExpression, flyteidl.core.Condition.BooleanExpression.Builder, flyteidl.core.Condition.BooleanExpressionOrBuilder> conditionBuilder_;
       /**
@@ -633,7 +653,7 @@ public final class Workflow {
         return conditionBuilder_;
       }
 
-      private flyteidl.core.Workflow.Node thenNode_ = null;
+      private flyteidl.core.Workflow.Node thenNode_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Workflow.Node, flyteidl.core.Workflow.Node.Builder, flyteidl.core.Workflow.NodeOrBuilder> thenNodeBuilder_;
       /**
@@ -749,11 +769,13 @@ public final class Workflow {
         }
         return thenNodeBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -775,6 +797,7 @@ public final class Workflow {
 
     private static final com.google.protobuf.Parser<IfBlock>
         PARSER = new com.google.protobuf.AbstractParser<IfBlock>() {
+      @java.lang.Override
       public IfBlock parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -792,6 +815,7 @@ public final class Workflow {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Workflow.IfBlock getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -968,13 +992,6 @@ public final class Workflow {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Workflow.IfBlock.Builder subBuilder = null;
               if (case_ != null) {
@@ -989,7 +1006,7 @@ public final class Workflow {
               break;
             }
             case 18: {
-              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
                 other_ = new java.util.ArrayList<flyteidl.core.Workflow.IfBlock>();
                 mutable_bitField0_ |= 0x00000002;
               }
@@ -1025,6 +1042,13 @@ public final class Workflow {
               defaultCase_ = 4;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1033,7 +1057,7 @@ public final class Workflow {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+        if (((mutable_bitField0_ & 0x00000002) != 0)) {
           other_ = java.util.Collections.unmodifiableList(other_);
         }
         this.unknownFields = unknownFields.build();
@@ -1045,6 +1069,7 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_IfElseBlock_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_IfElseBlock_fieldAccessorTable
@@ -1256,6 +1281,7 @@ public final class Workflow {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1265,6 +1291,7 @@ public final class Workflow {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (case_ != null) {
@@ -1282,6 +1309,7 @@ public final class Workflow {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1318,31 +1346,28 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.IfElseBlock other = (flyteidl.core.Workflow.IfElseBlock) obj;
 
-      boolean result = true;
-      result = result && (hasCase() == other.hasCase());
+      if (hasCase() != other.hasCase()) return false;
       if (hasCase()) {
-        result = result && getCase()
-            .equals(other.getCase());
+        if (!getCase()
+            .equals(other.getCase())) return false;
       }
-      result = result && getOtherList()
-          .equals(other.getOtherList());
-      result = result && getDefaultCase().equals(
-          other.getDefaultCase());
-      if (!result) return false;
+      if (!getOtherList()
+          .equals(other.getOtherList())) return false;
+      if (!getDefaultCase().equals(other.getDefaultCase())) return false;
       switch (defaultCase_) {
         case 3:
-          result = result && getElseNode()
-              .equals(other.getElseNode());
+          if (!getElseNode()
+              .equals(other.getElseNode())) return false;
           break;
         case 4:
-          result = result && getError()
-              .equals(other.getError());
+          if (!getError()
+              .equals(other.getError())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1447,6 +1472,7 @@ public final class Workflow {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1454,6 +1480,7 @@ public final class Workflow {
     public static Builder newBuilder(flyteidl.core.Workflow.IfElseBlock prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1482,6 +1509,7 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_IfElseBlock_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_IfElseBlock_fieldAccessorTable
@@ -1505,6 +1533,7 @@ public final class Workflow {
           getOtherFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (caseBuilder_ == null) {
@@ -1524,15 +1553,18 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_IfElseBlock_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.IfElseBlock getDefaultInstanceForType() {
         return flyteidl.core.Workflow.IfElseBlock.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.IfElseBlock build() {
         flyteidl.core.Workflow.IfElseBlock result = buildPartial();
         if (!result.isInitialized()) {
@@ -1541,6 +1573,7 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.IfElseBlock buildPartial() {
         flyteidl.core.Workflow.IfElseBlock result = new flyteidl.core.Workflow.IfElseBlock(this);
         int from_bitField0_ = bitField0_;
@@ -1551,7 +1584,7 @@ public final class Workflow {
           result.case_ = caseBuilder_.build();
         }
         if (otherBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          if (((bitField0_ & 0x00000002) != 0)) {
             other_ = java.util.Collections.unmodifiableList(other_);
             bitField0_ = (bitField0_ & ~0x00000002);
           }
@@ -1579,32 +1612,39 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Workflow.IfElseBlock) {
           return mergeFrom((flyteidl.core.Workflow.IfElseBlock)other);
@@ -1663,10 +1703,12 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1701,7 +1743,7 @@ public final class Workflow {
 
       private int bitField0_;
 
-      private flyteidl.core.Workflow.IfBlock case_ = null;
+      private flyteidl.core.Workflow.IfBlock case_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Workflow.IfBlock, flyteidl.core.Workflow.IfBlock.Builder, flyteidl.core.Workflow.IfBlockOrBuilder> caseBuilder_;
       /**
@@ -1857,7 +1899,7 @@ public final class Workflow {
       private java.util.List<flyteidl.core.Workflow.IfBlock> other_ =
         java.util.Collections.emptyList();
       private void ensureOtherIsMutable() {
-        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+        if (!((bitField0_ & 0x00000002) != 0)) {
           other_ = new java.util.ArrayList<flyteidl.core.Workflow.IfBlock>(other_);
           bitField0_ |= 0x00000002;
          }
@@ -2158,7 +2200,7 @@ public final class Workflow {
           otherBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Workflow.IfBlock, flyteidl.core.Workflow.IfBlock.Builder, flyteidl.core.Workflow.IfBlockOrBuilder>(
                   other_,
-                  ((bitField0_ & 0x00000002) == 0x00000002),
+                  ((bitField0_ & 0x00000002) != 0),
                   getParentForChildren(),
                   isClean());
           other_ = null;
@@ -2509,11 +2551,13 @@ public final class Workflow {
         onChanged();;
         return errorBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2535,6 +2579,7 @@ public final class Workflow {
 
     private static final com.google.protobuf.Parser<IfElseBlock>
         PARSER = new com.google.protobuf.AbstractParser<IfElseBlock>() {
+      @java.lang.Override
       public IfElseBlock parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2552,6 +2597,7 @@ public final class Workflow {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Workflow.IfElseBlock getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2631,13 +2677,6 @@ public final class Workflow {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Workflow.IfElseBlock.Builder subBuilder = null;
               if (ifElse_ != null) {
@@ -2649,6 +2688,13 @@ public final class Workflow {
                 ifElse_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -2668,6 +2714,7 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_BranchNode_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_BranchNode_fieldAccessorTable
@@ -2709,6 +2756,7 @@ public final class Workflow {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2718,6 +2766,7 @@ public final class Workflow {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (ifElse_ != null) {
@@ -2726,6 +2775,7 @@ public final class Workflow {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2750,14 +2800,13 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.BranchNode other = (flyteidl.core.Workflow.BranchNode) obj;
 
-      boolean result = true;
-      result = result && (hasIfElse() == other.hasIfElse());
+      if (hasIfElse() != other.hasIfElse()) return false;
       if (hasIfElse()) {
-        result = result && getIfElse()
-            .equals(other.getIfElse());
+        if (!getIfElse()
+            .equals(other.getIfElse())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2846,6 +2895,7 @@ public final class Workflow {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2853,6 +2903,7 @@ public final class Workflow {
     public static Builder newBuilder(flyteidl.core.Workflow.BranchNode prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2881,6 +2932,7 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_BranchNode_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_BranchNode_fieldAccessorTable
@@ -2903,6 +2955,7 @@ public final class Workflow {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (ifElseBuilder_ == null) {
@@ -2914,15 +2967,18 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_BranchNode_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.BranchNode getDefaultInstanceForType() {
         return flyteidl.core.Workflow.BranchNode.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.BranchNode build() {
         flyteidl.core.Workflow.BranchNode result = buildPartial();
         if (!result.isInitialized()) {
@@ -2931,6 +2987,7 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.BranchNode buildPartial() {
         flyteidl.core.Workflow.BranchNode result = new flyteidl.core.Workflow.BranchNode(this);
         if (ifElseBuilder_ == null) {
@@ -2942,32 +2999,39 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Workflow.BranchNode) {
           return mergeFrom((flyteidl.core.Workflow.BranchNode)other);
@@ -2987,10 +3051,12 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3009,7 +3075,7 @@ public final class Workflow {
         return this;
       }
 
-      private flyteidl.core.Workflow.IfElseBlock ifElse_ = null;
+      private flyteidl.core.Workflow.IfElseBlock ifElse_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Workflow.IfElseBlock, flyteidl.core.Workflow.IfElseBlock.Builder, flyteidl.core.Workflow.IfElseBlockOrBuilder> ifElseBuilder_;
       /**
@@ -3161,11 +3227,13 @@ public final class Workflow {
         }
         return ifElseBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3187,6 +3255,7 @@ public final class Workflow {
 
     private static final com.google.protobuf.Parser<BranchNode>
         PARSER = new com.google.protobuf.AbstractParser<BranchNode>() {
+      @java.lang.Override
       public BranchNode parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3204,6 +3273,7 @@ public final class Workflow {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Workflow.BranchNode getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3284,13 +3354,6 @@ public final class Workflow {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (referenceCase_ == 1) {
@@ -3303,6 +3366,13 @@ public final class Workflow {
                 reference_ = subBuilder.buildPartial();
               }
               referenceCase_ = 1;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -3322,6 +3392,7 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_TaskNode_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_TaskNode_fieldAccessorTable
@@ -3404,6 +3475,7 @@ public final class Workflow {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3413,6 +3485,7 @@ public final class Workflow {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (referenceCase_ == 1) {
@@ -3421,6 +3494,7 @@ public final class Workflow {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3445,20 +3519,17 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.TaskNode other = (flyteidl.core.Workflow.TaskNode) obj;
 
-      boolean result = true;
-      result = result && getReferenceCase().equals(
-          other.getReferenceCase());
-      if (!result) return false;
+      if (!getReferenceCase().equals(other.getReferenceCase())) return false;
       switch (referenceCase_) {
         case 1:
-          result = result && getReferenceId()
-              .equals(other.getReferenceId());
+          if (!getReferenceId()
+              .equals(other.getReferenceId())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3551,6 +3622,7 @@ public final class Workflow {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3558,6 +3630,7 @@ public final class Workflow {
     public static Builder newBuilder(flyteidl.core.Workflow.TaskNode prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3585,6 +3658,7 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_TaskNode_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_TaskNode_fieldAccessorTable
@@ -3607,6 +3681,7 @@ public final class Workflow {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         referenceCase_ = 0;
@@ -3614,15 +3689,18 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_TaskNode_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.TaskNode getDefaultInstanceForType() {
         return flyteidl.core.Workflow.TaskNode.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.TaskNode build() {
         flyteidl.core.Workflow.TaskNode result = buildPartial();
         if (!result.isInitialized()) {
@@ -3631,6 +3709,7 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.TaskNode buildPartial() {
         flyteidl.core.Workflow.TaskNode result = new flyteidl.core.Workflow.TaskNode(this);
         if (referenceCase_ == 1) {
@@ -3645,32 +3724,39 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Workflow.TaskNode) {
           return mergeFrom((flyteidl.core.Workflow.TaskNode)other);
@@ -3696,10 +3782,12 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3904,11 +3992,13 @@ public final class Workflow {
         onChanged();;
         return referenceIdBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3930,6 +4020,7 @@ public final class Workflow {
 
     private static final com.google.protobuf.Parser<TaskNode>
         PARSER = new com.google.protobuf.AbstractParser<TaskNode>() {
+      @java.lang.Override
       public TaskNode parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3947,6 +4038,7 @@ public final class Workflow {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Workflow.TaskNode getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -4052,13 +4144,6 @@ public final class Workflow {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (referenceCase_ == 1) {
@@ -4087,6 +4172,13 @@ public final class Workflow {
               referenceCase_ = 2;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -4104,6 +4196,7 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowNode_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowNode_fieldAccessorTable
@@ -4226,6 +4319,7 @@ public final class Workflow {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -4235,6 +4329,7 @@ public final class Workflow {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (referenceCase_ == 1) {
@@ -4246,6 +4341,7 @@ public final class Workflow {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -4274,24 +4370,21 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.WorkflowNode other = (flyteidl.core.Workflow.WorkflowNode) obj;
 
-      boolean result = true;
-      result = result && getReferenceCase().equals(
-          other.getReferenceCase());
-      if (!result) return false;
+      if (!getReferenceCase().equals(other.getReferenceCase())) return false;
       switch (referenceCase_) {
         case 1:
-          result = result && getLaunchplanRef()
-              .equals(other.getLaunchplanRef());
+          if (!getLaunchplanRef()
+              .equals(other.getLaunchplanRef())) return false;
           break;
         case 2:
-          result = result && getSubWorkflowRef()
-              .equals(other.getSubWorkflowRef());
+          if (!getSubWorkflowRef()
+              .equals(other.getSubWorkflowRef())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -4388,6 +4481,7 @@ public final class Workflow {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -4395,6 +4489,7 @@ public final class Workflow {
     public static Builder newBuilder(flyteidl.core.Workflow.WorkflowNode prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -4422,6 +4517,7 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowNode_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowNode_fieldAccessorTable
@@ -4444,6 +4540,7 @@ public final class Workflow {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         referenceCase_ = 0;
@@ -4451,15 +4548,18 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowNode_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.WorkflowNode getDefaultInstanceForType() {
         return flyteidl.core.Workflow.WorkflowNode.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.WorkflowNode build() {
         flyteidl.core.Workflow.WorkflowNode result = buildPartial();
         if (!result.isInitialized()) {
@@ -4468,6 +4568,7 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.WorkflowNode buildPartial() {
         flyteidl.core.Workflow.WorkflowNode result = new flyteidl.core.Workflow.WorkflowNode(this);
         if (referenceCase_ == 1) {
@@ -4489,32 +4590,39 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Workflow.WorkflowNode) {
           return mergeFrom((flyteidl.core.Workflow.WorkflowNode)other);
@@ -4544,10 +4652,12 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4924,11 +5034,13 @@ public final class Workflow {
         onChanged();;
         return subWorkflowRefBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -4950,6 +5062,7 @@ public final class Workflow {
 
     private static final com.google.protobuf.Parser<WorkflowNode>
         PARSER = new com.google.protobuf.AbstractParser<WorkflowNode>() {
+      @java.lang.Override
       public WorkflowNode parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4967,6 +5080,7 @@ public final class Workflow {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Workflow.WorkflowNode getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -5089,13 +5203,6 @@ public final class Workflow {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -5128,6 +5235,13 @@ public final class Workflow {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -5145,6 +5259,7 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_NodeMetadata_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_NodeMetadata_fieldAccessorTable
@@ -5261,6 +5376,7 @@ public final class Workflow {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -5270,6 +5386,7 @@ public final class Workflow {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getNameBytes().isEmpty()) {
@@ -5284,6 +5401,7 @@ public final class Workflow {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -5315,21 +5433,20 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.NodeMetadata other = (flyteidl.core.Workflow.NodeMetadata) obj;
 
-      boolean result = true;
-      result = result && getName()
-          .equals(other.getName());
-      result = result && (hasTimeout() == other.hasTimeout());
+      if (!getName()
+          .equals(other.getName())) return false;
+      if (hasTimeout() != other.hasTimeout()) return false;
       if (hasTimeout()) {
-        result = result && getTimeout()
-            .equals(other.getTimeout());
+        if (!getTimeout()
+            .equals(other.getTimeout())) return false;
       }
-      result = result && (hasRetries() == other.hasRetries());
+      if (hasRetries() != other.hasRetries()) return false;
       if (hasRetries()) {
-        result = result && getRetries()
-            .equals(other.getRetries());
+        if (!getRetries()
+            .equals(other.getRetries())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -5424,6 +5541,7 @@ public final class Workflow {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -5431,6 +5549,7 @@ public final class Workflow {
     public static Builder newBuilder(flyteidl.core.Workflow.NodeMetadata prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -5458,6 +5577,7 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_NodeMetadata_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_NodeMetadata_fieldAccessorTable
@@ -5480,6 +5600,7 @@ public final class Workflow {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         name_ = "";
@@ -5499,15 +5620,18 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_NodeMetadata_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.NodeMetadata getDefaultInstanceForType() {
         return flyteidl.core.Workflow.NodeMetadata.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.NodeMetadata build() {
         flyteidl.core.Workflow.NodeMetadata result = buildPartial();
         if (!result.isInitialized()) {
@@ -5516,6 +5640,7 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.NodeMetadata buildPartial() {
         flyteidl.core.Workflow.NodeMetadata result = new flyteidl.core.Workflow.NodeMetadata(this);
         result.name_ = name_;
@@ -5533,32 +5658,39 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Workflow.NodeMetadata) {
           return mergeFrom((flyteidl.core.Workflow.NodeMetadata)other);
@@ -5585,10 +5717,12 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5696,7 +5830,7 @@ public final class Workflow {
         return this;
       }
 
-      private com.google.protobuf.Duration timeout_ = null;
+      private com.google.protobuf.Duration timeout_;
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> timeoutBuilder_;
       /**
@@ -5849,7 +5983,7 @@ public final class Workflow {
         return timeoutBuilder_;
       }
 
-      private flyteidl.core.Literals.RetryStrategy retries_ = null;
+      private flyteidl.core.Literals.RetryStrategy retries_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.RetryStrategy, flyteidl.core.Literals.RetryStrategy.Builder, flyteidl.core.Literals.RetryStrategyOrBuilder> retriesBuilder_;
       /**
@@ -6001,11 +6135,13 @@ public final class Workflow {
         }
         return retriesBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -6027,6 +6163,7 @@ public final class Workflow {
 
     private static final com.google.protobuf.Parser<NodeMetadata>
         PARSER = new com.google.protobuf.AbstractParser<NodeMetadata>() {
+      @java.lang.Override
       public NodeMetadata parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6044,6 +6181,7 @@ public final class Workflow {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Workflow.NodeMetadata getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -6135,13 +6273,6 @@ public final class Workflow {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -6152,6 +6283,13 @@ public final class Workflow {
               java.lang.String s = input.readStringRequireUtf8();
 
               alias_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -6171,6 +6309,7 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_Alias_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_Alias_fieldAccessorTable
@@ -6263,6 +6402,7 @@ public final class Workflow {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -6272,6 +6412,7 @@ public final class Workflow {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getVarBytes().isEmpty()) {
@@ -6283,6 +6424,7 @@ public final class Workflow {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -6309,13 +6451,12 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.Alias other = (flyteidl.core.Workflow.Alias) obj;
 
-      boolean result = true;
-      result = result && getVar()
-          .equals(other.getVar());
-      result = result && getAlias()
-          .equals(other.getAlias());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getVar()
+          .equals(other.getVar())) return false;
+      if (!getAlias()
+          .equals(other.getAlias())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -6404,6 +6545,7 @@ public final class Workflow {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -6411,6 +6553,7 @@ public final class Workflow {
     public static Builder newBuilder(flyteidl.core.Workflow.Alias prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -6438,6 +6581,7 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_Alias_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_Alias_fieldAccessorTable
@@ -6460,6 +6604,7 @@ public final class Workflow {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         var_ = "";
@@ -6469,15 +6614,18 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_Alias_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.Alias getDefaultInstanceForType() {
         return flyteidl.core.Workflow.Alias.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.Alias build() {
         flyteidl.core.Workflow.Alias result = buildPartial();
         if (!result.isInitialized()) {
@@ -6486,6 +6634,7 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.Alias buildPartial() {
         flyteidl.core.Workflow.Alias result = new flyteidl.core.Workflow.Alias(this);
         result.var_ = var_;
@@ -6494,32 +6643,39 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Workflow.Alias) {
           return mergeFrom((flyteidl.core.Workflow.Alias)other);
@@ -6544,10 +6700,12 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6743,11 +6901,13 @@ public final class Workflow {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -6769,6 +6929,7 @@ public final class Workflow {
 
     private static final com.google.protobuf.Parser<Alias>
         PARSER = new com.google.protobuf.AbstractParser<Alias>() {
+      @java.lang.Override
       public Alias parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6786,6 +6947,7 @@ public final class Workflow {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Workflow.Alias getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -7112,13 +7274,6 @@ public final class Workflow {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -7139,7 +7294,7 @@ public final class Workflow {
               break;
             }
             case 26: {
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
                 inputs_ = new java.util.ArrayList<flyteidl.core.Literals.Binding>();
                 mutable_bitField0_ |= 0x00000004;
               }
@@ -7149,7 +7304,7 @@ public final class Workflow {
             }
             case 34: {
               java.lang.String s = input.readStringRequireUtf8();
-              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+              if (!((mutable_bitField0_ & 0x00000008) != 0)) {
                 upstreamNodeIds_ = new com.google.protobuf.LazyStringArrayList();
                 mutable_bitField0_ |= 0x00000008;
               }
@@ -7157,7 +7312,7 @@ public final class Workflow {
               break;
             }
             case 42: {
-              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+              if (!((mutable_bitField0_ & 0x00000010) != 0)) {
                 outputAliases_ = new java.util.ArrayList<flyteidl.core.Workflow.Alias>();
                 mutable_bitField0_ |= 0x00000010;
               }
@@ -7207,6 +7362,13 @@ public final class Workflow {
               targetCase_ = 8;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -7215,13 +7377,13 @@ public final class Workflow {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
+        if (((mutable_bitField0_ & 0x00000004) != 0)) {
           inputs_ = java.util.Collections.unmodifiableList(inputs_);
         }
-        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+        if (((mutable_bitField0_ & 0x00000008) != 0)) {
           upstreamNodeIds_ = upstreamNodeIds_.getUnmodifiableView();
         }
-        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((mutable_bitField0_ & 0x00000010) != 0)) {
           outputAliases_ = java.util.Collections.unmodifiableList(outputAliases_);
         }
         this.unknownFields = unknownFields.build();
@@ -7233,6 +7395,7 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_Node_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_Node_fieldAccessorTable
@@ -7651,6 +7814,7 @@ public final class Workflow {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -7660,6 +7824,7 @@ public final class Workflow {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getIdBytes().isEmpty()) {
@@ -7689,6 +7854,7 @@ public final class Workflow {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -7744,41 +7910,38 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.Node other = (flyteidl.core.Workflow.Node) obj;
 
-      boolean result = true;
-      result = result && getId()
-          .equals(other.getId());
-      result = result && (hasMetadata() == other.hasMetadata());
+      if (!getId()
+          .equals(other.getId())) return false;
+      if (hasMetadata() != other.hasMetadata()) return false;
       if (hasMetadata()) {
-        result = result && getMetadata()
-            .equals(other.getMetadata());
+        if (!getMetadata()
+            .equals(other.getMetadata())) return false;
       }
-      result = result && getInputsList()
-          .equals(other.getInputsList());
-      result = result && getUpstreamNodeIdsList()
-          .equals(other.getUpstreamNodeIdsList());
-      result = result && getOutputAliasesList()
-          .equals(other.getOutputAliasesList());
-      result = result && getTargetCase().equals(
-          other.getTargetCase());
-      if (!result) return false;
+      if (!getInputsList()
+          .equals(other.getInputsList())) return false;
+      if (!getUpstreamNodeIdsList()
+          .equals(other.getUpstreamNodeIdsList())) return false;
+      if (!getOutputAliasesList()
+          .equals(other.getOutputAliasesList())) return false;
+      if (!getTargetCase().equals(other.getTargetCase())) return false;
       switch (targetCase_) {
         case 6:
-          result = result && getTaskNode()
-              .equals(other.getTaskNode());
+          if (!getTaskNode()
+              .equals(other.getTaskNode())) return false;
           break;
         case 7:
-          result = result && getWorkflowNode()
-              .equals(other.getWorkflowNode());
+          if (!getWorkflowNode()
+              .equals(other.getWorkflowNode())) return false;
           break;
         case 8:
-          result = result && getBranchNode()
-              .equals(other.getBranchNode());
+          if (!getBranchNode()
+              .equals(other.getBranchNode())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -7897,6 +8060,7 @@ public final class Workflow {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -7904,6 +8068,7 @@ public final class Workflow {
     public static Builder newBuilder(flyteidl.core.Workflow.Node prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -7932,6 +8097,7 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_Node_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_Node_fieldAccessorTable
@@ -7956,6 +8122,7 @@ public final class Workflow {
           getOutputAliasesFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = "";
@@ -7985,15 +8152,18 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_Node_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.Node getDefaultInstanceForType() {
         return flyteidl.core.Workflow.Node.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.Node build() {
         flyteidl.core.Workflow.Node result = buildPartial();
         if (!result.isInitialized()) {
@@ -8002,6 +8172,7 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.Node buildPartial() {
         flyteidl.core.Workflow.Node result = new flyteidl.core.Workflow.Node(this);
         int from_bitField0_ = bitField0_;
@@ -8013,7 +8184,7 @@ public final class Workflow {
           result.metadata_ = metadataBuilder_.build();
         }
         if (inputsBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          if (((bitField0_ & 0x00000004) != 0)) {
             inputs_ = java.util.Collections.unmodifiableList(inputs_);
             bitField0_ = (bitField0_ & ~0x00000004);
           }
@@ -8021,13 +8192,13 @@ public final class Workflow {
         } else {
           result.inputs_ = inputsBuilder_.build();
         }
-        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (((bitField0_ & 0x00000008) != 0)) {
           upstreamNodeIds_ = upstreamNodeIds_.getUnmodifiableView();
           bitField0_ = (bitField0_ & ~0x00000008);
         }
         result.upstreamNodeIds_ = upstreamNodeIds_;
         if (outputAliasesBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          if (((bitField0_ & 0x00000010) != 0)) {
             outputAliases_ = java.util.Collections.unmodifiableList(outputAliases_);
             bitField0_ = (bitField0_ & ~0x00000010);
           }
@@ -8062,32 +8233,39 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Workflow.Node) {
           return mergeFrom((flyteidl.core.Workflow.Node)other);
@@ -8190,10 +8368,12 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8322,7 +8502,7 @@ public final class Workflow {
         return this;
       }
 
-      private flyteidl.core.Workflow.NodeMetadata metadata_ = null;
+      private flyteidl.core.Workflow.NodeMetadata metadata_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Workflow.NodeMetadata, flyteidl.core.Workflow.NodeMetadata.Builder, flyteidl.core.Workflow.NodeMetadataOrBuilder> metadataBuilder_;
       /**
@@ -8478,7 +8658,7 @@ public final class Workflow {
       private java.util.List<flyteidl.core.Literals.Binding> inputs_ =
         java.util.Collections.emptyList();
       private void ensureInputsIsMutable() {
-        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+        if (!((bitField0_ & 0x00000004) != 0)) {
           inputs_ = new java.util.ArrayList<flyteidl.core.Literals.Binding>(inputs_);
           bitField0_ |= 0x00000004;
          }
@@ -8797,7 +8977,7 @@ public final class Workflow {
           inputsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Literals.Binding, flyteidl.core.Literals.Binding.Builder, flyteidl.core.Literals.BindingOrBuilder>(
                   inputs_,
-                  ((bitField0_ & 0x00000004) == 0x00000004),
+                  ((bitField0_ & 0x00000004) != 0),
                   getParentForChildren(),
                   isClean());
           inputs_ = null;
@@ -8807,7 +8987,7 @@ public final class Workflow {
 
       private com.google.protobuf.LazyStringList upstreamNodeIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureUpstreamNodeIdsIsMutable() {
-        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (!((bitField0_ & 0x00000008) != 0)) {
           upstreamNodeIds_ = new com.google.protobuf.LazyStringArrayList(upstreamNodeIds_);
           bitField0_ |= 0x00000008;
          }
@@ -8956,7 +9136,7 @@ public final class Workflow {
       private java.util.List<flyteidl.core.Workflow.Alias> outputAliases_ =
         java.util.Collections.emptyList();
       private void ensureOutputAliasesIsMutable() {
-        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+        if (!((bitField0_ & 0x00000010) != 0)) {
           outputAliases_ = new java.util.ArrayList<flyteidl.core.Workflow.Alias>(outputAliases_);
           bitField0_ |= 0x00000010;
          }
@@ -9293,7 +9473,7 @@ public final class Workflow {
           outputAliasesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Workflow.Alias, flyteidl.core.Workflow.Alias.Builder, flyteidl.core.Workflow.AliasOrBuilder>(
                   outputAliases_,
-                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  ((bitField0_ & 0x00000010) != 0),
                   getParentForChildren(),
                   isClean());
           outputAliases_ = null;
@@ -9816,11 +9996,13 @@ public final class Workflow {
         onChanged();;
         return branchNodeBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -9842,6 +10024,7 @@ public final class Workflow {
 
     private static final com.google.protobuf.Parser<Node>
         PARSER = new com.google.protobuf.AbstractParser<Node>() {
+      @java.lang.Override
       public Node parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9859,6 +10042,7 @@ public final class Workflow {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Workflow.Node getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -9913,7 +10097,7 @@ public final class Workflow {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
+              if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
@@ -9936,6 +10120,7 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable
@@ -9944,6 +10129,7 @@ public final class Workflow {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -9953,11 +10139,13 @@ public final class Workflow {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -9978,9 +10166,8 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.WorkflowMetadata other = (flyteidl.core.Workflow.WorkflowMetadata) obj;
 
-      boolean result = true;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -10065,6 +10252,7 @@ public final class Workflow {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -10072,6 +10260,7 @@ public final class Workflow {
     public static Builder newBuilder(flyteidl.core.Workflow.WorkflowMetadata prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -10100,6 +10289,7 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable
@@ -10122,20 +10312,24 @@ public final class Workflow {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.WorkflowMetadata getDefaultInstanceForType() {
         return flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.WorkflowMetadata build() {
         flyteidl.core.Workflow.WorkflowMetadata result = buildPartial();
         if (!result.isInitialized()) {
@@ -10144,38 +10338,46 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.WorkflowMetadata buildPartial() {
         flyteidl.core.Workflow.WorkflowMetadata result = new flyteidl.core.Workflow.WorkflowMetadata(this);
         onBuilt();
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Workflow.WorkflowMetadata) {
           return mergeFrom((flyteidl.core.Workflow.WorkflowMetadata)other);
@@ -10192,10 +10394,12 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10213,11 +10417,13 @@ public final class Workflow {
         }
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -10239,6 +10445,7 @@ public final class Workflow {
 
     private static final com.google.protobuf.Parser<WorkflowMetadata>
         PARSER = new com.google.protobuf.AbstractParser<WorkflowMetadata>() {
+      @java.lang.Override
       public WorkflowMetadata parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10256,6 +10463,7 @@ public final class Workflow {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Workflow.WorkflowMetadata getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -10536,13 +10744,6 @@ public final class Workflow {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (id_ != null) {
@@ -10583,7 +10784,7 @@ public final class Workflow {
               break;
             }
             case 34: {
-              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+              if (!((mutable_bitField0_ & 0x00000008) != 0)) {
                 nodes_ = new java.util.ArrayList<flyteidl.core.Workflow.Node>();
                 mutable_bitField0_ |= 0x00000008;
               }
@@ -10592,7 +10793,7 @@ public final class Workflow {
               break;
             }
             case 42: {
-              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+              if (!((mutable_bitField0_ & 0x00000010) != 0)) {
                 outputs_ = new java.util.ArrayList<flyteidl.core.Literals.Binding>();
                 mutable_bitField0_ |= 0x00000010;
               }
@@ -10613,6 +10814,13 @@ public final class Workflow {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -10621,10 +10829,10 @@ public final class Workflow {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+        if (((mutable_bitField0_ & 0x00000008) != 0)) {
           nodes_ = java.util.Collections.unmodifiableList(nodes_);
         }
-        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((mutable_bitField0_ & 0x00000010) != 0)) {
           outputs_ = java.util.Collections.unmodifiableList(outputs_);
         }
         this.unknownFields = unknownFields.build();
@@ -10636,6 +10844,7 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowTemplate_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowTemplate_fieldAccessorTable
@@ -10923,6 +11132,7 @@ public final class Workflow {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -10932,6 +11142,7 @@ public final class Workflow {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (id_ != null) {
@@ -10955,6 +11166,7 @@ public final class Workflow {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -10999,33 +11211,32 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.WorkflowTemplate other = (flyteidl.core.Workflow.WorkflowTemplate) obj;
 
-      boolean result = true;
-      result = result && (hasId() == other.hasId());
+      if (hasId() != other.hasId()) return false;
       if (hasId()) {
-        result = result && getId()
-            .equals(other.getId());
+        if (!getId()
+            .equals(other.getId())) return false;
       }
-      result = result && (hasMetadata() == other.hasMetadata());
+      if (hasMetadata() != other.hasMetadata()) return false;
       if (hasMetadata()) {
-        result = result && getMetadata()
-            .equals(other.getMetadata());
+        if (!getMetadata()
+            .equals(other.getMetadata())) return false;
       }
-      result = result && (hasInterface() == other.hasInterface());
+      if (hasInterface() != other.hasInterface()) return false;
       if (hasInterface()) {
-        result = result && getInterface()
-            .equals(other.getInterface());
+        if (!getInterface()
+            .equals(other.getInterface())) return false;
       }
-      result = result && getNodesList()
-          .equals(other.getNodesList());
-      result = result && getOutputsList()
-          .equals(other.getOutputsList());
-      result = result && (hasFailureNode() == other.hasFailureNode());
+      if (!getNodesList()
+          .equals(other.getNodesList())) return false;
+      if (!getOutputsList()
+          .equals(other.getOutputsList())) return false;
+      if (hasFailureNode() != other.hasFailureNode()) return false;
       if (hasFailureNode()) {
-        result = result && getFailureNode()
-            .equals(other.getFailureNode());
+        if (!getFailureNode()
+            .equals(other.getFailureNode())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -11134,6 +11345,7 @@ public final class Workflow {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -11141,6 +11353,7 @@ public final class Workflow {
     public static Builder newBuilder(flyteidl.core.Workflow.WorkflowTemplate prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -11169,6 +11382,7 @@ public final class Workflow {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowTemplate_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowTemplate_fieldAccessorTable
@@ -11193,6 +11407,7 @@ public final class Workflow {
           getOutputsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (idBuilder_ == null) {
@@ -11234,15 +11449,18 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowTemplate_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.WorkflowTemplate getDefaultInstanceForType() {
         return flyteidl.core.Workflow.WorkflowTemplate.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.WorkflowTemplate build() {
         flyteidl.core.Workflow.WorkflowTemplate result = buildPartial();
         if (!result.isInitialized()) {
@@ -11251,6 +11469,7 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Workflow.WorkflowTemplate buildPartial() {
         flyteidl.core.Workflow.WorkflowTemplate result = new flyteidl.core.Workflow.WorkflowTemplate(this);
         int from_bitField0_ = bitField0_;
@@ -11271,7 +11490,7 @@ public final class Workflow {
           result.interface_ = interfaceBuilder_.build();
         }
         if (nodesBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          if (((bitField0_ & 0x00000008) != 0)) {
             nodes_ = java.util.Collections.unmodifiableList(nodes_);
             bitField0_ = (bitField0_ & ~0x00000008);
           }
@@ -11280,7 +11499,7 @@ public final class Workflow {
           result.nodes_ = nodesBuilder_.build();
         }
         if (outputsBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          if (((bitField0_ & 0x00000010) != 0)) {
             outputs_ = java.util.Collections.unmodifiableList(outputs_);
             bitField0_ = (bitField0_ & ~0x00000010);
           }
@@ -11298,32 +11517,39 @@ public final class Workflow {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Workflow.WorkflowTemplate) {
           return mergeFrom((flyteidl.core.Workflow.WorkflowTemplate)other);
@@ -11404,10 +11630,12 @@ public final class Workflow {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -11427,7 +11655,7 @@ public final class Workflow {
       }
       private int bitField0_;
 
-      private flyteidl.core.IdentifierOuterClass.Identifier id_ = null;
+      private flyteidl.core.IdentifierOuterClass.Identifier id_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> idBuilder_;
       /**
@@ -11580,7 +11808,7 @@ public final class Workflow {
         return idBuilder_;
       }
 
-      private flyteidl.core.Workflow.WorkflowMetadata metadata_ = null;
+      private flyteidl.core.Workflow.WorkflowMetadata metadata_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Workflow.WorkflowMetadata, flyteidl.core.Workflow.WorkflowMetadata.Builder, flyteidl.core.Workflow.WorkflowMetadataOrBuilder> metadataBuilder_;
       /**
@@ -11733,7 +11961,7 @@ public final class Workflow {
         return metadataBuilder_;
       }
 
-      private flyteidl.core.Interface.TypedInterface interface_ = null;
+      private flyteidl.core.Interface.TypedInterface interface_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.TypedInterface, flyteidl.core.Interface.TypedInterface.Builder, flyteidl.core.Interface.TypedInterfaceOrBuilder> interfaceBuilder_;
       /**
@@ -11889,7 +12117,7 @@ public final class Workflow {
       private java.util.List<flyteidl.core.Workflow.Node> nodes_ =
         java.util.Collections.emptyList();
       private void ensureNodesIsMutable() {
-        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+        if (!((bitField0_ & 0x00000008) != 0)) {
           nodes_ = new java.util.ArrayList<flyteidl.core.Workflow.Node>(nodes_);
           bitField0_ |= 0x00000008;
          }
@@ -12190,7 +12418,7 @@ public final class Workflow {
           nodesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Workflow.Node, flyteidl.core.Workflow.Node.Builder, flyteidl.core.Workflow.NodeOrBuilder>(
                   nodes_,
-                  ((bitField0_ & 0x00000008) == 0x00000008),
+                  ((bitField0_ & 0x00000008) != 0),
                   getParentForChildren(),
                   isClean());
           nodes_ = null;
@@ -12201,7 +12429,7 @@ public final class Workflow {
       private java.util.List<flyteidl.core.Literals.Binding> outputs_ =
         java.util.Collections.emptyList();
       private void ensureOutputsIsMutable() {
-        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+        if (!((bitField0_ & 0x00000010) != 0)) {
           outputs_ = new java.util.ArrayList<flyteidl.core.Literals.Binding>(outputs_);
           bitField0_ |= 0x00000010;
          }
@@ -12610,7 +12838,7 @@ public final class Workflow {
           outputsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Literals.Binding, flyteidl.core.Literals.Binding.Builder, flyteidl.core.Literals.BindingOrBuilder>(
                   outputs_,
-                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  ((bitField0_ & 0x00000010) != 0),
                   getParentForChildren(),
                   isClean());
           outputs_ = null;
@@ -12618,7 +12846,7 @@ public final class Workflow {
         return outputsBuilder_;
       }
 
-      private flyteidl.core.Workflow.Node failureNode_ = null;
+      private flyteidl.core.Workflow.Node failureNode_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Workflow.Node, flyteidl.core.Workflow.Node.Builder, flyteidl.core.Workflow.NodeOrBuilder> failureNodeBuilder_;
       /**
@@ -12788,11 +13016,13 @@ public final class Workflow {
         }
         return failureNodeBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -12814,6 +13044,7 @@ public final class Workflow {
 
     private static final com.google.protobuf.Parser<WorkflowTemplate>
         PARSER = new com.google.protobuf.AbstractParser<WorkflowTemplate>() {
+      @java.lang.Override
       public WorkflowTemplate parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12831,6 +13062,7 @@ public final class Workflow {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Workflow.WorkflowTemplate getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

@@ -114,13 +114,6 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 8: {
               valueCase_ = 1;
               value_ = input.readInt64();
@@ -170,6 +163,13 @@ public final class Literals {
               valueCase_ = 6;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -187,6 +187,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Primitive_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Primitive_fieldAccessorTable
@@ -369,6 +370,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -378,6 +380,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (valueCase_ == 1) {
@@ -404,6 +407,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -450,42 +454,38 @@ public final class Literals {
       }
       flyteidl.core.Literals.Primitive other = (flyteidl.core.Literals.Primitive) obj;
 
-      boolean result = true;
-      result = result && getValueCase().equals(
-          other.getValueCase());
-      if (!result) return false;
+      if (!getValueCase().equals(other.getValueCase())) return false;
       switch (valueCase_) {
         case 1:
-          result = result && (getInteger()
-              == other.getInteger());
+          if (getInteger()
+              != other.getInteger()) return false;
           break;
         case 2:
-          result = result && (
-              java.lang.Double.doubleToLongBits(getFloatValue())
-              == java.lang.Double.doubleToLongBits(
-                  other.getFloatValue()));
+          if (java.lang.Double.doubleToLongBits(getFloatValue())
+              != java.lang.Double.doubleToLongBits(
+                  other.getFloatValue())) return false;
           break;
         case 3:
-          result = result && getStringValue()
-              .equals(other.getStringValue());
+          if (!getStringValue()
+              .equals(other.getStringValue())) return false;
           break;
         case 4:
-          result = result && (getBoolean()
-              == other.getBoolean());
+          if (getBoolean()
+              != other.getBoolean()) return false;
           break;
         case 5:
-          result = result && getDatetime()
-              .equals(other.getDatetime());
+          if (!getDatetime()
+              .equals(other.getDatetime())) return false;
           break;
         case 6:
-          result = result && getDuration()
-              .equals(other.getDuration());
+          if (!getDuration()
+              .equals(other.getDuration())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -601,6 +601,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -608,6 +609,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.Primitive prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -635,6 +637,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Primitive_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Primitive_fieldAccessorTable
@@ -657,6 +660,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         valueCase_ = 0;
@@ -664,15 +668,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Primitive_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Primitive getDefaultInstanceForType() {
         return flyteidl.core.Literals.Primitive.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Primitive build() {
         flyteidl.core.Literals.Primitive result = buildPartial();
         if (!result.isInitialized()) {
@@ -681,6 +688,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Primitive buildPartial() {
         flyteidl.core.Literals.Primitive result = new flyteidl.core.Literals.Primitive(this);
         if (valueCase_ == 1) {
@@ -714,32 +722,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.Primitive) {
           return mergeFrom((flyteidl.core.Literals.Primitive)other);
@@ -787,10 +802,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1265,11 +1282,13 @@ public final class Literals {
         onChanged();;
         return durationBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1291,6 +1310,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<Primitive>
         PARSER = new com.google.protobuf.AbstractParser<Primitive>() {
+      @java.lang.Override
       public Primitive parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1308,6 +1328,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.Primitive getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1362,7 +1383,7 @@ public final class Literals {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
+              if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
@@ -1385,6 +1406,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Void_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Void_fieldAccessorTable
@@ -1393,6 +1415,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1402,11 +1425,13 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1427,9 +1452,8 @@ public final class Literals {
       }
       flyteidl.core.Literals.Void other = (flyteidl.core.Literals.Void) obj;
 
-      boolean result = true;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -1514,6 +1538,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1521,6 +1546,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.Void prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1549,6 +1575,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Void_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Void_fieldAccessorTable
@@ -1571,20 +1598,24 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Void_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Void getDefaultInstanceForType() {
         return flyteidl.core.Literals.Void.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Void build() {
         flyteidl.core.Literals.Void result = buildPartial();
         if (!result.isInitialized()) {
@@ -1593,38 +1624,46 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Void buildPartial() {
         flyteidl.core.Literals.Void result = new flyteidl.core.Literals.Void(this);
         onBuilt();
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.Void) {
           return mergeFrom((flyteidl.core.Literals.Void)other);
@@ -1641,10 +1680,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1662,11 +1703,13 @@ public final class Literals {
         }
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1688,6 +1731,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<Void>
         PARSER = new com.google.protobuf.AbstractParser<Void>() {
+      @java.lang.Override
       public Void parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1705,6 +1749,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.Void getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1783,13 +1828,6 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Literals.BlobMetadata.Builder subBuilder = null;
               if (metadata_ != null) {
@@ -1809,6 +1847,13 @@ public final class Literals {
               uri_ = s;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1826,6 +1871,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Blob_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Blob_fieldAccessorTable
@@ -1889,6 +1935,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1898,6 +1945,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (metadata_ != null) {
@@ -1909,6 +1957,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1936,16 +1985,15 @@ public final class Literals {
       }
       flyteidl.core.Literals.Blob other = (flyteidl.core.Literals.Blob) obj;
 
-      boolean result = true;
-      result = result && (hasMetadata() == other.hasMetadata());
+      if (hasMetadata() != other.hasMetadata()) return false;
       if (hasMetadata()) {
-        result = result && getMetadata()
-            .equals(other.getMetadata());
+        if (!getMetadata()
+            .equals(other.getMetadata())) return false;
       }
-      result = result && getUri()
-          .equals(other.getUri());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getUri()
+          .equals(other.getUri())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2036,6 +2084,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2043,6 +2092,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.Blob prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2071,6 +2121,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Blob_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Blob_fieldAccessorTable
@@ -2093,6 +2144,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (metadataBuilder_ == null) {
@@ -2106,15 +2158,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Blob_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Blob getDefaultInstanceForType() {
         return flyteidl.core.Literals.Blob.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Blob build() {
         flyteidl.core.Literals.Blob result = buildPartial();
         if (!result.isInitialized()) {
@@ -2123,6 +2178,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Blob buildPartial() {
         flyteidl.core.Literals.Blob result = new flyteidl.core.Literals.Blob(this);
         if (metadataBuilder_ == null) {
@@ -2135,32 +2191,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.Blob) {
           return mergeFrom((flyteidl.core.Literals.Blob)other);
@@ -2184,10 +2247,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2206,7 +2271,7 @@ public final class Literals {
         return this;
       }
 
-      private flyteidl.core.Literals.BlobMetadata metadata_ = null;
+      private flyteidl.core.Literals.BlobMetadata metadata_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.BlobMetadata, flyteidl.core.Literals.BlobMetadata.Builder, flyteidl.core.Literals.BlobMetadataOrBuilder> metadataBuilder_;
       /**
@@ -2391,11 +2456,13 @@ public final class Literals {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2417,6 +2484,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<Blob>
         PARSER = new com.google.protobuf.AbstractParser<Blob>() {
+      @java.lang.Override
       public Blob parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2434,6 +2502,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.Blob getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2496,13 +2565,6 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Types.BlobType.Builder subBuilder = null;
               if (type_ != null) {
@@ -2514,6 +2576,13 @@ public final class Literals {
                 type_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -2533,6 +2602,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_BlobMetadata_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_BlobMetadata_fieldAccessorTable
@@ -2562,6 +2632,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2571,6 +2642,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (type_ != null) {
@@ -2579,6 +2651,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2603,14 +2676,13 @@ public final class Literals {
       }
       flyteidl.core.Literals.BlobMetadata other = (flyteidl.core.Literals.BlobMetadata) obj;
 
-      boolean result = true;
-      result = result && (hasType() == other.hasType());
+      if (hasType() != other.hasType()) return false;
       if (hasType()) {
-        result = result && getType()
-            .equals(other.getType());
+        if (!getType()
+            .equals(other.getType())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -2699,6 +2771,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2706,6 +2779,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.BlobMetadata prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2729,6 +2803,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BlobMetadata_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BlobMetadata_fieldAccessorTable
@@ -2751,6 +2826,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (typeBuilder_ == null) {
@@ -2762,15 +2838,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BlobMetadata_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BlobMetadata getDefaultInstanceForType() {
         return flyteidl.core.Literals.BlobMetadata.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BlobMetadata build() {
         flyteidl.core.Literals.BlobMetadata result = buildPartial();
         if (!result.isInitialized()) {
@@ -2779,6 +2858,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BlobMetadata buildPartial() {
         flyteidl.core.Literals.BlobMetadata result = new flyteidl.core.Literals.BlobMetadata(this);
         if (typeBuilder_ == null) {
@@ -2790,32 +2870,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.BlobMetadata) {
           return mergeFrom((flyteidl.core.Literals.BlobMetadata)other);
@@ -2835,10 +2922,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2857,7 +2946,7 @@ public final class Literals {
         return this;
       }
 
-      private flyteidl.core.Types.BlobType type_ = null;
+      private flyteidl.core.Types.BlobType type_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Types.BlobType, flyteidl.core.Types.BlobType.Builder, flyteidl.core.Types.BlobTypeOrBuilder> typeBuilder_;
       /**
@@ -2973,11 +3062,13 @@ public final class Literals {
         }
         return typeBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -2999,6 +3090,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<BlobMetadata>
         PARSER = new com.google.protobuf.AbstractParser<BlobMetadata>() {
+      @java.lang.Override
       public BlobMetadata parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3016,6 +3108,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.BlobMetadata getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3087,13 +3180,6 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
 
               value_ = input.readBytes();
@@ -3103,6 +3189,13 @@ public final class Literals {
               java.lang.String s = input.readStringRequireUtf8();
 
               tag_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -3122,6 +3215,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Binary_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Binary_fieldAccessorTable
@@ -3173,6 +3267,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3182,6 +3277,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!value_.isEmpty()) {
@@ -3193,6 +3289,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3220,13 +3317,12 @@ public final class Literals {
       }
       flyteidl.core.Literals.Binary other = (flyteidl.core.Literals.Binary) obj;
 
-      boolean result = true;
-      result = result && getValue()
-          .equals(other.getValue());
-      result = result && getTag()
-          .equals(other.getTag());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getValue()
+          .equals(other.getValue())) return false;
+      if (!getTag()
+          .equals(other.getTag())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3315,6 +3411,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3322,6 +3419,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.Binary prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3350,6 +3448,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Binary_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Binary_fieldAccessorTable
@@ -3372,6 +3471,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         value_ = com.google.protobuf.ByteString.EMPTY;
@@ -3381,15 +3481,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Binary_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Binary getDefaultInstanceForType() {
         return flyteidl.core.Literals.Binary.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Binary build() {
         flyteidl.core.Literals.Binary result = buildPartial();
         if (!result.isInitialized()) {
@@ -3398,6 +3501,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Binary buildPartial() {
         flyteidl.core.Literals.Binary result = new flyteidl.core.Literals.Binary(this);
         result.value_ = value_;
@@ -3406,32 +3510,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.Binary) {
           return mergeFrom((flyteidl.core.Literals.Binary)other);
@@ -3455,10 +3566,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3574,11 +3687,13 @@ public final class Literals {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3600,6 +3715,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<Binary>
         PARSER = new com.google.protobuf.AbstractParser<Binary>() {
+      @java.lang.Override
       public Binary parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3617,6 +3733,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.Binary getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3694,13 +3811,6 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -3720,6 +3830,13 @@ public final class Literals {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -3737,6 +3854,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Schema_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Schema_fieldAccessorTable
@@ -3800,6 +3918,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3809,6 +3928,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getUriBytes().isEmpty()) {
@@ -3820,6 +3940,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3847,16 +3968,15 @@ public final class Literals {
       }
       flyteidl.core.Literals.Schema other = (flyteidl.core.Literals.Schema) obj;
 
-      boolean result = true;
-      result = result && getUri()
-          .equals(other.getUri());
-      result = result && (hasType() == other.hasType());
+      if (!getUri()
+          .equals(other.getUri())) return false;
+      if (hasType() != other.hasType()) return false;
       if (hasType()) {
-        result = result && getType()
-            .equals(other.getType());
+        if (!getType()
+            .equals(other.getType())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -3947,6 +4067,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3954,6 +4075,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.Schema prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3981,6 +4103,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Schema_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Schema_fieldAccessorTable
@@ -4003,6 +4126,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         uri_ = "";
@@ -4016,15 +4140,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Schema_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Schema getDefaultInstanceForType() {
         return flyteidl.core.Literals.Schema.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Schema build() {
         flyteidl.core.Literals.Schema result = buildPartial();
         if (!result.isInitialized()) {
@@ -4033,6 +4160,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Schema buildPartial() {
         flyteidl.core.Literals.Schema result = new flyteidl.core.Literals.Schema(this);
         result.uri_ = uri_;
@@ -4045,32 +4173,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.Schema) {
           return mergeFrom((flyteidl.core.Literals.Schema)other);
@@ -4094,10 +4229,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4185,7 +4322,7 @@ public final class Literals {
         return this;
       }
 
-      private flyteidl.core.Types.SchemaType type_ = null;
+      private flyteidl.core.Types.SchemaType type_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Types.SchemaType, flyteidl.core.Types.SchemaType.Builder, flyteidl.core.Types.SchemaTypeOrBuilder> typeBuilder_;
       /**
@@ -4301,11 +4438,13 @@ public final class Literals {
         }
         return typeBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -4327,6 +4466,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<Schema>
         PARSER = new com.google.protobuf.AbstractParser<Schema>() {
+      @java.lang.Override
       public Schema parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4344,6 +4484,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.Schema getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -4486,13 +4627,6 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Literals.Primitive.Builder subBuilder = null;
               if (valueCase_ == 1) {
@@ -4591,6 +4725,13 @@ public final class Literals {
               valueCase_ = 7;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -4608,6 +4749,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Scalar_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Scalar_fieldAccessorTable
@@ -4846,6 +4988,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -4855,6 +4998,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (valueCase_ == 1) {
@@ -4881,6 +5025,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -4929,44 +5074,41 @@ public final class Literals {
       }
       flyteidl.core.Literals.Scalar other = (flyteidl.core.Literals.Scalar) obj;
 
-      boolean result = true;
-      result = result && getValueCase().equals(
-          other.getValueCase());
-      if (!result) return false;
+      if (!getValueCase().equals(other.getValueCase())) return false;
       switch (valueCase_) {
         case 1:
-          result = result && getPrimitive()
-              .equals(other.getPrimitive());
+          if (!getPrimitive()
+              .equals(other.getPrimitive())) return false;
           break;
         case 2:
-          result = result && getBlob()
-              .equals(other.getBlob());
+          if (!getBlob()
+              .equals(other.getBlob())) return false;
           break;
         case 3:
-          result = result && getBinary()
-              .equals(other.getBinary());
+          if (!getBinary()
+              .equals(other.getBinary())) return false;
           break;
         case 4:
-          result = result && getSchema()
-              .equals(other.getSchema());
+          if (!getSchema()
+              .equals(other.getSchema())) return false;
           break;
         case 5:
-          result = result && getNoneType()
-              .equals(other.getNoneType());
+          if (!getNoneType()
+              .equals(other.getNoneType())) return false;
           break;
         case 6:
-          result = result && getError()
-              .equals(other.getError());
+          if (!getError()
+              .equals(other.getError())) return false;
           break;
         case 7:
-          result = result && getGeneric()
-              .equals(other.getGeneric());
+          if (!getGeneric()
+              .equals(other.getGeneric())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -5083,6 +5225,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -5090,6 +5233,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.Scalar prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -5113,6 +5257,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Scalar_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Scalar_fieldAccessorTable
@@ -5135,6 +5280,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         valueCase_ = 0;
@@ -5142,15 +5288,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Scalar_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Scalar getDefaultInstanceForType() {
         return flyteidl.core.Literals.Scalar.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Scalar build() {
         flyteidl.core.Literals.Scalar result = buildPartial();
         if (!result.isInitialized()) {
@@ -5159,6 +5308,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Scalar buildPartial() {
         flyteidl.core.Literals.Scalar result = new flyteidl.core.Literals.Scalar(this);
         if (valueCase_ == 1) {
@@ -5215,32 +5365,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.Scalar) {
           return mergeFrom((flyteidl.core.Literals.Scalar)other);
@@ -5290,10 +5447,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6278,11 +6437,13 @@ public final class Literals {
         onChanged();;
         return genericBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -6304,6 +6465,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<Scalar>
         PARSER = new com.google.protobuf.AbstractParser<Scalar>() {
+      @java.lang.Override
       public Scalar parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6321,6 +6483,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.Scalar getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -6451,13 +6614,6 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Literals.Scalar.Builder subBuilder = null;
               if (valueCase_ == 1) {
@@ -6500,6 +6656,13 @@ public final class Literals {
               valueCase_ = 3;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -6517,6 +6680,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Literal_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Literal_fieldAccessorTable
@@ -6679,6 +6843,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -6688,6 +6853,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (valueCase_ == 1) {
@@ -6702,6 +6868,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -6734,28 +6901,25 @@ public final class Literals {
       }
       flyteidl.core.Literals.Literal other = (flyteidl.core.Literals.Literal) obj;
 
-      boolean result = true;
-      result = result && getValueCase().equals(
-          other.getValueCase());
-      if (!result) return false;
+      if (!getValueCase().equals(other.getValueCase())) return false;
       switch (valueCase_) {
         case 1:
-          result = result && getScalar()
-              .equals(other.getScalar());
+          if (!getScalar()
+              .equals(other.getScalar())) return false;
           break;
         case 2:
-          result = result && getCollection()
-              .equals(other.getCollection());
+          if (!getCollection()
+              .equals(other.getCollection())) return false;
           break;
         case 3:
-          result = result && getMap()
-              .equals(other.getMap());
+          if (!getMap()
+              .equals(other.getMap())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -6856,6 +7020,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -6863,6 +7028,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.Literal prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -6890,6 +7056,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Literal_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Literal_fieldAccessorTable
@@ -6912,6 +7079,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         valueCase_ = 0;
@@ -6919,15 +7087,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Literal_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Literal getDefaultInstanceForType() {
         return flyteidl.core.Literals.Literal.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Literal build() {
         flyteidl.core.Literals.Literal result = buildPartial();
         if (!result.isInitialized()) {
@@ -6936,6 +7107,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Literal buildPartial() {
         flyteidl.core.Literals.Literal result = new flyteidl.core.Literals.Literal(this);
         if (valueCase_ == 1) {
@@ -6964,32 +7136,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.Literal) {
           return mergeFrom((flyteidl.core.Literals.Literal)other);
@@ -7023,10 +7202,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -7575,11 +7756,13 @@ public final class Literals {
         onChanged();;
         return mapBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -7601,6 +7784,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<Literal>
         PARSER = new com.google.protobuf.AbstractParser<Literal>() {
+      @java.lang.Override
       public Literal parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -7618,6 +7802,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.Literal getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -7696,20 +7881,20 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 literals_ = new java.util.ArrayList<flyteidl.core.Literals.Literal>();
                 mutable_bitField0_ |= 0x00000001;
               }
               literals_.add(
                   input.readMessage(flyteidl.core.Literals.Literal.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -7720,7 +7905,7 @@ public final class Literals {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
           literals_ = java.util.Collections.unmodifiableList(literals_);
         }
         this.unknownFields = unknownFields.build();
@@ -7732,6 +7917,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_LiteralCollection_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_LiteralCollection_fieldAccessorTable
@@ -7775,6 +7961,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -7784,6 +7971,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < literals_.size(); i++) {
@@ -7792,6 +7980,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -7816,11 +8005,10 @@ public final class Literals {
       }
       flyteidl.core.Literals.LiteralCollection other = (flyteidl.core.Literals.LiteralCollection) obj;
 
-      boolean result = true;
-      result = result && getLiteralsList()
-          .equals(other.getLiteralsList());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getLiteralsList()
+          .equals(other.getLiteralsList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -7909,6 +8097,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -7916,6 +8105,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.LiteralCollection prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -7943,6 +8133,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_LiteralCollection_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_LiteralCollection_fieldAccessorTable
@@ -7966,6 +8157,7 @@ public final class Literals {
           getLiteralsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (literalsBuilder_ == null) {
@@ -7977,15 +8169,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_LiteralCollection_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.LiteralCollection getDefaultInstanceForType() {
         return flyteidl.core.Literals.LiteralCollection.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.LiteralCollection build() {
         flyteidl.core.Literals.LiteralCollection result = buildPartial();
         if (!result.isInitialized()) {
@@ -7994,11 +8189,12 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.LiteralCollection buildPartial() {
         flyteidl.core.Literals.LiteralCollection result = new flyteidl.core.Literals.LiteralCollection(this);
         int from_bitField0_ = bitField0_;
         if (literalsBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          if (((bitField0_ & 0x00000001) != 0)) {
             literals_ = java.util.Collections.unmodifiableList(literals_);
             bitField0_ = (bitField0_ & ~0x00000001);
           }
@@ -8010,32 +8206,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.LiteralCollection) {
           return mergeFrom((flyteidl.core.Literals.LiteralCollection)other);
@@ -8078,10 +8281,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8104,7 +8309,7 @@ public final class Literals {
       private java.util.List<flyteidl.core.Literals.Literal> literals_ =
         java.util.Collections.emptyList();
       private void ensureLiteralsIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+        if (!((bitField0_ & 0x00000001) != 0)) {
           literals_ = new java.util.ArrayList<flyteidl.core.Literals.Literal>(literals_);
           bitField0_ |= 0x00000001;
          }
@@ -8333,18 +8538,20 @@ public final class Literals {
           literalsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Literals.Literal, flyteidl.core.Literals.Literal.Builder, flyteidl.core.Literals.LiteralOrBuilder>(
                   literals_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  ((bitField0_ & 0x00000001) != 0),
                   getParentForChildren(),
                   isClean());
           literals_ = null;
         }
         return literalsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -8366,6 +8573,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<LiteralCollection>
         PARSER = new com.google.protobuf.AbstractParser<LiteralCollection>() {
+      @java.lang.Override
       public LiteralCollection parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8383,6 +8591,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.LiteralCollection getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -8470,15 +8679,8 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 literals_ = com.google.protobuf.MapField.newMapField(
                     LiteralsDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000001;
@@ -8488,6 +8690,13 @@ public final class Literals {
                   LiteralsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
               literals_.getMutableMap().put(
                   literals__.getKey(), literals__.getValue());
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -8508,6 +8717,7 @@ public final class Literals {
     }
 
     @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
     protected com.google.protobuf.MapField internalGetMapField(
         int number) {
       switch (number) {
@@ -8518,6 +8728,7 @@ public final class Literals {
               "Invalid map field number: " + number);
       }
     }
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_LiteralMap_fieldAccessorTable
@@ -8602,6 +8813,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -8611,6 +8823,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       com.google.protobuf.GeneratedMessageV3
@@ -8622,6 +8835,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -8652,11 +8866,10 @@ public final class Literals {
       }
       flyteidl.core.Literals.LiteralMap other = (flyteidl.core.Literals.LiteralMap) obj;
 
-      boolean result = true;
-      result = result && internalGetLiterals().equals(
-          other.internalGetLiterals());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!internalGetLiterals().equals(
+          other.internalGetLiterals())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -8745,6 +8958,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -8752,6 +8966,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.LiteralMap prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -8801,6 +9016,7 @@ public final class Literals {
                 "Invalid map field number: " + number);
         }
       }
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_LiteralMap_fieldAccessorTable
@@ -8823,21 +9039,25 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         internalGetMutableLiterals().clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_LiteralMap_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.LiteralMap getDefaultInstanceForType() {
         return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.LiteralMap build() {
         flyteidl.core.Literals.LiteralMap result = buildPartial();
         if (!result.isInitialized()) {
@@ -8846,6 +9066,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.LiteralMap buildPartial() {
         flyteidl.core.Literals.LiteralMap result = new flyteidl.core.Literals.LiteralMap(this);
         int from_bitField0_ = bitField0_;
@@ -8855,32 +9076,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.LiteralMap) {
           return mergeFrom((flyteidl.core.Literals.LiteralMap)other);
@@ -8899,10 +9127,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9044,11 +9274,13 @@ public final class Literals {
             .putAll(values);
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -9070,6 +9302,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<LiteralMap>
         PARSER = new com.google.protobuf.AbstractParser<LiteralMap>() {
+      @java.lang.Override
       public LiteralMap parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9087,6 +9320,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.LiteralMap getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -9165,20 +9399,20 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 bindings_ = new java.util.ArrayList<flyteidl.core.Literals.BindingData>();
                 mutable_bitField0_ |= 0x00000001;
               }
               bindings_.add(
                   input.readMessage(flyteidl.core.Literals.BindingData.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -9189,7 +9423,7 @@ public final class Literals {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
           bindings_ = java.util.Collections.unmodifiableList(bindings_);
         }
         this.unknownFields = unknownFields.build();
@@ -9201,6 +9435,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_BindingDataCollection_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_BindingDataCollection_fieldAccessorTable
@@ -9244,6 +9479,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -9253,6 +9489,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < bindings_.size(); i++) {
@@ -9261,6 +9498,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -9285,11 +9523,10 @@ public final class Literals {
       }
       flyteidl.core.Literals.BindingDataCollection other = (flyteidl.core.Literals.BindingDataCollection) obj;
 
-      boolean result = true;
-      result = result && getBindingsList()
-          .equals(other.getBindingsList());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getBindingsList()
+          .equals(other.getBindingsList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -9378,6 +9615,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -9385,6 +9623,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.BindingDataCollection prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -9412,6 +9651,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BindingDataCollection_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BindingDataCollection_fieldAccessorTable
@@ -9435,6 +9675,7 @@ public final class Literals {
           getBindingsFieldBuilder();
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (bindingsBuilder_ == null) {
@@ -9446,15 +9687,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BindingDataCollection_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BindingDataCollection getDefaultInstanceForType() {
         return flyteidl.core.Literals.BindingDataCollection.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BindingDataCollection build() {
         flyteidl.core.Literals.BindingDataCollection result = buildPartial();
         if (!result.isInitialized()) {
@@ -9463,11 +9707,12 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BindingDataCollection buildPartial() {
         flyteidl.core.Literals.BindingDataCollection result = new flyteidl.core.Literals.BindingDataCollection(this);
         int from_bitField0_ = bitField0_;
         if (bindingsBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          if (((bitField0_ & 0x00000001) != 0)) {
             bindings_ = java.util.Collections.unmodifiableList(bindings_);
             bitField0_ = (bitField0_ & ~0x00000001);
           }
@@ -9479,32 +9724,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.BindingDataCollection) {
           return mergeFrom((flyteidl.core.Literals.BindingDataCollection)other);
@@ -9547,10 +9799,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9573,7 +9827,7 @@ public final class Literals {
       private java.util.List<flyteidl.core.Literals.BindingData> bindings_ =
         java.util.Collections.emptyList();
       private void ensureBindingsIsMutable() {
-        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+        if (!((bitField0_ & 0x00000001) != 0)) {
           bindings_ = new java.util.ArrayList<flyteidl.core.Literals.BindingData>(bindings_);
           bitField0_ |= 0x00000001;
          }
@@ -9802,18 +10056,20 @@ public final class Literals {
           bindingsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Literals.BindingData, flyteidl.core.Literals.BindingData.Builder, flyteidl.core.Literals.BindingDataOrBuilder>(
                   bindings_,
-                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  ((bitField0_ & 0x00000001) != 0),
                   getParentForChildren(),
                   isClean());
           bindings_ = null;
         }
         return bindingsBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -9835,6 +10091,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<BindingDataCollection>
         PARSER = new com.google.protobuf.AbstractParser<BindingDataCollection>() {
+      @java.lang.Override
       public BindingDataCollection parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9852,6 +10109,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.BindingDataCollection getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -9939,15 +10197,8 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 bindings_ = com.google.protobuf.MapField.newMapField(
                     BindingsDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000001;
@@ -9957,6 +10208,13 @@ public final class Literals {
                   BindingsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
               bindings_.getMutableMap().put(
                   bindings__.getKey(), bindings__.getValue());
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -9977,6 +10235,7 @@ public final class Literals {
     }
 
     @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
     protected com.google.protobuf.MapField internalGetMapField(
         int number) {
       switch (number) {
@@ -9987,6 +10246,7 @@ public final class Literals {
               "Invalid map field number: " + number);
       }
     }
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_BindingDataMap_fieldAccessorTable
@@ -10071,6 +10331,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -10080,6 +10341,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       com.google.protobuf.GeneratedMessageV3
@@ -10091,6 +10353,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -10121,11 +10384,10 @@ public final class Literals {
       }
       flyteidl.core.Literals.BindingDataMap other = (flyteidl.core.Literals.BindingDataMap) obj;
 
-      boolean result = true;
-      result = result && internalGetBindings().equals(
-          other.internalGetBindings());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!internalGetBindings().equals(
+          other.internalGetBindings())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -10214,6 +10476,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -10221,6 +10484,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.BindingDataMap prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -10270,6 +10534,7 @@ public final class Literals {
                 "Invalid map field number: " + number);
         }
       }
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BindingDataMap_fieldAccessorTable
@@ -10292,21 +10557,25 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         internalGetMutableBindings().clear();
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BindingDataMap_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BindingDataMap getDefaultInstanceForType() {
         return flyteidl.core.Literals.BindingDataMap.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BindingDataMap build() {
         flyteidl.core.Literals.BindingDataMap result = buildPartial();
         if (!result.isInitialized()) {
@@ -10315,6 +10584,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BindingDataMap buildPartial() {
         flyteidl.core.Literals.BindingDataMap result = new flyteidl.core.Literals.BindingDataMap(this);
         int from_bitField0_ = bitField0_;
@@ -10324,32 +10594,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.BindingDataMap) {
           return mergeFrom((flyteidl.core.Literals.BindingDataMap)other);
@@ -10368,10 +10645,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10513,11 +10792,13 @@ public final class Literals {
             .putAll(values);
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -10539,6 +10820,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<BindingDataMap>
         PARSER = new com.google.protobuf.AbstractParser<BindingDataMap>() {
+      @java.lang.Override
       public BindingDataMap parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10556,6 +10838,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.BindingDataMap getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -10714,13 +10997,6 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               flyteidl.core.Literals.Scalar.Builder subBuilder = null;
               if (valueCase_ == 1) {
@@ -10777,6 +11053,13 @@ public final class Literals {
               valueCase_ = 4;
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -10794,6 +11077,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_BindingData_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_BindingData_fieldAccessorTable
@@ -10999,6 +11283,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -11008,6 +11293,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (valueCase_ == 1) {
@@ -11025,6 +11311,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -11061,32 +11348,29 @@ public final class Literals {
       }
       flyteidl.core.Literals.BindingData other = (flyteidl.core.Literals.BindingData) obj;
 
-      boolean result = true;
-      result = result && getValueCase().equals(
-          other.getValueCase());
-      if (!result) return false;
+      if (!getValueCase().equals(other.getValueCase())) return false;
       switch (valueCase_) {
         case 1:
-          result = result && getScalar()
-              .equals(other.getScalar());
+          if (!getScalar()
+              .equals(other.getScalar())) return false;
           break;
         case 2:
-          result = result && getCollection()
-              .equals(other.getCollection());
+          if (!getCollection()
+              .equals(other.getCollection())) return false;
           break;
         case 3:
-          result = result && getPromise()
-              .equals(other.getPromise());
+          if (!getPromise()
+              .equals(other.getPromise())) return false;
           break;
         case 4:
-          result = result && getMap()
-              .equals(other.getMap());
+          if (!getMap()
+              .equals(other.getMap())) return false;
           break;
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -11191,6 +11475,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -11198,6 +11483,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.BindingData prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -11225,6 +11511,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BindingData_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BindingData_fieldAccessorTable
@@ -11247,6 +11534,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         valueCase_ = 0;
@@ -11254,15 +11542,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_BindingData_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BindingData getDefaultInstanceForType() {
         return flyteidl.core.Literals.BindingData.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BindingData build() {
         flyteidl.core.Literals.BindingData result = buildPartial();
         if (!result.isInitialized()) {
@@ -11271,6 +11562,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.BindingData buildPartial() {
         flyteidl.core.Literals.BindingData result = new flyteidl.core.Literals.BindingData(this);
         if (valueCase_ == 1) {
@@ -11306,32 +11598,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.BindingData) {
           return mergeFrom((flyteidl.core.Literals.BindingData)other);
@@ -11369,10 +11668,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12102,11 +12403,13 @@ public final class Literals {
         onChanged();;
         return mapBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -12128,6 +12431,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<BindingData>
         PARSER = new com.google.protobuf.AbstractParser<BindingData>() {
+      @java.lang.Override
       public BindingData parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12145,6 +12449,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.BindingData getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -12242,13 +12547,6 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -12268,6 +12566,13 @@ public final class Literals {
 
               break;
             }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -12285,6 +12590,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Binding_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Binding_fieldAccessorTable
@@ -12368,6 +12674,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -12377,6 +12684,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getVarBytes().isEmpty()) {
@@ -12388,6 +12696,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -12415,16 +12724,15 @@ public final class Literals {
       }
       flyteidl.core.Literals.Binding other = (flyteidl.core.Literals.Binding) obj;
 
-      boolean result = true;
-      result = result && getVar()
-          .equals(other.getVar());
-      result = result && (hasBinding() == other.hasBinding());
+      if (!getVar()
+          .equals(other.getVar())) return false;
+      if (hasBinding() != other.hasBinding()) return false;
       if (hasBinding()) {
-        result = result && getBinding()
-            .equals(other.getBinding());
+        if (!getBinding()
+            .equals(other.getBinding())) return false;
       }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -12515,6 +12823,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -12522,6 +12831,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.Binding prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -12549,6 +12859,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Binding_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Binding_fieldAccessorTable
@@ -12571,6 +12882,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         var_ = "";
@@ -12584,15 +12896,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Binding_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Binding getDefaultInstanceForType() {
         return flyteidl.core.Literals.Binding.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Binding build() {
         flyteidl.core.Literals.Binding result = buildPartial();
         if (!result.isInitialized()) {
@@ -12601,6 +12916,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.Binding buildPartial() {
         flyteidl.core.Literals.Binding result = new flyteidl.core.Literals.Binding(this);
         result.var_ = var_;
@@ -12613,32 +12929,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.Binding) {
           return mergeFrom((flyteidl.core.Literals.Binding)other);
@@ -12662,10 +12985,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12773,7 +13098,7 @@ public final class Literals {
         return this;
       }
 
-      private flyteidl.core.Literals.BindingData binding_ = null;
+      private flyteidl.core.Literals.BindingData binding_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.BindingData, flyteidl.core.Literals.BindingData.Builder, flyteidl.core.Literals.BindingDataOrBuilder> bindingBuilder_;
       /**
@@ -12925,11 +13250,13 @@ public final class Literals {
         }
         return bindingBuilder_;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -12951,6 +13278,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<Binding>
         PARSER = new com.google.protobuf.AbstractParser<Binding>() {
+      @java.lang.Override
       public Binding parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12968,6 +13296,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.Binding getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -13059,13 +13388,6 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -13076,6 +13398,13 @@ public final class Literals {
               java.lang.String s = input.readStringRequireUtf8();
 
               value_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -13095,6 +13424,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_KeyValuePair_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_KeyValuePair_fieldAccessorTable
@@ -13187,6 +13517,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -13196,6 +13527,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getKeyBytes().isEmpty()) {
@@ -13207,6 +13539,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -13233,13 +13566,12 @@ public final class Literals {
       }
       flyteidl.core.Literals.KeyValuePair other = (flyteidl.core.Literals.KeyValuePair) obj;
 
-      boolean result = true;
-      result = result && getKey()
-          .equals(other.getKey());
-      result = result && getValue()
-          .equals(other.getValue());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (!getKey()
+          .equals(other.getKey())) return false;
+      if (!getValue()
+          .equals(other.getValue())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -13328,6 +13660,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -13335,6 +13668,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.KeyValuePair prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -13362,6 +13696,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_KeyValuePair_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_KeyValuePair_fieldAccessorTable
@@ -13384,6 +13719,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         key_ = "";
@@ -13393,15 +13729,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_KeyValuePair_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.KeyValuePair getDefaultInstanceForType() {
         return flyteidl.core.Literals.KeyValuePair.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.KeyValuePair build() {
         flyteidl.core.Literals.KeyValuePair result = buildPartial();
         if (!result.isInitialized()) {
@@ -13410,6 +13749,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.KeyValuePair buildPartial() {
         flyteidl.core.Literals.KeyValuePair result = new flyteidl.core.Literals.KeyValuePair(this);
         result.key_ = key_;
@@ -13418,32 +13758,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.KeyValuePair) {
           return mergeFrom((flyteidl.core.Literals.KeyValuePair)other);
@@ -13468,10 +13815,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -13667,11 +14016,13 @@ public final class Literals {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -13693,6 +14044,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<KeyValuePair>
         PARSER = new com.google.protobuf.AbstractParser<KeyValuePair>() {
+      @java.lang.Override
       public KeyValuePair parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -13710,6 +14062,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.KeyValuePair getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -13747,7 +14100,6 @@ public final class Literals {
       super(builder);
     }
     private RetryStrategy() {
-      retries_ = 0;
     }
 
     @java.lang.Override
@@ -13774,16 +14126,16 @@ public final class Literals {
             case 0:
               done = true;
               break;
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
             case 40: {
 
               retries_ = input.readUInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
               break;
             }
           }
@@ -13803,6 +14155,7 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_RetryStrategy_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return flyteidl.core.Literals.internal_static_flyteidl_core_RetryStrategy_fieldAccessorTable
@@ -13825,6 +14178,7 @@ public final class Literals {
     }
 
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -13834,6 +14188,7 @@ public final class Literals {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (retries_ != 0) {
@@ -13842,6 +14197,7 @@ public final class Literals {
       unknownFields.writeTo(output);
     }
 
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -13866,11 +14222,10 @@ public final class Literals {
       }
       flyteidl.core.Literals.RetryStrategy other = (flyteidl.core.Literals.RetryStrategy) obj;
 
-      boolean result = true;
-      result = result && (getRetries()
-          == other.getRetries());
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+      if (getRetries()
+          != other.getRetries()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
     }
 
     @java.lang.Override
@@ -13957,6 +14312,7 @@ public final class Literals {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -13964,6 +14320,7 @@ public final class Literals {
     public static Builder newBuilder(flyteidl.core.Literals.RetryStrategy prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -13991,6 +14348,7 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_RetryStrategy_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_RetryStrategy_fieldAccessorTable
@@ -14013,6 +14371,7 @@ public final class Literals {
                 .alwaysUseFieldBuilders) {
         }
       }
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         retries_ = 0;
@@ -14020,15 +14379,18 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return flyteidl.core.Literals.internal_static_flyteidl_core_RetryStrategy_descriptor;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.RetryStrategy getDefaultInstanceForType() {
         return flyteidl.core.Literals.RetryStrategy.getDefaultInstance();
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.RetryStrategy build() {
         flyteidl.core.Literals.RetryStrategy result = buildPartial();
         if (!result.isInitialized()) {
@@ -14037,6 +14399,7 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public flyteidl.core.Literals.RetryStrategy buildPartial() {
         flyteidl.core.Literals.RetryStrategy result = new flyteidl.core.Literals.RetryStrategy(this);
         result.retries_ = retries_;
@@ -14044,32 +14407,39 @@ public final class Literals {
         return result;
       }
 
+      @java.lang.Override
       public Builder clone() {
-        return (Builder) super.clone();
+        return super.clone();
       }
+      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.setField(field, value);
+        return super.setField(field, value);
       }
+      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
+        return super.clearField(field);
       }
+      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
+        return super.clearOneof(oneof);
       }
+      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
+        return super.setRepeatedField(field, index, value);
       }
+      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
+        return super.addRepeatedField(field, value);
       }
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof flyteidl.core.Literals.RetryStrategy) {
           return mergeFrom((flyteidl.core.Literals.RetryStrategy)other);
@@ -14089,10 +14459,12 @@ public final class Literals {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -14151,11 +14523,13 @@ public final class Literals {
         onChanged();
         return this;
       }
+      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return super.setUnknownFields(unknownFields);
       }
 
+      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -14177,6 +14551,7 @@ public final class Literals {
 
     private static final com.google.protobuf.Parser<RetryStrategy>
         PARSER = new com.google.protobuf.AbstractParser<RetryStrategy>() {
+      @java.lang.Override
       public RetryStrategy parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -14194,6 +14569,7 @@ public final class Literals {
       return PARSER;
     }
 
+    @java.lang.Override
     public flyteidl.core.Literals.RetryStrategy getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }

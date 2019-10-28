@@ -6,37 +6,27 @@
 #include <algorithm>
 
 #include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/port.h>
-#include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/extension_set.h>
 #include <google/protobuf/wire_format_lite_inl.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
-// This is a temporary google only hack
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-#include "third_party/protobuf/version.h"
-#endif
 // @@protoc_insertion_point(includes)
+#include <google/protobuf/port_def.inc>
+
 namespace flyteidl {
 namespace plugins {
 class ArrayJobDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<ArrayJob>
-      _instance;
+  ::google::protobuf::internal::ExplicitlyConstructed<ArrayJob> _instance;
 } _ArrayJob_default_instance_;
 }  // namespace plugins
 }  // namespace flyteidl
-namespace protobuf_flyteidl_2fplugins_2farray_5fjob_2eproto {
-void InitDefaultsArrayJobImpl() {
+static void InitDefaultsArrayJob_flyteidl_2fplugins_2farray_5fjob_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
-#else
-  ::google::protobuf::internal::InitProtobufDefaults();
-#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::flyteidl::plugins::_ArrayJob_default_instance_;
     new (ptr) ::flyteidl::plugins::ArrayJob();
@@ -45,24 +35,28 @@ void InitDefaultsArrayJobImpl() {
   ::flyteidl::plugins::ArrayJob::InitAsDefaultInstance();
 }
 
-void InitDefaultsArrayJob() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &InitDefaultsArrayJobImpl);
+::google::protobuf::internal::SCCInfo<0> scc_info_ArrayJob_flyteidl_2fplugins_2farray_5fjob_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsArrayJob_flyteidl_2fplugins_2farray_5fjob_2eproto}, {}};
+
+void InitDefaults_flyteidl_2fplugins_2farray_5fjob_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_ArrayJob_flyteidl_2fplugins_2farray_5fjob_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata[1];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fplugins_2farray_5fjob_2eproto[1];
+constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fplugins_2farray_5fjob_2eproto = nullptr;
+constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fplugins_2farray_5fjob_2eproto = nullptr;
 
-const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2farray_5fjob_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, parallelism_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, size_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, min_successes_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, parallelism_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, size_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, min_successes_),
 };
-static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
+static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::plugins::ArrayJob)},
 };
 
@@ -70,51 +64,34 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::_ArrayJob_default_instance_),
 };
 
-void protobuf_AssignDescriptors() {
-  AddDescriptors();
-  ::google::protobuf::MessageFactory* factory = NULL;
-  AssignDescriptors(
-      "flyteidl/plugins/array_job.proto", schemas, file_default_instances, TableStruct::offsets, factory,
-      file_level_metadata, NULL, NULL);
-}
+::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fplugins_2farray_5fjob_2eproto = {
+  {}, AddDescriptors_flyteidl_2fplugins_2farray_5fjob_2eproto, "flyteidl/plugins/array_job.proto", schemas,
+  file_default_instances, TableStruct_flyteidl_2fplugins_2farray_5fjob_2eproto::offsets,
+  file_level_metadata_flyteidl_2fplugins_2farray_5fjob_2eproto, 1, file_level_enum_descriptors_flyteidl_2fplugins_2farray_5fjob_2eproto, file_level_service_descriptors_flyteidl_2fplugins_2farray_5fjob_2eproto,
+};
 
-void protobuf_AssignDescriptorsOnce() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &protobuf_AssignDescriptors);
-}
+const char descriptor_table_protodef_flyteidl_2fplugins_2farray_5fjob_2eproto[] =
+  "\n flyteidl/plugins/array_job.proto\022\020flyt"
+  "eidl.plugins\"D\n\010ArrayJob\022\023\n\013parallelism\030"
+  "\001 \001(\003\022\014\n\004size\030\002 \001(\003\022\025\n\rmin_successes\030\003 \001"
+  "(\003B5Z3github.com/lyft/flyteidl/gen/pb-go"
+  "/flyteidl/pluginsb\006proto3"
+  ;
+::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2farray_5fjob_2eproto = {
+  false, InitDefaults_flyteidl_2fplugins_2farray_5fjob_2eproto, 
+  descriptor_table_protodef_flyteidl_2fplugins_2farray_5fjob_2eproto,
+  "flyteidl/plugins/array_job.proto", &assign_descriptors_table_flyteidl_2fplugins_2farray_5fjob_2eproto, 185,
+};
 
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
-void protobuf_RegisterTypes(const ::std::string&) {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 1);
-}
-
-void AddDescriptorsImpl() {
-  InitDefaults();
-  static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n flyteidl/plugins/array_job.proto\022\020flyt"
-      "eidl.plugins\"D\n\010ArrayJob\022\023\n\013parallelism\030"
-      "\001 \001(\003\022\014\n\004size\030\002 \001(\003\022\025\n\rmin_successes\030\003 \001"
-      "(\003B5Z3github.com/lyft/flyteidl/gen/pb-go"
-      "/flyteidl/pluginsb\006proto3"
+void AddDescriptors_flyteidl_2fplugins_2farray_5fjob_2eproto() {
+  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
+  {
   };
-  ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 185);
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
-    "flyteidl/plugins/array_job.proto", &protobuf_RegisterTypes);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fplugins_2farray_5fjob_2eproto, deps, 0);
 }
 
-void AddDescriptors() {
-  static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
-  ::google::protobuf::GoogleOnceInit(&once, &AddDescriptorsImpl);
-}
-// Force AddDescriptors() to be called at dynamic initialization time.
-struct StaticDescriptorInitializer {
-  StaticDescriptorInitializer() {
-    AddDescriptors();
-  }
-} static_descriptor_initializer;
-}  // namespace protobuf_flyteidl_2fplugins_2farray_5fjob_2eproto
+// Force running AddDescriptors() at dynamic initialization time.
+static bool dynamic_init_dummy_flyteidl_2fplugins_2farray_5fjob_2eproto = []() { AddDescriptors_flyteidl_2fplugins_2farray_5fjob_2eproto(); return true; }();
 namespace flyteidl {
 namespace plugins {
 
@@ -122,6 +99,10 @@ namespace plugins {
 
 void ArrayJob::InitAsDefaultInstance() {
 }
+class ArrayJob::HasBitSetters {
+ public:
+};
+
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int ArrayJob::kParallelismFieldNumber;
 const int ArrayJob::kSizeFieldNumber;
@@ -129,17 +110,13 @@ const int ArrayJob::kMinSuccessesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ArrayJob::ArrayJob()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
-    ::protobuf_flyteidl_2fplugins_2farray_5fjob_2eproto::InitDefaultsArrayJob();
-  }
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:flyteidl.plugins.ArrayJob)
 }
 ArrayJob::ArrayJob(const ArrayJob& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _cached_size_(0) {
+      _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::memcpy(&parallelism_, &from.parallelism_,
     static_cast<size_t>(reinterpret_cast<char*>(&min_successes_) -
@@ -151,7 +128,6 @@ void ArrayJob::SharedCtor() {
   ::memset(&parallelism_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&min_successes_) -
       reinterpret_cast<char*>(&parallelism_)) + sizeof(min_successes_));
-  _cached_size_ = 0;
 }
 
 ArrayJob::~ArrayJob() {
@@ -163,27 +139,13 @@ void ArrayJob::SharedDtor() {
 }
 
 void ArrayJob::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  _cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* ArrayJob::descriptor() {
-  ::protobuf_flyteidl_2fplugins_2farray_5fjob_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2farray_5fjob_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
 const ArrayJob& ArrayJob::default_instance() {
-  ::protobuf_flyteidl_2fplugins_2farray_5fjob_2eproto::InitDefaultsArrayJob();
+  ::google::protobuf::internal::InitSCC(&::scc_info_ArrayJob_flyteidl_2fplugins_2farray_5fjob_2eproto.base);
   return *internal_default_instance();
 }
 
-ArrayJob* ArrayJob::New(::google::protobuf::Arena* arena) const {
-  ArrayJob* n = new ArrayJob;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void ArrayJob::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.plugins.ArrayJob)
@@ -197,20 +159,70 @@ void ArrayJob::Clear() {
   _internal_metadata_.Clear();
 }
 
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* ArrayJob::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<ArrayJob*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // int64 parallelism = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        msg->set_parallelism(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // int64 size = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
+        msg->set_size(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // int64 min_successes = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
+        msg->set_min_successes(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool ArrayJob::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.plugins.ArrayJob)
   for (;;) {
-    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
       // int64 parallelism = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
@@ -223,8 +235,7 @@ bool ArrayJob::MergePartialFromCodedStream(
 
       // int64 size = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(16u /* 16 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
@@ -237,8 +248,7 @@ bool ArrayJob::MergePartialFromCodedStream(
 
       // int64 min_successes = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(24u /* 24 & 0xFF */)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
@@ -268,6 +278,7 @@ failure:
   return false;
 #undef DO_
 }
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
 void ArrayJob::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
@@ -290,16 +301,15 @@ void ArrayJob::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->min_successes(), output);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
+        _internal_metadata_.unknown_fields(), output);
   }
   // @@protoc_insertion_point(serialize_end:flyteidl.plugins.ArrayJob)
 }
 
 ::google::protobuf::uint8* ArrayJob::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+    ::google::protobuf::uint8* target) const {
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.plugins.ArrayJob)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -319,9 +329,9 @@ void ArrayJob::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->min_successes(), target);
   }
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), target);
+        _internal_metadata_.unknown_fields(), target);
   }
   // @@protoc_insertion_point(serialize_to_array_end:flyteidl.plugins.ArrayJob)
   return target;
@@ -331,11 +341,15 @@ size_t ArrayJob::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:flyteidl.plugins.ArrayJob)
   size_t total_size = 0;
 
-  if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
+  if (_internal_metadata_.have_unknown_fields()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
+        _internal_metadata_.unknown_fields());
   }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
   // int64 parallelism = 1;
   if (this->parallelism() != 0) {
     total_size += 1 +
@@ -358,9 +372,7 @@ size_t ArrayJob::ByteSizeLong() const {
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = cached_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  SetCachedSize(cached_size);
   return total_size;
 }
 
@@ -368,9 +380,9 @@ void ArrayJob::MergeFrom(const ::google::protobuf::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:flyteidl.plugins.ArrayJob)
   GOOGLE_DCHECK_NE(&from, this);
   const ArrayJob* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const ArrayJob>(
+      ::google::protobuf::DynamicCastToGenerated<ArrayJob>(
           &from);
-  if (source == NULL) {
+  if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.plugins.ArrayJob)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
@@ -421,21 +433,28 @@ void ArrayJob::Swap(ArrayJob* other) {
 }
 void ArrayJob::InternalSwap(ArrayJob* other) {
   using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(parallelism_, other->parallelism_);
   swap(size_, other->size_);
   swap(min_successes_, other->min_successes_);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_cached_size_, other->_cached_size_);
 }
 
 ::google::protobuf::Metadata ArrayJob::GetMetadata() const {
-  protobuf_flyteidl_2fplugins_2farray_5fjob_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_flyteidl_2fplugins_2farray_5fjob_2eproto::file_level_metadata[kIndexInFileMessages];
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2farray_5fjob_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2farray_5fjob_2eproto[kIndexInFileMessages];
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace plugins
 }  // namespace flyteidl
+namespace google {
+namespace protobuf {
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::ArrayJob* Arena::CreateMaybeMessage< ::flyteidl::plugins::ArrayJob >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::ArrayJob >(arena);
+}
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
+#include <google/protobuf/port_undef.inc>

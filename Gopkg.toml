@@ -23,7 +23,10 @@
 #   go-tests = true
 #   unused-packages = true
 
-required = ["github.com/envoyproxy/protoc-gen-validate"]
+required = [
+  "github.com/envoyproxy/protoc-gen-validate",
+  "github.com/vektra/mockery/cmd/mockery"
+  ]
 
 [[constraint]]
   name = "github.com/golang/protobuf"
@@ -56,6 +59,18 @@ required = ["github.com/envoyproxy/protoc-gen-validate"]
 [[constraint]]
   name = "google.golang.org/grpc"
   version = "1.16.0"
+
+[[constraint]]
+  name = "github.com/vektra/mockery"
+  source = "github.com/enghabu/mockery"
+
+[[override]]
+  name = "k8s.io/apimachinery"
+  version = "kubernetes-1.16.2"
+
+[[override]]
+  name = "k8s.io/client-go"
+  version = "kubernetes-1.16.2"
 
 [prune]
   go-tests = true
