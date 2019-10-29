@@ -11438,6 +11438,271 @@ export const flyteidl = $root.flyteidl = (() => {
             return NamedEntityIdentifier;
         })();
 
+        admin.NamedEntityMetadata = (function() {
+
+            /**
+             * Properties of a NamedEntityMetadata.
+             * @memberof flyteidl.admin
+             * @interface INamedEntityMetadata
+             * @property {string|null} [description] NamedEntityMetadata description
+             */
+
+            /**
+             * Constructs a new NamedEntityMetadata.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a NamedEntityMetadata.
+             * @implements INamedEntityMetadata
+             * @constructor
+             * @param {flyteidl.admin.INamedEntityMetadata=} [properties] Properties to set
+             */
+            function NamedEntityMetadata(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * NamedEntityMetadata description.
+             * @member {string} description
+             * @memberof flyteidl.admin.NamedEntityMetadata
+             * @instance
+             */
+            NamedEntityMetadata.prototype.description = "";
+
+            /**
+             * Creates a new NamedEntityMetadata instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.NamedEntityMetadata
+             * @static
+             * @param {flyteidl.admin.INamedEntityMetadata=} [properties] Properties to set
+             * @returns {flyteidl.admin.NamedEntityMetadata} NamedEntityMetadata instance
+             */
+            NamedEntityMetadata.create = function create(properties) {
+                return new NamedEntityMetadata(properties);
+            };
+
+            /**
+             * Encodes the specified NamedEntityMetadata message. Does not implicitly {@link flyteidl.admin.NamedEntityMetadata.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.NamedEntityMetadata
+             * @static
+             * @param {flyteidl.admin.INamedEntityMetadata} message NamedEntityMetadata message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            NamedEntityMetadata.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.description != null && message.hasOwnProperty("description"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.description);
+                return writer;
+            };
+
+            /**
+             * Decodes a NamedEntityMetadata message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.NamedEntityMetadata
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.NamedEntityMetadata} NamedEntityMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            NamedEntityMetadata.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.NamedEntityMetadata();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.description = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a NamedEntityMetadata message.
+             * @function verify
+             * @memberof flyteidl.admin.NamedEntityMetadata
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            NamedEntityMetadata.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.description != null && message.hasOwnProperty("description"))
+                    if (!$util.isString(message.description))
+                        return "description: string expected";
+                return null;
+            };
+
+            return NamedEntityMetadata;
+        })();
+
+        admin.NamedEntity = (function() {
+
+            /**
+             * Properties of a NamedEntity.
+             * @memberof flyteidl.admin
+             * @interface INamedEntity
+             * @property {flyteidl.core.ResourceType|null} [resourceType] NamedEntity resourceType
+             * @property {flyteidl.admin.INamedEntityIdentifier|null} [id] NamedEntity id
+             * @property {flyteidl.admin.INamedEntityMetadata|null} [metadata] NamedEntity metadata
+             */
+
+            /**
+             * Constructs a new NamedEntity.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a NamedEntity.
+             * @implements INamedEntity
+             * @constructor
+             * @param {flyteidl.admin.INamedEntity=} [properties] Properties to set
+             */
+            function NamedEntity(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * NamedEntity resourceType.
+             * @member {flyteidl.core.ResourceType} resourceType
+             * @memberof flyteidl.admin.NamedEntity
+             * @instance
+             */
+            NamedEntity.prototype.resourceType = 0;
+
+            /**
+             * NamedEntity id.
+             * @member {flyteidl.admin.INamedEntityIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.NamedEntity
+             * @instance
+             */
+            NamedEntity.prototype.id = null;
+
+            /**
+             * NamedEntity metadata.
+             * @member {flyteidl.admin.INamedEntityMetadata|null|undefined} metadata
+             * @memberof flyteidl.admin.NamedEntity
+             * @instance
+             */
+            NamedEntity.prototype.metadata = null;
+
+            /**
+             * Creates a new NamedEntity instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.NamedEntity
+             * @static
+             * @param {flyteidl.admin.INamedEntity=} [properties] Properties to set
+             * @returns {flyteidl.admin.NamedEntity} NamedEntity instance
+             */
+            NamedEntity.create = function create(properties) {
+                return new NamedEntity(properties);
+            };
+
+            /**
+             * Encodes the specified NamedEntity message. Does not implicitly {@link flyteidl.admin.NamedEntity.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.NamedEntity
+             * @static
+             * @param {flyteidl.admin.INamedEntity} message NamedEntity message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            NamedEntity.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.resourceType);
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.admin.NamedEntityIdentifier.encode(message.id, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.metadata != null && message.hasOwnProperty("metadata"))
+                    $root.flyteidl.admin.NamedEntityMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a NamedEntity message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.NamedEntity
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.NamedEntity} NamedEntity
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            NamedEntity.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.NamedEntity();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.resourceType = reader.int32();
+                        break;
+                    case 2:
+                        message.id = $root.flyteidl.admin.NamedEntityIdentifier.decode(reader, reader.uint32());
+                        break;
+                    case 3:
+                        message.metadata = $root.flyteidl.admin.NamedEntityMetadata.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a NamedEntity message.
+             * @function verify
+             * @memberof flyteidl.admin.NamedEntity
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            NamedEntity.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                    switch (message.resourceType) {
+                    default:
+                        return "resourceType: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                        break;
+                    }
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.admin.NamedEntityIdentifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                    let error = $root.flyteidl.admin.NamedEntityMetadata.verify(message.metadata);
+                    if (error)
+                        return "metadata." + error;
+                }
+                return null;
+            };
+
+            return NamedEntity;
+        })();
+
         admin.Sort = (function() {
 
             /**
@@ -11764,6 +12029,210 @@ export const flyteidl = $root.flyteidl = (() => {
             return NamedEntityIdentifierListRequest;
         })();
 
+        admin.NamedEntityListRequest = (function() {
+
+            /**
+             * Properties of a NamedEntityListRequest.
+             * @memberof flyteidl.admin
+             * @interface INamedEntityListRequest
+             * @property {flyteidl.core.ResourceType|null} [resourceType] NamedEntityListRequest resourceType
+             * @property {string|null} [project] NamedEntityListRequest project
+             * @property {string|null} [domain] NamedEntityListRequest domain
+             * @property {number|null} [limit] NamedEntityListRequest limit
+             * @property {string|null} [token] NamedEntityListRequest token
+             * @property {flyteidl.admin.ISort|null} [sortBy] NamedEntityListRequest sortBy
+             */
+
+            /**
+             * Constructs a new NamedEntityListRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a NamedEntityListRequest.
+             * @implements INamedEntityListRequest
+             * @constructor
+             * @param {flyteidl.admin.INamedEntityListRequest=} [properties] Properties to set
+             */
+            function NamedEntityListRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * NamedEntityListRequest resourceType.
+             * @member {flyteidl.core.ResourceType} resourceType
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @instance
+             */
+            NamedEntityListRequest.prototype.resourceType = 0;
+
+            /**
+             * NamedEntityListRequest project.
+             * @member {string} project
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @instance
+             */
+            NamedEntityListRequest.prototype.project = "";
+
+            /**
+             * NamedEntityListRequest domain.
+             * @member {string} domain
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @instance
+             */
+            NamedEntityListRequest.prototype.domain = "";
+
+            /**
+             * NamedEntityListRequest limit.
+             * @member {number} limit
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @instance
+             */
+            NamedEntityListRequest.prototype.limit = 0;
+
+            /**
+             * NamedEntityListRequest token.
+             * @member {string} token
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @instance
+             */
+            NamedEntityListRequest.prototype.token = "";
+
+            /**
+             * NamedEntityListRequest sortBy.
+             * @member {flyteidl.admin.ISort|null|undefined} sortBy
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @instance
+             */
+            NamedEntityListRequest.prototype.sortBy = null;
+
+            /**
+             * Creates a new NamedEntityListRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @static
+             * @param {flyteidl.admin.INamedEntityListRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.NamedEntityListRequest} NamedEntityListRequest instance
+             */
+            NamedEntityListRequest.create = function create(properties) {
+                return new NamedEntityListRequest(properties);
+            };
+
+            /**
+             * Encodes the specified NamedEntityListRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityListRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @static
+             * @param {flyteidl.admin.INamedEntityListRequest} message NamedEntityListRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            NamedEntityListRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.resourceType);
+                if (message.project != null && message.hasOwnProperty("project"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.project);
+                if (message.domain != null && message.hasOwnProperty("domain"))
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.domain);
+                if (message.limit != null && message.hasOwnProperty("limit"))
+                    writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.limit);
+                if (message.token != null && message.hasOwnProperty("token"))
+                    writer.uint32(/* id 5, wireType 2 =*/42).string(message.token);
+                if (message.sortBy != null && message.hasOwnProperty("sortBy"))
+                    $root.flyteidl.admin.Sort.encode(message.sortBy, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a NamedEntityListRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.NamedEntityListRequest} NamedEntityListRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            NamedEntityListRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.NamedEntityListRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.resourceType = reader.int32();
+                        break;
+                    case 2:
+                        message.project = reader.string();
+                        break;
+                    case 3:
+                        message.domain = reader.string();
+                        break;
+                    case 4:
+                        message.limit = reader.uint32();
+                        break;
+                    case 5:
+                        message.token = reader.string();
+                        break;
+                    case 6:
+                        message.sortBy = $root.flyteidl.admin.Sort.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a NamedEntityListRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            NamedEntityListRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                    switch (message.resourceType) {
+                    default:
+                        return "resourceType: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                        break;
+                    }
+                if (message.project != null && message.hasOwnProperty("project"))
+                    if (!$util.isString(message.project))
+                        return "project: string expected";
+                if (message.domain != null && message.hasOwnProperty("domain"))
+                    if (!$util.isString(message.domain))
+                        return "domain: string expected";
+                if (message.limit != null && message.hasOwnProperty("limit"))
+                    if (!$util.isInteger(message.limit))
+                        return "limit: integer expected";
+                if (message.token != null && message.hasOwnProperty("token"))
+                    if (!$util.isString(message.token))
+                        return "token: string expected";
+                if (message.sortBy != null && message.hasOwnProperty("sortBy")) {
+                    let error = $root.flyteidl.admin.Sort.verify(message.sortBy);
+                    if (error)
+                        return "sortBy." + error;
+                }
+                return null;
+            };
+
+            return NamedEntityListRequest;
+        })();
+
         admin.NamedEntityIdentifierList = (function() {
 
             /**
@@ -11899,6 +12368,527 @@ export const flyteidl = $root.flyteidl = (() => {
             };
 
             return NamedEntityIdentifierList;
+        })();
+
+        admin.NamedEntityList = (function() {
+
+            /**
+             * Properties of a NamedEntityList.
+             * @memberof flyteidl.admin
+             * @interface INamedEntityList
+             * @property {Array.<flyteidl.admin.INamedEntity>|null} [entities] NamedEntityList entities
+             * @property {string|null} [token] NamedEntityList token
+             */
+
+            /**
+             * Constructs a new NamedEntityList.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a NamedEntityList.
+             * @implements INamedEntityList
+             * @constructor
+             * @param {flyteidl.admin.INamedEntityList=} [properties] Properties to set
+             */
+            function NamedEntityList(properties) {
+                this.entities = [];
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * NamedEntityList entities.
+             * @member {Array.<flyteidl.admin.INamedEntity>} entities
+             * @memberof flyteidl.admin.NamedEntityList
+             * @instance
+             */
+            NamedEntityList.prototype.entities = $util.emptyArray;
+
+            /**
+             * NamedEntityList token.
+             * @member {string} token
+             * @memberof flyteidl.admin.NamedEntityList
+             * @instance
+             */
+            NamedEntityList.prototype.token = "";
+
+            /**
+             * Creates a new NamedEntityList instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.NamedEntityList
+             * @static
+             * @param {flyteidl.admin.INamedEntityList=} [properties] Properties to set
+             * @returns {flyteidl.admin.NamedEntityList} NamedEntityList instance
+             */
+            NamedEntityList.create = function create(properties) {
+                return new NamedEntityList(properties);
+            };
+
+            /**
+             * Encodes the specified NamedEntityList message. Does not implicitly {@link flyteidl.admin.NamedEntityList.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.NamedEntityList
+             * @static
+             * @param {flyteidl.admin.INamedEntityList} message NamedEntityList message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            NamedEntityList.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.entities != null && message.entities.length)
+                    for (let i = 0; i < message.entities.length; ++i)
+                        $root.flyteidl.admin.NamedEntity.encode(message.entities[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.token != null && message.hasOwnProperty("token"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.token);
+                return writer;
+            };
+
+            /**
+             * Decodes a NamedEntityList message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.NamedEntityList
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.NamedEntityList} NamedEntityList
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            NamedEntityList.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.NamedEntityList();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        if (!(message.entities && message.entities.length))
+                            message.entities = [];
+                        message.entities.push($root.flyteidl.admin.NamedEntity.decode(reader, reader.uint32()));
+                        break;
+                    case 2:
+                        message.token = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a NamedEntityList message.
+             * @function verify
+             * @memberof flyteidl.admin.NamedEntityList
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            NamedEntityList.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.entities != null && message.hasOwnProperty("entities")) {
+                    if (!Array.isArray(message.entities))
+                        return "entities: array expected";
+                    for (let i = 0; i < message.entities.length; ++i) {
+                        let error = $root.flyteidl.admin.NamedEntity.verify(message.entities[i]);
+                        if (error)
+                            return "entities." + error;
+                    }
+                }
+                if (message.token != null && message.hasOwnProperty("token"))
+                    if (!$util.isString(message.token))
+                        return "token: string expected";
+                return null;
+            };
+
+            return NamedEntityList;
+        })();
+
+        admin.NamedEntityGetRequest = (function() {
+
+            /**
+             * Properties of a NamedEntityGetRequest.
+             * @memberof flyteidl.admin
+             * @interface INamedEntityGetRequest
+             * @property {flyteidl.core.ResourceType|null} [resourceType] NamedEntityGetRequest resourceType
+             * @property {flyteidl.admin.INamedEntityIdentifier|null} [id] NamedEntityGetRequest id
+             */
+
+            /**
+             * Constructs a new NamedEntityGetRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a NamedEntityGetRequest.
+             * @implements INamedEntityGetRequest
+             * @constructor
+             * @param {flyteidl.admin.INamedEntityGetRequest=} [properties] Properties to set
+             */
+            function NamedEntityGetRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * NamedEntityGetRequest resourceType.
+             * @member {flyteidl.core.ResourceType} resourceType
+             * @memberof flyteidl.admin.NamedEntityGetRequest
+             * @instance
+             */
+            NamedEntityGetRequest.prototype.resourceType = 0;
+
+            /**
+             * NamedEntityGetRequest id.
+             * @member {flyteidl.admin.INamedEntityIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.NamedEntityGetRequest
+             * @instance
+             */
+            NamedEntityGetRequest.prototype.id = null;
+
+            /**
+             * Creates a new NamedEntityGetRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.NamedEntityGetRequest
+             * @static
+             * @param {flyteidl.admin.INamedEntityGetRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.NamedEntityGetRequest} NamedEntityGetRequest instance
+             */
+            NamedEntityGetRequest.create = function create(properties) {
+                return new NamedEntityGetRequest(properties);
+            };
+
+            /**
+             * Encodes the specified NamedEntityGetRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityGetRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.NamedEntityGetRequest
+             * @static
+             * @param {flyteidl.admin.INamedEntityGetRequest} message NamedEntityGetRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            NamedEntityGetRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.resourceType);
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.admin.NamedEntityIdentifier.encode(message.id, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a NamedEntityGetRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.NamedEntityGetRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.NamedEntityGetRequest} NamedEntityGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            NamedEntityGetRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.NamedEntityGetRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.resourceType = reader.int32();
+                        break;
+                    case 2:
+                        message.id = $root.flyteidl.admin.NamedEntityIdentifier.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a NamedEntityGetRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.NamedEntityGetRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            NamedEntityGetRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                    switch (message.resourceType) {
+                    default:
+                        return "resourceType: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                        break;
+                    }
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.admin.NamedEntityIdentifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                return null;
+            };
+
+            return NamedEntityGetRequest;
+        })();
+
+        admin.NamedEntityUpdateRequest = (function() {
+
+            /**
+             * Properties of a NamedEntityUpdateRequest.
+             * @memberof flyteidl.admin
+             * @interface INamedEntityUpdateRequest
+             * @property {flyteidl.core.ResourceType|null} [resourceType] NamedEntityUpdateRequest resourceType
+             * @property {flyteidl.admin.INamedEntityIdentifier|null} [id] NamedEntityUpdateRequest id
+             * @property {flyteidl.admin.INamedEntityMetadata|null} [metadata] NamedEntityUpdateRequest metadata
+             */
+
+            /**
+             * Constructs a new NamedEntityUpdateRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a NamedEntityUpdateRequest.
+             * @implements INamedEntityUpdateRequest
+             * @constructor
+             * @param {flyteidl.admin.INamedEntityUpdateRequest=} [properties] Properties to set
+             */
+            function NamedEntityUpdateRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * NamedEntityUpdateRequest resourceType.
+             * @member {flyteidl.core.ResourceType} resourceType
+             * @memberof flyteidl.admin.NamedEntityUpdateRequest
+             * @instance
+             */
+            NamedEntityUpdateRequest.prototype.resourceType = 0;
+
+            /**
+             * NamedEntityUpdateRequest id.
+             * @member {flyteidl.admin.INamedEntityIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.NamedEntityUpdateRequest
+             * @instance
+             */
+            NamedEntityUpdateRequest.prototype.id = null;
+
+            /**
+             * NamedEntityUpdateRequest metadata.
+             * @member {flyteidl.admin.INamedEntityMetadata|null|undefined} metadata
+             * @memberof flyteidl.admin.NamedEntityUpdateRequest
+             * @instance
+             */
+            NamedEntityUpdateRequest.prototype.metadata = null;
+
+            /**
+             * Creates a new NamedEntityUpdateRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.NamedEntityUpdateRequest
+             * @static
+             * @param {flyteidl.admin.INamedEntityUpdateRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.NamedEntityUpdateRequest} NamedEntityUpdateRequest instance
+             */
+            NamedEntityUpdateRequest.create = function create(properties) {
+                return new NamedEntityUpdateRequest(properties);
+            };
+
+            /**
+             * Encodes the specified NamedEntityUpdateRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityUpdateRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.NamedEntityUpdateRequest
+             * @static
+             * @param {flyteidl.admin.INamedEntityUpdateRequest} message NamedEntityUpdateRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            NamedEntityUpdateRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.resourceType);
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.admin.NamedEntityIdentifier.encode(message.id, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.metadata != null && message.hasOwnProperty("metadata"))
+                    $root.flyteidl.admin.NamedEntityMetadata.encode(message.metadata, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a NamedEntityUpdateRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.NamedEntityUpdateRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.NamedEntityUpdateRequest} NamedEntityUpdateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            NamedEntityUpdateRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.NamedEntityUpdateRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.resourceType = reader.int32();
+                        break;
+                    case 2:
+                        message.id = $root.flyteidl.admin.NamedEntityIdentifier.decode(reader, reader.uint32());
+                        break;
+                    case 3:
+                        message.metadata = $root.flyteidl.admin.NamedEntityMetadata.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a NamedEntityUpdateRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.NamedEntityUpdateRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            NamedEntityUpdateRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.resourceType != null && message.hasOwnProperty("resourceType"))
+                    switch (message.resourceType) {
+                    default:
+                        return "resourceType: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                        break;
+                    }
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.admin.NamedEntityIdentifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                    let error = $root.flyteidl.admin.NamedEntityMetadata.verify(message.metadata);
+                    if (error)
+                        return "metadata." + error;
+                }
+                return null;
+            };
+
+            return NamedEntityUpdateRequest;
+        })();
+
+        admin.NamedEntityUpdateResponse = (function() {
+
+            /**
+             * Properties of a NamedEntityUpdateResponse.
+             * @memberof flyteidl.admin
+             * @interface INamedEntityUpdateResponse
+             */
+
+            /**
+             * Constructs a new NamedEntityUpdateResponse.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a NamedEntityUpdateResponse.
+             * @implements INamedEntityUpdateResponse
+             * @constructor
+             * @param {flyteidl.admin.INamedEntityUpdateResponse=} [properties] Properties to set
+             */
+            function NamedEntityUpdateResponse(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Creates a new NamedEntityUpdateResponse instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.NamedEntityUpdateResponse
+             * @static
+             * @param {flyteidl.admin.INamedEntityUpdateResponse=} [properties] Properties to set
+             * @returns {flyteidl.admin.NamedEntityUpdateResponse} NamedEntityUpdateResponse instance
+             */
+            NamedEntityUpdateResponse.create = function create(properties) {
+                return new NamedEntityUpdateResponse(properties);
+            };
+
+            /**
+             * Encodes the specified NamedEntityUpdateResponse message. Does not implicitly {@link flyteidl.admin.NamedEntityUpdateResponse.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.NamedEntityUpdateResponse
+             * @static
+             * @param {flyteidl.admin.INamedEntityUpdateResponse} message NamedEntityUpdateResponse message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            NamedEntityUpdateResponse.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                return writer;
+            };
+
+            /**
+             * Decodes a NamedEntityUpdateResponse message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.NamedEntityUpdateResponse
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.NamedEntityUpdateResponse} NamedEntityUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            NamedEntityUpdateResponse.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.NamedEntityUpdateResponse();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a NamedEntityUpdateResponse message.
+             * @function verify
+             * @memberof flyteidl.admin.NamedEntityUpdateResponse
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            NamedEntityUpdateResponse.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                return null;
+            };
+
+            return NamedEntityUpdateResponse;
         })();
 
         admin.ObjectGetRequest = (function() {
@@ -24537,6 +25527,105 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              * @param {flyteidl.admin.ITaskExecutionGetDataRequest} request TaskExecutionGetDataRequest message or plain object
              * @returns {Promise<flyteidl.admin.TaskExecutionGetDataResponse>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#listNamedEntities}.
+             * @memberof flyteidl.service.AdminService
+             * @typedef ListNamedEntitiesCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.NamedEntityList} [response] NamedEntityList
+             */
+
+            /**
+             * Calls ListNamedEntities.
+             * @function listNamedEntities
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.INamedEntityListRequest} request NamedEntityListRequest message or plain object
+             * @param {flyteidl.service.AdminService.ListNamedEntitiesCallback} callback Node-style callback called with the error, if any, and NamedEntityList
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(AdminService.prototype.listNamedEntities = function listNamedEntities(request, callback) {
+                return this.rpcCall(listNamedEntities, $root.flyteidl.admin.NamedEntityListRequest, $root.flyteidl.admin.NamedEntityList, request, callback);
+            }, "name", { value: "ListNamedEntities" });
+
+            /**
+             * Calls ListNamedEntities.
+             * @function listNamedEntities
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.INamedEntityListRequest} request NamedEntityListRequest message or plain object
+             * @returns {Promise<flyteidl.admin.NamedEntityList>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getNamedEntity}.
+             * @memberof flyteidl.service.AdminService
+             * @typedef GetNamedEntityCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.NamedEntity} [response] NamedEntity
+             */
+
+            /**
+             * Calls GetNamedEntity.
+             * @function getNamedEntity
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.INamedEntityGetRequest} request NamedEntityGetRequest message or plain object
+             * @param {flyteidl.service.AdminService.GetNamedEntityCallback} callback Node-style callback called with the error, if any, and NamedEntity
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(AdminService.prototype.getNamedEntity = function getNamedEntity(request, callback) {
+                return this.rpcCall(getNamedEntity, $root.flyteidl.admin.NamedEntityGetRequest, $root.flyteidl.admin.NamedEntity, request, callback);
+            }, "name", { value: "GetNamedEntity" });
+
+            /**
+             * Calls GetNamedEntity.
+             * @function getNamedEntity
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.INamedEntityGetRequest} request NamedEntityGetRequest message or plain object
+             * @returns {Promise<flyteidl.admin.NamedEntity>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#updateNamedEntity}.
+             * @memberof flyteidl.service.AdminService
+             * @typedef UpdateNamedEntityCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.NamedEntityUpdateResponse} [response] NamedEntityUpdateResponse
+             */
+
+            /**
+             * Calls UpdateNamedEntity.
+             * @function updateNamedEntity
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.INamedEntityUpdateRequest} request NamedEntityUpdateRequest message or plain object
+             * @param {flyteidl.service.AdminService.UpdateNamedEntityCallback} callback Node-style callback called with the error, if any, and NamedEntityUpdateResponse
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(AdminService.prototype.updateNamedEntity = function updateNamedEntity(request, callback) {
+                return this.rpcCall(updateNamedEntity, $root.flyteidl.admin.NamedEntityUpdateRequest, $root.flyteidl.admin.NamedEntityUpdateResponse, request, callback);
+            }, "name", { value: "UpdateNamedEntity" });
+
+            /**
+             * Calls UpdateNamedEntity.
+             * @function updateNamedEntity
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.INamedEntityUpdateRequest} request NamedEntityUpdateRequest message or plain object
+             * @returns {Promise<flyteidl.admin.NamedEntityUpdateResponse>} Promise
              * @variation 2
              */
 

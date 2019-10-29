@@ -16,6 +16,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/ptypes"
+
+	core "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // ensure the imports are used
@@ -31,6 +33,14 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = ptypes.DynamicAny{}
+
+	_ = core.ResourceType(0)
+
+	_ = core.ResourceType(0)
+
+	_ = core.ResourceType(0)
+
+	_ = core.ResourceType(0)
 )
 
 // define the regex for a UUID once up-front
@@ -108,6 +118,162 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = NamedEntityIdentifierValidationError{}
+
+// Validate checks the field values on NamedEntityMetadata with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *NamedEntityMetadata) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Description
+
+	return nil
+}
+
+// NamedEntityMetadataValidationError is the validation error returned by
+// NamedEntityMetadata.Validate if the designated constraints aren't met.
+type NamedEntityMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NamedEntityMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NamedEntityMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NamedEntityMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NamedEntityMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NamedEntityMetadataValidationError) ErrorName() string {
+	return "NamedEntityMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e NamedEntityMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNamedEntityMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NamedEntityMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NamedEntityMetadataValidationError{}
+
+// Validate checks the field values on NamedEntity with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *NamedEntity) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for ResourceType
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NamedEntityValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NamedEntityValidationError{
+				field:  "Metadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// NamedEntityValidationError is the validation error returned by
+// NamedEntity.Validate if the designated constraints aren't met.
+type NamedEntityValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NamedEntityValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NamedEntityValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NamedEntityValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NamedEntityValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NamedEntityValidationError) ErrorName() string { return "NamedEntityValidationError" }
+
+// Error satisfies the builtin error interface
+func (e NamedEntityValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNamedEntity.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NamedEntityValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NamedEntityValidationError{}
 
 // Validate checks the field values on Sort with the rules defined in the proto
 // definition for this message. If any rules are violated, an error is returned.
@@ -263,6 +429,93 @@ var _ interface {
 	ErrorName() string
 } = NamedEntityIdentifierListRequestValidationError{}
 
+// Validate checks the field values on NamedEntityListRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *NamedEntityListRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for ResourceType
+
+	// no validation rules for Project
+
+	// no validation rules for Domain
+
+	// no validation rules for Limit
+
+	// no validation rules for Token
+
+	if v, ok := interface{}(m.GetSortBy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NamedEntityListRequestValidationError{
+				field:  "SortBy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// NamedEntityListRequestValidationError is the validation error returned by
+// NamedEntityListRequest.Validate if the designated constraints aren't met.
+type NamedEntityListRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NamedEntityListRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NamedEntityListRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NamedEntityListRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NamedEntityListRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NamedEntityListRequestValidationError) ErrorName() string {
+	return "NamedEntityListRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e NamedEntityListRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNamedEntityListRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NamedEntityListRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NamedEntityListRequestValidationError{}
+
 // Validate checks the field values on NamedEntityIdentifierList with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -346,6 +599,323 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = NamedEntityIdentifierListValidationError{}
+
+// Validate checks the field values on NamedEntityList with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *NamedEntityList) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetEntities() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NamedEntityListValidationError{
+					field:  fmt.Sprintf("Entities[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Token
+
+	return nil
+}
+
+// NamedEntityListValidationError is the validation error returned by
+// NamedEntityList.Validate if the designated constraints aren't met.
+type NamedEntityListValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NamedEntityListValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NamedEntityListValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NamedEntityListValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NamedEntityListValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NamedEntityListValidationError) ErrorName() string { return "NamedEntityListValidationError" }
+
+// Error satisfies the builtin error interface
+func (e NamedEntityListValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNamedEntityList.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NamedEntityListValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NamedEntityListValidationError{}
+
+// Validate checks the field values on NamedEntityGetRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *NamedEntityGetRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for ResourceType
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NamedEntityGetRequestValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// NamedEntityGetRequestValidationError is the validation error returned by
+// NamedEntityGetRequest.Validate if the designated constraints aren't met.
+type NamedEntityGetRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NamedEntityGetRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NamedEntityGetRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NamedEntityGetRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NamedEntityGetRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NamedEntityGetRequestValidationError) ErrorName() string {
+	return "NamedEntityGetRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e NamedEntityGetRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNamedEntityGetRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NamedEntityGetRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NamedEntityGetRequestValidationError{}
+
+// Validate checks the field values on NamedEntityUpdateRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *NamedEntityUpdateRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for ResourceType
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NamedEntityUpdateRequestValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NamedEntityUpdateRequestValidationError{
+				field:  "Metadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// NamedEntityUpdateRequestValidationError is the validation error returned by
+// NamedEntityUpdateRequest.Validate if the designated constraints aren't met.
+type NamedEntityUpdateRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NamedEntityUpdateRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NamedEntityUpdateRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NamedEntityUpdateRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NamedEntityUpdateRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NamedEntityUpdateRequestValidationError) ErrorName() string {
+	return "NamedEntityUpdateRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e NamedEntityUpdateRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNamedEntityUpdateRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NamedEntityUpdateRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NamedEntityUpdateRequestValidationError{}
+
+// Validate checks the field values on NamedEntityUpdateResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *NamedEntityUpdateResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// NamedEntityUpdateResponseValidationError is the validation error returned by
+// NamedEntityUpdateResponse.Validate if the designated constraints aren't met.
+type NamedEntityUpdateResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NamedEntityUpdateResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NamedEntityUpdateResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NamedEntityUpdateResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NamedEntityUpdateResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NamedEntityUpdateResponseValidationError) ErrorName() string {
+	return "NamedEntityUpdateResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e NamedEntityUpdateResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNamedEntityUpdateResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NamedEntityUpdateResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NamedEntityUpdateResponseValidationError{}
 
 // Validate checks the field values on ObjectGetRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, an

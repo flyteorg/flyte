@@ -33,7 +33,7 @@ public final class Admin {
       "e_execution.proto\032#flyteidl/admin/task_e" +
       "xecution.proto\032\033flyteidl/admin/common.pr" +
       "oto\032,protoc-gen-swagger/options/annotati" +
-      "ons.proto2\370H\n\014AdminService\022\305\002\n\nCreateTas" +
+      "ons.proto2\276N\n\014AdminService\022\305\002\n\nCreateTas" +
       "k\022!.flyteidl.admin.TaskCreateRequest\032\".f" +
       "lyteidl.admin.TaskCreateResponse\"\357\001\202\323\344\223\002" +
       "\022\"\r/api/v1/tasks:\001*\222A\323\001\032&Create and regi" +
@@ -266,9 +266,27 @@ public final class Admin {
       "t}/{id.task_id.domain}/{id.task_id.name}" +
       "/{id.task_id.version}/{id.retry_attempt}" +
       "\222AA\032?Retrieve input and output data from" +
-      " an existing task execution.B5Z3github.c" +
-      "om/lyft/flyteidl/gen/pb-go/flyteidl/serv" +
-      "iceb\006proto3"
+      " an existing task execution.\022\200\002\n\021ListNam" +
+      "edEntities\022&.flyteidl.admin.NamedEntityL" +
+      "istRequest\032\037.flyteidl.admin.NamedEntityL" +
+      "ist\"\241\001\202\323\344\223\002;\0229/api/v1/named_entities/{re" +
+      "source_type}/{project}/{domain}\222A]\032[Retr" +
+      "ieve a list of NamedEntity objects shari" +
+      "ng a common resource type, project, and " +
+      "domain.\022\312\001\n\016GetNamedEntity\022%.flyteidl.ad" +
+      "min.NamedEntityGetRequest\032\033.flyteidl.adm" +
+      "in.NamedEntity\"t\202\323\344\223\002K\022I/api/v1/named_en" +
+      "tities/{resource_type}/{id.project}/{id." +
+      "domain}/{id.name}\222A \032\036Retrieve a NamedEn" +
+      "tity object.\022\363\001\n\021UpdateNamedEntity\022(.fly" +
+      "teidl.admin.NamedEntityUpdateRequest\032).f" +
+      "lyteidl.admin.NamedEntityUpdateResponse\"" +
+      "\210\001\202\323\344\223\002N\032I/api/v1/named_entities/{resour" +
+      "ce_type}/{id.project}/{id.domain}/{id.na" +
+      "me}:\001*\222A1\032/Update the fields associated " +
+      "with a NamedEntityB5Z3github.com/lyft/fl" +
+      "yteidl/gen/pb-go/flyteidl/serviceb\006proto" +
+      "3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

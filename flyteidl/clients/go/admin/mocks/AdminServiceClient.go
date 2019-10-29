@@ -545,6 +545,54 @@ func (_m *AdminServiceClient) GetLaunchPlan(ctx context.Context, in *admin.Objec
 	return r0, r1
 }
 
+type AdminServiceClient_GetNamedEntity struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetNamedEntity) Return(_a0 *admin.NamedEntity, _a1 error) *AdminServiceClient_GetNamedEntity {
+	return &AdminServiceClient_GetNamedEntity{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetNamedEntity(ctx context.Context, in *admin.NamedEntityGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetNamedEntity {
+	c := _m.On("GetNamedEntity", ctx, in, opts)
+	return &AdminServiceClient_GetNamedEntity{Call: c}
+}
+
+func (_m *AdminServiceClient) OnGetNamedEntityMatch(matchers ...interface{}) *AdminServiceClient_GetNamedEntity {
+	c := _m.On("GetNamedEntity", matchers...)
+	return &AdminServiceClient_GetNamedEntity{Call: c}
+}
+
+// GetNamedEntity provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetNamedEntity(ctx context.Context, in *admin.NamedEntityGetRequest, opts ...grpc.CallOption) (*admin.NamedEntity, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.NamedEntity
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.NamedEntityGetRequest, ...grpc.CallOption) *admin.NamedEntity); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.NamedEntity)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.NamedEntityGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetNodeExecution struct {
 	*mock.Call
 }
@@ -1017,6 +1065,54 @@ func (_m *AdminServiceClient) ListLaunchPlans(ctx context.Context, in *admin.Res
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.ResourceListRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceClient_ListNamedEntities struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_ListNamedEntities) Return(_a0 *admin.NamedEntityList, _a1 error) *AdminServiceClient_ListNamedEntities {
+	return &AdminServiceClient_ListNamedEntities{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnListNamedEntities(ctx context.Context, in *admin.NamedEntityListRequest, opts ...grpc.CallOption) *AdminServiceClient_ListNamedEntities {
+	c := _m.On("ListNamedEntities", ctx, in, opts)
+	return &AdminServiceClient_ListNamedEntities{Call: c}
+}
+
+func (_m *AdminServiceClient) OnListNamedEntitiesMatch(matchers ...interface{}) *AdminServiceClient_ListNamedEntities {
+	c := _m.On("ListNamedEntities", matchers...)
+	return &AdminServiceClient_ListNamedEntities{Call: c}
+}
+
+// ListNamedEntities provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) ListNamedEntities(ctx context.Context, in *admin.NamedEntityListRequest, opts ...grpc.CallOption) (*admin.NamedEntityList, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.NamedEntityList
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.NamedEntityListRequest, ...grpc.CallOption) *admin.NamedEntityList); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.NamedEntityList)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.NamedEntityListRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)
@@ -1593,6 +1689,54 @@ func (_m *AdminServiceClient) UpdateLaunchPlan(ctx context.Context, in *admin.La
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.LaunchPlanUpdateRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceClient_UpdateNamedEntity struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_UpdateNamedEntity) Return(_a0 *admin.NamedEntityUpdateResponse, _a1 error) *AdminServiceClient_UpdateNamedEntity {
+	return &AdminServiceClient_UpdateNamedEntity{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnUpdateNamedEntity(ctx context.Context, in *admin.NamedEntityUpdateRequest, opts ...grpc.CallOption) *AdminServiceClient_UpdateNamedEntity {
+	c := _m.On("UpdateNamedEntity", ctx, in, opts)
+	return &AdminServiceClient_UpdateNamedEntity{Call: c}
+}
+
+func (_m *AdminServiceClient) OnUpdateNamedEntityMatch(matchers ...interface{}) *AdminServiceClient_UpdateNamedEntity {
+	c := _m.On("UpdateNamedEntity", matchers...)
+	return &AdminServiceClient_UpdateNamedEntity{Call: c}
+}
+
+// UpdateNamedEntity provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) UpdateNamedEntity(ctx context.Context, in *admin.NamedEntityUpdateRequest, opts ...grpc.CallOption) (*admin.NamedEntityUpdateResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.NamedEntityUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.NamedEntityUpdateRequest, ...grpc.CallOption) *admin.NamedEntityUpdateResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.NamedEntityUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.NamedEntityUpdateRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

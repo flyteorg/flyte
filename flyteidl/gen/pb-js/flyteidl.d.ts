@@ -4721,6 +4721,122 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a NamedEntityMetadata. */
+        interface INamedEntityMetadata {
+
+            /** NamedEntityMetadata description */
+            description?: (string|null);
+        }
+
+        /** Represents a NamedEntityMetadata. */
+        class NamedEntityMetadata implements INamedEntityMetadata {
+
+            /**
+             * Constructs a new NamedEntityMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityMetadata);
+
+            /** NamedEntityMetadata description. */
+            public description: string;
+
+            /**
+             * Creates a new NamedEntityMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityMetadata instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityMetadata): flyteidl.admin.NamedEntityMetadata;
+
+            /**
+             * Encodes the specified NamedEntityMetadata message. Does not implicitly {@link flyteidl.admin.NamedEntityMetadata.verify|verify} messages.
+             * @param message NamedEntityMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityMetadata;
+
+            /**
+             * Verifies a NamedEntityMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntity. */
+        interface INamedEntity {
+
+            /** NamedEntity resourceType */
+            resourceType?: (flyteidl.core.ResourceType|null);
+
+            /** NamedEntity id */
+            id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /** NamedEntity metadata */
+            metadata?: (flyteidl.admin.INamedEntityMetadata|null);
+        }
+
+        /** Represents a NamedEntity. */
+        class NamedEntity implements INamedEntity {
+
+            /**
+             * Constructs a new NamedEntity.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntity);
+
+            /** NamedEntity resourceType. */
+            public resourceType: flyteidl.core.ResourceType;
+
+            /** NamedEntity id. */
+            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /** NamedEntity metadata. */
+            public metadata?: (flyteidl.admin.INamedEntityMetadata|null);
+
+            /**
+             * Creates a new NamedEntity instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntity instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntity): flyteidl.admin.NamedEntity;
+
+            /**
+             * Encodes the specified NamedEntity message. Does not implicitly {@link flyteidl.admin.NamedEntity.verify|verify} messages.
+             * @param message NamedEntity message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntity, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntity message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntity
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntity;
+
+            /**
+             * Verifies a NamedEntity message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a Sort. */
         interface ISort {
 
@@ -4864,6 +4980,88 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a NamedEntityListRequest. */
+        interface INamedEntityListRequest {
+
+            /** NamedEntityListRequest resourceType */
+            resourceType?: (flyteidl.core.ResourceType|null);
+
+            /** NamedEntityListRequest project */
+            project?: (string|null);
+
+            /** NamedEntityListRequest domain */
+            domain?: (string|null);
+
+            /** NamedEntityListRequest limit */
+            limit?: (number|null);
+
+            /** NamedEntityListRequest token */
+            token?: (string|null);
+
+            /** NamedEntityListRequest sortBy */
+            sortBy?: (flyteidl.admin.ISort|null);
+        }
+
+        /** Represents a NamedEntityListRequest. */
+        class NamedEntityListRequest implements INamedEntityListRequest {
+
+            /**
+             * Constructs a new NamedEntityListRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityListRequest);
+
+            /** NamedEntityListRequest resourceType. */
+            public resourceType: flyteidl.core.ResourceType;
+
+            /** NamedEntityListRequest project. */
+            public project: string;
+
+            /** NamedEntityListRequest domain. */
+            public domain: string;
+
+            /** NamedEntityListRequest limit. */
+            public limit: number;
+
+            /** NamedEntityListRequest token. */
+            public token: string;
+
+            /** NamedEntityListRequest sortBy. */
+            public sortBy?: (flyteidl.admin.ISort|null);
+
+            /**
+             * Creates a new NamedEntityListRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityListRequest instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityListRequest): flyteidl.admin.NamedEntityListRequest;
+
+            /**
+             * Encodes the specified NamedEntityListRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityListRequest.verify|verify} messages.
+             * @param message NamedEntityListRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityListRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityListRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityListRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityListRequest;
+
+            /**
+             * Verifies a NamedEntityListRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a NamedEntityIdentifierList. */
         interface INamedEntityIdentifierList {
 
@@ -4916,6 +5114,232 @@ export namespace flyteidl {
 
             /**
              * Verifies a NamedEntityIdentifierList message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntityList. */
+        interface INamedEntityList {
+
+            /** NamedEntityList entities */
+            entities?: (flyteidl.admin.INamedEntity[]|null);
+
+            /** NamedEntityList token */
+            token?: (string|null);
+        }
+
+        /** Represents a NamedEntityList. */
+        class NamedEntityList implements INamedEntityList {
+
+            /**
+             * Constructs a new NamedEntityList.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityList);
+
+            /** NamedEntityList entities. */
+            public entities: flyteidl.admin.INamedEntity[];
+
+            /** NamedEntityList token. */
+            public token: string;
+
+            /**
+             * Creates a new NamedEntityList instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityList instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityList): flyteidl.admin.NamedEntityList;
+
+            /**
+             * Encodes the specified NamedEntityList message. Does not implicitly {@link flyteidl.admin.NamedEntityList.verify|verify} messages.
+             * @param message NamedEntityList message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityList, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityList message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityList
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityList;
+
+            /**
+             * Verifies a NamedEntityList message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntityGetRequest. */
+        interface INamedEntityGetRequest {
+
+            /** NamedEntityGetRequest resourceType */
+            resourceType?: (flyteidl.core.ResourceType|null);
+
+            /** NamedEntityGetRequest id */
+            id?: (flyteidl.admin.INamedEntityIdentifier|null);
+        }
+
+        /** Represents a NamedEntityGetRequest. */
+        class NamedEntityGetRequest implements INamedEntityGetRequest {
+
+            /**
+             * Constructs a new NamedEntityGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityGetRequest);
+
+            /** NamedEntityGetRequest resourceType. */
+            public resourceType: flyteidl.core.ResourceType;
+
+            /** NamedEntityGetRequest id. */
+            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /**
+             * Creates a new NamedEntityGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityGetRequest): flyteidl.admin.NamedEntityGetRequest;
+
+            /**
+             * Encodes the specified NamedEntityGetRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityGetRequest.verify|verify} messages.
+             * @param message NamedEntityGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityGetRequest;
+
+            /**
+             * Verifies a NamedEntityGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntityUpdateRequest. */
+        interface INamedEntityUpdateRequest {
+
+            /** NamedEntityUpdateRequest resourceType */
+            resourceType?: (flyteidl.core.ResourceType|null);
+
+            /** NamedEntityUpdateRequest id */
+            id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /** NamedEntityUpdateRequest metadata */
+            metadata?: (flyteidl.admin.INamedEntityMetadata|null);
+        }
+
+        /** Represents a NamedEntityUpdateRequest. */
+        class NamedEntityUpdateRequest implements INamedEntityUpdateRequest {
+
+            /**
+             * Constructs a new NamedEntityUpdateRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityUpdateRequest);
+
+            /** NamedEntityUpdateRequest resourceType. */
+            public resourceType: flyteidl.core.ResourceType;
+
+            /** NamedEntityUpdateRequest id. */
+            public id?: (flyteidl.admin.INamedEntityIdentifier|null);
+
+            /** NamedEntityUpdateRequest metadata. */
+            public metadata?: (flyteidl.admin.INamedEntityMetadata|null);
+
+            /**
+             * Creates a new NamedEntityUpdateRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityUpdateRequest instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityUpdateRequest): flyteidl.admin.NamedEntityUpdateRequest;
+
+            /**
+             * Encodes the specified NamedEntityUpdateRequest message. Does not implicitly {@link flyteidl.admin.NamedEntityUpdateRequest.verify|verify} messages.
+             * @param message NamedEntityUpdateRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityUpdateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityUpdateRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityUpdateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityUpdateRequest;
+
+            /**
+             * Verifies a NamedEntityUpdateRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NamedEntityUpdateResponse. */
+        interface INamedEntityUpdateResponse {
+        }
+
+        /** Represents a NamedEntityUpdateResponse. */
+        class NamedEntityUpdateResponse implements INamedEntityUpdateResponse {
+
+            /**
+             * Constructs a new NamedEntityUpdateResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INamedEntityUpdateResponse);
+
+            /**
+             * Creates a new NamedEntityUpdateResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NamedEntityUpdateResponse instance
+             */
+            public static create(properties?: flyteidl.admin.INamedEntityUpdateResponse): flyteidl.admin.NamedEntityUpdateResponse;
+
+            /**
+             * Encodes the specified NamedEntityUpdateResponse message. Does not implicitly {@link flyteidl.admin.NamedEntityUpdateResponse.verify|verify} messages.
+             * @param message NamedEntityUpdateResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INamedEntityUpdateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NamedEntityUpdateResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NamedEntityUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NamedEntityUpdateResponse;
+
+            /**
+             * Verifies a NamedEntityUpdateResponse message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -10328,6 +10752,48 @@ export namespace flyteidl {
              * @returns Promise
              */
             public getTaskExecutionData(request: flyteidl.admin.ITaskExecutionGetDataRequest): Promise<flyteidl.admin.TaskExecutionGetDataResponse>;
+
+            /**
+             * Calls ListNamedEntities.
+             * @param request NamedEntityListRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and NamedEntityList
+             */
+            public listNamedEntities(request: flyteidl.admin.INamedEntityListRequest, callback: flyteidl.service.AdminService.ListNamedEntitiesCallback): void;
+
+            /**
+             * Calls ListNamedEntities.
+             * @param request NamedEntityListRequest message or plain object
+             * @returns Promise
+             */
+            public listNamedEntities(request: flyteidl.admin.INamedEntityListRequest): Promise<flyteidl.admin.NamedEntityList>;
+
+            /**
+             * Calls GetNamedEntity.
+             * @param request NamedEntityGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and NamedEntity
+             */
+            public getNamedEntity(request: flyteidl.admin.INamedEntityGetRequest, callback: flyteidl.service.AdminService.GetNamedEntityCallback): void;
+
+            /**
+             * Calls GetNamedEntity.
+             * @param request NamedEntityGetRequest message or plain object
+             * @returns Promise
+             */
+            public getNamedEntity(request: flyteidl.admin.INamedEntityGetRequest): Promise<flyteidl.admin.NamedEntity>;
+
+            /**
+             * Calls UpdateNamedEntity.
+             * @param request NamedEntityUpdateRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and NamedEntityUpdateResponse
+             */
+            public updateNamedEntity(request: flyteidl.admin.INamedEntityUpdateRequest, callback: flyteidl.service.AdminService.UpdateNamedEntityCallback): void;
+
+            /**
+             * Calls UpdateNamedEntity.
+             * @param request NamedEntityUpdateRequest message or plain object
+             * @returns Promise
+             */
+            public updateNamedEntity(request: flyteidl.admin.INamedEntityUpdateRequest): Promise<flyteidl.admin.NamedEntityUpdateResponse>;
         }
 
         namespace AdminService {
@@ -10562,6 +11028,27 @@ export namespace flyteidl {
              * @param [response] TaskExecutionGetDataResponse
              */
             type GetTaskExecutionDataCallback = (error: (Error|null), response?: flyteidl.admin.TaskExecutionGetDataResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#listNamedEntities}.
+             * @param error Error, if any
+             * @param [response] NamedEntityList
+             */
+            type ListNamedEntitiesCallback = (error: (Error|null), response?: flyteidl.admin.NamedEntityList) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getNamedEntity}.
+             * @param error Error, if any
+             * @param [response] NamedEntity
+             */
+            type GetNamedEntityCallback = (error: (Error|null), response?: flyteidl.admin.NamedEntity) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#updateNamedEntity}.
+             * @param error Error, if any
+             * @param [response] NamedEntityUpdateResponse
+             */
+            type UpdateNamedEntityCallback = (error: (Error|null), response?: flyteidl.admin.NamedEntityUpdateResponse) => void;
         }
     }
 }

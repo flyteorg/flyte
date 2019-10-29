@@ -32,6 +32,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**GetExecution**](docs/AdminServiceApi.md#getexecution) | **Get** /api/v1/executions/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**GetExecutionData**](docs/AdminServiceApi.md#getexecutiondata) | **Get** /api/v1/data/executions/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**GetLaunchPlan**](docs/AdminServiceApi.md#getlaunchplan) | **Get** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | 
+*AdminServiceApi* | [**GetNamedEntity**](docs/AdminServiceApi.md#getnamedentity) | **Get** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**GetNodeExecution**](docs/AdminServiceApi.md#getnodeexecution) | **Get** /api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | 
 *AdminServiceApi* | [**GetNodeExecutionData**](docs/AdminServiceApi.md#getnodeexecutiondata) | **Get** /api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | 
 *AdminServiceApi* | [**GetTask**](docs/AdminServiceApi.md#gettask) | **Get** /api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version} | 
@@ -43,6 +44,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**ListLaunchPlanIds**](docs/AdminServiceApi.md#listlaunchplanids) | **Get** /api/v1/launch_plan_ids/{project}/{domain} | 
 *AdminServiceApi* | [**ListLaunchPlans**](docs/AdminServiceApi.md#listlaunchplans) | **Get** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**ListLaunchPlans2**](docs/AdminServiceApi.md#listlaunchplans2) | **Get** /api/v1/launch_plans/{id.project}/{id.domain} | 
+*AdminServiceApi* | [**ListNamedEntities**](docs/AdminServiceApi.md#listnamedentities) | **Get** /api/v1/named_entities/{resource_type}/{project}/{domain} | 
 *AdminServiceApi* | [**ListNodeExecutions**](docs/AdminServiceApi.md#listnodeexecutions) | **Get** /api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name} | 
 *AdminServiceApi* | [**ListNodeExecutionsForTask**](docs/AdminServiceApi.md#listnodeexecutionsfortask) | **Get** /api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt} | 
 *AdminServiceApi* | [**ListProjects**](docs/AdminServiceApi.md#listprojects) | **Get** /api/v1/projects | 
@@ -57,6 +59,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**RelaunchExecution**](docs/AdminServiceApi.md#relaunchexecution) | **Post** /api/v1/executions/relaunch | 
 *AdminServiceApi* | [**TerminateExecution**](docs/AdminServiceApi.md#terminateexecution) | **Delete** /api/v1/executions/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**UpdateLaunchPlan**](docs/AdminServiceApi.md#updatelaunchplan) | **Put** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | 
+*AdminServiceApi* | [**UpdateNamedEntity**](docs/AdminServiceApi.md#updatenamedentity) | **Put** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | 
 
 
 ## Documentation For Models
@@ -89,8 +92,13 @@ Class | Method | HTTP request | Description
  - [AdminLaunchPlanUpdateRequest](docs/AdminLaunchPlanUpdateRequest.md)
  - [AdminLaunchPlanUpdateResponse](docs/AdminLaunchPlanUpdateResponse.md)
  - [AdminLiteralMapBlob](docs/AdminLiteralMapBlob.md)
+ - [AdminNamedEntity](docs/AdminNamedEntity.md)
  - [AdminNamedEntityIdentifier](docs/AdminNamedEntityIdentifier.md)
  - [AdminNamedEntityIdentifierList](docs/AdminNamedEntityIdentifierList.md)
+ - [AdminNamedEntityList](docs/AdminNamedEntityList.md)
+ - [AdminNamedEntityMetadata](docs/AdminNamedEntityMetadata.md)
+ - [AdminNamedEntityUpdateRequest](docs/AdminNamedEntityUpdateRequest.md)
+ - [AdminNamedEntityUpdateResponse](docs/AdminNamedEntityUpdateResponse.md)
  - [AdminNodeExecutionClosure](docs/AdminNodeExecutionClosure.md)
  - [AdminNodeExecutionEventRequest](docs/AdminNodeExecutionEventRequest.md)
  - [AdminNodeExecutionEventResponse](docs/AdminNodeExecutionEventResponse.md)

@@ -956,6 +956,169 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminLaunchPlanUpdateResponse"
+  /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}:
+    get:
+      tags:
+      - "AdminService"
+      description: "Retrieve a NamedEntity object."
+      operationId: "GetNamedEntity"
+      parameters:
+      - name: "resource_type"
+        in: "path"
+        required: true
+        type: "string"
+        enum:
+        - "UNSPECIFIED"
+        - "TASK"
+        - "WORKFLOW"
+        - "LAUNCH_PLAN"
+        x-exportParamName: "ResourceType"
+      - name: "id.project"
+        in: "path"
+        description: "Name of the project the resource belongs to."
+        required: true
+        type: "string"
+        x-exportParamName: "IdProject"
+      - name: "id.domain"
+        in: "path"
+        description: "Name of the domain the resource belongs to.\nA domain can be\
+          \ considered as a subset within a specific project."
+        required: true
+        type: "string"
+        x-exportParamName: "IdDomain"
+      - name: "id.name"
+        in: "path"
+        description: "User provided value for the resource.\nThe combination of project\
+          \ + domain + name uniquely identifies the resource.\n+optional - in certain\
+          \ contexts - like 'List API', 'Launch plans'"
+        required: true
+        type: "string"
+        x-exportParamName: "IdName"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminNamedEntity"
+    put:
+      tags:
+      - "AdminService"
+      description: "Update the fields associated with a NamedEntity"
+      operationId: "UpdateNamedEntity"
+      parameters:
+      - name: "resource_type"
+        in: "path"
+        description: "Resource type of the metadata to update"
+        required: true
+        type: "string"
+        enum:
+        - "UNSPECIFIED"
+        - "TASK"
+        - "WORKFLOW"
+        - "LAUNCH_PLAN"
+        x-exportParamName: "ResourceType"
+      - name: "id.project"
+        in: "path"
+        description: "Name of the project the resource belongs to."
+        required: true
+        type: "string"
+        x-exportParamName: "IdProject"
+      - name: "id.domain"
+        in: "path"
+        description: "Name of the domain the resource belongs to.\nA domain can be\
+          \ considered as a subset within a specific project."
+        required: true
+        type: "string"
+        x-exportParamName: "IdDomain"
+      - name: "id.name"
+        in: "path"
+        description: "User provided value for the resource.\nThe combination of project\
+          \ + domain + name uniquely identifies the resource.\n+optional - in certain\
+          \ contexts - like 'List API', 'Launch plans'"
+        required: true
+        type: "string"
+        x-exportParamName: "IdName"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminNamedEntityUpdateRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminNamedEntityUpdateResponse"
+  /api/v1/named_entities/{resource_type}/{project}/{domain}:
+    get:
+      tags:
+      - "AdminService"
+      description: "Retrieve a list of NamedEntity objects sharing a common resource\
+        \ type, project, and domain."
+      operationId: "ListNamedEntities"
+      parameters:
+      - name: "resource_type"
+        in: "path"
+        required: true
+        type: "string"
+        enum:
+        - "UNSPECIFIED"
+        - "TASK"
+        - "WORKFLOW"
+        - "LAUNCH_PLAN"
+        x-exportParamName: "ResourceType"
+      - name: "project"
+        in: "path"
+        description: "Name of the project that contains the identifiers."
+        required: true
+        type: "string"
+        x-exportParamName: "Project"
+      - name: "domain"
+        in: "path"
+        description: "Name of the domain the identifiers belongs to within the project."
+        required: true
+        type: "string"
+        x-exportParamName: "Domain"
+      - name: "limit"
+        in: "query"
+        description: "Indicates the number of resources to be returned."
+        required: false
+        type: "integer"
+        format: "int64"
+        x-exportParamName: "Limit"
+        x-optionalDataType: "Int64"
+      - name: "token"
+        in: "query"
+        description: "In the case of multiple pages of results, the server-provided\
+          \ token can be used to fetch the next page\nin a query.\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Token"
+        x-optionalDataType: "String"
+      - name: "sort_by.key"
+        in: "query"
+        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
+          \ Add string validation here. This should never be empty."
+        required: false
+        type: "string"
+        x-exportParamName: "SortByKey"
+        x-optionalDataType: "String"
+      - name: "sort_by.direction"
+        in: "query"
+        description: "Indicates the direction to apply sort key for response values.\n\
+          +optional."
+        required: false
+        type: "string"
+        default: "DESCENDING"
+        enum:
+        - "DESCENDING"
+        - "ASCENDING"
+        x-exportParamName: "SortByDirection"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminNamedEntityList"
   /api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}:
     get:
       tags:
@@ -3906,6 +4069,25 @@ definitions:
       values:
         literals: {}
       uri: "uri"
+  adminNamedEntity:
+    type: "object"
+    properties:
+      resource_type:
+        $ref: "#/definitions/coreResourceType"
+      id:
+        $ref: "#/definitions/adminNamedEntityIdentifier"
+      metadata:
+        $ref: "#/definitions/adminNamedEntityMetadata"
+    title: "Describes information common to a NamedEntity, identified by a project\
+      \ /\ndomain / name / resource type combination"
+    example:
+      metadata:
+        description: "description"
+      resource_type: {}
+      id:
+        domain: "domain"
+        name: "name"
+        project: "project"
   adminNamedEntityIdentifier:
     type: "object"
     properties:
@@ -3940,7 +4122,7 @@ definitions:
         description: "In the case of multiple pages of results, the server-provided\
           \ token can be used to fetch the next page\nin a query. If there are no\
           \ more results, this value will be empty."
-    description: "Represents a list of Identifiers."
+    description: "Represents a list of NamedEntityIdentifiers."
     example:
       entities:
       - domain: "domain"
@@ -3950,6 +4132,62 @@ definitions:
         name: "name"
         project: "project"
       token: "token"
+  adminNamedEntityList:
+    type: "object"
+    properties:
+      entities:
+        type: "array"
+        title: "A list of NamedEntity objects"
+        items:
+          $ref: "#/definitions/adminNamedEntity"
+      token:
+        type: "string"
+        description: "In the case of multiple pages of results, the server-provided\
+          \ token can be used to fetch the next page\nin a query. If there are no\
+          \ more results, this value will be empty."
+    description: "Represents a list of NamedEntityIdentifiers."
+    example:
+      entities:
+      - metadata:
+          description: "description"
+        resource_type: {}
+        id:
+          domain: "domain"
+          name: "name"
+          project: "project"
+      - metadata:
+          description: "description"
+        resource_type: {}
+        id:
+          domain: "domain"
+          name: "name"
+          project: "project"
+      token: "token"
+  adminNamedEntityMetadata:
+    type: "object"
+    properties:
+      description:
+        type: "string"
+        title: "Common description across all versions of the entity\n+optional"
+    example:
+      description: "description"
+  adminNamedEntityUpdateRequest:
+    type: "object"
+    properties:
+      resource_type:
+        title: "Resource type of the metadata to update"
+        $ref: "#/definitions/coreResourceType"
+      id:
+        title: "Identifier of the metadata to update"
+        $ref: "#/definitions/adminNamedEntityIdentifier"
+      metadata:
+        title: "Metadata object to set as the new value"
+        $ref: "#/definitions/adminNamedEntityMetadata"
+    description: "Request to set the referenced launch plan state to the configured\
+      \ value."
+  adminNamedEntityUpdateResponse:
+    type: "object"
+    description: "Purposefully empty, may be populated in the future."
   adminNodeExecutionClosure:
     type: "object"
     properties:
