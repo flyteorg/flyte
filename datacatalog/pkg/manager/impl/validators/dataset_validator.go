@@ -1,6 +1,8 @@
 package validators
 
-import datacatalog "github.com/lyft/datacatalog/protos/gen"
+import (
+	datacatalog "github.com/lyft/datacatalog/protos/gen"
+)
 
 const (
 	datasetEntity  = "dataset"

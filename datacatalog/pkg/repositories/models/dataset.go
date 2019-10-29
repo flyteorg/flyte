@@ -12,4 +12,11 @@ type Dataset struct {
 	BaseModel
 	DatasetKey
 	SerializedMetadata []byte
+	PartitionKeys      []PartitionKey `gorm:"association_foreignkey:UUID;foreignkey:DatasetUUID"`
+}
+
+type PartitionKey struct {
+	BaseModel
+	DatasetUUID string `gorm:"type:uuid;primary_key"`
+	Name        string `gorm:"primary_key"`
 }

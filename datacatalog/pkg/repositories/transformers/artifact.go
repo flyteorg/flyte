@@ -5,12 +5,21 @@ import (
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
 )
 
-func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData []models.ArtifactData) (models.Artifact, error) {
+func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData []models.ArtifactData, dataset models.Dataset) (models.Artifact, error) {
 	datasetID := request.Artifact.Dataset
 
 	serializedMetadata, err := marshalMetadata(request.Artifact.Metadata)
 	if err != nil {
 		return models.Artifact{}, err
+	}
+
+	partitions := make([]models.Partition, len(request.Artifact.Partitions))
+	for i, partition := range request.Artifact.GetPartitions() {
+		partitions[i] = models.Partition{
+			DatasetUUID: dataset.UUID,
+			Key:         partition.Key,
+			Value:       partition.Value,
+		}
 	}
 
 	return models.Artifact{
@@ -23,6 +32,7 @@ func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData
 		},
 		ArtifactData:       artifactData,
 		SerializedMetadata: serializedMetadata,
+		Partitions:         partitions,
 	}, nil
 }
 
@@ -30,6 +40,14 @@ func FromArtifactModel(artifact models.Artifact) (datacatalog.Artifact, error) {
 	metadata, err := unmarshalMetadata(artifact.SerializedMetadata)
 	if err != nil {
 		return datacatalog.Artifact{}, err
+	}
+
+	partitions := make([]*datacatalog.Partition, len(artifact.Partitions))
+	for i, partition := range artifact.Partitions {
+		partitions[i] = &datacatalog.Partition{
+			Key:   partition.Key,
+			Value: partition.Value,
+		}
 	}
 
 	return datacatalog.Artifact{
@@ -40,7 +58,8 @@ func FromArtifactModel(artifact models.Artifact) (datacatalog.Artifact, error) {
 			Name:    artifact.DatasetName,
 			Version: artifact.DatasetVersion,
 		},
-		Metadata: metadata,
+		Metadata:   metadata,
+		Partitions: partitions,
 	}, nil
 }
 

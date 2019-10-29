@@ -52,7 +52,7 @@ func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.A
 	defer timer.Stop()
 
 	var artifact models.Artifact
-	result := h.db.Preload("ArtifactData").Find(&artifact, &models.Artifact{
+	result := h.db.Preload("ArtifactData").Preload("Partitions").First(&artifact, &models.Artifact{
 		ArtifactKey: in,
 	})
 
