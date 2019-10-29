@@ -265,6 +265,28 @@ func TestCreateArtifact(t *testing.T) {
 		_, err := artifactManager.CreateArtifact(ctx, request)
 		assert.NoError(t, err)
 	})
+
+	t.Run("Invalid Partition", func(t *testing.T) {
+		dcRepo := newMockDataCatalogRepo()
+		dcRepo.MockDatasetRepo.On("Get", mock.Anything, mock.Anything).Return(mockDatasetModel, nil)
+		artifact := getTestArtifact()
+		artifact.Partitions = append(artifact.Partitions, &datacatalog.Partition{Key: "invalidKey", Value: "invalid"})
+		dcRepo.MockArtifactRepo.On("Create",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(artifact models.Artifact) bool {
+				return false
+			})).Return(fmt.Errorf("Validation should happen before this happens"))
+
+		request := datacatalog.CreateArtifactRequest{Artifact: artifact}
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
+		assert.Error(t, err)
+		assert.Nil(t, artifactResponse)
+
+		responseCode := status.Code(err)
+		assert.Equal(t, codes.InvalidArgument, responseCode)
+	})
+
 }
 
 func TestGetArtifact(t *testing.T) {
