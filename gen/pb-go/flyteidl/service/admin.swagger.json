@@ -1436,6 +1436,47 @@
         ]
       }
     },
+    "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}": {
+      "put": {
+        "description": "Update the customized resource attributes associated with a project-domain combination",
+        "operationId": "UpdateProjectDomainAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attributes.project",
+            "description": "Unique project id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.domain",
+            "description": "Unique domain id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/projects": {
       "get": {
         "description": "Fetch registered projects.",
@@ -3174,6 +3215,39 @@
         }
       },
       "description": "Top-level namespace used to classify different entities like workflows and executions."
+    },
+    "adminProjectDomainAttributes": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Unique project id for which this set of attributes will be applied."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Unique domain id for which this set of attributes will be applied."
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).\nMap keys are the *case-sensitive* names of variables in templatized resource files.\nMap values should be the custom values which get substituted during resource creation."
+        }
+      }
+    },
+    "adminProjectDomainAttributesUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminProjectDomainAttributes"
+        }
+      },
+      "description": "Sets custom attributes for a project-domain combination."
+    },
+    "adminProjectDomainAttributesUpdateResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
     },
     "adminProjectRegisterRequest": {
       "type": "object",

@@ -263,6 +263,12 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_update_project_domain_attributes(self):
+        """Test case for update_project_domain_attributes
+
+        """
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()
