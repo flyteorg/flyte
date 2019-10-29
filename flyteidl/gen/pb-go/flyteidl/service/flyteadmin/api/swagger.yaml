@@ -1230,6 +1230,37 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminNodeExecutionList"
+  /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}:
+    put:
+      tags:
+      - "AdminService"
+      description: "Update the customized resource attributes associated with a project-domain\
+        \ combination"
+      operationId: "UpdateProjectDomainAttributes"
+      parameters:
+      - name: "attributes.project"
+        in: "path"
+        description: "Unique project id for which this set of attributes will be applied."
+        required: true
+        type: "string"
+        x-exportParamName: "AttributesProject"
+      - name: "attributes.domain"
+        in: "path"
+        description: "Unique domain id for which this set of attributes will be applied."
+        required: true
+        type: "string"
+        x-exportParamName: "AttributesDomain"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminProjectDomainAttributesUpdateRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminProjectDomainAttributesUpdateResponse"
   /api/v1/projects:
     get:
       tags:
@@ -4437,6 +4468,32 @@ definitions:
         id: "id"
       description: "description"
       id: "id"
+  adminProjectDomainAttributes:
+    type: "object"
+    properties:
+      project:
+        type: "string"
+        description: "Unique project id for which this set of attributes will be applied."
+      domain:
+        type: "string"
+        description: "Unique domain id for which this set of attributes will be applied."
+      attributes:
+        type: "object"
+        description: "Custom resource attributes which will be applied in cluster\
+          \ resource creation (e.g. quotas).\nMap keys are the *case-sensitive* names\
+          \ of variables in templatized resource files.\nMap values should be the\
+          \ custom values which get substituted during resource creation."
+        additionalProperties:
+          type: "string"
+  adminProjectDomainAttributesUpdateRequest:
+    type: "object"
+    properties:
+      attributes:
+        $ref: "#/definitions/adminProjectDomainAttributes"
+    description: "Sets custom attributes for a project-domain combination."
+  adminProjectDomainAttributesUpdateResponse:
+    type: "object"
+    description: "Purposefully empty, may be populated in the future."
   adminProjectRegisterRequest:
     type: "object"
     properties:

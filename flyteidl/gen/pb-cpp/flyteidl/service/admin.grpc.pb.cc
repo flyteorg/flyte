@@ -53,6 +53,7 @@ static const char* AdminService_method_names[] = {
   "/flyteidl.service.AdminService/GetTaskExecution",
   "/flyteidl.service.AdminService/ListTaskExecutions",
   "/flyteidl.service.AdminService/GetTaskExecutionData",
+  "/flyteidl.service.AdminService/UpdateProjectDomainAttributes",
   "/flyteidl.service.AdminService/ListNamedEntities",
   "/flyteidl.service.AdminService/GetNamedEntity",
   "/flyteidl.service.AdminService/UpdateNamedEntity",
@@ -98,9 +99,10 @@ AdminService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chann
   , rpcmethod_GetTaskExecution_(AdminService_method_names[30], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_ListTaskExecutions_(AdminService_method_names[31], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetTaskExecutionData_(AdminService_method_names[32], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListNamedEntities_(AdminService_method_names[33], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetNamedEntity_(AdminService_method_names[34], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_UpdateNamedEntity_(AdminService_method_names[35], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateProjectDomainAttributes_(AdminService_method_names[33], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListNamedEntities_(AdminService_method_names[34], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetNamedEntity_(AdminService_method_names[35], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateNamedEntity_(AdminService_method_names[36], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status AdminService::Stub::CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::flyteidl::admin::TaskCreateResponse* response) {
@@ -1027,6 +1029,34 @@ void AdminService::Stub::experimental_async::GetTaskExecutionData(::grpc::Client
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::TaskExecutionGetDataResponse>::Create(channel_.get(), cq, rpcmethod_GetTaskExecutionData_, context, request, false);
 }
 
+::grpc::Status AdminService::Stub::UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest& request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_UpdateProjectDomainAttributes_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_UpdateProjectDomainAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_UpdateProjectDomainAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_UpdateProjectDomainAttributes_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_UpdateProjectDomainAttributes_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>* AdminService::Stub::AsyncUpdateProjectDomainAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateProjectDomainAttributes_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>* AdminService::Stub::PrepareAsyncUpdateProjectDomainAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateProjectDomainAttributes_, context, request, false);
+}
+
 ::grpc::Status AdminService::Stub::ListNamedEntities(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest& request, ::flyteidl::admin::NamedEntityList* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_ListNamedEntities_, context, request, response);
 }
@@ -1280,15 +1310,20 @@ AdminService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[33],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectDomainAttributesUpdateRequest, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>(
+          std::mem_fn(&AdminService::Service::UpdateProjectDomainAttributes), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[34],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityListRequest, ::flyteidl::admin::NamedEntityList>(
           std::mem_fn(&AdminService::Service::ListNamedEntities), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[34],
+      AdminService_method_names[35],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityGetRequest, ::flyteidl::admin::NamedEntity>(
           std::mem_fn(&AdminService::Service::GetNamedEntity), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[35],
+      AdminService_method_names[36],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityUpdateRequest, ::flyteidl::admin::NamedEntityUpdateResponse>(
           std::mem_fn(&AdminService::Service::UpdateNamedEntity), this)));
@@ -1522,6 +1557,13 @@ AdminService::Service::~Service() {
 }
 
 ::grpc::Status AdminService::Service::GetTaskExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::UpdateProjectDomainAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response) {
   (void) context;
   (void) request;
   (void) response;

@@ -21789,6 +21789,367 @@ export const flyteidl = $root.flyteidl = (() => {
             return ProjectRegisterResponse;
         })();
 
+        admin.ProjectDomainAttributes = (function() {
+
+            /**
+             * Properties of a ProjectDomainAttributes.
+             * @memberof flyteidl.admin
+             * @interface IProjectDomainAttributes
+             * @property {string|null} [project] ProjectDomainAttributes project
+             * @property {string|null} [domain] ProjectDomainAttributes domain
+             * @property {Object.<string,string>|null} [attributes] ProjectDomainAttributes attributes
+             */
+
+            /**
+             * Constructs a new ProjectDomainAttributes.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a ProjectDomainAttributes.
+             * @implements IProjectDomainAttributes
+             * @constructor
+             * @param {flyteidl.admin.IProjectDomainAttributes=} [properties] Properties to set
+             */
+            function ProjectDomainAttributes(properties) {
+                this.attributes = {};
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * ProjectDomainAttributes project.
+             * @member {string} project
+             * @memberof flyteidl.admin.ProjectDomainAttributes
+             * @instance
+             */
+            ProjectDomainAttributes.prototype.project = "";
+
+            /**
+             * ProjectDomainAttributes domain.
+             * @member {string} domain
+             * @memberof flyteidl.admin.ProjectDomainAttributes
+             * @instance
+             */
+            ProjectDomainAttributes.prototype.domain = "";
+
+            /**
+             * ProjectDomainAttributes attributes.
+             * @member {Object.<string,string>} attributes
+             * @memberof flyteidl.admin.ProjectDomainAttributes
+             * @instance
+             */
+            ProjectDomainAttributes.prototype.attributes = $util.emptyObject;
+
+            /**
+             * Creates a new ProjectDomainAttributes instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.ProjectDomainAttributes
+             * @static
+             * @param {flyteidl.admin.IProjectDomainAttributes=} [properties] Properties to set
+             * @returns {flyteidl.admin.ProjectDomainAttributes} ProjectDomainAttributes instance
+             */
+            ProjectDomainAttributes.create = function create(properties) {
+                return new ProjectDomainAttributes(properties);
+            };
+
+            /**
+             * Encodes the specified ProjectDomainAttributes message. Does not implicitly {@link flyteidl.admin.ProjectDomainAttributes.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.ProjectDomainAttributes
+             * @static
+             * @param {flyteidl.admin.IProjectDomainAttributes} message ProjectDomainAttributes message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ProjectDomainAttributes.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.project != null && message.hasOwnProperty("project"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.project);
+                if (message.domain != null && message.hasOwnProperty("domain"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.domain);
+                if (message.attributes != null && message.hasOwnProperty("attributes"))
+                    for (let keys = Object.keys(message.attributes), i = 0; i < keys.length; ++i)
+                        writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.attributes[keys[i]]).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a ProjectDomainAttributes message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.ProjectDomainAttributes
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.ProjectDomainAttributes} ProjectDomainAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ProjectDomainAttributes.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ProjectDomainAttributes(), key;
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.project = reader.string();
+                        break;
+                    case 2:
+                        message.domain = reader.string();
+                        break;
+                    case 3:
+                        reader.skip().pos++;
+                        if (message.attributes === $util.emptyObject)
+                            message.attributes = {};
+                        key = reader.string();
+                        reader.pos++;
+                        message.attributes[key] = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a ProjectDomainAttributes message.
+             * @function verify
+             * @memberof flyteidl.admin.ProjectDomainAttributes
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            ProjectDomainAttributes.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.project != null && message.hasOwnProperty("project"))
+                    if (!$util.isString(message.project))
+                        return "project: string expected";
+                if (message.domain != null && message.hasOwnProperty("domain"))
+                    if (!$util.isString(message.domain))
+                        return "domain: string expected";
+                if (message.attributes != null && message.hasOwnProperty("attributes")) {
+                    if (!$util.isObject(message.attributes))
+                        return "attributes: object expected";
+                    let key = Object.keys(message.attributes);
+                    for (let i = 0; i < key.length; ++i)
+                        if (!$util.isString(message.attributes[key[i]]))
+                            return "attributes: string{k:string} expected";
+                }
+                return null;
+            };
+
+            return ProjectDomainAttributes;
+        })();
+
+        admin.ProjectDomainAttributesUpdateRequest = (function() {
+
+            /**
+             * Properties of a ProjectDomainAttributesUpdateRequest.
+             * @memberof flyteidl.admin
+             * @interface IProjectDomainAttributesUpdateRequest
+             * @property {flyteidl.admin.IProjectDomainAttributes|null} [attributes] ProjectDomainAttributesUpdateRequest attributes
+             */
+
+            /**
+             * Constructs a new ProjectDomainAttributesUpdateRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a ProjectDomainAttributesUpdateRequest.
+             * @implements IProjectDomainAttributesUpdateRequest
+             * @constructor
+             * @param {flyteidl.admin.IProjectDomainAttributesUpdateRequest=} [properties] Properties to set
+             */
+            function ProjectDomainAttributesUpdateRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * ProjectDomainAttributesUpdateRequest attributes.
+             * @member {flyteidl.admin.IProjectDomainAttributes|null|undefined} attributes
+             * @memberof flyteidl.admin.ProjectDomainAttributesUpdateRequest
+             * @instance
+             */
+            ProjectDomainAttributesUpdateRequest.prototype.attributes = null;
+
+            /**
+             * Creates a new ProjectDomainAttributesUpdateRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.ProjectDomainAttributesUpdateRequest
+             * @static
+             * @param {flyteidl.admin.IProjectDomainAttributesUpdateRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.ProjectDomainAttributesUpdateRequest} ProjectDomainAttributesUpdateRequest instance
+             */
+            ProjectDomainAttributesUpdateRequest.create = function create(properties) {
+                return new ProjectDomainAttributesUpdateRequest(properties);
+            };
+
+            /**
+             * Encodes the specified ProjectDomainAttributesUpdateRequest message. Does not implicitly {@link flyteidl.admin.ProjectDomainAttributesUpdateRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.ProjectDomainAttributesUpdateRequest
+             * @static
+             * @param {flyteidl.admin.IProjectDomainAttributesUpdateRequest} message ProjectDomainAttributesUpdateRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ProjectDomainAttributesUpdateRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.attributes != null && message.hasOwnProperty("attributes"))
+                    $root.flyteidl.admin.ProjectDomainAttributes.encode(message.attributes, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a ProjectDomainAttributesUpdateRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.ProjectDomainAttributesUpdateRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.ProjectDomainAttributesUpdateRequest} ProjectDomainAttributesUpdateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ProjectDomainAttributesUpdateRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ProjectDomainAttributesUpdateRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.attributes = $root.flyteidl.admin.ProjectDomainAttributes.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a ProjectDomainAttributesUpdateRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.ProjectDomainAttributesUpdateRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            ProjectDomainAttributesUpdateRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.attributes != null && message.hasOwnProperty("attributes")) {
+                    let error = $root.flyteidl.admin.ProjectDomainAttributes.verify(message.attributes);
+                    if (error)
+                        return "attributes." + error;
+                }
+                return null;
+            };
+
+            return ProjectDomainAttributesUpdateRequest;
+        })();
+
+        admin.ProjectDomainAttributesUpdateResponse = (function() {
+
+            /**
+             * Properties of a ProjectDomainAttributesUpdateResponse.
+             * @memberof flyteidl.admin
+             * @interface IProjectDomainAttributesUpdateResponse
+             */
+
+            /**
+             * Constructs a new ProjectDomainAttributesUpdateResponse.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a ProjectDomainAttributesUpdateResponse.
+             * @implements IProjectDomainAttributesUpdateResponse
+             * @constructor
+             * @param {flyteidl.admin.IProjectDomainAttributesUpdateResponse=} [properties] Properties to set
+             */
+            function ProjectDomainAttributesUpdateResponse(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Creates a new ProjectDomainAttributesUpdateResponse instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.ProjectDomainAttributesUpdateResponse
+             * @static
+             * @param {flyteidl.admin.IProjectDomainAttributesUpdateResponse=} [properties] Properties to set
+             * @returns {flyteidl.admin.ProjectDomainAttributesUpdateResponse} ProjectDomainAttributesUpdateResponse instance
+             */
+            ProjectDomainAttributesUpdateResponse.create = function create(properties) {
+                return new ProjectDomainAttributesUpdateResponse(properties);
+            };
+
+            /**
+             * Encodes the specified ProjectDomainAttributesUpdateResponse message. Does not implicitly {@link flyteidl.admin.ProjectDomainAttributesUpdateResponse.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.ProjectDomainAttributesUpdateResponse
+             * @static
+             * @param {flyteidl.admin.IProjectDomainAttributesUpdateResponse} message ProjectDomainAttributesUpdateResponse message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ProjectDomainAttributesUpdateResponse.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                return writer;
+            };
+
+            /**
+             * Decodes a ProjectDomainAttributesUpdateResponse message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.ProjectDomainAttributesUpdateResponse
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.ProjectDomainAttributesUpdateResponse} ProjectDomainAttributesUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ProjectDomainAttributesUpdateResponse.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ProjectDomainAttributesUpdateResponse();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a ProjectDomainAttributesUpdateResponse message.
+             * @function verify
+             * @memberof flyteidl.admin.ProjectDomainAttributesUpdateResponse
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            ProjectDomainAttributesUpdateResponse.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                return null;
+            };
+
+            return ProjectDomainAttributesUpdateResponse;
+        })();
+
         admin.TaskCreateRequest = (function() {
 
             /**
@@ -25527,6 +25888,39 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              * @param {flyteidl.admin.ITaskExecutionGetDataRequest} request TaskExecutionGetDataRequest message or plain object
              * @returns {Promise<flyteidl.admin.TaskExecutionGetDataResponse>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#updateProjectDomainAttributes}.
+             * @memberof flyteidl.service.AdminService
+             * @typedef UpdateProjectDomainAttributesCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.ProjectDomainAttributesUpdateResponse} [response] ProjectDomainAttributesUpdateResponse
+             */
+
+            /**
+             * Calls UpdateProjectDomainAttributes.
+             * @function updateProjectDomainAttributes
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.IProjectDomainAttributesUpdateRequest} request ProjectDomainAttributesUpdateRequest message or plain object
+             * @param {flyteidl.service.AdminService.UpdateProjectDomainAttributesCallback} callback Node-style callback called with the error, if any, and ProjectDomainAttributesUpdateResponse
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(AdminService.prototype.updateProjectDomainAttributes = function updateProjectDomainAttributes(request, callback) {
+                return this.rpcCall(updateProjectDomainAttributes, $root.flyteidl.admin.ProjectDomainAttributesUpdateRequest, $root.flyteidl.admin.ProjectDomainAttributesUpdateResponse, request, callback);
+            }, "name", { value: "UpdateProjectDomainAttributes" });
+
+            /**
+             * Calls UpdateProjectDomainAttributes.
+             * @function updateProjectDomainAttributes
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.IProjectDomainAttributesUpdateRequest} request ProjectDomainAttributesUpdateRequest message or plain object
+             * @returns {Promise<flyteidl.admin.ProjectDomainAttributesUpdateResponse>} Promise
              * @variation 2
              */
 

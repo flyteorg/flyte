@@ -9138,6 +9138,168 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a ProjectDomainAttributes. */
+        interface IProjectDomainAttributes {
+
+            /** ProjectDomainAttributes project */
+            project?: (string|null);
+
+            /** ProjectDomainAttributes domain */
+            domain?: (string|null);
+
+            /** ProjectDomainAttributes attributes */
+            attributes?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a ProjectDomainAttributes. */
+        class ProjectDomainAttributes implements IProjectDomainAttributes {
+
+            /**
+             * Constructs a new ProjectDomainAttributes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectDomainAttributes);
+
+            /** ProjectDomainAttributes project. */
+            public project: string;
+
+            /** ProjectDomainAttributes domain. */
+            public domain: string;
+
+            /** ProjectDomainAttributes attributes. */
+            public attributes: { [k: string]: string };
+
+            /**
+             * Creates a new ProjectDomainAttributes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectDomainAttributes instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectDomainAttributes): flyteidl.admin.ProjectDomainAttributes;
+
+            /**
+             * Encodes the specified ProjectDomainAttributes message. Does not implicitly {@link flyteidl.admin.ProjectDomainAttributes.verify|verify} messages.
+             * @param message ProjectDomainAttributes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectDomainAttributes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectDomainAttributes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectDomainAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectDomainAttributes;
+
+            /**
+             * Verifies a ProjectDomainAttributes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectDomainAttributesUpdateRequest. */
+        interface IProjectDomainAttributesUpdateRequest {
+
+            /** ProjectDomainAttributesUpdateRequest attributes */
+            attributes?: (flyteidl.admin.IProjectDomainAttributes|null);
+        }
+
+        /** Represents a ProjectDomainAttributesUpdateRequest. */
+        class ProjectDomainAttributesUpdateRequest implements IProjectDomainAttributesUpdateRequest {
+
+            /**
+             * Constructs a new ProjectDomainAttributesUpdateRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectDomainAttributesUpdateRequest);
+
+            /** ProjectDomainAttributesUpdateRequest attributes. */
+            public attributes?: (flyteidl.admin.IProjectDomainAttributes|null);
+
+            /**
+             * Creates a new ProjectDomainAttributesUpdateRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectDomainAttributesUpdateRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectDomainAttributesUpdateRequest): flyteidl.admin.ProjectDomainAttributesUpdateRequest;
+
+            /**
+             * Encodes the specified ProjectDomainAttributesUpdateRequest message. Does not implicitly {@link flyteidl.admin.ProjectDomainAttributesUpdateRequest.verify|verify} messages.
+             * @param message ProjectDomainAttributesUpdateRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectDomainAttributesUpdateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectDomainAttributesUpdateRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectDomainAttributesUpdateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectDomainAttributesUpdateRequest;
+
+            /**
+             * Verifies a ProjectDomainAttributesUpdateRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectDomainAttributesUpdateResponse. */
+        interface IProjectDomainAttributesUpdateResponse {
+        }
+
+        /** Represents a ProjectDomainAttributesUpdateResponse. */
+        class ProjectDomainAttributesUpdateResponse implements IProjectDomainAttributesUpdateResponse {
+
+            /**
+             * Constructs a new ProjectDomainAttributesUpdateResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectDomainAttributesUpdateResponse);
+
+            /**
+             * Creates a new ProjectDomainAttributesUpdateResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectDomainAttributesUpdateResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectDomainAttributesUpdateResponse): flyteidl.admin.ProjectDomainAttributesUpdateResponse;
+
+            /**
+             * Encodes the specified ProjectDomainAttributesUpdateResponse message. Does not implicitly {@link flyteidl.admin.ProjectDomainAttributesUpdateResponse.verify|verify} messages.
+             * @param message ProjectDomainAttributesUpdateResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectDomainAttributesUpdateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectDomainAttributesUpdateResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectDomainAttributesUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectDomainAttributesUpdateResponse;
+
+            /**
+             * Verifies a ProjectDomainAttributesUpdateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a TaskCreateRequest. */
         interface ITaskCreateRequest {
 
@@ -10754,6 +10916,20 @@ export namespace flyteidl {
             public getTaskExecutionData(request: flyteidl.admin.ITaskExecutionGetDataRequest): Promise<flyteidl.admin.TaskExecutionGetDataResponse>;
 
             /**
+             * Calls UpdateProjectDomainAttributes.
+             * @param request ProjectDomainAttributesUpdateRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ProjectDomainAttributesUpdateResponse
+             */
+            public updateProjectDomainAttributes(request: flyteidl.admin.IProjectDomainAttributesUpdateRequest, callback: flyteidl.service.AdminService.UpdateProjectDomainAttributesCallback): void;
+
+            /**
+             * Calls UpdateProjectDomainAttributes.
+             * @param request ProjectDomainAttributesUpdateRequest message or plain object
+             * @returns Promise
+             */
+            public updateProjectDomainAttributes(request: flyteidl.admin.IProjectDomainAttributesUpdateRequest): Promise<flyteidl.admin.ProjectDomainAttributesUpdateResponse>;
+
+            /**
              * Calls ListNamedEntities.
              * @param request NamedEntityListRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and NamedEntityList
@@ -11028,6 +11204,13 @@ export namespace flyteidl {
              * @param [response] TaskExecutionGetDataResponse
              */
             type GetTaskExecutionDataCallback = (error: (Error|null), response?: flyteidl.admin.TaskExecutionGetDataResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#updateProjectDomainAttributes}.
+             * @param error Error, if any
+             * @param [response] ProjectDomainAttributesUpdateResponse
+             */
+            type UpdateProjectDomainAttributesCallback = (error: (Error|null), response?: flyteidl.admin.ProjectDomainAttributesUpdateResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listNamedEntities}.

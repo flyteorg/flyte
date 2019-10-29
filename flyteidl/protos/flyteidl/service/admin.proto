@@ -5,6 +5,7 @@ option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
 import "flyteidl/admin/project.proto";
+import "flyteidl/admin/project_domain_attributes.proto";
 import "flyteidl/admin/task.proto";
 import "flyteidl/admin/workflow.proto";
 import "flyteidl/admin/launch_plan.proto";
@@ -374,6 +375,16 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       description: "Retrieve input and output data from an existing task execution."
+    };
+  }
+
+  rpc UpdateProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesUpdateRequest) returns (flyteidl.admin.ProjectDomainAttributesUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Update the customized resource attributes associated with a project-domain combination"
     };
   }
 
