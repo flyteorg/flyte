@@ -99,6 +99,7 @@ func TestCreateArtifact(t *testing.T) {
 			Domain:  expectedDataset.Id.Domain,
 			Name:    expectedDataset.Id.Name,
 			Version: expectedDataset.Id.Version,
+			UUID:    expectedDataset.Id.UUID,
 		},
 		PartitionKeys: []models.PartitionKey{
 			{Name: expectedDataset.PartitionKeys[0]},
@@ -133,8 +134,10 @@ func TestCreateArtifact(t *testing.T) {
 					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
 					artifact.Partitions[0].Key == expectedArtifact.Partitions[0].Key &&
 					artifact.Partitions[0].Value == expectedArtifact.Partitions[0].Value &&
+					artifact.Partitions[0].DatasetUUID == expectedDataset.Id.UUID &&
 					artifact.Partitions[1].Key == expectedArtifact.Partitions[1].Key &&
-					artifact.Partitions[1].Value == expectedArtifact.Partitions[1].Value
+					artifact.Partitions[1].Value == expectedArtifact.Partitions[1].Value &&
+					artifact.Partitions[1].DatasetUUID == expectedDataset.Id.UUID
 			})).Return(nil)
 
 		request := datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}

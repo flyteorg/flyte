@@ -27,8 +27,20 @@ func getTestArtifactData() []*datacatalog.ArtifactData {
 
 func getTestPartitions() []models.Partition {
 	return []models.Partition{
-		{Key: "key1", Value: "value1"},
-		{Key: "key2", Value: "value2"},
+		{DatasetUUID: "dataset-uuid", Key: "key1", Value: "value1"},
+		{DatasetUUID: "dataset-uuid", Key: "key2", Value: "value2"},
+	}
+}
+
+func getDatasetModel() models.Dataset {
+	return models.Dataset{
+		DatasetKey: models.DatasetKey{
+			Project: datasetID.Project,
+			Domain:  datasetID.Domain,
+			Name:    datasetID.Name,
+			Version: datasetID.Version,
+			UUID:    "dataset-uuid",
+		},
 	}
 }
 
@@ -52,7 +64,7 @@ func TestCreateArtifactModel(t *testing.T) {
 		{Name: "data3", Location: "s3://test2"},
 	}
 
-	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData)
+	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData, getDatasetModel())
 	assert.NoError(t, err)
 	assert.Equal(t, artifactModel.ArtifactID, createArtifactRequest.Artifact.Id)
 	assert.Equal(t, artifactModel.ArtifactKey.DatasetProject, datasetID.Project)
@@ -76,7 +88,7 @@ func TestCreateArtifactModelNoMetdata(t *testing.T) {
 		{Name: "data1", Location: "s3://test1"},
 		{Name: "data3", Location: "s3://test2"},
 	}
-	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData)
+	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData, getDatasetModel())
 	assert.NoError(t, err)
 	assert.Equal(t, []byte{}, artifactModel.SerializedMetadata)
 	assert.Len(t, artifactModel.Partitions, 0)
@@ -93,8 +105,8 @@ func TestFromArtifactModel(t *testing.T) {
 		},
 		SerializedMetadata: []byte{},
 		Partitions: []models.Partition{
-			{Key: "key1", Value: "value1"},
-			{Key: "key2", Value: "value2"},
+			{DatasetUUID: "dataset-uuid", Key: "key1", Value: "value1"},
+			{DatasetUUID: "dataset-uuid", Key: "key2", Value: "value2"},
 		},
 	}
 

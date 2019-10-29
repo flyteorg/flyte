@@ -5,7 +5,7 @@ import (
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
 )
 
-func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData []models.ArtifactData) (models.Artifact, error) {
+func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData []models.ArtifactData, dataset models.Dataset) (models.Artifact, error) {
 	datasetID := request.Artifact.Dataset
 
 	serializedMetadata, err := marshalMetadata(request.Artifact.Metadata)
@@ -16,8 +16,9 @@ func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData
 	partitions := make([]models.Partition, len(request.Artifact.Partitions))
 	for i, partition := range request.Artifact.GetPartitions() {
 		partitions[i] = models.Partition{
-			Key:   partition.Key,
-			Value: partition.Value,
+			DatasetUUID: dataset.UUID,
+			Key:         partition.Key,
+			Value:       partition.Value,
 		}
 	}
 

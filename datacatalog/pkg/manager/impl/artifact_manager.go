@@ -94,7 +94,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalo
 
 	logger.Debugf(ctx, "Stored %v data for artifact %+v", len(artifactDataModels), artifact.Id)
 
-	artifactModel, err := transformers.CreateArtifactModel(request, artifactDataModels)
+	artifactModel, err := transformers.CreateArtifactModel(request, artifactDataModels, dataset)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to transform artifact err: %v", err)
 		m.systemMetrics.transformerErrorCounter.Inc(ctx)
