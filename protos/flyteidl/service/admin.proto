@@ -25,17 +25,17 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       description: "Create and register a task definition."
-      responses: {	
-        key: "400"	
-        value: {	
-          description: "Returned for bad request that may have failed validation."	
-        }	
-      }	
-      responses: {	
-        key: "409"	
-        value: {	
-          description: "Returned for a request that references an identical entity that has already been registered."	
-        }	
+      responses: {
+        key: "400"
+        value: {
+          description: "Returned for bad request that may have failed validation."
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "Returned for a request that references an identical entity that has already been registered."
+        }
       }
     };
   }
@@ -77,17 +77,17 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       description: "Create and register a workflow definition."
-      responses: {	
-        key: "400"	
-        value: {	
-          description: "Returned for bad request that may have failed validation."	
-        }	
-      }	
-      responses: {	
-        key: "409"	
-        value: {	
-          description: "Returned for a request that references an identical entity that has already been registered."	
-        }	
+      responses: {
+        key: "400"
+        value: {
+          description: "Returned for bad request that may have failed validation."
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "Returned for a request that references an identical entity that has already been registered."
+        }
       }
     };
   }
@@ -129,17 +129,17 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       description: "Create and register a launch plan definition."
-      responses: {	
-        key: "400"	
-        value: {	
-          description: "Returned for bad request that may have failed validation."	
-        }	
-      }	
-      responses: {	
-        key: "409"	
-        value: {	
-          description: "Returned for a request that references an identical entity that has already been registered."	
-        }	
+      responses: {
+        key: "400"
+        value: {
+          description: "Returned for bad request that may have failed validation."
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "Returned for a request that references an identical entity that has already been registered."
+        }
       }
     };
   }
@@ -374,6 +374,34 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       description: "Retrieve input and output data from an existing task execution."
+    };
+  }
+
+  rpc ListNamedEntities (flyteidl.admin.NamedEntityListRequest) returns (flyteidl.admin.NamedEntityList) {
+    option (google.api.http) = {
+      get: "/api/v1/named_entities/{resource_type}/{project}/{domain}"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain."
+    };
+  }
+
+  rpc GetNamedEntity (flyteidl.admin.NamedEntityGetRequest) returns (flyteidl.admin.NamedEntity) {
+    option (google.api.http) = {
+      get: "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Retrieve a NamedEntity object."
+    };
+  }
+
+  rpc UpdateNamedEntity (flyteidl.admin.NamedEntityUpdateRequest) returns (flyteidl.admin.NamedEntityUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Update the fields associated with a NamedEntity"
     };
   }
 }

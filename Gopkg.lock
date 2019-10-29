@@ -432,7 +432,7 @@
     "internal/span",
   ]
   pruneopts = "UT"
-  revision = "d78a1f2664a08ffcd20fbbc90d95df4fffa60547"
+  revision = "80f3f9ca0853fa9dbf1ffdc81029677e3c23108b"
 
 [[projects]]
   digest = "1:e0a1881f9e0564bebdeac98c75e59f07acdde6ed3a5396e0e613eaad31194866"

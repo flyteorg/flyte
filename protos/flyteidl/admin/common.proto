@@ -11,14 +11,28 @@ import "flyteidl/core/identifier.proto";
 // A resource can internally have multiple versions.
 message NamedEntityIdentifier {
     // Name of the project the resource belongs to.
-    string project    = 1;  // [(validate.rules).string.min_bytes = 1];
+    string project               = 1;  // [(validate.rules).string.min_bytes = 1];
     // Name of the domain the resource belongs to.
     // A domain can be considered as a subset within a specific project.
-    string domain     = 2;  // [(validate.rules).string.min_bytes = 1];
+    string domain                = 2;  // [(validate.rules).string.min_bytes = 1];
     // User provided value for the resource.
     // The combination of project + domain + name uniquely identifies the resource.
     // +optional - in certain contexts - like 'List API', 'Launch plans'
-    string name       = 3;
+    string name                  = 3;
+}
+
+message NamedEntityMetadata {
+    // Common description across all versions of the entity
+    // +optional
+    string description = 1;
+}
+
+// Describes information common to a NamedEntity, identified by a project /
+// domain / name / resource type combination
+message NamedEntity {
+    flyteidl.core.ResourceType resource_type = 1;
+    NamedEntityIdentifier id                 = 2;
+    NamedEntityMetadata metadata             = 3;
 }
 
 // Species sort ordering in a list request.
@@ -54,14 +68,64 @@ message NamedEntityIdentifierListRequest {
     Sort sort_by      = 5;
 }
 
-// Represents a list of Identifiers.
+// Represents a request structure to list NamedEntity objects
+message NamedEntityListRequest {
+    flyteidl.core.ResourceType resource_type = 1;
+    // Name of the project that contains the identifiers.
+    string project                           = 2;  // [(validate.rules).string.min_bytes = 1];
+    // Name of the domain the identifiers belongs to within the project.
+    string domain                            = 3;  // [(validate.rules).string.min_bytes = 1];
+    // Indicates the number of resources to be returned.
+    uint32 limit                             = 4;
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token                             = 5;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by                             = 6;
+}
+
+// Represents a list of NamedEntityIdentifiers.
 message NamedEntityIdentifierList {
     // A list of identifiers.
-    repeated NamedEntityIdentifier entities = 1;
+    repeated NamedEntityIdentifier entities                = 1;
 
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
     // in a query. If there are no more results, this value will be empty.
-    string token                      = 2;
+    string token                                           = 2;
+}
+
+// Represents a list of NamedEntityIdentifiers.
+message NamedEntityList {
+    // A list of NamedEntity objects
+    repeated NamedEntity entities                = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token                                           = 2;
+}
+
+// A request to retrieve the metadata associated with a NamedEntityIdentifier
+message NamedEntityGetRequest {
+    flyteidl.core.ResourceType resource_type = 1;
+    NamedEntityIdentifier id                 = 2;
+}
+
+// Request to set the referenced launch plan state to the configured value.
+message NamedEntityUpdateRequest {
+    // Resource type of the metadata to update
+    flyteidl.core.ResourceType resource_type = 1;
+    // Identifier of the metadata to update
+    NamedEntityIdentifier id                 = 2;
+
+    // Metadata object to set as the new value
+    NamedEntityMetadata metadata             = 3;
+}
+
+// Purposefully empty, may be populated in the future.
+message NamedEntityUpdateResponse {
 }
 
 // Represents a structure to fetch a single resource.

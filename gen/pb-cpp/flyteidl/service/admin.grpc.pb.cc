@@ -53,6 +53,9 @@ static const char* AdminService_method_names[] = {
   "/flyteidl.service.AdminService/GetTaskExecution",
   "/flyteidl.service.AdminService/ListTaskExecutions",
   "/flyteidl.service.AdminService/GetTaskExecutionData",
+  "/flyteidl.service.AdminService/ListNamedEntities",
+  "/flyteidl.service.AdminService/GetNamedEntity",
+  "/flyteidl.service.AdminService/UpdateNamedEntity",
 };
 
 std::unique_ptr< AdminService::Stub> AdminService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -95,6 +98,9 @@ AdminService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chann
   , rpcmethod_GetTaskExecution_(AdminService_method_names[30], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_ListTaskExecutions_(AdminService_method_names[31], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetTaskExecutionData_(AdminService_method_names[32], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListNamedEntities_(AdminService_method_names[33], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetNamedEntity_(AdminService_method_names[34], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateNamedEntity_(AdminService_method_names[35], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status AdminService::Stub::CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::flyteidl::admin::TaskCreateResponse* response) {
@@ -1021,6 +1027,90 @@ void AdminService::Stub::experimental_async::GetTaskExecutionData(::grpc::Client
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::TaskExecutionGetDataResponse>::Create(channel_.get(), cq, rpcmethod_GetTaskExecutionData_, context, request, false);
 }
 
+::grpc::Status AdminService::Stub::ListNamedEntities(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest& request, ::flyteidl::admin::NamedEntityList* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_ListNamedEntities_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::ListNamedEntities(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest* request, ::flyteidl::admin::NamedEntityList* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_ListNamedEntities_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::ListNamedEntities(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityList* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_ListNamedEntities_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::ListNamedEntities(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest* request, ::flyteidl::admin::NamedEntityList* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_ListNamedEntities_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::ListNamedEntities(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityList* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_ListNamedEntities_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityList>* AdminService::Stub::AsyncListNamedEntitiesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::NamedEntityList>::Create(channel_.get(), cq, rpcmethod_ListNamedEntities_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityList>* AdminService::Stub::PrepareAsyncListNamedEntitiesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::NamedEntityList>::Create(channel_.get(), cq, rpcmethod_ListNamedEntities_, context, request, false);
+}
+
+::grpc::Status AdminService::Stub::GetNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest& request, ::flyteidl::admin::NamedEntity* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetNamedEntity_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::GetNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest* request, ::flyteidl::admin::NamedEntity* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetNamedEntity_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntity* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetNamedEntity_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest* request, ::flyteidl::admin::NamedEntity* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetNamedEntity_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::GetNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntity* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetNamedEntity_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntity>* AdminService::Stub::AsyncGetNamedEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::NamedEntity>::Create(channel_.get(), cq, rpcmethod_GetNamedEntity_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntity>* AdminService::Stub::PrepareAsyncGetNamedEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::NamedEntity>::Create(channel_.get(), cq, rpcmethod_GetNamedEntity_, context, request, false);
+}
+
+::grpc::Status AdminService::Stub::UpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::flyteidl::admin::NamedEntityUpdateResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_UpdateNamedEntity_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::UpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_UpdateNamedEntity_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::UpdateNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_UpdateNamedEntity_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::UpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_UpdateNamedEntity_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::UpdateNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_UpdateNamedEntity_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityUpdateResponse>* AdminService::Stub::AsyncUpdateNamedEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::NamedEntityUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateNamedEntity_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityUpdateResponse>* AdminService::Stub::PrepareAsyncUpdateNamedEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::NamedEntityUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateNamedEntity_, context, request, false);
+}
+
 AdminService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[0],
@@ -1187,6 +1277,21 @@ AdminService::Service::Service() {
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::TaskExecutionGetDataRequest, ::flyteidl::admin::TaskExecutionGetDataResponse>(
           std::mem_fn(&AdminService::Service::GetTaskExecutionData), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[33],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityListRequest, ::flyteidl::admin::NamedEntityList>(
+          std::mem_fn(&AdminService::Service::ListNamedEntities), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[34],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityGetRequest, ::flyteidl::admin::NamedEntity>(
+          std::mem_fn(&AdminService::Service::GetNamedEntity), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[35],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityUpdateRequest, ::flyteidl::admin::NamedEntityUpdateResponse>(
+          std::mem_fn(&AdminService::Service::UpdateNamedEntity), this)));
 }
 
 AdminService::Service::~Service() {
@@ -1417,6 +1522,27 @@ AdminService::Service::~Service() {
 }
 
 ::grpc::Status AdminService::Service::GetTaskExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::TaskExecutionGetDataRequest* request, ::flyteidl::admin::TaskExecutionGetDataResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::ListNamedEntities(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityListRequest* request, ::flyteidl::admin::NamedEntityList* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::GetNamedEntity(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityGetRequest* request, ::flyteidl::admin::NamedEntity* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::UpdateNamedEntity(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest* request, ::flyteidl::admin::NamedEntityUpdateResponse* response) {
   (void) context;
   (void) request;
   (void) response;

@@ -47,7 +47,7 @@ struct TableStruct_flyteidl_2fadmin_2fcommon_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[15]
+  static const ::google::protobuf::internal::ParseTable schema[22]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -71,6 +71,12 @@ extern LabelsDefaultTypeInternal _Labels_default_instance_;
 class Labels_ValuesEntry_DoNotUse;
 class Labels_ValuesEntry_DoNotUseDefaultTypeInternal;
 extern Labels_ValuesEntry_DoNotUseDefaultTypeInternal _Labels_ValuesEntry_DoNotUse_default_instance_;
+class NamedEntity;
+class NamedEntityDefaultTypeInternal;
+extern NamedEntityDefaultTypeInternal _NamedEntity_default_instance_;
+class NamedEntityGetRequest;
+class NamedEntityGetRequestDefaultTypeInternal;
+extern NamedEntityGetRequestDefaultTypeInternal _NamedEntityGetRequest_default_instance_;
 class NamedEntityIdentifier;
 class NamedEntityIdentifierDefaultTypeInternal;
 extern NamedEntityIdentifierDefaultTypeInternal _NamedEntityIdentifier_default_instance_;
@@ -80,6 +86,21 @@ extern NamedEntityIdentifierListDefaultTypeInternal _NamedEntityIdentifierList_d
 class NamedEntityIdentifierListRequest;
 class NamedEntityIdentifierListRequestDefaultTypeInternal;
 extern NamedEntityIdentifierListRequestDefaultTypeInternal _NamedEntityIdentifierListRequest_default_instance_;
+class NamedEntityList;
+class NamedEntityListDefaultTypeInternal;
+extern NamedEntityListDefaultTypeInternal _NamedEntityList_default_instance_;
+class NamedEntityListRequest;
+class NamedEntityListRequestDefaultTypeInternal;
+extern NamedEntityListRequestDefaultTypeInternal _NamedEntityListRequest_default_instance_;
+class NamedEntityMetadata;
+class NamedEntityMetadataDefaultTypeInternal;
+extern NamedEntityMetadataDefaultTypeInternal _NamedEntityMetadata_default_instance_;
+class NamedEntityUpdateRequest;
+class NamedEntityUpdateRequestDefaultTypeInternal;
+extern NamedEntityUpdateRequestDefaultTypeInternal _NamedEntityUpdateRequest_default_instance_;
+class NamedEntityUpdateResponse;
+class NamedEntityUpdateResponseDefaultTypeInternal;
+extern NamedEntityUpdateResponseDefaultTypeInternal _NamedEntityUpdateResponse_default_instance_;
 class Notification;
 class NotificationDefaultTypeInternal;
 extern NotificationDefaultTypeInternal _Notification_default_instance_;
@@ -110,9 +131,16 @@ template<> ::flyteidl::admin::Annotations_ValuesEntry_DoNotUse* Arena::CreateMay
 template<> ::flyteidl::admin::EmailNotification* Arena::CreateMaybeMessage<::flyteidl::admin::EmailNotification>(Arena*);
 template<> ::flyteidl::admin::Labels* Arena::CreateMaybeMessage<::flyteidl::admin::Labels>(Arena*);
 template<> ::flyteidl::admin::Labels_ValuesEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::admin::Labels_ValuesEntry_DoNotUse>(Arena*);
+template<> ::flyteidl::admin::NamedEntity* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntity>(Arena*);
+template<> ::flyteidl::admin::NamedEntityGetRequest* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntityGetRequest>(Arena*);
 template<> ::flyteidl::admin::NamedEntityIdentifier* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntityIdentifier>(Arena*);
 template<> ::flyteidl::admin::NamedEntityIdentifierList* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntityIdentifierList>(Arena*);
 template<> ::flyteidl::admin::NamedEntityIdentifierListRequest* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntityIdentifierListRequest>(Arena*);
+template<> ::flyteidl::admin::NamedEntityList* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntityList>(Arena*);
+template<> ::flyteidl::admin::NamedEntityListRequest* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntityListRequest>(Arena*);
+template<> ::flyteidl::admin::NamedEntityMetadata* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntityMetadata>(Arena*);
+template<> ::flyteidl::admin::NamedEntityUpdateRequest* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntityUpdateRequest>(Arena*);
+template<> ::flyteidl::admin::NamedEntityUpdateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntityUpdateResponse>(Arena*);
 template<> ::flyteidl::admin::Notification* Arena::CreateMaybeMessage<::flyteidl::admin::Notification>(Arena*);
 template<> ::flyteidl::admin::ObjectGetRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ObjectGetRequest>(Arena*);
 template<> ::flyteidl::admin::PagerDutyNotification* Arena::CreateMaybeMessage<::flyteidl::admin::PagerDutyNotification>(Arena*);
@@ -298,6 +326,258 @@ class NamedEntityIdentifier final :
 };
 // -------------------------------------------------------------------
 
+class NamedEntityMetadata final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.NamedEntityMetadata) */ {
+ public:
+  NamedEntityMetadata();
+  virtual ~NamedEntityMetadata();
+
+  NamedEntityMetadata(const NamedEntityMetadata& from);
+
+  inline NamedEntityMetadata& operator=(const NamedEntityMetadata& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  NamedEntityMetadata(NamedEntityMetadata&& from) noexcept
+    : NamedEntityMetadata() {
+    *this = ::std::move(from);
+  }
+
+  inline NamedEntityMetadata& operator=(NamedEntityMetadata&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const NamedEntityMetadata& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const NamedEntityMetadata* internal_default_instance() {
+    return reinterpret_cast<const NamedEntityMetadata*>(
+               &_NamedEntityMetadata_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  void Swap(NamedEntityMetadata* other);
+  friend void swap(NamedEntityMetadata& a, NamedEntityMetadata& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline NamedEntityMetadata* New() const final {
+    return CreateMaybeMessage<NamedEntityMetadata>(nullptr);
+  }
+
+  NamedEntityMetadata* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<NamedEntityMetadata>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const NamedEntityMetadata& from);
+  void MergeFrom(const NamedEntityMetadata& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(NamedEntityMetadata* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string description = 1;
+  void clear_description();
+  static const int kDescriptionFieldNumber = 1;
+  const ::std::string& description() const;
+  void set_description(const ::std::string& value);
+  #if LANG_CXX11
+  void set_description(::std::string&& value);
+  #endif
+  void set_description(const char* value);
+  void set_description(const char* value, size_t size);
+  ::std::string* mutable_description();
+  ::std::string* release_description();
+  void set_allocated_description(::std::string* description);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.NamedEntityMetadata)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr description_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
+};
+// -------------------------------------------------------------------
+
+class NamedEntity final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.NamedEntity) */ {
+ public:
+  NamedEntity();
+  virtual ~NamedEntity();
+
+  NamedEntity(const NamedEntity& from);
+
+  inline NamedEntity& operator=(const NamedEntity& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  NamedEntity(NamedEntity&& from) noexcept
+    : NamedEntity() {
+    *this = ::std::move(from);
+  }
+
+  inline NamedEntity& operator=(NamedEntity&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const NamedEntity& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const NamedEntity* internal_default_instance() {
+    return reinterpret_cast<const NamedEntity*>(
+               &_NamedEntity_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  void Swap(NamedEntity* other);
+  friend void swap(NamedEntity& a, NamedEntity& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline NamedEntity* New() const final {
+    return CreateMaybeMessage<NamedEntity>(nullptr);
+  }
+
+  NamedEntity* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<NamedEntity>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const NamedEntity& from);
+  void MergeFrom(const NamedEntity& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(NamedEntity* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.NamedEntityIdentifier id = 2;
+  bool has_id() const;
+  void clear_id();
+  static const int kIdFieldNumber = 2;
+  const ::flyteidl::admin::NamedEntityIdentifier& id() const;
+  ::flyteidl::admin::NamedEntityIdentifier* release_id();
+  ::flyteidl::admin::NamedEntityIdentifier* mutable_id();
+  void set_allocated_id(::flyteidl::admin::NamedEntityIdentifier* id);
+
+  // .flyteidl.admin.NamedEntityMetadata metadata = 3;
+  bool has_metadata() const;
+  void clear_metadata();
+  static const int kMetadataFieldNumber = 3;
+  const ::flyteidl::admin::NamedEntityMetadata& metadata() const;
+  ::flyteidl::admin::NamedEntityMetadata* release_metadata();
+  ::flyteidl::admin::NamedEntityMetadata* mutable_metadata();
+  void set_allocated_metadata(::flyteidl::admin::NamedEntityMetadata* metadata);
+
+  // .flyteidl.core.ResourceType resource_type = 1;
+  void clear_resource_type();
+  static const int kResourceTypeFieldNumber = 1;
+  ::flyteidl::core::ResourceType resource_type() const;
+  void set_resource_type(::flyteidl::core::ResourceType value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.NamedEntity)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::admin::NamedEntityIdentifier* id_;
+  ::flyteidl::admin::NamedEntityMetadata* metadata_;
+  int resource_type_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Sort final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.Sort) */ {
  public:
@@ -336,7 +616,7 @@ class Sort final :
                &_Sort_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    3;
 
   void Swap(Sort* other);
   friend void swap(Sort& a, Sort& b) {
@@ -489,7 +769,7 @@ class NamedEntityIdentifierListRequest final :
                &_NamedEntityIdentifierListRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    4;
 
   void Swap(NamedEntityIdentifierListRequest* other);
   friend void swap(NamedEntityIdentifierListRequest& a, NamedEntityIdentifierListRequest& b) {
@@ -618,6 +898,180 @@ class NamedEntityIdentifierListRequest final :
 };
 // -------------------------------------------------------------------
 
+class NamedEntityListRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.NamedEntityListRequest) */ {
+ public:
+  NamedEntityListRequest();
+  virtual ~NamedEntityListRequest();
+
+  NamedEntityListRequest(const NamedEntityListRequest& from);
+
+  inline NamedEntityListRequest& operator=(const NamedEntityListRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  NamedEntityListRequest(NamedEntityListRequest&& from) noexcept
+    : NamedEntityListRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline NamedEntityListRequest& operator=(NamedEntityListRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const NamedEntityListRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const NamedEntityListRequest* internal_default_instance() {
+    return reinterpret_cast<const NamedEntityListRequest*>(
+               &_NamedEntityListRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  void Swap(NamedEntityListRequest* other);
+  friend void swap(NamedEntityListRequest& a, NamedEntityListRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline NamedEntityListRequest* New() const final {
+    return CreateMaybeMessage<NamedEntityListRequest>(nullptr);
+  }
+
+  NamedEntityListRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<NamedEntityListRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const NamedEntityListRequest& from);
+  void MergeFrom(const NamedEntityListRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(NamedEntityListRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string project = 2;
+  void clear_project();
+  static const int kProjectFieldNumber = 2;
+  const ::std::string& project() const;
+  void set_project(const ::std::string& value);
+  #if LANG_CXX11
+  void set_project(::std::string&& value);
+  #endif
+  void set_project(const char* value);
+  void set_project(const char* value, size_t size);
+  ::std::string* mutable_project();
+  ::std::string* release_project();
+  void set_allocated_project(::std::string* project);
+
+  // string domain = 3;
+  void clear_domain();
+  static const int kDomainFieldNumber = 3;
+  const ::std::string& domain() const;
+  void set_domain(const ::std::string& value);
+  #if LANG_CXX11
+  void set_domain(::std::string&& value);
+  #endif
+  void set_domain(const char* value);
+  void set_domain(const char* value, size_t size);
+  ::std::string* mutable_domain();
+  ::std::string* release_domain();
+  void set_allocated_domain(::std::string* domain);
+
+  // string token = 5;
+  void clear_token();
+  static const int kTokenFieldNumber = 5;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
+  // .flyteidl.admin.Sort sort_by = 6;
+  bool has_sort_by() const;
+  void clear_sort_by();
+  static const int kSortByFieldNumber = 6;
+  const ::flyteidl::admin::Sort& sort_by() const;
+  ::flyteidl::admin::Sort* release_sort_by();
+  ::flyteidl::admin::Sort* mutable_sort_by();
+  void set_allocated_sort_by(::flyteidl::admin::Sort* sort_by);
+
+  // .flyteidl.core.ResourceType resource_type = 1;
+  void clear_resource_type();
+  static const int kResourceTypeFieldNumber = 1;
+  ::flyteidl::core::ResourceType resource_type() const;
+  void set_resource_type(::flyteidl::core::ResourceType value);
+
+  // uint32 limit = 4;
+  void clear_limit();
+  static const int kLimitFieldNumber = 4;
+  ::google::protobuf::uint32 limit() const;
+  void set_limit(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.NamedEntityListRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr project_;
+  ::google::protobuf::internal::ArenaStringPtr domain_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
+  ::flyteidl::admin::Sort* sort_by_;
+  int resource_type_;
+  ::google::protobuf::uint32 limit_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
+};
+// -------------------------------------------------------------------
+
 class NamedEntityIdentifierList final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.NamedEntityIdentifierList) */ {
  public:
@@ -656,7 +1110,7 @@ class NamedEntityIdentifierList final :
                &_NamedEntityIdentifierList_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    6;
 
   void Swap(NamedEntityIdentifierList* other);
   friend void swap(NamedEntityIdentifierList& a, NamedEntityIdentifierList& b) {
@@ -751,6 +1205,498 @@ class NamedEntityIdentifierList final :
 };
 // -------------------------------------------------------------------
 
+class NamedEntityList final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.NamedEntityList) */ {
+ public:
+  NamedEntityList();
+  virtual ~NamedEntityList();
+
+  NamedEntityList(const NamedEntityList& from);
+
+  inline NamedEntityList& operator=(const NamedEntityList& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  NamedEntityList(NamedEntityList&& from) noexcept
+    : NamedEntityList() {
+    *this = ::std::move(from);
+  }
+
+  inline NamedEntityList& operator=(NamedEntityList&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const NamedEntityList& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const NamedEntityList* internal_default_instance() {
+    return reinterpret_cast<const NamedEntityList*>(
+               &_NamedEntityList_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(NamedEntityList* other);
+  friend void swap(NamedEntityList& a, NamedEntityList& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline NamedEntityList* New() const final {
+    return CreateMaybeMessage<NamedEntityList>(nullptr);
+  }
+
+  NamedEntityList* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<NamedEntityList>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const NamedEntityList& from);
+  void MergeFrom(const NamedEntityList& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(NamedEntityList* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .flyteidl.admin.NamedEntity entities = 1;
+  int entities_size() const;
+  void clear_entities();
+  static const int kEntitiesFieldNumber = 1;
+  ::flyteidl::admin::NamedEntity* mutable_entities(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::NamedEntity >*
+      mutable_entities();
+  const ::flyteidl::admin::NamedEntity& entities(int index) const;
+  ::flyteidl::admin::NamedEntity* add_entities();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::NamedEntity >&
+      entities() const;
+
+  // string token = 2;
+  void clear_token();
+  static const int kTokenFieldNumber = 2;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.NamedEntityList)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::NamedEntity > entities_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
+};
+// -------------------------------------------------------------------
+
+class NamedEntityGetRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.NamedEntityGetRequest) */ {
+ public:
+  NamedEntityGetRequest();
+  virtual ~NamedEntityGetRequest();
+
+  NamedEntityGetRequest(const NamedEntityGetRequest& from);
+
+  inline NamedEntityGetRequest& operator=(const NamedEntityGetRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  NamedEntityGetRequest(NamedEntityGetRequest&& from) noexcept
+    : NamedEntityGetRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline NamedEntityGetRequest& operator=(NamedEntityGetRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const NamedEntityGetRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const NamedEntityGetRequest* internal_default_instance() {
+    return reinterpret_cast<const NamedEntityGetRequest*>(
+               &_NamedEntityGetRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  void Swap(NamedEntityGetRequest* other);
+  friend void swap(NamedEntityGetRequest& a, NamedEntityGetRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline NamedEntityGetRequest* New() const final {
+    return CreateMaybeMessage<NamedEntityGetRequest>(nullptr);
+  }
+
+  NamedEntityGetRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<NamedEntityGetRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const NamedEntityGetRequest& from);
+  void MergeFrom(const NamedEntityGetRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(NamedEntityGetRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.NamedEntityIdentifier id = 2;
+  bool has_id() const;
+  void clear_id();
+  static const int kIdFieldNumber = 2;
+  const ::flyteidl::admin::NamedEntityIdentifier& id() const;
+  ::flyteidl::admin::NamedEntityIdentifier* release_id();
+  ::flyteidl::admin::NamedEntityIdentifier* mutable_id();
+  void set_allocated_id(::flyteidl::admin::NamedEntityIdentifier* id);
+
+  // .flyteidl.core.ResourceType resource_type = 1;
+  void clear_resource_type();
+  static const int kResourceTypeFieldNumber = 1;
+  ::flyteidl::core::ResourceType resource_type() const;
+  void set_resource_type(::flyteidl::core::ResourceType value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.NamedEntityGetRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::admin::NamedEntityIdentifier* id_;
+  int resource_type_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
+};
+// -------------------------------------------------------------------
+
+class NamedEntityUpdateRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.NamedEntityUpdateRequest) */ {
+ public:
+  NamedEntityUpdateRequest();
+  virtual ~NamedEntityUpdateRequest();
+
+  NamedEntityUpdateRequest(const NamedEntityUpdateRequest& from);
+
+  inline NamedEntityUpdateRequest& operator=(const NamedEntityUpdateRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  NamedEntityUpdateRequest(NamedEntityUpdateRequest&& from) noexcept
+    : NamedEntityUpdateRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline NamedEntityUpdateRequest& operator=(NamedEntityUpdateRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const NamedEntityUpdateRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const NamedEntityUpdateRequest* internal_default_instance() {
+    return reinterpret_cast<const NamedEntityUpdateRequest*>(
+               &_NamedEntityUpdateRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  void Swap(NamedEntityUpdateRequest* other);
+  friend void swap(NamedEntityUpdateRequest& a, NamedEntityUpdateRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline NamedEntityUpdateRequest* New() const final {
+    return CreateMaybeMessage<NamedEntityUpdateRequest>(nullptr);
+  }
+
+  NamedEntityUpdateRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<NamedEntityUpdateRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const NamedEntityUpdateRequest& from);
+  void MergeFrom(const NamedEntityUpdateRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(NamedEntityUpdateRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.NamedEntityIdentifier id = 2;
+  bool has_id() const;
+  void clear_id();
+  static const int kIdFieldNumber = 2;
+  const ::flyteidl::admin::NamedEntityIdentifier& id() const;
+  ::flyteidl::admin::NamedEntityIdentifier* release_id();
+  ::flyteidl::admin::NamedEntityIdentifier* mutable_id();
+  void set_allocated_id(::flyteidl::admin::NamedEntityIdentifier* id);
+
+  // .flyteidl.admin.NamedEntityMetadata metadata = 3;
+  bool has_metadata() const;
+  void clear_metadata();
+  static const int kMetadataFieldNumber = 3;
+  const ::flyteidl::admin::NamedEntityMetadata& metadata() const;
+  ::flyteidl::admin::NamedEntityMetadata* release_metadata();
+  ::flyteidl::admin::NamedEntityMetadata* mutable_metadata();
+  void set_allocated_metadata(::flyteidl::admin::NamedEntityMetadata* metadata);
+
+  // .flyteidl.core.ResourceType resource_type = 1;
+  void clear_resource_type();
+  static const int kResourceTypeFieldNumber = 1;
+  ::flyteidl::core::ResourceType resource_type() const;
+  void set_resource_type(::flyteidl::core::ResourceType value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.NamedEntityUpdateRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::admin::NamedEntityIdentifier* id_;
+  ::flyteidl::admin::NamedEntityMetadata* metadata_;
+  int resource_type_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
+};
+// -------------------------------------------------------------------
+
+class NamedEntityUpdateResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.NamedEntityUpdateResponse) */ {
+ public:
+  NamedEntityUpdateResponse();
+  virtual ~NamedEntityUpdateResponse();
+
+  NamedEntityUpdateResponse(const NamedEntityUpdateResponse& from);
+
+  inline NamedEntityUpdateResponse& operator=(const NamedEntityUpdateResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  NamedEntityUpdateResponse(NamedEntityUpdateResponse&& from) noexcept
+    : NamedEntityUpdateResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline NamedEntityUpdateResponse& operator=(NamedEntityUpdateResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const NamedEntityUpdateResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const NamedEntityUpdateResponse* internal_default_instance() {
+    return reinterpret_cast<const NamedEntityUpdateResponse*>(
+               &_NamedEntityUpdateResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  void Swap(NamedEntityUpdateResponse* other);
+  friend void swap(NamedEntityUpdateResponse& a, NamedEntityUpdateResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline NamedEntityUpdateResponse* New() const final {
+    return CreateMaybeMessage<NamedEntityUpdateResponse>(nullptr);
+  }
+
+  NamedEntityUpdateResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<NamedEntityUpdateResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const NamedEntityUpdateResponse& from);
+  void MergeFrom(const NamedEntityUpdateResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(NamedEntityUpdateResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.NamedEntityUpdateResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ObjectGetRequest final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ObjectGetRequest) */ {
  public:
@@ -789,7 +1735,7 @@ class ObjectGetRequest final :
                &_ObjectGetRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    11;
 
   void Swap(ObjectGetRequest* other);
   friend void swap(ObjectGetRequest& a, ObjectGetRequest& b) {
@@ -904,7 +1850,7 @@ class ResourceListRequest final :
                &_ResourceListRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    12;
 
   void Swap(ResourceListRequest* other);
   friend void swap(ResourceListRequest& a, ResourceListRequest& b) {
@@ -1066,7 +2012,7 @@ class EmailNotification final :
                &_EmailNotification_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    13;
 
   void Swap(EmailNotification* other);
   friend void swap(EmailNotification& a, EmailNotification& b) {
@@ -1194,7 +2140,7 @@ class PagerDutyNotification final :
                &_PagerDutyNotification_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    14;
 
   void Swap(PagerDutyNotification* other);
   friend void swap(PagerDutyNotification& a, PagerDutyNotification& b) {
@@ -1322,7 +2268,7 @@ class SlackNotification final :
                &_SlackNotification_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    15;
 
   void Swap(SlackNotification* other);
   friend void swap(SlackNotification& a, SlackNotification& b) {
@@ -1457,7 +2403,7 @@ class Notification final :
                &_Notification_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    16;
 
   void Swap(Notification* other);
   friend void swap(Notification& a, Notification& b) {
@@ -1617,7 +2563,7 @@ class UrlBlob final :
                &_UrlBlob_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    17;
 
   void Swap(UrlBlob* other);
   friend void swap(UrlBlob& a, UrlBlob& b) {
@@ -1768,7 +2714,7 @@ class Labels final :
                &_Labels_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    19;
 
   void Swap(Labels* other);
   friend void swap(Labels& a, Labels& b) {
@@ -1913,7 +2859,7 @@ class Annotations final :
                &_Annotations_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    21;
 
   void Swap(Annotations* other);
   friend void swap(Annotations& a, Annotations& b) {
@@ -2162,6 +3108,183 @@ inline void NamedEntityIdentifier::set_allocated_name(::std::string* name) {
   }
   name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityIdentifier.name)
+}
+
+// -------------------------------------------------------------------
+
+// NamedEntityMetadata
+
+// string description = 1;
+inline void NamedEntityMetadata::clear_description() {
+  description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NamedEntityMetadata::description() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityMetadata.description)
+  return description_.GetNoArena();
+}
+inline void NamedEntityMetadata::set_description(const ::std::string& value) {
+  
+  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityMetadata.description)
+}
+#if LANG_CXX11
+inline void NamedEntityMetadata::set_description(::std::string&& value) {
+  
+  description_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NamedEntityMetadata.description)
+}
+#endif
+inline void NamedEntityMetadata::set_description(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NamedEntityMetadata.description)
+}
+inline void NamedEntityMetadata::set_description(const char* value, size_t size) {
+  
+  description_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NamedEntityMetadata.description)
+}
+inline ::std::string* NamedEntityMetadata::mutable_description() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityMetadata.description)
+  return description_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NamedEntityMetadata::release_description() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityMetadata.description)
+  
+  return description_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NamedEntityMetadata::set_allocated_description(::std::string* description) {
+  if (description != nullptr) {
+    
+  } else {
+    
+  }
+  description_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), description);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityMetadata.description)
+}
+
+// -------------------------------------------------------------------
+
+// NamedEntity
+
+// .flyteidl.core.ResourceType resource_type = 1;
+inline void NamedEntity::clear_resource_type() {
+  resource_type_ = 0;
+}
+inline ::flyteidl::core::ResourceType NamedEntity::resource_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntity.resource_type)
+  return static_cast< ::flyteidl::core::ResourceType >(resource_type_);
+}
+inline void NamedEntity::set_resource_type(::flyteidl::core::ResourceType value) {
+  
+  resource_type_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntity.resource_type)
+}
+
+// .flyteidl.admin.NamedEntityIdentifier id = 2;
+inline bool NamedEntity::has_id() const {
+  return this != internal_default_instance() && id_ != nullptr;
+}
+inline void NamedEntity::clear_id() {
+  if (GetArenaNoVirtual() == nullptr && id_ != nullptr) {
+    delete id_;
+  }
+  id_ = nullptr;
+}
+inline const ::flyteidl::admin::NamedEntityIdentifier& NamedEntity::id() const {
+  const ::flyteidl::admin::NamedEntityIdentifier* p = id_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntity.id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::NamedEntityIdentifier*>(
+      &::flyteidl::admin::_NamedEntityIdentifier_default_instance_);
+}
+inline ::flyteidl::admin::NamedEntityIdentifier* NamedEntity::release_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntity.id)
+  
+  ::flyteidl::admin::NamedEntityIdentifier* temp = id_;
+  id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::NamedEntityIdentifier* NamedEntity::mutable_id() {
+  
+  if (id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::NamedEntityIdentifier>(GetArenaNoVirtual());
+    id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntity.id)
+  return id_;
+}
+inline void NamedEntity::set_allocated_id(::flyteidl::admin::NamedEntityIdentifier* id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete id_;
+  }
+  if (id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  id_ = id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntity.id)
+}
+
+// .flyteidl.admin.NamedEntityMetadata metadata = 3;
+inline bool NamedEntity::has_metadata() const {
+  return this != internal_default_instance() && metadata_ != nullptr;
+}
+inline void NamedEntity::clear_metadata() {
+  if (GetArenaNoVirtual() == nullptr && metadata_ != nullptr) {
+    delete metadata_;
+  }
+  metadata_ = nullptr;
+}
+inline const ::flyteidl::admin::NamedEntityMetadata& NamedEntity::metadata() const {
+  const ::flyteidl::admin::NamedEntityMetadata* p = metadata_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntity.metadata)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::NamedEntityMetadata*>(
+      &::flyteidl::admin::_NamedEntityMetadata_default_instance_);
+}
+inline ::flyteidl::admin::NamedEntityMetadata* NamedEntity::release_metadata() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntity.metadata)
+  
+  ::flyteidl::admin::NamedEntityMetadata* temp = metadata_;
+  metadata_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::NamedEntityMetadata* NamedEntity::mutable_metadata() {
+  
+  if (metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::NamedEntityMetadata>(GetArenaNoVirtual());
+    metadata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntity.metadata)
+  return metadata_;
+}
+inline void NamedEntity::set_allocated_metadata(::flyteidl::admin::NamedEntityMetadata* metadata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete metadata_;
+  }
+  if (metadata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      metadata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  metadata_ = metadata;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntity.metadata)
 }
 
 // -------------------------------------------------------------------
@@ -2465,6 +3588,248 @@ inline void NamedEntityIdentifierListRequest::set_allocated_sort_by(::flyteidl::
 
 // -------------------------------------------------------------------
 
+// NamedEntityListRequest
+
+// .flyteidl.core.ResourceType resource_type = 1;
+inline void NamedEntityListRequest::clear_resource_type() {
+  resource_type_ = 0;
+}
+inline ::flyteidl::core::ResourceType NamedEntityListRequest::resource_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityListRequest.resource_type)
+  return static_cast< ::flyteidl::core::ResourceType >(resource_type_);
+}
+inline void NamedEntityListRequest::set_resource_type(::flyteidl::core::ResourceType value) {
+  
+  resource_type_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityListRequest.resource_type)
+}
+
+// string project = 2;
+inline void NamedEntityListRequest::clear_project() {
+  project_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NamedEntityListRequest::project() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityListRequest.project)
+  return project_.GetNoArena();
+}
+inline void NamedEntityListRequest::set_project(const ::std::string& value) {
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityListRequest.project)
+}
+#if LANG_CXX11
+inline void NamedEntityListRequest::set_project(::std::string&& value) {
+  
+  project_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NamedEntityListRequest.project)
+}
+#endif
+inline void NamedEntityListRequest::set_project(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NamedEntityListRequest.project)
+}
+inline void NamedEntityListRequest::set_project(const char* value, size_t size) {
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NamedEntityListRequest.project)
+}
+inline ::std::string* NamedEntityListRequest::mutable_project() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityListRequest.project)
+  return project_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NamedEntityListRequest::release_project() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityListRequest.project)
+  
+  return project_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NamedEntityListRequest::set_allocated_project(::std::string* project) {
+  if (project != nullptr) {
+    
+  } else {
+    
+  }
+  project_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), project);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityListRequest.project)
+}
+
+// string domain = 3;
+inline void NamedEntityListRequest::clear_domain() {
+  domain_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NamedEntityListRequest::domain() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityListRequest.domain)
+  return domain_.GetNoArena();
+}
+inline void NamedEntityListRequest::set_domain(const ::std::string& value) {
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityListRequest.domain)
+}
+#if LANG_CXX11
+inline void NamedEntityListRequest::set_domain(::std::string&& value) {
+  
+  domain_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NamedEntityListRequest.domain)
+}
+#endif
+inline void NamedEntityListRequest::set_domain(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NamedEntityListRequest.domain)
+}
+inline void NamedEntityListRequest::set_domain(const char* value, size_t size) {
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NamedEntityListRequest.domain)
+}
+inline ::std::string* NamedEntityListRequest::mutable_domain() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityListRequest.domain)
+  return domain_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NamedEntityListRequest::release_domain() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityListRequest.domain)
+  
+  return domain_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NamedEntityListRequest::set_allocated_domain(::std::string* domain) {
+  if (domain != nullptr) {
+    
+  } else {
+    
+  }
+  domain_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), domain);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityListRequest.domain)
+}
+
+// uint32 limit = 4;
+inline void NamedEntityListRequest::clear_limit() {
+  limit_ = 0u;
+}
+inline ::google::protobuf::uint32 NamedEntityListRequest::limit() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityListRequest.limit)
+  return limit_;
+}
+inline void NamedEntityListRequest::set_limit(::google::protobuf::uint32 value) {
+  
+  limit_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityListRequest.limit)
+}
+
+// string token = 5;
+inline void NamedEntityListRequest::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NamedEntityListRequest::token() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityListRequest.token)
+  return token_.GetNoArena();
+}
+inline void NamedEntityListRequest::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityListRequest.token)
+}
+#if LANG_CXX11
+inline void NamedEntityListRequest::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NamedEntityListRequest.token)
+}
+#endif
+inline void NamedEntityListRequest::set_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NamedEntityListRequest.token)
+}
+inline void NamedEntityListRequest::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NamedEntityListRequest.token)
+}
+inline ::std::string* NamedEntityListRequest::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityListRequest.token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NamedEntityListRequest::release_token() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityListRequest.token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NamedEntityListRequest::set_allocated_token(::std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityListRequest.token)
+}
+
+// .flyteidl.admin.Sort sort_by = 6;
+inline bool NamedEntityListRequest::has_sort_by() const {
+  return this != internal_default_instance() && sort_by_ != nullptr;
+}
+inline void NamedEntityListRequest::clear_sort_by() {
+  if (GetArenaNoVirtual() == nullptr && sort_by_ != nullptr) {
+    delete sort_by_;
+  }
+  sort_by_ = nullptr;
+}
+inline const ::flyteidl::admin::Sort& NamedEntityListRequest::sort_by() const {
+  const ::flyteidl::admin::Sort* p = sort_by_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityListRequest.sort_by)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Sort*>(
+      &::flyteidl::admin::_Sort_default_instance_);
+}
+inline ::flyteidl::admin::Sort* NamedEntityListRequest::release_sort_by() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityListRequest.sort_by)
+  
+  ::flyteidl::admin::Sort* temp = sort_by_;
+  sort_by_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Sort* NamedEntityListRequest::mutable_sort_by() {
+  
+  if (sort_by_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Sort>(GetArenaNoVirtual());
+    sort_by_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityListRequest.sort_by)
+  return sort_by_;
+}
+inline void NamedEntityListRequest::set_allocated_sort_by(::flyteidl::admin::Sort* sort_by) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete sort_by_;
+  }
+  if (sort_by) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      sort_by = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, sort_by, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  sort_by_ = sort_by;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityListRequest.sort_by)
+}
+
+// -------------------------------------------------------------------
+
 // NamedEntityIdentifierList
 
 // repeated .flyteidl.admin.NamedEntityIdentifier entities = 1;
@@ -2549,6 +3914,286 @@ inline void NamedEntityIdentifierList::set_allocated_token(::std::string* token)
   token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityIdentifierList.token)
 }
+
+// -------------------------------------------------------------------
+
+// NamedEntityList
+
+// repeated .flyteidl.admin.NamedEntity entities = 1;
+inline int NamedEntityList::entities_size() const {
+  return entities_.size();
+}
+inline void NamedEntityList::clear_entities() {
+  entities_.Clear();
+}
+inline ::flyteidl::admin::NamedEntity* NamedEntityList::mutable_entities(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityList.entities)
+  return entities_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::NamedEntity >*
+NamedEntityList::mutable_entities() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.NamedEntityList.entities)
+  return &entities_;
+}
+inline const ::flyteidl::admin::NamedEntity& NamedEntityList::entities(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityList.entities)
+  return entities_.Get(index);
+}
+inline ::flyteidl::admin::NamedEntity* NamedEntityList::add_entities() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.NamedEntityList.entities)
+  return entities_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::NamedEntity >&
+NamedEntityList::entities() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.NamedEntityList.entities)
+  return entities_;
+}
+
+// string token = 2;
+inline void NamedEntityList::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NamedEntityList::token() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityList.token)
+  return token_.GetNoArena();
+}
+inline void NamedEntityList::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityList.token)
+}
+#if LANG_CXX11
+inline void NamedEntityList::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NamedEntityList.token)
+}
+#endif
+inline void NamedEntityList::set_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NamedEntityList.token)
+}
+inline void NamedEntityList::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NamedEntityList.token)
+}
+inline ::std::string* NamedEntityList::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityList.token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NamedEntityList::release_token() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityList.token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NamedEntityList::set_allocated_token(::std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityList.token)
+}
+
+// -------------------------------------------------------------------
+
+// NamedEntityGetRequest
+
+// .flyteidl.core.ResourceType resource_type = 1;
+inline void NamedEntityGetRequest::clear_resource_type() {
+  resource_type_ = 0;
+}
+inline ::flyteidl::core::ResourceType NamedEntityGetRequest::resource_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityGetRequest.resource_type)
+  return static_cast< ::flyteidl::core::ResourceType >(resource_type_);
+}
+inline void NamedEntityGetRequest::set_resource_type(::flyteidl::core::ResourceType value) {
+  
+  resource_type_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityGetRequest.resource_type)
+}
+
+// .flyteidl.admin.NamedEntityIdentifier id = 2;
+inline bool NamedEntityGetRequest::has_id() const {
+  return this != internal_default_instance() && id_ != nullptr;
+}
+inline void NamedEntityGetRequest::clear_id() {
+  if (GetArenaNoVirtual() == nullptr && id_ != nullptr) {
+    delete id_;
+  }
+  id_ = nullptr;
+}
+inline const ::flyteidl::admin::NamedEntityIdentifier& NamedEntityGetRequest::id() const {
+  const ::flyteidl::admin::NamedEntityIdentifier* p = id_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityGetRequest.id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::NamedEntityIdentifier*>(
+      &::flyteidl::admin::_NamedEntityIdentifier_default_instance_);
+}
+inline ::flyteidl::admin::NamedEntityIdentifier* NamedEntityGetRequest::release_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityGetRequest.id)
+  
+  ::flyteidl::admin::NamedEntityIdentifier* temp = id_;
+  id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::NamedEntityIdentifier* NamedEntityGetRequest::mutable_id() {
+  
+  if (id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::NamedEntityIdentifier>(GetArenaNoVirtual());
+    id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityGetRequest.id)
+  return id_;
+}
+inline void NamedEntityGetRequest::set_allocated_id(::flyteidl::admin::NamedEntityIdentifier* id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete id_;
+  }
+  if (id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  id_ = id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityGetRequest.id)
+}
+
+// -------------------------------------------------------------------
+
+// NamedEntityUpdateRequest
+
+// .flyteidl.core.ResourceType resource_type = 1;
+inline void NamedEntityUpdateRequest::clear_resource_type() {
+  resource_type_ = 0;
+}
+inline ::flyteidl::core::ResourceType NamedEntityUpdateRequest::resource_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityUpdateRequest.resource_type)
+  return static_cast< ::flyteidl::core::ResourceType >(resource_type_);
+}
+inline void NamedEntityUpdateRequest::set_resource_type(::flyteidl::core::ResourceType value) {
+  
+  resource_type_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityUpdateRequest.resource_type)
+}
+
+// .flyteidl.admin.NamedEntityIdentifier id = 2;
+inline bool NamedEntityUpdateRequest::has_id() const {
+  return this != internal_default_instance() && id_ != nullptr;
+}
+inline void NamedEntityUpdateRequest::clear_id() {
+  if (GetArenaNoVirtual() == nullptr && id_ != nullptr) {
+    delete id_;
+  }
+  id_ = nullptr;
+}
+inline const ::flyteidl::admin::NamedEntityIdentifier& NamedEntityUpdateRequest::id() const {
+  const ::flyteidl::admin::NamedEntityIdentifier* p = id_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityUpdateRequest.id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::NamedEntityIdentifier*>(
+      &::flyteidl::admin::_NamedEntityIdentifier_default_instance_);
+}
+inline ::flyteidl::admin::NamedEntityIdentifier* NamedEntityUpdateRequest::release_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityUpdateRequest.id)
+  
+  ::flyteidl::admin::NamedEntityIdentifier* temp = id_;
+  id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::NamedEntityIdentifier* NamedEntityUpdateRequest::mutable_id() {
+  
+  if (id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::NamedEntityIdentifier>(GetArenaNoVirtual());
+    id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityUpdateRequest.id)
+  return id_;
+}
+inline void NamedEntityUpdateRequest::set_allocated_id(::flyteidl::admin::NamedEntityIdentifier* id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete id_;
+  }
+  if (id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  id_ = id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityUpdateRequest.id)
+}
+
+// .flyteidl.admin.NamedEntityMetadata metadata = 3;
+inline bool NamedEntityUpdateRequest::has_metadata() const {
+  return this != internal_default_instance() && metadata_ != nullptr;
+}
+inline void NamedEntityUpdateRequest::clear_metadata() {
+  if (GetArenaNoVirtual() == nullptr && metadata_ != nullptr) {
+    delete metadata_;
+  }
+  metadata_ = nullptr;
+}
+inline const ::flyteidl::admin::NamedEntityMetadata& NamedEntityUpdateRequest::metadata() const {
+  const ::flyteidl::admin::NamedEntityMetadata* p = metadata_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityUpdateRequest.metadata)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::NamedEntityMetadata*>(
+      &::flyteidl::admin::_NamedEntityMetadata_default_instance_);
+}
+inline ::flyteidl::admin::NamedEntityMetadata* NamedEntityUpdateRequest::release_metadata() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityUpdateRequest.metadata)
+  
+  ::flyteidl::admin::NamedEntityMetadata* temp = metadata_;
+  metadata_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::NamedEntityMetadata* NamedEntityUpdateRequest::mutable_metadata() {
+  
+  if (metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::NamedEntityMetadata>(GetArenaNoVirtual());
+    metadata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityUpdateRequest.metadata)
+  return metadata_;
+}
+inline void NamedEntityUpdateRequest::set_allocated_metadata(::flyteidl::admin::NamedEntityMetadata* metadata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete metadata_;
+  }
+  if (metadata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      metadata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  metadata_ = metadata;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityUpdateRequest.metadata)
+}
+
+// -------------------------------------------------------------------
+
+// NamedEntityUpdateResponse
 
 // -------------------------------------------------------------------
 
@@ -3332,6 +4977,20 @@ Annotations::mutable_values() {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

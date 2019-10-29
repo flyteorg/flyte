@@ -95,6 +95,12 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_named_entity(self):
+        """Test case for get_named_entity
+
+        """
+        pass
+
     def test_get_node_execution(self):
         """Test case for get_node_execution
 
@@ -157,6 +163,12 @@ class TestAdminServiceApi(unittest.TestCase):
 
     def test_list_launch_plans2(self):
         """Test case for list_launch_plans2
+
+        """
+        pass
+
+    def test_list_named_entities(self):
+        """Test case for list_named_entities
 
         """
         pass
@@ -241,6 +253,12 @@ class TestAdminServiceApi(unittest.TestCase):
 
     def test_update_launch_plan(self):
         """Test case for update_launch_plan
+
+        """
+        pass
+
+    def test_update_named_entity(self):
+        """Test case for update_named_entity
 
         """
         pass

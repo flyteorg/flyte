@@ -1119,6 +1119,196 @@
         ]
       }
     },
+    "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "description": "Retrieve a NamedEntity object.",
+        "operationId": "GetNamedEntity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntity"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN"
+            ]
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "description": "Update the fields associated with a NamedEntity",
+        "operationId": "UpdateNamedEntity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntityUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "description": "Resource type of the metadata to update",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN"
+            ]
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntityUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/named_entities/{resource_type}/{project}/{domain}": {
+      "get": {
+        "description": "Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.",
+        "operationId": "ListNamedEntities",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntityList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN"
+            ]
+          },
+          {
+            "name": "project",
+            "description": "Name of the project that contains the identifiers.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the identifiers belongs to within the project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
       "get": {
         "description": "Retrieve an existing node execution.",
@@ -2733,6 +2923,21 @@
       },
       "title": "Input/output data can represented by actual values or a link to where values are stored"
     },
+    "adminNamedEntity": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/coreResourceType"
+        },
+        "id": {
+          "$ref": "#/definitions/adminNamedEntityIdentifier"
+        },
+        "metadata": {
+          "$ref": "#/definitions/adminNamedEntityMetadata"
+        }
+      },
+      "title": "Describes information common to a NamedEntity, identified by a project /\ndomain / name / resource type combination"
+    },
     "adminNamedEntityIdentifier": {
       "type": "object",
       "properties": {
@@ -2766,7 +2971,55 @@
           "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
         }
       },
-      "description": "Represents a list of Identifiers."
+      "description": "Represents a list of NamedEntityIdentifiers."
+    },
+    "adminNamedEntityList": {
+      "type": "object",
+      "properties": {
+        "entities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adminNamedEntity"
+          },
+          "title": "A list of NamedEntity objects"
+        },
+        "token": {
+          "type": "string",
+          "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
+        }
+      },
+      "description": "Represents a list of NamedEntityIdentifiers."
+    },
+    "adminNamedEntityMetadata": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Common description across all versions of the entity\n+optional"
+        }
+      }
+    },
+    "adminNamedEntityUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/coreResourceType",
+          "title": "Resource type of the metadata to update"
+        },
+        "id": {
+          "$ref": "#/definitions/adminNamedEntityIdentifier",
+          "title": "Identifier of the metadata to update"
+        },
+        "metadata": {
+          "$ref": "#/definitions/adminNamedEntityMetadata",
+          "title": "Metadata object to set as the new value"
+        }
+      },
+      "description": "Request to set the referenced launch plan state to the configured value."
+    },
+    "adminNamedEntityUpdateResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
     },
     "adminNodeExecutionClosure": {
       "type": "object",

@@ -44,12 +44,70 @@ name
   
 
 
+.. _api_msg_flyteidl.admin.NamedEntityMetadata:
+
+flyteidl.admin.NamedEntityMetadata
+----------------------------------
+
+`[flyteidl.admin.NamedEntityMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L23>`_
+
+
+.. code-block:: json
+
+  {
+    "description": "..."
+  }
+
+.. _api_field_flyteidl.admin.NamedEntityMetadata.description:
+
+description
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Common description across all versions of the entity
+  +optional
+  
+  
+
+
+.. _api_msg_flyteidl.admin.NamedEntity:
+
+flyteidl.admin.NamedEntity
+--------------------------
+
+`[flyteidl.admin.NamedEntity proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L31>`_
+
+Describes information common to a NamedEntity, identified by a project /
+domain / name / resource type combination
+
+.. code-block:: json
+
+  {
+    "resource_type": "...",
+    "id": "{...}",
+    "metadata": "{...}"
+  }
+
+.. _api_field_flyteidl.admin.NamedEntity.resource_type:
+
+resource_type
+  (:ref:`flyteidl.core.ResourceType <api_enum_flyteidl.core.ResourceType>`) 
+  
+.. _api_field_flyteidl.admin.NamedEntity.id:
+
+id
+  (:ref:`flyteidl.admin.NamedEntityIdentifier <api_msg_flyteidl.admin.NamedEntityIdentifier>`) 
+  
+.. _api_field_flyteidl.admin.NamedEntity.metadata:
+
+metadata
+  (:ref:`flyteidl.admin.NamedEntityMetadata <api_msg_flyteidl.admin.NamedEntityMetadata>`) 
+  
+
+
 .. _api_msg_flyteidl.admin.Sort:
 
 flyteidl.admin.Sort
 -------------------
 
-`[flyteidl.admin.Sort proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L24>`_
+`[flyteidl.admin.Sort proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L38>`_
 
 Species sort ordering in a list request.
 
@@ -80,7 +138,7 @@ direction
 Enum flyteidl.admin.Sort.Direction
 ----------------------------------
 
-`[flyteidl.admin.Sort.Direction proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L25>`_
+`[flyteidl.admin.Sort.Direction proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L39>`_
 
 
 .. _api_enum_value_flyteidl.admin.Sort.Direction.DESCENDING:
@@ -99,7 +157,7 @@ ASCENDING
 flyteidl.admin.NamedEntityIdentifierListRequest
 -----------------------------------------------
 
-`[flyteidl.admin.NamedEntityIdentifierListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L39>`_
+`[flyteidl.admin.NamedEntityIdentifierListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L53>`_
 
 Represents a request structure to list identifiers.
 
@@ -148,14 +206,74 @@ sort_by
   
 
 
+.. _api_msg_flyteidl.admin.NamedEntityListRequest:
+
+flyteidl.admin.NamedEntityListRequest
+-------------------------------------
+
+`[flyteidl.admin.NamedEntityListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L71>`_
+
+Represents a request structure to list NamedEntity objects
+
+.. code-block:: json
+
+  {
+    "resource_type": "...",
+    "project": "...",
+    "domain": "...",
+    "limit": "...",
+    "token": "...",
+    "sort_by": "{...}"
+  }
+
+.. _api_field_flyteidl.admin.NamedEntityListRequest.resource_type:
+
+resource_type
+  (:ref:`flyteidl.core.ResourceType <api_enum_flyteidl.core.ResourceType>`) 
+  
+.. _api_field_flyteidl.admin.NamedEntityListRequest.project:
+
+project
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Name of the project that contains the identifiers.
+  
+  
+.. _api_field_flyteidl.admin.NamedEntityListRequest.domain:
+
+domain
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Name of the domain the identifiers belongs to within the project.
+  
+  
+.. _api_field_flyteidl.admin.NamedEntityListRequest.limit:
+
+limit
+  (`uint32 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Indicates the number of resources to be returned.
+  
+  
+.. _api_field_flyteidl.admin.NamedEntityListRequest.token:
+
+token
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  in a query.
+  +optional
+  
+  
+.. _api_field_flyteidl.admin.NamedEntityListRequest.sort_by:
+
+sort_by
+  (:ref:`flyteidl.admin.Sort <api_msg_flyteidl.admin.Sort>`) Sort ordering.
+  +optional
+  
+  
+
+
 .. _api_msg_flyteidl.admin.NamedEntityIdentifierList:
 
 flyteidl.admin.NamedEntityIdentifierList
 ----------------------------------------
 
-`[flyteidl.admin.NamedEntityIdentifierList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L57>`_
+`[flyteidl.admin.NamedEntityIdentifierList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L90>`_
 
-Represents a list of Identifiers.
+Represents a list of NamedEntityIdentifiers.
 
 .. code-block:: json
 
@@ -179,12 +297,124 @@ token
   
 
 
+.. _api_msg_flyteidl.admin.NamedEntityList:
+
+flyteidl.admin.NamedEntityList
+------------------------------
+
+`[flyteidl.admin.NamedEntityList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L100>`_
+
+Represents a list of NamedEntityIdentifiers.
+
+.. code-block:: json
+
+  {
+    "entities": [],
+    "token": "..."
+  }
+
+.. _api_field_flyteidl.admin.NamedEntityList.entities:
+
+entities
+  (:ref:`flyteidl.admin.NamedEntity <api_msg_flyteidl.admin.NamedEntity>`) A list of NamedEntity objects
+  
+  
+.. _api_field_flyteidl.admin.NamedEntityList.token:
+
+token
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  in a query. If there are no more results, this value will be empty.
+  
+  
+
+
+.. _api_msg_flyteidl.admin.NamedEntityGetRequest:
+
+flyteidl.admin.NamedEntityGetRequest
+------------------------------------
+
+`[flyteidl.admin.NamedEntityGetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L110>`_
+
+A request to retrieve the metadata associated with a NamedEntityIdentifier
+
+.. code-block:: json
+
+  {
+    "resource_type": "...",
+    "id": "{...}"
+  }
+
+.. _api_field_flyteidl.admin.NamedEntityGetRequest.resource_type:
+
+resource_type
+  (:ref:`flyteidl.core.ResourceType <api_enum_flyteidl.core.ResourceType>`) 
+  
+.. _api_field_flyteidl.admin.NamedEntityGetRequest.id:
+
+id
+  (:ref:`flyteidl.admin.NamedEntityIdentifier <api_msg_flyteidl.admin.NamedEntityIdentifier>`) 
+  
+
+
+.. _api_msg_flyteidl.admin.NamedEntityUpdateRequest:
+
+flyteidl.admin.NamedEntityUpdateRequest
+---------------------------------------
+
+`[flyteidl.admin.NamedEntityUpdateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L116>`_
+
+Request to set the referenced launch plan state to the configured value.
+
+.. code-block:: json
+
+  {
+    "resource_type": "...",
+    "id": "{...}",
+    "metadata": "{...}"
+  }
+
+.. _api_field_flyteidl.admin.NamedEntityUpdateRequest.resource_type:
+
+resource_type
+  (:ref:`flyteidl.core.ResourceType <api_enum_flyteidl.core.ResourceType>`) Resource type of the metadata to update
+  
+  
+.. _api_field_flyteidl.admin.NamedEntityUpdateRequest.id:
+
+id
+  (:ref:`flyteidl.admin.NamedEntityIdentifier <api_msg_flyteidl.admin.NamedEntityIdentifier>`) Identifier of the metadata to update
+  
+  
+.. _api_field_flyteidl.admin.NamedEntityUpdateRequest.metadata:
+
+metadata
+  (:ref:`flyteidl.admin.NamedEntityMetadata <api_msg_flyteidl.admin.NamedEntityMetadata>`) Metadata object to set as the new value
+  
+  
+
+
+.. _api_msg_flyteidl.admin.NamedEntityUpdateResponse:
+
+flyteidl.admin.NamedEntityUpdateResponse
+----------------------------------------
+
+`[flyteidl.admin.NamedEntityUpdateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L127>`_
+
+Purposefully empty, may be populated in the future.
+
+.. code-block:: json
+
+  {}
+
+
+
+
 .. _api_msg_flyteidl.admin.ObjectGetRequest:
 
 flyteidl.admin.ObjectGetRequest
 -------------------------------
 
-`[flyteidl.admin.ObjectGetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L67>`_
+`[flyteidl.admin.ObjectGetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L131>`_
 
 Represents a structure to fetch a single resource.
 
@@ -207,7 +437,7 @@ id
 flyteidl.admin.ResourceListRequest
 ----------------------------------
 
-`[flyteidl.admin.ResourceListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L74>`_
+`[flyteidl.admin.ResourceListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L138>`_
 
 Represents a request structure to retrieve a list of resources.
 Resources include: Task, Workflow, LaunchPlan
@@ -264,7 +494,7 @@ sort_by
 flyteidl.admin.EmailNotification
 --------------------------------
 
-`[flyteidl.admin.EmailNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L93>`_
+`[flyteidl.admin.EmailNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L157>`_
 
 
 .. code-block:: json
@@ -286,7 +516,7 @@ recipients_email
 flyteidl.admin.PagerDutyNotification
 ------------------------------------
 
-`[flyteidl.admin.PagerDutyNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L98>`_
+`[flyteidl.admin.PagerDutyNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L162>`_
 
 
 .. code-block:: json
@@ -308,7 +538,7 @@ recipients_email
 flyteidl.admin.SlackNotification
 --------------------------------
 
-`[flyteidl.admin.SlackNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L103>`_
+`[flyteidl.admin.SlackNotification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L167>`_
 
 
 .. code-block:: json
@@ -330,7 +560,7 @@ recipients_email
 flyteidl.admin.Notification
 ---------------------------
 
-`[flyteidl.admin.Notification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L112>`_
+`[flyteidl.admin.Notification proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L176>`_
 
 Represents a structure for notifications based on execution status.
 The Notification content is configured within Admin. Future iterations could
@@ -383,7 +613,7 @@ slack
 flyteidl.admin.UrlBlob
 ----------------------
 
-`[flyteidl.admin.UrlBlob proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L126>`_
+`[flyteidl.admin.UrlBlob proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L190>`_
 
 Represents a string url and associated metadata used throughout the platform.
 
@@ -413,7 +643,7 @@ bytes
 flyteidl.admin.Labels
 ---------------------
 
-`[flyteidl.admin.Labels proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L137>`_
+`[flyteidl.admin.Labels proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L201>`_
 
 Label values to be applied to an execution resource.
 In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
@@ -438,7 +668,7 @@ values
 flyteidl.admin.Annotations
 --------------------------
 
-`[flyteidl.admin.Annotations proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L145>`_
+`[flyteidl.admin.Annotations proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L209>`_
 
 Annotation values to be applied to an execution resource.
 In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
