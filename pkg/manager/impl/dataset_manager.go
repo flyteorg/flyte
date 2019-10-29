@@ -15,6 +15,7 @@ import (
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
 	"github.com/lyft/flytestdlib/storage"
+	"google.golang.org/grpc/codes"
 )
 
 type datasetMetrics struct {
@@ -37,15 +38,32 @@ type datasetManager struct {
 	systemMetrics datasetMetrics
 }
 
+func (dm *datasetManager) validateCreateRequest(request datacatalog.CreateDatasetRequest) error {
+	errorSet := make([]error, 0)
+	err := validators.ValidateDatasetID(request.Dataset.Id)
+	if err != nil {
+		errorSet = append(errorSet, err)
+	}
+
+	err = validators.ValidateUniquePartitionKeys(request.Dataset.PartitionKeys)
+	if err != nil {
+		errorSet = append(errorSet, err)
+	}
+
+	if len(errorSet) > 0 {
+		return errors.NewCollectedErrors(codes.InvalidArgument, errorSet)
+	}
+
+	return nil
+}
+
 // Create a Dataset with optional metadata. If one already exists a grpc AlreadyExists err will be returned
 func (dm *datasetManager) CreateDataset(ctx context.Context, request datacatalog.CreateDatasetRequest) (*datacatalog.CreateDatasetResponse, error) {
 	timer := dm.systemMetrics.createResponseTime.Start(ctx)
 	defer timer.Stop()
 
-	err := validators.ValidateDatasetID(request.Dataset.Id)
+	err := dm.validateCreateRequest(request)
 	if err != nil {
-		logger.Warnf(ctx, "Invalid create dataset request %+v err: %v", request, err)
-		dm.systemMetrics.validationErrorCounter.Inc(ctx)
 		return nil, err
 	}
 

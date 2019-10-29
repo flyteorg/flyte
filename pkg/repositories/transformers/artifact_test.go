@@ -9,28 +9,53 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var testInteger = &core.Literal{
-	Value: &core.Literal_Scalar{
-		Scalar: &core.Scalar{
-			Value: &core.Scalar_Primitive{
-				Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}},
+func getTestArtifactData() []*datacatalog.ArtifactData {
+	testInteger := &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Primitive{
+					Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}},
+				},
 			},
 		},
-	},
-}
-
-func TestCreateArtifactModel(t *testing.T) {
-	artifactDataList := []*datacatalog.ArtifactData{
+	}
+	return []*datacatalog.ArtifactData{
 		{Name: "data1", Value: testInteger},
 		{Name: "data2", Value: testInteger},
 	}
+}
+
+func getTestPartitions() []models.Partition {
+	return []models.Partition{
+		{DatasetUUID: "dataset-uuid", Key: "key1", Value: "value1"},
+		{DatasetUUID: "dataset-uuid", Key: "key2", Value: "value2"},
+	}
+}
+
+func getDatasetModel() models.Dataset {
+	return models.Dataset{
+		DatasetKey: models.DatasetKey{
+			Project: datasetID.Project,
+			Domain:  datasetID.Domain,
+			Name:    datasetID.Name,
+			Version: datasetID.Version,
+			UUID:    "dataset-uuid",
+		},
+	}
+}
+
+func TestCreateArtifactModel(t *testing.T) {
 
 	createArtifactRequest := datacatalog.CreateArtifactRequest{
 		Artifact: &datacatalog.Artifact{
 			Id:       "artifactID-1",
 			Dataset:  &datasetID,
-			Data:     artifactDataList,
+			Data:     getTestArtifactData(),
 			Metadata: &metadata,
+			Partitions: []*datacatalog.Partition{
+				{Key: "key1", Value: "value1"},
+				{Key: "key2", Value: "value2"},
+			},
 		},
 	}
 
@@ -38,7 +63,8 @@ func TestCreateArtifactModel(t *testing.T) {
 		{Name: "data1", Location: "s3://test1"},
 		{Name: "data3", Location: "s3://test2"},
 	}
-	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData)
+
+	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData, getDatasetModel())
 	assert.NoError(t, err)
 	assert.Equal(t, artifactModel.ArtifactID, createArtifactRequest.Artifact.Id)
 	assert.Equal(t, artifactModel.ArtifactKey.DatasetProject, datasetID.Project)
@@ -46,19 +72,15 @@ func TestCreateArtifactModel(t *testing.T) {
 	assert.Equal(t, artifactModel.ArtifactKey.DatasetName, datasetID.Name)
 	assert.Equal(t, artifactModel.ArtifactKey.DatasetVersion, datasetID.Version)
 	assert.EqualValues(t, testArtifactData, artifactModel.ArtifactData)
+	assert.EqualValues(t, getTestPartitions(), artifactModel.Partitions)
 }
 
 func TestCreateArtifactModelNoMetdata(t *testing.T) {
-	artifactDataList := []*datacatalog.ArtifactData{
-		{Name: "data1", Value: testInteger},
-		{Name: "data2", Value: testInteger},
-	}
-
 	createArtifactRequest := datacatalog.CreateArtifactRequest{
 		Artifact: &datacatalog.Artifact{
 			Id:      "artifactID-1",
 			Dataset: &datasetID,
-			Data:    artifactDataList,
+			Data:    getTestArtifactData(),
 		},
 	}
 
@@ -66,9 +88,10 @@ func TestCreateArtifactModelNoMetdata(t *testing.T) {
 		{Name: "data1", Location: "s3://test1"},
 		{Name: "data3", Location: "s3://test2"},
 	}
-	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData)
+	artifactModel, err := CreateArtifactModel(createArtifactRequest, testArtifactData, getDatasetModel())
 	assert.NoError(t, err)
 	assert.Equal(t, []byte{}, artifactModel.SerializedMetadata)
+	assert.Len(t, artifactModel.Partitions, 0)
 }
 
 func TestFromArtifactModel(t *testing.T) {
@@ -81,6 +104,10 @@ func TestFromArtifactModel(t *testing.T) {
 			ArtifactID:     "id1",
 		},
 		SerializedMetadata: []byte{},
+		Partitions: []models.Partition{
+			{DatasetUUID: "dataset-uuid", Key: "key1", Value: "value1"},
+			{DatasetUUID: "dataset-uuid", Key: "key2", Value: "value2"},
+		},
 	}
 
 	actual, err := FromArtifactModel(artifactModel)
@@ -90,6 +117,9 @@ func TestFromArtifactModel(t *testing.T) {
 	assert.Equal(t, artifactModel.DatasetDomain, actual.Dataset.Domain)
 	assert.Equal(t, artifactModel.DatasetName, actual.Dataset.Name)
 	assert.Equal(t, artifactModel.DatasetVersion, actual.Dataset.Version)
+
+	assert.Len(t, actual.Partitions, 2)
+	assert.EqualValues(t, artifactModel.Partitions, getTestPartitions())
 }
 
 func TestToArtifactKey(t *testing.T) {

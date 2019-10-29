@@ -60,9 +60,19 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalo
 	datasetKey := transformers.FromDatasetID(*artifact.Dataset)
 
 	// The dataset must exist for the artifact, let's verify that first
-	_, err = m.repo.DatasetRepo().Get(ctx, datasetKey)
+	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
 	if err != nil {
 		logger.Warnf(ctx, "Failed to get dataset for artifact creation %v, err: %v", datasetKey, err)
+		m.systemMetrics.createFailureCounter.Inc(ctx)
+		return nil, err
+	}
+
+	// TODO: when adding a tag, need to verify one tag per partition combo
+	// check that the artifact's partitions are the same partition values of the dataset
+	datasetPartitionKeys := transformers.FromPartitionKeyModel(dataset.PartitionKeys)
+	err = validators.ValidatePartitions(datasetPartitionKeys, artifact.Partitions)
+	if err != nil {
+		logger.Warnf(ctx, "Invalid artifact partitions %v, err: %+v", artifact.Partitions, err)
 		m.systemMetrics.createFailureCounter.Inc(ctx)
 		return nil, err
 	}
@@ -84,7 +94,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalo
 
 	logger.Debugf(ctx, "Stored %v data for artifact %+v", len(artifactDataModels), artifact.Id)
 
-	artifactModel, err := transformers.CreateArtifactModel(request, artifactDataModels)
+	artifactModel, err := transformers.CreateArtifactModel(request, artifactDataModels, dataset)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to transform artifact err: %v", err)
 		m.systemMetrics.transformerErrorCounter.Inc(ctx)
