@@ -26,11 +26,6 @@ docker load -i /images/flyteadmin
 # start flyteadmin and dependencies
 kubectl create -f "${DIR}/integration.yaml"
 
-# TODO-OSS we won't need private DockerHub post open source
-
-# create the docker-registry secret so we can pull from private dockerhub
-kubectl create secret docker-registry dockerhub -n flyte --docker-server=docker.io --docker-username=${DOCKER_REGISTRY_USERNAME} --docker-password=${DOCKER_REGISTRY_PASSWORD} --docker-email=none
-
 # in debug mode, run bash instead of running the tests
 if [ -n "$DOCKERNETES_DEBUG" ]; then
   bash
