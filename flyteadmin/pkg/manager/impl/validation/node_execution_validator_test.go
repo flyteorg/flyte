@@ -53,7 +53,7 @@ func TestValidateNodeExecutionListRequest_MissingFields(t *testing.T) {
 	err = ValidateNodeExecutionListRequest(admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &testExecutionID,
 	})
-	assert.EqualError(t, err, "missing limit")
+	assert.EqualError(t, err, "invalid value for limit")
 }
 
 func TestValidateNodeExecutionForTaskListRequest(t *testing.T) {
@@ -93,7 +93,7 @@ func TestValidateNodeExecutionForTaskListRequest_MissingFields(t *testing.T) {
 			},
 		},
 	})
-	assert.EqualError(t, err, "missing limit")
+	assert.EqualError(t, err, "invalid value for limit")
 
 	err = ValidateNodeExecutionForTaskListRequest(admin.NodeExecutionForTaskListRequest{
 		TaskExecutionId: &core.TaskExecutionIdentifier{

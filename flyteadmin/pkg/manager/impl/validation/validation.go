@@ -76,8 +76,8 @@ func ValidateResourceListRequest(request admin.ResourceListRequest) error {
 	if err := ValidateEmptyStringField(request.Id.Domain, shared.Domain); err != nil {
 		return err
 	}
-	if request.Limit <= 0 {
-		return shared.GetInvalidArgumentError(shared.Limit)
+	if err := ValidateLimit(request.Limit); err != nil {
+		return err
 	}
 	return nil
 }
@@ -102,8 +102,8 @@ func ValidateActiveLaunchPlanListRequest(request admin.ActiveLaunchPlanListReque
 	if err := ValidateEmptyStringField(request.Domain, shared.Domain); err != nil {
 		return err
 	}
-	if request.Limit <= 0 {
-		return shared.GetInvalidArgumentError(shared.Limit)
+	if err := ValidateLimit(request.Limit); err != nil {
+		return err
 	}
 	return nil
 }
@@ -115,8 +115,8 @@ func ValidateNamedEntityIdentifierListRequest(request admin.NamedEntityIdentifie
 	if err := ValidateEmptyStringField(request.Domain, shared.Domain); err != nil {
 		return err
 	}
-	if request.Limit <= 0 {
-		return shared.GetInvalidArgumentError(shared.Limit)
+	if err := ValidateLimit(request.Limit); err != nil {
+		return err
 	}
 	return nil
 }
@@ -182,8 +182,8 @@ func ValidateToken(token string) (int, error) {
 }
 
 func ValidateLimit(limit uint32) error {
-	if limit <= 0 {
-		return shared.GetMissingArgumentError(shared.Limit)
+	if limit == 0 {
+		return shared.GetInvalidArgumentError(shared.Limit)
 	}
 	return nil
 }

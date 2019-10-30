@@ -49,8 +49,8 @@ func ValidateTaskExecutionListRequest(request admin.TaskExecutionListRequest) er
 	if err := ValidateNodeExecutionIdentifier(request.NodeExecutionId); err != nil {
 		return err
 	}
-	if request.Limit <= 0 {
-		return shared.GetInvalidArgumentError(shared.Limit)
+	if err := ValidateLimit(request.Limit); err != nil {
+		return err
 	}
 	return nil
 }

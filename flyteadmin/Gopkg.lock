@@ -18,7 +18,7 @@
   version = "v10.2.1-beta"
 
 [[projects]]
-  digest = "1:0f857a863c24bb1c277a5f3f8cb8a30e65b841405f69590132ee23ed9e7e6fbe"
+  digest = "1:dcf25ae752511462b05f08dc4be431e0c3231941071669c9230939a3600aa2b9"
   name = "github.com/Azure/go-autorest"
   packages = [
     "autorest",
@@ -29,8 +29,8 @@
     "tracing",
   ]
   pruneopts = "UT"
-  revision = "740293c019d8314ce3378d456b4327fa646297e6"
-  version = "v13.2.0"
+  revision = "3492b2aff5036c67228ab3c7dba3577c871db200"
+  version = "v13.3.0"
 
 [[projects]]
   digest = "1:4d8aa8bc01f60d0fd7f764e1838f26dbc5a5dec428217f936726007cdf3929f0"
@@ -54,7 +54,7 @@
   version = "v1.0.7"
 
 [[projects]]
-  digest = "1:c068593b2d873e3d100eb6fd1ea1715070ad588e8dcdb356b7c0d9530063e256"
+  digest = "1:fdee1cdd56e214deb6ff5d003c73bf3d882f322edaccd2601de8d792263ba8ee"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -107,8 +107,8 @@
     "service/sts/stsiface",
   ]
   pruneopts = "UT"
-  revision = "adf0d7dcf139d718ab18e46f6055735a27be867a"
-  version = "v1.25.15"
+  revision = "23e996a57757e6b586048809309e3945557c4edb"
+  version = "v1.25.22"
 
 [[projects]]
   branch = "master"
@@ -223,7 +223,7 @@
   name = "github.com/golang/groupcache"
   packages = ["lru"]
   pruneopts = "UT"
-  revision = "404acd9df4cc9859d64fb9eed42e5c026187287a"
+  revision = "611e8accdfc92c4187d399e95ce826046d4c8d73"
 
 [[projects]]
   digest = "1:e3839df32927e8d3403cd5aa7253d966e8ff80fc8f10e2e35d146461cd83fcfa"
@@ -420,62 +420,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:32d9795a0ac21fa2ed7d92ff408bb6cc00b33ac0a29ab06bef81d3f285672b47"
-  name = "github.com/lyft/flyteadmin"
-  packages = [
-    "cmd/entrypoints",
-    "pkg/async/notifications",
-    "pkg/async/notifications/implementations",
-    "pkg/async/notifications/interfaces",
-    "pkg/async/notifications/mocks",
-    "pkg/async/schedule",
-    "pkg/async/schedule/aws",
-    "pkg/async/schedule/aws/interfaces",
-    "pkg/async/schedule/aws/mocks",
-    "pkg/async/schedule/interfaces",
-    "pkg/async/schedule/mocks",
-    "pkg/async/schedule/noop",
-    "pkg/clusterresource",
-    "pkg/common",
-    "pkg/common/mocks",
-    "pkg/config",
-    "pkg/data",
-    "pkg/data/implementations",
-    "pkg/data/interfaces",
-    "pkg/data/mocks",
-    "pkg/errors",
-    "pkg/flytek8s",
-    "pkg/manager/impl",
-    "pkg/manager/impl/executions",
-    "pkg/manager/impl/shared",
-    "pkg/manager/impl/testutils",
-    "pkg/manager/impl/util",
-    "pkg/manager/impl/validation",
-    "pkg/manager/interfaces",
-    "pkg/manager/mocks",
-    "pkg/repositories",
-    "pkg/repositories/config",
-    "pkg/repositories/errors",
-    "pkg/repositories/gormimpl",
-    "pkg/repositories/interfaces",
-    "pkg/repositories/mocks",
-    "pkg/repositories/models",
-    "pkg/repositories/transformers",
-    "pkg/rpc/adminservice",
-    "pkg/rpc/adminservice/util",
-    "pkg/runtime",
-    "pkg/runtime/interfaces",
-    "pkg/runtime/mocks",
-    "pkg/workflowengine/impl",
-    "pkg/workflowengine/interfaces",
-    "pkg/workflowengine/mocks",
-  ]
-  pruneopts = "UT"
-  revision = "d1c61c34f62d8ee51964f47877802d070dfa9e98"
-  version = "v0.1.0"
-
-[[projects]]
-  digest = "1:4c02e347457c97ee8cfafb413554854fe236d715879ac0a43743017cd179de2e"
+  digest = "1:6fdab8881f20d41b91983d5aa104401be6b7d28e9cfd0a1a93337ec094d877ba"
   name = "github.com/lyft/flyteidl"
   packages = [
     "clients/go/admin",
@@ -519,12 +464,12 @@
     "pkg/utils",
   ]
   pruneopts = "UT"
-  revision = "eb1504e4bd6307626a955af48db5bbd2589f0725"
+  revision = "b02d8973fd60c318aecd6a9b440c982a77f72205"
   source = "https://github.com/lyft/flytepropeller"
-  version = "v0.1.10"
+  version = "v0.1.11"
 
 [[projects]]
-  digest = "1:85376f177ff6ee109741ae6e86882b78c56f9d1000befcec3e0540180f25d148"
+  digest = "1:d567ed1504f24205e9e480553d2bcfc2657d8e85f592bec3fc3a94b8c9814d4c"
   name = "github.com/lyft/flytestdlib"
   packages = [
     "atomic",
@@ -544,9 +489,9 @@
     "version",
   ]
   pruneopts = "UT"
-  revision = "9d0448cd08805c3ae39938d8fcaec34d11db366c"
+  revision = "f9214671dc3b5e86ff029bd514fc18be38c1c3f0"
   source = "https://github.com/lyft/flytestdlib"
-  version = "v0.2.24"
+  version = "v0.2.28"
 
 [[projects]]
   digest = "1:2a0da3440db3f2892609d99cd0389c2776a3fef24435f7b7b58bfc9030aa86ca"
@@ -616,12 +561,12 @@
   revision = "a24ef33bc9b7e59ae4bed9e87a51d7bc76122731"
 
 [[projects]]
-  digest = "1:bbd3997f0121200f72b64d7a3826eb8a0b910d6a4c19894c9fe2852b9e5eaf3b"
+  digest = "1:6eea828983c70075ca297bb915ffbcfd3e34c5a50affd94428a65df955c0ff9c"
   name = "github.com/pelletier/go-toml"
   packages = ["."]
   pruneopts = "UT"
-  revision = "8fe62057ea2d46ce44254c98e84e810044dbe197"
-  version = "v1.5.0"
+  revision = "903d9455db9ff1d7ac1ab199062eca7266dd11a3"
+  version = "v1.6.0"
 
 [[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
@@ -799,7 +744,7 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "87dc89f01550277dc22b74ffcf4cd89fa2f40f4c"
+  revision = "8986dd9e96cf0a6f74da406c005ba3df38527c04"
 
 [[projects]]
   branch = "master"
@@ -816,7 +761,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "da9a3fd4c5820e74b24a6cb7fb438dc9b0dd377c"
+  revision = "fe3aa8a4527195a6057b3fad46619d7d090e99b5"
 
 [[projects]]
   branch = "master"
@@ -834,14 +779,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9f5be1dbb5091bb62d83fbb6db8e794adb8f0e05424679d6f15a17b670e38b4c"
+  digest = "1:2c482fc32bdcfc572ce8b9cc37a409ae8a24c604b0dde73301d8de05d2c1f3e7"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "b09406accb4736d857a32bf9444cd7edae2ffa79"
+  revision = "f43be2a4598cf3a47be9f94f0c28197ed9eae611"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -870,15 +815,15 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:cdd088b35bbf78713a6861a44a1bbe97e581861b6b8835c7f2211bbeca3671f6"
+  digest = "1:a2f668c709f9078828e99cb1768cb02e876cb81030545046a32b54b2ac2a9ea8"
   name = "golang.org/x/time"
   packages = ["rate"]
   pruneopts = "UT"
-  revision = "c4c64cad1fd0a1a8dab2523e04e61d35308e131e"
+  revision = "555d28b269f0569763d25dbe1a237ae74c6bcc82"
 
 [[projects]]
   branch = "master"
-  digest = "1:2b7fccff5bf6caff757f5e468d580c8d3b763cc7b9354f127adf14fe54451428"
+  digest = "1:5874d3a4a53578470c16c65cc4312ba048d3d7673afcd5589e33e34f4b091931"
   name = "google.golang.org/api"
   packages = [
     "googleapi",
@@ -892,7 +837,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "1c098db1e8d0c17c2819910afd08052313af7a44"
+  revision = "4f42dad4690a01d7f6fa461106c63889ff1be027"
 
 [[projects]]
   digest = "1:3c03b58f57452764a4499c55c582346c0ee78c8a5033affe5bdfd9efd3da5bd1"
@@ -924,7 +869,7 @@
     "protobuf/field_mask",
   ]
   pruneopts = "UT"
-  revision = "548a555dbc03994223efbaba0090152849259498"
+  revision = "919d9bdd9fe6f1a5dd95ce5d5e4cdb8fd3c516d0"
 
 [[projects]]
   digest = "1:6cd77d0b616d2dcebd363dfecba593f27b0151fc82cdb5fbfb96c5a7cfbc95b5"
@@ -1184,52 +1129,6 @@
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",
     "github.com/lib/pq",
-    "github.com/lyft/flyteadmin/cmd/entrypoints",
-    "github.com/lyft/flyteadmin/pkg/async/notifications",
-    "github.com/lyft/flyteadmin/pkg/async/notifications/implementations",
-    "github.com/lyft/flyteadmin/pkg/async/notifications/interfaces",
-    "github.com/lyft/flyteadmin/pkg/async/notifications/mocks",
-    "github.com/lyft/flyteadmin/pkg/async/schedule",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/aws",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/aws/interfaces",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/aws/mocks",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/interfaces",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/mocks",
-    "github.com/lyft/flyteadmin/pkg/async/schedule/noop",
-    "github.com/lyft/flyteadmin/pkg/clusterresource",
-    "github.com/lyft/flyteadmin/pkg/common",
-    "github.com/lyft/flyteadmin/pkg/common/mocks",
-    "github.com/lyft/flyteadmin/pkg/config",
-    "github.com/lyft/flyteadmin/pkg/data",
-    "github.com/lyft/flyteadmin/pkg/data/implementations",
-    "github.com/lyft/flyteadmin/pkg/data/interfaces",
-    "github.com/lyft/flyteadmin/pkg/data/mocks",
-    "github.com/lyft/flyteadmin/pkg/errors",
-    "github.com/lyft/flyteadmin/pkg/flytek8s",
-    "github.com/lyft/flyteadmin/pkg/manager/impl",
-    "github.com/lyft/flyteadmin/pkg/manager/impl/executions",
-    "github.com/lyft/flyteadmin/pkg/manager/impl/shared",
-    "github.com/lyft/flyteadmin/pkg/manager/impl/testutils",
-    "github.com/lyft/flyteadmin/pkg/manager/impl/util",
-    "github.com/lyft/flyteadmin/pkg/manager/impl/validation",
-    "github.com/lyft/flyteadmin/pkg/manager/interfaces",
-    "github.com/lyft/flyteadmin/pkg/manager/mocks",
-    "github.com/lyft/flyteadmin/pkg/repositories",
-    "github.com/lyft/flyteadmin/pkg/repositories/config",
-    "github.com/lyft/flyteadmin/pkg/repositories/errors",
-    "github.com/lyft/flyteadmin/pkg/repositories/gormimpl",
-    "github.com/lyft/flyteadmin/pkg/repositories/interfaces",
-    "github.com/lyft/flyteadmin/pkg/repositories/mocks",
-    "github.com/lyft/flyteadmin/pkg/repositories/models",
-    "github.com/lyft/flyteadmin/pkg/repositories/transformers",
-    "github.com/lyft/flyteadmin/pkg/rpc/adminservice",
-    "github.com/lyft/flyteadmin/pkg/rpc/adminservice/util",
-    "github.com/lyft/flyteadmin/pkg/runtime",
-    "github.com/lyft/flyteadmin/pkg/runtime/interfaces",
-    "github.com/lyft/flyteadmin/pkg/runtime/mocks",
-    "github.com/lyft/flyteadmin/pkg/workflowengine/impl",
-    "github.com/lyft/flyteadmin/pkg/workflowengine/interfaces",
-    "github.com/lyft/flyteadmin/pkg/workflowengine/mocks",
     "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin",
     "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core",
     "github.com/lyft/flyteidl/gen/pb-go/flyteidl/event",

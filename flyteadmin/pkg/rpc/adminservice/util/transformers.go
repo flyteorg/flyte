@@ -9,7 +9,7 @@ import (
 
 // Transforms errors to grpc-compatible error types.
 func TransformAndRecordError(err error, metrics *RequestMetrics) error {
-	switch err.(type) {
+	switch err := err.(type) {
 	case errors.FlyteAdminError:
 		metrics.Record(err.(errors.FlyteAdminError).Code())
 		return err

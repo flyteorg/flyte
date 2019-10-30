@@ -168,7 +168,7 @@ func (s *cloudWatchScheduler) AddSchedule(ctx context.Context, input scheduleInt
 }
 
 func isResourceNotFoundException(err error) bool {
-	switch err.(type) {
+	switch err := err.(type) {
 	case awserr.Error:
 		return err.(awserr.Error).Code() == cloudwatchevents.ErrCodeResourceNotFoundException
 	}
