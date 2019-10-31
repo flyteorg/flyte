@@ -1,0 +1,19 @@
+bases:
+# global resources
+- ../../../base/namespace
+- ../../../dependencies/database
+- ../../../dependencies/storage
+
+# user plane / control plane resources
+- ../../../base/ingress
+- ../../../dependencies/contour_ingress_controller
+- ../admindeployment
+- ../datacatalog
+- ../console
+
+# data plane resources
+- ../../../base/wf_crd
+- ../../../base/operators/spark
+- ../../../base/adminserviceaccount
+- ../propeller
+- ../redis

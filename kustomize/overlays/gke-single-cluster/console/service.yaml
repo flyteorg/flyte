@@ -1,0 +1,11 @@
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyteconsole
+  namespace: flyte
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+spec:
+  type: LoadBalancer

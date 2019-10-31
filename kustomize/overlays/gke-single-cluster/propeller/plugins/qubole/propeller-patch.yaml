@@ -1,0 +1,20 @@
+# This file is only for volume mounts.  The configmap itself that's being mounted is sufficiently different that
+# there's no benefit to having it in this folder, since the entire thing gets overridden anyways.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flytepropeller
+  namespace: flyte
+spec:
+  template:
+    spec:
+      volumes:
+      - name: qubole-config-volume
+        configMap:
+          name: flyte-qubole-config
+      containers:
+      - name: flytepropeller
+        volumeMounts:
+        - name: qubole-config-volume
+          mountPath: /etc/flyte/config-qubole

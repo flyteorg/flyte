@@ -1,0 +1,22 @@
+plugins:
+  enabled-plugins:
+    - container
+    - spark
+    - waitable
+    - hiveExecutor
+    - sidecar
+  logs:
+    # Log links can link to multiple options
+    # #1 Kubernetes dashboard
+    kubernetes-enabled: false
+    # #2 GCP stackdriver
+    stackdriver-enabled: true
+    gcp-project: flyte-sandbox
+    stackdriver-logresourcename: flyte
+  k8s:
+    default-annotations:
+      # Example annotation that will be applied to every k8s resource launched
+      - flyte.lyft.net/deployment: base-google-gke
+    # Example Environment variables that will be applied to every container executed on k8s
+    default-env-vars:
+      - FLYTE_CLOUD_PLATFORM: google

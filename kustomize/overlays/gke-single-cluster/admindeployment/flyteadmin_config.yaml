@@ -1,0 +1,86 @@
+logger:
+  show-source: true
+  level: 5
+application:
+  httpPort: 8088
+  grpcPort: 8089
+flyteadmin:
+  roleNameKey: "iam.amazonaws.com/role"
+  profilerPort: 10254
+  metricsScope: "flyte:"
+  metadataStoragePrefix:
+    - "metadata"
+    - "admin"
+  testing:
+    host: http://flyteadmin
+database:
+  # Create a database like postgres and override these values
+  port: 5432
+  username: postgres
+  password: awesomesauce
+  # Recommended to use passwordPath and mount it using kubescrets or the like
+  # passwordPath: "/var/run/CREDENTIALS_DB_PASSWORD"
+  # host here is the ip address of the CloudSQL Db in private mode
+  host: 10.23.0.3
+  dbname: flyte
+  options: sslmode=disable
+storage:
+  type: stow
+  stow:
+    kind: google
+    config:
+      scopes: ""
+      project_id: flyte-sandbox
+      json: ""
+  container: "flyte-sandbox"
+task_resources:
+  defaults:
+    cpu: 200m
+    gpu: 0
+    memory: 500Mi
+    storage: 100Mi
+  limits:
+    cpu: 62
+    gpu: 8
+    memory: 256Gi
+    storage: 5Gi
+domains:
+  - id: development
+    name: development
+  - id: staging
+    name: staging
+  - id: production
+    name: production
+  - id: domain
+    name: domain
+registration:
+  maxWorkflowNodes: 100
+scheduler:
+  eventScheduler:
+    scheme: local
+    region: "us-east-1"
+    scheduleRole: "arn:aws:iam::173840052742:role/mbadmin-development-scheduler"
+    targetName: "arn:aws:sqs:us-east-1:173840052742:flyteadmin-development-scheduler"
+  workflowExecutor:
+    scheme: local
+    region: "us-east-1"
+    scheduleQueueName: "won't-work-locally"
+    accountId: "173840052742"
+notifications:
+  type: local
+  region: "us-east-1"
+  publisher:
+    topicName: "foo"
+  processor:
+    queueName: "queue"
+    accountId: "bar"
+  emailer:
+    subject: "Notice: Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\"."
+    sender:  "flyte-notifications@lyft.com"
+    body: >
+      Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\". View details at
+      <a href=\http://flyte.lyft.net/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
+      http://flyte.lyft.net/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
+cluster_resources:
+  templatePath: "/etc/flyte/clusterresource/templates"
+  refresh: 5m

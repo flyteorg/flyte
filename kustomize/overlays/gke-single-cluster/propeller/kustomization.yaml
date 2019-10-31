@@ -1,0 +1,31 @@
+bases:
+- ../../../base/propeller
+
+namespace: flyte
+
+configMapGenerator:
+# the main propeller configmap
+- name: flyte-propeller-config
+  files:
+    - config.yaml
+# the plugin-configmap
+- name: flyte-plugin-config
+  files:
+    - plugins/config.yaml
+# a configmap for each plugin
+- name: flyte-spark-config
+  files:
+    - plugins/spark/config.yaml
+- name: flyte-container-config
+  files:
+    - plugins/container/config.yaml
+- name: flyte-qubole-config
+  files: 
+    - plugins/qubole/config.yaml
+
+patches:
+- propeller.yaml
+# add the volumemount for each plugin configmap
+- plugins/spark/propeller-patch.yaml
+- plugins/container/propeller-patch.yaml
+- plugins/qubole/propeller-patch.yaml

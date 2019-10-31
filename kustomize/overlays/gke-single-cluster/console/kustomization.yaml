@@ -1,0 +1,8 @@
+bases:
+- ../../../base/console
+
+patches:
+- console.yaml
+
+resources:
+- service.yaml

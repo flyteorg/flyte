@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datacatalog 
+  namespace: flyte
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: check-db-ready
+        image: postgres:10.1
+        command: ['sh', '-c',
+          'until pg_isready -h postgres -p 5432;
+          do echo waiting for database; sleep 2; done;']
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/datacatalog/config
+      containers:
+      - name: datacatalog 
+        resources:
+          limits:
+            memory: "200Mi"
+            cpu: "0.1"
+            ephemeral-storage: "100Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datacatalog 
+  namespace: flyte
