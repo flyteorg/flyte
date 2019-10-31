@@ -1,0 +1,6 @@
+# Create a Service Account for FltyeAdmin
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: datacatalog
+  namespace: flyte
