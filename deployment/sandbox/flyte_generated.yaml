@@ -1497,6 +1497,7 @@ spec:
             - mountPath: /etc/flyte/config
               name: config-volume
           restartPolicy: OnFailure
+          serviceAccountName: flyteadmin
           volumes:
           - configMap:
               name: clusterresource-template-dgc9fcm2kh
