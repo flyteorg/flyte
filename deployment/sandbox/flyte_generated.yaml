@@ -187,6 +187,12 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: datacatalog
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   name: flyteadmin
   namespace: flyte
 ---
