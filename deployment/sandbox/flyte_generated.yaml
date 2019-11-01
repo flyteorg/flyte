@@ -556,30 +556,11 @@ data:
       host: postgres
       dbname: postgres
       options: sslmode=disable
-    scheduler:
-      eventScheduler:
-        scheme: "local"
-        region: "us-east-1"
-        scheduleRole: "arn:aws:iam::abc123:role/my-schedule-role"
-        targetName: "arn:aws:sqs:my-region:abc123:my-queue"
-      workflowExecutor:
-        scheme: "local"
-        region: "us-east-1"
-        scheduleQueueName: "won't-work-locally"
-        accountId: "173840052742"
     remoteData:
       region: "us-east-1"
       scheme: "local"
       signedUrls:
         durationMinutes: 3
-    notifications:
-      type: local
-      region: "us-east-1"
-      publisher:
-        topicName: "foo"
-      processor:
-        queueName: "queue"
-        accountId: "bar"
     queues:
       executionQueues:
       - parent: "FlyteNonProductionTaskCPU-staging-iad"
@@ -639,7 +620,7 @@ data:
       refresh: 5m
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-4gbbgmdf6d
+  name: flyte-admin-config-md9bt8468h
   namespace: flyte
 ---
 apiVersion: v1
@@ -1107,7 +1088,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-4gbbgmdf6d
+          name: flyte-admin-config-md9bt8468h
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1509,7 +1490,7 @@ spec:
               name: clusterresource-template-dgc9fcm2kh
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-4gbbgmdf6d
+              name: flyte-admin-config-md9bt8468h
             name: config-volume
   schedule: '*/1 * * * *'
 ---
