@@ -1,5 +1,5 @@
 import { Core } from 'flyteidl';
-import { NamedEntity } from 'models';
+import { getNamedEntity, NamedEntity } from 'models';
 import { useFetchableData } from './useFetchableData';
 
 export interface UseNamedEntityInput {
@@ -7,26 +7,6 @@ export interface UseNamedEntityInput {
     project: string;
     domain: string;
     name: string;
-}
-
-function fakeNamedEntity(input: UseNamedEntityInput) {
-    return new Promise<NamedEntity>(resolve => {
-        setTimeout(
-            () =>
-                resolve({
-                    resourceType: input.resourceType,
-                    id: {
-                        project: input.project,
-                        domain: input.domain,
-                        name: input.name
-                    },
-                    metadata: {
-                        description: 'test description'
-                    }
-                }),
-            750
-        );
-    });
 }
 
 /** Fetches a NamedEntity (Workflow, LaunchPlan, Task, etc) for a given
@@ -37,7 +17,7 @@ export function useNamedEntity(input: UseNamedEntityInput) {
         {
             debugName: 'NamedEntity',
             defaultValue: {} as NamedEntity,
-            doFetch: fakeNamedEntity,
+            doFetch: id => getNamedEntity(id),
             useCache: true
         },
         input

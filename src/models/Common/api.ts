@@ -1,4 +1,4 @@
-import { Admin } from 'flyteidl';
+import { Admin, Core } from 'flyteidl';
 import {
     defaultPaginationConfig,
     getAdminEntity,
@@ -7,8 +7,13 @@ import {
 } from 'models/AdminEntity';
 
 import { identifierPrefixes } from './constants';
-import { IdentifierScope, NamedEntityIdentifier, ResourceType } from './types';
-import { makeIdentifierPath } from './utils';
+import {
+    IdentifierScope,
+    NamedEntity,
+    NamedEntityIdentifier,
+    ResourceType
+} from './types';
+import { makeIdentifierPath, makeNamedEntityPath } from './utils';
 
 interface ListIdentifiersConfig {
     type: ResourceType;
@@ -40,5 +45,30 @@ export const listIdentifiers = (
             messageType: Admin.NamedEntityIdentifierList
         },
         { ...defaultPaginationConfig, ...requestConfig }
+    );
+};
+
+export interface GetNamedEntityInput {
+    resourceType: Core.ResourceType;
+    project: string;
+    domain: string;
+    name: string;
+}
+
+/** Fetches a NamedEntity from the Admin API
+ * @param input An object specifying the resource type, project, domain, and
+ * name of the entity to fetch. All fields are _required_
+ * @param requestConfig A standard `RequestConfig` object
+ */
+export const getNamedEntity = (
+    { resourceType, project, domain, name }: GetNamedEntityInput,
+    requestConfig?: RequestConfig
+) => {
+    return getAdminEntity<Admin.NamedEntity, NamedEntity>(
+        {
+            path: makeNamedEntityPath(resourceType, project, domain, name),
+            messageType: Admin.NamedEntity
+        },
+        requestConfig
     );
 };

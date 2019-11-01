@@ -1,4 +1,6 @@
+import { Core } from 'flyteidl';
 import { takeWhile } from 'lodash';
+import { endpointPrefixes } from './constants';
 import { Identifier } from './types';
 
 /** Concatenates string fields of an Identifier (excluding resourceType) into a
@@ -25,4 +27,22 @@ export function makeIdentifierPath(
 ) {
     const path = takeWhile([project, domain, name, version]).join('/');
     return `${prefix}/${path}`;
+}
+
+/** Creates a URL for the NamedEntity endpoint given an object with
+ * resource type, project, domain, and name. All fields are required.
+ */
+export function makeNamedEntityPath(
+    resourceType: Core.ResourceType,
+    project: string,
+    domain: string,
+    name: string
+) {
+    return [
+        endpointPrefixes.namedEntity,
+        resourceType,
+        project,
+        domain,
+        name
+    ].join('/');
 }

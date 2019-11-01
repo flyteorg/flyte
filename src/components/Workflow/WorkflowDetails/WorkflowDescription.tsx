@@ -8,6 +8,8 @@ import { NamedEntityIdentifier, NamedEntityMetadata } from 'models';
 import * as React from 'react';
 import reactLoadingSkeleton from 'react-loading-skeleton';
 
+const Skeleton = reactLoadingSkeleton;
+
 const useStyles = makeStyles((theme: Theme) => ({
     description: {
         marginTop: theme.spacing(1)

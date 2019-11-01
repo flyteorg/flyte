@@ -3,6 +3,7 @@ import { LiteralMapBlob, ResourceType } from './types';
 export const endpointPrefixes = {
     execution: '/executions',
     launchPlan: '/launch_plans',
+    namedEntity: '/named_entities',
     nodeExecution: '/node_executions',
     project: '/projects',
     relaunchExecution: '/executions/relaunch',
