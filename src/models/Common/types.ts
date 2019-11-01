@@ -19,6 +19,14 @@ export interface Identifier extends Core.IIdentifier {
 
 export interface NamedEntityIdentifier
     extends RequiredNonNullable<Admin.INamedEntityIdentifier> {}
+export interface NamedEntityMetadata
+    extends RequiredNonNullable<Admin.INamedEntityMetadata> {}
+
+export interface NamedEntity extends Admin.INamedEntity {
+    resourceType: Core.ResourceType;
+    id: NamedEntityIdentifier;
+    metadata: NamedEntityMetadata;
+}
 export interface Notification extends Admin.INotification {}
 export type ResourceType = Core.ResourceType;
 export const ResourceType = Core.ResourceType;

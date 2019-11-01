@@ -2,7 +2,8 @@ import { Dialog } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { contentMarginGridUnits } from 'common/layout';
 import { WaitForData, withRouteParams } from 'components/common';
-import { useProject } from 'components/hooks';
+import { useProject, waitForAllFetchables } from 'components/hooks';
+import { useWorkflowNamedEntity } from 'components/hooks/useNamedEntity';
 import { LaunchWorkflowForm } from 'components/Launch/LaunchWorkflowForm/LaunchWorkflowForm';
 import * as React from 'react';
 import { WorkflowDescription } from './WorkflowDescription';
@@ -68,7 +69,7 @@ export const WorkflowDetailsContainer: React.FC<WorkflowDetailsRouteParams> = ({
                 />
                 <div className={styles.metadataContainer}>
                     <div className={styles.descriptionContainer}>
-                        <WorkflowDescription descriptionString="" />
+                        <WorkflowDescription workflowId={workflowId} />
                     </div>
                     <div className={styles.schedulesContainer}>
                         <WorkflowSchedules workflowId={workflowId} />
