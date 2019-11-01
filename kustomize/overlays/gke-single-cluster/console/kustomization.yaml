@@ -3,6 +3,4 @@ bases:
 
 patches:
 - console.yaml
-
-resources:
 - service.yaml

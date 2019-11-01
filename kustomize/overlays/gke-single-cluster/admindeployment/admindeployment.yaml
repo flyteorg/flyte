@@ -37,7 +37,7 @@ spec:
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
         volumeMounts:
-        - name: resource-templates 
+        - name: resource-templates
           mountPath: /etc/flyte/clusterresource/templates
         - name: config-volume
           mountPath: /etc/flyte/config

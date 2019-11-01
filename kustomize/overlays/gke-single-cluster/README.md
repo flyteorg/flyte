@@ -7,7 +7,7 @@ SQL Database
 Create a SQL database (Postgres)
 https://cloud.google.com/sql/docs/postgres/create-instance
 
-Enable the the SQL server to be accessed from the GKE cluster that will host the FlyteAdmin service. This can be done using private networking mode and associating the shared network
+Enable the the SQL server to be accessed from the GKE cluster that will host the FlyteAdmin service. This can be done using private networking mode and associating the shared network.
 
 Create a database called "flyte" in this DB instance
 
@@ -30,7 +30,7 @@ gcloud iam service-accounts add-iam-policy-binding --role roles/iam.workloadIden
 kubectl annotate serviceaccount  --namespace flytekit-development flyte-sandbox iam.gke.io/gcp-service-account=flyte-sandbox@flyte-sandbox.iam.gserviceaccount.com
 
 
-IAM For FLyte components
+IAM For Flyte components
 ------------------------
 Create the right service accounts in GKE cluster's flyte namespace and then add the serviceaccountname to propeller and flyteadmin deployments. You may also want to add it to the various plugin
 deployments.

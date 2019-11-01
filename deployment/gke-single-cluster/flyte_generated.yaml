@@ -1,0 +1,1550 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flyte
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: heptio-contour
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sparkoperator
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: flyteworkflows.flyte.lyft.com
+spec:
+  group: flyte.lyft.com
+  names:
+    kind: FlyteWorkflow
+    plural: flyteworkflows
+    shortNames:
+    - fly
+    singular: flyteworkflow
+  scope: Namespaced
+  version: v1alpha1
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    component: ingressroute
+  name: ingressroutes.contour.heptio.com
+spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.virtualhost.fqdn
+    description: Fully qualified domain name
+    name: FQDN
+    type: string
+  - JSONPath: .spec.virtualhost.tls.secretName
+    description: Secret with TLS credentials
+    name: TLS Secret
+    type: string
+  - JSONPath: .spec.routes[0].match
+    description: First routes defined
+    name: First route
+    type: string
+  - JSONPath: .status.currentStatus
+    description: The current status of the IngressRoute
+    name: Status
+    type: string
+  - JSONPath: .status.description
+    description: Description of the current status
+    name: Status Description
+    type: string
+  group: contour.heptio.com
+  names:
+    kind: IngressRoute
+    plural: ingressroutes
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      properties:
+        spec:
+          properties:
+            healthCheck:
+              properties:
+                healthyThresholdCount:
+                  type: integer
+                intervalSeconds:
+                  type: integer
+                path:
+                  pattern: ^\/.*$
+                  type: string
+                timeoutSeconds:
+                  type: integer
+                unhealthyThresholdCount:
+                  type: integer
+              required:
+              - path
+              type: object
+            routes:
+              items:
+                properties:
+                  delegate:
+                    properties:
+                      name:
+                        pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                        type: string
+                      namespace:
+                        pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  match:
+                    pattern: ^\/.*$
+                    type: string
+                  services:
+                    items:
+                      properties:
+                        healthCheck:
+                          properties:
+                            healthyThresholdCount:
+                              type: integer
+                            intervalSeconds:
+                              type: integer
+                            path:
+                              pattern: ^\/.*$
+                              type: string
+                            timeoutSeconds:
+                              type: integer
+                            unhealthyThresholdCount:
+                              type: integer
+                          required:
+                          - path
+                          type: object
+                        name:
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                          type: string
+                        port:
+                          type: integer
+                        strategy:
+                          enum:
+                          - RoundRobin
+                          - WeightedLeastRequest
+                          - Random
+                          - RingHash
+                          - Maglev
+                          type: string
+                        weight:
+                          type: integer
+                      required:
+                      - name
+                      - port
+                      type: object
+                    type: array
+                required:
+                - match
+              type: array
+            strategy:
+              enum:
+              - RoundRobin
+              - LeastRequest
+              - Random
+              - RingHash
+              - Maglev
+              type: string
+            virtualhost:
+              properties:
+                aliases:
+                  items:
+                    pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$
+                    type: string
+                  type: array
+                fqdn:
+                  pattern: ^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-z]{2,}$
+                  type: string
+          required:
+          - routes
+  version: v1beta1
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: sparkapplications.sparkoperator.k8s.io
+spec:
+  group: sparkoperator.k8s.io
+  names:
+    kind: SparkApplication
+    listKind: SparkApplicationList
+    plural: sparkapplications
+    shortNames:
+    - sparkapp
+    singular: sparkapplication
+  scope: Namespaced
+  version: v1beta1
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: datacatalog
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyteadmin
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flytepropeller
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: contour
+  namespace: heptio-contour
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sparkoperator
+  namespace: sparkoperator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flyteadmin
+  namespace: flyte
+rules:
+- apiGroups:
+  - ""
+  - flyte.lyft.com
+  - rbac.authorization.k8s.io
+  resources:
+  - configmaps
+  - flyteworkflows
+  - namespaces
+  - pods
+  - roles
+  - rolebindings
+  - secrets
+  - services
+  - serviceaccounts
+  - spark-role
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flytepropeller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - update
+  - delete
+  - patch
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - update
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+  - post
+  - deletecollection
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: contour
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - endpoints
+  - nodes
+  - pods
+  - secrets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - contour.heptio.com
+  resources:
+  - ingressroutes
+  verbs:
+  - get
+  - list
+  - watch
+  - put
+  - post
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: sparkoperator
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - configmaps
+  verbs:
+  - create
+  - get
+  - delete
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - create
+  - get
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - get
+  - update
+  - delete
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - update
+  - patch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - get
+  - update
+  - delete
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+  - get
+  - update
+  - delete
+- apiGroups:
+  - sparkoperator.k8s.io
+  resources:
+  - sparkapplications
+  - scheduledsparkapplications
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: flyteadmin-binding
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyteadmin
+subjects:
+- kind: ServiceAccount
+  name: flyteadmin
+  namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: flytepropeller
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flytepropeller
+subjects:
+- kind: ServiceAccount
+  name: flytepropeller
+  namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: contour
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: contour
+subjects:
+- kind: ServiceAccount
+  name: contour
+  namespace: heptio-contour
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: sparkoperator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: sparkoperator
+subjects:
+- kind: ServiceAccount
+  name: sparkoperator
+  namespace: sparkoperator
+---
+apiVersion: v1
+data:
+  aa_namespace.yaml: |
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: {{ namespace }}
+    spec:
+      finalizers:
+      - kubernetes
+kind: ConfigMap
+metadata:
+  name: clusterresource-template-dgc9fcm2kh
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  datacatalog_config.yaml: |
+    logger:
+      show-source: true
+      level: 5
+    datacatalog:
+      storage-prefix: metadata/datacatalog
+      metrics-scope: "datacatalog"
+      profiler-port: 10254
+    application:
+      grpcPort: 8089
+    storage:
+      connection:
+        access-key: minio
+        auth-type: accesskey
+        disable-ssl: true
+        endpoint: http://minio.flyte.svc.cluster.local:9000
+        region: us-east-1
+        secret-key: miniostorage
+      cache:
+        max_size_mbs: 10
+        target_gc_percent: 100
+      container: my-container
+      type: minio
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: datacatalog
+      options: sslmode=disable
+kind: ConfigMap
+metadata:
+  name: datacatalog-config-5g5bbg2k49
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  flyteadmin_config.yaml: |
+    logger:
+      show-source: true
+      level: 5
+    application:
+      httpPort: 8088
+      grpcPort: 8089
+    flyteadmin:
+      roleNameKey: "iam.amazonaws.com/role"
+      profilerPort: 10254
+      metricsScope: "flyte:"
+      metadataStoragePrefix:
+        - "metadata"
+        - "admin"
+      testing:
+        host: http://flyteadmin
+    database:
+      # Create a database like postgres and override these values
+      port: 5432
+      username: postgres
+      password: awesomesauce
+      # Recommended to use passwordPath and mount it using kubescrets or the like
+      # passwordPath: "/var/run/CREDENTIALS_DB_PASSWORD"
+      # host here is the private ip address of the CloudSQL Db in private mode
+      host: 10.23.0.3
+      dbname: flyte
+      options: sslmode=disable
+    storage:
+      type: stow
+      stow:
+        kind: google
+        config:
+          scopes: ""
+          project_id: flyte-sandbox
+          json: ""
+      container: "flyte-sandbox"
+    task_resources:
+      defaults:
+        cpu: 200m
+        gpu: 0
+        memory: 500Mi
+        storage: 100Mi
+      limits:
+        cpu: 62
+        gpu: 8
+        memory: 256Gi
+        storage: 5Gi
+    domains:
+      - id: development
+        name: development
+      - id: staging
+        name: staging
+      - id: production
+        name: production
+      - id: domain
+        name: domain
+    registration:
+      maxWorkflowNodes: 100
+    scheduler:
+      eventScheduler:
+        scheme: local
+        region: "my-region"
+        scheduleRole: "arn:aws:iam::abc123:role/my-iam-role"
+        targetName: "arn:aws:sqs:my-region:abc123:my-queue"
+      workflowExecutor:
+        scheme: local
+        region: "my-region"
+        scheduleQueueName: "won't-work-locally"
+        accountId: "abc123"
+    notifications:
+      type: local
+      region: "us-east-1"
+      publisher:
+        topicName: "foo"
+      processor:
+        queueName: "queue"
+        accountId: "bar"
+      emailer:
+        subject: "Notice: Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\"."
+        sender:  "flyte-notifications@lyft.com"
+        body: >
+          Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\". View details at
+          <a href=\http://flyte.lyft.net/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
+          http://flyte.lyft.net/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
+    cluster_resources:
+      templatePath: "/etc/flyte/clusterresource/templates"
+      refresh: 5m
+kind: ConfigMap
+metadata:
+  name: flyte-admin-config-228b7f76mk
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  BASE_URL: /console
+  CONFIG_DIR: /etc/flyte/config
+kind: ConfigMap
+metadata:
+  name: flyte-console-config
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  config.yaml: ""
+kind: ConfigMap
+metadata:
+  name: flyte-container-config-5k78b9cm42
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  config.yaml: |
+    plugins:
+      enabled-plugins:
+        - container
+        - spark
+        - waitable
+        - hiveExecutor
+        - sidecar
+      logs:
+        # Log links can link to multiple options
+        # #1 Kubernetes dashboard
+        kubernetes-enabled: false
+        # #2 GCP stackdriver
+        stackdriver-enabled: true
+        gcp-project: flyte-sandbox
+        stackdriver-logresourcename: flyte
+      k8s:
+        default-annotations:
+          # Example annotation that will be applied to every k8s resource launched
+          - flyte.lyft.net/deployment: base-google-gke
+        # Example Environment variables that will be applied to every container executed on k8s
+        default-env-vars:
+          - FLYTE_CLOUD_PLATFORM: google
+kind: ConfigMap
+metadata:
+  name: flyte-plugin-config-hkh64698kg
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  config.yaml: |
+    propeller:
+      metadata-prefix: metadata/propeller
+      workers: 4
+      max-workflow-retries: 30
+      workflow-reeval-duration: 30s
+      downstream-eval-duration: 30s
+      limit-namespace: "all"
+      prof-port: 10254
+      metrics-prefix: flyte
+      enable-admin-launcher: true
+      leader-election:
+        lock-config-map:
+          name: propeller-leader
+          namespace: flyte
+        enabled: true
+        lease-duration: 15s
+        renew-deadline: 10s
+        retry-period: 2s
+      queue:
+        type: batch
+        batching-interval: 2s
+        batch-size: -1
+        queue:
+          type: bucket
+          rate: 10
+          capacity: 100
+        sub-queue:
+          type: bucket
+          rate: 10
+          capacity: 100
+    logger:
+      show-source: true
+      level: 5
+    storage:
+      type: stow
+      stow:
+        kind: google
+        config:
+          scopes: ""
+          project_id: flyte-sandbox
+          json: ""
+      container: "flyte-sandbox"
+    event:
+      type: admin
+      rate: 500
+      capacity: 1000
+    admin:
+      endpoint: flyteadmin:81
+      insecure: true
+    # TODO may be we should disable catalog cache in the default?
+    catalog-cache:
+      endpoint: datacatalog:89
+      type: datacatalog
+      insecure: true
+kind: ConfigMap
+metadata:
+  name: flyte-propeller-config-96k59km44m
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  config.yaml: |
+    plugins:
+      qubole:
+        # Either create this file with your username with the real token, or set the QUBOLE_API_KEY environment variable
+        # See the secrets_manager.go file in the plugins repo for usage.  Since the dev/test deployment of
+        # this has a dummy QUBOLE_API_KEY env var built in, this fake path won't break anything.
+        quboleTokenPath: "/Path/To/QUBOLE_CLIENT_TOKEN"
+        resourceManagerType: redis
+        redisHostPath: redis-resource-manager.flyte:6379
+        redisHostKey: mypassword
+        quboleLimit: 10
+kind: ConfigMap
+metadata:
+  name: flyte-qubole-config-h626c9t6f7
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  config.yaml: |
+    plugins:
+      spark:
+        spark-config-default:
+          - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
+          - spark.kubernetes.allocation.batch.size: "50"
+          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
+          - spark.blacklist.enabled: "true"
+          - spark.blacklist.timeout: "5m"
+          - spark.task.maxfailures: "8"
+kind: ConfigMap
+metadata:
+  name: flyte-spark-config-h72bmtggc2
+  namespace: flyte
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    contour.heptio.com/upstream-protocol.h2c: grpc
+  name: datacatalog
+  namespace: flyte
+spec:
+  ports:
+  - name: http
+    port: 88
+    protocol: TCP
+    targetPort: 8088
+  - name: grpc
+    port: 89
+    protocol: TCP
+    targetPort: 8089
+  selector:
+    app: datacatalog
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/load-balancer-type: Internal
+    contour.heptio.com/upstream-protocol.h2c: grpc
+  name: flyteadmin
+  namespace: flyte
+spec:
+  ports:
+  - name: redoc
+    port: 87
+    protocol: TCP
+    targetPort: 8087
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8088
+  - name: grpc
+    port: 81
+    protocol: TCP
+    targetPort: 8089
+  selector:
+    app: flyteadmin
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/load-balancer-type: Internal
+  name: flyteconsole
+  namespace: flyte
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: flyteconsole
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: flyte
+spec:
+  externalName: minio
+  ports:
+  - port: 9000
+  selector:
+    app: minio
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: flyte
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: redis-resource-manager
+  name: redis-resource-manager
+  namespace: flyte
+spec:
+  ports:
+  - name: redis
+    port: 6379
+    protocol: TCP
+    targetPort: redis
+  selector:
+    app: redis-resource-manager
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: contour
+  name: contour
+  namespace: heptio-contour
+spec:
+  ports:
+  - nodePort: 30081
+    port: 80
+    protocol: TCP
+  selector:
+    app: contour
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: datacatalog
+  name: datacatalog
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datacatalog
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+      labels:
+        app: datacatalog
+    spec:
+      containers:
+      - command:
+        - datacatalog
+        - --logtostderr
+        - --config
+        - /etc/datacatalog/config/datacatalog_config.yaml
+        - serve
+        image: docker.io/lyft/datacatalog:v0.1.1
+        imagePullPolicy: IfNotPresent
+        name: datacatalog
+        ports:
+        - containerPort: 8088
+        - containerPort: 8089
+        resources:
+          limits:
+            cpu: "0.1"
+            ephemeral-storage: 100Mi
+            memory: 200Mi
+        volumeMounts:
+        - mountPath: /etc/datacatalog/config
+          name: config-volume
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep
+          2; done;
+        image: postgres:10.1
+        name: check-db-ready
+        volumeMounts:
+        - mountPath: /etc/datacatalog/config
+          name: config-volume
+      - command:
+        - datacatalog
+        - --logtostderr
+        - --config
+        - /etc/datacatalog/config/datacatalog_config.yaml
+        - migrate
+        - run
+        image: docker.io/lyft/datacatalog:v0.1.1
+        imagePullPolicy: IfNotPresent
+        name: run-migrations
+        volumeMounts:
+        - mountPath: /etc/datacatalog/config
+          name: config-volume
+      serviceAccountName: datacatalog
+      volumes:
+      - emptyDir: {}
+        name: shared-data
+      - configMap:
+          name: datacatalog-config-5g5bbg2k49
+        name: config-volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: flyteadmin
+  name: flyteadmin
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flyteadmin
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+      labels:
+        app: flyteadmin
+    spec:
+      containers:
+      - command:
+        - flyteadmin
+        - --logtostderr
+        - --config
+        - /etc/flyte/config/flyteadmin_config.yaml
+        - serve
+        image: docker.io/lyft/flyteadmin:v0.1.4
+        imagePullPolicy: IfNotPresent
+        name: flyteadmin
+        ports:
+        - containerPort: 8088
+        - containerPort: 8089
+        resources:
+          limits:
+            cpu: "0.1"
+            ephemeral-storage: 100Mi
+            memory: 200Mi
+        volumeMounts:
+        - mountPath: /srv/flyte
+          name: shared-data
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      - command:
+        - sh
+        - -c
+        - ln -s /usr/share/nginx/html /usr/share/nginx/html/openapi && sh /usr/local/bin/docker-run.sh
+        env:
+        - name: PAGE_TITLE
+          value: Flyte Admin OpenAPI
+        - name: SPEC_URL
+          value: /api/v1/openapi
+        - name: PORT
+          value: "8087"
+        image: docker.io/redocly/redoc
+        imagePullPolicy: IfNotPresent
+        name: redoc
+        ports:
+        - containerPort: 8087
+        resources:
+          limits:
+            cpu: "0.1"
+            memory: 200Mi
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep
+          2; done;
+        image: postgres:10.1
+        name: check-db-ready
+      - command:
+        - flyteadmin
+        - --logtostderr
+        - --config
+        - /etc/flyte/config/flyteadmin_config.yaml
+        - migrate
+        - run
+        image: docker.io/lyft/flyteadmin:v0.1.1
+        imagePullPolicy: IfNotPresent
+        name: run-migrations
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      - command:
+        - flyteadmin
+        - --logtostderr
+        - --config
+        - /etc/flyte/config/flyteadmin_config.yaml
+        - migrate
+        - seed-projects
+        - flytesnacks
+        - flytetester
+        image: docker.io/lyft/flyteadmin:v0.1.1
+        imagePullPolicy: IfNotPresent
+        name: seed-projects
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      - command:
+        - flyteadmin
+        - --logtostderr
+        - --config
+        - /etc/flyte/config/flyteadmin_config.yaml
+        - clusterresource
+        - sync
+        image: docker.io/lyft/flyteadmin:v0.1.1
+        imagePullPolicy: IfNotPresent
+        name: sync-cluster-resources
+        volumeMounts:
+        - mountPath: /etc/flyte/clusterresource/templates
+          name: resource-templates
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      serviceAccountName: flyteadmin
+      volumes:
+      - configMap:
+          name: clusterresource-template-dgc9fcm2kh
+        name: resource-templates
+      - emptyDir: {}
+        name: shared-data
+      - configMap:
+          name: flyte-admin-config-228b7f76mk
+        name: config-volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: flyteconsole
+  name: flyteconsole
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flyteconsole
+  template:
+    metadata:
+      labels:
+        app: flyteconsole
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: flyte-console-config
+        image: docker.io/lyft/flyteconsole:v0.1.0
+        name: flyteconsole
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "0.1"
+            ephemeral-storage: 100Mi
+            memory: 150Mi
+        volumeMounts:
+        - mountPath: /srv/flyte
+          name: shared-data
+      volumes:
+      - emptyDir: {}
+        name: shared-data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: flytepropeller
+  name: flytepropeller
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app: flytepropeller
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+      labels:
+        app: flytepropeller
+        app.kubernetes.io/name: flytepropeller
+        app.kubernetes.io/version: 0.1.9
+    spec:
+      containers:
+      - args:
+        - --config
+        - /etc/flyte/config*/config.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: QUBOLE_API_KEY
+          value: notarealkey
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: docker.io/lyft/flytepropeller:v0.1.9
+        imagePullPolicy: IfNotPresent
+        name: flytepropeller
+        ports:
+        - containerPort: 10254
+        resources:
+          limits:
+            cpu: "0.1"
+            ephemeral-storage: 100Mi
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /etc/flyte/config-qubole
+          name: qubole-config-volume
+        - mountPath: /etc/flyte/config-container
+          name: container-config-volume
+        - mountPath: /etc/flyte/config-spark
+          name: spark-config-volume
+        - mountPath: /etc/flyte/config
+          name: config-volume
+        - mountPath: /etc/flyte/config-plugin
+          name: plugin-config-volume
+      serviceAccountName: flytepropeller
+      volumes:
+      - configMap:
+          name: flyte-qubole-config-h626c9t6f7
+        name: qubole-config-volume
+      - configMap:
+          name: flyte-container-config-5k78b9cm42
+        name: container-config-volume
+      - configMap:
+          name: flyte-spark-config-h72bmtggc2
+        name: spark-config-volume
+      - configMap:
+          name: flyte-propeller-config-96k59km44m
+        name: config-volume
+      - configMap:
+          name: flyte-plugin-config-hkh64698kg
+        name: plugin-config-volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - args:
+        - server
+        - /data
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: minio
+        - name: MINIO_SECRET_KEY
+          value: miniostorage
+        image: minio/minio:RELEASE.2019-06-04T01-15-58Z
+        name: minio
+        ports:
+        - containerPort: 9000
+          name: minio
+        volumeMounts:
+        - mountPath: /data
+          name: minio-storage
+      volumes:
+      - emptyDir: {}
+        name: minio-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - image: postgres:10.1
+        name: postgres
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-storage
+      volumes:
+      - emptyDir: {}
+        name: postgres-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: contour
+  name: contour
+  namespace: heptio-contour
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contour
+  template:
+    metadata:
+      annotations:
+        prometheus.io/format: prometheus
+        prometheus.io/path: /stats
+        prometheus.io/port: "8002"
+        prometheus.io/scrape: "true"
+      labels:
+        app: contour
+    spec:
+      containers:
+      - args:
+        - -c
+        - /config/contour.yaml
+        - --service-cluster
+        - cluster0
+        - --service-node
+        - node0
+        command:
+        - envoy
+        image: docker.io/envoyproxy/envoy-alpine:v1.6.0
+        name: envoy-envoyingressv1
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 8002
+          name: statsd
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /config
+          name: contour-config
+      - args:
+        - serve
+        - --incluster
+        - --envoy-http-port=80
+        - --debug-http-port=6069
+        command:
+        - contour
+        image: gcr.io/heptio-images/contour:v0.6.1
+        imagePullPolicy: Always
+        name: contour-unknown
+        ports:
+        - containerPort: 8000
+          name: contour
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - args:
+        - bootstrap
+        - /config/contour.yaml
+        - --statsd-enabled
+        command:
+        - contour
+        image: gcr.io/heptio-images/contour:v0.6.1
+        imagePullPolicy: Always
+        name: envoy-initconfig
+        volumeMounts:
+        - mountPath: /config
+          name: contour-config
+      serviceAccountName: contour
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: contour-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: sparkoperator
+    app.kubernetes.io/version: v2.4.0-v1alpha1
+  name: sparkoperator
+  namespace: sparkoperator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sparkoperator
+      app.kubernetes.io/version: v2.4.0-v1alpha1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+      initializers:
+        pending: []
+      labels:
+        app.kubernetes.io/name: sparkoperator
+        app.kubernetes.io/version: v2.4.0-v1alpha1
+    spec:
+      containers:
+      - args:
+        - -logtostderr
+        - -v=2
+        - -controller-threads=20
+        - -enable-metrics=true
+        - '-metrics-prefix=service:'
+        - -metrics-labels=task_name
+        - -metrics-labels=workflow_name
+        command:
+        - /usr/bin/spark-operator
+        image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0
+        imagePullPolicy: Always
+        name: sparkoperator-unknown
+        ports:
+        - containerPort: 10254
+      serviceAccountName: sparkoperator
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-resource-manager
+  serviceName: redis-resource-manager
+  template:
+    metadata:
+      labels:
+        app: redis-resource-manager
+    spec:
+      containers:
+      - env:
+        - name: REDIS_PASSWORD
+          value: mypassword
+        image: docker.io/bitnami/redis:4.0.2-r1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: redis-resource-manager
+        ports:
+        - containerPort: 6379
+          name: redis
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          failureThreshold: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 200m
+            memory: 128Mi
+        volumeMounts:
+        - mountPath: /bitnami
+          name: redis-data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      volumes:
+      - emptyDir: {}
+        name: redis-data
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: syncresources
+  namespace: flyte
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - command:
+            - flyteadmin
+            - --logtostderr
+            - --config
+            - /etc/flyte/config/flyteadmin_config.yaml
+            - clusterresource
+            - sync
+            image: docker.io/lyft/flyteadmin:v0.1.1
+            imagePullPolicy: IfNotPresent
+            name: sync-cluster-resources
+            volumeMounts:
+            - mountPath: /etc/flyte/clusterresource/templates
+              name: resource-templates
+            - mountPath: /etc/flyte/config
+              name: config-volume
+          restartPolicy: OnFailure
+          serviceAccountName: flyteadmin
+          volumes:
+          - configMap:
+              name: clusterresource-template-dgc9fcm2kh
+            name: resource-templates
+          - configMap:
+              name: flyte-admin-config-228b7f76mk
+            name: config-volume
+  schedule: '*/1 * * * *'
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: flytesystem
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: flyteconsole
+          servicePort: 80
+        path: /console
+      - backend:
+          serviceName: flyteconsole
+          servicePort: 80
+        path: /__webpack_hmr
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /api
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /healthcheck
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /v1
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 81
+        path: /flyteidl.service.AdminService
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 87
+        path: /openapi
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: minio
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: minio
+          servicePort: 9000
+        path: /minio

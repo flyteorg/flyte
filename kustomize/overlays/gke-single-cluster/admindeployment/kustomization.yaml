@@ -5,7 +5,6 @@ namespace: flyte
 
 resources:
 - cron.yaml
-- service.yaml
 
 configMapGenerator:
 # the main admin configmap
@@ -20,3 +19,4 @@ configMapGenerator:
 
 patches:
 - admindeployment.yaml
+- service.yaml

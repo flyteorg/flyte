@@ -20,7 +20,7 @@ database:
   password: awesomesauce
   # Recommended to use passwordPath and mount it using kubescrets or the like
   # passwordPath: "/var/run/CREDENTIALS_DB_PASSWORD"
-  # host here is the ip address of the CloudSQL Db in private mode
+  # host here is the private ip address of the CloudSQL Db in private mode
   host: 10.23.0.3
   dbname: flyte
   options: sslmode=disable
@@ -58,14 +58,14 @@ registration:
 scheduler:
   eventScheduler:
     scheme: local
-    region: "us-east-1"
-    scheduleRole: "arn:aws:iam::173840052742:role/mbadmin-development-scheduler"
-    targetName: "arn:aws:sqs:us-east-1:173840052742:flyteadmin-development-scheduler"
+    region: "my-region"
+    scheduleRole: "arn:aws:iam::abc123:role/my-iam-role"
+    targetName: "arn:aws:sqs:my-region:abc123:my-queue"
   workflowExecutor:
     scheme: local
-    region: "us-east-1"
+    region: "my-region"
     scheduleQueueName: "won't-work-locally"
-    accountId: "173840052742"
+    accountId: "abc123"
 notifications:
   type: local
   region: "us-east-1"
