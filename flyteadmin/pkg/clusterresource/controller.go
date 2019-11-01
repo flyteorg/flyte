@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
+
 	"github.com/lyft/flyteadmin/pkg/executioncluster/interfaces"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -64,6 +66,8 @@ type NamespaceName = string
 type LastModTimeCache = map[FileName]time.Time
 type NamespaceCache = map[NamespaceName]LastModTimeCache
 
+type templateValuesType = map[string]string
+
 type controller struct {
 	db                     repositories.RepositoryInterface
 	config                 runtimeInterfaces.Configuration
@@ -95,12 +99,10 @@ func (c *controller) templateAlreadyApplied(namespace NamespaceName, templateFil
 	return timestamp.Equal(templateFile.ModTime())
 }
 
-func populateTemplateValues(namespace NamespaceName, data map[string]runtimeInterfaces.DataSource) (map[string]string, error) {
-	templateValues := make(map[string]string, len(data)+1)
-	// First, add the special case namespace template which is always substituted by the system
-	// rather than fetched via a user-specified source.
-	templateValues[fmt.Sprintf(templateVariableFormat, namespaceVariable)] = namespace
-
+// Given a map of templatized variable names -> data source, this function produces an output that maps the same
+// variable names to their fully resolved values (from the specified data source).
+func populateTemplateValues(data map[string]runtimeInterfaces.DataSource) (templateValuesType, error) {
+	templateValues := make(templateValuesType, len(data))
 	collectedErrs := make([]error, 0)
 	for templateVar, dataSource := range data {
 		if templateVar == namespaceVariable {
@@ -141,13 +143,71 @@ func populateTemplateValues(namespace NamespaceName, data map[string]runtimeInte
 	return templateValues, nil
 }
 
+// Produces a map of template variable names and their fully resolved values based on configured defaults for each
+// system-domain in the application config file.
+func populateDefaultTemplateValues(defaultData map[runtimeInterfaces.DomainName]runtimeInterfaces.TemplateData) (
+	map[string]templateValuesType, error) {
+	defaultTemplateValues := make(map[string]templateValuesType)
+	collectedErrs := make([]error, 0)
+	for domainName, templateData := range defaultData {
+		domainSpecificTemplateValues, err := populateTemplateValues(templateData)
+		if err != nil {
+			collectedErrs = append(collectedErrs, err)
+			continue
+		}
+		defaultTemplateValues[domainName] = domainSpecificTemplateValues
+	}
+	if len(collectedErrs) > 0 {
+		return nil, errors.NewCollectedFlyteAdminError(codes.InvalidArgument, collectedErrs)
+	}
+	return defaultTemplateValues, nil
+}
+
+// Fetches user-specified overrides from the admin database for template variables and their desired value
+// substitutions based on the input project and domain. These database values are overlaid on top of the configured
+// variable defaults for the specific domain as defined in the admin application config file.
+func (c *controller) getCustomTemplateValues(
+	ctx context.Context, project, domain string, domainTemplateValues templateValuesType) (templateValuesType, error) {
+	if len(domainTemplateValues) == 0 {
+		domainTemplateValues = make(templateValuesType)
+	}
+	customTemplateValues := make(templateValuesType)
+	for key, value := range domainTemplateValues {
+		customTemplateValues[key] = value
+	}
+	collectedErrs := make([]error, 0)
+	// All project-domain defaults saved in the database take precedence over the domain-specific defaults.
+	projectDomainModel, err := c.db.ProjectDomainRepo().Get(ctx, project, domain)
+	if err != nil {
+		if err.(errors.FlyteAdminError).Code() != codes.NotFound {
+			// Not found is fine because not every project-domain combination will have specific custom resource
+			// attributes.
+			collectedErrs = append(collectedErrs, err)
+		}
+	}
+	projectDomain, err := transformers.FromProjectDomainModel(projectDomainModel)
+	if err != nil {
+		collectedErrs = append(collectedErrs, err)
+	}
+	if len(projectDomain.Attributes) > 0 {
+		for templateKey, templateValue := range projectDomain.Attributes {
+			customTemplateValues[fmt.Sprintf(templateVariableFormat, templateKey)] = templateValue
+		}
+	}
+	if len(collectedErrs) > 0 {
+		return nil, errors.NewCollectedFlyteAdminError(codes.InvalidArgument, collectedErrs)
+	}
+	return customTemplateValues, nil
+}
+
 // This function loops through the kubernetes resource template files in the configured template directory.
 // For each unapplied template file (wrt the namespace) this func attempts to
 //   1) read the template file
 //   2) substitute templatized variables with their resolved values
 //   3) decode the output of the above into a kubernetes resource
 //   4) create the resource on the kubernetes cluster and cache successful outcomes
-func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName) error {
+func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName,
+	templateValues, customTemplateValues templateValuesType) error {
 	templateDir := c.config.ClusterResourceConfiguration().GetTemplatePath()
 	if c.lastAppliedTemplateDir != templateDir {
 		// Invalidate all caches
@@ -162,8 +222,6 @@ func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName)
 	}
 
 	collectedErrs := make([]error, 0)
-	// Template values are lazy initialized only iff a new template file must be applied for this namespace.
-	var templateValues map[string]string
 	for _, templateFile := range templateFiles {
 		templateFileName := templateFile.Name()
 		if filepath.Ext(templateFileName) != ".yaml" {
@@ -195,16 +253,15 @@ func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName)
 		logger.Debugf(ctx, "successfully read template config file [%s]", templateFileName)
 
 		// 2) substitute templatized variables with their resolved values
-		if len(templateValues) == 0 {
-			// Compute templatized values.
-			var err error
-			templateValues, err = populateTemplateValues(namespace, c.config.ClusterResourceConfiguration().GetTemplateData())
-			if err != nil {
-				return err
-			}
-		}
+		// First, add the special case namespace template which is always substituted by the system
+		// rather than fetched via a user-specified source.
+		templateValues[fmt.Sprintf(templateVariableFormat, namespaceVariable)] = namespace
 		var config = string(template)
 		for templateKey, templateValue := range templateValues {
+			config = strings.Replace(config, templateKey, templateValue, replaceAllInstancesOfString)
+		}
+		// Replace remaining template variables from domain specific defaults.
+		for templateKey, templateValue := range customTemplateValues {
 			config = strings.Replace(config, templateKey, templateValue, replaceAllInstancesOfString)
 		}
 
@@ -280,10 +337,27 @@ func (c *controller) Sync(ctx context.Context) error {
 	}
 	domains := c.config.ApplicationConfiguration().GetDomainsConfig()
 	var errs = make([]error, 0)
+	templateValues, err := populateTemplateValues(c.config.ClusterResourceConfiguration().GetTemplateData())
+	if err != nil {
+		logger.Warningf(ctx, "Failed to get templatized values specified in config: %v", err)
+		errs = append(errs, err)
+	}
+	domainTemplateValues, err := populateDefaultTemplateValues(c.config.ClusterResourceConfiguration().GetCustomTemplateData())
+	if err != nil {
+		logger.Warningf(ctx, "Failed to get domain-specific templatized values specified in config: %v", err)
+		errs = append(errs, err)
+	}
+
 	for _, project := range projects {
 		for _, domain := range *domains {
 			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceMappingConfig(), project.Identifier, domain.Name)
-			err := c.syncNamespace(ctx, namespace)
+			customTemplateValues, err := c.getCustomTemplateValues(
+				ctx, project.Identifier, domain.ID, domainTemplateValues[domain.ID])
+			if err != nil {
+				logger.Warningf(ctx, "Failed to get custom template values for %s with err: %v", namespace, err)
+				errs = append(errs, err)
+			}
+			err = c.syncNamespace(ctx, namespace, templateValues, customTemplateValues)
 			if err != nil {
 				logger.Warningf(ctx, "Failed to create cluster resources for namespace [%s] with err: %v", namespace, err)
 				c.metrics.ResourceAddErrors.Inc()
