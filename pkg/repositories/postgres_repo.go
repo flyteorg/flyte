@@ -13,6 +13,7 @@ type PostgresRepo struct {
 	executionRepo     interfaces.ExecutionRepoInterface
 	launchPlanRepo    interfaces.LaunchPlanRepoInterface
 	projectRepo       interfaces.ProjectRepoInterface
+	projectDomainRepo interfaces.ProjectDomainRepoInterface
 	nodeExecutionRepo interfaces.NodeExecutionRepoInterface
 	taskRepo          interfaces.TaskRepoInterface
 	taskExecutionRepo interfaces.TaskExecutionRepoInterface
@@ -29,6 +30,10 @@ func (p *PostgresRepo) LaunchPlanRepo() interfaces.LaunchPlanRepoInterface {
 
 func (p *PostgresRepo) ProjectRepo() interfaces.ProjectRepoInterface {
 	return p.projectRepo
+}
+
+func (p *PostgresRepo) ProjectDomainRepo() interfaces.ProjectDomainRepoInterface {
+	return p.projectDomainRepo
 }
 
 func (p *PostgresRepo) NodeExecutionRepo() interfaces.NodeExecutionRepoInterface {
@@ -51,7 +56,8 @@ func NewPostgresRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scop
 	return &PostgresRepo{
 		executionRepo:     gormimpl.NewExecutionRepo(db, errorTransformer, scope.NewSubScope("executions")),
 		launchPlanRepo:    gormimpl.NewLaunchPlanRepo(db, errorTransformer, scope.NewSubScope("launch_plans")),
-		projectRepo:       gormimpl.NewProjectRepo(db, errorTransformer, scope.NewSubScope("namespace")),
+		projectRepo:       gormimpl.NewProjectRepo(db, errorTransformer, scope.NewSubScope("project")),
+		projectDomainRepo: gormimpl.NewProjectDomainRepo(db, errorTransformer, scope.NewSubScope("project_domain")),
 		nodeExecutionRepo: gormimpl.NewNodeExecutionRepo(db, errorTransformer, scope.NewSubScope("node_executions")),
 		taskRepo:          gormimpl.NewTaskRepo(db, errorTransformer, scope.NewSubScope("tasks")),
 		taskExecutionRepo: gormimpl.NewTaskExecutionRepo(db, errorTransformer, scope.NewSubScope("task_executions")),
