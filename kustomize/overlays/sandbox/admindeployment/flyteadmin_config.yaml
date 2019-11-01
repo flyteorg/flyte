@@ -24,28 +24,6 @@ remoteData:
   scheme: "local"
   signedUrls:
     durationMinutes: 3
-queues:
-  executionQueues:
-  - parent: "FlyteNonProductionTaskCPU-staging-iad"
-    child: "FlyteNonProductionSubTaskCPU-staging-iad"
-    attributes:
-    - all
-workflowConfigs:
-  - project: flytekit
-    tags:
-      - all
-  - project: "flytetester"
-    domain: "development"
-    workflowName: "app-workflows-rich-workflow-rich-workflow"
-    tags:
-      - all
-  - project: "flytetester"
-    domain: "development"
-    workflowName: "app-workflows-batch-workflow-batch-tasks-workflow"
-    tags:
-      - all
-  - tags:
-      - all
 storage:
   type: minio
   connection:

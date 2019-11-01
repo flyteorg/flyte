@@ -561,28 +561,6 @@ data:
       scheme: "local"
       signedUrls:
         durationMinutes: 3
-    queues:
-      executionQueues:
-      - parent: "FlyteNonProductionTaskCPU-staging-iad"
-        child: "FlyteNonProductionSubTaskCPU-staging-iad"
-        attributes:
-        - all
-    workflowConfigs:
-      - project: flytekit
-        tags:
-          - all
-      - project: "flytetester"
-        domain: "development"
-        workflowName: "app-workflows-rich-workflow-rich-workflow"
-        tags:
-          - all
-      - project: "flytetester"
-        domain: "development"
-        workflowName: "app-workflows-batch-workflow-batch-tasks-workflow"
-        tags:
-          - all
-      - tags:
-          - all
     storage:
       type: minio
       connection:
@@ -620,7 +598,7 @@ data:
       refresh: 5m
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-md9bt8468h
+  name: flyte-admin-config-44hkc4cmdg
   namespace: flyte
 ---
 apiVersion: v1
@@ -1088,7 +1066,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-md9bt8468h
+          name: flyte-admin-config-44hkc4cmdg
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1490,7 +1468,7 @@ spec:
               name: clusterresource-template-dgc9fcm2kh
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-md9bt8468h
+              name: flyte-admin-config-44hkc4cmdg
             name: config-volume
   schedule: '*/1 * * * *'
 ---
