@@ -588,8 +588,6 @@ data:
         name: staging
       - id: production
         name: production
-      - id: domain
-        name: domain
     registration:
       maxWorkflowNodes: 100
     cluster_resources:
@@ -597,7 +595,7 @@ data:
       refresh: 5m
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-k442g2d588
+  name: flyte-admin-config-bhkhcbfmcc
   namespace: flyte
 ---
 apiVersion: v1
@@ -1066,7 +1064,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-k442g2d588
+          name: flyte-admin-config-bhkhcbfmcc
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1463,7 +1461,7 @@ spec:
               name: clusterresource-template-dgc9fcm2kh
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-k442g2d588
+              name: flyte-admin-config-bhkhcbfmcc
             name: config-volume
   schedule: '*/1 * * * *'
 ---

@@ -51,8 +51,6 @@ domains:
     name: staging
   - id: production
     name: production
-  - id: domain
-    name: domain
 registration:
   maxWorkflowNodes: 100
 cluster_resources:
