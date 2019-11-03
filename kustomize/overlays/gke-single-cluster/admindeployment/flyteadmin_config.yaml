@@ -55,32 +55,6 @@ domains:
     name: domain
 registration:
   maxWorkflowNodes: 100
-scheduler:
-  eventScheduler:
-    scheme: local
-    region: "my-region"
-    scheduleRole: "arn:aws:iam::abc123:role/my-iam-role"
-    targetName: "arn:aws:sqs:my-region:abc123:my-queue"
-  workflowExecutor:
-    scheme: local
-    region: "my-region"
-    scheduleQueueName: "won't-work-locally"
-    accountId: "abc123"
-notifications:
-  type: local
-  region: "us-east-1"
-  publisher:
-    topicName: "foo"
-  processor:
-    queueName: "queue"
-    accountId: "bar"
-  emailer:
-    subject: "Notice: Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\"."
-    sender:  "flyte-notifications@lyft.com"
-    body: >
-      Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\". View details at
-      <a href=\http://flyte.lyft.net/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
-      http://flyte.lyft.net/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
 cluster_resources:
   templatePath: "/etc/flyte/clusterresource/templates"
   refresh: 5m

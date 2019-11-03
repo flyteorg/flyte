@@ -592,38 +592,12 @@ data:
         name: domain
     registration:
       maxWorkflowNodes: 100
-    scheduler:
-      eventScheduler:
-        scheme: local
-        region: "my-region"
-        scheduleRole: "arn:aws:iam::abc123:role/my-iam-role"
-        targetName: "arn:aws:sqs:my-region:abc123:my-queue"
-      workflowExecutor:
-        scheme: local
-        region: "my-region"
-        scheduleQueueName: "won't-work-locally"
-        accountId: "abc123"
-    notifications:
-      type: local
-      region: "us-east-1"
-      publisher:
-        topicName: "foo"
-      processor:
-        queueName: "queue"
-        accountId: "bar"
-      emailer:
-        subject: "Notice: Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\"."
-        sender:  "flyte-notifications@lyft.com"
-        body: >
-          Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\". View details at
-          <a href=\http://flyte.lyft.net/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
-          http://flyte.lyft.net/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
     cluster_resources:
       templatePath: "/etc/flyte/clusterresource/templates"
       refresh: 5m
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-228b7f76mk
+  name: flyte-admin-config-k442g2d588
   namespace: flyte
 ---
 apiVersion: v1
@@ -1048,7 +1022,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.1.1
+        image: docker.io/lyft/flyteadmin:v0.1.4
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -1063,7 +1037,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flytetester
-        image: docker.io/lyft/flyteadmin:v0.1.1
+        image: docker.io/lyft/flyteadmin:v0.1.4
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -1076,7 +1050,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.1.1
+        image: docker.io/lyft/flyteadmin:v0.1.4
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -1092,7 +1066,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-228b7f76mk
+          name: flyte-admin-config-k442g2d588
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1489,7 +1463,7 @@ spec:
               name: clusterresource-template-dgc9fcm2kh
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-228b7f76mk
+              name: flyte-admin-config-k442g2d588
             name: config-volume
   schedule: '*/1 * * * *'
 ---
