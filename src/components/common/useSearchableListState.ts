@@ -16,7 +16,7 @@ export type PropertyGetter<T> = (item: T) => string;
 /** A displayable search result item */
 export interface SearchResult<T> {
     /** Undecorated string identifying the item */
-    id: string;
+    key: string;
     /** (Potentially) decorated string of HTML to be displayed */
     content: React.ReactNode;
     /** The raw value of the item */
@@ -41,7 +41,7 @@ function toSearchResults<T>(
         const property = getProperty(item, getter);
         return {
             content: property,
-            id: property,
+            key: property,
             value: item
         };
     });
@@ -120,7 +120,7 @@ function getFilteredItems<T>(
         const content = createHighlightedResult(result);
         return {
             content,
-            id: result.target,
+            key: result.target,
             value: result.obj.value
         };
     });

@@ -1,6 +1,6 @@
 import { WaitForData } from 'components/common';
-import { useWorkflowIds } from 'components/hooks';
-import { SearchableWorkflowIdList } from 'components/Workflow/SearchableWorkflowIdList';
+import { useWorkflowNameList } from 'components/hooks/useNamedEntity';
+import { SearchableWorkflowNameList } from 'components/Workflow/SearchableWorkflowNameList';
 import { limits, SortDirection, workflowSortFields } from 'models';
 import * as React from 'react';
 
@@ -14,7 +14,7 @@ export const ProjectWorkflows: React.FC<ProjectWorkflowsProps> = ({
     domainId: domain,
     projectId: project
 }) => {
-    const workflowIds = useWorkflowIds(
+    const workflowNames = useWorkflowNameList(
         { domain, project },
         {
             limit: limits.NONE,
@@ -26,8 +26,8 @@ export const ProjectWorkflows: React.FC<ProjectWorkflowsProps> = ({
     );
 
     return (
-        <WaitForData {...workflowIds}>
-            <SearchableWorkflowIdList workflowIds={workflowIds.value} />
+        <WaitForData {...workflowNames}>
+            <SearchableWorkflowNameList workflowNames={workflowNames.value} />
         </WaitForData>
     );
 };

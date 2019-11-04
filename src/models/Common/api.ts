@@ -61,14 +61,43 @@ export interface GetNamedEntityInput {
  * @param requestConfig A standard `RequestConfig` object
  */
 export const getNamedEntity = (
-    { resourceType, project, domain, name }: GetNamedEntityInput,
+    input: GetNamedEntityInput,
     requestConfig?: RequestConfig
 ) => {
     return getAdminEntity<Admin.NamedEntity, NamedEntity>(
         {
-            path: makeNamedEntityPath(resourceType, project, domain, name),
+            path: makeNamedEntityPath(input),
             messageType: Admin.NamedEntity
         },
         requestConfig
+    );
+};
+
+export interface ListNamedEntitiesInput {
+    resourceType: Core.ResourceType;
+    project: string;
+    domain: string;
+}
+
+/** Fetches a list of NamedEntity objects sharing a common project/domain
+ * @param input An object specifying the resource type, project, and domain.
+ * All fields are _required_
+ * @param requestConfig A standard `RequestConfig` object
+ */
+export const listNamedEntities = (
+    input: ListNamedEntitiesInput,
+    requestConfig?: RequestConfig
+) => {
+    const path = makeNamedEntityPath(input);
+
+    return getAdminEntity<
+        Admin.NamedEntityList,
+        PaginatedEntityResponse<NamedEntity>
+    >(
+        {
+            path,
+            messageType: Admin.NamedEntityList
+        },
+        { ...defaultPaginationConfig, ...requestConfig }
     );
 };

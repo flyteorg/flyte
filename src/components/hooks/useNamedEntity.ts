@@ -1,6 +1,14 @@
+import { useAPIContext } from 'components/data/apiContext';
 import { Core } from 'flyteidl';
-import { getNamedEntity, NamedEntity } from 'models';
+import {
+    DomainIdentifierScope,
+    getNamedEntity,
+    NamedEntity,
+    RequestConfig,
+    ResourceType
+} from 'models';
 import { useFetchableData } from './useFetchableData';
+import { usePagination } from './usePagination';
 
 export interface UseNamedEntityInput {
     resourceType: Core.ResourceType;
@@ -49,4 +57,20 @@ export function useWorkflowNamedEntity(
         ...input,
         resourceType: Core.ResourceType.WORKFLOW
     });
+}
+
+/** A hook for fetching a paginated list of workflow names */
+export function useWorkflowNameList(
+    scope: DomainIdentifierScope,
+    config: RequestConfig
+) {
+    const { listNamedEntities } = useAPIContext();
+    return usePagination<NamedEntity, DomainIdentifierScope>(
+        { ...config, fetchArg: scope },
+        (scope, requestConfig) =>
+            listNamedEntities(
+                { ...scope, resourceType: ResourceType.WORKFLOW },
+                requestConfig
+            )
+    );
 }

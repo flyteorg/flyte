@@ -66,10 +66,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         <NoResults />
     ) : (
         <ul className={commonStyles.listUnstyled}>
-            {results.map(({ id, content, value }) => (
+            {results.map(({ key, content, value }) => (
                 <div
                     className={styles.searchResult}
-                    key={id}
+                    key={key}
                     onClick={onProjectSelected.bind(null, value)}
                 >
                     <div className={styles.itemName}>{content}</div>

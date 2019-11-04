@@ -4,7 +4,7 @@ import ChevronRight from '@material-ui/icons/ChevronRight';
 import { SearchableList, SearchResult } from 'components/common/SearchableList';
 import { useCommonStyles } from 'components/common/styles';
 import { listhoverColor, separatorColor } from 'components/Theme';
-import { NamedEntityIdentifier } from 'models';
+import { NamedEntity } from 'models';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Routes } from 'routes';
@@ -48,11 +48,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-interface SearchableWorkflowId extends NamedEntityIdentifier {
-    id: string;
+interface SearchableWorkflowName extends NamedEntity {
+    key: string;
 }
 
-const workflowIdKey = ({ domain, name, project }: NamedEntityIdentifier) =>
+const workflowNameKey = ({ id: { domain, name, project } }: NamedEntity) =>
     `${domain}/${name}/${project}`;
 
 const NoResults: React.FC = () => (
@@ -62,7 +62,7 @@ const NoResults: React.FC = () => (
 );
 
 interface SearchResultsProps {
-    results: SearchResult<SearchableWorkflowId>[];
+    results: SearchResult<SearchableWorkflowName>[];
 }
 const SearchResults: React.FC<SearchResultsProps> = ({ results }) => {
     const commonStyles = useCommonStyles();
@@ -71,14 +71,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results }) => {
         <NoResults />
     ) : (
         <ul className={commonStyles.listUnstyled}>
-            {results.map(({ id, content, value }) => (
+            {results.map(({ key, content, value }) => (
                 <Link
-                    key={id}
+                    key={key}
                     className={commonStyles.linkUnstyled}
                     to={Routes.WorkflowDetails.makeUrl(
-                        value.project,
-                        value.domain,
-                        value.name
+                        value.id.project,
+                        value.id.domain,
+                        value.id.name
                     )}
                 >
                     <div className={styles.searchResult}>
@@ -91,22 +91,25 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results }) => {
     );
 };
 
-export interface SearchableWorkflowIdListProps {
-    workflowIds: NamedEntityIdentifier[];
+export interface SearchableWorkflowNameListProps {
+    workflowNames: NamedEntity[];
 }
+
+const workflowSearchPropertyGetter = ({ id }: SearchableWorkflowName) =>
+    id.name;
 /** Given a list of WorkflowIds, renders a searchable list of items which
  * navigate to the WorkflowDetails page on click
  */
-export const SearchableWorkflowIdList: React.FC<
-    SearchableWorkflowIdListProps
-> = ({ workflowIds }) => {
+export const SearchableWorkflowNameList: React.FC<
+    SearchableWorkflowNameListProps
+> = ({ workflowNames }) => {
     const styles = useStyles();
-    const searchValues = workflowIds.map(workflowId => ({
-        ...workflowId,
-        id: workflowIdKey(workflowId)
+    const searchValues = workflowNames.map(workflowName => ({
+        ...workflowName,
+        key: workflowNameKey(workflowName)
     }));
 
-    const renderItems = (results: SearchResult<SearchableWorkflowId>[]) => (
+    const renderItems = (results: SearchResult<SearchableWorkflowName>[]) => (
         <SearchResults results={results} />
     );
 
@@ -114,7 +117,7 @@ export const SearchableWorkflowIdList: React.FC<
         <div className={styles.container}>
             <SearchableList
                 items={searchValues}
-                propertyGetter="name"
+                propertyGetter={workflowSearchPropertyGetter}
                 renderContent={renderItems}
             />
         </div>
