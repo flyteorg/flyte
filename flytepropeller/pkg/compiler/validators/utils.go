@@ -50,6 +50,8 @@ func literalTypeForScalar(scalar *core.Scalar) *core.LiteralType {
 		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_NONE}}
 	case *core.Scalar_Error:
 		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_ERROR}}
+	case *core.Scalar_Generic:
+		literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
 	default:
 		return nil
 	}
