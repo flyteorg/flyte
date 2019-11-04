@@ -15,7 +15,8 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: '100%'
     },
     itemName: {
-        flex: '1 0 auto'
+        flex: '1 0 auto',
+        padding: `${theme.spacing(2)}px 0`
     },
     itemChevron: {
         color: theme.palette.grey[500],
@@ -32,7 +33,6 @@ const useStyles = makeStyles((theme: Theme) => ({
         borderBottom: `1px solid ${separatorColor}`,
         display: 'flex',
         flexDirection: 'row',
-        height: theme.spacing(7),
         padding: `0 ${theme.spacing(3)}px`,
         '&:first-of-type': {
             borderTop: `1px solid ${separatorColor}`
@@ -82,7 +82,17 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results }) => {
                     )}
                 >
                     <div className={styles.searchResult}>
-                        <div className={styles.itemName}>{content}</div>
+                        <div className={styles.itemName}>
+                            <div>{content}</div>
+                            {!!value.metadata.description && (
+                                <Typography
+                                    variant="body2"
+                                    className={commonStyles.hintText}
+                                >
+                                    {value.metadata.description}
+                                </Typography>
+                            )}
+                        </div>
                         <ChevronRight className={styles.itemChevron} />
                     </div>
                 </Link>
