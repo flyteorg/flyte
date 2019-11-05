@@ -1,4 +1,5 @@
-import { NamedEntityIdentifier } from 'models/Common';
+import { Core } from 'flyteidl';
+import { NamedEntity, NamedEntityIdentifier } from 'models/Common';
 
 export const sampleWorkflowIds: NamedEntityIdentifier[] = [
     'batch_workflow.BatchTasksWorkflow',
@@ -27,3 +28,11 @@ export const sampleWorkflowIds: NamedEntityIdentifier[] = [
     'workflows-python-python-tasks-workflow',
     'workflows.python.PythonTasksWorkflow'
 ].map(name => ({ name, project: 'flytekit', domain: 'development' }));
+
+export const sampleWorkflowNames: NamedEntity[] = sampleWorkflowIds.map(id => ({
+    id,
+    resourceType: Core.ResourceType.WORKFLOW,
+    metadata: {
+        description: `A description for ${id.name}`
+    }
+}));

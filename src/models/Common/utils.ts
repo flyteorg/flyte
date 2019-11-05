@@ -1,4 +1,5 @@
 import { takeWhile } from 'lodash';
+import { endpointPrefixes } from './constants';
 import { Identifier } from './types';
 
 /** Concatenates string fields of an Identifier (excluding resourceType) into a
@@ -25,4 +26,22 @@ export function makeIdentifierPath(
 ) {
     const path = takeWhile([project, domain, name, version]).join('/');
     return `${prefix}/${path}`;
+}
+
+/** Creates a URL for the NamedEntity endpoint given an object with
+ * resource type, project, domain, and optionally name.
+ */
+export function makeNamedEntityPath({
+    resourceType,
+    project,
+    domain,
+    name
+}: Partial<Omit<Identifier, 'version'>>) {
+    return takeWhile([
+        endpointPrefixes.namedEntity,
+        resourceType,
+        project,
+        domain,
+        name
+    ]).join('/');
 }

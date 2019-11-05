@@ -25,7 +25,7 @@ const listObjectItems: SimpleItem[] = listStringItems.map(s => ({
 const renderContent = (results: SearchResult<SimpleItem>[]) => (
     <div>
         {results.map(r => (
-            <div role="list-item" aria-label={r.value.label} key={r.id}>
+            <div role="list-item" aria-label={r.value.label} key={r.key}>
                 {r.content}
             </div>
         ))}
