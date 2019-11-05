@@ -1576,6 +1576,13 @@ func TestExecutionManager_PublishNotifications(t *testing.T) {
 	}
 	var execClosure = admin.ExecutionClosure{
 		Notifications: testutils.GetExecutionRequest().Spec.GetNotifications().Notifications,
+		WorkflowId: &core.Identifier{
+			ResourceType: core.ResourceType_WORKFLOW,
+			Project:      "wf_project",
+			Domain:       "wf_domain",
+			Name:         "wf_name",
+			Version:      "wf_version",
+		},
 	}
 	var extraNotifications = []*admin.Notification{
 		{
@@ -1618,6 +1625,7 @@ func TestExecutionManager_PublishNotifications(t *testing.T) {
 		LaunchPlanID: uint(1),
 		WorkflowID:   uint(2),
 		Closure:      execClosureBytes,
+		Spec:         specBytes,
 	}
 	assert.Nil(t, myExecManager.publishNotifications(context.Background(), workflowRequest, executionModel))
 }
@@ -1709,6 +1717,13 @@ func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformErro
 	}
 	var execClosure = admin.ExecutionClosure{
 		Notifications: testutils.GetExecutionRequest().Spec.GetNotifications().Notifications,
+		WorkflowId: &core.Identifier{
+			ResourceType: core.ResourceType_WORKFLOW,
+			Project:      "wf_project",
+			Domain:       "wf_domain",
+			Name:         "wf_name",
+			Version:      "wf_version",
+		},
 	}
 	execClosureBytes, _ := proto.Marshal(&execClosure)
 	executionModel := models.Execution{
@@ -1721,6 +1736,7 @@ func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformErro
 		LaunchPlanID: uint(1),
 		WorkflowID:   uint(2),
 		Closure:      execClosureBytes,
+		Spec:         specBytes,
 	}
 	assert.Nil(t, myExecManager.publishNotifications(context.Background(), workflowRequest, executionModel))
 

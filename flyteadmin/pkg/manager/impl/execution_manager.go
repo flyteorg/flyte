@@ -812,7 +812,7 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request adm
 		// Currently there are no possible errors while creating an email message.
 		// Once customizable content is specified, errors are possible.
 		email := notifications.ToEmailMessageFromWorkflowExecutionEvent(
-			*m.config.ApplicationConfiguration().GetNotificationsConfig(), emailNotification, request, execution)
+			*m.config.ApplicationConfiguration().GetNotificationsConfig(), emailNotification, request, adminExecution)
 		// Errors seen while publishing a message are considered non-fatal to the method and will not result
 		// in the method returning an error.
 		if err = m.notificationClient.Publish(ctx, proto.MessageName(&emailNotification), email); err != nil {
