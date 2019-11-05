@@ -26,6 +26,7 @@ func CreateDatasetModel(dataset *datacatalog.Dataset) (*models.Dataset, error) {
 			Domain:  dataset.Id.Domain,
 			Name:    dataset.Id.Name,
 			Version: dataset.Id.Version,
+			UUID:    dataset.Id.UUID,
 		},
 		SerializedMetadata: serializedMetadata,
 		PartitionKeys:      partitionKeys,
@@ -39,6 +40,7 @@ func FromDatasetID(datasetID datacatalog.DatasetID) models.DatasetKey {
 		Domain:  datasetID.Domain,
 		Name:    datasetID.Name,
 		Version: datasetID.Version,
+		UUID:    datasetID.UUID,
 	}
 }
 

@@ -51,7 +51,7 @@ func TestCreateTag(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "tags" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","tag_name","artifact_id") VALUES (?,?,?,?,?,?,?,?,?)`).WithCallback(
+		`INSERT  INTO "tags" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","tag_name","artifact_id","dataset_uuid") VALUES (?,?,?,?,?,?,?,?,?,?)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			tagCreated = true
 		},
@@ -75,6 +75,7 @@ func TestGetTag(t *testing.T) {
 	sampleArtifactData["artifact_id"] = artifact.ArtifactID
 	sampleArtifactData["name"] = "test-dataloc-name"
 	sampleArtifactData["location"] = "test-dataloc-location"
+	sampleArtifactData["dataset_uuid"] = artifact.DatasetUUID
 
 	expectedArtifactDataResponse = append(expectedArtifactDataResponse, sampleArtifactData)
 
@@ -85,6 +86,7 @@ func TestGetTag(t *testing.T) {
 	sampleArtifact["dataset_name"] = artifact.DatasetName
 	sampleArtifact["dataset_version"] = artifact.DatasetVersion
 	sampleArtifact["artifact_id"] = artifact.ArtifactID
+	sampleArtifact["dataset_uuid"] = artifact.DatasetUUID
 	expectedArtifactResponse = append(expectedArtifactResponse, sampleArtifact)
 
 	expectedTagResponse := make([]map[string]interface{}, 0)
@@ -95,6 +97,7 @@ func TestGetTag(t *testing.T) {
 	sampleTag["dataset_version"] = artifact.DatasetVersion
 	sampleTag["artifact_id"] = artifact.ArtifactID
 	sampleTag["name"] = "test-tag"
+	sampleTag["dataset_uuid"] = artifact.DatasetUUID
 	expectedTagResponse = append(expectedTagResponse, sampleTag)
 
 	GlobalMock := mocket.Catcher.Reset()
@@ -130,7 +133,7 @@ func TestTagAlreadyExists(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "tags" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","tag_name","artifact_id") VALUES (?,?,?,?,?,?,?,?,?)`).WithError(
+		`INSERT  INTO "tags" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","tag_name","artifact_id","dataset_uuid") VALUES (?,?,?,?,?,?,?,?,?,?)`).WithError(
 		getAlreadyExistsErr(),
 	)
 

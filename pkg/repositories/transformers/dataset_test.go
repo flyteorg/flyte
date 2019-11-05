@@ -20,6 +20,7 @@ var datasetID = datacatalog.DatasetID{
 	Domain:  "test-domain",
 	Name:    "test-name",
 	Version: "test-version",
+	UUID:    "test-uuid",
 }
 
 func assertDatasetIDEqualsModel(t *testing.T, idlDataset *datacatalog.DatasetID, model *models.DatasetKey) {
@@ -27,6 +28,7 @@ func assertDatasetIDEqualsModel(t *testing.T, idlDataset *datacatalog.DatasetID,
 	assert.Equal(t, idlDataset.Domain, model.Domain)
 	assert.Equal(t, idlDataset.Name, model.Name)
 	assert.Equal(t, idlDataset.Version, model.Version)
+	assert.Equal(t, idlDataset.UUID, model.UUID)
 }
 
 func TestCreateDatasetModelNoParitions(t *testing.T) {
