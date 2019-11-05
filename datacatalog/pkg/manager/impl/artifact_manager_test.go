@@ -56,6 +56,7 @@ func getTestArtifact() *datacatalog.Artifact {
 			Domain:  "test-domain",
 			Name:    "test-name",
 			Version: "test-version",
+			UUID:    "test-uuid",
 		},
 		Metadata: &datacatalog.Metadata{
 			KeyMap: map[string]string{"key1": "value1"},
@@ -132,6 +133,7 @@ func TestCreateArtifact(t *testing.T) {
 					artifact.ArtifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
 					artifact.ArtifactKey.DatasetName == expectedArtifact.Dataset.Name &&
 					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
+					artifact.DatasetUUID == expectedArtifact.Dataset.UUID &&
 					artifact.Partitions[0].Key == expectedArtifact.Partitions[0].Key &&
 					artifact.Partitions[0].Value == expectedArtifact.Partitions[0].Value &&
 					artifact.Partitions[0].DatasetUUID == expectedDataset.Id.UUID &&
@@ -321,6 +323,7 @@ func TestGetArtifact(t *testing.T) {
 		Domain:  expectedDataset.Domain,
 		Version: expectedDataset.Version,
 		Name:    expectedDataset.Name,
+		UUID:    expectedDataset.UUID,
 	}
 	mockArtifactModel := models.Artifact{
 		ArtifactKey: models.ArtifactKey{
@@ -330,6 +333,7 @@ func TestGetArtifact(t *testing.T) {
 			DatasetName:    expectedDataset.Name,
 			ArtifactID:     expectedArtifact.Id,
 		},
+		DatasetUUID: expectedDataset.UUID,
 		ArtifactData: []models.ArtifactData{
 			{Name: "data1", Location: dataLocation.String()},
 		},
@@ -383,8 +387,9 @@ func TestGetArtifact(t *testing.T) {
 				DatasetVersion: expectedTag.DatasetVersion,
 				TagName:        expectedTag.TagName,
 			},
-			Artifact:   mockArtifactModel,
-			ArtifactID: mockArtifactModel.ArtifactID,
+			DatasetUUID: expectedTag.DatasetUUID,
+			Artifact:    mockArtifactModel,
+			ArtifactID:  mockArtifactModel.ArtifactID,
 		}, nil)
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
@@ -393,7 +398,6 @@ func TestGetArtifact(t *testing.T) {
 			QueryHandle: &datacatalog.GetArtifactRequest_TagName{TagName: expectedTag.TagName},
 		})
 		assert.NoError(t, err)
-
 		assert.True(t, proto.Equal(expectedArtifact, artifactResponse.Artifact))
 	})
 

@@ -41,6 +41,11 @@ func getTestDataset() models.Dataset {
 	}
 }
 
+// sql will generate a uuid
+func getDatasetUUID() string {
+	return "test-uuid"
+}
+
 func TestCreateDatasetNoPartitions(t *testing.T) {
 	dataset := getTestDataset()
 	datasetCreated := false
@@ -89,12 +94,12 @@ func TestCreateDataset(t *testing.T) {
 	)
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT "uuid" FROM "datasets"  WHERE (project = testProject) AND (name = testName) AND (domain = testDomain) AND (version = testVersion)`).WithReply([]map[string]interface{}{{"uuid": "test-uuid"}})
+		`SELECT "uuid" FROM "datasets"  WHERE (project = testProject) AND (name = testName) AND (domain = testDomain) AND (version = testVersion)`).WithReply([]map[string]interface{}{{"uuid": getDatasetUUID()}})
 
 	GlobalMock.NewMock().WithQuery(
 		`INSERT  INTO "partition_keys" ("created_at","updated_at","deleted_at","dataset_uuid","name") VALUES (?,?,?,?,?)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
-			assert.EqualValues(t, "test-uuid", values[3].Value)
+			assert.EqualValues(t, getDatasetUUID(), values[3].Value)
 			assert.EqualValues(t, dataset.PartitionKeys[insertKeyQueryNum].Name, values[4].Value)
 			insertKeyQueryNum++
 		},
@@ -108,7 +113,6 @@ func TestCreateDataset(t *testing.T) {
 }
 
 func TestGetDataset(t *testing.T) {
-	datasetUUID := "test-uuid" // sql will generate a uuid
 	dataset := getTestDataset()
 
 	expectedDatasetResponse := make([]map[string]interface{}, 0)
@@ -117,7 +121,7 @@ func TestGetDataset(t *testing.T) {
 	sampleDataset["domain"] = dataset.Domain
 	sampleDataset["name"] = dataset.Name
 	sampleDataset["version"] = dataset.Version
-	sampleDataset["uuid"] = datasetUUID
+	sampleDataset["uuid"] = getDatasetUUID()
 
 	expectedDatasetResponse = append(expectedDatasetResponse, sampleDataset)
 
@@ -130,7 +134,7 @@ func TestGetDataset(t *testing.T) {
 	expectedPartitionKeyResponse := make([]map[string]interface{}, 0)
 	samplePartitionKey := make(map[string]interface{})
 	samplePartitionKey["name"] = "testKey1"
-	samplePartitionKey["dataset_uuid"] = datasetUUID
+	samplePartitionKey["dataset_uuid"] = getDatasetUUID()
 	expectedPartitionKeyResponse = append(expectedPartitionKeyResponse, samplePartitionKey, samplePartitionKey)
 
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys"  WHERE "partition_keys"."deleted_at" IS NULL AND (("dataset_uuid" IN (test-uuid))) ORDER BY "partition_keys"."dataset_uuid" ASC`).WithReply(expectedPartitionKeyResponse)
@@ -141,14 +145,14 @@ func TestGetDataset(t *testing.T) {
 	assert.Equal(t, dataset.Domain, actualDataset.Domain)
 	assert.Equal(t, dataset.Name, actualDataset.Name)
 	assert.Equal(t, dataset.Version, actualDataset.Version)
-	assert.Equal(t, "test-uuid", actualDataset.UUID)
+	assert.Equal(t, getDatasetUUID(), actualDataset.UUID)
 	assert.Len(t, actualDataset.PartitionKeys, 2)
 }
 
 func TestGetDatasetWithUUID(t *testing.T) {
 	dataset := models.Dataset{
 		DatasetKey: models.DatasetKey{
-			UUID: "test-uuid",
+			UUID: getDatasetUUID(),
 		},
 	}
 	expectedResponse := make([]map[string]interface{}, 0)

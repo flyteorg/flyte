@@ -27,8 +27,8 @@ func getTestArtifactData() []*datacatalog.ArtifactData {
 
 func getTestPartitions() []models.Partition {
 	return []models.Partition{
-		{DatasetUUID: "dataset-uuid", Key: "key1", Value: "value1"},
-		{DatasetUUID: "dataset-uuid", Key: "key2", Value: "value2"},
+		{DatasetUUID: "test-uuid", Key: "key1", Value: "value1"},
+		{DatasetUUID: "test-uuid", Key: "key2", Value: "value2"},
 	}
 }
 
@@ -39,7 +39,7 @@ func getDatasetModel() models.Dataset {
 			Domain:  datasetID.Domain,
 			Name:    datasetID.Name,
 			Version: datasetID.Version,
-			UUID:    "dataset-uuid",
+			UUID:    datasetID.UUID,
 		},
 	}
 }
@@ -105,8 +105,8 @@ func TestFromArtifactModel(t *testing.T) {
 		},
 		SerializedMetadata: []byte{},
 		Partitions: []models.Partition{
-			{DatasetUUID: "dataset-uuid", Key: "key1", Value: "value1"},
-			{DatasetUUID: "dataset-uuid", Key: "key2", Value: "value2"},
+			{DatasetUUID: "test-uuid", Key: "key1", Value: "value1"},
+			{DatasetUUID: "test-uuid", Key: "key2", Value: "value2"},
 		},
 	}
 

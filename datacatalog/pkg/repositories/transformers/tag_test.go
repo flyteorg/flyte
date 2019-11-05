@@ -13,6 +13,7 @@ func TestToTagKey(t *testing.T) {
 		Domain:  "testDomain",
 		Name:    "testName",
 		Version: "testVersion",
+		UUID:    "test-uuid",
 	}
 
 	tagName := "testTag"

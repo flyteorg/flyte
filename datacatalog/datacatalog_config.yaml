@@ -1,6 +1,8 @@
 # This is a sample configuration file.
 # Real configuration when running inside K8s (local or otherwise) lives in a ConfigMap
 # Look in the artifacts directory in the flyte repo for what's actually run
+logger:
+  level: 5
 application:
   grpcPort: 8081
   httpPort: 8080

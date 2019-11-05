@@ -33,6 +33,7 @@ func getTestArtifact() models.Artifact {
 			DatasetName:    "testName",
 			DatasetVersion: "testVersion",
 		},
+		DatasetUUID: "test-uuid",
 	}
 }
 
@@ -57,7 +58,7 @@ func TestCreateArtifact(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","serialized_metadata") VALUES (?,?,?,?,?,?,?,?,?)`).WithCallback(
+		`INSERT  INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata") VALUES (?,?,?,?,?,?,?,?,?,?)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			artifactCreated = true
 		},
@@ -114,6 +115,7 @@ func TestGetArtifact(t *testing.T) {
 	sampleArtifactData["artifact_id"] = artifact.ArtifactID
 	sampleArtifactData["name"] = "test-dataloc-name"
 	sampleArtifactData["location"] = "test-dataloc-location"
+	sampleArtifactData["dataset_uuid"] = artifact.DatasetUUID
 
 	expectedArtifactDataResponse = append(expectedArtifactDataResponse, sampleArtifactData)
 
@@ -124,6 +126,7 @@ func TestGetArtifact(t *testing.T) {
 	sampleArtifact["dataset_name"] = artifact.DatasetName
 	sampleArtifact["dataset_version"] = artifact.DatasetVersion
 	sampleArtifact["artifact_id"] = artifact.ArtifactID
+	sampleArtifact["dataset_uuid"] = artifact.DatasetUUID
 	expectedArtifactResponse = append(expectedArtifactResponse, sampleArtifact)
 
 	expectedPartitionResponse := make([]map[string]interface{}, 0)
@@ -139,7 +142,7 @@ func TestGetArtifact(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifacts"  WHERE "artifacts"."deleted_at" IS NULL AND (("artifacts"."dataset_project" = testProject) AND ("artifacts"."dataset_name" = testName) AND ("artifacts"."dataset_domain" = testDomain) AND ("artifacts"."dataset_version" = testVersion) AND ("artifacts"."artifact_id" = 123))`).WithReply(expectedArtifactResponse)
+		`SELECT * FROM "artifacts"  WHERE "artifacts"."deleted_at" IS NULL AND (("artifacts"."dataset_project" = testProject) AND ("artifacts"."dataset_name" = testName) AND ("artifacts"."dataset_domain" = testDomain) AND ("artifacts"."dataset_version" = testVersion) AND ("artifacts"."artifact_id" = 123)) ORDER BY "artifacts"."dataset_project" ASC LIMIT 1`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123))))`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
@@ -196,7 +199,7 @@ func TestCreateArtifactAlreadyExists(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","serialized_metadata") VALUES (?,?,?,?,?,?,?,?,?)`).WithError(
+		`INSERT  INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata") VALUES (?,?,?,?,?,?,?,?,?,?)`).WithError(
 		getAlreadyExistsErr(),
 	)
 
