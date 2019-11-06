@@ -53,8 +53,8 @@ func (p *PostgresConfigProvider) GetArgs() string {
 		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=disable",
 			p.config.Host, p.config.Port, p.config.DbName, p.config.User)
 	}
-	return fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s",
-		p.config.Host, p.config.Port, p.config.DbName, p.config.User, p.config.Password)
+	return fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s %s",
+		p.config.Host, p.config.Port, p.config.DbName, p.config.User, p.config.Password, p.config.ExtraOptions)
 }
 
 func (p *PostgresConfigProvider) WithDebugModeEnabled() {
