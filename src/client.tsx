@@ -1,3 +1,4 @@
+import 'intersection-observer';
 import 'protobuf';
 
 import * as React from 'react';
