@@ -1,10 +1,10 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { SearchableList, SearchResult } from 'components/common/SearchableList';
-import { useCommonStyles } from 'components/common/styles';
 import { listhoverColor, separatorColor } from 'components/Theme';
 import { NamedEntity } from 'models';
 import * as React from 'react';
+import { SearchableList, SearchResult } from './SearchableList';
+import { useCommonStyles } from './styles';
 
 export const useNamedEntityListStyles = makeStyles((theme: Theme) => ({
     container: {
@@ -88,9 +88,7 @@ export interface SearchableNamedEntityListProps {
 }
 
 const nameSearchPropertyGetter = ({ id }: SearchableNamedEntity) => id.name;
-/** Given a list of WorkflowIds, renders a searchable list of items which
- * navigate to the WorkflowDetails page on click
- */
+/** Base component functionalityfor rendering NamedEntities (Workflow/Task/LaunchPlan) */
 export const SearchableNamedEntityList: React.FC<
     SearchableNamedEntityListProps
 > = ({ names, renderItem }) => {

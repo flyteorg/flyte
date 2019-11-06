@@ -1,15 +1,16 @@
 import { Typography } from '@material-ui/core';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import { SearchResult } from 'components/common';
-import { useCommonStyles } from 'components/common/styles';
 import {
     SearchableNamedEntity,
     SearchableNamedEntityList,
     SearchableNamedEntityListProps,
     useNamedEntityListStyles
-} from 'components/Workflow/SearchableNamedEntityList';
+} from 'components/common/SearchableNamedEntityList';
+import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
 
+/** Renders a searchable list of Task names, with associated metadata */
 export const SearchableTaskNameList: React.FC<
     Omit<SearchableNamedEntityListProps, 'renderItem'>
 > = props => {

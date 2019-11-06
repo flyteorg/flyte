@@ -1,13 +1,13 @@
 import { Typography } from '@material-ui/core';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import { SearchResult, WaitForData } from 'components/common';
-import { useCommonStyles } from 'components/common/styles';
-import { useTaskNameList } from 'components/hooks/useNamedEntity';
 import {
     SearchableNamedEntity,
     SearchableNamedEntityList,
     useNamedEntityListStyles
-} from 'components/Workflow/SearchableNamedEntityList';
+} from 'components/common/SearchableNamedEntityList';
+import { useCommonStyles } from 'components/common/styles';
+import { useTaskNameList } from 'components/hooks/useNamedEntity';
 import { limits, SortDirection, workflowSortFields } from 'models';
 import * as React from 'react';
 

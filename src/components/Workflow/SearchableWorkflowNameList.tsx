@@ -1,17 +1,18 @@
 import { Typography } from '@material-ui/core';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import { SearchResult } from 'components/common';
-import { useCommonStyles } from 'components/common/styles';
 import {
     SearchableNamedEntity,
     SearchableNamedEntityList,
     SearchableNamedEntityListProps,
     useNamedEntityListStyles
-} from 'components/Workflow/SearchableNamedEntityList';
+} from 'components/common/SearchableNamedEntityList';
+import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Routes } from 'routes';
 
+/** Renders a searchable list of Workflow names, with associated descriptions */
 export const SearchableWorkflowNameList: React.FC<
     Omit<SearchableNamedEntityListProps, 'renderItem'>
 > = props => {
