@@ -1,5 +1,4 @@
 import { Typography } from '@material-ui/core';
-import ChevronRight from '@material-ui/icons/ChevronRight';
 import { SearchResult, WaitForData } from 'components/common';
 import {
     SearchableNamedEntity,
@@ -41,7 +40,6 @@ export const ProjectTasks: React.FC<ProjectTasksProps> = ({
                         </Typography>
                     )}
                 </div>
-                {/* <ChevronRight className={listStyles.itemChevron} /> */}
             </div>
         </li>
     );

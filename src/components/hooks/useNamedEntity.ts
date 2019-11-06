@@ -59,7 +59,7 @@ export function useWorkflowNamedEntity(
     });
 }
 
-/** A hook for fetching a paginated list of workflow names */
+/** A hook for fetching a paginated list of task names */
 export function useTaskNameList(
     scope: DomainIdentifierScope,
     config: RequestConfig

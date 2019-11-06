@@ -29,7 +29,7 @@ export class Routes {
     static ProjectDetails = {
         makeUrl: (project: string, section?: string) =>
             makeProjectBoundPath(project, section ? `/${section}` : ''),
-        path: `${projectBasePath}/:section?`,
+        path: projectBasePath,
         sections: {
             tasks: {
                 makeUrl: (project: string, domain?: string) =>
