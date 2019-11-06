@@ -9,6 +9,7 @@ import (
 
 	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
 	"github.com/lyft/flytestdlib/logger"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp" // to overcome gke auth provider issue
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
