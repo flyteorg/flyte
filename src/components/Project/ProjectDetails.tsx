@@ -6,6 +6,7 @@ import { Project } from 'models';
 import * as React from 'react';
 import { Redirect, Route, Switch } from 'react-router';
 import { Routes } from 'routes';
+import { ProjectTasks } from './ProjectTasks';
 import { ProjectWorkflows } from './ProjectWorkflows';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -23,7 +24,7 @@ export interface ProjectDetailsRouteParams {
 export type ProjectDetailsProps = ProjectDetailsRouteParams;
 
 const entityTypeToComponent = {
-    tasks: ProjectWorkflows,
+    tasks: ProjectTasks,
     workflows: ProjectWorkflows
 };
 

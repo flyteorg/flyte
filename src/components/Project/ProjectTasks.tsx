@@ -1,20 +1,51 @@
-import { WaitForData } from 'components/common';
-import { useWorkflowNameList } from 'components/hooks/useNamedEntity';
-import { SearchableWorkflowNameList } from 'components/Workflow/SearchableWorkflowNameList';
+import { Typography } from '@material-ui/core';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import { SearchResult, WaitForData } from 'components/common';
+import { useCommonStyles } from 'components/common/styles';
+import { useTaskNameList } from 'components/hooks/useNamedEntity';
+import {
+    SearchableNamedEntity,
+    SearchableNamedEntityList,
+    useNamedEntityListStyles
+} from 'components/Workflow/SearchableNamedEntityList';
 import { limits, SortDirection, workflowSortFields } from 'models';
 import * as React from 'react';
 
-export interface ProjectWorkflowsProps {
+export interface ProjectTasksProps {
     projectId: string;
     domainId: string;
 }
 
-/** A listing of the Workflows registered for a project */
-export const ProjectWorkflows: React.FC<ProjectWorkflowsProps> = ({
+/** A listing of the Tasks registered for a project */
+export const ProjectTasks: React.FC<ProjectTasksProps> = ({
     domainId: domain,
     projectId: project
 }) => {
-    const workflowNames = useWorkflowNameList(
+    const listStyles = useNamedEntityListStyles();
+    const commonStyles = useCommonStyles();
+    const renderItem = ({
+        key,
+        value,
+        content
+    }: SearchResult<SearchableNamedEntity>) => (
+        <li key={key}>
+            <div className={listStyles.searchResult}>
+                <div className={listStyles.itemName}>
+                    <div>{content}</div>
+                    {!!value.metadata.description && (
+                        <Typography
+                            variant="body2"
+                            className={commonStyles.hintText}
+                        >
+                            {value.metadata.description}
+                        </Typography>
+                    )}
+                </div>
+                {/* <ChevronRight className={listStyles.itemChevron} /> */}
+            </div>
+        </li>
+    );
+    const taskNames = useTaskNameList(
         { domain, project },
         {
             limit: limits.NONE,
@@ -26,8 +57,11 @@ export const ProjectWorkflows: React.FC<ProjectWorkflowsProps> = ({
     );
 
     return (
-        <WaitForData {...workflowNames}>
-            <SearchableWorkflowNameList workflowNames={workflowNames.value} />
+        <WaitForData {...taskNames}>
+            <SearchableNamedEntityList
+                names={taskNames.value}
+                renderItem={renderItem}
+            />
         </WaitForData>
     );
 };

@@ -9,10 +9,8 @@ import {
     useNamedEntityListStyles
 } from 'components/Workflow/SearchableNamedEntityList';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
-import { Routes } from 'routes';
 
-export const SearchableWorkflowNameList: React.FC<
+export const SearchableTaskNameList: React.FC<
     Omit<SearchableNamedEntityListProps, 'renderItem'>
 > = props => {
     const commonStyles = useCommonStyles();
@@ -23,15 +21,7 @@ export const SearchableWorkflowNameList: React.FC<
         value,
         content
     }: SearchResult<SearchableNamedEntity>) => (
-        <Link
-            key={key}
-            className={commonStyles.linkUnstyled}
-            to={Routes.WorkflowDetails.makeUrl(
-                value.id.project,
-                value.id.domain,
-                value.id.name
-            )}
-        >
+        <li key={key}>
             <div className={listStyles.searchResult}>
                 <div className={listStyles.itemName}>
                     <div>{content}</div>
@@ -44,9 +34,9 @@ export const SearchableWorkflowNameList: React.FC<
                         </Typography>
                     )}
                 </div>
-                <ChevronRight className={listStyles.itemChevron} />
+                {/* <ChevronRight className={listStyles.itemChevron} /> */}
             </div>
-        </Link>
+        </li>
     );
     return <SearchableNamedEntityList {...props} renderItem={renderItem} />;
 };

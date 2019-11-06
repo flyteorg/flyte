@@ -1,0 +1,116 @@
+import { Typography } from '@material-ui/core';
+import { makeStyles, Theme } from '@material-ui/core/styles';
+import { SearchableList, SearchResult } from 'components/common/SearchableList';
+import { useCommonStyles } from 'components/common/styles';
+import { listhoverColor, separatorColor } from 'components/Theme';
+import { NamedEntity } from 'models';
+import * as React from 'react';
+
+export const useNamedEntityListStyles = makeStyles((theme: Theme) => ({
+    container: {
+        marginBottom: theme.spacing(2),
+        width: '100%'
+    },
+    itemName: {
+        flex: '1 0 auto',
+        padding: `${theme.spacing(2)}px 0`
+    },
+    itemChevron: {
+        color: theme.palette.grey[500],
+        flex: '0 0 auto'
+    },
+    noResults: {
+        color: theme.palette.text.disabled,
+        display: 'flex',
+        justifyContent: 'center',
+        marginTop: theme.spacing(6)
+    },
+    searchResult: {
+        alignItems: 'center',
+        borderBottom: `1px solid ${separatorColor}`,
+        display: 'flex',
+        flexDirection: 'row',
+        padding: `0 ${theme.spacing(3)}px`,
+        '&:first-of-type': {
+            borderTop: `1px solid ${separatorColor}`
+        },
+        '&:hover': {
+            backgroundColor: listhoverColor
+        },
+        '& mark': {
+            backgroundColor: 'unset',
+            color: theme.palette.primary.main,
+            fontWeight: 'bold'
+        }
+    }
+}));
+
+export interface SearchableNamedEntity extends NamedEntity {
+    key: string;
+}
+
+const nameKey = ({ id: { domain, name, project } }: NamedEntity) =>
+    `${domain}/${name}/${project}`;
+
+const NoResults: React.FC = () => (
+    <Typography
+        className={useNamedEntityListStyles().noResults}
+        variant="h6"
+        component="div"
+    >
+        No matching results
+    </Typography>
+);
+
+type ItemRenderer = (
+    item: SearchResult<SearchableNamedEntity>
+) => React.ReactNode;
+
+interface SearchResultsProps {
+    results: SearchResult<SearchableNamedEntity>[];
+    renderItem: ItemRenderer;
+}
+const SearchResults: React.FC<SearchResultsProps> = ({
+    renderItem,
+    results
+}) => {
+    const commonStyles = useCommonStyles();
+    return results.length === 0 ? (
+        <NoResults />
+    ) : (
+        <ul className={commonStyles.listUnstyled}>{results.map(renderItem)}</ul>
+    );
+};
+
+export interface SearchableNamedEntityListProps {
+    names: NamedEntity[];
+    renderItem: ItemRenderer;
+}
+
+const nameSearchPropertyGetter = ({ id }: SearchableNamedEntity) => id.name;
+/** Given a list of WorkflowIds, renders a searchable list of items which
+ * navigate to the WorkflowDetails page on click
+ */
+export const SearchableNamedEntityList: React.FC<
+    SearchableNamedEntityListProps
+> = ({ names, renderItem }) => {
+    const styles = useNamedEntityListStyles();
+    const searchValues = names.map(name => ({
+        ...name,
+        key: nameKey(name)
+    }));
+
+    const renderItems = (results: SearchResult<SearchableNamedEntity>[]) => (
+        <SearchResults results={results} renderItem={renderItem} />
+    );
+
+    return (
+        <div className={styles.container}>
+            <SearchableList
+                items={searchValues}
+                propertyGetter={nameSearchPropertyGetter}
+                renderContent={renderItems}
+            />
+        </div>
+    );
+};

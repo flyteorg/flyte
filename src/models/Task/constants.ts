@@ -12,3 +12,8 @@ export enum TaskType {
     UNKNOWN = 'unknown',
     WAITABLE = 'waitable'
 }
+
+export const taskSortFields = {
+    createdAt: 'created_at',
+    name: 'name'
+};
