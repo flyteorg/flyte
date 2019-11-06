@@ -1029,7 +1029,7 @@
   version = "kubernetes-1.14.1"
 
 [[projects]]
-  digest = "1:3a5d9667edf3cf65768b6b304a1e0816d89ac766b9d6abc454970981e02a7a12"
+  digest = "1:36eda2149a202a27b173655b5a3b3a5486e7cad1e882767ab5d1d44330335ef2"
   name = "k8s.io/client-go"
   packages = [
     "discovery",
@@ -1040,9 +1040,11 @@
     "pkg/apis/clientauthentication/v1beta1",
     "pkg/version",
     "plugin/pkg/client/auth/exec",
+    "plugin/pkg/client/auth/gcp",
     "rest",
     "rest/watch",
     "restmapper",
+    "third_party/forked/golang/template",
     "tools/auth",
     "tools/clientcmd",
     "tools/clientcmd/api",
@@ -1054,6 +1056,7 @@
     "util/connrotation",
     "util/flowcontrol",
     "util/homedir",
+    "util/jsonpath",
     "util/keyutil",
     "util/workqueue",
   ]
@@ -1171,6 +1174,7 @@
     "k8s.io/apimachinery/pkg/util/validation",
     "k8s.io/apimachinery/pkg/util/wait",
     "k8s.io/client-go/kubernetes/scheme",
+    "k8s.io/client-go/plugin/pkg/client/auth/gcp",
     "k8s.io/client-go/rest",
     "k8s.io/client-go/tools/clientcmd",
     "sigs.k8s.io/controller-runtime/pkg/client",
