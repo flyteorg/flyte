@@ -8,11 +8,14 @@
   },
   "main": "index.js",
   "scripts": {
-    "build:prod": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' NODE_ENV=production webpack --config webpack.config.ts --mode=production",
-    "build": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' webpack --config webpack.config.ts --mode=development",
+    "build:prod":
+      "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' NODE_ENV=production webpack --config webpack.config.ts --mode=production",
+    "build":
+      "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' webpack --config webpack.config.ts --mode=development",
     "clean": "rm -rf dist",
     "lint": "tslint --project .",
-    "lint-fix": "tslint --fix --project . && prettier --write './**/*.{js,json}'",
+    "lint-fix":
+      "tslint --fix --project . && prettier --write './**/*.{js,json}'",
     "lint:hooks": "eslint \"src/**/*.{ts,tsx}\"",
     "mockApi": "node ./mockApi",
     "prebuild": "yarn run clean",
@@ -24,22 +27,12 @@
     "snyk-protect": "snyk protect",
     "prepublish": "npm run snyk-protect"
   },
-  "keywords": [
-    "react",
-    "lyft"
-  ],
+  "keywords": ["react", "lyft"],
   "author": "Lyft <flyte-eng@lyft.com>",
   "license": "Apache-2.0",
   "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint",
-      "tslint --fix",
-      "git add"
-    ],
-    "*.{js,json}": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.{ts,tsx}": ["eslint", "tslint --fix", "git add"],
+    "*.{js,json}": ["prettier --write", "git add"]
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
