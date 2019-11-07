@@ -4,6 +4,9 @@ import { WaitForData, withRouteParams } from 'components/common';
 import { useProject, useQueryState } from 'components/hooks';
 import { Project } from 'models';
 import * as React from 'react';
+import { Redirect, Route, Switch } from 'react-router';
+import { Routes } from 'routes';
+import { ProjectTasks } from './ProjectTasks';
 import { ProjectWorkflows } from './ProjectWorkflows';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -20,9 +23,15 @@ export interface ProjectDetailsRouteParams {
 }
 export type ProjectDetailsProps = ProjectDetailsRouteParams;
 
-const ProjectWorkflowsByDomain: React.FC<{ project: Project }> = ({
-    project
-}) => {
+const entityTypeToComponent = {
+    tasks: ProjectTasks,
+    workflows: ProjectWorkflows
+};
+
+const ProjectEntitiesByDomain: React.FC<{
+    project: Project;
+    entityType: 'tasks' | 'workflows';
+}> = ({ entityType, project }) => {
     const styles = useStyles();
     const { params, setQueryState } = useQueryState<{ domain: string }>();
     if (project.domains.length === 0) {
@@ -33,6 +42,7 @@ const ProjectWorkflowsByDomain: React.FC<{ project: Project }> = ({
         setQueryState({
             domain: tabId
         });
+    const EntityComponent = entityTypeToComponent[entityType];
     return (
         <>
             <Tabs
@@ -49,10 +59,18 @@ const ProjectWorkflowsByDomain: React.FC<{ project: Project }> = ({
                     />
                 ))}
             </Tabs>
-            <ProjectWorkflows projectId={project.id} domainId={domainId} />
+            <EntityComponent projectId={project.id} domainId={domainId} />
         </>
     );
 };
+
+const ProjectWorkflowsByDomain: React.FC<{ project: Project }> = ({
+    project
+}) => <ProjectEntitiesByDomain project={project} entityType="workflows" />;
+
+const ProjectTasksByDomain: React.FC<{ project: Project }> = ({ project }) => (
+    <ProjectEntitiesByDomain project={project} entityType="tasks" />
+);
 
 /** The view component for the Project landing page */
 export const ProjectDetailsContainer: React.FC<ProjectDetailsRouteParams> = ({
@@ -62,7 +80,23 @@ export const ProjectDetailsContainer: React.FC<ProjectDetailsRouteParams> = ({
     return (
         <WaitForData {...project}>
             {() => {
-                return <ProjectWorkflowsByDomain project={project.value} />;
+                return (
+                    <Switch>
+                        <Route
+                            path={Routes.ProjectDetails.sections.workflows.path}
+                        >
+                            <ProjectWorkflowsByDomain project={project.value} />
+                        </Route>
+                        <Route path={Routes.ProjectDetails.sections.tasks.path}>
+                            <ProjectTasksByDomain project={project.value} />
+                        </Route>
+                        <Redirect
+                            to={Routes.ProjectDetails.sections.workflows.makeUrl(
+                                projectId
+                            )}
+                        />
+                    </Switch>
+                );
             }}
         </WaitForData>
     );

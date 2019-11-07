@@ -2,6 +2,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import { SvgIconProps } from '@material-ui/core/SvgIcon';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import DeviceHub from '@material-ui/icons/DeviceHub';
+import LinearScale from '@material-ui/icons/LinearScale';
 import * as classnames from 'classnames';
 import { withRouteParams } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
@@ -85,6 +86,23 @@ const ProjectNavigationImpl: React.FC<ProjectNavigationRouteParams> = ({
                 domainId
             ),
             text: 'Workflows'
+        },
+        {
+            icon: LinearScale,
+            isActive: (match, location) => {
+                const finalMatch = match
+                    ? match
+                    : matchPath(location.pathname, {
+                          path: Routes.TaskDetails.path,
+                          exact: false
+                      });
+                return !!finalMatch;
+            },
+            path: Routes.ProjectDetails.sections.tasks.makeUrl(
+                project.value.id,
+                domainId
+            ),
+            text: 'Tasks'
         }
     ];
 
