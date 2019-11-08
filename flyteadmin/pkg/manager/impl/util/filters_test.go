@@ -81,6 +81,11 @@ func TestParseFilters(t *testing.T) {
 	actualFilterExpression, _ = taskFilters[2].GetGormQueryExpr()
 	assert.Equal(t, "bar in (?)", actualFilterExpression.Query)
 	assert.Equal(t, []interface{}{"4", "5", "6"}, actualFilterExpression.Args)
+
+	filterExpression = "invalid_function(foo,bar)"
+	_, err = ParseFilters(filterExpression, common.Task)
+	assert.Error(t, err)
+	assert.EqualError(t, err, "unrecognized filter function: invalid_function")
 }
 
 func TestGetEqualityFilter(t *testing.T) {

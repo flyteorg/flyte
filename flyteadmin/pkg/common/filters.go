@@ -80,6 +80,7 @@ var executionIdentifierFields = map[string]bool{
 	"name":    true,
 }
 
+const unrecognizedFilterFunction = "unrecognized filter function: %s"
 const unsupportedFilterExpression = "unsupported filter expression: %s"
 const invalidSingleValueFilter = "invalid single value filter expression: %s"
 const invalidRepeatedValueFilter = "invalid repeated value filter expression: %s"
@@ -105,6 +106,11 @@ func getFilterExpressionName(expression FilterExpression) string {
 	default:
 		return ""
 	}
+}
+
+func GetUnrecognizedFilterFunctionErr(function string) error {
+	return errors.NewFlyteAdminErrorf(codes.InvalidArgument, unrecognizedFilterFunction,
+		function)
 }
 
 func GetUnsupportedFilterExpressionErr(expression FilterExpression) error {
@@ -252,7 +258,7 @@ func NewInlineFilter(entity Entity, function string, field string, value interfa
 	expression, ok := filterNameMappings[function]
 	if !ok {
 		logger.Debugf(context.Background(), "can't create filter for unrecognized function: %s", function)
-		return nil, GetUnsupportedFilterExpressionErr(expression)
+		return nil, GetUnrecognizedFilterFunctionErr(function)
 	}
 	if isSingleValueFilter := singleValueFilters[expression]; isSingleValueFilter {
 		return NewSingleValueFilter(entity, expression, field, value)
