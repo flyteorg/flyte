@@ -54,7 +54,7 @@
   version = "v1.0.7"
 
 [[projects]]
-  digest = "1:fdee1cdd56e214deb6ff5d003c73bf3d882f322edaccd2601de8d792263ba8ee"
+  digest = "1:548ef20acc5fa4bbdc8b3e0d2801d10333f558e417d521318531c6eecb2e4811"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -107,16 +107,16 @@
     "service/sts/stsiface",
   ]
   pruneopts = "UT"
-  revision = "23e996a57757e6b586048809309e3945557c4edb"
-  version = "v1.25.22"
+  revision = "15b7acb9c9b5df95e91d4cb24b38b57d795bcdde"
+  version = "v1.25.30"
 
 [[projects]]
-  branch = "master"
-  digest = "1:0ad5484a25fbd88409bae8b8b19134135fe73d3cb00e45d3255280b2ab975fcc"
+  digest = "1:390dd851aedb37e9ef896e7e4e5c8553576798f8be769657e2f507090c96449d"
   name = "github.com/benbjohnson/clock"
   packages = ["."]
   pruneopts = "UT"
-  revision = "7dc76406b6d3c05b5f71a86293cbcf3c4ea03b19"
+  revision = "e7ca2eb904dce84a821b09d9285dc600d6174b8f"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -309,7 +309,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:eb9de289c8c6ff3bc3c07a0cb36506b20dc7295cc2a5d72d98d4b96ea0e1be18"
+  digest = "1:3d5eaf6409dc6cd9d36eb09ddfc9ab5fae740658960bc52e1b94263ee4bb3649"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
     "internal",
@@ -318,8 +318,8 @@
     "utilities",
   ]
   pruneopts = "UT"
-  revision = "ece8fdf051b731392b407fdb9a9b1b9ffb6f9793"
-  version = "v1.11.3"
+  revision = "f7120437bb4f6c71f7f5076ad65a45310de2c009"
+  version = "v1.12.1"
 
 [[projects]]
   digest = "1:c0d19ab64b32ce9fe5cf4ddceba78d5bc9807f0016db6b1183599da3dcc24d10"
@@ -447,7 +447,7 @@
   version = "v0.1.10"
 
 [[projects]]
-  digest = "1:af952e5d7b139f49e58826a68455b9b3b38f54e29f51563c890272a70777e5f0"
+  digest = "1:1a496916f9dc3254345b7aa0396c012c17e4238fdc62f928f12acd5231d5558b"
   name = "github.com/lyft/flytepropeller"
   packages = [
     "pkg/apis/flyteworkflow",
@@ -464,9 +464,9 @@
     "pkg/utils",
   ]
   pruneopts = "UT"
-  revision = "b02d8973fd60c318aecd6a9b440c982a77f72205"
+  revision = "0ee7a87d4f7f05691f2893cb369726ab46e5999c"
   source = "https://github.com/lyft/flytepropeller"
-  version = "v0.1.11"
+  version = "v0.1.12"
 
 [[projects]]
   digest = "1:d567ed1504f24205e9e480553d2bcfc2657d8e85f592bec3fc3a94b8c9814d4c"
@@ -744,11 +744,11 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "8986dd9e96cf0a6f74da406c005ba3df38527c04"
+  revision = "f4817d981bb690635456c5c1c6aa0585e5d45891"
 
 [[projects]]
   branch = "master"
-  digest = "1:2ce67db9864088dee35dab5967f041d2b4ae1c7440dabb44542c1847933fd872"
+  digest = "1:e68bb8e38abc12b2b31771144e1f647b5a61ef02c0f6002d7d6b2e5cb9a67d66"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -761,7 +761,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "fe3aa8a4527195a6057b3fad46619d7d090e99b5"
+  revision = "7e6e90b9ea8824b29cbeee76d03ef838c9187418"
 
 [[projects]]
   branch = "master"
@@ -779,14 +779,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2c482fc32bdcfc572ce8b9cc37a409ae8a24c604b0dde73301d8de05d2c1f3e7"
+  digest = "1:1017834f19e0d987e8b1b928f016b0a1186a202ec1867fee7112efd4b4475bd1"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "f43be2a4598cf3a47be9f94f0c28197ed9eae611"
+  revision = "c1f44814a5cd81a6d1cb589ef1e528bc5d305e07"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -823,21 +823,21 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5874d3a4a53578470c16c65cc4312ba048d3d7673afcd5589e33e34f4b091931"
+  digest = "1:c44d6bb4637f76ed050d57aa855da3d9b1883d65c2a941ea72b6990e6c9e413f"
   name = "google.golang.org/api"
   packages = [
     "googleapi",
-    "googleapi/internal/uritemplates",
     "googleapi/transport",
     "internal",
     "internal/gensupport",
+    "internal/third_party/uritemplates",
     "option",
     "storage/v1",
     "transport/http",
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "4f42dad4690a01d7f6fa461106c63889ff1be027"
+  revision = "22b92ae6b4f349643d80412d64d34d6eeaa02169"
 
 [[projects]]
   digest = "1:3c03b58f57452764a4499c55c582346c0ee78c8a5033affe5bdfd9efd3da5bd1"
@@ -872,10 +872,11 @@
   revision = "919d9bdd9fe6f1a5dd95ce5d5e4cdb8fd3c516d0"
 
 [[projects]]
-  digest = "1:6cd77d0b616d2dcebd363dfecba593f27b0151fc82cdb5fbfb96c5a7cfbc95b5"
+  digest = "1:0c0ea0f0ccec8a112245dd3ca0c3b304224ede9afd4b7a2b482a7b48471ef894"
   name = "google.golang.org/grpc"
   packages = [
     ".",
+    "backoff",
     "balancer",
     "balancer/base",
     "balancer/roundrobin",
@@ -891,10 +892,13 @@
     "internal/backoff",
     "internal/balancerload",
     "internal/binarylog",
+    "internal/buffer",
     "internal/channelz",
     "internal/envconfig",
     "internal/grpcrand",
     "internal/grpcsync",
+    "internal/resolver/dns",
+    "internal/resolver/passthrough",
     "internal/syscall",
     "internal/transport",
     "keepalive",
@@ -902,16 +906,14 @@
     "naming",
     "peer",
     "resolver",
-    "resolver/dns",
-    "resolver/passthrough",
     "serviceconfig",
     "stats",
     "status",
     "tap",
   ]
   pruneopts = "UT"
-  revision = "f6d0f9ee430895e87ef1ceb5ac8f39725bafceef"
-  version = "v1.24.0"
+  revision = "9d331e2b02dd47daeecae02790f61cc88dc75a64"
+  version = "v1.25.0"
 
 [[projects]]
   digest = "1:1048ae210f190cd7b6aea19a92a055bd6112b025dd49f560579dfdfd76c8c42e"
@@ -930,12 +932,12 @@
   version = "v0.9.1"
 
 [[projects]]
-  digest = "1:59f10c1537d2199d9115d946927fe31165959a95190849c82ff11e05803528b0"
+  digest = "1:f26a5d382387e03a40d1471dddfba85dfff9bf05352d7e42d37612677c4d3c5c"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   pruneopts = "UT"
-  revision = "f221b8435cfb71e54062f6c6e99e9ade30b124d5"
-  version = "v2.2.4"
+  revision = "f90ceb4f409096b60e2e9076b38b304b8246e5fa"
+  version = "v2.2.5"
 
 [[projects]]
   digest = "1:86ad5797d1189de342ed6988fbb76b92dc0429a4d677ad69888d6137efa5712e"
@@ -1078,7 +1080,7 @@
   name = "k8s.io/utils"
   packages = ["integer"]
   pruneopts = "UT"
-  revision = "8d271d903fe4c290aa361acfb242cff7bcee96f1"
+  revision = "2b95a09bc58df43d4032504619706b6a38293a47"
 
 [[projects]]
   digest = "1:19c282f372fb82ff1e3599e1ecfa13d18a7d836a401abf38c11f5124d697a656"
