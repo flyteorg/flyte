@@ -345,13 +345,13 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 		},
 		Logs: []*core.TaskLog{
 			{
-				Uri: "uri_a",
-			},
-			{
 				Uri: "uri_b",
 			},
 			{
 				Uri: "uri_c",
+			},
+			{
+				Uri: "uri_a",
 			},
 		},
 		CustomInfo: &customInfo,
@@ -527,7 +527,7 @@ func TestMergeLogs(t *testing.T) {
 				},
 				{
 					Uri:  "uri_b",
-					Name: "name_b",
+					Name: "ignored_name_b",
 				},
 				{
 					Uri:  "uri_c",
@@ -546,20 +546,20 @@ func TestMergeLogs(t *testing.T) {
 			},
 			expected: []*core.TaskLog{
 				{
-					Uri:  "uri_a",
-					Name: "name_a",
-				},
-				{
 					Uri:  "uri_b",
 					Name: "name_b",
 				},
 				{
-					Uri:  "uri_c",
-					Name: "name_c",
-				},
-				{
 					Uri:  "uri_d",
 					Name: "name_d",
+				},
+				{
+					Uri:  "uri_a",
+					Name: "name_a",
+				},
+				{
+					Uri:  "uri_c",
+					Name: "name_c",
 				},
 			},
 			name: "Merge unique logs",

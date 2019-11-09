@@ -137,16 +137,16 @@ func mergeLogs(existing, latest []*core.TaskLog) []*core.TaskLog {
 	if len(existing) == 0 {
 		return latest
 	}
-	existingSet := make(map[string]*core.TaskLog, len(existing))
-	for _, existingLog := range existing {
-		existingSet[existingLog.Uri] = existingLog
-	}
-	// Copy over the existing logs from the input list so we preserve the original order.
-	logs := existing
+	latestSet := make(map[string]*core.TaskLog, len(latest))
 	for _, latestLog := range latest {
-		if _, ok := existingSet[latestLog.Uri]; !ok {
+		latestSet[latestLog.Uri] = latestLog
+	}
+	// Copy over the latest logs since names will change for existing logs as a task transitions across phases.
+	logs := latest
+	for _, existingLog := range existing {
+		if _, ok := latestSet[existingLog.Uri]; !ok {
 			// We haven't seen this log before: add it to the output result list.
-			logs = append(logs, latestLog)
+			logs = append(logs, existingLog)
 		}
 	}
 	return logs
