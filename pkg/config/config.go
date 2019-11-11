@@ -3,42 +3,72 @@ package config
 import (
 	"fmt"
 
+	config2 "github.com/lyft/flyteadmin/pkg/auth/config"
 	"github.com/lyft/flytestdlib/config"
 )
 
-const SectionKey = "application"
+const SectionKey = "server"
 
-//go:generate pflags Config
-//TODO add instructions on how to generate certs
+//go:generate pflags ServerConfig --default-var=defaultServerConfig
 
-type Config struct {
-	HTTPPort   int    `json:"httpPort" pflag:",On which http port to serve admin"`
-	GrpcPort   int    `json:"grpcPort" pflag:",On which grpc port to serve admin"`
-	KubeConfig string `json:"kube-config" pflag:",Path to kubernetes client config file."`
-	Master     string `json:"master" pflag:",The address of the Kubernetes API server."`
-	Secure     bool   `json:"secure" pflag:",Whether to run admin in secure mode or not"`
+type ServerConfig struct {
+	HTTPPort   int                   `json:"httpPort" pflag:",On which http port to serve admin"`
+	GrpcPort   int                   `json:"grpcPort" pflag:",On which grpc port to serve admin"`
+	KubeConfig string                `json:"kube-config" pflag:",Path to kubernetes client config file."`
+	Master     string                `json:"master" pflag:",The address of the Kubernetes API server."`
+	Security   ServerSecurityOptions `json:"security"`
 }
 
-var applicationConfig = config.MustRegisterSection(SectionKey, &Config{})
+type ServerSecurityOptions struct {
+	Secure  bool                 `json:"secure"`
+	Ssl     SslOptions           `json:"ssl"`
+	UseAuth bool                 `json:"useAuth"`
+	Oauth   config2.OAuthOptions `json:"oauth"`
 
-func GetConfig() *Config {
-	return applicationConfig.GetConfig().(*Config)
+	// These options are here to allow deployments where the Flyte UI (Console) is served from a different domain/port.
+	// Note that CORS only applies to Admin's API endpoints. The health check endpoint for instance is unaffected.
+	// Please obviously evaluate security concerns before turning this on.
+	AllowCors bool `json:"allowCors"`
+	// TODO: Go through the gorilla library and resolve singular vs plural. It should be singular, but what else is the library doing?
+	AllowedOrigins []string `json:"allowedOrigins"`
+	// These are the Access-Control-Request-Headers that the server will respond to
+	AllowedHeaders []string `json:"allowedHeaders"`
 }
 
-func SetConfig(c *Config) {
-	if err := applicationConfig.SetConfig(c); err != nil {
+type SslOptions struct {
+	CertificateFile string `json:"certificateFile"`
+	KeyFile         string `json:"keyFile"`
+}
+
+var defaultServerConfig = &ServerConfig{
+	Security: ServerSecurityOptions{
+		Oauth: config2.OAuthOptions{
+			// Please see the comments in this struct's definition for more information
+			HTTPAuthorizationHeader: "placeholder",
+			GrpcAuthorizationHeader: "flyte-authorization",
+		},
+	},
+}
+var serverConfig = config.MustRegisterSection(SectionKey, defaultServerConfig)
+
+func GetConfig() *ServerConfig {
+	return serverConfig.GetConfig().(*ServerConfig)
+}
+
+func SetConfig(s *ServerConfig) {
+	if err := serverConfig.SetConfig(s); err != nil {
 		panic(err)
 	}
 }
 
-func (c Config) GetHostAddress() string {
-	return fmt.Sprintf(":%d", c.HTTPPort)
+func (s ServerConfig) GetHostAddress() string {
+	return fmt.Sprintf(":%d", s.HTTPPort)
 }
 
-func (c Config) GetGrpcHostAddress() string {
-	return fmt.Sprintf(":%d", c.GrpcPort)
+func (s ServerConfig) GetGrpcHostAddress() string {
+	return fmt.Sprintf(":%d", s.GrpcPort)
 }
 
 func init() {
-	SetConfig(&Config{})
+	SetConfig(&ServerConfig{})
 }

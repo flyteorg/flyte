@@ -248,8 +248,6 @@ data:
       grpcPort: 8089
       kube-config: "$HOME/.kube/config"
     flyteadmin:
-      someBoolean: true
-      someOtherBoolean: false
       httpPort: 8088
       grpcPort: 8089
       roleNameKey: "iam.amazonaws.com/role"
