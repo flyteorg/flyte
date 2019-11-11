@@ -9,7 +9,7 @@ package tests
 import (
 	"context"
 	"fmt"
-	"github.com/lyft/flyteplugins/go/tasks/v1/resourcemanager"
+	"github.com/lyft/flyteplugins/go/tasks/resourcemanager"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"

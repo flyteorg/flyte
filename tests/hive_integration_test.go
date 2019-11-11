@@ -21,8 +21,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/lyft/flyteplugins/go/tasks/v1/qubole"
-	"github.com/lyft/flyteplugins/go/tasks/v1/qubole/config"
+	"github.com/lyft/flyteplugins/go/tasks/v1/qubole_collection"
+	"github.com/lyft/flyteplugins/go/tasks/v1/qubole_collection/config"
 	"github.com/lyft/flyteplugins/go/tasks/v1/types"
 	tasksMocks "github.com/lyft/flyteplugins/go/tasks/v1/types/mocks"
 	"github.com/lyft/flyteplugins/go/tasks/v1/utils"
@@ -96,7 +96,7 @@ func TestHappy(t *testing.T) {
 		LruCacheSize:           100,
 	}))
 
-	executor, err := qubole.NewHiveTaskExecutorWithCache(ctx)
+	executor, err := qubole_collection.NewHiveTaskExecutorWithCache(ctx)
 	assert.NoError(t, err)
 	err = executor.Initialize(ctx, types.ExecutorInitializationParameters{
 		MetricsScope:  testScope,
@@ -113,8 +113,8 @@ func TestHappy(t *testing.T) {
 
 	// The initial custom state returned by the StartTask function
 	customState0 := statuses.State
-	work := customState0["flyteplugins_integration_0"].(qubole.QuboleWorkItem)
-	assert.Equal(t, qubole.QuboleWorkNotStarted, work.Status)
+	work := customState0["flyteplugins_integration_0"].(qubole_collection.QuboleWorkItem)
+	assert.Equal(t, qubole_collection.QuboleWorkNotStarted, work.Status)
 	assert.Equal(t, 0, work.Retries)
 	assert.Equal(t, "flyteplugins_integration_0", work.ID())
 
@@ -156,7 +156,7 @@ func TestMultipleCallbacks(t *testing.T) {
 		LruCacheSize:           100,
 	}))
 
-	executor, err := qubole.NewHiveTaskExecutorWithCache(ctx)
+	executor, err := qubole_collection.NewHiveTaskExecutorWithCache(ctx)
 	assert.NoError(t, err)
 	err = executor.Initialize(ctx, types.ExecutorInitializationParameters{
 		MetricsScope:  testScope,
@@ -173,8 +173,8 @@ func TestMultipleCallbacks(t *testing.T) {
 
 	// The initial custom state returned by the StartTask function
 	customState0 := statuses.State
-	work := customState0["flyteplugins_integration_0"].(qubole.QuboleWorkItem)
-	assert.Equal(t, qubole.QuboleWorkNotStarted, work.Status)
+	work := customState0["flyteplugins_integration_0"].(qubole_collection.QuboleWorkItem)
+	assert.Equal(t, qubole_collection.QuboleWorkNotStarted, work.Status)
 	assert.Equal(t, 0, work.Retries)
 	assert.Equal(t, "flyteplugins_integration_0", work.ID())
 

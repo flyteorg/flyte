@@ -8,7 +8,7 @@ package tests
 
 import (
 	"context"
-	"github.com/lyft/flyteplugins/go/tasks/v1/resourcemanager"
+	"github.com/lyft/flyteplugins/go/tasks/resourcemanager"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/stretchr/testify/assert"
 	"testing"
