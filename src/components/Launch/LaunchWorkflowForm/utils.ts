@@ -3,12 +3,13 @@ import {
     LaunchPlan,
     Literal,
     LiteralMap,
+    LiteralType,
     Variable,
     Workflow,
     WorkflowId
 } from 'models';
 import * as moment from 'moment';
-import { typeLabels } from './constants';
+import { simpleTypeToInputType, typeLabels } from './constants';
 import { inputTypeConverters } from './inputConverters';
 import { SearchableSelectorOption } from './SearchableSelector';
 import { InputProps, InputType, InputTypeDefinition } from './types';
@@ -111,4 +112,36 @@ export function convertFormInputsToLiteralMap(
     return {
         literals
     };
+}
+
+export function getInputDefintionForLiteralType(
+    literalType: LiteralType
+): InputTypeDefinition {
+    if (literalType.blob) {
+        return { type: InputType.Blob };
+    }
+
+    if (literalType.collectionType) {
+        return {
+            type: InputType.Collection,
+            subtype: getInputDefintionForLiteralType(literalType.collectionType)
+        };
+    }
+
+    if (literalType.mapValueType) {
+        return {
+            type: InputType.Map,
+            subtype: getInputDefintionForLiteralType(literalType.mapValueType)
+        };
+    }
+
+    if (literalType.schema) {
+        return { type: InputType.Schema };
+    }
+
+    if (literalType.simple) {
+        return { type: simpleTypeToInputType[literalType.simple] };
+    }
+
+    return { type: InputType.Unknown };
 }

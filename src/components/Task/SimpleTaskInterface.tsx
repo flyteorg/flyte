@@ -1,0 +1,90 @@
+import { makeStyles, Theme } from '@material-ui/core/styles';
+import { noneString } from 'common/constants';
+import { DetailsGroup } from 'components/common';
+import { useCommonStyles } from 'components/common/styles';
+import {
+    formatType,
+    getInputDefintionForLiteralType
+} from 'components/Launch/LaunchWorkflowForm/utils';
+import { Task, Variable } from 'models';
+import * as React from 'react';
+
+const useStyles = makeStyles((theme: Theme) => ({
+    container: {
+        marginTop: theme.spacing(0.5),
+        marginBottom: theme.spacing(0.5)
+    },
+    label: {
+        marginRight: theme.spacing(1)
+    },
+    typeAnnotationContainer: {
+        paddingLeft: theme.spacing(0.5)
+    },
+    typeAnnotation: {
+        color: theme.palette.secondary.main
+    }
+}));
+
+const emptyVariables = {
+    variables: {}
+};
+
+const VariablesList: React.FC<{ variables: Record<string, Variable> }> = ({
+    variables
+}) => {
+    const commonStyles = useCommonStyles();
+    const styles = useStyles();
+    const output = Object.keys(variables).reduce<React.ReactNode[]>(
+        (out, name, idx) => {
+            const variable = variables[name];
+            out.push(
+                <span>
+                    {idx > 0 ? ', ' : ''}
+                    {name}
+                </span>
+            );
+            const typeString = formatType(
+                getInputDefintionForLiteralType(variable.type)
+            );
+            if (typeString.length > 0) {
+                out.push(
+                    <span className={styles.typeAnnotationContainer}>
+                        (<span className={styles.typeAnnotation}>
+                            {typeString}
+                        </span>)
+                    </span>
+                );
+            }
+            return out;
+        },
+        []
+    );
+    return (
+        <span className={commonStyles.textMonospace}>
+            {output.length ? output : noneString}
+        </span>
+    );
+};
+
+export const SimpleTaskInterface: React.FC<{ task: Task }> = ({ task }) => {
+    const styles = useStyles();
+    const { inputs = emptyVariables, outputs = emptyVariables } =
+        task.closure.compiledTask.template.interface || {};
+    return (
+        <div className={styles.container}>
+            <DetailsGroup
+                labelWidthGridUnits={5}
+                items={[
+                    {
+                        name: 'inputs',
+                        content: <VariablesList variables={inputs.variables} />
+                    },
+                    {
+                        name: 'outputs',
+                        content: <VariablesList variables={outputs.variables} />
+                    }
+                ]}
+            />
+        </div>
+    );
+};

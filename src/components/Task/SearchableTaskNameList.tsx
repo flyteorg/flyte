@@ -1,5 +1,7 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+import * as classnames from 'classnames';
+import { noDescriptionString } from 'common/constants';
 import { SearchResult, WaitForData } from 'components/common';
 import {
     SearchableNamedEntity,
@@ -8,16 +10,24 @@ import {
     useNamedEntityListStyles
 } from 'components/common/SearchableNamedEntityList';
 import { useCommonStyles } from 'components/common/styles';
-import { useFetchableData } from 'components/hooks';
 import { NamedEntity } from 'models';
 import * as React from 'react';
 import { IntersectionOptions, useInView } from 'react-intersection-observer';
 import reactLoadingSkeleton from 'react-loading-skeleton';
+import { SimpleTaskInterface } from './SimpleTaskInterface';
+import { useLatestTaskVersion } from './useLatestTask';
 const Skeleton = reactLoadingSkeleton;
 
 const useStyles = makeStyles((theme: Theme) => ({
+    description: {
+        color: theme.palette.text.secondary,
+        marginTop: theme.spacing(0.5)
+    },
     interfaceContainer: {
         width: '100%'
+    },
+    taskName: {
+        fontWeight: 'bold'
     }
 }));
 
@@ -31,50 +41,34 @@ const intersectionOptions: IntersectionOptions = {
     triggerOnce: true
 };
 
-const fakeFetchInterface = () =>
-    new Promise(resolve => setTimeout(resolve, 500));
-
 const TaskInterface: React.FC<{ taskName: NamedEntity }> = ({ taskName }) => {
     const styles = useStyles();
-    const taskInterface = useFetchableData(
-        {
-            defaultValue: undefined,
-            useCache: true,
-            doFetch: fakeFetchInterface
-        },
-        taskName
-    );
+    const task = useLatestTaskVersion(taskName.id);
     return (
         <div className={styles.interfaceContainer}>
-            <WaitForData {...taskInterface} loadingComponent={Skeleton}>
-                <em>(interface data goes here)</em>
+            <WaitForData {...task} loadingComponent={Skeleton}>
+                {() => <SimpleTaskInterface task={task.value} />}
             </WaitForData>
         </div>
     );
 };
 
 // TODO:
-// * Load latest task version (cache it)
-// * Create component to render the interface
 // * Write custom error content since it will be a small area
 
 const TaskNameRow: React.FC<TaskNameRowProps> = ({ label, entityName }) => {
-    const commonStyles = useCommonStyles();
+    const styles = useStyles();
     const listStyles = useNamedEntityListStyles();
     const [inViewRef, inView] = useInView(intersectionOptions);
+    const description = entityName.metadata.description || noDescriptionString;
 
     return (
         <div ref={inViewRef} className={listStyles.searchResult}>
             <div className={listStyles.itemName}>
-                <div>{label}</div>
-                {!!entityName.metadata.description && (
-                    <Typography
-                        variant="body2"
-                        className={commonStyles.hintText}
-                    >
-                        {entityName.metadata.description}
-                    </Typography>
-                )}
+                <div className={styles.taskName}>{label}</div>
+                <Typography variant="body2" className={styles.description}>
+                    {description}
+                </Typography>
                 {!!inView && <TaskInterface taskName={entityName} />}
             </div>
         </div>
