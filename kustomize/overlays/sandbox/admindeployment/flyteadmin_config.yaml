@@ -19,52 +19,11 @@ database:
   host: postgres
   dbname: postgres
   options: sslmode=disable
-scheduler:
-  eventScheduler:
-    scheme: "local"
-    region: "us-east-1"
-    scheduleRole: "arn:aws:iam::abc123:role/my-schedule-role"
-    targetName: "arn:aws:sqs:my-region:abc123:my-queue"
-  workflowExecutor:
-    scheme: "local"
-    region: "us-east-1"
-    scheduleQueueName: "won't-work-locally"
-    accountId: "173840052742"
 remoteData:
   region: "us-east-1"
   scheme: "local"
   signedUrls:
     durationMinutes: 3
-notifications:
-  type: local
-  region: "us-east-1"
-  publisher:
-    topicName: "foo"
-  processor:
-    queueName: "queue"
-    accountId: "bar"
-queues:
-  executionQueues:
-  - parent: "FlyteNonProductionTaskCPU-staging-iad"
-    child: "FlyteNonProductionSubTaskCPU-staging-iad"
-    attributes:
-    - all
-workflowConfigs:
-  - project: flytekit
-    tags:
-      - all
-  - project: "flytetester"
-    domain: "development"
-    workflowName: "app-workflows-rich-workflow-rich-workflow"
-    tags:
-      - all
-  - project: "flytetester"
-    domain: "development"
-    workflowName: "app-workflows-batch-workflow-batch-tasks-workflow"
-    tags:
-      - all
-  - tags:
-      - all
 storage:
   type: minio
   connection:
