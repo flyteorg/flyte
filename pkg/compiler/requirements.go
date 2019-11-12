@@ -63,7 +63,7 @@ func updateWorkflowRequirements(workflow *core.WorkflowTemplate, subWfs common.W
 }
 
 func updateNodeRequirements(node *flyteNode, subWfs common.WorkflowIndex, taskIds, workflowIds common.IdentifierSet,
-	followSubworkflows bool, errs errors.CompileErrors) (ok bool) {
+	followSubworkflows bool, errs errors.CompileErrors) {
 
 	if taskN := node.GetTaskNode(); taskN != nil && taskN.GetReferenceId() != nil {
 		taskIds.Insert(*taskN.GetReferenceId())
@@ -83,6 +83,4 @@ func updateNodeRequirements(node *flyteNode, subWfs common.WorkflowIndex, taskId
 			updateNodeRequirements(otherCase.ThenNode, subWfs, taskIds, workflowIds, followSubworkflows, errs)
 		}
 	}
-
-	return !errs.HasErrors()
 }

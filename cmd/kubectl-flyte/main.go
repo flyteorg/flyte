@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/lyft/flytepropeller/cmd/kubectl-flyte/cmd"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
 func main() {

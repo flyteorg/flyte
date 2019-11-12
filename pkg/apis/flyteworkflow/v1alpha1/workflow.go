@@ -32,7 +32,7 @@ type FlyteWorkflow struct {
 	// +optional
 	ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty"`
 	// Specifies the time when the workflow has been accepted into the system.
-	AcceptedAt *metav1.Time `json:"acceptedAt,omitEmpty"`
+	AcceptedAt *metav1.Time `json:"acceptedAt,omitempty"`
 	// ServiceAccountName is the name of the ServiceAccount to use to run this pod.
 	// More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 	// +optional
@@ -43,7 +43,7 @@ type FlyteWorkflow struct {
 
 var FlyteWorkflowGVK = SchemeGroupVersion.WithKind(FlyteWorkflowKind)
 
-func (in *FlyteWorkflow) NewControllerRef() metav1.OwnerReference {
+func (in *FlyteWorkflow) GetOwnerReference() metav1.OwnerReference {
 	// TODO Open Issue - https://github.com/kubernetes/client-go/issues/308
 	// For some reason the CRD does not have the GVK correctly populated. So we will fake it.
 	if len(in.GroupVersionKind().Group) == 0 || len(in.GroupVersionKind().Kind) == 0 || len(in.GroupVersionKind().Version) == 0 {
@@ -101,6 +101,9 @@ func (in *Inputs) UnmarshalJSON(b []byte) error {
 }
 
 func (in *Inputs) MarshalJSON() ([]byte, error) {
+	if in == nil {
+		return []byte{}, nil
+	}
 	var buf bytes.Buffer
 	if err := marshaler.Marshal(&buf, in.LiteralMap); err != nil {
 		return nil, err

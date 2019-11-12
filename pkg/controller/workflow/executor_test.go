@@ -5,45 +5,87 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"reflect"
 	"strconv"
 	"testing"
-
-	mocks2 "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
-
-	eventsErr "github.com/lyft/flyteidl/clients/go/events/errors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	wfErrors "github.com/lyft/flytepropeller/pkg/controller/workflow/errors"
-
 	"time"
 
-	"github.com/lyft/flyteplugins/go/tasks/v1/flytek8s"
+	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
+	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/lyft/flytestdlib/logger"
+
+	eventsErr "github.com/lyft/flyteidl/clients/go/events/errors"
+	mocks2 "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/fakeplugins"
+
+	wfErrors "github.com/lyft/flytepropeller/pkg/controller/workflow/errors"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flyteidl/clients/go/events"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
-	pluginV1 "github.com/lyft/flyteplugins/go/tasks/v1/types"
-	"github.com/lyft/flyteplugins/go/tasks/v1/types/mocks"
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/catalog"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task"
-	"github.com/lyft/flytepropeller/pkg/utils"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/storage"
 	"github.com/lyft/flytestdlib/yamlutils"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"k8s.io/client-go/tools/record"
+
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/lyft/flytepropeller/pkg/utils"
 )
 
 var (
 	testScope      = promutils.NewScope("test_wfexec")
 	fakeKubeClient = mocks2.NewFakeKubeClient()
 )
+
+const (
+	maxOutputSize = 10 * 1024
+)
+
+type fakeRemoteWritePlugin struct {
+	pluginCore.Plugin
+	enableAsserts bool
+	t             assert.TestingT
+}
+
+func (f fakeRemoteWritePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskExecutionContext) (pluginCore.Transition, error) {
+	logger.Infof(ctx, "----------------------------------------------------------------------------------------------")
+	logger.Infof(ctx, "Handle called for %s", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+
+	defer func() {
+		logger.Infof(ctx, "Handle completed for %s", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+		logger.Infof(ctx, "----------------------------------------------------------------------------------------------")
+	}()
+	trns, err := f.Plugin.Handle(ctx, tCtx)
+	if err != nil {
+		return trns, err
+	}
+	if trns.Info().Phase() == pluginCore.PhaseSuccess {
+		tk, err := tCtx.TaskReader().Read(ctx)
+		assert.NoError(f.t, err)
+		outputVars := tk.GetInterface().Outputs.Variables
+		o := &core.LiteralMap{
+			Literals: make(map[string]*core.Literal, len(outputVars)),
+		}
+		for k, v := range outputVars {
+			l, err := utils.MakeDefaultLiteralForType(v.Type)
+			if f.enableAsserts && !assert.NoError(f.t, err) {
+				assert.FailNow(f.t, "Failed to create default output for node [%v] Type [%v]", tCtx.TaskExecutionMetadata().GetTaskExecutionID(), v.Type)
+			}
+			o.Literals[k] = l
+		}
+		assert.NoError(f.t, tCtx.DataStore().WriteProtobuf(ctx, tCtx.OutputWriter().GetOutputPath(), storage.Options{}, o))
+		assert.NoError(f.t, tCtx.OutputWriter().Put(ctx, ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), tCtx.MaxDatasetSizeBytes())))
+	}
+	return trns, err
+}
 
 func createInmemoryDataStore(t testing.TB, scope promutils.Scope) *storage.DataStore {
 	cfg := storage.Config{
@@ -73,147 +115,91 @@ func StdOutEventRecorder() record.EventRecorder {
 	return recorder
 }
 
-func createHappyPathTaskExecutor(t assert.TestingT, store *storage.DataStore, enableAsserts bool) pluginV1.Executor {
-	exec := &mocks.Executor{}
-	exec.On("GetID").Return("task")
-	exec.On("GetProperties").Return(pluginV1.ExecutorProperties{})
-	exec.On("Initialize",
-		mock.AnythingOfType(reflect.TypeOf(context.TODO()).String()),
-		mock.AnythingOfType(reflect.TypeOf(pluginV1.ExecutorInitializationParameters{}).String()),
-	).Return(nil)
-
-	exec.On("ResolveOutputs",
-		mock.Anything,
-		mock.Anything,
-		mock.Anything,
-	).
-		Return(func(ctx context.Context, taskCtx pluginV1.TaskContext, varNames ...string) (values map[string]*core.Literal) {
-			d := &handler.Data{}
-			outputsFileRef := v1alpha1.GetOutputsFile(taskCtx.GetDataDir())
-			assert.NoError(t, store.ReadProtobuf(ctx, outputsFileRef, d))
-			assert.NotNil(t, d.Literals)
-
-			values = make(map[string]*core.Literal, len(varNames))
-			for _, varName := range varNames {
-				l, ok := d.Literals[varName]
-				assert.True(t, ok, "Expect var %v in task outputs.", varName)
-
-				values[varName] = l
-			}
-
-			return values
-		}, func(ctx context.Context, taskCtx pluginV1.TaskContext, varNames ...string) error {
-			return nil
-		})
-
-	startFn := func(ctx context.Context, taskCtx pluginV1.TaskContext, task *core.TaskTemplate, _ *core.LiteralMap) pluginV1.TaskStatus {
-		outputVars := task.GetInterface().Outputs.Variables
-		o := &core.LiteralMap{
-			Literals: make(map[string]*core.Literal, len(outputVars)),
-		}
-		for k, v := range outputVars {
-			l, err := utils.MakeDefaultLiteralForType(v.Type)
-			if enableAsserts && !assert.NoError(t, err) {
-				assert.FailNow(t, "Failed to create default output for node [%v] Type [%v]", taskCtx.GetTaskExecutionID(), v.Type)
-			}
-			o.Literals[k] = l
-		}
-		assert.NoError(t, store.WriteProtobuf(ctx, v1alpha1.GetOutputsFile(taskCtx.GetDataDir()), storage.Options{}, o))
-
-		return pluginV1.TaskStatusRunning
+func createHappyPathTaskExecutor(t assert.TestingT, enableAsserts bool) pluginCore.PluginEntry {
+	f := func(ctx context.Context, iCtx pluginCore.SetupContext) (plugin pluginCore.Plugin, e error) {
+		return fakeRemoteWritePlugin{
+			Plugin: fakeplugins.NewReplayer(
+				"test",
+				pluginCore.PluginProperties{},
+				[]fakeplugins.HandleResponse{
+					fakeplugins.NewHandleTransition(pluginCore.DoTransition(pluginCore.PhaseInfoRunning(1, nil))),
+					fakeplugins.NewHandleTransition(pluginCore.DoTransition(pluginCore.PhaseInfoSuccess(nil))),
+				},
+				[]error{
+					nil,
+				},
+				[]error{
+					nil,
+				},
+			),
+			enableAsserts: enableAsserts,
+			t:             t,
+		}, nil
 	}
-
-	exec.On("StartTask",
-		mock.MatchedBy(func(ctx context.Context) bool { return true }),
-		mock.MatchedBy(func(o pluginV1.TaskContext) bool { return true }),
-		mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
-		mock.MatchedBy(func(o *core.LiteralMap) bool { return true }),
-	).Return(startFn, nil)
-
-	checkStatusFn := func(_ context.Context, taskCtx pluginV1.TaskContext, _ *core.TaskTemplate) pluginV1.TaskStatus {
-		if enableAsserts {
-			assert.NotEmpty(t, taskCtx.GetDataDir())
-		}
-		return pluginV1.TaskStatusSucceeded
-	}
-	exec.On("CheckTaskStatus",
-		mock.MatchedBy(func(ctx context.Context) bool { return true }),
-		mock.MatchedBy(func(o pluginV1.TaskContext) bool { return true }),
-		mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
-	).Return(checkStatusFn, nil)
-
-	return exec
-}
-
-func createFailingTaskExecutor() pluginV1.Executor {
-	exec := &mocks.Executor{}
-	exec.On("GetID").Return("task")
-	exec.On("GetProperties").Return(pluginV1.ExecutorProperties{})
-	exec.On("Initialize",
-		mock.AnythingOfType(reflect.TypeOf(context.TODO()).String()),
-		mock.AnythingOfType(reflect.TypeOf(pluginV1.ExecutorInitializationParameters{}).String()),
-	).Return(nil)
-
-	exec.On("StartTask",
-		mock.MatchedBy(func(ctx context.Context) bool { return true }),
-		mock.MatchedBy(func(o pluginV1.TaskContext) bool { return true }),
-		mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
-		mock.MatchedBy(func(o *core.LiteralMap) bool { return true }),
-	).Return(pluginV1.TaskStatusRunning, nil)
-
-	exec.On("CheckTaskStatus",
-		mock.MatchedBy(func(ctx context.Context) bool { return true }),
-		mock.MatchedBy(func(o pluginV1.TaskContext) bool { return true }),
-		mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
-	).Return(pluginV1.TaskStatusPermanentFailure(errors.New("failed")), nil)
-
-	exec.On("KillTask",
-		mock.MatchedBy(func(ctx context.Context) bool { return true }),
-		mock.MatchedBy(func(o pluginV1.TaskContext) bool { return true }),
-		mock.Anything,
-	).Return(nil)
-
-	return exec
-}
-
-func createTaskExecutorErrorInCheck() pluginV1.Executor {
-	exec := &mocks.Executor{}
-	exec.On("GetID").Return("task")
-	exec.On("GetProperties").Return(pluginV1.ExecutorProperties{})
-	exec.On("Initialize",
-		mock.AnythingOfType(reflect.TypeOf(context.TODO()).String()),
-		mock.AnythingOfType(reflect.TypeOf(pluginV1.ExecutorInitializationParameters{}).String()),
-	).Return(nil)
-
-	exec.On("StartTask",
-		mock.MatchedBy(func(ctx context.Context) bool { return true }),
-		mock.MatchedBy(func(o pluginV1.TaskContext) bool { return true }),
-		mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
-		mock.MatchedBy(func(o *core.LiteralMap) bool { return true }),
-	).Return(pluginV1.TaskStatusRunning, nil)
-
-	exec.On("CheckTaskStatus",
-		mock.MatchedBy(func(ctx context.Context) bool { return true }),
-		mock.MatchedBy(func(o pluginV1.TaskContext) bool { return true }),
-		mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
-	).Return(pluginV1.TaskStatusUndefined, errors.New("check failed"))
-
-	return exec
-}
-
-func createSingletonTaskExecutorFactory(te pluginV1.Executor) task.Factory {
-	return &task.FactoryFuncs{
-		GetTaskExecutorCb: func(taskType v1alpha1.TaskType) (pluginV1.Executor, error) {
-			return te, nil
-		},
-		ListAllTaskExecutorsCb: func() []pluginV1.Executor {
-			return []pluginV1.Executor{te}
-		},
+	return pluginCore.PluginEntry{
+		ID:                  "test",
+		RegisteredTaskTypes: []string{"7"},
+		LoadPlugin:          f,
+		IsDefault:           true,
 	}
 }
 
-func init() {
-	flytek8s.InitializeFake()
+func createFailingTaskExecutor(t assert.TestingT) pluginCore.PluginEntry {
+	f := func(ctx context.Context, iCtx pluginCore.SetupContext) (plugin pluginCore.Plugin, e error) {
+		return fakeRemoteWritePlugin{
+			Plugin: fakeplugins.NewReplayer(
+				"test",
+				pluginCore.PluginProperties{},
+				[]fakeplugins.HandleResponse{
+					fakeplugins.NewHandleTransition(pluginCore.DoTransition(pluginCore.PhaseInfoRunning(1, nil))),
+					fakeplugins.NewHandleTransition(pluginCore.DoTransition(pluginCore.PhaseInfoFailure("code", "message", nil))),
+				},
+				[]error{
+					nil,
+				},
+				[]error{
+					nil,
+				},
+			),
+			enableAsserts: false,
+			t:             t,
+		}, nil
+	}
+	return pluginCore.PluginEntry{
+		ID:                  "test",
+		RegisteredTaskTypes: []string{"7"},
+		LoadPlugin:          f,
+		IsDefault:           true,
+	}
+}
+
+func createTaskExecutorErrorInCheck(t assert.TestingT) pluginCore.PluginEntry {
+	f := func(ctx context.Context, iCtx pluginCore.SetupContext) (plugin pluginCore.Plugin, e error) {
+		return fakeRemoteWritePlugin{
+			Plugin: fakeplugins.NewReplayer(
+				"test",
+				pluginCore.PluginProperties{},
+				[]fakeplugins.HandleResponse{
+					fakeplugins.NewHandleTransition(pluginCore.DoTransition(pluginCore.PhaseInfoRunning(1, nil))),
+					fakeplugins.NewHandleError(fmt.Errorf("error")),
+				},
+				[]error{
+					nil,
+				},
+				[]error{
+					nil,
+				},
+			),
+			enableAsserts: false,
+			t:             t,
+		}, nil
+	}
+	return pluginCore.PluginEntry{
+		ID:                  "test",
+		RegisteredTaskTypes: []string{"7"},
+		LoadPlugin:          f,
+		IsDefault:           true,
+	}
 }
 
 func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
@@ -223,16 +209,15 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
 	assert.NoError(t, err)
 
-	te := createTaskExecutorErrorInCheck()
-	tf := createSingletonTaskExecutorFactory(te)
-	task.SetTestFactory(tf)
-	assert.True(t, task.IsTestModeEnabled())
-
+	te := createTaskExecutorErrorInCheck(t)
+	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
 
 	eventSink := events.NewMockEventSink()
-	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
-	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, time.Second, eventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
+	catalogClient, err := catalog.NewCatalogClient(ctx)
+	assert.NoError(t, err)
+
+	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, eventSink, launchplan.NewFailFastLaunchPlanExecutor(), maxOutputSize, fakeKubeClient, catalogClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -266,6 +251,31 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	}
 }
 
+func walkAndPrint(conns v1alpha1.Connections, ns map[v1alpha1.NodeID]*v1alpha1.NodeStatus) {
+	ds := []v1alpha1.NodeID{v1alpha1.StartNodeID}
+	visited := map[v1alpha1.NodeID]bool{}
+	for k := range ns {
+		visited[k] = false
+	}
+	for len(ds) > 0 {
+		sub := sets.NewString()
+		for _, x := range ds {
+			sub.Insert(conns.DownstreamEdges[x]...)
+			if !visited[x] {
+				s, ok := ns[x]
+				if ok {
+					fmt.Printf("| %s: %s, %s |", x, s.Phase, s.Message)
+					visited[x] = true
+				} else {
+					fmt.Printf("| %s: Not considered |", x)
+				}
+			}
+		}
+		fmt.Println()
+		ds = sub.List()
+	}
+}
+
 func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 	ctx := context.Background()
 	store := createInmemoryDataStore(t, testScope.NewSubScope("13"))
@@ -273,16 +283,16 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
 	assert.NoError(t, err)
 
-	te := createHappyPathTaskExecutor(t, store, true)
-	tf := createSingletonTaskExecutorFactory(te)
-	task.SetTestFactory(tf)
-	assert.True(t, task.IsTestModeEnabled())
+	te := createHappyPathTaskExecutor(t, true)
+	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 
 	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
 
 	eventSink := events.NewMockEventSink()
-	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
-	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, time.Second, eventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
+	catalogClient, err := catalog.NewCatalogClient(ctx)
+	assert.NoError(t, err)
+
+	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, eventSink, launchplan.NewFailFastLaunchPlanExecutor(), maxOutputSize, fakeKubeClient, catalogClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, promutils.NewTestScope())
@@ -295,8 +305,16 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 		w := &v1alpha1.FlyteWorkflow{}
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we know how many rounds it needs
-			// Number of rounds = 12 ?
-			for i := 0; i < 12; i++ {
+			// Number of rounds = 14
+			// + WF (x1)
+			// | start-node: Succeeded, successfully completed | (x1)
+			// | add-one-and-print-0: Succeeded, completed successfully || add-one-and-print-3: Succeeded, completed successfully || print-every-time-0: Succeeded, completed successfully | (x3)
+			// | sum-non-none-0: Succeeded, completed successfully | (x3)
+			// | add-one-and-print-1: Succeeded, completed successfully || sum-and-print-0: Succeeded, completed successfully | (x3)
+			// | add-one-and-print-2: Succeeded, completed successfully | (x3)
+			// + WF (x2)
+			// Also there is some overlap
+			for i := 0; i < 14; i++ {
 				err := executor.HandleFlyteWorkflow(ctx, w)
 				if err != nil {
 					t.Log(err)
@@ -304,8 +322,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 
 				assert.NoError(t, err)
 				fmt.Printf("Round[%d] Workflow[%v]\n", i, w.Status.Phase.String())
-				for k, v := range w.Status.NodeStatus {
-					fmt.Printf("Node[%v=%v],", k, v.Phase.String())
+				walkAndPrint(w.Connections, w.Status.NodeStatus)
+				for _, v := range w.Status.NodeStatus {
 					// Reset dirty manually for tests.
 					v.ResetDirty()
 				}
@@ -325,15 +343,14 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
 	assert.NoError(b, err)
 
-	te := createHappyPathTaskExecutor(b, store, false)
-	tf := createSingletonTaskExecutorFactory(te)
-	task.SetTestFactory(tf)
-	assert.True(b, task.IsTestModeEnabled())
+	te := createHappyPathTaskExecutor(b, false)
+	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
 
 	eventSink := events.NewMockEventSink()
-	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
-	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, time.Second, eventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, scope)
+	catalogClient, err := catalog.NewCatalogClient(ctx)
+	assert.NoError(b, err)
+	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, eventSink, launchplan.NewFailFastLaunchPlanExecutor(), maxOutputSize, fakeKubeClient, catalogClient, scope)
 	assert.NoError(b, err)
 
 	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, promutils.NewTestScope())
@@ -376,10 +393,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
 	assert.NoError(t, err)
 
-	te := createFailingTaskExecutor()
-	tf := createSingletonTaskExecutorFactory(te)
-	task.SetTestFactory(tf)
-	assert.True(t, task.IsTestModeEnabled())
+	te := createFailingTaskExecutor(t)
+	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 
 	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
 
@@ -418,8 +433,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 		}
 		return nil
 	}
-	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
-	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, time.Second, eventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
+	catalogClient, err := catalog.NewCatalogClient(ctx)
+	assert.NoError(t, err)
+	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, eventSink, launchplan.NewFailFastLaunchPlanExecutor(), maxOutputSize, fakeKubeClient, catalogClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -432,18 +448,19 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we will run into the first failure on round 6
 
-			for i := 0; i < 6; i++ {
+			roundsToFail := 7
+			for i := 0; i < roundsToFail; i++ {
 				err := executor.HandleFlyteWorkflow(ctx, w)
 				assert.Nil(t, err, "Round [%v]", i)
 				fmt.Printf("Round[%d] Workflow[%v]\n", i, w.Status.Phase.String())
-				for k, v := range w.Status.NodeStatus {
-					fmt.Printf("Node[%v=%v],", k, v.Phase.String())
+				walkAndPrint(w.Connections, w.Status.NodeStatus)
+				for _, v := range w.Status.NodeStatus {
 					// Reset dirty manually for tests.
 					v.ResetDirty()
 				}
 				fmt.Printf("\n")
 
-				if i == 5 {
+				if i == roundsToFail-1 {
 					assert.Equal(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase)
 				} else {
 					assert.NotEqual(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase, "For Round [%v] got phase [%v]", i, w.Status.Phase.String())
@@ -466,10 +483,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
 	assert.NoError(t, err)
 
-	te := createHappyPathTaskExecutor(t, store, true)
-	tf := createSingletonTaskExecutorFactory(te)
-	task.SetTestFactory(tf)
-	assert.True(t, task.IsTestModeEnabled())
+	te := createHappyPathTaskExecutor(t, true)
+	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 
 	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
 
@@ -506,8 +521,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 		}
 		return nil
 	}
-	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
-	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, time.Second, eventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
+	catalogClient, err := catalog.NewCatalogClient(ctx)
+	assert.NoError(t, err)
+	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, eventSink, launchplan.NewFailFastLaunchPlanExecutor(), maxOutputSize, fakeKubeClient, catalogClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "metadata", nodeExec, promutils.NewTestScope())
 	assert.NoError(t, err)
@@ -519,13 +535,13 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 		w := &v1alpha1.FlyteWorkflow{}
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we know how many rounds it needs
-			// Number of rounds = 12 ?
-			for i := 0; i < 12; i++ {
+			// Number of rounds = 14 ?
+			for i := 0; i < 14; i++ {
 				err := executor.HandleFlyteWorkflow(ctx, w)
 				assert.NoError(t, err)
 				fmt.Printf("Round[%d] Workflow[%v]\n", i, w.Status.Phase.String())
-				for k, v := range w.Status.NodeStatus {
-					fmt.Printf("Node[%v=%v],", k, v.Phase.String())
+				walkAndPrint(w.Connections, w.Status.NodeStatus)
+				for _, v := range w.Status.NodeStatus {
 					// Reset dirty manually for tests.
 					v.ResetDirty()
 				}
@@ -547,10 +563,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	_, err := events.ConstructEventSink(ctx, events.GetConfig(ctx))
 	assert.NoError(t, err)
 
-	te := createHappyPathTaskExecutor(t, store, true)
-	tf := createSingletonTaskExecutorFactory(te)
-	task.SetTestFactory(tf)
-	assert.True(t, task.IsTestModeEnabled())
+	te := createHappyPathTaskExecutor(t, true)
+	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 
 	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
 
@@ -558,8 +572,10 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 	assert.NoError(t, err)
 
 	nodeEventSink := events.NewMockEventSink()
-	catalogClient, _ := catalog.NewCatalogClient(ctx, store)
-	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, time.Second, nodeEventSink, launchplan.NewFailFastLaunchPlanExecutor(), catalogClient, fakeKubeClient, promutils.NewTestScope())
+	catalogClient, err := catalog.NewCatalogClient(ctx)
+	assert.NoError(t, err)
+
+	nodeExec, err := nodes.NewExecutor(ctx, store, enqueueWorkflow, nodeEventSink, launchplan.NewFailFastLaunchPlanExecutor(), maxOutputSize, fakeKubeClient, catalogClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	t.Run("EventAlreadyInTerminalStateError", func(t *testing.T) {

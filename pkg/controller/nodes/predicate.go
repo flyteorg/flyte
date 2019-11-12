@@ -4,10 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/lyft/flytestdlib/logger"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 )
 
 // Special enum to indicate if the node under consideration is ready to be executed or should be skipped
@@ -23,6 +24,18 @@ const (
 	// Indicates failure during Predicate check
 	PredicatePhaseUndefined
 )
+
+func (p PredicatePhase) String() string {
+	switch p {
+	case PredicatePhaseNotReady:
+		return "NotReady"
+	case PredicatePhaseReady:
+		return "Ready"
+	case PredicatePhaseSkip:
+		return "Skip"
+	}
+	return "undefined"
+}
 
 func CanExecute(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.BaseNode) (PredicatePhase, error) {
 	nodeID := node.GetID()

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog"
 
 	"github.com/lyft/flytepropeller/pkg/controller/config"
 	"github.com/lyft/flytepropeller/pkg/controller/workflowstore"
@@ -28,7 +29,6 @@ import (
 	clientset "github.com/lyft/flytepropeller/pkg/client/clientset/versioned"
 	flyteScheme "github.com/lyft/flytepropeller/pkg/client/clientset/versioned/scheme"
 	informers "github.com/lyft/flytepropeller/pkg/client/informers/externalversions"
-	"github.com/lyft/flytepropeller/pkg/controller/catalog"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/lyft/flytepropeller/pkg/controller/workflow"
@@ -236,7 +236,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 		numWorkers: cfg.Workers,
 	}
 
-	lock, err := newResourceLock(kubeclientset.CoreV1(), eventRecorder, cfg.LeaderElection)
+	lock, err := newResourceLock(kubeclientset.CoreV1(), kubeclientset.CoordinationV1(), eventRecorder, cfg.LeaderElection)
 	if err != nil {
 		logger.Errorf(ctx, "failed to initialize resource lock.")
 		return nil, errors.Wrapf(err, "failed to initialize resource lock.")
@@ -274,7 +274,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 	}
 
 	logger.Info(ctx, "Setting up Catalog client.")
-	catalogClient, err := catalog.NewCatalogClient(ctx, store)
+	catalogClient, err := catalog.NewCatalogClient(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create datacatalog client")
 	}
@@ -287,8 +287,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 
 	controller.workflowStore = workflowstore.NewPassthroughWorkflowStore(ctx, scope, flytepropellerClientset.FlyteworkflowV1alpha1(), flyteworkflowInformer.Lister())
 
-	nodeExecutor, err := nodes.NewExecutor(ctx, store, controller.enqueueWorkflowForNodeUpdates,
-		cfg.DownstreamEval.Duration, eventSink, wfLauncher, catalogClient, kubeClient, scope)
+	nodeExecutor, err := nodes.NewExecutor(ctx, store, controller.enqueueWorkflowForNodeUpdates, eventSink, wfLauncher, cfg.MaxDatasetSizeBytes, kubeClient, catalogClient, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}

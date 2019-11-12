@@ -56,7 +56,7 @@ func WorkflowIDAsString(id *core.Identifier) string {
 }
 
 func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTask, errs errors.CompileErrors) (
-	spec *v1alpha1.WorkflowSpec, ok bool) {
+	spec *v1alpha1.WorkflowSpec) {
 	var failureN *v1alpha1.NodeSpec
 	if n := wf.Template.GetFailureNode(); n != nil {
 		failureN, _ = buildNodeSpec(n, tasks, errs.NewScope())
@@ -65,7 +65,7 @@ func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTas
 	nodes, _ := buildNodes(wf.Template.GetNodes(), tasks, errs.NewScope())
 
 	if errs.HasErrors() {
-		return nil, !errs.HasErrors()
+		return nil
 	}
 
 	outputBindings := make([]*v1alpha1.Binding, 0, len(wf.Template.Outputs))
@@ -89,7 +89,7 @@ func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTas
 		Connections:    buildConnections(wf),
 		Outputs:        outputs,
 		OutputBindings: outputBindings,
-	}, !errs.HasErrors()
+	}
 }
 
 func withSeparatorIfNotEmpty(value string) string {
@@ -130,10 +130,10 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		return nil, errs
 	}
 
-	primarySpec, _ := buildFlyteWorkflowSpec(wfClosure.Primary, wfClosure.Tasks, errs.NewScope())
+	primarySpec := buildFlyteWorkflowSpec(wfClosure.Primary, wfClosure.Tasks, errs.NewScope())
 	subwfs := make(map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec, len(wfClosure.SubWorkflows))
 	for _, subWf := range wfClosure.SubWorkflows {
-		spec, _ := buildFlyteWorkflowSpec(wfClosure.Primary, wfClosure.Tasks, errs.NewScope())
+		spec := buildFlyteWorkflowSpec(wfClosure.Primary, wfClosure.Tasks, errs.NewScope())
 		subwfs[subWf.Template.Id.String()] = spec
 	}
 

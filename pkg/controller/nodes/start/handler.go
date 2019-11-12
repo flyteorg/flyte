@@ -3,38 +3,32 @@ package start
 import (
 	"context"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/lyft/flytestdlib/storage"
 )
 
 type startHandler struct {
-	store *storage.DataStore
 }
 
-func (s startHandler) Initialize(ctx context.Context) error {
+func (s startHandler) FinalizeRequired() bool {
+	return false
+}
+
+func (s startHandler) Setup(ctx context.Context, setupContext handler.SetupContext) error {
 	return nil
 }
 
-func (s *startHandler) StartNode(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, nodeInputs *handler.Data) (handler.Status, error) {
-	return handler.StatusSuccess, nil
+func (s startHandler) Handle(ctx context.Context, executionContext handler.NodeExecutionContext) (handler.Transition, error) {
+	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{})), nil
 }
 
-func (s *startHandler) CheckNodeStatus(ctx context.Context, g v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) (handler.Status, error) {
-	return handler.StatusSuccess, nil
-}
-
-func (s *startHandler) HandleFailingNode(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode) (handler.Status, error) {
-	return handler.StatusFailed(errors.Errorf(errors.IllegalStateError, node.GetID(), "start node cannot enter a failing state")), nil
-}
-
-func (s *startHandler) AbortNode(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode) error {
+func (s startHandler) Abort(ctx context.Context, executionContext handler.NodeExecutionContext, reason string) error {
 	return nil
 }
 
-func New(store *storage.DataStore) handler.IFace {
-	return &startHandler{
-		store: store,
-	}
+func (s startHandler) Finalize(ctx context.Context, executionContext handler.NodeExecutionContext) error {
+	return nil
+}
+
+func New() handler.Node {
+	return &startHandler{}
 }

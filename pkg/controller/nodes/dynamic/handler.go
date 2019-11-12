@@ -2,21 +2,27 @@ package dynamic
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/Masterminds/semver"
+
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
+	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils/labeled"
 
 	"github.com/lyft/flytepropeller/pkg/compiler"
 	common2 "github.com/lyft/flytepropeller/pkg/compiler/common"
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
-
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/common"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task"
 
 	"github.com/lyft/flytestdlib/promutils"
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/storage"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -25,13 +31,17 @@ import (
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 )
 
-type dynamicNodeHandler struct {
-	handler.IFace
-	metrics        metrics
-	simpleResolver common.SimpleOutputsResolver
-	store          *storage.DataStore
-	nodeExecutor   executors.Node
-	enQWorkflow    v1alpha1.EnqueueWorkflow
+//go:generate mockery -all -case=underscore
+
+const dynamicNodeID = "dynamic-node"
+
+// TODO: Remove after deploying version 0.2.4
+var arrayFlyteKitVersion = semver.MustParse("0.2.3")
+
+type TaskNodeHandler interface {
+	handler.Node
+	ValidateOutputAndCacheAdd(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader, r io.OutputReader, outputCommitter io.OutputWriter,
+		tr pluginCore.TaskReader, m catalog.Metadata) (*io.ExecutionError, error)
 }
 
 type metrics struct {
@@ -44,61 +54,147 @@ type metrics struct {
 func newMetrics(scope promutils.Scope) metrics {
 	return metrics{
 		buildDynamicWorkflow:   labeled.NewStopWatch("build_dynamic_workflow", "Overhead for building a dynamic workflow in memory.", time.Microsecond, scope),
-		retrieveDynamicJobSpec: labeled.NewStopWatch("retrieve_dynamic_spec", "Overhead of downloading and unmarshaling dynamic job spec", time.Microsecond, scope),
+		retrieveDynamicJobSpec: labeled.NewStopWatch("retrieve_dynamic_spec", "Overhead of downloading and un-marshaling dynamic job spec", time.Microsecond, scope),
 		CacheHit:               labeled.NewStopWatch("dynamic_workflow_cache_hit", "A dynamic workflow was loaded from store.", time.Microsecond, scope),
 		CacheError:             labeled.NewCounter("cache_err", "A dynamic workflow failed to store or load from data store.", scope),
 	}
 }
 
-func (e dynamicNodeHandler) ExtractOutput(ctx context.Context, w v1alpha1.ExecutableWorkflow, n v1alpha1.ExecutableNode,
-	bindToVar handler.VarName) (values *core.Literal, err error) {
-	outputResolver, casted := e.IFace.(handler.OutputResolver)
-	if !casted {
-		return e.simpleResolver.ExtractOutput(ctx, w, n, bindToVar)
-	}
-
-	return outputResolver.ExtractOutput(ctx, w, n, bindToVar)
+type dynamicNodeTaskNodeHandler struct {
+	TaskNodeHandler
+	metrics      metrics
+	nodeExecutor executors.Node
 }
 
-func (e dynamicNodeHandler) getDynamicJobSpec(ctx context.Context, node v1alpha1.ExecutableNode, dataDir storage.DataReference) (*core.DynamicJobSpec, error) {
-	t := e.metrics.retrieveDynamicJobSpec.Start(ctx)
-	defer t.Stop()
-
-	futuresFilePath, err := e.store.ConstructReference(ctx, dataDir, v1alpha1.GetFutureFile())
+func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevState handler.DynamicNodeState, nCtx handler.NodeExecutionContext) (handler.Transition, handler.DynamicNodeState, error) {
+	// It seems parent node is still running, lets call handle for parent node
+	trns, err := d.TaskNodeHandler.Handle(ctx, nCtx)
 	if err != nil {
-		logger.Warnf(ctx, "Failed to construct data path for futures file. Error: %v", err)
-		return nil, err
+		return trns, prevState, err
 	}
 
-	// If no futures file produced, then declare success and return.
-	if metadata, err := e.store.Head(ctx, futuresFilePath); err != nil {
-		logger.Warnf(ctx, "Failed to read futures file. Error: %v", err)
-		return nil, errors.Wrapf(errors.CausedByError, node.GetID(), err, "Failed to do HEAD on futures file.")
-	} else if !metadata.Exists() {
-		return nil, nil
+	if trns.Info().GetPhase() == handler.EPhaseSuccess {
+		f, err := task.NewRemoteFutureFileReader(ctx, nCtx.NodeStatus().GetDataDir(), nCtx.DataStore())
+		if err != nil {
+			return handler.UnknownTransition, prevState, err
+		}
+		// If the node succeeded, check if it generated a futures.pb file to execute.
+		ok, err := f.Exists(ctx)
+		if err != nil {
+			return handler.UnknownTransition, prevState, err
+		}
+		if ok {
+			// Mark the node that parent node has completed and a dynamic node executing its child nodes. Next time check node status is called, it'll go
+			// directly to progress the dynamically generated workflow.
+			logger.Infof(ctx, "future file detected, assuming dynamic node")
+			// There is a futures file, so we need to continue running the node with the modified state
+			return trns.WithInfo(handler.PhaseInfoRunning(trns.Info().GetInfo())), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseExecuting}, nil
+		}
 	}
 
-	djSpec := &core.DynamicJobSpec{}
-	if err := e.store.ReadProtobuf(ctx, futuresFilePath, djSpec); err != nil {
-		logger.Warnf(ctx, "Failed to read futures file. Error: %v", err)
-		return nil, errors.Wrapf(errors.CausedByError, node.GetID(), err, "Failed to read futures protobuf file.")
-	}
-
-	return djSpec, nil
+	logger.Infof(ctx, "regular node detected, (no future file found)")
+	return trns, prevState, nil
 }
 
-func (e dynamicNodeHandler) buildDynamicWorkflowTemplate(ctx context.Context, djSpec *core.DynamicJobSpec,
-	w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) (
+func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+	dynamicWF, _, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
+	if err != nil {
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("DynamicWorkflowBuildFailed", err.Error(), nil)), nil
+	}
+
+	trns, err := d.progressDynamicWorkflow(ctx, dynamicWF, nCtx)
+	if err != nil {
+		return handler.UnknownTransition, err
+	}
+
+	if trns.Info().GetPhase() == handler.EPhaseSuccess {
+		logger.Infof(ctx, "dynamic workflow node has succeeded, will call on success handler for parent node [%s]", nCtx.NodeID())
+		outputPaths := ioutils.NewRemoteFileOutputPaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetDataDir())
+		execID := task.GetTaskExecutionIdentifier(nCtx)
+		outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
+		ee, err := d.TaskNodeHandler.ValidateOutputAndCacheAdd(ctx, nCtx.NodeID(), nCtx.InputReader(), outputReader, nil, nCtx.TaskReader(), catalog.Metadata{
+			TaskExecutionIdentifier: execID,
+		})
+
+		if err != nil {
+			return handler.UnknownTransition, err
+		}
+
+		if ee != nil {
+			if ee.IsRecoverable {
+				return trns.WithInfo(handler.PhaseInfoRetryableFailureErr(ee.ExecutionError, trns.Info().GetInfo())), nil
+			}
+			return trns.WithInfo(handler.PhaseInfoFailureErr(ee.ExecutionError, trns.Info().GetInfo())), nil
+		}
+	}
+
+	return trns, nil
+}
+
+func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+	ds := nCtx.NodeStateReader().GetDynamicNodeState()
+	var err error
+	var trns handler.Transition
+	newState := ds
+	if ds.Phase == v1alpha1.DynamicNodePhaseExecuting {
+		trns, err = d.handleDynamicSubNodes(ctx, nCtx)
+		if err != nil {
+			logger.Errorf(ctx, "handling dynamic subnodes failed with error: %s", err.Error())
+			return trns, err
+		}
+	} else {
+		trns, newState, err = d.handleParentNode(ctx, ds, nCtx)
+		if err != nil {
+			logger.Errorf(ctx, "handling parent node failed with error: %s", err.Error())
+			return trns, err
+		}
+	}
+
+	if err := nCtx.NodeStateWriter().PutDynamicNodeState(newState); err != nil {
+		return handler.UnknownTransition, err
+	}
+
+	return trns, nil
+}
+
+func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+
+	ds := nCtx.NodeStateReader().GetDynamicNodeState()
+	switch ds.Phase {
+	case v1alpha1.DynamicNodePhaseExecuting:
+		dynamicWF, isDynamic, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
+		if err != nil {
+			return err
+		}
+
+		if !isDynamic {
+			return nil
+		}
+
+		return d.nodeExecutor.AbortHandler(ctx, dynamicWF, dynamicWF.StartNode(), reason)
+	default:
+		// The parent node has not yet completed, so we will abort the parent node
+		return d.TaskNodeHandler.Abort(ctx, nCtx, reason)
+	}
+}
+
+// This is a weird method. We should always finalize before we set the dynamic parent node phase as complete?
+// TODO we are finalizing the parent node only after sub tasks are completed
+func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext) error {
+	return d.TaskNodeHandler.Finalize(ctx, nCtx)
+}
+
+func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Context, djSpec *core.DynamicJobSpec, nCtx handler.NodeExecutionContext, parentNodeStatus v1alpha1.ExecutableNodeStatus) (
 	*core.WorkflowTemplate, error) {
 
-	iface, err := underlyingInterface(w, node)
+	iface, err := underlyingInterface(ctx, nCtx.TaskReader())
 	if err != nil {
 		return nil, err
 	}
 
 	// Modify node IDs to include lineage, the entire system assumes node IDs are unique per parent WF.
 	// We keep track of the original node ids because that's where inputs are written to.
-	parentNodeID := node.GetID()
+	parentNodeID := nCtx.NodeID()
 	for _, n := range djSpec.Nodes {
 		newID, err := hierarchicalNodeID(parentNodeID, n.Id)
 		if err != nil {
@@ -106,8 +202,8 @@ func (e dynamicNodeHandler) buildDynamicWorkflowTemplate(ctx context.Context, dj
 		}
 
 		// Instantiate a nodeStatus using the modified name but set its data directory using the original name.
-		subNodeStatus := nodeStatus.GetNodeExecutionStatus(newID)
-		originalNodePath, err := e.store.ConstructReference(ctx, nodeStatus.GetDataDir(), n.Id)
+		subNodeStatus := parentNodeStatus.GetNodeExecutionStatus(newID)
+		originalNodePath, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetDataDir(), n.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -118,16 +214,32 @@ func (e dynamicNodeHandler) buildDynamicWorkflowTemplate(ctx context.Context, dj
 		n.Id = newID
 	}
 
-	if node.GetTaskID() != nil {
+	if nCtx.TaskReader().GetTaskID() != nil {
 		// If the parent is a task, pass down data children nodes should inherit.
-		parentTask, err := w.GetTask(*node.GetTaskID())
+		parentTask, err := nCtx.TaskReader().Read(ctx)
 		if err != nil {
-			return nil, errors.Wrapf(errors.CausedByError, node.GetID(), err, "Failed to find task [%v].", node.GetTaskID())
+			return nil, errors.Wrapf(errors.CausedByError, nCtx.NodeID(), err, "Failed to find task [%v].", nCtx.TaskReader().GetTaskID())
 		}
 
 		for _, t := range djSpec.Tasks {
-			if t.GetContainer() != nil && parentTask.CoreTask().GetContainer() != nil {
-				t.GetContainer().Config = append(t.GetContainer().Config, parentTask.CoreTask().GetContainer().Config...)
+			if t.GetContainer() != nil && parentTask.GetContainer() != nil {
+				t.GetContainer().Config = append(t.GetContainer().Config, parentTask.GetContainer().Config...)
+			}
+
+			// TODO: This is a hack since array tasks' interfaces are malformed. Remove after
+			// FlyteKit version that generates the right interfaces is deployed.
+			if t.Type == "container_array" {
+				isBelow, err := isFlyteKitVersionBelow(t.GetMetadata().Runtime, arrayFlyteKitVersion)
+				if err != nil {
+					logger.Warnf(ctx, "Failed to validate flytekit version of task [%v] will skip array"+
+						" interface manipulation.", t.GetId())
+					continue
+				}
+
+				if isBelow {
+					iface := t.GetInterface()
+					iface.Outputs = makeArrayInterface(iface.Outputs)
+				}
 			}
 		}
 	}
@@ -141,8 +253,8 @@ func (e dynamicNodeHandler) buildDynamicWorkflowTemplate(ctx context.Context, dj
 
 	return &core.WorkflowTemplate{
 		Id: &core.Identifier{
-			Project:      w.GetExecutionID().Project,
-			Domain:       w.GetExecutionID().Domain,
+			Project:      nCtx.NodeExecutionMetadata().GetExecutionID().Project,
+			Domain:       nCtx.NodeExecutionMetadata().GetExecutionID().Domain,
 			Version:      rand.String(10),
 			Name:         rand.String(10),
 			ResourceType: core.ResourceType_WORKFLOW,
@@ -153,126 +265,48 @@ func (e dynamicNodeHandler) buildDynamicWorkflowTemplate(ctx context.Context, dj
 	}, nil
 }
 
-// For any node that is not in a NEW/READY state in the recording, CheckNodeStatus will be invoked. The implementation should handle
-// idempotency and return the current observed state of the node
-func (e dynamicNodeHandler) CheckNodeStatus(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode,
-	previousNodeStatus v1alpha1.ExecutableNodeStatus) (handler.Status, error) {
+func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext) (dynamicWf v1alpha1.ExecutableWorkflow, isDynamic bool, err error) {
 
-	var status handler.Status
-	var err error
-	switch previousNodeStatus.GetOrCreateDynamicNodeStatus().GetDynamicNodePhase() {
-	case v1alpha1.DynamicNodePhaseExecuting:
-		// If the node succeeded, check if it generated a futures.pb file to execute.
-		dynamicWF, nStatus, _, err := e.buildContextualDynamicWorkflow(ctx, w, node, previousNodeStatus)
-		if err != nil {
-			return handler.StatusFailed(err), nil
-		}
-
-		s, err := e.progressDynamicWorkflow(ctx, nStatus, dynamicWF)
-		if err == nil && s == handler.StatusSuccess {
-			// After the dynamic node completes we need to copy the outputs from its end nodes to the parent nodes status
-			endNode := dynamicWF.GetNodeExecutionStatus(v1alpha1.EndNodeID)
-			outputPath := v1alpha1.GetOutputsFile(endNode.GetDataDir())
-			destinationPath := v1alpha1.GetOutputsFile(previousNodeStatus.GetDataDir())
-			logger.Infof(ctx, "Dynamic workflow completed, copying outputs from the end-node [%s] to the parent node data dir [%s]", outputPath, destinationPath)
-			if err := e.store.CopyRaw(ctx, outputPath, destinationPath, storage.Options{}); err != nil {
-				logger.Errorf(ctx, "Failed to copy outputs from dynamic sub-wf [%s] to [%s]. Error: %s", outputPath, destinationPath, err.Error())
-				return handler.StatusUndefined, errors.Wrapf(errors.StorageError, node.GetID(), err, "Failed to copy outputs from dynamic sub-wf [%s] to [%s]. Error: %s", outputPath, destinationPath, err.Error())
-			}
-			if successHandler, ok := e.IFace.(handler.PostNodeSuccessHandler); ok {
-				return successHandler.HandleNodeSuccess(ctx, w, node)
-			}
-			logger.Warnf(ctx, "Bad configuration for dynamic node, no post node success handler found!")
-		}
-		return s, err
-	default:
-		// Invoke the underlying check node status.
-		status, err = e.IFace.CheckNodeStatus(ctx, w, node, previousNodeStatus)
-
-		if err != nil {
-			return status, err
-		}
-
-		if status.Phase != handler.PhaseSuccess {
-			return status, err
-		}
-
-		// If the node succeeded, check if it generated a futures.pb file to execute.
-		_, _, isDynamic, err := e.buildContextualDynamicWorkflow(ctx, w, node, previousNodeStatus)
-		if err != nil {
-			return handler.StatusFailed(err), nil
-		}
-
-		if !isDynamic {
-			if successHandler, ok := e.IFace.(handler.PostNodeSuccessHandler); ok {
-				return successHandler.HandleNodeSuccess(ctx, w, node)
-			}
-			logger.Warnf(ctx, "Bad configuration for dynamic node, no post node success handler found!")
-			return status, err
-		}
-
-		// Mark the node as a dynamic node executing its child nodes. Next time check node status is called, it'll go
-		// directly to progress the dynamically generated workflow.
-		previousNodeStatus.GetOrCreateDynamicNodeStatus().SetDynamicNodePhase(v1alpha1.DynamicNodePhaseExecuting)
-
-		return handler.StatusRunning, nil
-	}
-}
-
-func (e dynamicNodeHandler) buildContextualDynamicWorkflow(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode,
-	previousNodeStatus v1alpha1.ExecutableNodeStatus) (dynamicWf v1alpha1.ExecutableWorkflow, status v1alpha1.ExecutableNodeStatus, isDynamic bool, err error) {
-
-	var nStatus v1alpha1.ExecutableNodeStatus
-	rootNodeStatus := w.GetNodeExecutionStatus(node.GetID())
-	if node.GetTaskID() != nil {
-		// TODO: This is a hack to set parent task execution id, we should move to node-node relationship.
-		execID, err := e.getTaskExecutionIdentifier(ctx, w, node)
-		if err != nil {
-			return nil, nil, false, err
-		}
-
-		dynamicNode := &v1alpha1.NodeSpec{
-			ID: "dynamic-node",
-		}
-
-		nStatus = rootNodeStatus.GetNodeExecutionStatus(dynamicNode.GetID())
-		nStatus.SetDataDir(rootNodeStatus.GetDataDir())
-		nStatus.SetParentTaskID(execID)
-	} else {
-		nStatus = w.GetNodeExecutionStatus(node.GetID())
-	}
-
-	subwf, isDynamic, err := e.loadOrBuildDynamicWorkflow(ctx, w, node, previousNodeStatus.GetDataDir(), nStatus)
-	if err != nil {
-		return nil, nStatus, false, err
-	}
-
-	if !isDynamic {
-		return nil, nil, false, nil
-	}
-
-	return newContextualWorkflow(w, subwf, nStatus, subwf.Tasks, subwf.SubWorkflows), nStatus, isDynamic, nil
-}
-
-func (e dynamicNodeHandler) buildFlyteWorkflow(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode,
-	dataDir storage.DataReference, nStatus v1alpha1.ExecutableNodeStatus) (compiledWf *v1alpha1.FlyteWorkflow, isDynamic bool, err error) {
-	t := e.metrics.buildDynamicWorkflow.Start(ctx)
+	t := d.metrics.buildDynamicWorkflow.Start(ctx)
 	defer t.Stop()
 
-	// We will only get here if the Phase is success. The downside is that this is an overhead for all nodes that are
-	// not dynamic. But given that we will only check once, it should be ok.
-	// TODO: Check for node.is_dynamic once the IDL changes are in and SDK migration has happened.
-	djSpec, err := e.getDynamicJobSpec(ctx, node, dataDir)
+	f, err := task.NewRemoteFutureFileReader(ctx, nCtx.NodeStatus().GetDataDir(), nCtx.DataStore())
 	if err != nil {
 		return nil, false, err
 	}
 
-	if djSpec == nil {
-		return nil, false, nil
+	// TODO: This is a hack to set parent task execution id, we should move to node-node relationship.
+	execID := task.GetTaskExecutionIdentifier(nCtx)
+	nStatus := nCtx.NodeStatus().GetNodeExecutionStatus(dynamicNodeID)
+	nStatus.SetDataDir(nCtx.NodeStatus().GetDataDir())
+	nStatus.SetParentTaskID(execID)
+
+	// cacheHitStopWatch := d.metrics.CacheHit.Start(ctx)
+	// Check if we have compiled the workflow before:
+	// If there is a cached compiled Workflow, load and return it.
+	// if ok, err := f.CacheExists(ctx); err != nil {
+	//	logger.Warnf(ctx, "Failed to call head on compiled futures file. Error: %v", err)
+	//	return nil, false, errors.Wrapf(errors.CausedByError, nCtx.NodeID(), err, "Failed to do HEAD on compiled futures file.")
+	// } else if ok {
+	//	// It exists, load and return it
+	//	compiledWf, err := f.RetrieveCache(ctx)
+	//	if err != nil {
+	//		logger.Warnf(ctx, "Failed to load cached flyte workflow , this will cause the dynamic workflow to be recompiled. Error: %v", err)
+	//		d.metrics.CacheError.Inc(ctx)
+	//	} else {
+	//		cacheHitStopWatch.Stop()
+	//		return newContextualWorkflow(nCtx.Workflow(), compiledWf, nStatus, compiledWf.Tasks, compiledWf.SubWorkflows), true, nil
+	//	}
+	// }
+
+	// We know for sure that futures file was generated. Lets read it
+	djSpec, err := f.Read(ctx)
+	if err != nil {
+		return nil, false, errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "unable to read futures file, maybe corrupted")
 	}
 
 	var closure *core.CompiledWorkflowClosure
-	wf, err := e.buildDynamicWorkflowTemplate(ctx, djSpec, w, node, nStatus)
+	wf, err := d.buildDynamicWorkflowTemplate(ctx, djSpec, nCtx, nStatus)
 	if err != nil {
 		return nil, true, err
 	}
@@ -290,168 +324,80 @@ func (e dynamicNodeHandler) buildFlyteWorkflow(ctx context.Context, w v1alpha1.E
 
 	subwf, err := k8s.BuildFlyteWorkflow(closure, &core.LiteralMap{}, nil, "")
 	if err != nil {
-		return nil, false, err
+		return nil, true, err
 	}
 
-	return subwf, true, nil
+	if err := f.Cache(ctx, subwf); err != nil {
+		logger.Errorf(ctx, "Failed to cache Dynamic workflow [%s]", err.Error())
+	}
+
+	return newContextualWorkflow(nCtx.Workflow(), subwf, nStatus, subwf.Tasks, subwf.SubWorkflows), true, nil
 }
 
-func (e dynamicNodeHandler) loadOrBuildDynamicWorkflow(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode,
-	dataDir storage.DataReference, nodeStatus v1alpha1.ExecutableNodeStatus) (compiledWf *v1alpha1.FlyteWorkflow, isDynamic bool, err error) {
+func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context, dynamicWorkflow v1alpha1.ExecutableWorkflow,
+	nCtx handler.NodeExecutionContext) (handler.Transition, error) {
 
-	cacheHitStopWatch := e.metrics.CacheHit.Start(ctx)
-	// Check if we have compiled the workflow before:
-	compiledFuturesFilePath, err := e.store.ConstructReference(ctx, nodeStatus.GetDataDir(), v1alpha1.GetCompiledFutureFile())
+	state, err := d.nodeExecutor.RecursiveNodeHandler(ctx, dynamicWorkflow, dynamicWorkflow.StartNode())
 	if err != nil {
-		logger.Warnf(ctx, "Failed to construct data path for futures file. Error: %v", err)
-		return nil, false, errors.Wrapf(errors.CausedByError, node.GetID(), err, "Failed to construct data path for futures file.")
-	}
-
-	// If there is a cached compiled Workflow, load and return it.
-	if metadata, err := e.store.Head(ctx, compiledFuturesFilePath); err != nil {
-		logger.Warnf(ctx, "Failed to call head on compiled futures file. Error: %v", err)
-		return nil, false, errors.Wrapf(errors.CausedByError, node.GetID(), err, "Failed to do HEAD on compiled futures file.")
-	} else if metadata.Exists() {
-		// It exists, load and return it
-		compiledWf, err = loadCachedFlyteWorkflow(ctx, e.store, compiledFuturesFilePath)
-		if err != nil {
-			logger.Warnf(ctx, "Failed to load cached flyte workflow from [%v], this will cause the dynamic workflow to be recompiled. Error: %v",
-				compiledFuturesFilePath, err)
-			e.metrics.CacheError.Inc(ctx)
-		} else {
-			cacheHitStopWatch.Stop()
-			return compiledWf, true, nil
-		}
-	}
-
-	// If we have not build this spec before, build it now and cache it.
-	compiledWf, isDynamic, err = e.buildFlyteWorkflow(ctx, w, node, dataDir, nodeStatus)
-	if err != nil {
-		return compiledWf, isDynamic, err
-	}
-
-	if !isDynamic {
-		return compiledWf, isDynamic, err
-	}
-
-	// Cache the built WF. Errors are swallowed.
-	err = cacheFlyteWorkflow(ctx, e.store, compiledWf, compiledFuturesFilePath)
-	if err != nil {
-		logger.Warnf(ctx, "Failed to cache flyte workflow, this will cause a cache miss next time and cause the dynamic workflow to be recompiled. Error: %v", err)
-		e.metrics.CacheError.Inc(ctx)
-	}
-
-	return compiledWf, true, nil
-}
-
-func (e dynamicNodeHandler) progressDynamicWorkflow(ctx context.Context, parentNodeStatus v1alpha1.ExecutableNodeStatus,
-	w v1alpha1.ExecutableWorkflow) (handler.Status, error) {
-
-	state, err := e.nodeExecutor.RecursiveNodeHandler(ctx, w, w.StartNode())
-	if err != nil {
-		return handler.StatusUndefined, err
+		return handler.UnknownTransition, err
 	}
 
 	if state.HasFailed() {
-		if w.GetOnFailureNode() != nil {
-			return handler.StatusFailing(state.Err), nil
+		if dynamicWorkflow.GetOnFailureNode() != nil {
+			// TODO Once we migrate to closure node we need to handle subworkflow using the subworkflow handler
+			logger.Errorf(ctx, "We do not support failure nodes in dynamic workflow today")
 		}
-		return handler.StatusFailed(state.Err), nil
+
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("DynamicWorkflowFailure", state.Err.Error(), nil)), err
 	}
 
 	if state.IsComplete() {
-		nodeID := ""
-		if parentNodeStatus.GetParentNodeID() != nil {
-			nodeID = *parentNodeStatus.GetParentNodeID()
-		}
-
+		var o *handler.OutputInfo
 		// If the WF interface has outputs, validate that the outputs file was written.
-		if outputBindings := w.GetOutputBindings(); len(outputBindings) > 0 {
-			endNodeStatus := w.GetNodeExecutionStatus(v1alpha1.EndNodeID)
+		if outputBindings := dynamicWorkflow.GetOutputBindings(); len(outputBindings) > 0 {
+			endNodeStatus := dynamicWorkflow.GetNodeExecutionStatus(v1alpha1.EndNodeID)
 			if endNodeStatus == nil {
-				return handler.StatusFailed(errors.Errorf(errors.SubWorkflowExecutionFailed, nodeID,
-					"No end node found in subworkflow.")), nil
+				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("MalformedDynamicWorkflow", "no end-node found in dynamic workflow", nil)), nil
 			}
 
 			sourcePath := v1alpha1.GetOutputsFile(endNodeStatus.GetDataDir())
-			if metadata, err := e.store.Head(ctx, sourcePath); err == nil {
+			if metadata, err := nCtx.DataStore().Head(ctx, sourcePath); err == nil {
 				if !metadata.Exists() {
-					return handler.StatusFailed(errors.Errorf(errors.SubWorkflowExecutionFailed, nodeID,
-						"Subworkflow is expected to produce outputs but no outputs file was written to %v.",
-						sourcePath)), nil
+					return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("DynamicWorkflowOutputsNotFound", " is expected to produce outputs but no outputs file was written to %v.", nil)), nil
 				}
 			} else {
-				return handler.StatusUndefined, err
+				return handler.UnknownTransition, err
 			}
 
-			destinationPath := v1alpha1.GetOutputsFile(parentNodeStatus.GetDataDir())
-			if err := e.store.CopyRaw(ctx, sourcePath, destinationPath, storage.Options{}); err != nil {
-				return handler.StatusFailed(errors.Wrapf(errors.OutputsNotFoundError, nodeID,
-					err, "Failed to copy subworkflow outputs from [%v] to [%v]",
-					sourcePath, destinationPath)), nil
+			destinationPath := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetDataDir())
+			if err := nCtx.DataStore().CopyRaw(ctx, sourcePath, destinationPath, storage.Options{}); err != nil {
+				return handler.DoTransition(handler.TransitionTypeEphemeral,
+					handler.PhaseInfoFailure(errors.OutputsNotFoundError.String(),
+						fmt.Sprintf("Failed to copy subworkflow outputs from [%v] to [%v]", sourcePath, destinationPath), nil),
+				), nil
 			}
+			o = &handler.OutputInfo{OutputURI: destinationPath}
 		}
 
-		return handler.StatusSuccess, nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(&handler.ExecutionInfo{
+			OutputInfo: o,
+		})), nil
 	}
 
 	if state.PartiallyComplete() {
-		// Re-enqueue the workflow
-		e.enQWorkflow(w.GetK8sWorkflowID().String())
-	}
-
-	return handler.StatusRunning, nil
-}
-
-func (e dynamicNodeHandler) getTaskExecutionIdentifier(_ context.Context, w v1alpha1.ExecutableWorkflow,
-	node v1alpha1.ExecutableNode) (*core.TaskExecutionIdentifier, error) {
-
-	taskID := node.GetTaskID()
-	task, err := w.GetTask(*taskID)
-	if err != nil {
-		return nil, errors.Wrapf(errors.BadSpecificationError, node.GetID(), err, "Unable to find task for taskId: [%v]", *taskID)
-	}
-
-	nodeStatus := w.GetNodeExecutionStatus(node.GetID())
-	return &core.TaskExecutionIdentifier{
-		TaskId:       task.CoreTask().Id,
-		RetryAttempt: nodeStatus.GetAttempts(),
-		NodeExecutionId: &core.NodeExecutionIdentifier{
-			NodeId:      node.GetID(),
-			ExecutionId: w.GetExecutionID().WorkflowExecutionIdentifier,
-		},
-	}, nil
-}
-
-func (e dynamicNodeHandler) AbortNode(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode) error {
-
-	previousNodeStatus := w.GetNodeExecutionStatus(node.GetID())
-	switch previousNodeStatus.GetOrCreateDynamicNodeStatus().GetDynamicNodePhase() {
-	case v1alpha1.DynamicNodePhaseExecuting:
-		dynamicWF, _, isDynamic, err := e.buildContextualDynamicWorkflow(ctx, w, node, previousNodeStatus)
-		if err != nil {
-			return err
+		if err := nCtx.EnqueueOwnerFunc()(); err != nil {
+			return handler.UnknownTransition, err
 		}
-
-		if !isDynamic {
-			return nil
-		}
-
-		return e.nodeExecutor.AbortHandler(ctx, dynamicWF, dynamicWF.StartNode())
-	default:
-		// Invoke the underlying abort node.
-		return e.IFace.AbortNode(ctx, w, node)
 	}
+
+	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 }
 
-func New(underlying handler.IFace, nodeExecutor executors.Node, enQWorkflow v1alpha1.EnqueueWorkflow, store *storage.DataStore,
-	scope promutils.Scope) handler.IFace {
+func New(underlying TaskNodeHandler, nodeExecutor executors.Node, scope promutils.Scope) handler.Node {
 
-	return dynamicNodeHandler{
-		IFace:        underlying,
-		metrics:      newMetrics(scope),
-		nodeExecutor: nodeExecutor,
-		enQWorkflow:  enQWorkflow,
-		store:        store,
+	return &dynamicNodeTaskNodeHandler{
+		TaskNodeHandler: underlying,
+		metrics:         newMetrics(scope),
+		nodeExecutor:    nodeExecutor,
 	}
 }

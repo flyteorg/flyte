@@ -68,7 +68,7 @@ func (p NodeStatusPrinter) NodeInfo(wName string, node v1alpha1.BaseNode, nodeSt
 
 func (p NodePrinter) BranchNodeInfo(node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) []string {
 	info := p.BaseNodeInfo(node, nodeStatus)
-	branchStatus := nodeStatus.GetOrCreateBranchStatus()
+	branchStatus := nodeStatus.GetBranchStatus()
 	info = append(info, branchStatus.GetPhase().String())
 	if branchStatus.GetFinalizedNode() != nil {
 		info = append(info, *branchStatus.GetFinalizedNode())

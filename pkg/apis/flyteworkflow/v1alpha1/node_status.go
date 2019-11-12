@@ -1,11 +1,11 @@
 package v1alpha1
 
 import (
+	"bytes"
 	"encoding/json"
 	"reflect"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteplugins/go/tasks/v1/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -74,34 +74,29 @@ func (s *DynamicNodeStatus) Equals(o *DynamicNodeStatus) bool {
 	if s == nil && o == nil {
 		return true
 	}
-	if s != nil && o != nil {
-		return s.Phase == o.Phase
+	if s == nil || o == nil {
+		return false
 	}
-	return false
+	return s.Phase == o.Phase
 }
 
-type SubWorkflowNodeStatus struct {
-	Phase WorkflowPhase `json:"phase"`
-}
+type WorkflowNodePhase int
 
-func (s SubWorkflowNodeStatus) GetPhase() WorkflowPhase {
-	return s.Phase
-}
-
-func (s *SubWorkflowNodeStatus) SetPhase(phase WorkflowPhase) {
-	s.Phase = phase
-}
+const (
+	WorkflowNodePhaseUndefined WorkflowNodePhase = iota
+	WorkflowNodePhaseExecuting
+)
 
 type WorkflowNodeStatus struct {
-	WorkflowName string `json:"name"`
+	Phase WorkflowNodePhase `json:"phase"`
 }
 
-func (in *WorkflowNodeStatus) SetWorkflowExecutionName(name string) {
-	in.WorkflowName = name
+func (in *WorkflowNodeStatus) GetWorkflowNodePhase() WorkflowNodePhase {
+	return in.Phase
 }
 
-func (in *WorkflowNodeStatus) GetWorkflowExecutionName() string {
-	return in.WorkflowName
+func (in *WorkflowNodeStatus) SetWorkflowNodePhase(phase WorkflowNodePhase) {
+	in.Phase = phase
 }
 
 type NodeStatus struct {
@@ -122,16 +117,45 @@ type NodeStatus struct {
 	SubNodeStatus map[NodeID]*NodeStatus   `json:"subNodeStatus,omitempty"`
 	// We can store the outputs at this layer
 
-	WorkflowNodeStatus    *WorkflowNodeStatus    `json:"workflowNodeStatus,omitempty"`
-	TaskNodeStatus        *TaskNodeStatus        `json:",omitempty"`
-	SubWorkflowNodeStatus *SubWorkflowNodeStatus `json:"subWorkflowStatus,omitempty"`
-	DynamicNodeStatus     *DynamicNodeStatus     `json:"dynamicNodeStatus,omitempty"`
+	// TODO not used delete
+	WorkflowNodeStatus *WorkflowNodeStatus `json:"workflowNodeStatus,omitempty"`
+	TaskNodeStatus     *TaskNodeStatus     `json:",omitempty"`
+	// TODO not used delete
+	DynamicNodeStatus *DynamicNodeStatus `json:"dynamicNodeStatus,omitempty"`
+}
+
+func (in *NodeStatus) GetBranchStatus() MutableBranchNodeStatus {
+	if in.BranchStatus == nil {
+		return nil
+	}
+	return in.BranchStatus
+}
+
+func (in *NodeStatus) GetWorkflowStatus() MutableWorkflowNodeStatus {
+	if in.WorkflowNodeStatus == nil {
+		return nil
+	}
+	return in.WorkflowNodeStatus
+}
+
+func (in *NodeStatus) GetTaskStatus() MutableTaskNodeStatus {
+	if in.TaskNodeStatus == nil {
+		return nil
+	}
+	return in.TaskNodeStatus
 }
 
 func (in NodeStatus) VisitNodeStatuses(visitor NodeStatusVisitFn) {
 	for n, s := range in.SubNodeStatus {
 		visitor(n, s)
 	}
+}
+
+func (in NodeStatus) GetDynamicNodeStatus() MutableDynamicNodeStatus {
+	if in.DynamicNodeStatus == nil {
+		return nil
+	}
+	return in.DynamicNodeStatus
 }
 
 func (in *NodeStatus) ClearWorkflowStatus() {
@@ -318,26 +342,6 @@ func (in NodeStatus) GetTaskNodeStatus() ExecutableTaskNodeStatus {
 	return in.TaskNodeStatus
 }
 
-func (in NodeStatus) GetSubWorkflowNodeStatus() ExecutableSubWorkflowNodeStatus {
-	if in.SubWorkflowNodeStatus == nil {
-		return nil
-	}
-
-	return in.SubWorkflowNodeStatus
-}
-
-func (in NodeStatus) GetOrCreateSubWorkflowStatus() MutableSubWorkflowNodeStatus {
-	if in.SubWorkflowNodeStatus == nil {
-		in.SubWorkflowNodeStatus = &SubWorkflowNodeStatus{}
-	}
-
-	return in.SubWorkflowNodeStatus
-}
-
-func (in *NodeStatus) ClearSubWorkflowStatus() {
-	in.SubWorkflowNodeStatus = nil
-}
-
 func (in *NodeStatus) GetNodeExecutionStatus(id NodeID) ExecutableNodeStatus {
 	n, ok := in.SubNodeStatus[id]
 	if ok {
@@ -373,6 +377,12 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 		return false
 	}
 
+	if in.Phase == other.Phase {
+		if in.Phase == NodePhaseSucceeded || in.Phase == NodePhaseFailed {
+			return true
+		}
+	}
+
 	if in.Attempts != other.Attempts {
 		return false
 	}
@@ -381,7 +391,7 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 		return false
 	}
 
-	if !reflect.DeepEqual(in.TaskNodeStatus, other.TaskNodeStatus) {
+	if !in.TaskNodeStatus.Equals(other.TaskNodeStatus) {
 		return false
 	}
 
@@ -416,7 +426,7 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 		}
 	}
 
-	return in.BranchStatus.Equals(other.BranchStatus) // && in.DynamicNodeStatus.Equals(other.DynamicNodeStatus)
+	return in.BranchStatus.Equals(other.BranchStatus) && in.DynamicNodeStatus.Equals(other.DynamicNodeStatus)
 }
 
 // THIS IS NOT AUTO GENERATED
@@ -447,12 +457,38 @@ func (in *CustomState) DeepCopy() *CustomState {
 }
 
 type TaskNodeStatus struct {
-	Phase        types.TaskPhase   `json:"phase,omitempty"`
-	PhaseVersion uint32            `json:"phaseVersion,omitempty"`
-	CustomState  types.CustomState `json:"custom,omitempty"`
+	Phase              int    `json:"phase,omitempty"`
+	PhaseVersion       uint32 `json:"phaseVersion,omitempty"`
+	PluginState        []byte `json:"pState,omitempty"`
+	PluginStateVersion uint32 `json:"psv,omitempty"`
+	BarrierClockTick   uint32 `json:"tick,omitempty"`
 }
 
-func (in *TaskNodeStatus) SetPhase(phase types.TaskPhase) {
+func (in *TaskNodeStatus) GetBarrierClockTick() uint32 {
+	return in.BarrierClockTick
+}
+
+func (in *TaskNodeStatus) SetBarrierClockTick(tick uint32) {
+	in.BarrierClockTick = tick
+}
+
+func (in *TaskNodeStatus) SetPluginState(s []byte) {
+	in.PluginState = s
+}
+
+func (in *TaskNodeStatus) SetPluginStateVersion(v uint32) {
+	in.PluginStateVersion = v
+}
+
+func (in *TaskNodeStatus) GetPluginState() []byte {
+	return in.PluginState
+}
+
+func (in *TaskNodeStatus) GetPluginStateVersion() uint32 {
+	return in.PluginStateVersion
+}
+
+func (in *TaskNodeStatus) SetPhase(phase int) {
 	in.Phase = phase
 }
 
@@ -460,11 +496,7 @@ func (in *TaskNodeStatus) SetPhaseVersion(version uint32) {
 	in.PhaseVersion = version
 }
 
-func (in *TaskNodeStatus) SetCustomState(state types.CustomState) {
-	in.CustomState = state
-}
-
-func (in TaskNodeStatus) GetPhase() types.TaskPhase {
+func (in TaskNodeStatus) GetPhase() int {
 	return in.Phase
 }
 
@@ -472,17 +504,9 @@ func (in TaskNodeStatus) GetPhaseVersion() uint32 {
 	return in.PhaseVersion
 }
 
-func (in TaskNodeStatus) GetCustomState() types.CustomState {
-	return in.CustomState
-}
-
-func (in *TaskNodeStatus) UpdatePhase(phase types.TaskPhase, phaseVersion uint32) {
+func (in *TaskNodeStatus) UpdatePhase(phase int, phaseVersion uint32) {
 	in.Phase = phase
 	in.PhaseVersion = phaseVersion
-}
-
-func (in *TaskNodeStatus) UpdateCustomState(state types.CustomState) {
-	in.CustomState = state
 }
 
 func (in *TaskNodeStatus) DeepCopyInto(out *TaskNodeStatus) {
@@ -509,4 +533,14 @@ func (in *TaskNodeStatus) DeepCopy() *TaskNodeStatus {
 	out := &TaskNodeStatus{}
 	in.DeepCopyInto(out)
 	return out
+}
+
+func (in *TaskNodeStatus) Equals(other *TaskNodeStatus) bool {
+	if in == nil && other == nil {
+		return true
+	}
+	if in == nil || other == nil {
+		return false
+	}
+	return in.Phase == other.Phase && in.PhaseVersion == other.PhaseVersion && in.PluginStateVersion == other.PluginStateVersion && bytes.Equal(in.PluginState, other.PluginState) && in.BarrierClockTick == other.BarrierClockTick
 }

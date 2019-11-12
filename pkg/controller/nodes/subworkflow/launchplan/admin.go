@@ -3,16 +3,17 @@ package launchplan
 import (
 	"context"
 	"fmt"
-	"runtime/pprof"
 	"time"
+
+	"github.com/lyft/flytestdlib/cache"
+	"golang.org/x/time/rate"
+	"k8s.io/client-go/util/workqueue"
+
+	"github.com/lyft/flytestdlib/errors"
 
 	"github.com/lyft/flytestdlib/logger"
 
-	"github.com/lyft/flytestdlib/contextutils"
-
 	"github.com/lyft/flytestdlib/promutils"
-
-	"github.com/lyft/flytestdlib/utils"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -24,7 +25,7 @@ import (
 // Executor for Launchplans that executes on a remote FlyteAdmin service (if configured)
 type adminLaunchPlanExecutor struct {
 	adminClient service.AdminServiceClient
-	cache       utils.AutoRefreshCache
+	cache       cache.AutoRefresh
 }
 
 type executionCacheItem struct {
@@ -37,7 +38,9 @@ func (e executionCacheItem) ID() string {
 	return e.String()
 }
 
-func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error {
+func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchContext,
+	executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error {
+
 	req := &admin.ExecutionCreateRequest{
 		Project: executionID.Project,
 		Domain:  executionID.Domain,
@@ -58,20 +61,20 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		statusCode := status.Code(err)
 		switch statusCode {
 		case codes.AlreadyExists:
-			_, err := a.cache.GetOrCreate(executionCacheItem{WorkflowExecutionIdentifier: *executionID})
+			_, err := a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
 			if err != nil {
 				logger.Errorf(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
 			}
 
-			return Wrapf(RemoteErrorAlreadyExists, err, "ExecID %s already exists", executionID.Name)
+			return errors.Wrapf(RemoteErrorAlreadyExists, err, "ExecID %s already exists", executionID.Name)
 		case codes.DataLoss, codes.DeadlineExceeded, codes.Internal, codes.Unknown, codes.Canceled:
-			return Wrapf(RemoteErrorSystem, err, "failed to launch workflow [%s], system error", launchPlanRef.Name)
+			return errors.Wrapf(RemoteErrorSystem, err, "failed to launch workflow [%s], system error", launchPlanRef.Name)
 		default:
-			return Wrapf(RemoteErrorUser, err, "failed to launch workflow")
+			return errors.Wrapf(RemoteErrorUser, err, "failed to launch workflow")
 		}
 	}
 
-	_, err = a.cache.GetOrCreate(executionCacheItem{WorkflowExecutionIdentifier: *executionID})
+	_, err = a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
 	if err != nil {
 		logger.Info(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
 	}
@@ -84,7 +87,7 @@ func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *co
 		return nil, fmt.Errorf("nil executionID")
 	}
 
-	obj, err := a.cache.GetOrCreate(executionCacheItem{WorkflowExecutionIdentifier: *executionID})
+	obj, err := a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
 	if err != nil {
 		return nil, err
 	}
@@ -104,49 +107,57 @@ func (a *adminLaunchPlanExecutor) Kill(ctx context.Context, executionID *core.Wo
 		if status.Code(err) == codes.NotFound {
 			return nil
 		}
-		return Wrapf(RemoteErrorSystem, err, "system error")
+		return errors.Wrapf(RemoteErrorSystem, err, "system error")
 	}
 	return nil
 }
 
 func (a *adminLaunchPlanExecutor) Initialize(ctx context.Context) error {
-	go func() {
-		// Set goroutine-label...
-		ctx = contextutils.WithGoroutineLabel(ctx, "admin-launcher")
-		pprof.SetGoroutineLabels(ctx)
-		a.cache.Start(ctx)
-	}()
-
-	return nil
+	return a.cache.Start(ctx)
 }
 
-func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, obj utils.CacheItem) (
-	newItem utils.CacheItem, result utils.CacheSyncAction, err error) {
-	exec := obj.(executionCacheItem)
-	req := &admin.WorkflowExecutionGetRequest{
-		Id: &exec.WorkflowExecutionIdentifier,
-	}
-
-	res, err := a.adminClient.GetExecution(ctx, req)
-	if err != nil {
-		// TODO: Define which error codes are system errors (and return the error) vs user errors.
-
-		if status.Code(err) == codes.NotFound {
-			err = Wrapf(RemoteErrorNotFound, err, "execID [%s] not found on remote", exec.WorkflowExecutionIdentifier.Name)
-		} else {
-			err = Wrapf(RemoteErrorSystem, err, "system error")
+func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batch) (
+	resp []cache.ItemSyncResponse, err error) {
+	resp = make([]cache.ItemSyncResponse, 0, len(batch))
+	for _, obj := range batch {
+		exec := obj.GetItem().(executionCacheItem)
+		req := &admin.WorkflowExecutionGetRequest{
+			Id: &exec.WorkflowExecutionIdentifier,
 		}
 
-		return executionCacheItem{
-			WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
-			SyncError:                   err,
-		}, utils.Update, nil
+		res, err := a.adminClient.GetExecution(ctx, req)
+		if err != nil {
+			// TODO: Define which error codes are system errors (and return the error) vs user errors.
+
+			if status.Code(err) == codes.NotFound {
+				err = errors.Wrapf(RemoteErrorNotFound, err, "execID [%s] not found on remote", exec.WorkflowExecutionIdentifier.Name)
+			} else {
+				err = errors.Wrapf(RemoteErrorSystem, err, "system error")
+			}
+
+			resp = append(resp, cache.ItemSyncResponse{
+				ID: obj.GetID(),
+				Item: executionCacheItem{
+					WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
+					SyncError:                   err,
+				},
+				Action: cache.Update,
+			})
+
+			continue
+		}
+
+		resp = append(resp, cache.ItemSyncResponse{
+			ID: obj.GetID(),
+			Item: executionCacheItem{
+				WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
+				ExecutionClosure:            res.Closure,
+			},
+			Action: cache.Update,
+		})
 	}
 
-	return executionCacheItem{
-		WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
-		ExecutionClosure:            res.Closure,
-	}, utils.Update, nil
+	return resp, nil
 }
 
 func NewAdminLaunchPlanExecutor(_ context.Context, client service.AdminServiceClient,
@@ -155,13 +166,12 @@ func NewAdminLaunchPlanExecutor(_ context.Context, client service.AdminServiceCl
 		adminClient: client,
 	}
 
-	// TODO: make tps/burst/size configurable
-	cache, err := utils.NewAutoRefreshCache(exec.syncItem, utils.NewRateLimiter("adminSync",
-		float64(cfg.TPS), cfg.Burst), syncPeriod, cfg.MaxCacheSize, scope)
+	rateLimiter := &workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(cfg.TPS), cfg.Burst)}
+	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, syncPeriod, cfg.Workers, cfg.MaxCacheSize, scope)
 	if err != nil {
 		return nil, err
 	}
 
-	exec.cache = cache
+	exec.cache = c
 	return exec, nil
 }

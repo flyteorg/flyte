@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	v12 "k8s.io/client-go/kubernetes/typed/coordination/v1"
+
 	"github.com/lyft/flytepropeller/pkg/controller/config"
 
 	"k8s.io/apimachinery/pkg/util/rand"
@@ -26,7 +28,7 @@ const (
 )
 
 // NewResourceLock creates a new config map resource lock for use in a leader election loop
-func newResourceLock(corev1 v1.CoreV1Interface, eventRecorder record.EventRecorder, options config.LeaderElectionConfig) (
+func newResourceLock(corev1 v1.CoreV1Interface, coordinationV1 v12.CoordinationV1Interface, eventRecorder record.EventRecorder, options config.LeaderElectionConfig) (
 	resourcelock.Interface, error) {
 
 	if !options.Enabled {
@@ -43,6 +45,7 @@ func newResourceLock(corev1 v1.CoreV1Interface, eventRecorder record.EventRecord
 		options.LockConfigMap.Namespace,
 		options.LockConfigMap.Name,
 		corev1,
+		coordinationV1,
 		resourcelock.ResourceLockConfig{
 			Identity:      getUniqueLeaderID(),
 			EventRecorder: eventRecorder,

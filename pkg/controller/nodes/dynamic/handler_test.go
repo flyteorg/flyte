@@ -5,131 +5,180 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lyft/flyteidl/clients/go/events"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteplugins/go/tasks/v1/types/mocks"
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"k8s.io/apimachinery/pkg/api/resource"
+	v12 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
-	pluginsV1 "github.com/lyft/flyteplugins/go/tasks/v1/types"
-	typesV1 "k8s.io/api/core/v1"
+	ioMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/catalog"
-	mocks2 "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
+	flyteMocks "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	"github.com/lyft/flytepropeller/pkg/controller/executors"
+	executorMocks "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/dynamic/mocks"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task"
+	nodeMocks "github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
 )
 
-const DataDir = storage.DataReference("test-data")
-const NodeID = "n1"
-
-var (
-	enqueueWfFunc  = func(id string) {}
-	fakeKubeClient = mocks2.NewFakeKubeClient()
-)
-
-func newIntegerPrimitive(value int64) *core.Primitive {
-	return &core.Primitive{Value: &core.Primitive_Integer{Integer: value}}
+type dynamicNodeStateHolder struct {
+	s handler.DynamicNodeState
 }
 
-func newScalarInteger(value int64) *core.Scalar {
-	return &core.Scalar{
-		Value: &core.Scalar_Primitive{
-			Primitive: newIntegerPrimitive(value),
-		},
-	}
+func (t *dynamicNodeStateHolder) PutTaskNodeState(s handler.TaskNodeState) error {
+	panic("not implemented")
 }
 
-func newIntegerLiteral(value int64) *core.Literal {
-	return &core.Literal{
-		Value: &core.Literal_Scalar{
-			Scalar: newScalarInteger(value),
-		},
-	}
+func (t dynamicNodeStateHolder) PutBranchNode(s handler.BranchNodeState) error {
+	panic("not implemented")
 }
 
-func createTask(id string, ttype string, discoverable bool) *v1alpha1.TaskSpec {
-	return &v1alpha1.TaskSpec{
-		TaskTemplate: &core.TaskTemplate{
-			Id:       &core.Identifier{Name: id},
-			Type:     ttype,
-			Metadata: &core.TaskMetadata{Discoverable: discoverable},
+func (t dynamicNodeStateHolder) PutWorkflowNodeState(s handler.WorkflowNodeState) error {
+	panic("not implemented")
+}
+
+func (t *dynamicNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState) error {
+	t.s = s
+	return nil
+}
+
+func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
+	createNodeContext := func(ttype string) *nodeMocks.NodeExecutionContext {
+		wfExecID := &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		}
+
+		nm := &nodeMocks.NodeExecutionMetadata{}
+		nm.On("GetAnnotations").Return(map[string]string{})
+		nm.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
+			WorkflowExecutionIdentifier: wfExecID,
+		})
+		nm.On("GetK8sServiceAccount").Return("service-account")
+		nm.On("GetLabels").Return(map[string]string{})
+		nm.On("GetNamespace").Return("namespace")
+		nm.On("GetOwnerID").Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.On("GetOwnerReference").Return(v1.OwnerReference{
+			Kind: "sample",
+			Name: "name",
+		})
+
+		taskID := &core.Identifier{}
+		tk := &core.TaskTemplate{
+			Id:   taskID,
+			Type: "test",
+			Metadata: &core.TaskMetadata{
+				Discoverable: true,
+			},
 			Interface: &core.TypedInterface{
-				Inputs: &core.VariableMap{},
 				Outputs: &core.VariableMap{
 					Variables: map[string]*core.Variable{
-						"out1": {
-							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+						"x": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_BOOLEAN,
+								},
+							},
 						},
 					},
 				},
 			},
-		},
-	}
-}
+		}
+		tr := &nodeMocks.TaskReader{}
+		tr.On("GetTaskID").Return(taskID)
+		tr.On("GetTaskType").Return(ttype)
+		tr.On("Read", mock.Anything).Return(tk, nil)
 
-func mockCatalogClient() catalog.Client {
-	return &catalog.MockCatalogClient{
-		GetFunc: func(ctx context.Context, task *core.TaskTemplate, inputPath storage.DataReference) (*core.LiteralMap, error) {
-			return nil, nil
-		},
-		PutFunc: func(ctx context.Context, task *core.TaskTemplate, execId *core.TaskExecutionIdentifier, inputPath storage.DataReference, outputPath storage.DataReference) error {
-			return nil
-		},
-	}
-}
+		ns := &flyteMocks.ExecutableNodeStatus{}
+		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
 
-func createWf(id string, execID string, project string, domain string, name string) *v1alpha1.FlyteWorkflow {
-	return &v1alpha1.FlyteWorkflow{
-		ExecutionID: v1alpha1.WorkflowExecutionIdentifier{
-			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
-				Project: project,
-				Domain:  domain,
-				Name:    execID,
-			},
-		},
-		Status: v1alpha1.WorkflowStatus{
-			NodeStatus: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
-				NodeID: {
-					DataDir: DataDir,
-				},
-			},
-		},
-		ObjectMeta: v1.ObjectMeta{
-			Name: name,
-		},
-		WorkflowSpec: &v1alpha1.WorkflowSpec{
-			ID: id,
-		},
-	}
-}
+		res := &v12.ResourceRequirements{}
+		n := &flyteMocks.ExecutableNode{}
+		n.On("GetResources").Return(res)
 
-func createStartNode() *v1alpha1.NodeSpec {
-	return &v1alpha1.NodeSpec{
-		ID:   NodeID,
-		Kind: v1alpha1.NodeKindStart,
-		Resources: &typesV1.ResourceRequirements{
-			Requests: typesV1.ResourceList{
-				typesV1.ResourceCPU: resource.MustParse("1"),
-			},
-		},
-	}
-}
+		ir := &ioMocks.InputReader{}
+		nCtx := &nodeMocks.NodeExecutionContext{}
+		nCtx.On("NodeExecutionMetadata").Return(nm)
+		nCtx.On("Node").Return(n)
+		nCtx.On("InputReader").Return(ir)
+		nCtx.On("DataStore").Return(storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope()))
+		nCtx.On("CurrentAttempt").Return(uint32(1))
+		nCtx.On("TaskReader").Return(tr)
+		nCtx.On("MaxDatasetSizeBytes").Return(int64(1))
+		nCtx.On("NodeStatus").Return(ns)
+		nCtx.On("NodeID").Return("n1")
+		nCtx.On("EnqueueOwner").Return(nil)
 
-func createInmemoryDataStore(t testing.TB, scope promutils.Scope) *storage.DataStore {
-	cfg := storage.Config{
-		Type: storage.TypeMemory,
+		r := &nodeMocks.NodeStateReader{}
+		r.On("GetDynamicNodeState").Return(handler.DynamicNodeState{})
+		nCtx.On("NodeStateReader").Return(r)
+		return nCtx
 	}
-	d, err := storage.NewDataStore(&cfg, scope)
-	assert.NoError(t, err)
-	return d
+
+	i := &handler.ExecutionInfo{}
+	type args struct {
+		isDynamic bool
+		trns      handler.Transition
+		isErr     bool
+	}
+	type want struct {
+		p     handler.EPhase
+		info  *handler.ExecutionInfo
+		isErr bool
+		phase v1alpha1.DynamicNodePhase
+	}
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{"error", args{isErr: true}, want{isErr: true}},
+		{"success-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil))}, want{p: handler.EPhaseSuccess, phase: v1alpha1.DynamicNodePhaseNone}},
+		{"running-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(i))}, want{p: handler.EPhaseRunning, info: i}},
+		{"retryfailure-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("x", "y", i))}, want{p: handler.EPhaseRetryableFailure, info: i}},
+		{"failure-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("x", "y", i))}, want{p: handler.EPhaseFailed, info: i}},
+		{"success-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil))}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"running-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(i))}, want{p: handler.EPhaseRunning, info: i}},
+		{"retryfailure-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("x", "y", i))}, want{p: handler.EPhaseRetryableFailure, info: i}},
+		{"failure-non-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("x", "y", i))}, want{p: handler.EPhaseFailed, info: i}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			nCtx := createNodeContext("test")
+			s := &dynamicNodeStateHolder{}
+			nCtx.On("NodeStateWriter").Return(s)
+			if tt.args.isDynamic {
+				f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
+				assert.NoError(t, err)
+				dj := &core.DynamicJobSpec{}
+				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
+			}
+			h := &mocks.TaskNodeHandler{}
+			n := &executorMocks.Node{}
+			if tt.args.isErr {
+				h.On("Handle", mock.Anything, mock.Anything).Return(handler.UnknownTransition, fmt.Errorf("error"))
+			} else {
+				h.On("Handle", mock.Anything, mock.Anything).Return(tt.args.trns, nil)
+			}
+			d := New(h, n, promutils.NewTestScope())
+			got, err := d.Handle(context.TODO(), nCtx)
+			if (err != nil) != tt.want.isErr {
+				t.Errorf("Handle() error = %v, wantErr %v", err, tt.want.isErr)
+				return
+			}
+			if err == nil {
+				assert.Equal(t, tt.want.p.String(), got.Info().GetPhase().String())
+				assert.Equal(t, tt.want.info, got.Info().GetInfo())
+				assert.Equal(t, tt.want.phase, s.s.Phase)
+			}
+		})
+	}
 }
 
 func createDynamicJobSpec() *core.DynamicJobSpec {
@@ -204,191 +253,172 @@ func createDynamicJobSpec() *core.DynamicJobSpec {
 	}
 }
 
-func TestTaskHandler_CheckNodeStatusDiscovery(t *testing.T) {
-	ctx := context.Background()
+func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
+	createNodeContext := func(ttype string, finalOutput storage.DataReference) *nodeMocks.NodeExecutionContext {
+		wfExecID := &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		}
 
-	taskID := "t1"
-	tk := createTask(taskID, "container", true)
-	tk.Id.Project = "flytekit"
+		nm := &nodeMocks.NodeExecutionMetadata{}
+		nm.On("GetAnnotations").Return(map[string]string{})
+		nm.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
+			WorkflowExecutionIdentifier: wfExecID,
+		})
+		nm.On("GetK8sServiceAccount").Return("service-account")
+		nm.On("GetLabels").Return(map[string]string{})
+		nm.On("GetNamespace").Return("namespace")
+		nm.On("GetOwnerID").Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.On("GetOwnerReference").Return(v1.OwnerReference{
+			Kind: "sample",
+			Name: "name",
+		})
 
-	w := createWf("w1", "w2-exec", "projTest", "domainTest", "checkNodeTestName")
-	w.Tasks = map[v1alpha1.TaskID]*v1alpha1.TaskSpec{
-		taskID: tk,
+		taskID := &core.Identifier{}
+		tk := &core.TaskTemplate{
+			Id:   taskID,
+			Type: "test",
+			Metadata: &core.TaskMetadata{
+				Discoverable: true,
+			},
+			Interface: &core.TypedInterface{
+				Outputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"x": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		tr := &nodeMocks.TaskReader{}
+		tr.On("GetTaskID").Return(taskID)
+		tr.On("GetTaskType").Return(ttype)
+		tr.On("Read", mock.Anything).Return(tk, nil)
+
+		n := &flyteMocks.ExecutableNode{}
+		tID := "task-1"
+		n.On("GetTaskID").Return(&tID)
+
+		ir := &ioMocks.InputReader{}
+		nCtx := &nodeMocks.NodeExecutionContext{}
+		nCtx.On("NodeExecutionMetadata").Return(nm)
+		nCtx.On("Node").Return(n)
+		nCtx.On("InputReader").Return(ir)
+		nCtx.On("DataStore").Return(storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope()))
+		nCtx.On("CurrentAttempt").Return(uint32(1))
+		nCtx.On("TaskReader").Return(tr)
+		nCtx.On("MaxDatasetSizeBytes").Return(int64(1))
+		nCtx.On("NodeID").Return("n1")
+		nCtx.On("EnqueueOwnerFunc").Return(func() error { return nil })
+
+		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
+		endNodeStatus.On("GetDataDir").Return(storage.DataReference("end-node"))
+
+		subNs := &flyteMocks.ExecutableNodeStatus{}
+		subNs.On("SetDataDir", mock.Anything).Return()
+		subNs.On("ResetDirty").Return()
+		subNs.On("GetDataDir").Return(finalOutput)
+		subNs.On("SetParentTaskID", mock.Anything).Return()
+
+		dynamicNS := &flyteMocks.ExecutableNodeStatus{}
+		dynamicNS.On("SetDataDir", mock.Anything).Return()
+		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
+		dynamicNS.On("GetNodeExecutionStatus", "n1-Node_1").Return(subNs)
+		dynamicNS.On("GetNodeExecutionStatus", "n1-Node_2").Return(subNs)
+		dynamicNS.On("GetNodeExecutionStatus", "n1-Node_3").Return(subNs)
+		dynamicNS.On("GetNodeExecutionStatus", v1alpha1.EndNodeID).Return(endNodeStatus)
+
+		ns := &flyteMocks.ExecutableNodeStatus{}
+		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+		ns.On("GetNodeExecutionStatus", dynamicNodeID).Return(dynamicNS)
+		nCtx.On("NodeStatus").Return(ns)
+
+		w := &flyteMocks.ExecutableWorkflow{}
+		ws := &flyteMocks.ExecutableWorkflowStatus{}
+		ws.On("GetNodeExecutionStatus", "n1").Return(ns)
+		w.On("GetExecutionStatus").Return(ws)
+		nCtx.On("Workflow").Return(w)
+
+		r := &nodeMocks.NodeStateReader{}
+		r.On("GetDynamicNodeState").Return(handler.DynamicNodeState{
+			Phase: v1alpha1.DynamicNodePhaseExecuting,
+		})
+		nCtx.On("NodeStateReader").Return(r)
+		return nCtx
 	}
 
-	n := createStartNode()
-	n.TaskRef = &taskID
-
-	t.Run("TaskExecDoneDiscoveryWriteFail", func(t *testing.T) {
-		taskExec := &mocks.Executor{}
-		taskExec.On("GetProperties").Return(pluginsV1.ExecutorProperties{})
-		taskExec.On("CheckTaskStatus",
-			ctx,
-			mock.MatchedBy(func(o pluginsV1.TaskContext) bool { return true }),
-			mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
-		).Return(pluginsV1.TaskStatusSucceeded, nil)
-		d := &task.FactoryFuncs{
-			GetTaskExecutorCb: func(taskType v1alpha1.TaskType) (pluginsV1.Executor, error) {
-				if taskType == tk.Type {
-					return taskExec, nil
-				}
-				return nil, fmt.Errorf("no match")
-			},
-		}
-		mockCatalog := catalog.MockCatalogClient{
-			GetFunc: func(ctx context.Context, task *core.TaskTemplate, inputPath storage.DataReference) (*core.LiteralMap, error) {
-				return nil, nil
-			},
-			PutFunc: func(ctx context.Context, task *core.TaskTemplate, execId *core.TaskExecutionIdentifier, inputPath storage.DataReference, outputPath storage.DataReference) error {
-				return status.Errorf(codes.DeadlineExceeded, "")
-			},
-		}
-		store := createInmemoryDataStore(t, promutils.NewTestScope())
-		paramsMap := make(map[string]*core.Literal)
-		paramsMap["out1"] = newIntegerLiteral(1)
-		err1 := store.WriteProtobuf(ctx, "test-data/inputs.pb", storage.Options{}, &core.LiteralMap{Literals: paramsMap})
-		err2 := store.WriteProtobuf(ctx, "test-data/outputs.pb", storage.Options{}, &core.LiteralMap{Literals: paramsMap})
-		assert.NoError(t, err1)
-		assert.NoError(t, err2)
-
-		th := New(
-			task.NewTaskHandlerForFactory(events.NewMockEventSink(), store, enqueueWfFunc, d, &mockCatalog, fakeKubeClient, promutils.NewTestScope()),
-			nil,
-			enqueueWfFunc,
-			store,
-			promutils.NewTestScope(),
-		)
-
-		prevNodeStatus := &v1alpha1.NodeStatus{Phase: v1alpha1.NodePhaseRunning}
-		s, err := th.CheckNodeStatus(ctx, w, n, prevNodeStatus)
-		assert.NoError(t, err)
-		assert.Equal(t, handler.StatusSuccess, s)
-	})
-
-	t.Run("TaskExecDoneDiscoveryMissingOutputs", func(t *testing.T) {
-		taskExec := &mocks.Executor{}
-		taskExec.On("GetProperties").Return(pluginsV1.ExecutorProperties{})
-		taskExec.On("CheckTaskStatus",
-			ctx,
-			mock.MatchedBy(func(o pluginsV1.TaskContext) bool { return true }),
-			mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
-		).Return(pluginsV1.TaskStatusSucceeded, nil)
-		d := &task.FactoryFuncs{
-			GetTaskExecutorCb: func(taskType v1alpha1.TaskType) (pluginsV1.Executor, error) {
-				if taskType == tk.Type {
-					return taskExec, nil
-				}
-				return nil, fmt.Errorf("no match")
-			},
-		}
-		store := createInmemoryDataStore(t, promutils.NewTestScope())
-		th := New(
-			task.NewTaskHandlerForFactory(events.NewMockEventSink(), store, enqueueWfFunc, d, mockCatalogClient(), fakeKubeClient, promutils.NewTestScope()),
-			nil,
-			enqueueWfFunc,
-			store,
-			promutils.NewTestScope(),
-		)
-
-		prevNodeStatus := &v1alpha1.NodeStatus{Phase: v1alpha1.NodePhaseRunning}
-		s, err := th.CheckNodeStatus(ctx, w, n, prevNodeStatus)
-		assert.NoError(t, err)
-		assert.Equal(t, handler.PhaseRetryableFailure, s.Phase, "received: %s", s.Phase.String())
-	})
-
-	t.Run("TaskExecDoneDiscoveryWriteSuccess", func(t *testing.T) {
-		taskExec := &mocks.Executor{}
-		taskExec.On("GetProperties").Return(pluginsV1.ExecutorProperties{})
-		taskExec.On("CheckTaskStatus",
-			ctx,
-			mock.MatchedBy(func(o pluginsV1.TaskContext) bool { return true }),
-			mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
-		).Return(pluginsV1.TaskStatusSucceeded, nil)
-		d := &task.FactoryFuncs{
-			GetTaskExecutorCb: func(taskType v1alpha1.TaskType) (pluginsV1.Executor, error) {
-				if taskType == tk.Type {
-					return taskExec, nil
-				}
-				return nil, fmt.Errorf("no match")
-			},
-		}
-		store := createInmemoryDataStore(t, promutils.NewTestScope())
-		paramsMap := make(map[string]*core.Literal)
-		paramsMap["out1"] = newIntegerLiteral(100)
-		err1 := store.WriteProtobuf(ctx, "test-data/inputs.pb", storage.Options{}, &core.LiteralMap{Literals: paramsMap})
-		err2 := store.WriteProtobuf(ctx, "test-data/outputs.pb", storage.Options{}, &core.LiteralMap{Literals: paramsMap})
-		assert.NoError(t, err1)
-		assert.NoError(t, err2)
-		th := New(
-			task.NewTaskHandlerForFactory(events.NewMockEventSink(), store, enqueueWfFunc, d, mockCatalogClient(), fakeKubeClient, promutils.NewTestScope()),
-			nil,
-			enqueueWfFunc,
-			store,
-			promutils.NewTestScope(),
-		)
-
-		prevNodeStatus := &v1alpha1.NodeStatus{Phase: v1alpha1.NodePhaseRunning}
-		s, err := th.CheckNodeStatus(ctx, w, n, prevNodeStatus)
-		assert.NoError(t, err)
-		assert.Equal(t, handler.StatusSuccess, s)
-	})
-}
-
-func TestBuildFlyteWorkflow(t *testing.T) {
-	ctx := context.Background()
-
-	dynamicSpec := createDynamicJobSpec()
-	tk := dynamicSpec.Tasks[0]
-	w := createWf("w1", "w2-exec", "projTest", "domainTest", "checkNodeTestName")
-	w.Tasks = map[v1alpha1.TaskID]*v1alpha1.TaskSpec{
-		tk.Id.String(): {TaskTemplate: tk},
+	type args struct {
+		s               executors.NodeStatus
+		isErr           bool
+		dj              *core.DynamicJobSpec
+		validErr        *io.ExecutionError
+		generateOutputs bool
 	}
-
-	n := createStartNode()
-	taskID := tk.Id.String()
-	n.TaskRef = &taskID
-
-	w.Nodes = map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
-		NodeID: n,
+	type want struct {
+		p     handler.EPhase
+		isErr bool
+		phase v1alpha1.DynamicNodePhase
 	}
-
-	taskExec := &mocks.Executor{}
-	taskExec.On("GetProperties").Return(pluginsV1.ExecutorProperties{})
-	taskExec.On("CheckTaskStatus",
-		ctx,
-		mock.MatchedBy(func(o pluginsV1.TaskContext) bool { return true }),
-		mock.MatchedBy(func(o *core.TaskTemplate) bool { return true }),
-	).Return(pluginsV1.TaskStatusSucceeded, nil)
-	d := &task.FactoryFuncs{
-		GetTaskExecutorCb: func(taskType v1alpha1.TaskType) (pluginsV1.Executor, error) {
-			if taskType == tk.Type {
-				return taskExec, nil
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{"error", args{isErr: true, dj: createDynamicJobSpec()}, want{isErr: true}},
+		{"success", args{s: executors.NodeStatusSuccess, dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"complete", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: true}, want{p: handler.EPhaseSuccess, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"complete-no-outputs", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: false}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"complete-valid-error-retryable", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{IsRecoverable: true}, generateOutputs: true}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"complete-valid-error", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}, generateOutputs: true}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"failed", args{s: executors.NodeStatusFailed(fmt.Errorf("error")), dj: createDynamicJobSpec()}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"running", args{s: executors.NodeStatusRunning, dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"running-valid-err", args{s: executors.NodeStatusRunning, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"queued", args{s: executors.NodeStatusQueued, dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			finalOutput := storage.DataReference("/subnode")
+			nCtx := createNodeContext("test", finalOutput)
+			s := &dynamicNodeStateHolder{}
+			nCtx.On("NodeStateWriter").Return(s)
+			f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
+			assert.NoError(t, err)
+			if tt.args.dj != nil {
+				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, tt.args.dj))
 			}
-			return nil, fmt.Errorf("no match")
-		},
+			h := &mocks.TaskNodeHandler{}
+			if tt.args.validErr != nil {
+				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.validErr, nil)
+			} else {
+				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
+			}
+			n := &executorMocks.Node{}
+			if tt.args.isErr {
+				n.On("RecursiveNodeHandler", mock.Anything, mock.Anything, mock.Anything).Return(executors.NodeStatusUndefined, fmt.Errorf("error"))
+			} else {
+				n.On("RecursiveNodeHandler", mock.Anything, mock.Anything, mock.Anything).Return(tt.args.s, nil)
+			}
+			if tt.args.generateOutputs {
+				endF := v1alpha1.GetOutputsFile("end-node")
+				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), endF, storage.Options{}, &core.LiteralMap{}))
+			}
+			d := New(h, n, promutils.NewTestScope())
+			got, err := d.Handle(context.TODO(), nCtx)
+			if tt.want.isErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+			if err == nil {
+				assert.Equal(t, tt.want.p.String(), got.Info().GetPhase().String())
+				assert.Equal(t, tt.want.phase, s.s.Phase)
+			}
+		})
 	}
-	store := createInmemoryDataStore(t, promutils.NewTestScope())
-	assert.NoError(t, store.WriteProtobuf(ctx, "/test-data/futures.pb", storage.Options{}, dynamicSpec))
-
-	paramsMap := make(map[string]*core.Literal)
-	paramsMap["out1"] = newIntegerLiteral(100)
-	assert.NoError(t, store.WriteProtobuf(ctx, "/test-data/inputs.pb", storage.Options{}, &core.LiteralMap{Literals: paramsMap}))
-	assert.NoError(t, store.WriteProtobuf(ctx, "/test-data/outputs.pb", storage.Options{}, &core.LiteralMap{Literals: paramsMap}))
-
-	th := New(
-		task.NewTaskHandlerForFactory(events.NewMockEventSink(), store, enqueueWfFunc, d, mockCatalogClient(), fakeKubeClient, promutils.NewTestScope()),
-		nil,
-		enqueueWfFunc,
-		store,
-		promutils.NewTestScope(),
-	).(dynamicNodeHandler)
-
-	prevNodeStatus := &v1alpha1.NodeStatus{Phase: v1alpha1.NodePhaseRunning}
-
-	n2, found := w.GetNode(NodeID)
-	assert.True(t, found)
-
-	_, isdynamic, err := th.buildFlyteWorkflow(ctx, w, n2, "/test-data/", prevNodeStatus)
-	assert.NoError(t, err)
-	assert.True(t, isdynamic)
 }

@@ -463,7 +463,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 	errs := errors.NewCompileErrors()
 	compiledTasks := make([]common.Task, 0, len(inputTasks))
 	for _, inputTask := range inputTasks {
-		t, _ := compileTaskInternal(inputTask, errs)
+		t := compileTaskInternal(inputTask, errs)
 		compiledTasks = append(compiledTasks, t)
 		assert.False(parentT, errs.HasErrors())
 		if errs.HasErrors() {

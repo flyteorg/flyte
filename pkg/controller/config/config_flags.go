@@ -74,5 +74,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "leader-election.renew-deadline"), "10s", "Duration that the acting master will retry refreshing leadership before giving up.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "leader-election.retry-period"), "2s", "Duration the LeaderElector clients should wait between tries of actions.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "publish-k8s-events"), *new(bool), "Enable events publishing to K8s events API.")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "max-output-size-bytes"), *new(int64), "Maximum size of outputs per task")
 	return cmdFlags
 }

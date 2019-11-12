@@ -39,10 +39,10 @@ func TestNewCompositeWorkQueue(t *testing.T) {
 		q, err := NewCompositeWorkQueue(ctx, cfg, testScope)
 		assert.NoError(t, err)
 		assert.NotNil(t, q)
-		switch q.(type) {
+		switch bq := q.(type) {
 		case *BatchingWorkQueue:
-			assert.Equal(t, -1, q.(*BatchingWorkQueue).batchSize)
-			assert.Equal(t, time.Second*1, q.(*BatchingWorkQueue).batchingInterval)
+			assert.Equal(t, -1, bq.batchSize)
+			assert.Equal(t, time.Second*1, bq.batchingInterval)
 			return
 		default:
 			assert.FailNow(t, "BatchWorkQueue expected")

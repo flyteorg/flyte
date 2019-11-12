@@ -17,12 +17,10 @@ func validateResource(resourceName core.Resources_ResourceName, resourceVal stri
 	return false
 }
 
-func validateKnownResources(resources []*core.Resources_ResourceEntry, errs errors.CompileErrors) (ok bool) {
+func validateKnownResources(resources []*core.Resources_ResourceEntry, errs errors.CompileErrors) {
 	for _, r := range resources {
 		validateResource(r.Name, r.Value, errs.NewScope())
 	}
-
-	return !errs.HasErrors()
 }
 
 func validateResources(resources *core.Resources, errs errors.CompileErrors) (ok bool) {
@@ -72,7 +70,7 @@ func validateContainer(task *core.TaskTemplate, errs errors.CompileErrors) (ok b
 	return !errs.HasErrors()
 }
 
-func compileTaskInternal(task *core.TaskTemplate, errs errors.CompileErrors) (common.Task, bool) {
+func compileTaskInternal(task *core.TaskTemplate, errs errors.CompileErrors) common.Task {
 	if task.Id == nil {
 		errs.Collect(errors.NewValueRequiredErr("root", "Id"))
 	}
@@ -82,14 +80,14 @@ func compileTaskInternal(task *core.TaskTemplate, errs errors.CompileErrors) (co
 		validateContainer(task, errs.NewScope())
 	}
 
-	return taskBuilder{flyteTask: task}, !errs.HasErrors()
+	return taskBuilder{flyteTask: task}
 }
 
 // Task compiler compiles a given Task into an executable Task. It validates all required parameters and ensures a Task
 // is well-formed.
 func CompileTask(task *core.TaskTemplate) (*core.CompiledTask, error) {
 	errs := errors.NewCompileErrors()
-	t, _ := compileTaskInternal(task, errs.NewScope())
+	t := compileTaskInternal(task, errs.NewScope())
 	if errs.HasErrors() {
 		return nil, errs
 	}
