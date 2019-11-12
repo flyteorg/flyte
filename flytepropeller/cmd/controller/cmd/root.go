@@ -5,7 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
+	"k8s.io/klog"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
@@ -16,9 +18,6 @@ import (
 
 	config2 "github.com/lyft/flytepropeller/pkg/controller/config"
 
-	"github.com/lyft/flyteplugins/go/tasks"
-
-	"github.com/lyft/flyteplugins/go/tasks/v1/flytek8s"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/lyft/flytestdlib/config/viper"
@@ -28,7 +27,6 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/profutils"
 	"github.com/lyft/flytestdlib/promutils"
-	"github.com/operator-framework/operator-sdk/pkg/util/k8sutil"
 	"github.com/pkg/errors"
 	"github.com/spf13/pflag"
 
@@ -79,6 +77,7 @@ func Execute() {
 
 func init() {
 	// allows `$ flytepropeller --logtostderr` to work
+	klog.InitFlags(flag.CommandLine)
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	err := flag.CommandLine.Parse([]string{})
 	if err != nil {
@@ -91,6 +90,8 @@ func init() {
 		"config file (default is $HOME/config.yaml)")
 
 	configAccessor.InitializePflags(rootCmd.PersistentFlags())
+
+	rootCmd.AddCommand(viper.GetConfigCommand())
 }
 
 func initConfig(_ *cobra.Command, _ []string) error {
@@ -102,13 +103,6 @@ func initConfig(_ *cobra.Command, _ []string) error {
 	err := configAccessor.UpdateConfig(context.TODO())
 	if err != nil {
 		return err
-	}
-
-	// Operator-SDK expects kube config to be in KUBERNETES_CONFIG env var.
-	controllerCfg := config2.GetConfig()
-	if controllerCfg.KubeConfigPath != "" {
-		fmt.Printf("Setting env variable for operator-sdk, %v\n", controllerCfg.KubeConfigPath)
-		return os.Setenv(k8sutil.KubeConfigEnvVar, os.ExpandEnv(controllerCfg.KubeConfigPath))
 	}
 
 	fmt.Printf("Started in-cluster mode\n")
@@ -159,8 +153,13 @@ func sharedInformerOptions(cfg *config2.Config) []informers.SharedInformerOption
 	return opts
 }
 
+func safeMetricName(original string) string {
+	// TODO: Replace all non-prom-compatible charset
+	return strings.Replace(original, "-", "_", -1)
+}
+
 func executeRootCmd(cfg *config2.Config) {
-	baseCtx := context.TODO()
+	baseCtx := context.Background()
 
 	// set up signals so we handle the first shutdown signal gracefully
 	ctx := signals.SetupSignalHandler(baseCtx)
@@ -179,7 +178,7 @@ func executeRootCmd(cfg *config2.Config) {
 	flyteworkflowInformerFactory := informers.NewSharedInformerFactoryWithOptions(flyteworkflowClient, cfg.WorkflowReEval.Duration, opts...)
 
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
-	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
+	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(safeMetricName(cfg.LimitNamespace))
 
 	go func() {
 		err := profutils.StartProfilingServerWithDefaultHandlers(ctx, cfg.ProfilerPort.Port, nil)
@@ -191,15 +190,6 @@ func executeRootCmd(cfg *config2.Config) {
 	limitNamespace := ""
 	if cfg.LimitNamespace != defaultNamespace {
 		limitNamespace = cfg.LimitNamespace
-	}
-
-	err = flytek8s.Initialize(ctx, limitNamespace, cfg.DownstreamEval.Duration)
-	if err != nil {
-		logger.Panicf(ctx, "Failed to initialize k8s plugins. Error: %v", err)
-	}
-
-	if err := tasks.Load(ctx); err != nil {
-		logger.Fatalf(ctx, "Failed to load task plugins. [%v]", err)
 	}
 
 	mgr, err := manager.New(kubecfg, manager.Options{

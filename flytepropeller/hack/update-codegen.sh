@@ -23,6 +23,8 @@ set -o pipefail
 : "${RESOURCE_NAME:?should be set for CRD}"
 : "${OPERATOR_PKG:?should be set for operator}"
 
+go install github.com/lyft/flytepropeller/vendor/k8s.io/code-generator/cmd/deepcopy-gen
+
 echo "Generating CRD: ${RESOURCE_NAME}, in package ${OPERATOR_PKG}..."
 
 SCRIPT_ROOT=$(dirname ${BASH_SOURCE})/..

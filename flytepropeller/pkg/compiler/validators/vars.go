@@ -41,7 +41,7 @@ func validateVarType(nodeID c.NodeID, paramName string, param *flyte.Variable,
 }
 
 func validateVarsSetMatch(nodeID string, params1, params2 map[string]*flyte.Variable,
-	params1Set, params2Set sets.String, errs errors.CompileErrors) (match bool) {
+	params1Set, params2Set sets.String, errs errors.CompileErrors) {
 	// Validate that parameters that exist in both interfaces have compatible types.
 	inBoth := params1Set.Intersection(params2Set)
 	for paramName := range inBoth {
@@ -60,13 +60,10 @@ func validateVarsSetMatch(nodeID string, params1, params2 map[string]*flyte.Vari
 	for range inRightSide {
 		errs.Collect(errors.NewMismatchingInterfacesErr(nodeID, nodeID))
 	}
-
-	return !errs.HasErrors()
 }
 
 // Validate parameters have their required attributes set
-func validateVariables(nodeID c.NodeID, params *flyte.VariableMap, errs errors.CompileErrors) (ok bool) {
-
+func validateVariables(nodeID c.NodeID, params *flyte.VariableMap, errs errors.CompileErrors) {
 	for paramName, param := range params.Variables {
 		if len(paramName) == 0 {
 			errs.Collect(errors.NewValueRequiredErr(nodeID, "paramName"))
@@ -76,6 +73,4 @@ func validateVariables(nodeID c.NodeID, params *flyte.VariableMap, errs errors.C
 			errs.Collect(errors.NewValueRequiredErr(nodeID, "param.Type"))
 		}
 	}
-
-	return !errs.HasErrors()
 }

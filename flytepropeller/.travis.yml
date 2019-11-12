@@ -1,7 +1,7 @@
 sudo: required
 language: go
 go:
-  - "1.12"
+  - "1.13"
 services:
   - docker
 jobs:
@@ -13,9 +13,9 @@ jobs:
       script: make docker_build
     - if: fork = false
       stage: test
-      name: docker build and push
+      name: docker build
       install: true
-      script: make dockerhub_push
+      script: make docker_build
     - stage: test
       install: make install
       name: lint

@@ -44,5 +44,6 @@ func (cfg AdminConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "tps"), defaultAdminConfig.TPS, "The maximum number of transactions per second to flyte admin from this client.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "burst"), defaultAdminConfig.Burst, "Maximum burst for throttle")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cacheSize"), defaultAdminConfig.MaxCacheSize, "Maximum cache in terms of number of items stored.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "workers"), defaultAdminConfig.Workers, "Number of parallel workers to work on the queue.")
 	return cmdFlags
 }

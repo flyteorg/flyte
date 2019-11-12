@@ -27,7 +27,7 @@ type WorkflowErrorWithCause struct {
 }
 
 func (w *WorkflowErrorWithCause) Error() string {
-	return fmt.Sprintf("%v, caused by: %v", w.WorkflowError.Error(), errors.Cause(w))
+	return fmt.Sprintf("%v, caused by: %v", w.WorkflowError.Error(), w.cause)
 }
 
 func (w *WorkflowErrorWithCause) Cause() error {

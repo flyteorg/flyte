@@ -165,4 +165,26 @@ func TestAdminConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_workers", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt, err := cmdFlags.GetInt("workers"); err == nil {
+				assert.Equal(t, int(defaultAdminConfig.Workers), vInt)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("workers", testValue)
+			if vInt, err := cmdFlags.GetInt("workers"); err == nil {
+				testDecodeJson_AdminConfig(t, fmt.Sprintf("%v", vInt), &actual.Workers)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

@@ -3,76 +3,117 @@ package subworkflow
 import (
 	"context"
 
-	"github.com/lyft/flyteidl/clients/go/events"
+	"github.com/lyft/flytestdlib/promutils"
+
+	"github.com/lyft/flytestdlib/logger"
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
 )
 
 type workflowNodeHandler struct {
-	recorder     events.WorkflowEventRecorder
 	lpHandler    launchPlanHandler
 	subWfHandler subworkflowHandler
+	metrics      metrics
 }
 
-func (w *workflowNodeHandler) Initialize(ctx context.Context) error {
+type metrics struct {
+	CacheError labeled.Counter
+}
+
+func newMetrics(scope promutils.Scope) metrics {
+	return metrics{
+		CacheError: labeled.NewCounter("cache_err", "workflow handler failed to store or load from data store.", scope),
+	}
+}
+
+func (w *workflowNodeHandler) FinalizeRequired() bool {
+	return false
+}
+
+func (w *workflowNodeHandler) Setup(ctx context.Context, setupContext handler.SetupContext) error {
 	return nil
 }
 
-func (w *workflowNodeHandler) StartNode(ctx context.Context, wf v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, nodeInputs *handler.Data) (handler.Status, error) {
-	if node.GetWorkflowNode().GetSubWorkflowRef() != nil {
-		return w.subWfHandler.StartSubWorkflow(ctx, wf, node, nodeInputs)
+func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
+
+	logger.Debug(ctx, "Starting workflow Node")
+	invalidWFNodeError := func() (handler.Transition, error) {
+		errMsg := "workflow wfNode does not have a subworkflow or child workflow reference"
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.BadSpecificationError), errMsg, nil)), nil
 	}
 
-	if node.GetWorkflowNode().GetLaunchPlanRefID() != nil {
-		return w.lpHandler.StartLaunchPlan(ctx, wf, node, nodeInputs)
+	updateNodeStateFn := func(transition handler.Transition, err error) (handler.Transition, error) {
+		if err != nil {
+			return transition, err
+		}
+		workflowNodeState := handler.WorkflowNodeState{Phase: v1alpha1.WorkflowNodePhaseExecuting}
+		err = nCtx.NodeStateWriter().PutWorkflowNodeState(workflowNodeState)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to store WorkflowNodeState, err :%s", err.Error())
+			return handler.UnknownTransition, err
+		}
+
+		return transition, err
 	}
 
-	return handler.StatusFailed(errors.Errorf(errors.BadSpecificationError, node.GetID(), "SubWorkflow is incorrectly specified.")), nil
+	wfNode := nCtx.Node().GetWorkflowNode()
+	workflowPhase := nCtx.NodeStateReader().GetWorkflowNodeState().Phase
+	if workflowPhase == v1alpha1.WorkflowNodePhaseUndefined {
+		if wfNode == nil {
+			errMsg := "Invoked workflow handler, for a non workflow Node."
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.RuntimeExecutionError), errMsg, nil)), nil
+		}
+
+		if wfNode.GetSubWorkflowRef() != nil {
+			return updateNodeStateFn(w.subWfHandler.StartSubWorkflow(ctx, nCtx))
+		} else if wfNode.GetLaunchPlanRefID() != nil {
+			return updateNodeStateFn(w.lpHandler.StartLaunchPlan(ctx, nCtx))
+		}
+
+		return invalidWFNodeError()
+	}
+
+	if wfNode.GetSubWorkflowRef() != nil {
+		wf := nCtx.Workflow()
+		status := wf.GetNodeExecutionStatus(nCtx.NodeID())
+		return w.subWfHandler.CheckSubWorkflowStatus(ctx, nCtx, wf, status)
+	} else if wfNode.GetLaunchPlanRefID() != nil {
+		return w.lpHandler.CheckLaunchPlanStatus(ctx, nCtx)
+	}
+
+	return invalidWFNodeError()
 }
 
-func (w *workflowNodeHandler) CheckNodeStatus(ctx context.Context, wf v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, status v1alpha1.ExecutableNodeStatus) (handler.Status, error) {
-	if node.GetWorkflowNode().GetSubWorkflowRef() != nil {
-		return w.subWfHandler.CheckSubWorkflowStatus(ctx, wf, node, status)
+func (w *workflowNodeHandler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+	wf := nCtx.Workflow()
+	wfNode := nCtx.Node().GetWorkflowNode()
+	if wfNode.GetSubWorkflowRef() != nil {
+		return w.subWfHandler.HandleAbort(ctx, nCtx, wf, *wfNode.GetSubWorkflowRef())
 	}
 
-	if node.GetWorkflowNode().GetLaunchPlanRefID() != nil {
-		return w.lpHandler.CheckLaunchPlanStatus(ctx, wf, node, status)
-	}
-
-	return handler.StatusFailed(errors.Errorf(errors.BadSpecificationError, node.GetID(), "workflow node does not have a subworkflow or child workflow reference")), nil
-}
-
-func (w *workflowNodeHandler) HandleFailingNode(ctx context.Context, wf v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode) (handler.Status, error) {
-	if node.GetWorkflowNode() != nil && node.GetWorkflowNode().GetSubWorkflowRef() != nil {
-		return w.subWfHandler.HandleSubWorkflowFailingNode(ctx, wf, node)
-	}
-	return handler.StatusFailed(nil), nil
-}
-
-func (w *workflowNodeHandler) AbortNode(ctx context.Context, wf v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode) error {
-	if node.GetWorkflowNode().GetSubWorkflowRef() != nil {
-		return w.subWfHandler.HandleAbort(ctx, wf, node)
-	}
-
-	if node.GetWorkflowNode().GetLaunchPlanRefID() != nil {
-		return w.lpHandler.HandleAbort(ctx, wf, node)
+	if wfNode.GetLaunchPlanRefID() != nil {
+		return w.lpHandler.HandleAbort(ctx, wf, nCtx.Node())
 	}
 	return nil
 }
 
-func New(executor executors.Node, eventSink events.EventSink, workflowLauncher launchplan.Executor, enQWorkflow v1alpha1.EnqueueWorkflow, store *storage.DataStore, scope promutils.Scope) handler.IFace {
-	subworkflowScope := scope.NewSubScope("workflow")
+func (w *workflowNodeHandler) Finalize(ctx context.Context, executionContext handler.NodeExecutionContext) error {
+	logger.Debugf(ctx, "WorkflowNode::Finalizer: nothing to do")
+	return nil
+}
+
+func New(executor executors.Node, workflowLauncher launchplan.Executor, scope promutils.Scope) handler.Node {
+	workflowScope := scope.NewSubScope("workflow")
 	return &workflowNodeHandler{
-		subWfHandler: newSubworkflowHandler(executor, enQWorkflow, store),
+		subWfHandler: newSubworkflowHandler(executor),
 		lpHandler: launchPlanHandler{
-			store:      store,
 			launchPlan: workflowLauncher,
 		},
-		recorder: events.NewWorkflowEventRecorder(eventSink, subworkflowScope),
+		metrics: newMetrics(workflowScope),
 	}
 }

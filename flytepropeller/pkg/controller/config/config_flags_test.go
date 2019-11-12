@@ -825,4 +825,26 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_max-output-size-bytes", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt64, err := cmdFlags.GetInt64("max-output-size-bytes"); err == nil {
+				assert.Equal(t, int64(*new(int64)), vInt64)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("max-output-size-bytes", testValue)
+			if vInt64, err := cmdFlags.GetInt64("max-output-size-bytes"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.MaxDatasetSizeBytes)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

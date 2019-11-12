@@ -5,15 +5,15 @@ import (
 	"testing"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/lyft/flytepropeller/pkg/utils"
-	"github.com/stretchr/testify/assert"
 )
 
 // Creates a ComparisonExpression, comparing 2 literals
-func getComparisonExpression(lV interface{}, op core.ComparisonExpression_Operator, rV interface{}) (*core.ComparisonExpression, *handler.Data) {
+func getComparisonExpression(lV interface{}, op core.ComparisonExpression_Operator, rV interface{}) (*core.ComparisonExpression, *core.LiteralMap) {
 	exp := &core.ComparisonExpression{
 		LeftValue: &core.Operand{
 			Val: &core.Operand_Var{
@@ -27,7 +27,7 @@ func getComparisonExpression(lV interface{}, op core.ComparisonExpression_Operat
 			},
 		},
 	}
-	inputs := &handler.Data{
+	inputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"x": utils.MustMakePrimitiveLiteral(lV),
 			"y": utils.MustMakePrimitiveLiteral(rV),
@@ -87,7 +87,7 @@ func TestEvaluateComparison(t *testing.T) {
 				},
 			},
 		}
-		inputs := &handler.Data{
+		inputs := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
 				"y": utils.MustMakePrimitiveLiteral(2),
 			},
@@ -112,7 +112,7 @@ func TestEvaluateComparison(t *testing.T) {
 				},
 			},
 		}
-		inputs := &handler.Data{
+		inputs := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
 				"x": utils.MustMakePrimitiveLiteral(1),
 				"y": utils.MustMakePrimitiveLiteral(3),
@@ -153,7 +153,7 @@ func TestEvaluateComparison(t *testing.T) {
 				},
 			},
 		}
-		inputs := &handler.Data{
+		inputs := &core.LiteralMap{
 			Literals: map[string]*core.Literal{},
 		}
 		_, err := EvaluateComparison(exp, inputs)
@@ -178,7 +178,7 @@ func TestEvaluateComparison(t *testing.T) {
 				},
 			},
 		}
-		inputs := &handler.Data{
+		inputs := &core.LiteralMap{
 			Literals: map[string]*core.Literal{},
 		}
 		_, err := EvaluateComparison(exp, inputs)
@@ -255,7 +255,7 @@ func TestEvaluateBooleanExpression(t *testing.T) {
 				},
 			},
 		}
-		outerInputs := &handler.Data{
+		outerInputs := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
 				"a": utils.MustMakePrimitiveLiteral(5),
 				"b": utils.MustMakePrimitiveLiteral(4),

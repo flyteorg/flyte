@@ -4,16 +4,16 @@ import (
 	"context"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/lyft/flytestdlib/logger"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 
 	regErrors "github.com/pkg/errors"
 )
 
-func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *handler.Data) (bool, error) {
+func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.LiteralMap) (bool, error) {
 	var lValue *core.Literal
 	var rValue *core.Literal
 	var lPrim *core.Primitive
@@ -55,7 +55,7 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *handler.Dat
 	return Evaluate(lPrim, rPrim, expr.GetOperator())
 }
 
-func EvaluateBooleanExpression(expr *core.BooleanExpression, nodeInputs *handler.Data) (bool, error) {
+func EvaluateBooleanExpression(expr *core.BooleanExpression, nodeInputs *core.LiteralMap) (bool, error) {
 	if expr.GetComparison() != nil {
 		return EvaluateComparison(expr.GetComparison(), nodeInputs)
 	}
@@ -76,7 +76,7 @@ func EvaluateBooleanExpression(expr *core.BooleanExpression, nodeInputs *handler
 	return lvalue && rvalue, nil
 }
 
-func EvaluateIfBlock(block v1alpha1.ExecutableIfBlock, nodeInputs *handler.Data, skippedNodeIds []*v1alpha1.NodeID) (*v1alpha1.NodeID, []*v1alpha1.NodeID, error) {
+func EvaluateIfBlock(block v1alpha1.ExecutableIfBlock, nodeInputs *core.LiteralMap, skippedNodeIds []*v1alpha1.NodeID) (*v1alpha1.NodeID, []*v1alpha1.NodeID, error) {
 	if ok, err := EvaluateBooleanExpression(block.GetCondition(), nodeInputs); err != nil {
 		return nil, skippedNodeIds, err
 	} else if ok {
@@ -90,7 +90,7 @@ func EvaluateIfBlock(block v1alpha1.ExecutableIfBlock, nodeInputs *handler.Data,
 // Decides the branch to be taken, returns the nodeId of the selected node or an error
 // The branchnode is marked as success. This is used by downstream node to determine if it can be executed
 // All downstream nodes are marked as skipped
-func DecideBranch(ctx context.Context, w v1alpha1.BaseWorkflowWithStatus, nodeID v1alpha1.NodeID, node v1alpha1.ExecutableBranchNode, nodeInputs *handler.Data) (*v1alpha1.NodeID, error) {
+func DecideBranch(ctx context.Context, w v1alpha1.BaseWorkflowWithStatus, nodeID v1alpha1.NodeID, node v1alpha1.ExecutableBranchNode, nodeInputs *core.LiteralMap) (*v1alpha1.NodeID, error) {
 	var selectedNodeID *v1alpha1.NodeID
 	var skippedNodeIds []*v1alpha1.NodeID
 	var err error

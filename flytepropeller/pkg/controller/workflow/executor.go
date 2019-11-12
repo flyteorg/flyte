@@ -135,7 +135,7 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
 	contextualWf := executors.NewBaseContextualWorkflow(w)
 	// Best effort clean-up.
-	if err := c.cleanupRunningNodes(ctx, contextualWf); err != nil {
+	if err := c.cleanupRunningNodes(ctx, contextualWf, "Some node execution failed, auto-abort."); err != nil {
 		logger.Errorf(ctx, "Failed to propagate Abort for workflow:%v. Error: %v", w.ExecutionID.WorkflowExecutionIdentifier, err)
 	}
 
@@ -284,7 +284,7 @@ func (c *workflowExecutor) Initialize(ctx context.Context) error {
 }
 
 func (c *workflowExecutor) HandleFlyteWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
-	logger.Infof(ctx, "Handling Workflow [%s], id: [%s], Phase [%s]", w.GetName(), w.GetExecutionID(), w.GetExecutionStatus().GetPhase().String())
+	logger.Infof(ctx, "Handling Workflow [%s], id: [%s], p [%s]", w.GetName(), w.GetExecutionID(), w.GetExecutionStatus().GetPhase().String())
 	defer logger.Infof(ctx, "Handling Workflow [%s] Done", w.GetName())
 
 	wStatus := w.GetExecutionStatus()
@@ -345,15 +345,17 @@ func (c *workflowExecutor) HandleFlyteWorkflow(ctx context.Context, w *v1alpha1.
 
 func (c *workflowExecutor) HandleAbortedWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow, maxRetries uint32) error {
 	if !w.Status.IsTerminated() {
+		reason := "User initiated workflow abort."
 		c.metrics.IncompleteWorkflowAborted.Inc(ctx)
 		var err error
 		if w.Status.FailedAttempts > maxRetries {
+			reason = fmt.Sprintf("max number of system retry attempts [%d/%d] exhausted - system failure.", w.Status.FailedAttempts, maxRetries)
 			err = errors.Errorf(errors.RuntimeExecutionError, w.GetID(), "max number of system retry attempts [%d/%d] exhausted. Last known status message: %v", w.Status.FailedAttempts, maxRetries, w.Status.Message)
 		}
 
 		// Best effort clean-up.
 		contextualWf := executors.NewBaseContextualWorkflow(w)
-		if err2 := c.cleanupRunningNodes(ctx, contextualWf); err2 != nil {
+		if err2 := c.cleanupRunningNodes(ctx, contextualWf, reason); err2 != nil {
 			logger.Errorf(ctx, "Failed to propagate Abort for workflow:%v. Error: %v", w.ExecutionID.WorkflowExecutionIdentifier, err2)
 		}
 
@@ -375,13 +377,13 @@ func (c *workflowExecutor) HandleAbortedWorkflow(ctx context.Context, w *v1alpha
 	return nil
 }
 
-func (c *workflowExecutor) cleanupRunningNodes(ctx context.Context, w v1alpha1.ExecutableWorkflow) error {
+func (c *workflowExecutor) cleanupRunningNodes(ctx context.Context, w v1alpha1.ExecutableWorkflow, reason string) error {
 	startNode := w.StartNode()
 	if startNode == nil {
 		return errors.Errorf(errors.IllegalStateError, w.GetID(), "StartNode not found in running workflow?")
 	}
 
-	if err := c.nodeExecutor.AbortHandler(ctx, w, startNode); err != nil {
+	if err := c.nodeExecutor.AbortHandler(ctx, w, startNode, reason); err != nil {
 		return errors.Errorf(errors.CausedByError, w.GetID(), "Failed to propagate Abort for workflow. Error: %v", err)
 	}
 

@@ -4,15 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	mocks2 "github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/stretchr/testify/assert"
@@ -46,70 +41,22 @@ func TestUnderlyingInterface(t *testing.T) {
 			},
 		},
 	}
-	wf := &mocks.ExecutableWorkflow{}
 
-	subWF := &mocks.ExecutableSubWorkflow{}
-	wf.On("FindSubWorkflow", mock.Anything).Return(subWF)
-	subWF.On("GetOutputs").Return(&v1alpha1.OutputVarMap{VariableMap: expectedIface.Outputs})
-
-	task := &mocks.ExecutableTask{}
-	wf.On("GetTask", mock.Anything).Return(task, nil)
-	task.On("CoreTask").Return(&core.TaskTemplate{
+	tk := &core.TaskTemplate{
 		Interface: expectedIface,
-	})
+	}
 
-	n := &mocks.ExecutableNode{}
-	wf.On("GetNode", mock.Anything).Return(n)
-	emptyStr := ""
-	n.On("GetTaskID").Return(&emptyStr)
+	tr := &mocks2.TaskReader{}
+	tr.On("Read", mock.Anything).Return(tk, nil)
 
-	iface, err := underlyingInterface(wf, n)
+	iface, err := underlyingInterface(context.TODO(), tr)
 	assert.NoError(t, err)
 	assert.NotNil(t, iface)
 	assert.Equal(t, expectedIface, iface)
 
-	n = &mocks.ExecutableNode{}
-	n.On("GetTaskID").Return(nil)
-
-	wfNode := &mocks.ExecutableWorkflowNode{}
-	n.On("GetWorkflowNode").Return(wfNode)
-	wfNode.On("GetSubWorkflowRef").Return(&emptyStr)
-
-	iface, err = underlyingInterface(wf, n)
+	tk.Interface = nil
+	iface, err = underlyingInterface(context.TODO(), tr)
 	assert.NoError(t, err)
 	assert.NotNil(t, iface)
-	assert.Equal(t, expectedIface, iface)
-}
-
-func createInmemoryStore(t testing.TB) *storage.DataStore {
-	cfg := storage.Config{
-		Type: storage.TypeMemory,
-	}
-
-	d, err := storage.NewDataStore(&cfg, promutils.NewTestScope())
-	assert.NoError(t, err)
-
-	return d
-}
-
-func Test_cacheFlyteWorkflow(t *testing.T) {
-	store := createInmemoryStore(t)
-	expected := &v1alpha1.FlyteWorkflow{
-		TypeMeta:   v1.TypeMeta{},
-		ObjectMeta: v1.ObjectMeta{},
-		WorkflowSpec: &v1alpha1.WorkflowSpec{
-			ID: "abc",
-			Connections: v1alpha1.Connections{
-				DownstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{},
-				UpstreamEdges:   map[v1alpha1.NodeID][]v1alpha1.NodeID{},
-			},
-		},
-		Inputs: &v1alpha1.Inputs{LiteralMap: &core.LiteralMap{}},
-	}
-
-	location := storage.DataReference("somekey/file.json")
-	assert.NoError(t, cacheFlyteWorkflow(context.TODO(), store, expected, location))
-	actual, err := loadCachedFlyteWorkflow(context.TODO(), store, location)
-	assert.NoError(t, err)
-	assert.Equal(t, expected, actual)
+	assert.Nil(t, iface.Outputs)
 }

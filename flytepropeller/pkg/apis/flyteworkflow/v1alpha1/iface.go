@@ -8,7 +8,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	types2 "github.com/lyft/flyteplugins/go/tasks/v1/types"
 	"github.com/lyft/flytestdlib/storage"
 )
 
@@ -173,7 +172,7 @@ type MutableDynamicNodeStatus interface {
 }
 
 // Interface for Branch node. All the methods are purely read only except for the GetExecutionStatus.
-// Phase returns ExecutableBranchNodeStatus, which permits some mutations
+// p returns ExecutableBranchNodeStatus, which permits some mutations
 type ExecutableBranchNode interface {
 	GetIf() ExecutableIfBlock
 	GetElse() *NodeID
@@ -182,17 +181,12 @@ type ExecutableBranchNode interface {
 }
 
 type ExecutableWorkflowNodeStatus interface {
-	// Name of the child execution. We only store name since the project and domain will be
-	// the same as the parent workflow execution.
-	GetWorkflowExecutionName() string
+	GetWorkflowNodePhase() WorkflowNodePhase
 }
 
 type MutableWorkflowNodeStatus interface {
 	ExecutableWorkflowNodeStatus
-
-	// Sets the name of the child execution. We only store name since the project and domain
-	// will be the same as the parent workflow execution.
-	SetWorkflowExecutionName(name string)
+	SetWorkflowNodePhase(phase WorkflowNodePhase)
 }
 
 type MutableNodeStatus interface {
@@ -205,18 +199,21 @@ type MutableNodeStatus interface {
 	SetCached()
 	ResetDirty()
 
+	GetBranchStatus() MutableBranchNodeStatus
 	GetOrCreateBranchStatus() MutableBranchNodeStatus
+	GetWorkflowStatus() MutableWorkflowNodeStatus
 	GetOrCreateWorkflowStatus() MutableWorkflowNodeStatus
+
 	ClearWorkflowStatus()
 	GetOrCreateTaskStatus() MutableTaskNodeStatus
+	GetTaskStatus() MutableTaskNodeStatus
 	ClearTaskStatus()
-	GetOrCreateSubWorkflowStatus() MutableSubWorkflowNodeStatus
-	ClearSubWorkflowStatus()
 	GetOrCreateDynamicNodeStatus() MutableDynamicNodeStatus
+	GetDynamicNodeStatus() MutableDynamicNodeStatus
 	ClearDynamicNodeStatus()
 }
 
-// Interface for a Node Phase. This provides a mutable API.
+// Interface for a Node p. This provides a mutable API.
 type ExecutableNodeStatus interface {
 	NodeStatusGetter
 	MutableNodeStatus
@@ -233,7 +230,6 @@ type ExecutableNodeStatus interface {
 	GetAttempts() uint32
 	GetWorkflowNodeStatus() ExecutableWorkflowNodeStatus
 	GetTaskNodeStatus() ExecutableTaskNodeStatus
-	GetSubWorkflowNodeStatus() ExecutableSubWorkflowNodeStatus
 
 	IsCached() bool
 	IsDirty() bool
@@ -249,16 +245,20 @@ type MutableSubWorkflowNodeStatus interface {
 }
 
 type ExecutableTaskNodeStatus interface {
-	GetPhase() types2.TaskPhase
+	GetPhase() int
 	GetPhaseVersion() uint32
-	GetCustomState() types2.CustomState
+	GetPluginState() []byte
+	GetPluginStateVersion() uint32
+	GetBarrierClockTick() uint32
 }
 
 type MutableTaskNodeStatus interface {
 	ExecutableTaskNodeStatus
-	SetPhase(phase types2.TaskPhase)
+	SetPhase(phase int)
 	SetPhaseVersion(version uint32)
-	SetCustomState(state types2.CustomState)
+	SetPluginState([]byte)
+	SetPluginStateVersion(uint32)
+	SetBarrierClockTick(tick uint32)
 }
 
 // Interface for a Child Workflow Node
@@ -287,7 +287,7 @@ type ExecutableNode interface {
 	GetRetryStrategy() *RetryStrategy
 }
 
-// Interface for the Workflow Phase. This is the mutable portion for a Workflow
+// Interface for the Workflow p. This is the mutable portion for a Workflow
 type ExecutableWorkflowStatus interface {
 	NodeStatusGetter
 	UpdatePhase(p WorkflowPhase, msg string)
@@ -336,7 +336,7 @@ type ExecutableSubWorkflow interface {
 type WorkflowMeta interface {
 	GetExecutionID() ExecutionID
 	GetK8sWorkflowID() types.NamespacedName
-	NewControllerRef() metav1.OwnerReference
+	GetOwnerReference() metav1.OwnerReference
 	GetNamespace() string
 	GetCreationTimestamp() metav1.Time
 	GetAnnotations() map[string]string
@@ -345,9 +345,13 @@ type WorkflowMeta interface {
 	GetServiceAccountName() string
 }
 
+type TaskDetailsGetter interface {
+	GetTask(id TaskID) (ExecutableTask, error)
+}
+
 type WorkflowMetaExtended interface {
 	WorkflowMeta
-	GetTask(id TaskID) (ExecutableTask, error)
+	TaskDetailsGetter
 	FindSubWorkflow(subID WorkflowID) ExecutableSubWorkflow
 	GetExecutionStatus() ExecutableWorkflowStatus
 }

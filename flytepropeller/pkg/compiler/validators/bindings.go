@@ -47,20 +47,29 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			}
 
 			if param, paramFound := validateOutputVar(upNode, v.Name, errs.NewScope()); paramFound {
-				if AreTypesCastable(param.Type, expectedType) {
+				sourceType := param.Type
+				// If the variable has an index. We expect param to be a collection.
+				if v.Index != nil {
+					if cType := param.GetType().GetCollectionType(); cType == nil {
+						errs.Collect(errors.NewMismatchingTypesErr(nodeID, binding.GetPromise().Var, param.Type.String(), expectedType.String()))
+					} else {
+						sourceType = cType
+					}
+				}
+
+				if AreTypesCastable(sourceType, expectedType) {
 					binding.GetPromise().NodeId = upNode.GetId()
 					return []c.NodeID{binding.GetPromise().NodeId}, true
 				}
-				errs.Collect(errors.NewMismatchingTypesErr(nodeID, binding.GetPromise().Var, param.Type.String(), expectedType.String()))
+
+				errs.Collect(errors.NewMismatchingTypesErr(nodeID, binding.GetPromise().Var, sourceType.String(), expectedType.String()))
 			}
 		}
 	case *flyte.BindingData_Scalar:
 		literalType := literalTypeForScalar(binding.GetScalar())
 		if literalType == nil {
 			errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(binding.GetScalar().GetValue()).String()))
-		}
-
-		if !AreTypesCastable(literalType, expectedType) {
+		} else if !AreTypesCastable(literalType, expectedType) {
 			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), expectedType.String()))
 		}
 

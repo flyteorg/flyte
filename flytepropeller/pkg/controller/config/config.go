@@ -9,7 +9,9 @@ import (
 
 const configSectionKey = "propeller"
 
-var ConfigSection = config.MustRegisterSection(configSectionKey, &Config{})
+var ConfigSection = config.MustRegisterSection(configSectionKey, &Config{
+	MaxDatasetSizeBytes: 10 * 1024 * 1024,
+})
 
 // NOTE: when adding new fields, do not mark them as "omitempty" if it's desirable to read the value from env variables.
 // Config that uses the flytestdlib Config module to generate commandline and load config files. This configuration is
@@ -31,6 +33,7 @@ type Config struct {
 	GCInterval          config.Duration      `json:"gc-interval" pflag:"\"30m\",Run periodic GC every 30 minutes"`
 	LeaderElection      LeaderElectionConfig `json:"leader-election,omitempty" pflag:",Config for leader election."`
 	PublishK8sEvents    bool                 `json:"publish-k8s-events" pflag:",Enable events publishing to K8s events API."`
+	MaxDatasetSizeBytes int64                `json:"max-output-size-bytes" pflag:",Maximum size of outputs per task"`
 	KubeConfig          KubeClientConfig     `json:"kube-client-config" pflag:",Configuration to control the Kubernetes client"`
 }
 
@@ -102,4 +105,8 @@ type LeaderElectionConfig struct {
 // TODO What if the type is incorrect?
 func GetConfig() *Config {
 	return ConfigSection.GetConfig().(*Config)
+}
+
+func MustRegisterSubSection(subSectionKey string, section config.Config) config.Section {
+	return ConfigSection.MustRegisterSection(subSectionKey, section)
 }

@@ -9,8 +9,11 @@ import (
 )
 
 func EqualPrimitive(t *testing.T, p1 *core.Primitive, p2 *core.Primitive) {
-	if p1 != nil {
-		assert.NotNil(t, p2)
+	if !assert.Equal(t, p1 == nil, p2 == nil) {
+		assert.FailNow(t, "One of the values is nil")
+	}
+	if p1 == nil {
+		return
 	}
 	assert.Equal(t, reflect.TypeOf(p1.Value), reflect.TypeOf(p2.Value))
 	switch p1.Value.(type) {
@@ -24,8 +27,11 @@ func EqualPrimitive(t *testing.T, p1 *core.Primitive, p2 *core.Primitive) {
 }
 
 func EqualScalar(t *testing.T, p1 *core.Scalar, p2 *core.Scalar) {
-	if p1 != nil {
-		assert.NotNil(t, p2)
+	if !assert.Equal(t, p1 == nil, p2 == nil) {
+		assert.FailNow(t, "One of the values is nil")
+	}
+	if p1 == nil {
+		return
 	}
 	assert.Equal(t, reflect.TypeOf(p1.Value), reflect.TypeOf(p2.Value))
 	switch p1.Value.(type) {
@@ -37,10 +43,11 @@ func EqualScalar(t *testing.T, p1 *core.Scalar, p2 *core.Scalar) {
 }
 
 func EqualLiterals(t *testing.T, l1 *core.Literal, l2 *core.Literal) {
-	if l1 != nil {
-		assert.NotNil(t, l2)
-	} else {
-		assert.FailNow(t, "expected value is nil")
+	if !assert.Equal(t, l1 == nil, l2 == nil) {
+		assert.FailNow(t, "One of the values is nil")
+	}
+	if l1 == nil {
+		return
 	}
 	assert.Equal(t, reflect.TypeOf(l1.Value), reflect.TypeOf(l2.Value))
 	switch l1.Value.(type) {

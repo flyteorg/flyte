@@ -11,9 +11,10 @@ var (
 		TPS:          5,
 		Burst:        10,
 		MaxCacheSize: 10000,
+		Workers:      10,
 	}
 
-	adminConfigSection = ctrlConfig.ConfigSection.MustRegisterSection("admin-launcher", defaultAdminConfig)
+	adminConfigSection = ctrlConfig.MustRegisterSubSection("admin-launcher", defaultAdminConfig)
 )
 
 type AdminConfig struct {
@@ -26,6 +27,8 @@ type AdminConfig struct {
 	Burst int `json:"burst" pflag:",Maximum burst for throttle"`
 
 	MaxCacheSize int `json:"cacheSize" pflag:",Maximum cache in terms of number of items stored."`
+
+	Workers int `json:"workers" pflag:",Number of parallel workers to work on the queue."`
 }
 
 func GetAdminConfig() *AdminConfig {

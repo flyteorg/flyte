@@ -134,8 +134,9 @@ func (g *GetOpts) listWorkflows() error {
 	if err != nil {
 		return err
 	}
+
 	fmt.Print(workflows.Print())
 	fmt.Printf("Found %d workflows\n", counter)
-	fmt.Printf("Sucess: %d, Failed: %d, Running: %d, Waiting: %d\n", succeeded, failed, running, waiting)
+	fmt.Printf("Success: %d, Failed: %d, Running: %d, Waiting: %d\n", succeeded, failed, running, waiting)
 	return nil
 }

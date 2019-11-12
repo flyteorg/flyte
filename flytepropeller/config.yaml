@@ -22,13 +22,14 @@ propeller:
       capacity: 1000
   kube-config: "$HOME/.kube/config"
   publish-k8s-events: true
+tasks:
+  task-plugins:
+    enabled-plugins:
+      - container
+      - K8S-ARRAY
+      - qubole-hive-executor
 # Sample plugins config
 plugins:
-  # Set of enabled plugins at root level
-  enabled-plugins:
-    - container
-    - waitable
-    - K8S-ARRAY
   # All k8s plugins default configuration
   k8s:
     inject-finalizer: true
@@ -46,24 +47,6 @@ plugins:
       - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
       - FLYTE_AWS_ACCESS_KEY_ID: minio
       - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
-  # Spark Plugin configuration
-  spark:
-    spark-config-default:
-      - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
-      - spark.kubernetes.allocation.batch.size: "50"
-      - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-      - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-      - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-      - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-      - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-      - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-      - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-      - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
-      - spark.blacklist.enabled: "true"
-      - spark.blacklist.timeout: "5m"
-  # Waitable plugin configuration
-  waitable:
-    console-uri: http://localhost:30081/console
   # Logging configuration
   logs:
     kubernetes-enabled: true
@@ -76,24 +59,19 @@ storage:
     endpoint: http://localhost:9000
     region: us-east-1
     secret-key: miniostorage
-  cache:
-    max_size_mbs: 10
-    target_gc_percent: 100
-  container: myflytecontainer
   type: minio
+  container: "my-s3-bucket"
 event:
   type: admin
   rate: 500
   capacity: 1000
 admin:
-  endpoint: localhost:8089
+  endpoint: localhost:30081
   insecure: true
 catalog-cache:
-  type: catalog
+  type: noop
   endpoint: datacatalog:8089
   insecure: true
-errors:
-  show-source: true
 logger:
   level: 4
   show-source: true

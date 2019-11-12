@@ -22,19 +22,19 @@ func (n *NodeError) Error() string {
 }
 
 type NodeErrorWithCause struct {
-	*NodeError
-	cause error
+	NodeError error
+	cause     error
 }
 
 func (n *NodeErrorWithCause) Error() string {
-	return fmt.Sprintf("%v, caused by: %v", n.NodeError.Error(), errors.Cause(n))
+	return fmt.Sprintf("%v, caused by: %v", n.NodeError.Error(), n.cause)
 }
 
 func (n *NodeErrorWithCause) Cause() error {
 	return n.cause
 }
 
-func errorf(c ErrorCode, n v1alpha1.NodeID, msgFmt string, args ...interface{}) *NodeError {
+func errorf(c ErrorCode, n v1alpha1.NodeID, msgFmt string, args ...interface{}) error {
 	return &NodeError{
 		Code:    c,
 		Node:    n,
@@ -70,11 +70,13 @@ func GetErrorCode(err error) (code ErrorCode, isNodeError bool) {
 		return
 	}
 
-	e2, ok := err.(*NodeErrorWithCause)
-	if ok {
-		code = e2.Code
-		isNodeError = true
-		return
+	if e2, ok := err.(*NodeErrorWithCause); ok {
+		if ne, ok := e2.NodeError.(*NodeError); ok {
+			code = ne.Code
+			isNodeError = true
+			return
+		}
 	}
+
 	return
 }

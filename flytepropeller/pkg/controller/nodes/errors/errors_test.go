@@ -26,9 +26,10 @@ func TestErrorfWithCause(t *testing.T) {
 	err := Wrapf(IllegalStateError, "n1", cause, "Message [%v]", msg)
 	assert.NotNil(t, err)
 	e := err.(*NodeErrorWithCause)
-	assert.Equal(t, IllegalStateError, e.Code)
-	assert.Equal(t, "n1", e.Node)
-	assert.Equal(t, fmt.Sprintf("Message [%v]", msg), e.Message)
+	nodeErr := e.NodeError.(*NodeError)
+	assert.Equal(t, IllegalStateError, nodeErr.Code)
+	assert.Equal(t, "n1", nodeErr.Node)
+	assert.Equal(t, fmt.Sprintf("Message [%v]", msg), nodeErr.Message)
 	assert.Equal(t, cause, extErrors.Cause(e))
 	assert.Equal(t, "failed at Node[n1]. IllegalStateError: Message [msg], caused by: Some Error", err.Error())
 }

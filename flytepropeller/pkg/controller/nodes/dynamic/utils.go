@@ -1,59 +1,31 @@
 package dynamic
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/Masterminds/semver"
+
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+
 	"github.com/lyft/flytepropeller/pkg/compiler"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/lyft/flytepropeller/pkg/utils"
 )
 
 // Constructs the expected interface of a given node.
-func underlyingInterface(w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode) (*core.TypedInterface, error) {
+func underlyingInterface(ctx context.Context, taskReader handler.TaskReader) (*core.TypedInterface, error) {
+	t, err := taskReader.Read(ctx)
 	iface := &core.TypedInterface{}
-	if node.GetTaskID() != nil {
-		t, err := w.GetTask(*node.GetTaskID())
-		if err != nil {
-			// Should never happen
-			return nil, err
-		}
-
-		iface.Outputs = t.CoreTask().GetInterface().Outputs
-	} else if wfNode := node.GetWorkflowNode(); wfNode != nil {
-		if wfRef := wfNode.GetSubWorkflowRef(); wfRef != nil {
-			t := w.FindSubWorkflow(*wfRef)
-			if t == nil {
-				// Should never happen
-				return nil, errors.Errorf(errors.IllegalStateError, node.GetID(), "Couldn't find subworkflow [%v].", wfRef)
-			}
-
-			iface.Outputs = t.GetOutputs().VariableMap
-		} else {
-			return nil, errors.Errorf(errors.IllegalStateError, node.GetID(), "Unknown interface")
-		}
-	} else if node.GetBranchNode() != nil {
-		if ifBlock := node.GetBranchNode().GetIf(); ifBlock != nil && ifBlock.GetThenNode() != nil {
-			bn, found := w.GetNode(*ifBlock.GetThenNode())
-			if !found {
-				return nil, errors.Errorf(errors.IllegalStateError, node.GetID(), "Couldn't find branch node [%v]",
-					*ifBlock.GetThenNode())
-			}
-
-			return underlyingInterface(w, bn)
-		}
-
-		return nil, errors.Errorf(errors.IllegalStateError, node.GetID(), "Empty branch detected.")
-	} else {
-		return nil, errors.Errorf(errors.IllegalStateError, node.GetID(), "Unknown interface.")
+	if err != nil {
+		// Should never happen
+		return nil, err
 	}
 
+	if t.GetInterface() != nil {
+		iface.Outputs = t.GetInterface().Outputs
+	}
 	return iface, nil
 }
 
@@ -107,34 +79,35 @@ func compileTasks(_ context.Context, tasks []*core.TaskTemplate) ([]*core.Compil
 	return compiledTasks, nil
 }
 
-func cacheFlyteWorkflow(ctx context.Context, store storage.RawStore, wf *v1alpha1.FlyteWorkflow, target storage.DataReference) error {
-	raw, err := json.Marshal(wf)
-	if err != nil {
-		return err
+func isFlyteKitVersionBelow(runtime *core.RuntimeMetadata, ver *semver.Version) (bool, error) {
+	if runtime == nil {
+		return false, nil
 	}
 
-	return store.WriteRaw(ctx, target, int64(len(raw)), storage.Options{}, bytes.NewReader(raw))
+	if runtime.Type != core.RuntimeMetadata_FLYTE_SDK {
+		return false, nil
+	}
+
+	v, err := semver.NewVersion(runtime.Version)
+	if err != nil {
+		return false, err
+	}
+
+	return v.LessThan(ver), nil
 }
 
-func loadCachedFlyteWorkflow(ctx context.Context, store storage.RawStore, source storage.DataReference) (
-	*v1alpha1.FlyteWorkflow, error) {
-
-	rawReader, err := store.ReadRaw(ctx, source)
-	if err != nil {
-		return nil, err
+func makeArrayInterface(varMap *core.VariableMap) *core.VariableMap {
+	if varMap == nil || len(varMap.Variables) == 0 {
+		return varMap
 	}
 
-	buf := bytes.NewBuffer(nil)
-	_, err = buf.ReadFrom(rawReader)
-	if err != nil {
-		return nil, err
+	for _, val := range varMap.Variables {
+		val.Type = &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: val.Type,
+			},
+		}
 	}
 
-	err = rawReader.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	wf := &v1alpha1.FlyteWorkflow{}
-	return wf, json.Unmarshal(buf.Bytes(), wf)
+	return varMap
 }

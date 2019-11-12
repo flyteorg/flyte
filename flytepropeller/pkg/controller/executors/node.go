@@ -8,7 +8,9 @@ import (
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-// Phase of the node
+//go:generate mockery -all -case=underscore
+
+// p of the node
 type NodePhase int
 
 const (
@@ -64,7 +66,7 @@ type Node interface {
 	RecursiveNodeHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) (NodeStatus, error)
 
 	// This aborts the given node. If the given node is complete then it recursively finds the running nodes and aborts them
-	AbortHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) error
+	AbortHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode, reason string) error
 
 	// This method should be used to initialize Node executor
 	Initialize(ctx context.Context) error
