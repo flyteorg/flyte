@@ -108,15 +108,24 @@ func UpdateBatchInputForArray(_ context.Context, batchInput *batch.SubmitJobInpu
 func getEnvVarsForTask(ctx context.Context, tCtx pluginCore.TaskExecutionContext, containerEnvVars []*core.KeyValuePair,
 	defaultEnvVars map[string]string) []v1.EnvVar {
 	envVars := flytek8s.DecorateEnvVars(ctx, flytek8s.ToK8sEnvVar(containerEnvVars), tCtx.TaskExecutionMetadata().GetTaskExecutionID())
+	m := make(map[string]string, len(envVars))
+	for _, envVar := range envVars {
+		m[envVar.Name] = envVar.Value
+	}
 
 	for key, value := range defaultEnvVars {
-		envVars = append(envVars, v1.EnvVar{
+		m[key] = value
+	}
+
+	finalEnvVars := make([]v1.EnvVar, 0, len(m))
+	for key, val := range m {
+		finalEnvVars = append(envVars, v1.EnvVar{
 			Name:  key,
-			Value: value,
+			Value: val,
 		})
 	}
 
-	return envVars
+	return finalEnvVars
 }
 
 func toEnvironmentVariables(_ context.Context, envVars []v1.EnvVar) []*batch.KeyValuePair {
