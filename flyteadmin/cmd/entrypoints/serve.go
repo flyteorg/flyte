@@ -3,6 +3,7 @@ package entrypoints
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
@@ -132,7 +133,8 @@ func newHTTPServer(ctx context.Context, cfg *config.ServerConfig, authContext in
 		if authContext.GetUserInfoURL() != nil && authContext.GetUserInfoURL().String() != "" {
 			mux.HandleFunc("/me", auth.GetMeEndpointHandler(ctx, authContext))
 		}
-		mux.HandleFunc(auth.MetadataEndpoint, auth.GetMetadataEndpointRedirectHandler(ctx, authContext))
+		// The metadata endpoint is an RFC-defined constant, but we need a leading / for the handler to pattern match correctly.
+		mux.HandleFunc(fmt.Sprintf("/%s", auth.MetadataEndpoint), auth.GetMetadataEndpointRedirectHandler(ctx, authContext))
 
 		// This option translates HTTP authorization data (cookies) into a gRPC metadata field
 		gwmuxOptions = append(gwmuxOptions, runtime.WithMetadata(auth.GetHTTPRequestCookieToMetadataHandler(authContext)))

@@ -20,5 +20,7 @@ type AuthenticationContext interface {
 	CookieManager() CookieHandler
 	Options() config.OAuthOptions
 	GetUserInfoURL() *url.URL
+	GetBaseURL() *url.URL
+	GetMetadataURL() *url.URL
 	GetHTTPClient() *http.Client
 }

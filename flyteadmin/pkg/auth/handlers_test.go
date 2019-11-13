@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 
 	"github.com/lyft/flyteadmin/pkg/auth/interfaces/mocks"
@@ -52,4 +53,22 @@ func TestGetHttpRequestCookieToMetadataHandler(t *testing.T) {
 	assert.NoError(t, err)
 	req.AddCookie(&jwtCookie)
 	assert.Equal(t, "Bearer a.b.c", handler(ctx, req)["authorization"][0])
+}
+
+func TestGetMetadataEndpointRedirectHandler(t *testing.T) {
+	ctx := context.Background()
+	baseURL, err := url.Parse("http://www.google.com")
+	assert.NoError(t, err)
+	metadataPath, err := url.Parse(MetadataEndpoint)
+	assert.NoError(t, err)
+	mockAuthCtx := mocks.AuthenticationContext{}
+	mockAuthCtx.On("GetBaseURL").Return(baseURL)
+	mockAuthCtx.On("GetMetadataURL").Return(metadataPath)
+	handler := GetMetadataEndpointRedirectHandler(ctx, &mockAuthCtx)
+	req, err := http.NewRequest("GET", "/xyz", nil)
+	assert.NoError(t, err)
+	w := httptest.NewRecorder()
+	handler(w, req)
+	assert.Equal(t, http.StatusSeeOther, w.Code)
+	assert.Equal(t, "http://www.google.com/.well-known/oauth-authorization-server", w.Header()["Location"][0])
 }

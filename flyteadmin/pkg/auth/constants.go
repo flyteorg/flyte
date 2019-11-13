@@ -10,7 +10,8 @@ const DefaultAuthorizationHeader = "authorization"
 const BearerScheme = "Bearer"
 
 // https://tools.ietf.org/html/rfc8414
-const MetadataEndpoint = "/.well-known/oauth-authorization-server"
+// This should be defined without a leading slash. If there is one, the url library's ResolveReference will make it a root path
+const MetadataEndpoint = ".well-known/oauth-authorization-server"
 
 // IDP specific
 const OfflineAccessType = "offline_access"
