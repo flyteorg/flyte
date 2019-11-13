@@ -11,6 +11,7 @@ type OAuthOptions struct {
 
 	// This should be the base url of the authorization server that you are trying to hit. With Okta for instance, it
 	// will look something like https://company.okta.com/oauth2/abcdef123456789/
+	// TODO: Convert all the URLs in this config to the config.URL type
 	BaseURL string `json:"baseUrl"`
 
 	// These two config elements currently need the entire path, including the already specified baseUrl

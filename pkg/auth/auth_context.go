@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 	"time"
 
@@ -29,6 +28,8 @@ type Context struct {
 	oidcProvider  *oidc.Provider
 	options       config.OAuthOptions
 	userInfoURL   *url.URL
+	baseURL       *url.URL
+	metadataURL   *url.URL
 	httpClient    *http.Client
 }
 
@@ -58,6 +59,14 @@ func (c Context) GetUserInfoURL() *url.URL {
 
 func (c Context) GetHTTPClient() *http.Client {
 	return c.httpClient
+}
+
+func (c Context) GetBaseURL() *url.URL {
+	return c.baseURL
+}
+
+func (c Context) GetMetadataURL() *url.URL {
+	return c.metadataURL
 }
 
 const (
@@ -102,24 +111,36 @@ func NewAuthenticationContext(ctx context.Context, options config.OAuthOptions) 
 	}
 	result.oidcProvider = provider
 
+	// TODO: Convert all the URLs in this config to the config.URL type
+	// Then we will not have to do any of the parsing in this code here, and the error handling will be taken care for
+	// us by the flytestdlib config parser.
+	// Construct base URL object
+	base, err := url.Parse(options.BaseURL)
+	if err != nil {
+		logger.Errorf(ctx, "Error parsing base URL %s", err)
+		return Context{}, errors.Wrapf(ErrAuthContext, err, "Error parsing IDP base URL")
+	}
+	logger.Infof(ctx, "Base IDP URL is %s", base)
+	result.baseURL = base
+
+	metadataURL, err := url.Parse(MetadataEndpoint)
+	if err != nil {
+		logger.Errorf(ctx, "Error parsing metadata URL %s", err)
+		return Context{}, errors.Wrapf(ErrAuthContext, err, "Error parsing metadata URL")
+	}
+	logger.Infof(ctx, "Metadata endpoint is %s", metadataURL)
+	result.metadataURL = metadataURL
+
 	// Construct the URL object for the user info endpoint if applicable
 	if options.IdpUserInfoEndpoint != "" {
-		base, err := url.Parse(options.BaseURL)
+		parsedURL, err := url.Parse(options.IdpUserInfoEndpoint)
 		if err != nil {
-			logger.Errorf(ctx, "Error parsing base URL %s", err)
-			return Context{}, errors.Wrapf(ErrAuthContext, err,
-				"Error parsing base URL while constructing IDP user info endpoint")
-		}
-		joinedPath := path.Join(base.EscapedPath(), options.IdpUserInfoEndpoint)
-
-		parsedURL, err := url.Parse(joinedPath)
-		if err != nil {
-			logger.Errorf(ctx, "Error parsing total IDP user info path %s as URL %s", joinedPath, err)
+			logger.Errorf(ctx, "Error parsing total IDP user info path %s as URL %s", options.IdpUserInfoEndpoint, err)
 			return Context{}, errors.Wrapf(ErrAuthContext, err,
 				"Error parsing IDP user info path as URL while constructing IDP user info endpoint")
 		}
-		finalURL := base.ResolveReference(parsedURL)
-		logger.Infof(ctx, "The /userinfo URL for the IDP is %s", finalURL.String())
+		finalURL := result.baseURL.ResolveReference(parsedURL)
+		logger.Infof(ctx, "User info URL for IDP is %s", finalURL.String())
 		result.userInfoURL = finalURL
 	}
 
