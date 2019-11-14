@@ -149,4 +149,14 @@ var Migrations = []*gormigrate.Migration{
 			return tx.DropTable("project_domains").Error
 		},
 	},
+	// Create named_entity_metadata table.
+	{
+		ID: "2019-11-05-named-entity-metadata",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.NamedEntityMetadata{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.DropTable("named_entity_metadata").Error
+		},
+	},
 }

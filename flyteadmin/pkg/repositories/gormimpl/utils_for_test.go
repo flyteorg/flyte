@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+
 	mocket "github.com/Selvatico/go-mocket"
 	"github.com/jinzhu/gorm"
 	"github.com/lyft/flyteadmin/pkg/common"
@@ -13,6 +15,8 @@ import (
 const project = "project"
 const domain = "domain"
 const name = "name"
+const description = "description"
+const resourceType = core.ResourceType_WORKFLOW
 const version = "XYZ"
 
 func GetDbForTest(t *testing.T) *gorm.DB {

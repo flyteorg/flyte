@@ -33,8 +33,6 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-const project, domain, name, version = "project", "domain", "name", "version"
-
 var active = int32(admin.LaunchPlanState_ACTIVE)
 var inactive = int32(admin.LaunchPlanState_INACTIVE)
 var mockScheduler = mocks.NewMockEventScheduler()

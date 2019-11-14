@@ -1,5 +1,9 @@
 package common
 
+import (
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+)
+
 type Entity = string
 
 const (
@@ -11,3 +15,10 @@ const (
 	TaskExecution      = "te"
 	Workflow           = "w"
 )
+
+// ResourceTypeToEntity maps a resource type to an entity suitable for use with Database filters
+var ResourceTypeToEntity = map[core.ResourceType]Entity{
+	core.ResourceType_LAUNCH_PLAN: LaunchPlan,
+	core.ResourceType_TASK:        Task,
+	core.ResourceType_WORKFLOW:    Workflow,
+}

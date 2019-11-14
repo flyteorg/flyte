@@ -4,13 +4,12 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	"google.golang.org/grpc/codes"
-
 	"github.com/lyft/flyteadmin/pkg/common"
 	adminErrors "github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"google.golang.org/grpc/codes"
 )
 
 const Project = "project"
@@ -18,6 +17,8 @@ const Domain = "domain"
 const Name = "name"
 const Version = "version"
 const Closure = "closure"
+const Description = "description"
+const ResourceType = "resource_type"
 
 const ProjectID = "project_id"
 const ProjectName = "project_name"
@@ -25,6 +26,7 @@ const DomainID = "domain_id"
 const DomainName = "domain_name"
 
 const executionTableName = "executions"
+const namedEntityMetadataTableName = "named_entity_metadata"
 const nodeExecutionTableName = "node_executions"
 const nodeExecutionEventTableName = "node_event_executions"
 const taskExecutionTableName = "task_executions"
@@ -34,6 +36,16 @@ const limit = "limit"
 const filters = "filters"
 
 var identifierGroupBy = fmt.Sprintf("%s, %s, %s", Project, Domain, Name)
+
+var entityToModel = map[common.Entity]interface{}{
+	common.Execution:          models.Execution{},
+	common.LaunchPlan:         models.LaunchPlan{},
+	common.NodeExecution:      models.NodeExecution{},
+	common.NodeExecutionEvent: models.NodeExecutionEvent{},
+	common.Task:               models.Task{},
+	common.TaskExecution:      models.TaskExecution{},
+	common.Workflow:           models.Workflow{},
+}
 
 var innerJoinNodeExecToNodeEvents = fmt.Sprintf(
 	"INNER JOIN %s ON %s.node_execution_id = %s.id",
@@ -59,16 +71,6 @@ var leftJoinTaskToTaskExec = fmt.Sprintf(
 		"%s.version = %s.version",
 	taskTableName, taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName,
 	taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName)
-
-var entityToModel = map[common.Entity]interface{}{
-	common.Execution:          models.Execution{},
-	common.LaunchPlan:         models.LaunchPlan{},
-	common.NodeExecution:      models.NodeExecution{},
-	common.NodeExecutionEvent: models.NodeExecutionEvent{},
-	common.Task:               models.Task{},
-	common.TaskExecution:      models.TaskExecution{},
-	common.Workflow:           models.Workflow{},
-}
 
 // Validates there are no missing but required parameters in ListResourceInput
 func ValidateListInput(input interfaces.ListResourceInput) adminErrors.FlyteAdminError {

@@ -1,6 +1,8 @@
 package interfaces
 
-import "github.com/lyft/flyteadmin/pkg/common"
+import (
+	"github.com/lyft/flyteadmin/pkg/common"
+)
 
 // Parameters for getting an individual resource.
 type GetResourceInput struct {

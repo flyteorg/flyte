@@ -5,20 +5,17 @@ import (
 	"context"
 	"time"
 
-	"github.com/lyft/flyteadmin/pkg/manager/impl/validation"
-
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/lyft/flytestdlib/logger"
-
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
+	"github.com/lyft/flyteadmin/pkg/manager/impl/validation"
 	"github.com/lyft/flyteadmin/pkg/repositories"
 	repoInterfaces "github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/storage"
 	"google.golang.org/grpc/codes"
 )
@@ -115,6 +112,30 @@ func GetLaunchPlan(
 		return nil, err
 	}
 	return transformers.FromLaunchPlanModel(launchPlanModel)
+}
+
+func GetNamedEntityModel(
+	ctx context.Context, repo repositories.RepositoryInterface, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (models.NamedEntity, error) {
+	metadataModel, err := (repo).NamedEntityRepo().Get(ctx, repoInterfaces.GetNamedEntityInput{
+		ResourceType: resourceType,
+		Project:      identifier.Project,
+		Domain:       identifier.Domain,
+		Name:         identifier.Name,
+	})
+	if err != nil {
+		return models.NamedEntity{}, err
+	}
+	return metadataModel, nil
+}
+
+func GetNamedEntity(
+	ctx context.Context, repo repositories.RepositoryInterface, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (*admin.NamedEntity, error) {
+	metadataModel, err := GetNamedEntityModel(ctx, repo, resourceType, identifier)
+	if err != nil {
+		return nil, err
+	}
+	metadata := transformers.FromNamedEntityModel(metadataModel)
+	return &metadata, nil
 }
 
 // Returns the set of filters necessary to query launch plan models to find the active version of a launch plan

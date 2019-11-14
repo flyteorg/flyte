@@ -6,15 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/golang/protobuf/ptypes"
-
-	"github.com/lyft/flytestdlib/storage"
-
-	"github.com/lyft/flytestdlib/logger"
-
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/manager/impl/util"
@@ -30,6 +22,10 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	compiler "github.com/lyft/flytepropeller/pkg/compiler/common"
+	"github.com/lyft/flytestdlib/logger"
+	"github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/storage"
+	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 )
 
@@ -321,8 +317,9 @@ func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request a
 	if len(output.Workflows) == int(request.Limit) {
 		token = strconv.Itoa(offset + len(output.Workflows))
 	}
+	entities := transformers.FromWorkflowModelsToIdentifiers(output.Workflows)
 	return &admin.NamedEntityIdentifierList{
-		Entities: transformers.FromWorkflowModelsToIdentifiers(output.Workflows),
+		Entities: entities,
 		Token:    token,
 	}, nil
 

@@ -13,11 +13,8 @@ import (
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/stretchr/testify/assert"
 )
-
-var workflowVersions = []string{"123", "456", "789"}
 
 func TestCreateWorkflow(t *testing.T) {
 	ctx := context.Background()
@@ -43,37 +40,6 @@ func TestCreateWorkflow(t *testing.T) {
 
 	_, err := client.CreateWorkflow(ctx, &req)
 	assert.Nil(t, err)
-}
-
-func insertWorkflowsForTests(t *testing.T, client service.AdminServiceClient) {
-	ctx := context.Background()
-	for _, project := range []string{"admintests"} {
-		for _, domain := range []string{"development", "production"} {
-			for _, name := range []string{"name_a", "name_b", "name_c"} {
-				for _, version := range workflowVersions {
-					identifier := core.Identifier{
-						ResourceType: core.ResourceType_WORKFLOW,
-						Project:      project,
-						Domain:       domain,
-						Name:         name,
-						Version:      version,
-					}
-					req := admin.WorkflowCreateRequest{
-						Id: &identifier,
-						Spec: &admin.WorkflowSpec{
-							Template: &core.WorkflowTemplate{
-								Id:        &identifier,
-								Interface: &core.TypedInterface{},
-							},
-						},
-					}
-
-					_, err := client.CreateWorkflow(ctx, &req)
-					assert.Nil(t, err, "Failed to create workflow test data with err %v", err)
-				}
-			}
-		}
-	}
 }
 
 func TestGetWorkflows(t *testing.T) {
@@ -156,7 +122,7 @@ func testListWorkflowGrpc(t *testing.T) {
 		assert.Equal(t, "admintests", workflow.Id.Project)
 		assert.Equal(t, "development", workflow.Id.Domain)
 		assert.Equal(t, "name_a", workflow.Id.Name)
-		assert.Contains(t, workflowVersions, workflow.Id.Version)
+		assert.Contains(t, entityVersions, workflow.Id.Version)
 	}
 }
 
@@ -182,7 +148,7 @@ func testListWorkflowHTTP(t *testing.T) {
 		assert.Equal(t, "admintests", workflow.Id.Project)
 		assert.Equal(t, "development", workflow.Id.Domain)
 		assert.Equal(t, "name_a", workflow.Id.Name)
-		assert.Contains(t, workflowVersions, workflow.Id.Version)
+		assert.Contains(t, entityVersions, workflow.Id.Version)
 	}
 }
 
@@ -206,7 +172,7 @@ func testListWorkflow_PaginationGrpc(t *testing.T) {
 		assert.Equal(t, "admintests", workflow.Id.Project)
 		assert.Equal(t, "development", workflow.Id.Domain)
 		assert.Equal(t, "name_a", workflow.Id.Name)
-		assert.Contains(t, workflowVersions, workflow.Id.Version)
+		assert.Contains(t, entityVersions, workflow.Id.Version)
 
 		firstResponseVersions[idx] = workflow.Id.Version
 	}
@@ -227,7 +193,7 @@ func testListWorkflow_PaginationGrpc(t *testing.T) {
 		assert.Equal(t, "admintests", workflow.Id.Project)
 		assert.Equal(t, "development", workflow.Id.Domain)
 		assert.Equal(t, "name_a", workflow.Id.Name)
-		assert.Contains(t, workflowVersions, workflow.Id.Version)
+		assert.Contains(t, entityVersions, workflow.Id.Version)
 		assert.NotContains(t, firstResponseVersions, workflow.Id.Version)
 	}
 	assert.Empty(t, workflows.Token)
@@ -256,7 +222,7 @@ func testListWorkflow_PaginationHTTP(t *testing.T) {
 		assert.Equal(t, "admintests", workflow.Id.Project)
 		assert.Equal(t, "development", workflow.Id.Domain)
 		assert.Equal(t, "name_a", workflow.Id.Name)
-		assert.Contains(t, workflowVersions, workflow.Id.Version)
+		assert.Contains(t, entityVersions, workflow.Id.Version)
 
 		firstResponseVersions[idx] = workflow.Id.Version
 	}
@@ -282,7 +248,7 @@ func testListWorkflow_PaginationHTTP(t *testing.T) {
 		assert.Equal(t, "admintests", workflow.Id.Project)
 		assert.Equal(t, "development", workflow.Id.Domain)
 		assert.Equal(t, "name_a", workflow.Id.Name)
-		assert.Contains(t, workflowVersions, workflow.Id.Version)
+		assert.Contains(t, entityVersions, workflow.Id.Version)
 		assert.NotContains(t, firstResponseVersions, workflow.Id.Version)
 	}
 	assert.Empty(t, octetStreamedWorkflowList.Token)
