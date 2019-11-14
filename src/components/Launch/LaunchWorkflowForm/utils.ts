@@ -114,6 +114,9 @@ export function convertFormInputsToLiteralMap(
     };
 }
 
+/** Converts a `LiteralType` to an `InputTypeDefintion` to assist with rendering
+ * a type annotation.
+ */
 export function getInputDefintionForLiteralType(
     literalType: LiteralType
 ): InputTypeDefinition {

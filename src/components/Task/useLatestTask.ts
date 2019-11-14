@@ -24,6 +24,9 @@ async function fetchLatestTaskVersion(id: NamedEntityIdentifier) {
     return entities[0];
 }
 
+/** A hook for fetching the latest version of a task, equivalent to listing
+ * tasks for a project/domain/name with limit=1
+ */
 export function useLatestTaskVersion(taskId: NamedEntityIdentifier) {
     return useFetchableData(
         {

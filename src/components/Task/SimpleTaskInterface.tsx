@@ -10,10 +10,6 @@ import { Task, Variable } from 'models';
 import * as React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
-    container: {
-        marginTop: theme.spacing(0.5),
-        marginBottom: theme.spacing(0.5)
-    },
     label: {
         marginRight: theme.spacing(1)
     },
@@ -66,12 +62,12 @@ const VariablesList: React.FC<{ variables: Record<string, Variable> }> = ({
     );
 };
 
+/** Renders Task interface details as two basic string lists with type annotations. */
 export const SimpleTaskInterface: React.FC<{ task: Task }> = ({ task }) => {
-    const styles = useStyles();
     const { inputs = emptyVariables, outputs = emptyVariables } =
         task.closure.compiledTask.template.interface || {};
     return (
-        <div className={styles.container}>
+        <div>
             <DetailsGroup
                 labelWidthGridUnits={5}
                 items={[

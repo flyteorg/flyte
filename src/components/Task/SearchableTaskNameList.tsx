@@ -22,12 +22,12 @@ const Skeleton = reactLoadingSkeleton;
 const useStyles = makeStyles((theme: Theme) => ({
     description: {
         color: theme.palette.text.secondary,
-        marginTop: theme.spacing(0.5)
+        marginTop: theme.spacing(0.5),
+        marginBottom: theme.spacing(0.5)
     },
     errorContainer: {
         // Fix icon left alignment
-        marginLeft: '-2px',
-        marginTop: theme.spacing(1)
+        marginLeft: '-2px'
     },
     interfaceContainer: {
         width: '100%'
@@ -75,9 +75,6 @@ const TaskInterface: React.FC<{ taskName: NamedEntity }> = ({ taskName }) => {
         </div>
     );
 };
-
-// TODO:
-// * Write custom error content since it will be a small area
 
 const TaskNameRow: React.FC<TaskNameRowProps> = ({ label, entityName }) => {
     const styles = useStyles();
