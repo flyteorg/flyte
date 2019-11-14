@@ -5,26 +5,21 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	executionCluster "github.com/lyft/flyteadmin/pkg/executioncluster/impl"
-
-	"github.com/lyft/flytestdlib/profutils"
-
+	"github.com/golang/protobuf/proto"
+	"github.com/lyft/flyteadmin/pkg/async/notifications"
 	"github.com/lyft/flyteadmin/pkg/async/schedule"
 	"github.com/lyft/flyteadmin/pkg/data"
-
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
-
-	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flytestdlib/logger"
-
-	"github.com/lyft/flyteadmin/pkg/async/notifications"
+	executionCluster "github.com/lyft/flyteadmin/pkg/executioncluster/impl"
 	manager "github.com/lyft/flyteadmin/pkg/manager/impl"
 	"github.com/lyft/flyteadmin/pkg/manager/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories"
 	repositoryConfig "github.com/lyft/flyteadmin/pkg/repositories/config"
 	"github.com/lyft/flyteadmin/pkg/runtime"
 	workflowengine "github.com/lyft/flyteadmin/pkg/workflowengine/impl"
+	"github.com/lyft/flytestdlib/logger"
+	"github.com/lyft/flytestdlib/profutils"
+	"github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/storage"
 )
 
 type AdminService struct {
@@ -36,6 +31,7 @@ type AdminService struct {
 	TaskExecutionManager interfaces.TaskExecutionInterface
 	ProjectManager       interfaces.ProjectInterface
 	ProjectDomainManager interfaces.ProjectDomainInterface
+	NamedEntityManager   interfaces.NamedEntityInterface
 	Metrics              AdminMetrics
 }
 
@@ -156,8 +152,9 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		WorkflowManager: manager.NewWorkflowManager(
 			db, configuration, workflowengine.NewCompiler(), dataStorageClient, applicationConfiguration.MetadataStoragePrefix,
 			adminScope.NewSubScope("workflow_manager")),
-		LaunchPlanManager: launchPlanManager,
-		ExecutionManager:  executionManager,
+		LaunchPlanManager:  launchPlanManager,
+		ExecutionManager:   executionManager,
+		NamedEntityManager: manager.NewNamedEntityManager(db, configuration, adminScope.NewSubScope("named_entity_manager")),
 		NodeExecutionManager: manager.NewNodeExecutionManager(
 			db, adminScope.NewSubScope("node_execution_manager"), urlData),
 		TaskExecutionManager: manager.NewTaskExecutionManager(

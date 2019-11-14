@@ -9,7 +9,7 @@ update_boilerplate:
 
 .PHONY: integration
 integration:
-	GOCACHE=off go test -v -tags=integration ./tests/...
+	GOFLAGS="-count=1" go test -v -tags=integration ./tests/...
 
 .PHONY: k8s_integration
 k8s_integration:
@@ -25,7 +25,7 @@ linux_compile:
 
 .PHONY: server
 server:
-	go run cmd/main.go --logtostderr --server.kube-config ~/.kube/config  --config ~/flyteadmin_config.yaml serve
+	go run cmd/main.go --logtostderr --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml serve
 
 .PHONY: migrate
 migrate:

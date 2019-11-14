@@ -25,7 +25,9 @@ import (
 const project = "project"
 const domain = "domain"
 const name = "name"
+const description = "description"
 const version = "version"
+const resourceType = core.ResourceType_WORKFLOW
 const remoteClosureIdentifier = "remote closure id"
 
 var errExpected = errors.New("expected error")
@@ -353,6 +355,95 @@ func TestGetLaunchPlan_TransformerError(t *testing.T) {
 	})
 	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 	assert.Empty(t, launchPlan)
+}
+
+func TestGetNamedEntityModel(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	getNamedEntityFunc := func(input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
+		assert.Equal(t, project, input.Project)
+		assert.Equal(t, domain, input.Domain)
+		assert.Equal(t, name, input.Name)
+		assert.Equal(t, resourceType, input.ResourceType)
+		return models.NamedEntity{
+			NamedEntityKey: models.NamedEntityKey{
+				Project:      input.Project,
+				Domain:       input.Domain,
+				Name:         input.Name,
+				ResourceType: input.ResourceType,
+			},
+			NamedEntityMetadataFields: models.NamedEntityMetadataFields{
+				Description: description,
+			},
+		}, nil
+	}
+	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
+	entity, err := GetNamedEntityModel(context.Background(), repository,
+		core.ResourceType_WORKFLOW,
+		admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		})
+	assert.Nil(t, err)
+	assert.NotNil(t, entity)
+	assert.Equal(t, project, entity.Project)
+	assert.Equal(t, domain, entity.Domain)
+	assert.Equal(t, name, entity.Name)
+	assert.Equal(t, description, entity.Description)
+	assert.Equal(t, resourceType, entity.ResourceType)
+}
+
+func TestGetNamedEntityModel_DatabaseError(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	getNamedEntityFunc := func(input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
+		return models.NamedEntity{}, errExpected
+	}
+	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
+	launchPlan, err := GetNamedEntityModel(context.Background(), repository,
+		core.ResourceType_WORKFLOW,
+		admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		})
+	assert.EqualError(t, err, errExpected.Error())
+	assert.Empty(t, launchPlan)
+}
+
+func TestGetNamedEntity(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	getNamedEntityFunc := func(input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
+		assert.Equal(t, project, input.Project)
+		assert.Equal(t, domain, input.Domain)
+		assert.Equal(t, name, input.Name)
+		assert.Equal(t, resourceType, input.ResourceType)
+		return models.NamedEntity{
+			NamedEntityKey: models.NamedEntityKey{
+				Project:      input.Project,
+				Domain:       input.Domain,
+				Name:         input.Name,
+				ResourceType: core.ResourceType_WORKFLOW,
+			},
+			NamedEntityMetadataFields: models.NamedEntityMetadataFields{
+				Description: description,
+			},
+		}, nil
+	}
+	repository.NamedEntityRepo().(*repositoryMocks.MockNamedEntityRepo).SetGetCallback(getNamedEntityFunc)
+	entity, err := GetNamedEntity(context.Background(), repository,
+		core.ResourceType_WORKFLOW,
+		admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		})
+	assert.Nil(t, err)
+	assert.NotNil(t, entity)
+	assert.Equal(t, project, entity.Id.Project)
+	assert.Equal(t, domain, entity.Id.Domain)
+	assert.Equal(t, name, entity.Id.Name)
+	assert.Equal(t, description, entity.Metadata.Description)
+	assert.Equal(t, resourceType, entity.ResourceType)
 }
 
 func TestGetActiveLaunchPlanVersionFilters(t *testing.T) {

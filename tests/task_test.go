@@ -15,11 +15,8 @@ import (
 
 	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/stretchr/testify/assert"
 )
-
-var taskVersions = []string{"123", "456", "789"}
 
 func TestCreateBasic(t *testing.T) {
 	ctx := context.Background()
@@ -62,36 +59,6 @@ func TestCreateBasic(t *testing.T) {
 	assert.Nil(t, response)
 	assert.Error(t, err)
 	assert.True(t, strings.Contains(err.Error(), "already exists"))
-}
-
-func addHTTPRequestHeaders(req *http.Request) {
-	req.Header.Add("Accept", "application/octet-stream")
-	req.Header.Add("Content-Type", "application/json")
-}
-
-func insertTasksForTests(t *testing.T, client service.AdminServiceClient) {
-	ctx := context.Background()
-	for _, project := range []string{"admintests"} {
-		for _, domain := range []string{"development", "production"} {
-			for _, name := range []string{"name_a", "name_b", "name_c"} {
-				for _, version := range taskVersions {
-					req := admin.TaskCreateRequest{
-						Id: &core.Identifier{
-							ResourceType: core.ResourceType_TASK,
-							Project:      project,
-							Domain:       domain,
-							Name:         name,
-							Version:      version,
-						},
-						Spec: testutils.GetValidTaskRequest().Spec,
-					}
-
-					_, err := client.CreateTask(ctx, &req)
-					assert.Nil(t, err)
-				}
-			}
-		}
-	}
 }
 
 func TestCreateTaskWithoutContainer(t *testing.T) {
@@ -185,7 +152,7 @@ func testListTaskGrpc(t *testing.T) {
 		assert.Equal(t, "admintests", task.Id.Project)
 		assert.Equal(t, "development", task.Id.Domain)
 		assert.Equal(t, "name_a", task.Id.Name)
-		assert.Contains(t, taskVersions, task.Id.Version)
+		assert.Contains(t, entityVersions, task.Id.Version)
 	}
 	assert.True(t, tasks.Tasks[0].Id.Version < tasks.Tasks[1].Id.Version)
 	assert.True(t, tasks.Tasks[1].Id.Version < tasks.Tasks[2].Id.Version)
@@ -216,7 +183,7 @@ func testListTaskHTTP(t *testing.T) {
 		assert.Equal(t, "admintests", task.Id.Project)
 		assert.Equal(t, "development", task.Id.Domain)
 		assert.Equal(t, "name_a", task.Id.Name)
-		assert.Contains(t, taskVersions, task.Id.Version)
+		assert.Contains(t, entityVersions, task.Id.Version)
 	}
 	assert.True(t, octetStreamedTaskList.Tasks[0].Id.Version < octetStreamedTaskList.Tasks[1].Id.Version)
 	assert.True(t, octetStreamedTaskList.Tasks[1].Id.Version < octetStreamedTaskList.Tasks[2].Id.Version)
@@ -242,7 +209,7 @@ func testListTask_PaginationGrpc(t *testing.T) {
 		assert.Equal(t, "admintests", task.Id.Project)
 		assert.Equal(t, "development", task.Id.Domain)
 		assert.Equal(t, "name_a", task.Id.Name)
-		assert.Contains(t, taskVersions, task.Id.Version)
+		assert.Contains(t, entityVersions, task.Id.Version)
 
 		firstResponseVersions[idx] = task.Id.Version
 	}
@@ -263,7 +230,7 @@ func testListTask_PaginationGrpc(t *testing.T) {
 		assert.Equal(t, "admintests", task.Id.Project)
 		assert.Equal(t, "development", task.Id.Domain)
 		assert.Equal(t, "name_a", task.Id.Name)
-		assert.Contains(t, taskVersions, task.Id.Version)
+		assert.Contains(t, entityVersions, task.Id.Version)
 		assert.NotContains(t, firstResponseVersions, task.Id.Version)
 	}
 }
@@ -293,7 +260,7 @@ func testListTask_PaginationHTTP(t *testing.T) {
 		assert.Equal(t, "admintests", task.Id.Project)
 		assert.Equal(t, "development", task.Id.Domain)
 		assert.Equal(t, "name_a", task.Id.Name)
-		assert.Contains(t, taskVersions, task.Id.Version)
+		assert.Contains(t, entityVersions, task.Id.Version)
 
 		firstResponseVersions[idx] = task.Id.Version
 	}
@@ -319,7 +286,7 @@ func testListTask_PaginationHTTP(t *testing.T) {
 		assert.Equal(t, "admintests", task.Id.Project)
 		assert.Equal(t, "development", task.Id.Domain)
 		assert.Equal(t, "name_a", task.Id.Name)
-		assert.Contains(t, taskVersions, task.Id.Version)
+		assert.Contains(t, entityVersions, task.Id.Version)
 		assert.NotContains(t, firstResponseVersions, task.Id.Version)
 	}
 }

@@ -30,19 +30,19 @@ func getWorkflowCreateRequest() admin.WorkflowCreateRequest {
 	return admin.WorkflowCreateRequest{
 		Id: &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
-			Project:      "admintests",
-			Domain:       "development",
-			Name:         "workflow",
-			Version:      "version",
+			Project:      entityProjects[0],
+			Domain:       entityDomains[0],
+			Name:         entityNames[0],
+			Version:      entityVersions[0],
 		},
 		Spec: &admin.WorkflowSpec{
 			Template: &core.WorkflowTemplate{
 				Id: &core.Identifier{
 					ResourceType: core.ResourceType_WORKFLOW,
-					Project:      "admintests",
-					Domain:       "development",
-					Name:         "workflow",
-					Version:      "version",
+					Project:      entityProjects[0],
+					Domain:       entityDomains[0],
+					Name:         entityNames[0],
+					Version:      entityVersions[0],
 				},
 				Interface: &core.TypedInterface{
 					Inputs: &core.VariableMap{
@@ -56,6 +56,16 @@ func getWorkflowCreateRequest() admin.WorkflowCreateRequest {
 			},
 		},
 	}
+}
+
+func getLaunchPlanCreateRequestWithCronSchedule(workflowIdentifier *core.Identifier, test_cron_expr string) admin.LaunchPlanCreateRequest {
+	lpCreateReq := getLaunchPlanCreateRequest(workflowIdentifier)
+	lpCreateReq.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
+		Schedule: &admin.Schedule{
+			ScheduleExpression: &admin.Schedule_CronExpression{CronExpression: test_cron_expr},
+		},
+	}
+	return lpCreateReq
 }
 
 func getLaunchPlanCreateRequest(workflowIdentifier *core.Identifier) admin.LaunchPlanCreateRequest {
@@ -77,16 +87,6 @@ func getLaunchPlanCreateRequest(workflowIdentifier *core.Identifier) admin.Launc
 			},
 		},
 	}
-}
-
-func getLaunchPlanCreateRequestWithCronSchedule(workflowIdentifier *core.Identifier, test_cron_expr string) admin.LaunchPlanCreateRequest {
-	lpCreateReq := getLaunchPlanCreateRequest(workflowIdentifier)
-	lpCreateReq.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
-		Schedule: &admin.Schedule{
-			ScheduleExpression: &admin.Schedule_CronExpression{CronExpression: test_cron_expr},
-		},
-	}
-	return lpCreateReq
 }
 
 func getLaunchPlanCreateRequestWithFixedRateSchedule(workflowIdentifier *core.Identifier, test_rate_value uint32, test_rate_unit admin.FixedRateUnit) admin.LaunchPlanCreateRequest {

@@ -8,6 +8,7 @@ const (
 	Name                  = "name"
 	ID                    = "id"
 	Version               = "version"
+	ResourceType          = "resource_type"
 	Spec                  = "spec"
 	Type                  = "type"
 	RuntimeVersion        = "runtime version"

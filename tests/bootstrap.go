@@ -43,6 +43,7 @@ func truncateAllTablesForTestingOnly() {
 	// HACK: alter executions table so that spec is not required for testing.
 	TruncateExecutions := fmt.Sprintf("TRUNCATE TABLE executions; alter table executions alter column spec drop not null;")
 	TruncateExecutionEvents := fmt.Sprintf("TRUNCATE TABLE execution_events;")
+	TruncateNamedEntityMetadata := fmt.Sprintf("TRUNCATE TABLE named_entity_metadata;")
 	TruncateNodeExecutions := fmt.Sprintf("TRUNCATE TABLE node_executions;")
 	TruncateNodeExecutionEvents := fmt.Sprintf("TRUNCATE TABLE node_execution_events;")
 	TruncateTaskExecutions := fmt.Sprintf("TRUNCATE TABLE task_executions;")
@@ -53,6 +54,7 @@ func truncateAllTablesForTestingOnly() {
 	db.Exec(TruncateLaunchPlans)
 	db.Exec(TruncateExecutions)
 	db.Exec(TruncateExecutionEvents)
+	db.Exec(TruncateNamedEntityMetadata)
 	db.Exec(TruncateNodeExecutions)
 	db.Exec(TruncateNodeExecutionEvents)
 	db.Exec(TruncateTaskExecutions)

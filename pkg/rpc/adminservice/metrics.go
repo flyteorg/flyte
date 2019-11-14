@@ -31,6 +31,14 @@ type launchPlanEndpointMetrics struct {
 	listIds    util.RequestMetrics
 }
 
+type namedEntityEndpointMetrics struct {
+	scope promutils.Scope
+
+	list   util.RequestMetrics
+	update util.RequestMetrics
+	get    util.RequestMetrics
+}
+
 type nodeExecutionEndpointMetrics struct {
 	scope promutils.Scope
 
@@ -87,6 +95,7 @@ type AdminMetrics struct {
 
 	executionEndpointMetrics     executionEndpointMetrics
 	launchPlanEndpointMetrics    launchPlanEndpointMetrics
+	namedEntityEndpointMetrics   namedEntityEndpointMetrics
 	nodeExecutionEndpointMetrics nodeExecutionEndpointMetrics
 	projectEndpointMetrics       projectEndpointMetrics
 	projectDomainEndpointMetrics projectDomainEndpointMetrics
@@ -120,6 +129,12 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			list:       util.NewRequestMetrics(adminScope, "list_launch_plan"),
 			listActive: util.NewRequestMetrics(adminScope, "list_active_launch_plans"),
 			listIds:    util.NewRequestMetrics(adminScope, "list_launch_plan_ids"),
+		},
+		namedEntityEndpointMetrics: namedEntityEndpointMetrics{
+			scope:  adminScope,
+			get:    util.NewRequestMetrics(adminScope, "get_named_entity"),
+			list:   util.NewRequestMetrics(adminScope, "list_named_entities"),
+			update: util.NewRequestMetrics(adminScope, "update_named_entity"),
 		},
 		nodeExecutionEndpointMetrics: nodeExecutionEndpointMetrics{
 			scope:        adminScope,
