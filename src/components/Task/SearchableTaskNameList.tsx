@@ -1,5 +1,6 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import * as classnames from 'classnames';
 import { noDescriptionString } from 'common/constants';
 import { SearchResult, WaitForData } from 'components/common';
@@ -23,6 +24,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         color: theme.palette.text.secondary,
         marginTop: theme.spacing(0.5)
     },
+    errorContainer: {
+        // Fix icon left alignment
+        marginLeft: '-2px',
+        marginTop: theme.spacing(1)
+    },
     interfaceContainer: {
         width: '100%'
     },
@@ -41,12 +47,29 @@ const intersectionOptions: IntersectionOptions = {
     triggerOnce: true
 };
 
+const TaskInterfaceError: React.FC = () => {
+    const { flexCenter, hintText, iconRight } = useCommonStyles();
+    const { errorContainer } = useStyles();
+    return (
+        <div className={classnames(errorContainer, flexCenter)}>
+            <ErrorOutline fontSize="small" color="disabled" />
+            <div className={classnames(iconRight, hintText)}>
+                Failed to load task interface details.
+            </div>
+        </div>
+    );
+};
+
 const TaskInterface: React.FC<{ taskName: NamedEntity }> = ({ taskName }) => {
     const styles = useStyles();
     const task = useLatestTaskVersion(taskName.id);
     return (
         <div className={styles.interfaceContainer}>
-            <WaitForData {...task} loadingComponent={Skeleton}>
+            <WaitForData
+                {...task}
+                errorComponent={TaskInterfaceError}
+                loadingComponent={Skeleton}
+            >
                 {() => <SimpleTaskInterface task={task.value} />}
             </WaitForData>
         </div>
