@@ -18,6 +18,8 @@ function renderSpinner(variant: SpinnerVariant) {
 
 interface WaitForDataProps {
     children: (() => React.ReactNode) | React.ReactNode;
+    /** Component to use for displaying errors. This will override `errorTitle` */
+    errorComponent?: React.ComponentType<{ error?: Error; retry?(): any }>;
     /** The string to display as the header of the error content */
     errorTitle?: string;
     /** Indicates if the data has successfully loaded at least once */
@@ -48,6 +50,7 @@ interface WaitForDataProps {
  */
 export const WaitForData: React.FC<WaitForDataProps> = ({
     children,
+    errorComponent: ErrorComponent,
     errorTitle = defaultErrorTitle,
     hasLoaded,
     lastError,
@@ -59,7 +62,9 @@ export const WaitForData: React.FC<WaitForDataProps> = ({
     // If an error occurs, only show it if we haven't successfully retrieved a
     // value yet
     if (lastError && !hasLoaded) {
-        return (
+        return ErrorComponent ? (
+            <ErrorComponent error={lastError} retry={fetch} />
+        ) : (
             <DataError
                 error={lastError}
                 errorTitle={errorTitle}

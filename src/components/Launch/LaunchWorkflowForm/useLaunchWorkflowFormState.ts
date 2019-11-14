@@ -30,6 +30,7 @@ import {
 import {
     convertFormInputsToLiteralMap,
     formatLabelWithType,
+    getInputDefintionForLiteralType,
     getWorkflowInputs,
     launchPlansToSearchableSelectorOptions,
     workflowsToSearchableSelectorOptions
@@ -38,38 +39,6 @@ import {
 // We use a non-empty string for the description to allow display components
 // to depend on the existence of a value
 const emptyDescription = ' ';
-
-function getInputDefintionForLiteralType(
-    literalType: LiteralType
-): InputTypeDefinition {
-    if (literalType.blob) {
-        return { type: InputType.Blob };
-    }
-
-    if (literalType.collectionType) {
-        return {
-            type: InputType.Collection,
-            subtype: getInputDefintionForLiteralType(literalType.collectionType)
-        };
-    }
-
-    if (literalType.mapValueType) {
-        return {
-            type: InputType.Map,
-            subtype: getInputDefintionForLiteralType(literalType.mapValueType)
-        };
-    }
-
-    if (literalType.schema) {
-        return { type: InputType.Schema };
-    }
-
-    if (literalType.simple) {
-        return { type: simpleTypeToInputType[literalType.simple] };
-    }
-
-    return { type: InputType.Unknown };
-}
 
 type ParsedInput = Pick<
     InputProps,

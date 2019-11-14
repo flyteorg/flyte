@@ -1,8 +1,15 @@
+import { useAPIContext } from 'components/data/apiContext';
 import { NotFoundError } from 'errors';
-import { Identifier, TaskTemplate } from 'models';
-
+import {
+    Identifier,
+    IdentifierScope,
+    RequestConfig,
+    Task,
+    TaskTemplate
+} from 'models';
 import { FetchableData } from './types';
 import { useFetchableData } from './useFetchableData';
+import { usePagination } from './usePagination';
 
 /** A hook for fetching a Task template */
 export function useTaskTemplate(id: Identifier): FetchableData<TaskTemplate> {
@@ -22,5 +29,14 @@ export function useTaskTemplate(id: Identifier): FetchableData<TaskTemplate> {
                 )
         },
         id
+    );
+}
+
+/** A hook for fetching a paginated list of tasks */
+export function useTaskList(scope: IdentifierScope, config: RequestConfig) {
+    const { listTasks } = useAPIContext();
+    return usePagination<Task, IdentifierScope>(
+        { ...config, cacheItems: true, fetchArg: scope },
+        listTasks
     );
 }
