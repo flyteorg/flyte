@@ -1,7 +1,7 @@
 import { WaitForData } from 'components/common';
 import { useTaskNameList } from 'components/hooks/useNamedEntity';
 import { SearchableTaskNameList } from 'components/Task/SearchableTaskNameList';
-import { limits, SortDirection, workflowSortFields } from 'models';
+import { limits, SortDirection, taskSortFields } from 'models';
 import * as React from 'react';
 
 export interface ProjectTasksProps {
@@ -20,7 +20,7 @@ export const ProjectTasks: React.FC<ProjectTasksProps> = ({
             limit: limits.NONE,
             sort: {
                 direction: SortDirection.ASCENDING,
-                key: workflowSortFields.name
+                key: taskSortFields.name
             }
         }
     );

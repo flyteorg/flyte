@@ -12,7 +12,7 @@ export const useNamedEntityListStyles = makeStyles((theme: Theme) => ({
         width: '100%'
     },
     itemName: {
-        flex: '1 0 auto',
+        flex: '1 1 auto',
         padding: `${theme.spacing(2)}px 0`
     },
     itemChevron: {
