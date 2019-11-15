@@ -27,7 +27,7 @@ export const AppComponent: React.StatelessComponent<{}> = () => {
             >
                 <CssBaseline />
                 <Helmet>
-                    <title>Flyte Dashboard</title>
+                    <title>Flyte Console</title>
                     <meta name="viewport" content="width=device-width" />
                 </Helmet>
                 <Router history={history}>
