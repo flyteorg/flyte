@@ -41,6 +41,10 @@ func (s *DataCatalogService) GetArtifact(ctx context.Context, request *catalog.G
 	return s.ArtifactManager.GetArtifact(ctx, *request)
 }
 
+func (s *DataCatalogService) ListArtifacts(ctx context.Context, request *catalog.ListArtifactsRequest) (*catalog.ListArtifactsResponse, error) {
+	return s.ArtifactManager.ListArtifacts(ctx, *request)
+}
+
 func (s *DataCatalogService) AddTag(ctx context.Context, request *catalog.AddTagRequest) (*catalog.AddTagResponse, error) {
 	return s.TagManager.AddTag(ctx, *request)
 }

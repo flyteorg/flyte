@@ -10,10 +10,12 @@ import (
 
 	"database/sql/driver"
 
+	"github.com/lyft/datacatalog/pkg/common"
 	apiErrors "github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	"github.com/lyft/datacatalog/pkg/repositories/utils"
+	datacatalog "github.com/lyft/datacatalog/protos/gen"
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
@@ -44,6 +46,48 @@ func getTestPartition() models.Partition {
 		Value:       "value",
 		ArtifactID:  "123",
 	}
+}
+
+// Raw db response to return on raw queries for artifacts
+func getDBArtifactResponse(artifact models.Artifact) []map[string]interface{} {
+	expectedArtifactResponse := make([]map[string]interface{}, 0)
+	sampleArtifact := make(map[string]interface{})
+	sampleArtifact["dataset_project"] = artifact.DatasetProject
+	sampleArtifact["dataset_domain"] = artifact.DatasetDomain
+	sampleArtifact["dataset_name"] = artifact.DatasetName
+	sampleArtifact["dataset_version"] = artifact.DatasetVersion
+	sampleArtifact["artifact_id"] = artifact.ArtifactID
+	sampleArtifact["dataset_uuid"] = artifact.DatasetUUID
+	expectedArtifactResponse = append(expectedArtifactResponse, sampleArtifact)
+	return expectedArtifactResponse
+}
+
+// Raw db response to return on raw queries for the artifact data
+func getDBArtifactDataResponse(artifact models.Artifact) []map[string]interface{} {
+	expectedArtifactDataResponse := make([]map[string]interface{}, 0)
+	sampleArtifactData := make(map[string]interface{})
+	sampleArtifactData["dataset_project"] = artifact.DatasetProject
+	sampleArtifactData["dataset_domain"] = artifact.DatasetDomain
+	sampleArtifactData["dataset_name"] = artifact.DatasetName
+	sampleArtifactData["dataset_version"] = artifact.DatasetVersion
+	sampleArtifactData["artifact_id"] = artifact.ArtifactID
+	sampleArtifactData["name"] = "test-dataloc-name"
+	sampleArtifactData["location"] = "test-dataloc-location"
+	sampleArtifactData["dataset_uuid"] = artifact.DatasetUUID
+	expectedArtifactDataResponse = append(expectedArtifactDataResponse, sampleArtifactData)
+	return expectedArtifactDataResponse
+}
+
+// Raw db response to return on raw queries for partitions
+func getDBPartitionResponse(artifact models.Artifact) []map[string]interface{} {
+	expectedPartitionResponse := make([]map[string]interface{}, 0)
+	sampleParition := make(map[string]interface{})
+	sampleParition["key"] = "region"
+	sampleParition["value"] = "SEA"
+	sampleParition["artifact_id"] = artifact.ArtifactID
+	sampleParition["dataset_uuid"] = "uuid"
+	expectedPartitionResponse = append(expectedPartitionResponse, sampleParition)
+	return expectedPartitionResponse
 }
 
 func TestCreateArtifact(t *testing.T) {
@@ -106,36 +150,9 @@ func TestCreateArtifact(t *testing.T) {
 func TestGetArtifact(t *testing.T) {
 	artifact := getTestArtifact()
 
-	expectedArtifactDataResponse := make([]map[string]interface{}, 0)
-	sampleArtifactData := make(map[string]interface{})
-	sampleArtifactData["dataset_project"] = artifact.DatasetProject
-	sampleArtifactData["dataset_domain"] = artifact.DatasetDomain
-	sampleArtifactData["dataset_name"] = artifact.DatasetName
-	sampleArtifactData["dataset_version"] = artifact.DatasetVersion
-	sampleArtifactData["artifact_id"] = artifact.ArtifactID
-	sampleArtifactData["name"] = "test-dataloc-name"
-	sampleArtifactData["location"] = "test-dataloc-location"
-	sampleArtifactData["dataset_uuid"] = artifact.DatasetUUID
-
-	expectedArtifactDataResponse = append(expectedArtifactDataResponse, sampleArtifactData)
-
-	expectedArtifactResponse := make([]map[string]interface{}, 0)
-	sampleArtifact := make(map[string]interface{})
-	sampleArtifact["dataset_project"] = artifact.DatasetProject
-	sampleArtifact["dataset_domain"] = artifact.DatasetDomain
-	sampleArtifact["dataset_name"] = artifact.DatasetName
-	sampleArtifact["dataset_version"] = artifact.DatasetVersion
-	sampleArtifact["artifact_id"] = artifact.ArtifactID
-	sampleArtifact["dataset_uuid"] = artifact.DatasetUUID
-	expectedArtifactResponse = append(expectedArtifactResponse, sampleArtifact)
-
-	expectedPartitionResponse := make([]map[string]interface{}, 0)
-	sampleParition := make(map[string]interface{})
-	sampleParition["key"] = "region"
-	sampleParition["value"] = "SEA"
-	sampleParition["artifact_id"] = artifact.ArtifactID
-	sampleParition["dataset_uuid"] = "uuid"
-	expectedPartitionResponse = append(expectedPartitionResponse, sampleParition)
+	expectedArtifactDataResponse := getDBArtifactDataResponse(artifact)
+	expectedArtifactResponse := getDBArtifactResponse(artifact)
+	expectedPartitionResponse := getDBPartitionResponse(artifact)
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
@@ -144,7 +161,7 @@ func TestGetArtifact(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "artifacts"  WHERE "artifacts"."deleted_at" IS NULL AND (("artifacts"."dataset_project" = testProject) AND ("artifacts"."dataset_name" = testName) AND ("artifacts"."dataset_domain" = testDomain) AND ("artifacts"."dataset_version" = testVersion) AND ("artifacts"."artifact_id" = 123)) ORDER BY "artifacts"."dataset_project" ASC LIMIT 1`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123))))`).WithReply(expectedArtifactDataResponse)
+		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123)))) ORDER BY "artifact_data"."dataset_project" ASC`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "partitions"  WHERE "partitions"."deleted_at" IS NULL AND (("artifact_id" IN (123))) ORDER BY "partitions"."dataset_uuid" ASC`).WithReply(expectedPartitionResponse)
 	getInput := models.ArtifactKey{
@@ -209,4 +226,74 @@ func TestCreateArtifactAlreadyExists(t *testing.T) {
 	dcErr, ok := err.(apiErrors.DataCatalogError)
 	assert.True(t, ok)
 	assert.Equal(t, dcErr.Code(), codes.AlreadyExists)
+}
+
+func TestListArtifactsWithPartition(t *testing.T) {
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+	dataset := getTestDataset()
+	dataset.UUID = getDatasetUUID()
+
+	artifact := getTestArtifact()
+	expectedArtifactDataResponse := getDBArtifactDataResponse(artifact)
+	expectedArtifactResponse := getDBArtifactResponse(artifact)
+	expectedPartitionResponse := getDBPartitionResponse(artifact)
+
+	GlobalMock.NewMock().WithQuery(
+		`SELECT "artifacts".* FROM "artifacts" JOIN partitions ON artifacts.artifact_id = partitions.artifact_id WHERE "artifacts"."deleted_at" IS NULL AND ((partitions.key1 = val1) AND (partitions.key2 = val2) AND (artifacts.dataset_uuid = test-uuid)) ORDER BY artifacts.created_at desc LIMIT 10 OFFSET 10`).WithReply(expectedArtifactResponse)
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123))))`).WithReply(expectedArtifactDataResponse)
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "partitions"  WHERE "partitions"."deleted_at" IS NULL AND (("artifact_id" IN (123)))`).WithReply(expectedPartitionResponse)
+
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	listInput := models.ListModelsInput{
+		JoinEntityToConditionMap: map[common.Entity]models.ModelJoinCondition{
+			common.Partition: NewGormJoinCondition(common.Artifact, common.Partition),
+		},
+		Filters: []models.ModelValueFilter{
+			NewGormValueFilter(common.Partition, common.Equal, "key1", "val1"),
+			NewGormValueFilter(common.Partition, common.Equal, "key2", "val2"),
+		},
+		Offset:        10,
+		Limit:         10,
+		SortParameter: NewGormSortParameter(datacatalog.PaginationOptions_CREATION_TIME, datacatalog.PaginationOptions_DESCENDING),
+	}
+	artifacts, err := artifactRepo.List(context.Background(), dataset.DatasetKey, listInput)
+	assert.NoError(t, err)
+	assert.Len(t, artifacts, 1)
+	assert.Equal(t, artifacts[0].ArtifactID, artifact.ArtifactID)
+	assert.Len(t, artifacts[0].ArtifactData, 1)
+	assert.Len(t, artifacts[0].Partitions, 1)
+}
+
+func TestListArtifactsNoPartitions(t *testing.T) {
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+	dataset := getTestDataset()
+	dataset.UUID = getDatasetUUID()
+
+	artifact := getTestArtifact()
+	expectedArtifactDataResponse := getDBArtifactDataResponse(artifact)
+	expectedArtifactResponse := getDBArtifactResponse(artifact)
+	expectedPartitionResponse := make([]map[string]interface{}, 0)
+
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "artifacts"  WHERE "artifacts"."deleted_at" IS NULL AND ((artifacts.dataset_uuid = test-uuid)) LIMIT 10 OFFSET 10`).WithReply(expectedArtifactResponse)
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123))))`).WithReply(expectedArtifactDataResponse)
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "partitions"  WHERE "partitions"."deleted_at" IS NULL AND (("artifact_id" IN (123)))`).WithReply(expectedPartitionResponse)
+
+	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	listInput := models.ListModelsInput{
+		Offset: 10,
+		Limit:  10,
+	}
+	artifacts, err := artifactRepo.List(context.Background(), dataset.DatasetKey, listInput)
+	assert.NoError(t, err)
+	assert.Len(t, artifacts, 1)
+	assert.Equal(t, artifacts[0].ArtifactID, artifact.ArtifactID)
+	assert.Len(t, artifacts[0].ArtifactData, 1)
+	assert.Len(t, artifacts[0].Partitions, 0)
 }

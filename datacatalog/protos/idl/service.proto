@@ -10,6 +10,7 @@ service DataCatalog {
     rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse);
     rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse);
     rpc AddTag (AddTagRequest) returns (AddTagResponse);
+    rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse);
 }
 
 message CreateDatasetRequest {
@@ -57,6 +58,23 @@ message AddTagResponse {
 
 }
 
+// List the artifacts that belong to the Dataset
+message ListArtifactsRequest {
+    DatasetID dataset = 1;
+    // Apply the filter expression to this query
+    FilterExpression filter = 2;
+    // Pagination options to get a page of artifacts
+    PaginationOptions pagination = 3;
+}
+
+// Response to list artifacts
+message ListArtifactsResponse {
+    // The list of artifacts
+    repeated Artifact artifacts = 1;
+    // Token to use to request the next page, pass this into the next requests PaginationOptions
+    string next_token = 2;
+}
+
 message Dataset {
     DatasetID id = 1;
     Metadata metadata = 2;
@@ -97,4 +115,89 @@ message Tag {
 
 message Metadata {
     map<string, string> key_map = 1; // key map is a dictionary of key/val strings that represent metadata
+}
+
+// Filter expression that is composed of a combination of single filters
+message FilterExpression {
+    repeated SinglePropertyFilter filters = 1;
+}
+
+// A single property to filter on.
+message SinglePropertyFilter {
+    oneof property_filter {
+        TagPropertyFilter tag_filter = 1;
+        PartitionPropertyFilter partition_filter = 2;
+        ArtifactPropertyFilter artifact_filter = 3;
+        DatasetPropertyFilter dataset_filter = 4;
+    }
+
+    // as use-cases come up we can add more operators, ex: gte, like, not eq etc.
+    enum ComparisonOperator {
+        EQUALS = 0;
+    }
+
+    ComparisonOperator operator = 10; // field 10 in case we add more entities to query
+    // Next field number: 11
+}
+
+// Artifact properties we can filter by
+message ArtifactPropertyFilter {
+    // oneof because we can add more properties in the future
+    oneof property {
+        string artifact_id = 1;
+    }
+}
+
+// Tag properties we can filter by
+message TagPropertyFilter {
+    oneof property {
+        string tag_name = 1;
+    }
+}
+
+// Partition properties we can filter by
+message PartitionPropertyFilter {
+    oneof property {
+        KeyValuePair key_val = 1;
+    }
+}
+
+message KeyValuePair {
+    string key = 1;
+    string value = 2;
+}
+
+// Dataset properties we can filter by
+message DatasetPropertyFilter {
+    oneof property {
+        string project = 1;
+        string name = 2;
+        string domain = 3;
+        string version = 4;
+    }
+}
+
+// Pagination options for making list requests
+message PaginationOptions {
+
+    // the max number of results to return
+    uint32 limit = 1;
+
+    // the token to pass to fetch the next page
+    string token = 2;
+
+    // the property that we want to sort the results by
+    SortKey sortKey = 3;
+
+    // the sort order of the results
+    SortOrder sortOrder = 4;
+
+    enum SortOrder {
+        DESCENDING = 0;
+        ASCENDING = 1;
+    }
+
+    enum SortKey {
+        CREATION_TIME = 0;
+    }
 }

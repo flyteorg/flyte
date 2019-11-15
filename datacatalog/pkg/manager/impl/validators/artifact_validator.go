@@ -3,6 +3,7 @@ package validators
 import (
 	"fmt"
 
+	"github.com/lyft/datacatalog/pkg/common"
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
 )
 
@@ -62,5 +63,35 @@ func ValidateArtifact(artifact *datacatalog.Artifact) error {
 		return err
 	}
 
+	return nil
+}
+
+// Validate the list request and format the request with proper defaults if not provided
+func ValidateListArtifactRequest(request *datacatalog.ListArtifactsRequest) error {
+	if err := ValidateDatasetID(request.Dataset); err != nil {
+		return err
+	}
+
+	if err := ValidateArtifactFilterTypes(request.Filter.GetFilters()); err != nil {
+		return err
+	}
+
+	if request.Pagination != nil {
+		err := ValidatePagination(*request.Pagination)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Artifacts cannot be filtered across Datasets
+func ValidateArtifactFilterTypes(filters []*datacatalog.SinglePropertyFilter) error {
+	for _, filter := range filters {
+		if filter.GetDatasetFilter() != nil {
+			return NewInvalidFilterError(common.Artifact, common.Dataset)
+		}
+	}
 	return nil
 }

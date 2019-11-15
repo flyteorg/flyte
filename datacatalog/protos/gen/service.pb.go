@@ -6,13 +6,12 @@ package datacatalog
 import (
 	context "context"
 	fmt "fmt"
-	math "math"
-
 	proto "github.com/golang/protobuf/proto"
 	core "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -25,6 +24,76 @@ var _ = math.Inf
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+
+// as use-cases come up we can add more operators, ex: gte, like, not eq etc.
+type SinglePropertyFilter_ComparisonOperator int32
+
+const (
+	SinglePropertyFilter_EQUALS SinglePropertyFilter_ComparisonOperator = 0
+)
+
+var SinglePropertyFilter_ComparisonOperator_name = map[int32]string{
+	0: "EQUALS",
+}
+
+var SinglePropertyFilter_ComparisonOperator_value = map[string]int32{
+	"EQUALS": 0,
+}
+
+func (x SinglePropertyFilter_ComparisonOperator) String() string {
+	return proto.EnumName(SinglePropertyFilter_ComparisonOperator_name, int32(x))
+}
+
+func (SinglePropertyFilter_ComparisonOperator) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{20, 0}
+}
+
+type PaginationOptions_SortOrder int32
+
+const (
+	PaginationOptions_DESCENDING PaginationOptions_SortOrder = 0
+	PaginationOptions_ASCENDING  PaginationOptions_SortOrder = 1
+)
+
+var PaginationOptions_SortOrder_name = map[int32]string{
+	0: "DESCENDING",
+	1: "ASCENDING",
+}
+
+var PaginationOptions_SortOrder_value = map[string]int32{
+	"DESCENDING": 0,
+	"ASCENDING":  1,
+}
+
+func (x PaginationOptions_SortOrder) String() string {
+	return proto.EnumName(PaginationOptions_SortOrder_name, int32(x))
+}
+
+func (PaginationOptions_SortOrder) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{26, 0}
+}
+
+type PaginationOptions_SortKey int32
+
+const (
+	PaginationOptions_CREATION_TIME PaginationOptions_SortKey = 0
+)
+
+var PaginationOptions_SortKey_name = map[int32]string{
+	0: "CREATION_TIME",
+}
+
+var PaginationOptions_SortKey_value = map[string]int32{
+	"CREATION_TIME": 0,
+}
+
+func (x PaginationOptions_SortKey) String() string {
+	return proto.EnumName(PaginationOptions_SortKey_name, int32(x))
+}
+
+func (PaginationOptions_SortKey) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{26, 1}
+}
 
 type CreateDatasetRequest struct {
 	Dataset              *Dataset `protobuf:"bytes,1,opt,name=dataset,proto3" json:"dataset,omitempty"`
@@ -441,6 +510,114 @@ func (m *AddTagResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_AddTagResponse proto.InternalMessageInfo
 
+// List the artifacts that belong to the Dataset
+type ListArtifactsRequest struct {
+	Dataset *DatasetID `protobuf:"bytes,1,opt,name=dataset,proto3" json:"dataset,omitempty"`
+	// Apply the filter expression to this query
+	Filter *FilterExpression `protobuf:"bytes,2,opt,name=filter,proto3" json:"filter,omitempty"`
+	// Pagination options to get a page of artifacts
+	Pagination           *PaginationOptions `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
+}
+
+func (m *ListArtifactsRequest) Reset()         { *m = ListArtifactsRequest{} }
+func (m *ListArtifactsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListArtifactsRequest) ProtoMessage()    {}
+func (*ListArtifactsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{10}
+}
+
+func (m *ListArtifactsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListArtifactsRequest.Unmarshal(m, b)
+}
+func (m *ListArtifactsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListArtifactsRequest.Marshal(b, m, deterministic)
+}
+func (m *ListArtifactsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListArtifactsRequest.Merge(m, src)
+}
+func (m *ListArtifactsRequest) XXX_Size() int {
+	return xxx_messageInfo_ListArtifactsRequest.Size(m)
+}
+func (m *ListArtifactsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListArtifactsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListArtifactsRequest proto.InternalMessageInfo
+
+func (m *ListArtifactsRequest) GetDataset() *DatasetID {
+	if m != nil {
+		return m.Dataset
+	}
+	return nil
+}
+
+func (m *ListArtifactsRequest) GetFilter() *FilterExpression {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (m *ListArtifactsRequest) GetPagination() *PaginationOptions {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+// Response to list artifacts
+type ListArtifactsResponse struct {
+	// The list of artifacts
+	Artifacts []*Artifact `protobuf:"bytes,1,rep,name=artifacts,proto3" json:"artifacts,omitempty"`
+	// Token to use to request the next page, pass this into the next requests PaginationOptions
+	NextToken            string   `protobuf:"bytes,2,opt,name=next_token,json=nextToken,proto3" json:"next_token,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListArtifactsResponse) Reset()         { *m = ListArtifactsResponse{} }
+func (m *ListArtifactsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListArtifactsResponse) ProtoMessage()    {}
+func (*ListArtifactsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{11}
+}
+
+func (m *ListArtifactsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListArtifactsResponse.Unmarshal(m, b)
+}
+func (m *ListArtifactsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListArtifactsResponse.Marshal(b, m, deterministic)
+}
+func (m *ListArtifactsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListArtifactsResponse.Merge(m, src)
+}
+func (m *ListArtifactsResponse) XXX_Size() int {
+	return xxx_messageInfo_ListArtifactsResponse.Size(m)
+}
+func (m *ListArtifactsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListArtifactsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListArtifactsResponse proto.InternalMessageInfo
+
+func (m *ListArtifactsResponse) GetArtifacts() []*Artifact {
+	if m != nil {
+		return m.Artifacts
+	}
+	return nil
+}
+
+func (m *ListArtifactsResponse) GetNextToken() string {
+	if m != nil {
+		return m.NextToken
+	}
+	return ""
+}
+
 type Dataset struct {
 	Id                   *DatasetID `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Metadata             *Metadata  `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
@@ -454,7 +631,7 @@ func (m *Dataset) Reset()         { *m = Dataset{} }
 func (m *Dataset) String() string { return proto.CompactTextString(m) }
 func (*Dataset) ProtoMessage()    {}
 func (*Dataset) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a0b84a42fa06f626, []int{10}
+	return fileDescriptor_a0b84a42fa06f626, []int{12}
 }
 
 func (m *Dataset) XXX_Unmarshal(b []byte) error {
@@ -508,7 +685,7 @@ func (m *Partition) Reset()         { *m = Partition{} }
 func (m *Partition) String() string { return proto.CompactTextString(m) }
 func (*Partition) ProtoMessage()    {}
 func (*Partition) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a0b84a42fa06f626, []int{11}
+	return fileDescriptor_a0b84a42fa06f626, []int{13}
 }
 
 func (m *Partition) XXX_Unmarshal(b []byte) error {
@@ -558,7 +735,7 @@ func (m *DatasetID) Reset()         { *m = DatasetID{} }
 func (m *DatasetID) String() string { return proto.CompactTextString(m) }
 func (*DatasetID) ProtoMessage()    {}
 func (*DatasetID) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a0b84a42fa06f626, []int{12}
+	return fileDescriptor_a0b84a42fa06f626, []int{14}
 }
 
 func (m *DatasetID) XXX_Unmarshal(b []byte) error {
@@ -629,7 +806,7 @@ func (m *Artifact) Reset()         { *m = Artifact{} }
 func (m *Artifact) String() string { return proto.CompactTextString(m) }
 func (*Artifact) ProtoMessage()    {}
 func (*Artifact) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a0b84a42fa06f626, []int{13}
+	return fileDescriptor_a0b84a42fa06f626, []int{15}
 }
 
 func (m *Artifact) XXX_Unmarshal(b []byte) error {
@@ -697,7 +874,7 @@ func (m *ArtifactData) Reset()         { *m = ArtifactData{} }
 func (m *ArtifactData) String() string { return proto.CompactTextString(m) }
 func (*ArtifactData) ProtoMessage()    {}
 func (*ArtifactData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a0b84a42fa06f626, []int{14}
+	return fileDescriptor_a0b84a42fa06f626, []int{16}
 }
 
 func (m *ArtifactData) XXX_Unmarshal(b []byte) error {
@@ -745,7 +922,7 @@ func (m *Tag) Reset()         { *m = Tag{} }
 func (m *Tag) String() string { return proto.CompactTextString(m) }
 func (*Tag) ProtoMessage()    {}
 func (*Tag) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a0b84a42fa06f626, []int{15}
+	return fileDescriptor_a0b84a42fa06f626, []int{17}
 }
 
 func (m *Tag) XXX_Unmarshal(b []byte) error {
@@ -798,7 +975,7 @@ func (m *Metadata) Reset()         { *m = Metadata{} }
 func (m *Metadata) String() string { return proto.CompactTextString(m) }
 func (*Metadata) ProtoMessage()    {}
 func (*Metadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a0b84a42fa06f626, []int{16}
+	return fileDescriptor_a0b84a42fa06f626, []int{18}
 }
 
 func (m *Metadata) XXX_Unmarshal(b []byte) error {
@@ -826,7 +1003,595 @@ func (m *Metadata) GetKeyMap() map[string]string {
 	return nil
 }
 
+// Filter expression that is composed of a combination of single filters
+type FilterExpression struct {
+	Filters              []*SinglePropertyFilter `protobuf:"bytes,1,rep,name=filters,proto3" json:"filters,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     []byte                  `json:"-"`
+	XXX_sizecache        int32                   `json:"-"`
+}
+
+func (m *FilterExpression) Reset()         { *m = FilterExpression{} }
+func (m *FilterExpression) String() string { return proto.CompactTextString(m) }
+func (*FilterExpression) ProtoMessage()    {}
+func (*FilterExpression) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{19}
+}
+
+func (m *FilterExpression) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FilterExpression.Unmarshal(m, b)
+}
+func (m *FilterExpression) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FilterExpression.Marshal(b, m, deterministic)
+}
+func (m *FilterExpression) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FilterExpression.Merge(m, src)
+}
+func (m *FilterExpression) XXX_Size() int {
+	return xxx_messageInfo_FilterExpression.Size(m)
+}
+func (m *FilterExpression) XXX_DiscardUnknown() {
+	xxx_messageInfo_FilterExpression.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FilterExpression proto.InternalMessageInfo
+
+func (m *FilterExpression) GetFilters() []*SinglePropertyFilter {
+	if m != nil {
+		return m.Filters
+	}
+	return nil
+}
+
+// A single property to filter on.
+type SinglePropertyFilter struct {
+	// Types that are valid to be assigned to PropertyFilter:
+	//	*SinglePropertyFilter_TagFilter
+	//	*SinglePropertyFilter_PartitionFilter
+	//	*SinglePropertyFilter_ArtifactFilter
+	//	*SinglePropertyFilter_DatasetFilter
+	PropertyFilter       isSinglePropertyFilter_PropertyFilter   `protobuf_oneof:"property_filter"`
+	Operator             SinglePropertyFilter_ComparisonOperator `protobuf:"varint,10,opt,name=operator,proto3,enum=datacatalog.SinglePropertyFilter_ComparisonOperator" json:"operator,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                                `json:"-"`
+	XXX_unrecognized     []byte                                  `json:"-"`
+	XXX_sizecache        int32                                   `json:"-"`
+}
+
+func (m *SinglePropertyFilter) Reset()         { *m = SinglePropertyFilter{} }
+func (m *SinglePropertyFilter) String() string { return proto.CompactTextString(m) }
+func (*SinglePropertyFilter) ProtoMessage()    {}
+func (*SinglePropertyFilter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{20}
+}
+
+func (m *SinglePropertyFilter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SinglePropertyFilter.Unmarshal(m, b)
+}
+func (m *SinglePropertyFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SinglePropertyFilter.Marshal(b, m, deterministic)
+}
+func (m *SinglePropertyFilter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SinglePropertyFilter.Merge(m, src)
+}
+func (m *SinglePropertyFilter) XXX_Size() int {
+	return xxx_messageInfo_SinglePropertyFilter.Size(m)
+}
+func (m *SinglePropertyFilter) XXX_DiscardUnknown() {
+	xxx_messageInfo_SinglePropertyFilter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SinglePropertyFilter proto.InternalMessageInfo
+
+type isSinglePropertyFilter_PropertyFilter interface {
+	isSinglePropertyFilter_PropertyFilter()
+}
+
+type SinglePropertyFilter_TagFilter struct {
+	TagFilter *TagPropertyFilter `protobuf:"bytes,1,opt,name=tag_filter,json=tagFilter,proto3,oneof"`
+}
+
+type SinglePropertyFilter_PartitionFilter struct {
+	PartitionFilter *PartitionPropertyFilter `protobuf:"bytes,2,opt,name=partition_filter,json=partitionFilter,proto3,oneof"`
+}
+
+type SinglePropertyFilter_ArtifactFilter struct {
+	ArtifactFilter *ArtifactPropertyFilter `protobuf:"bytes,3,opt,name=artifact_filter,json=artifactFilter,proto3,oneof"`
+}
+
+type SinglePropertyFilter_DatasetFilter struct {
+	DatasetFilter *DatasetPropertyFilter `protobuf:"bytes,4,opt,name=dataset_filter,json=datasetFilter,proto3,oneof"`
+}
+
+func (*SinglePropertyFilter_TagFilter) isSinglePropertyFilter_PropertyFilter() {}
+
+func (*SinglePropertyFilter_PartitionFilter) isSinglePropertyFilter_PropertyFilter() {}
+
+func (*SinglePropertyFilter_ArtifactFilter) isSinglePropertyFilter_PropertyFilter() {}
+
+func (*SinglePropertyFilter_DatasetFilter) isSinglePropertyFilter_PropertyFilter() {}
+
+func (m *SinglePropertyFilter) GetPropertyFilter() isSinglePropertyFilter_PropertyFilter {
+	if m != nil {
+		return m.PropertyFilter
+	}
+	return nil
+}
+
+func (m *SinglePropertyFilter) GetTagFilter() *TagPropertyFilter {
+	if x, ok := m.GetPropertyFilter().(*SinglePropertyFilter_TagFilter); ok {
+		return x.TagFilter
+	}
+	return nil
+}
+
+func (m *SinglePropertyFilter) GetPartitionFilter() *PartitionPropertyFilter {
+	if x, ok := m.GetPropertyFilter().(*SinglePropertyFilter_PartitionFilter); ok {
+		return x.PartitionFilter
+	}
+	return nil
+}
+
+func (m *SinglePropertyFilter) GetArtifactFilter() *ArtifactPropertyFilter {
+	if x, ok := m.GetPropertyFilter().(*SinglePropertyFilter_ArtifactFilter); ok {
+		return x.ArtifactFilter
+	}
+	return nil
+}
+
+func (m *SinglePropertyFilter) GetDatasetFilter() *DatasetPropertyFilter {
+	if x, ok := m.GetPropertyFilter().(*SinglePropertyFilter_DatasetFilter); ok {
+		return x.DatasetFilter
+	}
+	return nil
+}
+
+func (m *SinglePropertyFilter) GetOperator() SinglePropertyFilter_ComparisonOperator {
+	if m != nil {
+		return m.Operator
+	}
+	return SinglePropertyFilter_EQUALS
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*SinglePropertyFilter) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*SinglePropertyFilter_TagFilter)(nil),
+		(*SinglePropertyFilter_PartitionFilter)(nil),
+		(*SinglePropertyFilter_ArtifactFilter)(nil),
+		(*SinglePropertyFilter_DatasetFilter)(nil),
+	}
+}
+
+// Artifact properties we can filter by
+type ArtifactPropertyFilter struct {
+	// oneof because we can add more properties in the future
+	//
+	// Types that are valid to be assigned to Property:
+	//	*ArtifactPropertyFilter_ArtifactId
+	Property             isArtifactPropertyFilter_Property `protobuf_oneof:"property"`
+	XXX_NoUnkeyedLiteral struct{}                          `json:"-"`
+	XXX_unrecognized     []byte                            `json:"-"`
+	XXX_sizecache        int32                             `json:"-"`
+}
+
+func (m *ArtifactPropertyFilter) Reset()         { *m = ArtifactPropertyFilter{} }
+func (m *ArtifactPropertyFilter) String() string { return proto.CompactTextString(m) }
+func (*ArtifactPropertyFilter) ProtoMessage()    {}
+func (*ArtifactPropertyFilter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{21}
+}
+
+func (m *ArtifactPropertyFilter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ArtifactPropertyFilter.Unmarshal(m, b)
+}
+func (m *ArtifactPropertyFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ArtifactPropertyFilter.Marshal(b, m, deterministic)
+}
+func (m *ArtifactPropertyFilter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ArtifactPropertyFilter.Merge(m, src)
+}
+func (m *ArtifactPropertyFilter) XXX_Size() int {
+	return xxx_messageInfo_ArtifactPropertyFilter.Size(m)
+}
+func (m *ArtifactPropertyFilter) XXX_DiscardUnknown() {
+	xxx_messageInfo_ArtifactPropertyFilter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ArtifactPropertyFilter proto.InternalMessageInfo
+
+type isArtifactPropertyFilter_Property interface {
+	isArtifactPropertyFilter_Property()
+}
+
+type ArtifactPropertyFilter_ArtifactId struct {
+	ArtifactId string `protobuf:"bytes,1,opt,name=artifact_id,json=artifactId,proto3,oneof"`
+}
+
+func (*ArtifactPropertyFilter_ArtifactId) isArtifactPropertyFilter_Property() {}
+
+func (m *ArtifactPropertyFilter) GetProperty() isArtifactPropertyFilter_Property {
+	if m != nil {
+		return m.Property
+	}
+	return nil
+}
+
+func (m *ArtifactPropertyFilter) GetArtifactId() string {
+	if x, ok := m.GetProperty().(*ArtifactPropertyFilter_ArtifactId); ok {
+		return x.ArtifactId
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ArtifactPropertyFilter) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*ArtifactPropertyFilter_ArtifactId)(nil),
+	}
+}
+
+// Tag properties we can filter by
+type TagPropertyFilter struct {
+	// Types that are valid to be assigned to Property:
+	//	*TagPropertyFilter_TagName
+	Property             isTagPropertyFilter_Property `protobuf_oneof:"property"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_unrecognized     []byte                       `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
+}
+
+func (m *TagPropertyFilter) Reset()         { *m = TagPropertyFilter{} }
+func (m *TagPropertyFilter) String() string { return proto.CompactTextString(m) }
+func (*TagPropertyFilter) ProtoMessage()    {}
+func (*TagPropertyFilter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{22}
+}
+
+func (m *TagPropertyFilter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_TagPropertyFilter.Unmarshal(m, b)
+}
+func (m *TagPropertyFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_TagPropertyFilter.Marshal(b, m, deterministic)
+}
+func (m *TagPropertyFilter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TagPropertyFilter.Merge(m, src)
+}
+func (m *TagPropertyFilter) XXX_Size() int {
+	return xxx_messageInfo_TagPropertyFilter.Size(m)
+}
+func (m *TagPropertyFilter) XXX_DiscardUnknown() {
+	xxx_messageInfo_TagPropertyFilter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_TagPropertyFilter proto.InternalMessageInfo
+
+type isTagPropertyFilter_Property interface {
+	isTagPropertyFilter_Property()
+}
+
+type TagPropertyFilter_TagName struct {
+	TagName string `protobuf:"bytes,1,opt,name=tag_name,json=tagName,proto3,oneof"`
+}
+
+func (*TagPropertyFilter_TagName) isTagPropertyFilter_Property() {}
+
+func (m *TagPropertyFilter) GetProperty() isTagPropertyFilter_Property {
+	if m != nil {
+		return m.Property
+	}
+	return nil
+}
+
+func (m *TagPropertyFilter) GetTagName() string {
+	if x, ok := m.GetProperty().(*TagPropertyFilter_TagName); ok {
+		return x.TagName
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*TagPropertyFilter) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*TagPropertyFilter_TagName)(nil),
+	}
+}
+
+// Partition properties we can filter by
+type PartitionPropertyFilter struct {
+	// Types that are valid to be assigned to Property:
+	//	*PartitionPropertyFilter_KeyVal
+	Property             isPartitionPropertyFilter_Property `protobuf_oneof:"property"`
+	XXX_NoUnkeyedLiteral struct{}                           `json:"-"`
+	XXX_unrecognized     []byte                             `json:"-"`
+	XXX_sizecache        int32                              `json:"-"`
+}
+
+func (m *PartitionPropertyFilter) Reset()         { *m = PartitionPropertyFilter{} }
+func (m *PartitionPropertyFilter) String() string { return proto.CompactTextString(m) }
+func (*PartitionPropertyFilter) ProtoMessage()    {}
+func (*PartitionPropertyFilter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{23}
+}
+
+func (m *PartitionPropertyFilter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PartitionPropertyFilter.Unmarshal(m, b)
+}
+func (m *PartitionPropertyFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PartitionPropertyFilter.Marshal(b, m, deterministic)
+}
+func (m *PartitionPropertyFilter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PartitionPropertyFilter.Merge(m, src)
+}
+func (m *PartitionPropertyFilter) XXX_Size() int {
+	return xxx_messageInfo_PartitionPropertyFilter.Size(m)
+}
+func (m *PartitionPropertyFilter) XXX_DiscardUnknown() {
+	xxx_messageInfo_PartitionPropertyFilter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PartitionPropertyFilter proto.InternalMessageInfo
+
+type isPartitionPropertyFilter_Property interface {
+	isPartitionPropertyFilter_Property()
+}
+
+type PartitionPropertyFilter_KeyVal struct {
+	KeyVal *KeyValuePair `protobuf:"bytes,1,opt,name=key_val,json=keyVal,proto3,oneof"`
+}
+
+func (*PartitionPropertyFilter_KeyVal) isPartitionPropertyFilter_Property() {}
+
+func (m *PartitionPropertyFilter) GetProperty() isPartitionPropertyFilter_Property {
+	if m != nil {
+		return m.Property
+	}
+	return nil
+}
+
+func (m *PartitionPropertyFilter) GetKeyVal() *KeyValuePair {
+	if x, ok := m.GetProperty().(*PartitionPropertyFilter_KeyVal); ok {
+		return x.KeyVal
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*PartitionPropertyFilter) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*PartitionPropertyFilter_KeyVal)(nil),
+	}
+}
+
+type KeyValuePair struct {
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Value                string   `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *KeyValuePair) Reset()         { *m = KeyValuePair{} }
+func (m *KeyValuePair) String() string { return proto.CompactTextString(m) }
+func (*KeyValuePair) ProtoMessage()    {}
+func (*KeyValuePair) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{24}
+}
+
+func (m *KeyValuePair) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_KeyValuePair.Unmarshal(m, b)
+}
+func (m *KeyValuePair) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_KeyValuePair.Marshal(b, m, deterministic)
+}
+func (m *KeyValuePair) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_KeyValuePair.Merge(m, src)
+}
+func (m *KeyValuePair) XXX_Size() int {
+	return xxx_messageInfo_KeyValuePair.Size(m)
+}
+func (m *KeyValuePair) XXX_DiscardUnknown() {
+	xxx_messageInfo_KeyValuePair.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_KeyValuePair proto.InternalMessageInfo
+
+func (m *KeyValuePair) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *KeyValuePair) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
+// Dataset properties we can filter by
+type DatasetPropertyFilter struct {
+	// Types that are valid to be assigned to Property:
+	//	*DatasetPropertyFilter_Project
+	//	*DatasetPropertyFilter_Name
+	//	*DatasetPropertyFilter_Domain
+	//	*DatasetPropertyFilter_Version
+	Property             isDatasetPropertyFilter_Property `protobuf_oneof:"property"`
+	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
+	XXX_unrecognized     []byte                           `json:"-"`
+	XXX_sizecache        int32                            `json:"-"`
+}
+
+func (m *DatasetPropertyFilter) Reset()         { *m = DatasetPropertyFilter{} }
+func (m *DatasetPropertyFilter) String() string { return proto.CompactTextString(m) }
+func (*DatasetPropertyFilter) ProtoMessage()    {}
+func (*DatasetPropertyFilter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{25}
+}
+
+func (m *DatasetPropertyFilter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DatasetPropertyFilter.Unmarshal(m, b)
+}
+func (m *DatasetPropertyFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DatasetPropertyFilter.Marshal(b, m, deterministic)
+}
+func (m *DatasetPropertyFilter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DatasetPropertyFilter.Merge(m, src)
+}
+func (m *DatasetPropertyFilter) XXX_Size() int {
+	return xxx_messageInfo_DatasetPropertyFilter.Size(m)
+}
+func (m *DatasetPropertyFilter) XXX_DiscardUnknown() {
+	xxx_messageInfo_DatasetPropertyFilter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DatasetPropertyFilter proto.InternalMessageInfo
+
+type isDatasetPropertyFilter_Property interface {
+	isDatasetPropertyFilter_Property()
+}
+
+type DatasetPropertyFilter_Project struct {
+	Project string `protobuf:"bytes,1,opt,name=project,proto3,oneof"`
+}
+
+type DatasetPropertyFilter_Name struct {
+	Name string `protobuf:"bytes,2,opt,name=name,proto3,oneof"`
+}
+
+type DatasetPropertyFilter_Domain struct {
+	Domain string `protobuf:"bytes,3,opt,name=domain,proto3,oneof"`
+}
+
+type DatasetPropertyFilter_Version struct {
+	Version string `protobuf:"bytes,4,opt,name=version,proto3,oneof"`
+}
+
+func (*DatasetPropertyFilter_Project) isDatasetPropertyFilter_Property() {}
+
+func (*DatasetPropertyFilter_Name) isDatasetPropertyFilter_Property() {}
+
+func (*DatasetPropertyFilter_Domain) isDatasetPropertyFilter_Property() {}
+
+func (*DatasetPropertyFilter_Version) isDatasetPropertyFilter_Property() {}
+
+func (m *DatasetPropertyFilter) GetProperty() isDatasetPropertyFilter_Property {
+	if m != nil {
+		return m.Property
+	}
+	return nil
+}
+
+func (m *DatasetPropertyFilter) GetProject() string {
+	if x, ok := m.GetProperty().(*DatasetPropertyFilter_Project); ok {
+		return x.Project
+	}
+	return ""
+}
+
+func (m *DatasetPropertyFilter) GetName() string {
+	if x, ok := m.GetProperty().(*DatasetPropertyFilter_Name); ok {
+		return x.Name
+	}
+	return ""
+}
+
+func (m *DatasetPropertyFilter) GetDomain() string {
+	if x, ok := m.GetProperty().(*DatasetPropertyFilter_Domain); ok {
+		return x.Domain
+	}
+	return ""
+}
+
+func (m *DatasetPropertyFilter) GetVersion() string {
+	if x, ok := m.GetProperty().(*DatasetPropertyFilter_Version); ok {
+		return x.Version
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*DatasetPropertyFilter) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*DatasetPropertyFilter_Project)(nil),
+		(*DatasetPropertyFilter_Name)(nil),
+		(*DatasetPropertyFilter_Domain)(nil),
+		(*DatasetPropertyFilter_Version)(nil),
+	}
+}
+
+// Pagination options for making list requests
+type PaginationOptions struct {
+	// the max number of results to return
+	Limit uint32 `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
+	// the token to pass to fetch the next page
+	Token string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	// the property that we want to sort the results by
+	SortKey PaginationOptions_SortKey `protobuf:"varint,3,opt,name=sortKey,proto3,enum=datacatalog.PaginationOptions_SortKey" json:"sortKey,omitempty"`
+	// the sort order of the results
+	SortOrder            PaginationOptions_SortOrder `protobuf:"varint,4,opt,name=sortOrder,proto3,enum=datacatalog.PaginationOptions_SortOrder" json:"sortOrder,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_unrecognized     []byte                      `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
+}
+
+func (m *PaginationOptions) Reset()         { *m = PaginationOptions{} }
+func (m *PaginationOptions) String() string { return proto.CompactTextString(m) }
+func (*PaginationOptions) ProtoMessage()    {}
+func (*PaginationOptions) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a0b84a42fa06f626, []int{26}
+}
+
+func (m *PaginationOptions) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PaginationOptions.Unmarshal(m, b)
+}
+func (m *PaginationOptions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PaginationOptions.Marshal(b, m, deterministic)
+}
+func (m *PaginationOptions) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PaginationOptions.Merge(m, src)
+}
+func (m *PaginationOptions) XXX_Size() int {
+	return xxx_messageInfo_PaginationOptions.Size(m)
+}
+func (m *PaginationOptions) XXX_DiscardUnknown() {
+	xxx_messageInfo_PaginationOptions.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PaginationOptions proto.InternalMessageInfo
+
+func (m *PaginationOptions) GetLimit() uint32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *PaginationOptions) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
+func (m *PaginationOptions) GetSortKey() PaginationOptions_SortKey {
+	if m != nil {
+		return m.SortKey
+	}
+	return PaginationOptions_CREATION_TIME
+}
+
+func (m *PaginationOptions) GetSortOrder() PaginationOptions_SortOrder {
+	if m != nil {
+		return m.SortOrder
+	}
+	return PaginationOptions_DESCENDING
+}
+
 func init() {
+	proto.RegisterEnum("datacatalog.SinglePropertyFilter_ComparisonOperator", SinglePropertyFilter_ComparisonOperator_name, SinglePropertyFilter_ComparisonOperator_value)
+	proto.RegisterEnum("datacatalog.PaginationOptions_SortOrder", PaginationOptions_SortOrder_name, PaginationOptions_SortOrder_value)
+	proto.RegisterEnum("datacatalog.PaginationOptions_SortKey", PaginationOptions_SortKey_name, PaginationOptions_SortKey_value)
 	proto.RegisterType((*CreateDatasetRequest)(nil), "datacatalog.CreateDatasetRequest")
 	proto.RegisterType((*CreateDatasetResponse)(nil), "datacatalog.CreateDatasetResponse")
 	proto.RegisterType((*GetDatasetRequest)(nil), "datacatalog.GetDatasetRequest")
@@ -837,6 +1602,8 @@ func init() {
 	proto.RegisterType((*CreateArtifactResponse)(nil), "datacatalog.CreateArtifactResponse")
 	proto.RegisterType((*AddTagRequest)(nil), "datacatalog.AddTagRequest")
 	proto.RegisterType((*AddTagResponse)(nil), "datacatalog.AddTagResponse")
+	proto.RegisterType((*ListArtifactsRequest)(nil), "datacatalog.ListArtifactsRequest")
+	proto.RegisterType((*ListArtifactsResponse)(nil), "datacatalog.ListArtifactsResponse")
 	proto.RegisterType((*Dataset)(nil), "datacatalog.Dataset")
 	proto.RegisterType((*Partition)(nil), "datacatalog.Partition")
 	proto.RegisterType((*DatasetID)(nil), "datacatalog.DatasetID")
@@ -845,57 +1612,97 @@ func init() {
 	proto.RegisterType((*Tag)(nil), "datacatalog.Tag")
 	proto.RegisterType((*Metadata)(nil), "datacatalog.Metadata")
 	proto.RegisterMapType((map[string]string)(nil), "datacatalog.Metadata.KeyMapEntry")
+	proto.RegisterType((*FilterExpression)(nil), "datacatalog.FilterExpression")
+	proto.RegisterType((*SinglePropertyFilter)(nil), "datacatalog.SinglePropertyFilter")
+	proto.RegisterType((*ArtifactPropertyFilter)(nil), "datacatalog.ArtifactPropertyFilter")
+	proto.RegisterType((*TagPropertyFilter)(nil), "datacatalog.TagPropertyFilter")
+	proto.RegisterType((*PartitionPropertyFilter)(nil), "datacatalog.PartitionPropertyFilter")
+	proto.RegisterType((*KeyValuePair)(nil), "datacatalog.KeyValuePair")
+	proto.RegisterType((*DatasetPropertyFilter)(nil), "datacatalog.DatasetPropertyFilter")
+	proto.RegisterType((*PaginationOptions)(nil), "datacatalog.PaginationOptions")
 }
 
 func init() { proto.RegisterFile("service.proto", fileDescriptor_a0b84a42fa06f626) }
 
 var fileDescriptor_a0b84a42fa06f626 = []byte{
-	// 709 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x95, 0xd1, 0x4e, 0xd4, 0x4e,
-	0x14, 0xc6, 0xff, 0xdd, 0x2e, 0xbb, 0xdb, 0x53, 0x76, 0xc3, 0x7f, 0x04, 0xac, 0xc5, 0xc8, 0x52,
-	0x8d, 0xe1, 0x42, 0x8b, 0x42, 0x62, 0x94, 0x3b, 0x64, 0x51, 0x10, 0x31, 0xa4, 0x01, 0x13, 0xaf,
-	0x36, 0xe3, 0x76, 0x58, 0x2b, 0xdd, 0xb6, 0xb4, 0x03, 0x49, 0xaf, 0x8c, 0xb7, 0x3e, 0x80, 0x4f,
-	0xe0, 0xb3, 0xf9, 0x1c, 0x66, 0x3a, 0x33, 0xa5, 0x2d, 0x05, 0x57, 0xee, 0x3a, 0x33, 0x67, 0x7e,
-	0xfd, 0xe6, 0x3b, 0xd3, 0xaf, 0xd0, 0x4d, 0x48, 0x7c, 0xe1, 0x8d, 0x88, 0x1d, 0xc5, 0x21, 0x0d,
-	0x91, 0xee, 0x62, 0x8a, 0x47, 0x98, 0x62, 0x3f, 0x1c, 0x9b, 0xf7, 0x4f, 0xfc, 0x94, 0x12, 0xcf,
-	0xf5, 0xd7, 0x46, 0x61, 0x4c, 0xd6, 0x7c, 0x8f, 0x92, 0x18, 0xfb, 0x09, 0x2f, 0xb5, 0xde, 0xc0,
-	0xfc, 0x76, 0x4c, 0x30, 0x25, 0x03, 0x4c, 0x71, 0x42, 0xa8, 0x43, 0xce, 0xce, 0x49, 0x42, 0x91,
-	0x0d, 0x6d, 0x97, 0xcf, 0x18, 0x4a, 0x5f, 0x59, 0xd5, 0xd7, 0xe7, 0xed, 0x02, 0xd4, 0x96, 0xd5,
-	0xb2, 0xc8, 0xba, 0x0b, 0x0b, 0x15, 0x4e, 0x12, 0x85, 0x41, 0x42, 0xac, 0x1d, 0xf8, 0xff, 0x2d,
-	0xa1, 0x15, 0xfa, 0xb3, 0x2a, 0x7d, 0xb1, 0x8e, 0xbe, 0x37, 0xb8, 0xe4, 0x0f, 0x00, 0x15, 0x31,
-	0x1c, 0xfe, 0xcf, 0x2a, 0x7f, 0x2a, 0x19, 0x66, 0x2b, 0xa6, 0xde, 0x09, 0x1e, 0xdd, 0x5e, 0x0e,
-	0x5a, 0x01, 0x1d, 0x0b, 0xc8, 0xd0, 0x73, 0x8d, 0x46, 0x5f, 0x59, 0xd5, 0x76, 0xff, 0x73, 0x40,
-	0x4e, 0xee, 0xb9, 0x68, 0x09, 0x3a, 0x14, 0x8f, 0x87, 0x01, 0x9e, 0x10, 0x43, 0x15, 0xeb, 0x6d,
-	0x8a, 0xc7, 0x1f, 0xf0, 0x84, 0xbc, 0xee, 0xc1, 0xec, 0xd9, 0x39, 0x89, 0xd3, 0xe1, 0x17, 0x1c,
-	0xb8, 0x3e, 0xb1, 0x76, 0xe1, 0x4e, 0x49, 0x97, 0x38, 0xdf, 0x73, 0xe8, 0x48, 0xa2, 0x50, 0xb6,
-	0x50, 0x52, 0x96, 0x6f, 0xc8, 0xcb, 0xac, 0x77, 0xb2, 0x11, 0xd5, 0x43, 0xde, 0x82, 0x65, 0xc0,
-	0x62, 0x95, 0x25, 0xba, 0xba, 0x01, 0xdd, 0x2d, 0xd7, 0x3d, 0xc2, 0x63, 0x49, 0xb7, 0x40, 0xa5,
-	0x78, 0x2c, 0xc0, 0x73, 0x25, 0x30, 0xab, 0x62, 0x8b, 0xd6, 0x1c, 0xf4, 0xe4, 0x26, 0x81, 0xf9,
-	0xa1, 0x40, 0x5b, 0xb8, 0x8b, 0x1e, 0x43, 0xc3, 0x73, 0xff, 0xe2, 0x7f, 0xc3, 0x73, 0xd9, 0x39,
-	0x26, 0x84, 0x62, 0x56, 0x90, 0xf9, 0x5e, 0x3d, 0xc7, 0x81, 0x58, 0x74, 0xf2, 0x32, 0xf4, 0x08,
-	0xba, 0x11, 0x3b, 0x14, 0xf5, 0xc2, 0x60, 0x9f, 0xa4, 0x89, 0xa1, 0xf6, 0xd5, 0x55, 0xcd, 0x29,
-	0x4f, 0x5a, 0x1b, 0xa0, 0x1d, 0xca, 0x09, 0x34, 0x07, 0xea, 0x29, 0x49, 0x33, 0x39, 0x9a, 0xc3,
-	0x1e, 0xd1, 0x3c, 0xcc, 0x5c, 0x60, 0xff, 0x9c, 0xf0, 0x66, 0x3b, 0x7c, 0x60, 0x7d, 0x03, 0x2d,
-	0x97, 0x87, 0x0c, 0x68, 0x47, 0x71, 0xf8, 0x95, 0x08, 0x87, 0x35, 0x47, 0x0e, 0x11, 0x82, 0x66,
-	0x76, 0x11, 0xf8, 0xde, 0xec, 0x19, 0x2d, 0x42, 0xcb, 0x0d, 0x27, 0xd8, 0x0b, 0xf8, 0xf5, 0x70,
-	0xc4, 0x88, 0x51, 0x2e, 0x48, 0x9c, 0x78, 0x61, 0x60, 0x34, 0x39, 0x45, 0x0c, 0x19, 0xe5, 0xf8,
-	0x78, 0x6f, 0x60, 0xcc, 0x70, 0x0a, 0x7b, 0xb6, 0x7e, 0x2b, 0xd0, 0x91, 0xed, 0x41, 0xbd, 0xdc,
-	0x43, 0x2d, 0xf3, 0xaa, 0x70, 0xb1, 0x1b, 0xd3, 0x5d, 0xec, 0xa7, 0xd0, 0xcc, 0x9c, 0x65, 0x0e,
-	0xe9, 0xeb, 0xf7, 0x6a, 0x6f, 0x08, 0xdb, 0xe6, 0x64, 0x65, 0xa5, 0x66, 0x34, 0xa7, 0x6b, 0xc6,
-	0x0b, 0x80, 0xdc, 0xf7, 0xc4, 0x98, 0xc9, 0xde, 0x53, 0x96, 0x95, 0x77, 0xc1, 0x29, 0x54, 0x5a,
-	0x87, 0x30, 0x5b, 0x14, 0x90, 0x5b, 0xaa, 0x14, 0x2c, 0x7d, 0x52, 0xec, 0x11, 0xc3, 0xca, 0xec,
-	0xb3, 0x59, 0xf6, 0xd9, 0xef, 0x79, 0xf6, 0xc9, 0xde, 0xf9, 0xa0, 0x1e, 0xe1, 0x71, 0x2d, 0x68,
-	0xb9, 0xe6, 0xfb, 0x2e, 0x7d, 0xdd, 0x05, 0x67, 0xd5, 0xe9, 0x12, 0xec, 0xbb, 0x02, 0x1d, 0x69,
-	0x07, 0xda, 0x84, 0xf6, 0x29, 0x49, 0x87, 0x13, 0x1c, 0x19, 0x4a, 0xe6, 0xc0, 0x4a, 0xad, 0x6d,
-	0xf6, 0x3e, 0x49, 0x0f, 0x70, 0xb4, 0x13, 0xd0, 0x38, 0x75, 0x5a, 0xa7, 0xd9, 0xc0, 0x7c, 0x05,
-	0x7a, 0x61, 0x7a, 0xda, 0x9b, 0xba, 0xd9, 0x78, 0xa9, 0xac, 0xff, 0x52, 0x41, 0x67, 0xd2, 0xb6,
-	0xf9, 0x7b, 0xd0, 0x47, 0xe8, 0x96, 0x52, 0x1b, 0x95, 0x65, 0xd4, 0xfd, 0x19, 0x4c, 0xeb, 0xa6,
-	0x12, 0x91, 0x5b, 0x07, 0x00, 0x97, 0x69, 0x8d, 0x1e, 0x94, 0x76, 0x5c, 0xf9, 0x1b, 0x98, 0xcb,
-	0xd7, 0xae, 0x0b, 0xdc, 0x27, 0xe8, 0x95, 0x73, 0x08, 0xd5, 0x89, 0xa8, 0x04, 0x9e, 0xf9, 0xf0,
-	0xc6, 0x1a, 0x81, 0x3e, 0x04, 0xbd, 0x10, 0xbc, 0xe8, 0x8a, 0x94, 0x2a, 0xb4, 0x7f, 0x7d, 0x81,
-	0x20, 0x6e, 0x41, 0x8b, 0xa7, 0x1c, 0x32, 0xcb, 0x5f, 0x4f, 0x31, 0x2f, 0xcd, 0xa5, 0xda, 0x35,
-	0x8e, 0xf8, 0xdc, 0xca, 0xfe, 0xcd, 0x1b, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x36, 0x3e, 0x04,
-	0x54, 0xd7, 0x07, 0x00, 0x00,
+	// 1225 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x97, 0xdd, 0x72, 0xdb, 0x44,
+	0x14, 0xc7, 0x2d, 0x3b, 0xb1, 0xad, 0xe3, 0xd8, 0x71, 0x16, 0x27, 0x15, 0x6e, 0x4b, 0x5d, 0xb5,
+	0xd3, 0xc9, 0x30, 0xe0, 0x82, 0x53, 0x3a, 0x50, 0x18, 0xc0, 0x89, 0x9d, 0xc4, 0xe4, 0xcb, 0x55,
+	0x9c, 0xcc, 0x30, 0x5c, 0x78, 0x96, 0x68, 0x63, 0x44, 0x64, 0x4b, 0x95, 0x36, 0x99, 0xfa, 0x8a,
+	0xe1, 0x16, 0x2e, 0x99, 0xe1, 0x75, 0x78, 0x03, 0x1e, 0x83, 0xa7, 0xe0, 0x82, 0x59, 0xed, 0x4a,
+	0xd1, 0xca, 0x4a, 0x6a, 0x72, 0x93, 0xd1, 0xee, 0x9e, 0xf3, 0xcb, 0xd9, 0xf3, 0x3f, 0x3a, 0x3a,
+	0x86, 0xb2, 0x4f, 0xbc, 0x2b, 0xeb, 0x8c, 0x34, 0x5d, 0xcf, 0xa1, 0x0e, 0x2a, 0x99, 0x98, 0xe2,
+	0x33, 0x4c, 0xb1, 0xed, 0x8c, 0xea, 0x0f, 0xce, 0xed, 0x29, 0x25, 0x96, 0x69, 0x3f, 0x3f, 0x73,
+	0x3c, 0xf2, 0xdc, 0xb6, 0x28, 0xf1, 0xb0, 0xed, 0x73, 0x53, 0x7d, 0x1b, 0x6a, 0x5b, 0x1e, 0xc1,
+	0x94, 0x74, 0x30, 0xc5, 0x3e, 0xa1, 0x06, 0x79, 0x73, 0x49, 0x7c, 0x8a, 0x9a, 0x50, 0x30, 0xf9,
+	0x8e, 0xa6, 0x34, 0x94, 0xf5, 0x52, 0xab, 0xd6, 0x8c, 0x41, 0x9b, 0xa1, 0x75, 0x68, 0xa4, 0xdf,
+	0x83, 0xd5, 0x04, 0xc7, 0x77, 0x9d, 0x89, 0x4f, 0xf4, 0x2e, 0xac, 0xec, 0x10, 0x9a, 0xa0, 0x7f,
+	0x92, 0xa4, 0xaf, 0xa5, 0xd1, 0x7b, 0x9d, 0x6b, 0x7e, 0x07, 0x50, 0x1c, 0xc3, 0xe1, 0xff, 0x3b,
+	0xca, 0x3f, 0x95, 0x00, 0xd3, 0xf6, 0xa8, 0x75, 0x8e, 0xcf, 0xee, 0x1e, 0x0e, 0x7a, 0x0c, 0x25,
+	0x2c, 0x20, 0x43, 0xcb, 0xd4, 0xb2, 0x0d, 0x65, 0x5d, 0xdd, 0xcd, 0x18, 0x10, 0x6e, 0xf6, 0x4c,
+	0x74, 0x1f, 0x8a, 0x14, 0x8f, 0x86, 0x13, 0x3c, 0x26, 0x5a, 0x4e, 0x9c, 0x17, 0x28, 0x1e, 0x1d,
+	0xe2, 0x31, 0xd9, 0xac, 0xc0, 0xd2, 0x9b, 0x4b, 0xe2, 0x4d, 0x87, 0x3f, 0xe1, 0x89, 0x69, 0x13,
+	0x7d, 0x17, 0xde, 0x93, 0xe2, 0x12, 0xf7, 0xfb, 0x14, 0x8a, 0x21, 0x51, 0x44, 0xb6, 0x2a, 0x45,
+	0x16, 0x39, 0x44, 0x66, 0xfa, 0x77, 0xa1, 0x10, 0xc9, 0x4b, 0xde, 0x81, 0xa5, 0xc1, 0x5a, 0x92,
+	0x25, 0x54, 0xdd, 0x80, 0x72, 0xdb, 0x34, 0x07, 0x78, 0x14, 0xd2, 0x75, 0xc8, 0x51, 0x3c, 0x12,
+	0xe0, 0xaa, 0x04, 0x66, 0x56, 0xec, 0x50, 0xaf, 0x42, 0x25, 0x74, 0x12, 0x98, 0xbf, 0x14, 0xa8,
+	0xed, 0x5b, 0x7e, 0x74, 0x71, 0xff, 0xee, 0x8a, 0x7c, 0x06, 0xf9, 0x73, 0xcb, 0xa6, 0xc4, 0x0b,
+	0xc4, 0x28, 0xb5, 0x1e, 0x4a, 0x0e, 0xdb, 0xc1, 0x51, 0xf7, 0xad, 0xeb, 0x11, 0xdf, 0xb7, 0x9c,
+	0x89, 0x21, 0x8c, 0xd1, 0xd7, 0x00, 0x2e, 0x1e, 0x59, 0x13, 0x4c, 0x2d, 0x67, 0x12, 0xe8, 0x54,
+	0x6a, 0x7d, 0x20, 0xb9, 0xf6, 0xa3, 0xe3, 0x23, 0x97, 0xfd, 0xf5, 0x8d, 0x98, 0x87, 0x7e, 0x01,
+	0xab, 0x89, 0x0b, 0x08, 0xe9, 0x36, 0x40, 0x0d, 0xf3, 0xe8, 0x6b, 0x4a, 0x23, 0x77, 0x73, 0xbe,
+	0xaf, 0xed, 0xd0, 0x43, 0x80, 0x09, 0x79, 0x4b, 0x87, 0xd4, 0xb9, 0x20, 0x13, 0x5e, 0x55, 0x86,
+	0xca, 0x76, 0x06, 0x6c, 0x43, 0xff, 0x4d, 0x81, 0x82, 0xb8, 0x3a, 0x7a, 0x06, 0x59, 0xcb, 0x7c,
+	0x47, 0x72, 0xb2, 0x96, 0xc9, 0x64, 0x1f, 0x13, 0x8a, 0x99, 0x81, 0xc8, 0x8c, 0x1c, 0xc6, 0x81,
+	0x38, 0x34, 0x22, 0x33, 0xf4, 0x14, 0xca, 0x2e, 0x8b, 0x89, 0x5d, 0x70, 0x8f, 0x4c, 0x7d, 0x2d,
+	0xd7, 0xc8, 0xad, 0xab, 0x86, 0xbc, 0xa9, 0x6f, 0x80, 0xda, 0x0f, 0x37, 0x50, 0x15, 0x72, 0x17,
+	0x64, 0x1a, 0x84, 0xa3, 0x1a, 0xec, 0x11, 0xd5, 0x60, 0xf1, 0x0a, 0xdb, 0x97, 0x44, 0xdc, 0x82,
+	0x2f, 0xf4, 0x5f, 0x40, 0x8d, 0xc2, 0x43, 0x1a, 0x14, 0x5c, 0xcf, 0xf9, 0x99, 0x88, 0x82, 0x54,
+	0x8d, 0x70, 0x89, 0x10, 0x2c, 0x04, 0xef, 0x0d, 0xf7, 0x0d, 0x9e, 0xd1, 0x1a, 0xe4, 0x4d, 0x67,
+	0x8c, 0x2d, 0xae, 0x92, 0x6a, 0x88, 0x15, 0xa3, 0x5c, 0x11, 0x8f, 0x89, 0xaa, 0x2d, 0x70, 0x8a,
+	0x58, 0x32, 0xca, 0xc9, 0x49, 0xaf, 0xa3, 0x2d, 0x72, 0x0a, 0x7b, 0xd6, 0xff, 0x51, 0xa0, 0x18,
+	0x66, 0x1e, 0x55, 0xa2, 0x1c, 0xaa, 0x41, 0xae, 0x62, 0x55, 0x97, 0x9d, 0xaf, 0xea, 0x3e, 0x86,
+	0x85, 0x20, 0xb3, 0xb9, 0x40, 0xe0, 0xf7, 0x53, 0x05, 0x66, 0x6e, 0x46, 0x60, 0x26, 0x89, 0xb1,
+	0x30, 0x9f, 0x18, 0x2f, 0x59, 0x81, 0x8a, 0x34, 0xfb, 0xda, 0x62, 0xf0, 0x7f, 0xd6, 0x12, 0x05,
+	0x2a, 0x8e, 0x8d, 0x98, 0xa5, 0xde, 0x87, 0xa5, 0x78, 0x00, 0x51, 0x4a, 0x95, 0x58, 0x4a, 0x3f,
+	0x8a, 0x6b, 0xc4, 0xb0, 0xe1, 0xa7, 0xa2, 0xc9, 0x3e, 0x15, 0xcd, 0x7d, 0xfe, 0xa9, 0x08, 0xb5,
+	0xb3, 0x21, 0x37, 0xc0, 0xa3, 0x54, 0xd0, 0xa3, 0x94, 0x76, 0x28, 0x35, 0xc3, 0x58, 0x66, 0x73,
+	0xf3, 0x35, 0xfc, 0x5f, 0x15, 0x28, 0x86, 0xe9, 0x40, 0xaf, 0xa0, 0x70, 0x41, 0xa6, 0xc3, 0x31,
+	0x76, 0xc5, 0xab, 0xf4, 0x38, 0x35, 0x6d, 0xcd, 0x3d, 0x32, 0x3d, 0xc0, 0x6e, 0x77, 0x42, 0xbd,
+	0xa9, 0x91, 0xbf, 0x08, 0x16, 0xf5, 0x2f, 0xa0, 0x14, 0xdb, 0x9e, 0xb7, 0x52, 0x5f, 0x65, 0x3f,
+	0x57, 0xf4, 0x23, 0xa8, 0x26, 0x1b, 0x07, 0xfa, 0x12, 0x0a, 0xbc, 0x75, 0xf8, 0xa9, 0xa1, 0x1c,
+	0x5b, 0x93, 0x91, 0x4d, 0xfa, 0x9e, 0xe3, 0x12, 0x8f, 0x4e, 0xb9, 0xb7, 0x11, 0x7a, 0xe8, 0x7f,
+	0xe7, 0xa0, 0x96, 0x66, 0x81, 0xbe, 0x01, 0x60, 0x1f, 0x0b, 0xd1, 0xc1, 0x94, 0x94, 0x36, 0x34,
+	0xc0, 0x23, 0xd9, 0x67, 0x37, 0x63, 0xa8, 0x14, 0x8f, 0x04, 0xe0, 0x35, 0x54, 0x23, 0xf1, 0x87,
+	0x52, 0x23, 0x7c, 0x9a, 0x5e, 0x2c, 0x33, 0xb0, 0xe5, 0xc8, 0x5f, 0x20, 0x0f, 0x61, 0x39, 0x12,
+	0x55, 0x10, 0xb9, 0x76, 0x4f, 0x52, 0xcb, 0x7c, 0x06, 0x58, 0x09, 0xbd, 0x05, 0x6f, 0x0f, 0x2a,
+	0x42, 0xdc, 0x10, 0xc7, 0x5f, 0x01, 0x3d, 0xad, 0x14, 0x66, 0x68, 0x65, 0xe1, 0x2b, 0x60, 0x7d,
+	0x28, 0x32, 0x03, 0x4c, 0x1d, 0x4f, 0x83, 0x86, 0xb2, 0x5e, 0x69, 0xbd, 0x78, 0xa7, 0x0e, 0xcd,
+	0x2d, 0x67, 0xec, 0x62, 0xcf, 0xf2, 0x59, 0x2b, 0xe7, 0xbe, 0x46, 0x44, 0xd1, 0x1b, 0x80, 0x66,
+	0xcf, 0x11, 0x40, 0xbe, 0xfb, 0xfa, 0xa4, 0xbd, 0x7f, 0x5c, 0xcd, 0x6c, 0xae, 0xc0, 0xb2, 0x2b,
+	0x80, 0xe2, 0x06, 0xfa, 0x0e, 0xac, 0xa5, 0xdf, 0x3f, 0x39, 0x21, 0x28, 0xb3, 0x13, 0xc2, 0x26,
+	0x40, 0x31, 0xe4, 0xe9, 0x5f, 0xc1, 0xca, 0x8c, 0xc2, 0xd2, 0x08, 0xa1, 0x24, 0x47, 0x88, 0xb8,
+	0xf7, 0x0f, 0x70, 0xef, 0x06, 0x61, 0xd1, 0x0b, 0xfe, 0xea, 0x5c, 0x61, 0x5b, 0x94, 0x95, 0xdc,
+	0xa4, 0xf6, 0xc8, 0xf4, 0x94, 0xd5, 0x7b, 0x1f, 0x5b, 0x2c, 0xcb, 0xec, 0xa5, 0x39, 0xc5, 0xb6,
+	0x04, 0x7f, 0x09, 0x4b, 0x71, 0xab, 0xb9, 0x7b, 0xfd, 0xef, 0x0a, 0xac, 0xa6, 0xaa, 0x89, 0xea,
+	0x89, 0xc6, 0xcf, 0xae, 0x15, 0xb6, 0xfe, 0x5a, 0xbc, 0xf5, 0xef, 0x66, 0x44, 0x83, 0xd1, 0xe4,
+	0xe6, 0xcf, 0x22, 0x15, 0xed, 0xbf, 0x9e, 0x68, 0xff, 0x8c, 0x25, 0x36, 0xa4, 0x5b, 0xfc, 0x91,
+	0x85, 0x95, 0x99, 0x4f, 0x39, 0x8b, 0xdc, 0xb6, 0xc6, 0x16, 0x8f, 0xa3, 0x6c, 0xf0, 0x05, 0xdb,
+	0x8d, 0x7f, 0x81, 0xf9, 0x02, 0x7d, 0x0b, 0x05, 0xdf, 0xf1, 0xe8, 0x1e, 0x99, 0x06, 0x41, 0x54,
+	0x5a, 0xcf, 0x6e, 0x9f, 0x13, 0x9a, 0xc7, 0xdc, 0xda, 0x08, 0xdd, 0xd0, 0x36, 0xa8, 0xec, 0xf1,
+	0xc8, 0x33, 0x45, 0xf1, 0x57, 0x5a, 0xeb, 0x73, 0x30, 0x02, 0x7b, 0xe3, 0xda, 0x55, 0xff, 0x10,
+	0xd4, 0x68, 0x1f, 0x55, 0x00, 0x3a, 0xdd, 0xe3, 0xad, 0xee, 0x61, 0xa7, 0x77, 0xb8, 0x53, 0xcd,
+	0xa0, 0x32, 0xa8, 0xed, 0x68, 0xa9, 0xe8, 0x0f, 0xa0, 0x20, 0xe2, 0x40, 0x2b, 0x50, 0xde, 0x32,
+	0xba, 0xed, 0x41, 0xef, 0xe8, 0x70, 0x38, 0xe8, 0x1d, 0x74, 0xab, 0x99, 0xd6, 0xbf, 0x39, 0x28,
+	0x31, 0x8d, 0xb6, 0x78, 0x00, 0xe8, 0x14, 0xca, 0xd2, 0x18, 0x8f, 0xe4, 0xee, 0x96, 0xf6, 0x53,
+	0xa1, 0xae, 0xdf, 0x66, 0x22, 0xa6, 0xa1, 0x03, 0x80, 0xeb, 0xf1, 0x1d, 0xc9, 0x9d, 0x6d, 0xe6,
+	0xe7, 0x41, 0xfd, 0xd1, 0x8d, 0xe7, 0x02, 0xf7, 0x3d, 0x54, 0xe4, 0xc1, 0x14, 0xa5, 0x05, 0x91,
+	0x98, 0x80, 0xeb, 0x4f, 0x6e, 0xb5, 0x11, 0xe8, 0x3e, 0x94, 0x62, 0x93, 0x38, 0x9a, 0x09, 0x25,
+	0x09, 0x6d, 0xdc, 0x6c, 0x20, 0x88, 0x6d, 0xc8, 0xf3, 0xb1, 0x17, 0xd5, 0xe5, 0xc6, 0x19, 0x1f,
+	0xa0, 0xeb, 0xf7, 0x53, 0xcf, 0x04, 0xe2, 0x14, 0xca, 0xd2, 0x94, 0x99, 0x90, 0x25, 0x6d, 0x84,
+	0x4e, 0xc8, 0x92, 0x3a, 0xa4, 0xfe, 0x98, 0x0f, 0x7e, 0x04, 0x6e, 0xfc, 0x17, 0x00, 0x00, 0xff,
+	0xff, 0x22, 0x14, 0x72, 0xd7, 0x40, 0x0e, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -915,6 +1722,7 @@ type DataCatalogClient interface {
 	CreateArtifact(ctx context.Context, in *CreateArtifactRequest, opts ...grpc.CallOption) (*CreateArtifactResponse, error)
 	GetArtifact(ctx context.Context, in *GetArtifactRequest, opts ...grpc.CallOption) (*GetArtifactResponse, error)
 	AddTag(ctx context.Context, in *AddTagRequest, opts ...grpc.CallOption) (*AddTagResponse, error)
+	ListArtifacts(ctx context.Context, in *ListArtifactsRequest, opts ...grpc.CallOption) (*ListArtifactsResponse, error)
 }
 
 type dataCatalogClient struct {
@@ -970,6 +1778,15 @@ func (c *dataCatalogClient) AddTag(ctx context.Context, in *AddTagRequest, opts 
 	return out, nil
 }
 
+func (c *dataCatalogClient) ListArtifacts(ctx context.Context, in *ListArtifactsRequest, opts ...grpc.CallOption) (*ListArtifactsResponse, error) {
+	out := new(ListArtifactsResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/ListArtifacts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DataCatalogServer is the server API for DataCatalog service.
 type DataCatalogServer interface {
 	CreateDataset(context.Context, *CreateDatasetRequest) (*CreateDatasetResponse, error)
@@ -977,6 +1794,7 @@ type DataCatalogServer interface {
 	CreateArtifact(context.Context, *CreateArtifactRequest) (*CreateArtifactResponse, error)
 	GetArtifact(context.Context, *GetArtifactRequest) (*GetArtifactResponse, error)
 	AddTag(context.Context, *AddTagRequest) (*AddTagResponse, error)
+	ListArtifacts(context.Context, *ListArtifactsRequest) (*ListArtifactsResponse, error)
 }
 
 // UnimplementedDataCatalogServer can be embedded to have forward compatible implementations.
@@ -997,6 +1815,9 @@ func (*UnimplementedDataCatalogServer) GetArtifact(ctx context.Context, req *Get
 }
 func (*UnimplementedDataCatalogServer) AddTag(ctx context.Context, req *AddTagRequest) (*AddTagResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddTag not implemented")
+}
+func (*UnimplementedDataCatalogServer) ListArtifacts(ctx context.Context, req *ListArtifactsRequest) (*ListArtifactsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListArtifacts not implemented")
 }
 
 func RegisterDataCatalogServer(s *grpc.Server, srv DataCatalogServer) {
@@ -1093,6 +1914,24 @@ func _DataCatalog_AddTag_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataCatalog_ListArtifacts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListArtifactsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).ListArtifacts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datacatalog.DataCatalog/ListArtifacts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).ListArtifacts(ctx, req.(*ListArtifactsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _DataCatalog_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "datacatalog.DataCatalog",
 	HandlerType: (*DataCatalogServer)(nil),
@@ -1116,6 +1955,10 @@ var _DataCatalog_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddTag",
 			Handler:    _DataCatalog_AddTag_Handler,
+		},
+		{
+			MethodName: "ListArtifacts",
+			Handler:    _DataCatalog_ListArtifacts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
