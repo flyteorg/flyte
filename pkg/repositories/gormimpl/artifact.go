@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jinzhu/gorm"
+	"github.com/lyft/datacatalog/pkg/common"
 	"github.com/lyft/datacatalog/pkg/repositories/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/interfaces"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
@@ -72,4 +73,32 @@ func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.A
 	}
 
 	return artifact, nil
+}
+
+func (h *artifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error) {
+	timer := h.repoMetrics.ListDuration.Start(ctx)
+	defer timer.Stop()
+
+	artifacts := make([]models.Artifact, 0)
+	sourceEntity := common.Artifact
+
+	// add filter for dataset
+	datasetUUIDFilter := NewGormValueFilter(sourceEntity, common.Equal, "dataset_uuid", datasetKey.UUID)
+	in.Filters = append(in.Filters, datasetUUIDFilter)
+
+	// apply filters and joins
+	tx, err := applyListModelsInput(h.db, sourceEntity, in)
+
+	if err != nil {
+		return nil, err
+	} else if tx.Error != nil {
+		return []models.Artifact{}, h.errorTransformer.ToDataCatalogError(tx.Error)
+	}
+
+	tx = tx.Preload("ArtifactData").Preload("Partitions").Find(&artifacts)
+	if tx.Error != nil {
+		return []models.Artifact{}, h.errorTransformer.ToDataCatalogError(tx.Error)
+	}
+
+	return artifacts, nil
 }

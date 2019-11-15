@@ -65,6 +65,20 @@ func FromArtifactModel(artifact models.Artifact) (datacatalog.Artifact, error) {
 	}, nil
 }
 
+func FromArtifactModels(artifacts []models.Artifact) ([]*datacatalog.Artifact, error) {
+	retArtifacts := make([]*datacatalog.Artifact, 0, len(artifacts))
+	for _, artifact := range artifacts {
+		retArtifact, err := FromArtifactModel(artifact)
+		if err != nil {
+			return nil, err
+		}
+
+		retArtifacts = append(retArtifacts, &retArtifact)
+	}
+
+	return retArtifacts, nil
+}
+
 func ToArtifactKey(datasetID datacatalog.DatasetID, artifactID string) models.ArtifactKey {
 	return models.ArtifactKey{
 		DatasetProject: datasetID.Project,

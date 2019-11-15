@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/lyft/datacatalog/pkg/common"
 	"github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/mocks"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
@@ -84,6 +85,50 @@ func newMockDataCatalogRepo() *mocks.DataCatalogRepo {
 func getExpectedDatastoreLocation(ctx context.Context, store *storage.DataStore, prefix storage.DataReference, artifact *datacatalog.Artifact, idx int) (storage.DataReference, error) {
 	dataset := artifact.Dataset
 	return store.ConstructReference(ctx, prefix, dataset.Project, dataset.Domain, dataset.Name, dataset.Version, artifact.Id, artifact.Data[idx].Name, artifactDataFile)
+}
+
+func getExpectedArtifactModel(ctx context.Context, t *testing.T, datastore *storage.DataStore, artifact *datacatalog.Artifact) models.Artifact {
+	expectedDataset := artifact.Dataset
+	// Write sample artifact data to the expected location and see if the retrieved data matches
+	testStoragePrefix, err := datastore.ConstructReference(ctx, datastore.GetBaseContainerFQN(ctx), "test")
+	assert.NoError(t, err)
+	dataLocation, err := getExpectedDatastoreLocation(ctx, datastore, testStoragePrefix, artifact, 0)
+	assert.NoError(t, err)
+	err = datastore.WriteProtobuf(ctx, dataLocation, storage.Options{}, getTestStringLiteral())
+	assert.NoError(t, err)
+
+	// construct the artifact model we will return on the queries
+	serializedMetadata, err := proto.Marshal(artifact.Metadata)
+	assert.NoError(t, err)
+	datasetKey := models.DatasetKey{
+		Project: expectedDataset.Project,
+		Domain:  expectedDataset.Domain,
+		Version: expectedDataset.Version,
+		Name:    expectedDataset.Name,
+		UUID:    expectedDataset.UUID,
+	}
+	return models.Artifact{
+		ArtifactKey: models.ArtifactKey{
+			DatasetProject: expectedDataset.Project,
+			DatasetDomain:  expectedDataset.Domain,
+			DatasetVersion: expectedDataset.Version,
+			DatasetName:    expectedDataset.Name,
+			ArtifactID:     artifact.Id,
+		},
+		DatasetUUID: expectedDataset.UUID,
+		ArtifactData: []models.ArtifactData{
+			{Name: "data1", Location: dataLocation.String()},
+		},
+		Dataset: models.Dataset{
+			DatasetKey:         datasetKey,
+			SerializedMetadata: serializedMetadata,
+		},
+		SerializedMetadata: serializedMetadata,
+		Partitions: []models.Partition{
+			{Key: "key1", Value: "value1"},
+			{Key: "key2", Value: "value2"},
+		},
+	}
 }
 
 func TestCreateArtifact(t *testing.T) {
@@ -307,46 +352,7 @@ func TestGetArtifact(t *testing.T) {
 	}
 
 	expectedArtifact := getTestArtifact()
-	expectedDataset := expectedArtifact.Dataset
-
-	// Write the artifact data to the expected location and see if the retrieved data matches
-	dataLocation, err := getExpectedDatastoreLocation(ctx, datastore, testStoragePrefix, expectedArtifact, 0)
-	assert.NoError(t, err)
-	err = datastore.WriteProtobuf(ctx, dataLocation, storage.Options{}, getTestStringLiteral())
-	assert.NoError(t, err)
-
-	// construct the artifact model we will return on the queries
-	serializedMetadata, err := proto.Marshal(expectedArtifact.Metadata)
-	assert.NoError(t, err)
-	datasetKey := models.DatasetKey{
-		Project: expectedDataset.Project,
-		Domain:  expectedDataset.Domain,
-		Version: expectedDataset.Version,
-		Name:    expectedDataset.Name,
-		UUID:    expectedDataset.UUID,
-	}
-	mockArtifactModel := models.Artifact{
-		ArtifactKey: models.ArtifactKey{
-			DatasetProject: expectedDataset.Project,
-			DatasetDomain:  expectedDataset.Domain,
-			DatasetVersion: expectedDataset.Version,
-			DatasetName:    expectedDataset.Name,
-			ArtifactID:     expectedArtifact.Id,
-		},
-		DatasetUUID: expectedDataset.UUID,
-		ArtifactData: []models.ArtifactData{
-			{Name: "data1", Location: dataLocation.String()},
-		},
-		Dataset: models.Dataset{
-			DatasetKey:         datasetKey,
-			SerializedMetadata: serializedMetadata,
-		},
-		SerializedMetadata: serializedMetadata,
-		Partitions: []models.Partition{
-			{Key: "key1", Value: "value1"},
-			{Key: "key2", Value: "value2"},
-		},
-	}
+	mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
 
 	t.Run("Get by Id", func(t *testing.T) {
 
@@ -420,5 +426,160 @@ func TestGetArtifact(t *testing.T) {
 		responseCode := status.Code(err)
 		assert.Equal(t, codes.NotFound, responseCode)
 	})
+}
 
+func TestListArtifact(t *testing.T) {
+	ctx := context.Background()
+	datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
+	testStoragePrefix, err := datastore.ConstructReference(ctx, datastore.GetBaseContainerFQN(ctx), "test")
+	assert.NoError(t, err)
+
+	dcRepo := &mocks.DataCatalogRepo{
+		MockDatasetRepo:  &mocks.DatasetRepo{},
+		MockArtifactRepo: &mocks.ArtifactRepo{},
+		MockTagRepo:      &mocks.TagRepo{},
+	}
+
+	expectedDataset := getTestDataset()
+	mockDatasetModel := models.Dataset{
+		DatasetKey: models.DatasetKey{
+			Project: expectedDataset.Id.Project,
+			Domain:  expectedDataset.Id.Domain,
+			Name:    expectedDataset.Id.Name,
+			Version: expectedDataset.Id.Version,
+			UUID:    expectedDataset.Id.UUID,
+		},
+	}
+
+	expectedArtifact := getTestArtifact()
+	mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
+
+	t.Run("List Artifact on invalid filter", func(t *testing.T) {
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		filter := &datacatalog.FilterExpression{
+			Filters: []*datacatalog.SinglePropertyFilter{
+				{
+					PropertyFilter: &datacatalog.SinglePropertyFilter_DatasetFilter{
+						DatasetFilter: &datacatalog.DatasetPropertyFilter{
+							Property: &datacatalog.DatasetPropertyFilter_Project{
+								Project: "test",
+							},
+						},
+					},
+				},
+			},
+		}
+
+		artifactResponse, err := artifactManager.ListArtifacts(ctx, datacatalog.ListArtifactsRequest{Dataset: getTestDataset().Id, Filter: filter})
+		assert.Error(t, err)
+		assert.Nil(t, artifactResponse)
+		responseCode := status.Code(err)
+		assert.Equal(t, codes.InvalidArgument, responseCode)
+	})
+
+	t.Run("List Artifacts with Partition and Tag", func(t *testing.T) {
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		filter := &datacatalog.FilterExpression{
+			Filters: []*datacatalog.SinglePropertyFilter{
+				{
+					PropertyFilter: &datacatalog.SinglePropertyFilter_PartitionFilter{
+						PartitionFilter: &datacatalog.PartitionPropertyFilter{
+							Property: &datacatalog.PartitionPropertyFilter_KeyVal{
+								KeyVal: &datacatalog.KeyValuePair{Key: "key1", Value: "val1"},
+							},
+						},
+					},
+				},
+				{
+					PropertyFilter: &datacatalog.SinglePropertyFilter_PartitionFilter{
+						PartitionFilter: &datacatalog.PartitionPropertyFilter{
+							Property: &datacatalog.PartitionPropertyFilter_KeyVal{
+								KeyVal: &datacatalog.KeyValuePair{Key: "key2", Value: "val2"},
+							},
+						},
+					},
+				},
+				{
+					PropertyFilter: &datacatalog.SinglePropertyFilter_TagFilter{
+						TagFilter: &datacatalog.TagPropertyFilter{
+							Property: &datacatalog.TagPropertyFilter_TagName{
+								TagName: "special",
+							},
+						},
+					},
+				},
+			},
+		}
+
+		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
+			mock.MatchedBy(func(dataset models.DatasetKey) bool {
+				return dataset.Project == expectedDataset.Id.Project &&
+					dataset.Domain == expectedDataset.Id.Domain &&
+					dataset.Name == expectedDataset.Id.Name &&
+					dataset.Version == expectedDataset.Id.Version
+			})).Return(mockDatasetModel, nil)
+
+		mockArtifacts := []models.Artifact{
+			mockArtifactModel,
+			mockArtifactModel,
+		}
+
+		dcRepo.MockArtifactRepo.On("List", mock.Anything,
+			mock.MatchedBy(func(dataset models.DatasetKey) bool {
+				return dataset.Project == expectedDataset.Id.Project &&
+					dataset.Domain == expectedDataset.Id.Domain &&
+					dataset.Name == expectedDataset.Id.Name &&
+					dataset.Version == expectedDataset.Id.Version
+			}),
+			mock.MatchedBy(func(listInput models.ListModelsInput) bool {
+				return len(listInput.Filters) == 5 &&
+					len(listInput.JoinEntityToConditionMap) == 2 &&
+					listInput.Filters[0].GetDBEntity() == common.Partition &&
+					listInput.Filters[1].GetDBEntity() == common.Partition &&
+					listInput.Filters[2].GetDBEntity() == common.Partition &&
+					listInput.Filters[3].GetDBEntity() == common.Partition &&
+					listInput.Filters[4].GetDBEntity() == common.Tag &&
+					listInput.JoinEntityToConditionMap[common.Partition] != nil &&
+					listInput.JoinEntityToConditionMap[common.Tag] != nil &&
+					listInput.Limit == 50 &&
+					listInput.Offset == 0
+			})).Return(mockArtifacts, nil)
+
+		artifactResponse, err := artifactManager.ListArtifacts(ctx, datacatalog.ListArtifactsRequest{Dataset: expectedDataset.Id, Filter: filter})
+		assert.NoError(t, err)
+		assert.NotEmpty(t, artifactResponse)
+	})
+
+	t.Run("List Artifacts with No Partition", func(t *testing.T) {
+		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
+		filter := &datacatalog.FilterExpression{Filters: nil}
+
+		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
+			mock.MatchedBy(func(dataset models.DatasetKey) bool {
+				return dataset.Project == expectedDataset.Id.Project &&
+					dataset.Domain == expectedDataset.Id.Domain &&
+					dataset.Name == expectedDataset.Id.Name &&
+					dataset.Version == expectedDataset.Id.Version
+			})).Return(mockDatasetModel, nil)
+
+		mockArtifacts := []models.Artifact{
+			mockArtifactModel,
+			mockArtifactModel,
+		}
+		dcRepo.MockArtifactRepo.On("List", mock.Anything,
+			mock.MatchedBy(func(dataset models.DatasetKey) bool {
+				return dataset.Project == expectedDataset.Id.Project &&
+					dataset.Domain == expectedDataset.Id.Domain &&
+					dataset.Name == expectedDataset.Id.Name &&
+					dataset.Version == expectedDataset.Id.Version
+			}),
+			mock.MatchedBy(func(listInput models.ListModelsInput) bool {
+				return len(listInput.Filters) == 0 &&
+					len(listInput.JoinEntityToConditionMap) == 0
+			})).Return(mockArtifacts, nil)
+
+		artifactResponse, err := artifactManager.ListArtifacts(ctx, datacatalog.ListArtifactsRequest{Dataset: expectedDataset.Id, Filter: filter})
+		assert.NoError(t, err)
+		assert.NotEmpty(t, artifactResponse)
+	})
 }

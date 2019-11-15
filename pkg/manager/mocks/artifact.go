@@ -3,7 +3,7 @@
 package mocks
 
 import context "context"
-import idl_datacatalog "github.com/lyft/datacatalog/protos/gen"
+import datacatalog "github.com/lyft/datacatalog/protos/gen"
 
 import mock "github.com/stretchr/testify/mock"
 
@@ -13,20 +13,20 @@ type ArtifactManager struct {
 }
 
 // CreateArtifact provides a mock function with given fields: ctx, request
-func (_m *ArtifactManager) CreateArtifact(ctx context.Context, request idl_datacatalog.CreateArtifactRequest) (*idl_datacatalog.CreateArtifactResponse, error) {
+func (_m *ArtifactManager) CreateArtifact(ctx context.Context, request datacatalog.CreateArtifactRequest) (*datacatalog.CreateArtifactResponse, error) {
 	ret := _m.Called(ctx, request)
 
-	var r0 *idl_datacatalog.CreateArtifactResponse
-	if rf, ok := ret.Get(0).(func(context.Context, idl_datacatalog.CreateArtifactRequest) *idl_datacatalog.CreateArtifactResponse); ok {
+	var r0 *datacatalog.CreateArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, datacatalog.CreateArtifactRequest) *datacatalog.CreateArtifactResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*idl_datacatalog.CreateArtifactResponse)
+			r0 = ret.Get(0).(*datacatalog.CreateArtifactResponse)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, idl_datacatalog.CreateArtifactRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, datacatalog.CreateArtifactRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -36,20 +36,43 @@ func (_m *ArtifactManager) CreateArtifact(ctx context.Context, request idl_datac
 }
 
 // GetArtifact provides a mock function with given fields: ctx, request
-func (_m *ArtifactManager) GetArtifact(ctx context.Context, request idl_datacatalog.GetArtifactRequest) (*idl_datacatalog.GetArtifactResponse, error) {
+func (_m *ArtifactManager) GetArtifact(ctx context.Context, request datacatalog.GetArtifactRequest) (*datacatalog.GetArtifactResponse, error) {
 	ret := _m.Called(ctx, request)
 
-	var r0 *idl_datacatalog.GetArtifactResponse
-	if rf, ok := ret.Get(0).(func(context.Context, idl_datacatalog.GetArtifactRequest) *idl_datacatalog.GetArtifactResponse); ok {
+	var r0 *datacatalog.GetArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, datacatalog.GetArtifactRequest) *datacatalog.GetArtifactResponse); ok {
 		r0 = rf(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*idl_datacatalog.GetArtifactResponse)
+			r0 = ret.Get(0).(*datacatalog.GetArtifactResponse)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, idl_datacatalog.GetArtifactRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, datacatalog.GetArtifactRequest) error); ok {
+		r1 = rf(ctx, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ListArtifacts provides a mock function with given fields: ctx, request
+func (_m *ArtifactManager) ListArtifacts(ctx context.Context, request datacatalog.ListArtifactsRequest) (*datacatalog.ListArtifactsResponse, error) {
+	ret := _m.Called(ctx, request)
+
+	var r0 *datacatalog.ListArtifactsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, datacatalog.ListArtifactsRequest) *datacatalog.ListArtifactsResponse); ok {
+		r0 = rf(ctx, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.ListArtifactsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, datacatalog.ListArtifactsRequest) error); ok {
 		r1 = rf(ctx, request)
 	} else {
 		r1 = ret.Error(1)

@@ -46,3 +46,26 @@ func (_m *ArtifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.
 
 	return r0, r1
 }
+
+// List provides a mock function with given fields: ctx, datasetKey, in
+func (_m *ArtifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error) {
+	ret := _m.Called(ctx, datasetKey, in)
+
+	var r0 []models.Artifact
+	if rf, ok := ret.Get(0).(func(context.Context, models.DatasetKey, models.ListModelsInput) []models.Artifact); ok {
+		r0 = rf(ctx, datasetKey, in)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]models.Artifact)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, models.DatasetKey, models.ListModelsInput) error); ok {
+		r1 = rf(ctx, datasetKey, in)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
