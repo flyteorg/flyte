@@ -162,6 +162,6 @@ As your Flyte user-base evolves, adding new projects is as simple as registering
 
     flyte-cli -h {{ your-flyte-admin-host.com }} register-project --identifier myuniqueworkflow --name FriendlyWorkflowName 
 
-A cron which runs at the cadence specified in flyteadmin config will ensure that all the kubernetes resources necessary for the new project are created and new workflow can successfully
+A cron which runs at the cadence specified in flyteadmin config will ensure that all the kubernetes resources necessary for the new project are created and new workflows can successfully
 be registered and executed under the new project.
 
