@@ -8,6 +8,8 @@ import (
 	"context"
 	"testing"
 
+	flyteK8sConfig "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+
 	mocks2 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
 	"github.com/stretchr/testify/mock"
@@ -120,4 +122,28 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	batchInput = UpdateBatchInputForArray(ctx, batchInput, input.Size)
 	assert.NotNil(t, batchInput)
 	assert.Equal(t, *expectedBatchInput, *batchInput)
+}
+
+func Test_getEnvVarsForTask(t *testing.T) {
+	ctx := context.Background()
+	id := &mocks.TaskExecutionID{}
+	id.OnGetGeneratedName().Return("Job_Name")
+	id.OnGetID().Return(core.TaskExecutionIdentifier{})
+
+	assert.NoError(t, flyteK8sConfig.SetK8sPluginConfig(&flyteK8sConfig.K8sPluginConfig{
+		DefaultEnvVars: map[string]string{
+			"MyKey": "BadVal",
+		},
+	}))
+
+	envVars := getEnvVarsForTask(ctx, id, nil, map[string]string{
+		"MyKey": "MyVal",
+	})
+
+	assert.Equal(t, []v12.EnvVar{
+		{
+			Name:  "MyKey",
+			Value: "MyVal",
+		},
+	}, envVars)
 }
