@@ -68,13 +68,17 @@ func GetTaskLinks(ctx context.Context, taskMeta pluginCore.TaskExecutionMetadata
 		return logLinks, nil
 	}
 
+	detailedArrayStatus := state.GetArrayStatus().Detailed
 	for childIdx, subJob := range job.SubJobs {
 		originalIndex := core.CalculateOriginalIndex(childIdx, state.GetIndexesToCache())
+		finalPhaseIdx := detailedArrayStatus.GetItem(childIdx)
+		finalPhase := pluginCore.Phases[finalPhaseIdx]
 
+		// The caveat here is that we will mark all attempts with the final phase we are tracking in the state.
 		for attemptIdx, attempt := range subJob.Attempts {
 			if len(attempt.LogStream) > 0 {
 				logLinks = append(logLinks, &idlCore.TaskLog{
-					Name: fmt.Sprintf("AWS Batch #%v-%v (%v)", originalIndex, attemptIdx, subJob.Status.Phase),
+					Name: fmt.Sprintf("AWS Batch #%v-%v (%v)", originalIndex, attemptIdx, finalPhase),
 					Uri:  fmt.Sprintf(LogStreamFormatter, jobStore.GetRegion(), attempt.LogStream),
 				})
 			}

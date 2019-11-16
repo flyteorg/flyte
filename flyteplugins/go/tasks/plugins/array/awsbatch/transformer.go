@@ -73,7 +73,7 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 		return nil, err
 	}
 
-	envVars := getEnvVarsForTask(ctx, tCtx, taskTemplate.GetContainer().GetEnv(), cfg.DefaultEnvVars)
+	envVars := getEnvVarsForTask(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID(), taskTemplate.GetContainer().GetEnv(), cfg.DefaultEnvVars)
 	resources := newContainerResourcesFromContainerTask(ctx, taskTemplate.GetContainer())
 	return &batch.SubmitJobInput{
 		JobName:            refStr(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()),
@@ -105,9 +105,9 @@ func UpdateBatchInputForArray(_ context.Context, batchInput *batch.SubmitJobInpu
 	return batchInput
 }
 
-func getEnvVarsForTask(ctx context.Context, tCtx pluginCore.TaskExecutionContext, containerEnvVars []*core.KeyValuePair,
+func getEnvVarsForTask(ctx context.Context, execID pluginCore.TaskExecutionID, containerEnvVars []*core.KeyValuePair,
 	defaultEnvVars map[string]string) []v1.EnvVar {
-	envVars := flytek8s.DecorateEnvVars(ctx, flytek8s.ToK8sEnvVar(containerEnvVars), tCtx.TaskExecutionMetadata().GetTaskExecutionID())
+	envVars := flytek8s.DecorateEnvVars(ctx, flytek8s.ToK8sEnvVar(containerEnvVars), execID)
 	m := make(map[string]string, len(envVars))
 	for _, envVar := range envVars {
 		m[envVar.Name] = envVar.Value
@@ -119,7 +119,7 @@ func getEnvVarsForTask(ctx context.Context, tCtx pluginCore.TaskExecutionContext
 
 	finalEnvVars := make([]v1.EnvVar, 0, len(m))
 	for key, val := range m {
-		finalEnvVars = append(envVars, v1.EnvVar{
+		finalEnvVars = append(finalEnvVars, v1.EnvVar{
 			Name:  key,
 			Value: val,
 		})
