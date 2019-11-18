@@ -76,7 +76,7 @@ func ValidateUniquePartitionKeys(partitionKeys []string) error {
 	}
 
 	if invalidPartitionKeys {
-		return NewInvalidArgumentError(partitionKeyName, fmt.Sprintf("Keys are not unique, occurence count: %+v", partitionKeySet))
+		return NewInvalidArgumentError(partitionKeyName, fmt.Sprintf("Keys are not unique, occurrence count: %+v", partitionKeySet))
 	}
 
 	return nil
