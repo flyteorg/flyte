@@ -1,7 +1,7 @@
 sudo: required
 language: go
 go:
-  - "1.10"
+  - "1.13"
 services:
   - docker
 jobs:

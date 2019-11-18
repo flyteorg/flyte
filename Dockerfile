@@ -4,7 +4,7 @@
 # TO OPT OUT OF UPDATES, SEE https://github.com/lyft/boilerplate/blob/master/Readme.rst
 
 # Using go1.10.4
-FROM golang:1.10.4-alpine3.8 as builder
+FROM golang:1.13.3-alpine3.10 as builder
 RUN apk add git openssh-client make curl dep
 
 # COPY only the dep files for efficient caching
@@ -25,7 +25,7 @@ RUN make linux_compile
 ENV PATH="/artifacts:${PATH}"
 
 # This will eventually move to centurylink/ca-certs:latest for minimum possible image size
-FROM alpine:3.8
+FROM alpine:3.10
 COPY --from=builder /artifacts /bin
 
 RUN apk --update add ca-certificates

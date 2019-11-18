@@ -288,8 +288,8 @@ func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.Da
 		scope:                    artifactScope,
 		createResponseTime:       labeled.NewStopWatch("create_duration", "The duration of the create artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
 		getResponseTime:          labeled.NewStopWatch("get_duration", "The duration of the get artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
-		createSuccessCounter:     labeled.NewCounter("create_success_count", "The number of times create artifact suceeded", artifactScope, labeled.EmitUnlabeledMetric),
-		getSuccessCounter:        labeled.NewCounter("get_success_count", "The number of times get artifact suceeded", artifactScope, labeled.EmitUnlabeledMetric),
+		createSuccessCounter:     labeled.NewCounter("create_success_count", "The number of times create artifact succeeded", artifactScope, labeled.EmitUnlabeledMetric),
+		getSuccessCounter:        labeled.NewCounter("get_success_count", "The number of times get artifact succeeded", artifactScope, labeled.EmitUnlabeledMetric),
 		createFailureCounter:     labeled.NewCounter("create_failure_count", "The number of times create artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
 		getFailureCounter:        labeled.NewCounter("get_failure_count", "The number of times get artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
 		createDataFailureCounter: labeled.NewCounter("create_data_failure_count", "The number of times create artifact data failed", artifactScope, labeled.EmitUnlabeledMetric),
@@ -298,7 +298,7 @@ func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.Da
 		validationErrorCounter:   labeled.NewCounter("validation_failed_count", "The number of times validation failed", artifactScope, labeled.EmitUnlabeledMetric),
 		alreadyExistsCounter:     labeled.NewCounter("already_exists_count", "The number of times an artifact already exists", artifactScope, labeled.EmitUnlabeledMetric),
 		doesNotExistCounter:      labeled.NewCounter("does_not_exists_count", "The number of times an artifact was not found", artifactScope, labeled.EmitUnlabeledMetric),
-		listSuccessCounter:       labeled.NewCounter("list_success_count", "The number of times list artifact suceeded", artifactScope, labeled.EmitUnlabeledMetric),
+		listSuccessCounter:       labeled.NewCounter("list_success_count", "The number of times list artifact succeeded", artifactScope, labeled.EmitUnlabeledMetric),
 		listFailureCounter:       labeled.NewCounter("list_failure_count", "The number of times list artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
 	}
 

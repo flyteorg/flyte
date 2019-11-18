@@ -1,3 +1,4 @@
+export GO111MODULE=off
 export REPOSITORY=datacatalog
 include boilerplate/lyft/docker_build/Makefile
 include boilerplate/lyft/golang_test_targets/Makefile
