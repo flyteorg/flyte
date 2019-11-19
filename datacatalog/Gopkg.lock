@@ -226,12 +226,11 @@
   version = "v1.0"
 
 [[projects]]
-  digest = "1:3e7866d10bf2bfd05794822c8428582eaf3d419186748cd0e099edf54a4cbec1"
+  digest = "1:a0216296da5c3191358b114fa8d2490477f5dff7380541551495b4f2a16989b3"
   name = "github.com/jinzhu/gorm"
   packages = [
     ".",
     "dialects/postgres",
-    "dialects/sqlite",
   ]
   pruneopts = "UT"
   revision = "81c17a7e2529c59efc4e74c5b32c1fb71fb12fa2"
@@ -328,14 +327,6 @@
   pruneopts = "UT"
   revision = "88ba11cfdc67c7588b30042edf244b2875f892b6"
   version = "v0.0.10"
-
-[[projects]]
-  digest = "1:49c2ac4246176b09f99f36fefa4a48aae5c405fcc5a412eea6ff1d9efe1ba26b"
-  name = "github.com/mattn/go-sqlite3"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "3f45aefa8dc8bbdd97619dd2765f864972f3310e"
-  version = "v1.12.0"
 
 [[projects]]
   digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
@@ -745,7 +736,6 @@
     "github.com/golang/protobuf/proto",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",
-    "github.com/jinzhu/gorm/dialects/sqlite",
     "github.com/lib/pq",
     "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core",
     "github.com/lyft/flytestdlib/config",
