@@ -10,7 +10,6 @@ import (
 	"context"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Required to import database driver.
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/spf13/cobra"
 )
 
