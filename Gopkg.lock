@@ -458,7 +458,7 @@
   version = "v0.14.1"
 
 [[projects]]
-  digest = "1:120998aa088736abc91137a82c5d1d49927aa6216e0c7c2c0a8c85f9e9456c15"
+  digest = "1:0f2319c4da524090f6db2e99eaf2da31c907a81b39ff2c6b399c8288557f9648"
   name = "github.com/lyft/flyteplugins"
   packages = [
     "go/tasks/aws",
@@ -496,8 +496,8 @@
     "tests",
   ]
   pruneopts = ""
-  revision = "507218de571b7ca7e9dcbc8a178ccfe92b1af1ae"
-  version = "v0.2.1"
+  revision = "3a30f6d7f5b17f788b2f28a6700ebf97b58dca0d"
+  version = "v0.2.2"
 
 [[projects]]
   digest = "1:7fee6ae151d081a92d58a53099adcfccf89e424aef03eb20531ae0285da8613d"
