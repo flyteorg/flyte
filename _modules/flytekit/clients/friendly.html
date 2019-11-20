@@ -711,13 +711,14 @@
     <span class="c1">#</span>
     <span class="c1">####################################################################################################################</span>
 
-<div class="viewcode-block" id="SynchronousFlyteClient.create_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.create_execution">[docs]</a>    <span class="k">def</span> <span class="nf">create_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">execution_spec</span><span class="p">):</span>
+<div class="viewcode-block" id="SynchronousFlyteClient.create_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.create_execution">[docs]</a>    <span class="k">def</span> <span class="nf">create_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">execution_spec</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This will create an execution for the given execution spec.</span>
 <span class="sd">        :param Text project:</span>
 <span class="sd">        :param Text domain:</span>
 <span class="sd">        :param Text name:</span>
 <span class="sd">        :param flytekit.models.execution.ExecutionSpec execution_spec: This is the specification for the execution.</span>
+<span class="sd">        :param flytekit.models.literals.LiteralMap inputs: The inputs for the execution</span>
 <span class="sd">        :returns: The unique identifier for the execution.</span>
 <span class="sd">        :rtype: flytekit.models.core.identifier.WorkflowExecutionIdentifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -727,7 +728,8 @@
                     <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
                     <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
                     <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-                    <span class="n">spec</span><span class="o">=</span><span class="n">execution_spec</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+                    <span class="n">spec</span><span class="o">=</span><span class="n">execution_spec</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+                    <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
                 <span class="p">)</span>
             <span class="p">)</span><span class="o">.</span><span class="n">id</span>
         <span class="p">)</span></div>
@@ -740,6 +742,21 @@
         <span class="k">return</span> <span class="n">_execution</span><span class="o">.</span><span class="n">Execution</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_execution</span><span class="p">(</span>
                 <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">WorkflowExecutionGetRequest</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SynchronousFlyteClient.get_execution_data"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.get_execution_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_execution_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns signed URLs to LiteralMap blobs for an execution&#39;s inputs and outputs (when available).</span>
+
+<span class="sd">        :param flytekit.models.core.identifier.WorkflowExecutionIdentifier id:</span>
+<span class="sd">        :rtype: flytekit.models.execution.WorkflowExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_execution</span><span class="o">.</span><span class="n">WorkflowExecutionGetDataResponse</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_execution_data</span><span class="p">(</span>
+                <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">WorkflowExecutionGetDataRequest</span><span class="p">(</span>
                     <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
                 <span class="p">)</span>
             <span class="p">)</span>
@@ -807,6 +824,23 @@
             <span class="p">)</span>
         <span class="p">)</span></div>
 
+<div class="viewcode-block" id="SynchronousFlyteClient.relaunch_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.relaunch_execution">[docs]</a>    <span class="k">def</span> <span class="nf">relaunch_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param flytekit.common.core.identifier.WorkflowExecutionIdentifier id:</span>
+<span class="sd">        :param Text name: [Optional] name for the new execution. If not specified, a randomly generated name will be</span>
+<span class="sd">            used</span>
+<span class="sd">        :returns: The unique identifier for the new execution.</span>
+<span class="sd">        :rtype: flytekit.models.core.identifier.WorkflowExecutionIdentifier</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">WorkflowExecutionIdentifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">relaunch_execution</span><span class="p">(</span>
+                <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">ExecutionRelaunchRequest</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">name</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">id</span>
+        <span class="p">)</span></div>
+
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>
     <span class="c1">#  Node Execution Endpoints</span>
@@ -821,6 +855,21 @@
         <span class="k">return</span> <span class="n">_node_execution</span><span class="o">.</span><span class="n">NodeExecution</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_node_execution</span><span class="p">(</span>
                 <span class="n">_node_execution_pb2</span><span class="o">.</span><span class="n">NodeExecutionGetRequest</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="n">node_execution_identifier</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SynchronousFlyteClient.get_node_execution_data"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.get_node_execution_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_execution_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_execution_identifier</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns signed URLs to LiteralMap blobs for a node execution&#39;s inputs and outputs (when available).</span>
+
+<span class="sd">        :param flytekit.models.core.identifier.NodeExecutionIdentifier node_execution_identifier:</span>
+<span class="sd">        :rtype: flytekit.models.execution.NodeExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_execution</span><span class="o">.</span><span class="n">NodeExecutionGetDataResponse</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_node_execution_data</span><span class="p">(</span>
+                <span class="n">_node_execution_pb2</span><span class="o">.</span><span class="n">NodeExecutionGetDataRequest</span><span class="p">(</span>
                     <span class="nb">id</span><span class="o">=</span><span class="n">node_execution_identifier</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
                 <span class="p">)</span>
             <span class="p">)</span>
@@ -903,6 +952,21 @@
             <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_task_execution</span><span class="p">(</span>
                 <span class="n">_task_execution_pb2</span><span class="o">.</span><span class="n">TaskExecutionGetRequest</span><span class="p">(</span>
                     <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SynchronousFlyteClient.get_task_execution_data"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.get_task_execution_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_execution_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_execution_identifier</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns signed URLs to LiteralMap blobs for a node execution&#39;s inputs and outputs (when available).</span>
+
+<span class="sd">        :param flytekit.models.core.identifier.TaskExecutionIdentifier task_execution_identifier:</span>
+<span class="sd">        :rtype: flytekit.models.execution.NodeExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_execution</span><span class="o">.</span><span class="n">TaskExecutionGetDataResponse</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_task_execution_data</span><span class="p">(</span>
+                <span class="n">_task_execution_pb2</span><span class="o">.</span><span class="n">TaskExecutionGetDataRequest</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="n">task_execution_identifier</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
                 <span class="p">)</span>
             <span class="p">)</span>
         <span class="p">)</span></div>

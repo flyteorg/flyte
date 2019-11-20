@@ -98,6 +98,7 @@
 <li class="toctree-l4"><a class="reference internal" href="flytekit.clis.html">flytekit.clis package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.common.html">flytekit.common package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.configuration.html">flytekit.configuration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.html">flytekit.contrib package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.engines.html">flytekit.engines package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.interfaces.html">flytekit.interfaces package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.models.html">flytekit.models package</a></li>
@@ -193,12 +194,13 @@
 <dd><p>Bases: <a class="reference internal" href="#flytekit.clients.raw.RawSynchronousFlyteClient" title="flytekit.clients.raw.RawSynchronousFlyteClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.clients.raw.RawSynchronousFlyteClient</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.clients.friendly.SynchronousFlyteClient.create_execution">
-<code class="sig-name descname">create_execution</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">execution_spec</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.create_execution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.create_execution" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_execution</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">execution_spec</em>, <em class="sig-param">inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.create_execution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.create_execution" title="Permalink to this definition">¶</a></dt>
 <dd><p>This will create an execution for the given execution spec.
 :param Text project:
 :param Text domain:
 :param Text name:
 :param flytekit.models.execution.ExecutionSpec execution_spec: This is the specification for the execution.
+:param flytekit.models.literals.LiteralMap inputs: The inputs for the execution
 :returns: The unique identifier for the execution.
 :rtype: flytekit.models.core.identifier.WorkflowExecutionIdentifier</p>
 </dd></dl>
@@ -332,6 +334,20 @@ error if no active launch plan exists.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.get_execution_data">
+<code class="sig-name descname">get_execution_data</code><span class="sig-paren">(</span><em class="sig-param">id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.get_execution_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.get_execution_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns signed URLs to LiteralMap blobs for an execution’s inputs and outputs (when available).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.WorkflowExecutionIdentifier" title="flytekit.models.core.identifier.WorkflowExecutionIdentifier"><em>flytekit.models.core.identifier.WorkflowExecutionIdentifier</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.models.html#flytekit.models.execution.WorkflowExecutionGetDataResponse" title="flytekit.models.execution.WorkflowExecutionGetDataResponse">flytekit.models.execution.WorkflowExecutionGetDataResponse</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.clients.friendly.SynchronousFlyteClient.get_launch_plan">
 <code class="sig-name descname">get_launch_plan</code><span class="sig-paren">(</span><em class="sig-param">id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.get_launch_plan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.get_launch_plan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves a launch plan entity.</p>
@@ -354,6 +370,20 @@ error if no active launch plan exists.</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="flytekit.models.html#flytekit.models.node_execution.NodeExecution" title="flytekit.models.node_execution.NodeExecution">flytekit.models.node_execution.NodeExecution</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.get_node_execution_data">
+<code class="sig-name descname">get_node_execution_data</code><span class="sig-paren">(</span><em class="sig-param">node_execution_identifier</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.get_node_execution_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.get_node_execution_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns signed URLs to LiteralMap blobs for a node execution’s inputs and outputs (when available).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>node_execution_identifier</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.NodeExecutionIdentifier" title="flytekit.models.core.identifier.NodeExecutionIdentifier"><em>flytekit.models.core.identifier.NodeExecutionIdentifier</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.models.html#flytekit.models.execution.NodeExecutionGetDataResponse" title="flytekit.models.execution.NodeExecutionGetDataResponse">flytekit.models.execution.NodeExecutionGetDataResponse</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -384,6 +414,20 @@ error if no active launch plan exists.</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.task_execution.TaskExecution" title="flytekit.models.admin.task_execution.TaskExecution">flytekit.models.admin.task_execution.TaskExecution</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.get_task_execution_data">
+<code class="sig-name descname">get_task_execution_data</code><span class="sig-paren">(</span><em class="sig-param">task_execution_identifier</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.get_task_execution_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.get_task_execution_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns signed URLs to LiteralMap blobs for a node execution’s inputs and outputs (when available).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>task_execution_identifier</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.TaskExecutionIdentifier" title="flytekit.models.core.identifier.TaskExecutionIdentifier"><em>flytekit.models.core.identifier.TaskExecutionIdentifier</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.models.html#flytekit.models.execution.NodeExecutionGetDataResponse" title="flytekit.models.execution.NodeExecutionGetDataResponse">flytekit.models.execution.NodeExecutionGetDataResponse</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -781,6 +825,26 @@ the query.  If the filter is not supported, an exception will be raised.</p></li
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.relaunch_execution">
+<code class="sig-name descname">relaunch_execution</code><span class="sig-paren">(</span><em class="sig-param">id</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.relaunch_execution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.relaunch_execution" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<a class="reference internal" href="flytekit.common.core.html#flytekit.common.core.identifier.WorkflowExecutionIdentifier" title="flytekit.common.core.identifier.WorkflowExecutionIdentifier"><em>flytekit.common.core.identifier.WorkflowExecutionIdentifier</em></a>) – </p></li>
+<li><p><strong>name</strong> (<em>Text</em>) – [Optional] name for the new execution. If not specified, a randomly generated name will be
+used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The unique identifier for the new execution.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.WorkflowExecutionIdentifier" title="flytekit.models.core.identifier.WorkflowExecutionIdentifier">flytekit.models.core.identifier.WorkflowExecutionIdentifier</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.clients.friendly.SynchronousFlyteClient.terminate_execution">
 <code class="sig-name descname">terminate_execution</code><span class="sig-paren">(</span><em class="sig-param">id</em>, <em class="sig-param">cause</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.terminate_execution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.terminate_execution" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -879,22 +943,24 @@ be explicit as opposed to inferred from the environment or a configuration file.
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_execution_data">
+<code class="sig-name descname">get_execution_data</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_execution_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_execution_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_launch_plan">
 <code class="sig-name descname">get_launch_plan</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_launch_plan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_launch_plan" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_node_execution">
-<code class="sig-name descname">get_node_execution</code><span class="sig-paren">(</span><em class="sig-param">node_execution_request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_node_execution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_node_execution" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>node_execution_request</strong> (<em>flyteidl.admin.node_execution_pb2.NodeExecutionGetRequest</em>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>flyteidl.admin.node_execution_pb2.NodeExecution</p>
-</dd>
-</dl>
-</dd></dl>
+<code class="sig-name descname">get_node_execution</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_node_execution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_node_execution" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_node_execution_data">
+<code class="sig-name descname">get_node_execution_data</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_node_execution_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_node_execution_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_task">
@@ -903,16 +969,13 @@ be explicit as opposed to inferred from the environment or a configuration file.
 
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_task_execution">
-<code class="sig-name descname">get_task_execution</code><span class="sig-paren">(</span><em class="sig-param">task_execution_request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_task_execution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_task_execution" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>task_execution_request</strong> (<em>flyteidl.admin.task_execution_pb2.TaskExecutionGetRequest</em>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>flyteidl.admin.task_execution_pb2.TaskExecution</p>
-</dd>
-</dl>
-</dd></dl>
+<code class="sig-name descname">get_task_execution</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_task_execution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_task_execution" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_task_execution_data">
+<code class="sig-name descname">get_task_execution_data</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_task_execution_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_task_execution_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_workflow">
@@ -941,29 +1004,13 @@ be explicit as opposed to inferred from the environment or a configuration file.
 
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_for_task_paginated">
-<code class="sig-name descname">list_node_executions_for_task_paginated</code><span class="sig-paren">(</span><em class="sig-param">node_execution_for_task_list_request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.list_node_executions_for_task_paginated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_for_task_paginated" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>node_execution_for_task_list_request</strong> (<em>flyteidl.admin.node_execution_pb2.NodeExecutionListRequest</em>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>flyteidl.admin.node_execution_pb2.NodeExecutionList</p>
-</dd>
-</dl>
-</dd></dl>
+<code class="sig-name descname">list_node_executions_for_task_paginated</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.list_node_executions_for_task_paginated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_for_task_paginated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_paginated">
-<code class="sig-name descname">list_node_executions_paginated</code><span class="sig-paren">(</span><em class="sig-param">node_execution_list_request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.list_node_executions_paginated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_paginated" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>node_execution_list_request</strong> (<em>flyteidl.admin.node_execution_pb2.NodeExecutionListRequest</em>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>flyteidl.admin.node_execution_pb2.NodeExecutionList</p>
-</dd>
-</dl>
-</dd></dl>
+<code class="sig-name descname">list_node_executions_paginated</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.list_node_executions_paginated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_paginated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.list_projects">
@@ -972,16 +1019,8 @@ be explicit as opposed to inferred from the environment or a configuration file.
 
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.list_task_executions_paginated">
-<code class="sig-name descname">list_task_executions_paginated</code><span class="sig-paren">(</span><em class="sig-param">task_execution_list_request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.list_task_executions_paginated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.list_task_executions_paginated" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>task_execution_list_request</strong> (<em>flyteidl.admin.task_execution_pb2.TaskExecutionListRequest</em>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>flyteidl.admin.task_execution_pb2.TaskExecutionList</p>
-</dd>
-</dl>
-</dd></dl>
+<code class="sig-name descname">list_task_executions_paginated</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.list_task_executions_paginated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.list_task_executions_paginated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.list_task_ids_paginated">
@@ -1006,6 +1045,11 @@ be explicit as opposed to inferred from the environment or a configuration file.
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.register_project">
 <code class="sig-name descname">register_project</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.register_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.register_project" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.raw.RawSynchronousFlyteClient.relaunch_execution">
+<code class="sig-name descname">relaunch_execution</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.relaunch_execution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.relaunch_execution" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

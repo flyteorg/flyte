@@ -98,6 +98,7 @@
 <li class="toctree-l4"><a class="reference internal" href="flytekit.clis.html">flytekit.clis package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="flytekit.common.html">flytekit.common package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.configuration.html">flytekit.configuration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.html">flytekit.contrib package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.engines.html">flytekit.engines package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.interfaces.html">flytekit.interfaces package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.models.html">flytekit.models package</a></li>
@@ -676,11 +677,8 @@ literals.</p>
 <dl class="method">
 <dt id="flytekit.common.tasks.spark_task.SdkRunnableSparkContainer.args">
 <em class="property">property </em><code class="sig-name descname">args</code><a class="headerlink" href="#flytekit.common.tasks.spark_task.SdkRunnableSparkContainer.args" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[Text]</p>
-</dd>
-</dl>
+<dd><p>Override args to remove the injection of command prefixes
+:rtype: list[Text]</p>
 </dd></dl>
 
 </dd></dl>
@@ -701,7 +699,7 @@ literals.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>[Text, <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity">flytekit.models.common.FlyteIdlEntity</a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>[Text,<a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity">flytekit.models.common.FlyteIdlEntity</a>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>This function must return a dictionary mapping ‘filenames’ to Flyte Interface Entities.  These
@@ -765,7 +763,7 @@ the wrapped function.
 
 <dl class="method">
 <dt id="flytekit.common.tasks.task.SdkTask.fetch">
-<em class="property">classmethod </em><code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">version=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/task.html#SdkTask.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.fetch" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/task.html#SdkTask.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.fetch" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function uses the engine loader to call create a hydrated task from Admin.
 :param Text project:
 :param Text domain:

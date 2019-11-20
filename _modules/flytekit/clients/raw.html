@@ -491,6 +491,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetExecution</span><span class="p">(</span><span class="n">get_object_request</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="RawSynchronousFlyteClient.get_execution_data"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_execution_data">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">get_execution_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_execution_data_request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns signed URLs to LiteralMap blobs for an execution&#39;s inputs and outputs (when available).</span>
+
+<span class="sd">        :param flyteidl.admin.execution_pb2.WorkflowExecutionGetRequest get_execution_data_request:</span>
+<span class="sd">        :rtype: flyteidl.admin.execution_pb2.WorkflowExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetExecutionData</span><span class="p">(</span><span class="n">get_execution_data_request</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="RawSynchronousFlyteClient.list_executions_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_executions_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">list_executions_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_list_request</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -509,27 +519,48 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">TerminateExecution</span><span class="p">(</span><span class="n">terminate_execution_request</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="RawSynchronousFlyteClient.relaunch_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.relaunch_execution">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">relaunch_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relaunch_execution_request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param flyteidl.admin.execution_pb2.ExecutionRelaunchRequest relaunch_execution_request:</span>
+<span class="sd">        :rtype: flyteidl.admin.execution_pb2.ExecutionCreateResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">RelaunchExecution</span><span class="p">(</span><span class="n">relaunch_execution_request</span><span class="p">)</span></div>
+
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>
     <span class="c1">#  Node Execution Endpoints</span>
     <span class="c1">#</span>
     <span class="c1">####################################################################################################################</span>
 
-<div class="viewcode-block" id="RawSynchronousFlyteClient.get_node_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_node_execution">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_execution_request</span><span class="p">):</span>
+<div class="viewcode-block" id="RawSynchronousFlyteClient.get_node_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_node_execution">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">get_node_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_execution_request</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flyteidl.admin.node_execution_pb2.NodeExecutionGetRequest node_execution_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.node_execution_pb2.NodeExecution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetNodeExecution</span><span class="p">(</span><span class="n">node_execution_request</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RawSynchronousFlyteClient.list_node_executions_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_paginated">[docs]</a>    <span class="k">def</span> <span class="nf">list_node_executions_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_execution_list_request</span><span class="p">):</span>
+<div class="viewcode-block" id="RawSynchronousFlyteClient.get_node_execution_data"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_node_execution_data">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">get_node_execution_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_node_execution_data_request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns signed URLs to LiteralMap blobs for a node execution&#39;s inputs and outputs (when available).</span>
+
+<span class="sd">        :param flyteidl.admin.node_execution_pb2.NodeExecutionGetDataRequest get_node_execution_data_request:</span>
+<span class="sd">        :rtype: flyteidl.admin.node_execution_pb2.NodeExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetNodeExecutionData</span><span class="p">(</span><span class="n">get_node_execution_data_request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RawSynchronousFlyteClient.list_node_executions_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">list_node_executions_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_execution_list_request</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flyteidl.admin.node_execution_pb2.NodeExecutionListRequest node_execution_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.node_execution_pb2.NodeExecutionList</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListNodeExecutions</span><span class="p">(</span><span class="n">node_execution_list_request</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RawSynchronousFlyteClient.list_node_executions_for_task_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_for_task_paginated">[docs]</a>    <span class="k">def</span> <span class="nf">list_node_executions_for_task_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_execution_for_task_list_request</span><span class="p">):</span>
+<div class="viewcode-block" id="RawSynchronousFlyteClient.list_node_executions_for_task_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_for_task_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">list_node_executions_for_task_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_execution_for_task_list_request</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flyteidl.admin.node_execution_pb2.NodeExecutionListRequest node_execution_for_task_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.node_execution_pb2.NodeExecutionList</span>
@@ -542,14 +573,26 @@
     <span class="c1">#</span>
     <span class="c1">####################################################################################################################</span>
 
-<div class="viewcode-block" id="RawSynchronousFlyteClient.get_task_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_task_execution">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_execution_request</span><span class="p">):</span>
+<div class="viewcode-block" id="RawSynchronousFlyteClient.get_task_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_task_execution">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">get_task_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_execution_request</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flyteidl.admin.task_execution_pb2.TaskExecutionGetRequest task_execution_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.task_execution_pb2.TaskExecution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetTaskExecution</span><span class="p">(</span><span class="n">task_execution_request</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RawSynchronousFlyteClient.list_task_executions_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_task_executions_paginated">[docs]</a>    <span class="k">def</span> <span class="nf">list_task_executions_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_execution_list_request</span><span class="p">):</span>
+<div class="viewcode-block" id="RawSynchronousFlyteClient.get_task_execution_data"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_task_execution_data">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">get_task_execution_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_task_execution_data_request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns signed URLs to LiteralMap blobs for a task execution&#39;s inputs and outputs (when available).</span>
+
+<span class="sd">        :param flyteidl.admin.task_execution_pb2.TaskExecutionGetDataRequest get_task_execution_data_request:</span>
+<span class="sd">        :rtype: flyteidl.admin.task_execution_pb2.TaskExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetTaskExecutionData</span><span class="p">(</span><span class="n">get_task_execution_data_request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RawSynchronousFlyteClient.list_task_executions_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_task_executions_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">list_task_executions_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_execution_list_request</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flyteidl.admin.task_execution_pb2.TaskExecutionListRequest task_execution_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.task_execution_pb2.TaskExecutionList</span>

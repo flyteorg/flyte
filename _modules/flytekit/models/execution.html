@@ -155,10 +155,12 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
 <span class="kn">import</span> <span class="nn">flyteidl.admin.execution_pb2</span> <span class="k">as</span> <span class="nn">_execution_pb2</span>
+<span class="kn">import</span> <span class="nn">flyteidl.admin.node_execution_pb2</span> <span class="k">as</span> <span class="nn">_node_execution_pb2</span>
+<span class="kn">import</span> <span class="nn">flyteidl.admin.task_execution_pb2</span> <span class="k">as</span> <span class="nn">_task_execution_pb2</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_core_execution</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
-
+<span class="kn">import</span> <span class="nn">pytz</span> <span class="k">as</span> <span class="nn">_pytz</span>
 
 <div class="viewcode-block" id="ExecutionMetadata"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.ExecutionMetadata">[docs]</a><span class="k">class</span> <span class="nc">ExecutionMetadata</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
@@ -227,11 +229,10 @@
 
 <div class="viewcode-block" id="ExecutionSpec"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.ExecutionSpec">[docs]</a><span class="k">class</span> <span class="nc">ExecutionSpec</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">launch_plan</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">notifications</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disable_all</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">launch_plan</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">notifications</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disable_all</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.identifier.Identifier launch_plan: Launch plan unique identifier to execute</span>
-<span class="sd">        :param flytekit.models.literals.LiteralMap inputs: Inputs to apply to the launch plan</span>
 <span class="sd">        :param ExecutionMetadata metadata: The metadata to be associated with this execution</span>
 <span class="sd">        :param NotificationList notifications: List of notifications for this execution.</span>
 <span class="sd">        :param bool disable_all: If true, all notifications should be disabled.</span>
@@ -240,19 +241,11 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_launch_plan</span> <span class="o">=</span> <span class="n">launch_plan</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span> <span class="o">=</span> <span class="n">inputs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_notifications</span> <span class="o">=</span> <span class="n">notifications</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_disable_all</span> <span class="o">=</span> <span class="n">disable_all</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="o">=</span> <span class="n">labels</span> <span class="ow">or</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">Labels</span><span class="p">({})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_annotations</span> <span class="o">=</span> <span class="n">annotations</span> <span class="ow">or</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">Annotations</span><span class="p">({})</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: flytekit.models.literals.LiteralMap</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -302,7 +295,6 @@
 <span class="sd">        :rtype: flyteidl.admin.execution_pb2.ExecutionSpec</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">ExecutionSpec</span><span class="p">(</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">launch_plan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">launch_plan</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">notifications</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">notifications</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notifications</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
@@ -319,7 +311,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">launch_plan</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">launch_plan</span><span class="p">),</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span>
             <span class="n">metadata</span><span class="o">=</span><span class="n">ExecutionMetadata</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">metadata</span><span class="p">),</span>
             <span class="n">notifications</span><span class="o">=</span><span class="n">NotificationList</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">notifications</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;notifications&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">disable_all</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">disable_all</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;disable_all&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
@@ -435,15 +426,15 @@
 
 <div class="viewcode-block" id="ExecutionClosure"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.ExecutionClosure">[docs]</a><span class="k">class</span> <span class="nc">ExecutionClosure</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">computed_inputs</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">started_at</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param flytekit.models.literals.LiteralMap computed_inputs:</span>
 <span class="sd">        :param int phase: From the flytekit.models.core.execution.WorkflowExecutionPhase enum</span>
+<span class="sd">        :param datetime.datetime started_at:</span>
 <span class="sd">        :param flytekit.models.core.execution.ExecutionError error:</span>
 <span class="sd">        :param LiteralMapBlob outputs:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_computed_inputs</span> <span class="o">=</span> <span class="n">computed_inputs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span> <span class="o">=</span> <span class="n">phase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_started_at</span> <span class="o">=</span> <span class="n">started_at</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_error</span> <span class="o">=</span> <span class="n">error</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span> <span class="o">=</span> <span class="n">outputs</span>
 
@@ -463,29 +454,30 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">started_at</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: datetime.datetime</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started_at</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: LiteralMapBlob</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">computed_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: flytekit.models.literals.LiteralMap</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_computed_inputs</span>
-
 <div class="viewcode-block" id="ExecutionClosure.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.ExecutionClosure.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.execution_pb2.ExecutionClosure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">ExecutionClosure</span><span class="p">(</span>
-            <span class="n">computed_inputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">computed_inputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">ExecutionClosure</span><span class="p">(</span>
             <span class="n">phase</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
             <span class="n">error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">outputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">started_at</span><span class="o">.</span><span class="n">FromDatetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">started_at</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">_pytz</span><span class="o">.</span><span class="n">UTC</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="ExecutionClosure.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.ExecutionClosure.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -503,7 +495,7 @@
             <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">,</span>
             <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
             <span class="n">phase</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
-            <span class="n">computed_inputs</span><span class="o">=</span><span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">computed_inputs</span><span class="p">)</span>
+            <span class="n">started_at</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">started_at</span><span class="o">.</span><span class="n">ToDatetime</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">_pytz</span><span class="o">.</span><span class="n">UTC</span><span class="p">),</span>
         <span class="p">)</span></div></div>
 
 
@@ -537,6 +529,101 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="p">[</span><span class="n">_common_models</span><span class="o">.</span><span class="n">Notification</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">notifications</span><span class="p">]</span>
+        <span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">_CommonDataResponse</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Currently, node, task, and workflow execution all have the same get data response. So we&#39;ll create this common</span>
+<span class="sd">    superclass to reduce code duplication until things diverge in the future.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param _common_models.UrlBlob inputs:</span>
+<span class="sd">        :param _common_models.UrlBlob outputs:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span> <span class="o">=</span> <span class="n">inputs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span> <span class="o">=</span> <span class="n">outputs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: _common_models.UrlBlob</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: _common_models.UrlBlob</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span>
+
+
+<div class="viewcode-block" id="WorkflowExecutionGetDataResponse"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.WorkflowExecutionGetDataResponse">[docs]</a><span class="k">class</span> <span class="nc">WorkflowExecutionGetDataResponse</span><span class="p">(</span><span class="n">_CommonDataResponse</span><span class="p">):</span>
+<div class="viewcode-block" id="WorkflowExecutionGetDataResponse.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.WorkflowExecutionGetDataResponse.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param _execution_pb2.WorkflowExecutionGetDataResponse pb2_object:</span>
+<span class="sd">        :rtype: WorkflowExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">UrlBlob</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">UrlBlob</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="WorkflowExecutionGetDataResponse.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.WorkflowExecutionGetDataResponse.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: _execution_pb2.WorkflowExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">WorkflowExecutionGetDataResponse</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TaskExecutionGetDataResponse"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.TaskExecutionGetDataResponse">[docs]</a><span class="k">class</span> <span class="nc">TaskExecutionGetDataResponse</span><span class="p">(</span><span class="n">_CommonDataResponse</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskExecutionGetDataResponse.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.TaskExecutionGetDataResponse.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param _task_execution_pb2.TaskExecutionGetDataResponse pb2_object:</span>
+<span class="sd">        :rtype: TaskExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">UrlBlob</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">UrlBlob</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TaskExecutionGetDataResponse.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.TaskExecutionGetDataResponse.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: _task_execution_pb2.TaskExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_task_execution_pb2</span><span class="o">.</span><span class="n">TaskExecutionGetDataResponse</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="NodeExecutionGetDataResponse"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.NodeExecutionGetDataResponse">[docs]</a><span class="k">class</span> <span class="nc">NodeExecutionGetDataResponse</span><span class="p">(</span><span class="n">_CommonDataResponse</span><span class="p">):</span>
+<div class="viewcode-block" id="NodeExecutionGetDataResponse.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.NodeExecutionGetDataResponse.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param _node_execution_pb2.NodeExecutionGetDataResponse pb2_object:</span>
+<span class="sd">        :rtype: NodeExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">UrlBlob</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">inputs</span><span class="p">),</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">UrlBlob</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="NodeExecutionGetDataResponse.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.NodeExecutionGetDataResponse.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: _node_execution_pb2.NodeExecutionGetDataResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_node_execution_pb2</span><span class="o">.</span><span class="n">NodeExecutionGetDataResponse</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
         <span class="p">)</span></div></div>
 </pre></div>
 

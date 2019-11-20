@@ -98,6 +98,7 @@
 <li class="toctree-l4"><a class="reference internal" href="flytekit.clis.html">flytekit.clis package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.common.html">flytekit.common package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.configuration.html">flytekit.configuration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.html">flytekit.contrib package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.engines.html">flytekit.engines package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.interfaces.html">flytekit.interfaces package</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">flytekit.models package</a></li>
@@ -307,7 +308,7 @@ requires processing of all input data. This has to be a positive number.</p>
 <code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/common.html#Annotations.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.common.Annotations.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>[Text, Text]</p>
+<dd class="field-odd"><p>_common_pb2.Annotations</p>
 </dd>
 </dl>
 </dd></dl>
@@ -687,6 +688,55 @@ requires processing of all input data. This has to be a positive number.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="flytekit.models.common.UrlBlob">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.common.</code><code class="sig-name descname">UrlBlob</code><span class="sig-paren">(</span><em class="sig-param">url</em>, <em class="sig-param">bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/common.html#UrlBlob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.common.UrlBlob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.common.UrlBlob.bytes">
+<em class="property">property </em><code class="sig-name descname">bytes</code><a class="headerlink" href="#flytekit.models.common.UrlBlob.bytes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.common.UrlBlob.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/common.html#UrlBlob.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.common.UrlBlob.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb</strong> (<em>flyteidl.admin.common_pb2.UrlBlob</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.common.UrlBlob" title="flytekit.models.common.UrlBlob">UrlBlob</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.common.UrlBlob.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/common.html#UrlBlob.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.common.UrlBlob.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.admin.common_pb2.UrlBlob</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.common.UrlBlob.url">
+<em class="property">property </em><code class="sig-name descname">url</code><a class="headerlink" href="#flytekit.models.common.UrlBlob.url" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Text</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-flytekit.models.dynamic_job">
 <span id="flytekit-models-dynamic-job-module"></span><h2>flytekit.models.dynamic_job module<a class="headerlink" href="#module-flytekit.models.dynamic_job" title="Permalink to this headline">¶</a></h2>
@@ -832,18 +882,8 @@ requires processing of all input data. This has to be a positive number.</p>
 
 <dl class="class">
 <dt id="flytekit.models.execution.ExecutionClosure">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.execution.</code><code class="sig-name descname">ExecutionClosure</code><span class="sig-paren">(</span><em class="sig-param">computed_inputs</em>, <em class="sig-param">phase</em>, <em class="sig-param">error=None</em>, <em class="sig-param">outputs=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#ExecutionClosure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.ExecutionClosure" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.execution.</code><code class="sig-name descname">ExecutionClosure</code><span class="sig-paren">(</span><em class="sig-param">phase</em>, <em class="sig-param">started_at</em>, <em class="sig-param">error=None</em>, <em class="sig-param">outputs=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#ExecutionClosure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.ExecutionClosure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
-<dl class="method">
-<dt id="flytekit.models.execution.ExecutionClosure.computed_inputs">
-<em class="property">property </em><code class="sig-name descname">computed_inputs</code><a class="headerlink" href="#flytekit.models.execution.ExecutionClosure.computed_inputs" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#flytekit.models.literals.LiteralMap" title="flytekit.models.literals.LiteralMap">flytekit.models.literals.LiteralMap</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="method">
 <dt id="flytekit.models.execution.ExecutionClosure.error">
 <em class="property">property </em><code class="sig-name descname">error</code><a class="headerlink" href="#flytekit.models.execution.ExecutionClosure.error" title="Permalink to this definition">¶</a></dt>
@@ -882,6 +922,16 @@ requires processing of all input data. This has to be a positive number.</p>
 <em class="property">property </em><code class="sig-name descname">phase</code><a class="headerlink" href="#flytekit.models.execution.ExecutionClosure.phase" title="Permalink to this definition">¶</a></dt>
 <dd><p>From the flytekit.models.core.execution.WorkflowExecutionPhase enum
 :rtype: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.execution.ExecutionClosure.started_at">
+<em class="property">property </em><code class="sig-name descname">started_at</code><a class="headerlink" href="#flytekit.models.execution.ExecutionClosure.started_at" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)">datetime.datetime</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -969,7 +1019,7 @@ requires processing of all input data. This has to be a positive number.</p>
 
 <dl class="class">
 <dt id="flytekit.models.execution.ExecutionSpec">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.execution.</code><code class="sig-name descname">ExecutionSpec</code><span class="sig-paren">(</span><em class="sig-param">launch_plan</em>, <em class="sig-param">inputs</em>, <em class="sig-param">metadata</em>, <em class="sig-param">notifications=None</em>, <em class="sig-param">disable_all=None</em>, <em class="sig-param">labels=None</em>, <em class="sig-param">annotations=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#ExecutionSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.ExecutionSpec" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.execution.</code><code class="sig-name descname">ExecutionSpec</code><span class="sig-paren">(</span><em class="sig-param">launch_plan</em>, <em class="sig-param">metadata</em>, <em class="sig-param">notifications=None</em>, <em class="sig-param">disable_all=None</em>, <em class="sig-param">labels=None</em>, <em class="sig-param">annotations=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#ExecutionSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.ExecutionSpec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.models.execution.ExecutionSpec.annotations">
@@ -1000,16 +1050,6 @@ requires processing of all input data. This has to be a positive number.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>ExecutionSpec</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="flytekit.models.execution.ExecutionSpec.inputs">
-<em class="property">property </em><code class="sig-name descname">inputs</code><a class="headerlink" href="#flytekit.models.execution.ExecutionSpec.inputs" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#flytekit.models.literals.LiteralMap" title="flytekit.models.literals.LiteralMap">flytekit.models.literals.LiteralMap</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1113,6 +1153,35 @@ requires processing of all input data. This has to be a positive number.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="flytekit.models.execution.NodeExecutionGetDataResponse">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.execution.</code><code class="sig-name descname">NodeExecutionGetDataResponse</code><span class="sig-paren">(</span><em class="sig-param">inputs</em>, <em class="sig-param">outputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#NodeExecutionGetDataResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.NodeExecutionGetDataResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.execution._CommonDataResponse</span></code></p>
+<dl class="method">
+<dt id="flytekit.models.execution.NodeExecutionGetDataResponse.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#NodeExecutionGetDataResponse.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.NodeExecutionGetDataResponse.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> (<em>_node_execution_pb2.NodeExecutionGetDataResponse</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.execution.NodeExecutionGetDataResponse" title="flytekit.models.execution.NodeExecutionGetDataResponse">NodeExecutionGetDataResponse</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.execution.NodeExecutionGetDataResponse.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#NodeExecutionGetDataResponse.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.NodeExecutionGetDataResponse.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_node_execution_pb2.NodeExecutionGetDataResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="flytekit.models.execution.NotificationList">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.models.execution.</code><code class="sig-name descname">NotificationList</code><span class="sig-paren">(</span><em class="sig-param">notifications</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#NotificationList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.NotificationList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
@@ -1145,6 +1214,64 @@ requires processing of all input data. This has to be a positive number.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>flyteidl.admin.execution_pb2.NotificationList</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.execution.TaskExecutionGetDataResponse">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.execution.</code><code class="sig-name descname">TaskExecutionGetDataResponse</code><span class="sig-paren">(</span><em class="sig-param">inputs</em>, <em class="sig-param">outputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#TaskExecutionGetDataResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.TaskExecutionGetDataResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.execution._CommonDataResponse</span></code></p>
+<dl class="method">
+<dt id="flytekit.models.execution.TaskExecutionGetDataResponse.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#TaskExecutionGetDataResponse.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.TaskExecutionGetDataResponse.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> (<em>_task_execution_pb2.TaskExecutionGetDataResponse</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.execution.TaskExecutionGetDataResponse" title="flytekit.models.execution.TaskExecutionGetDataResponse">TaskExecutionGetDataResponse</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.execution.TaskExecutionGetDataResponse.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#TaskExecutionGetDataResponse.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.TaskExecutionGetDataResponse.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_task_execution_pb2.TaskExecutionGetDataResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.execution.WorkflowExecutionGetDataResponse">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.execution.</code><code class="sig-name descname">WorkflowExecutionGetDataResponse</code><span class="sig-paren">(</span><em class="sig-param">inputs</em>, <em class="sig-param">outputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#WorkflowExecutionGetDataResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.WorkflowExecutionGetDataResponse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.execution._CommonDataResponse</span></code></p>
+<dl class="method">
+<dt id="flytekit.models.execution.WorkflowExecutionGetDataResponse.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#WorkflowExecutionGetDataResponse.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.WorkflowExecutionGetDataResponse.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> (<em>_execution_pb2.WorkflowExecutionGetDataResponse</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.execution.WorkflowExecutionGetDataResponse" title="flytekit.models.execution.WorkflowExecutionGetDataResponse">WorkflowExecutionGetDataResponse</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.execution.WorkflowExecutionGetDataResponse.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#WorkflowExecutionGetDataResponse.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.WorkflowExecutionGetDataResponse.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_execution_pb2.WorkflowExecutionGetDataResponse</p>
 </dd>
 </dl>
 </dd></dl>

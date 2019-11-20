@@ -98,6 +98,7 @@
 <li class="toctree-l4"><a class="reference internal" href="flytekit.clis.html">flytekit.clis package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.common.html">flytekit.common package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.configuration.html">flytekit.configuration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.html">flytekit.contrib package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.engines.html">flytekit.engines package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.interfaces.html">flytekit.interfaces package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.models.html">flytekit.models package</a></li>
@@ -193,7 +194,7 @@
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="attribute">
 <dt id="flytekit.tools.lazy_loader.LazyLoadPlugin.LAZY_LOADING_PLUGINS">
-<code class="sig-name descname">LAZY_LOADING_PLUGINS</code><em class="property"> = {'schema': ['numpy&gt;=1.14.0,&lt;2.0.0', 'pandas&gt;=0.22.0,&lt;1.0.0', 'pyarrow&gt;=0.11.0,&lt;1.0.0'], 'sidecar': ['k8s-proto&gt;=0.0.2,&lt;1.0.0'], 'spark': ['pyspark&gt;=2.4.0,&lt;3.0.0']}</em><a class="headerlink" href="#flytekit.tools.lazy_loader.LazyLoadPlugin.LAZY_LOADING_PLUGINS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">LAZY_LOADING_PLUGINS</code><em class="property"> = {'hive_sensor': ['hmsclient&gt;=0.0.1,&lt;1.0.0'], 'schema': ['numpy&gt;=1.14.0,&lt;2.0.0', 'pandas&gt;=0.22.0,&lt;1.0.0', 'pyarrow&gt;=0.11.0,&lt;1.0.0'], 'sidecar': ['k8s-proto&gt;=0.0.2,&lt;1.0.0'], 'spark': ['pyspark&gt;=2.4.0,&lt;3.0.0']}</em><a class="headerlink" href="#flytekit.tools.lazy_loader.LazyLoadPlugin.LAZY_LOADING_PLUGINS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -231,7 +232,7 @@
 
 <dl class="function">
 <dt id="flytekit.tools.module_loader.iterate_registerable_entities_in_order">
-<code class="sig-prename descclassname">flytekit.tools.module_loader.</code><code class="sig-name descname">iterate_registerable_entities_in_order</code><span class="sig-paren">(</span><em class="sig-param">pkgs</em>, <em class="sig-param">ignore_entities=None</em>, <em class="sig-param">include_entities=None</em>, <em class="sig-param">only_include_defs=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/tools/module_loader.html#iterate_registerable_entities_in_order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.tools.module_loader.iterate_registerable_entities_in_order" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.tools.module_loader.</code><code class="sig-name descname">iterate_registerable_entities_in_order</code><span class="sig-paren">(</span><em class="sig-param">pkgs</em>, <em class="sig-param">ignore_entities=None</em>, <em class="sig-param">include_entities=None</em>, <em class="sig-param">detect_unreferenced_entities=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/tools/module_loader.html#iterate_registerable_entities_in_order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.tools.module_loader.iterate_registerable_entities_in_order" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function will iterate all discovered entities in the given package list.  It will then attempt to
 topologically sort such that any entity with a dependency on another comes later in the list.  Note that workflows
 can reference other workflows and launch plans.
@@ -245,7 +246,8 @@ can reference other workflows and launch plans.
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>include_entities</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.8)"><em>set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em>]</em>) – If specified, include these entities while doing a topological sort.  All
 other entities will be ignored.  Only one of ignore_entities or include_entities can be set.</p></li>
-<li><p><strong>only_include_defs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If false, we will possibly return duplicate references to an entity.</p></li>
+<li><p><strong>detect_unreferenced_entities</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If true, we will raise exceptions on entities not included in the package
+configuration.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>

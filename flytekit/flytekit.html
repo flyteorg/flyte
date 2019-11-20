@@ -98,6 +98,7 @@
 <li class="toctree-l4"><a class="reference internal" href="flytekit.clis.html">flytekit.clis package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.common.html">flytekit.common package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.configuration.html">flytekit.configuration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.html">flytekit.contrib package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.engines.html">flytekit.engines package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.interfaces.html">flytekit.interfaces package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.models.html">flytekit.models package</a></li>
@@ -187,7 +188,6 @@
 <li class="toctree-l1"><a class="reference internal" href="flytekit.bin.html">flytekit.bin package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.bin.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.bin.html#module-flytekit.bin.entrypoint">flytekit.bin.entrypoint module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flytekit.bin.html#module-flytekit.bin.spark_executor">flytekit.bin.spark_executor module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.bin.html#module-flytekit.bin">Module contents</a></li>
 </ul>
 </li>
@@ -307,12 +307,28 @@
 <li class="toctree-l2"><a class="reference internal" href="flytekit.configuration.html#module-flytekit.configuration.auth">flytekit.configuration.auth module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.configuration.html#module-flytekit.configuration.aws">flytekit.configuration.aws module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.configuration.html#module-flytekit.configuration.common">flytekit.configuration.common module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.configuration.html#module-flytekit.configuration.gcp">flytekit.configuration.gcp module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.configuration.html#module-flytekit.configuration.internal">flytekit.configuration.internal module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.configuration.html#module-flytekit.configuration.platform">flytekit.configuration.platform module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.configuration.html#module-flytekit.configuration.resources">flytekit.configuration.resources module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.configuration.html#module-flytekit.configuration.sdk">flytekit.configuration.sdk module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.configuration.html#module-flytekit.configuration.statsd">flytekit.configuration.statsd module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.configuration.html#module-flytekit.configuration">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="flytekit.contrib.html">flytekit.contrib package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.contrib.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="flytekit.contrib.sensors.html">flytekit.contrib.sensors package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.sensors.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.sensors.html#module-flytekit.contrib.sensors.base_sensor">flytekit.contrib.sensors.base_sensor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.sensors.html#module-flytekit.contrib.sensors.impl">flytekit.contrib.sensors.impl module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.sensors.html#module-flytekit.contrib.sensors.task">flytekit.contrib.sensors.task module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.sensors.html#module-flytekit.contrib.sensors">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.contrib.html#module-flytekit.contrib">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="flytekit.engines.html">flytekit.engines package</a><ul>
@@ -342,6 +358,18 @@
 <li class="toctree-l2"><a class="reference internal" href="flytekit.interfaces.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="flytekit.interfaces.data.html">flytekit.interfaces.data package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.interfaces.data.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="flytekit.interfaces.data.gcs.html">flytekit.interfaces.data.gcs package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="flytekit.interfaces.data.gcs.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="flytekit.interfaces.data.gcs.html#module-flytekit.interfaces.data.gcs.gcs_proxy">flytekit.interfaces.data.gcs.gcs_proxy module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="flytekit.interfaces.data.gcs.html#module-flytekit.interfaces.data.gcs">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="flytekit.interfaces.data.http.html">flytekit.interfaces.data.http package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="flytekit.interfaces.data.http.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="flytekit.interfaces.data.http.html#module-flytekit.interfaces.data.http.http_data_proxy">flytekit.interfaces.data.http.http_data_proxy module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="flytekit.interfaces.data.http.html#module-flytekit.interfaces.data.http">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l5"><a class="reference internal" href="flytekit.interfaces.data.local.html">flytekit.interfaces.data.local package</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="flytekit.interfaces.data.local.html#submodules">Submodules</a></li>
 <li class="toctree-l6"><a class="reference internal" href="flytekit.interfaces.data.local.html#module-flytekit.interfaces.data.local.local_file_proxy">flytekit.interfaces.data.local.local_file_proxy module</a></li>

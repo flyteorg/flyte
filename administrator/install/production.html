@@ -95,6 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#going-beyond-the-sandbox">Going Beyond the Sandbox</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#production-grade-database">Production Grade Database</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#production-grade-object-store">Production Grade Object Store</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamically-configured-projects">Dynamically Configured Projects</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="multi_cluster.html">Scaling Beyond Kubernetes</a></li>
@@ -303,6 +304,15 @@ The process for other cloud providers like <a class="reference external" href="h
 <p>Next, open <code class="docutils literal notranslate"><span class="pre">propeller/plugins/config.yaml</span></code> and remove the <a class="reference external" href="https://github.com/lyft/flyte/blob/master/kustomize/overlays/sandbox/propeller/plugins/config.yaml#L13-L15">default-env-vars</a> (no need to replace them, the default behavior is sufficient).</p>
 <p>Now if you re-run <code class="docutils literal notranslate"><span class="pre">kustomize</span> <span class="pre">build</span> <span class="pre">flyte</span> <span class="pre">&gt;</span> <span class="pre">flyte_generated.yaml</span></code>, you should see that the configmaps have been updated.</p>
 <p>Run <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">apply</span> <span class="pre">-f</span> <span class="pre">flyte_generated.yaml</span></code> to deploy these changes to your cluster for a production-ready deployment.</p>
+</div>
+<div class="section" id="dynamically-configured-projects">
+<h2>Dynamically Configured Projects<a class="headerlink" href="#dynamically-configured-projects" title="Permalink to this headline">¶</a></h2>
+<p>As your Flyte user-base evolves, adding new projects is as simple as registering them through the cli</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">flyte</span><span class="o">-</span><span class="n">cli</span> <span class="o">-</span><span class="n">h</span> <span class="p">{{</span> <span class="n">your</span><span class="o">-</span><span class="n">flyte</span><span class="o">-</span><span class="n">admin</span><span class="o">-</span><span class="n">host</span><span class="o">.</span><span class="n">com</span> <span class="p">}}</span> <span class="n">register</span><span class="o">-</span><span class="n">project</span> <span class="o">--</span><span class="n">identifier</span> <span class="n">myuniqueworkflow</span> <span class="o">--</span><span class="n">name</span> <span class="n">FriendlyWorkflowName</span>
+</pre></div>
+</div>
+<p>A cron which runs at the cadence specified in flyteadmin config will ensure that all the kubernetes resources necessary for the new project are created and new workflows can successfully
+be registered and executed under the new project.</p>
 </div>
 </div>
 

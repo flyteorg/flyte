@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="flytekit.interfaces.data.local package" href="flytekit.interfaces.data.local.html" />
+    <link rel="next" title="flytekit.interfaces.data.gcs package" href="flytekit.interfaces.data.gcs.html" />
     <link rel="prev" title="flytekit.interfaces package" href="flytekit.interfaces.html" /> 
 </head>
 
@@ -98,6 +98,7 @@
 <li class="toctree-l4"><a class="reference internal" href="flytekit.clis.html">flytekit.clis package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.common.html">flytekit.common package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.configuration.html">flytekit.configuration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.contrib.html">flytekit.contrib package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.engines.html">flytekit.engines package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="flytekit.interfaces.html">flytekit.interfaces package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="flytekit.models.html">flytekit.models package</a></li>
@@ -188,6 +189,18 @@
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="flytekit.interfaces.data.gcs.html">flytekit.interfaces.data.gcs package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.interfaces.data.gcs.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.interfaces.data.gcs.html#module-flytekit.interfaces.data.gcs.gcs_proxy">flytekit.interfaces.data.gcs.gcs_proxy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.interfaces.data.gcs.html#module-flytekit.interfaces.data.gcs">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="flytekit.interfaces.data.http.html">flytekit.interfaces.data.http package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.interfaces.data.http.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.interfaces.data.http.html#module-flytekit.interfaces.data.http.http_data_proxy">flytekit.interfaces.data.http.http_data_proxy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.interfaces.data.http.html#module-flytekit.interfaces.data.http">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="flytekit.interfaces.data.local.html">flytekit.interfaces.data.local package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.interfaces.data.local.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.interfaces.data.local.html#module-flytekit.interfaces.data.local.local_file_proxy">flytekit.interfaces.data.local.local_file_proxy module</a></li>
@@ -388,7 +401,7 @@
 
 <dl class="class">
 <dt id="flytekit.interfaces.data.data_proxy.RemoteDataContext">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.interfaces.data.data_proxy.</code><code class="sig-name descname">RemoteDataContext</code><a class="reference internal" href="../_modules/flytekit/interfaces/data/data_proxy.html#RemoteDataContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.interfaces.data.data_proxy.RemoteDataContext" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.interfaces.data.data_proxy.</code><code class="sig-name descname">RemoteDataContext</code><span class="sig-paren">(</span><em class="sig-param">cloud_provider=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/interfaces/data/data_proxy.html#RemoteDataContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.interfaces.data.data_proxy.RemoteDataContext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.interfaces.data.data_proxy._OutputDataContext</span></code></p>
 </dd></dl>
 
@@ -406,7 +419,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="flytekit.interfaces.data.local.html" class="btn btn-neutral float-right" title="flytekit.interfaces.data.local package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="flytekit.interfaces.data.gcs.html" class="btn btn-neutral float-right" title="flytekit.interfaces.data.gcs package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="flytekit.interfaces.html" class="btn btn-neutral float-left" title="flytekit.interfaces package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

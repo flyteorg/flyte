@@ -194,7 +194,7 @@
 <h2>Creating a Project<a class="headerlink" href="#creating-a-project" title="Permalink to this headline">¶</a></h2>
 <p>In Flyte, workflows are organized into namespaces called “Projects”. When you register a workflow, it must be registered under a project.</p>
 <p>Lets create a new project called <code class="docutils literal notranslate"><span class="pre">myflyteproject</span></code>. Use the project creation endpoint to create the new project</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">30082</span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">projects</span> <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;{&quot;project&quot;: {&quot;id&quot;: &quot;myflyteproject&quot;, &quot;name&quot;: &quot;myflyteproject&quot;} }&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">X</span> <span class="n">POST</span> <span class="n">localhost</span><span class="p">:</span><span class="mi">30081</span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">projects</span> <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;{&quot;project&quot;: {&quot;id&quot;: &quot;myflyteproject&quot;, &quot;name&quot;: &quot;myflyteproject&quot;} }&#39;</span>
 </pre></div>
 </div>
 </div>

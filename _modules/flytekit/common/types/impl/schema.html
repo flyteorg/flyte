@@ -222,7 +222,6 @@
 <span class="sd">        FROM {table};</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-
 <span class="c1"># Set location in both parts of this query so in case of a partial failure, we will always have some data backing a</span>
 <span class="c1"># partition.</span>
 <span class="n">_WRITE_HIVE_PARTITION_QUERY_FORMATTER</span> <span class="o">=</span> \
@@ -560,7 +559,6 @@
 
 
 <div class="viewcode-block" id="SchemaType"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.SchemaType">[docs]</a><span class="k">class</span> <span class="nc">SchemaType</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="p">)):</span>
-
     <span class="n">_LITERAL_TYPE_TO_PROTO_ENUM</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">_primitives</span><span class="o">.</span><span class="n">Integer</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">():</span> <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
         <span class="n">_primitives</span><span class="o">.</span><span class="n">Float</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">():</span> <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
@@ -745,6 +743,27 @@
             <span class="k">return</span> <span class="n">schema</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t_value</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">t_value</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t_value</span><span class="p">,</span> <span class="n">_pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="c1"># Accepts a pandas dataframe and converts to a Schema object</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create_at_any_location</span><span class="p">(</span><span class="n">schema_type</span><span class="o">=</span><span class="n">schema_type</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">o</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
+                <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">t_value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">o</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t_value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># Accepts a list of pandas dataframe and converts to a Schema object</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create_at_any_location</span><span class="p">(</span><span class="n">schema_type</span><span class="o">=</span><span class="n">schema_type</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">o</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">t_value</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+                        <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span>
+                            <span class="nb">type</span><span class="p">(</span><span class="n">t_value</span><span class="p">),</span>
+                            <span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">,</span> <span class="n">Schema</span><span class="p">},</span>
+                            <span class="n">received_value</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+                            <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;A Schema object can only be create from a pandas DataFrame or a list of pandas DataFrame.&quot;</span>
+                        <span class="p">)</span>
+            <span class="k">return</span> <span class="n">o</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span>
                 <span class="nb">type</span><span class="p">(</span><span class="n">t_value</span><span class="p">),</span>
@@ -1048,8 +1067,8 @@
 
             <span class="c1"># TODO np.issubdtype is deprecated. Replace it</span>
             <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
-                <span class="ow">not</span> <span class="n">_np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">allowed_type</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">allowed_type</span> <span class="ow">in</span> <span class="n">get_supported_literal_types_to_pandas_types</span><span class="p">()[</span><span class="n">literal_type</span><span class="p">]</span>
+                    <span class="ow">not</span> <span class="n">_np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">allowed_type</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">allowed_type</span> <span class="ow">in</span> <span class="n">get_supported_literal_types_to_pandas_types</span><span class="p">()[</span><span class="n">literal_type</span><span class="p">]</span>
             <span class="p">):</span>
                 <span class="k">if</span> <span class="n">read</span><span class="p">:</span>
                     <span class="n">read_or_write_msg</span> <span class="o">=</span> <span class="s2">&quot;read data frame object from schema&quot;</span>

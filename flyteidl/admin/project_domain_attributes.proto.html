@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>notification.proto &mdash; Flyte 0.0.1 documentation</title>
+  <title>project_domain_attributes.proto &mdash; Flyte 0.0.1 documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="project.proto" href="project.proto.html" />
-    <link rel="prev" title="node_execution.proto" href="node_execution.proto.html" /> 
+    <link rel="next" title="schedule.proto" href="schedule.proto.html" />
+    <link rel="prev" title="project.proto" href="project.proto.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -96,12 +96,14 @@
 <li class="toctree-l3"><a class="reference internal" href="execution.proto.html">execution.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="launch_plan.proto.html">launch_plan.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="node_execution.proto.html">node_execution.proto</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">notification.proto</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-emailmessage">flyteidl.admin.EmailMessage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="notification.proto.html">notification.proto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="project.proto.html">project.proto</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">project_domain_attributes.proto</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-projectdomainattributes">flyteidl.admin.ProjectDomainAttributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-projectdomainattributesupdaterequest">flyteidl.admin.ProjectDomainAttributesUpdateRequest</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-projectdomainattributesupdateresponse">flyteidl.admin.ProjectDomainAttributesUpdateResponse</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="project.proto.html">project.proto</a></li>
-<li class="toctree-l3"><a class="reference internal" href="project_domain_attributes.proto.html">project_domain_attributes.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="schedule.proto.html">schedule.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="task.proto.html">task.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="task_execution.proto.html">task_execution.proto</a></li>
@@ -164,13 +166,13 @@
         
           <li><a href="index.html">Flyte Admin Service entities</a> &raquo;</li>
         
-      <li>notification.proto</li>
+      <li>project_domain_attributes.proto</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/flyteidl/admin/notification.proto.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/flyteidl/admin/project_domain_attributes.proto.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -183,44 +185,54 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="notification-proto">
-<span id="api-file-flyteidl-admin-notification-proto"></span><h1>notification.proto<a class="headerlink" href="#notification-proto" title="Permalink to this headline">¶</a></h1>
-<p>import “validate/validate.proto”;</p>
-<div class="section" id="flyteidl-admin-emailmessage">
-<span id="api-msg-flyteidl-admin-emailmessage"></span><h2>flyteidl.admin.EmailMessage<a class="headerlink" href="#flyteidl-admin-emailmessage" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/notification.proto#L11">[flyteidl.admin.EmailMessage proto]</a></p>
-<p>Represents the Email object that is sent to a publisher/subscriber
-to forward the notification.
-Note: This is internal to Admin and doesn’t need to be exposed to other components.</p>
+  <div class="section" id="project-domain-attributes-proto">
+<span id="api-file-flyteidl-admin-project-domain-attributes-proto"></span><h1>project_domain_attributes.proto<a class="headerlink" href="#project-domain-attributes-proto" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="flyteidl-admin-projectdomainattributes">
+<span id="api-msg-flyteidl-admin-projectdomainattributes"></span><h2>flyteidl.admin.ProjectDomainAttributes<a class="headerlink" href="#flyteidl-admin-projectdomainattributes" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_domain_attributes.proto#L5">[flyteidl.admin.ProjectDomainAttributes proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-  <span class="nt">&quot;recipients_email&quot;</span><span class="p">:</span> <span class="p">[],</span>
-  <span class="nt">&quot;sender_email&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;subject_line&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;body&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+  <span class="nt">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;attributes&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<dl class="simple" id="api-field-flyteidl-admin-emailmessage-recipients-email">
-<dt>recipients_email</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) The list of email addresses to receive an email with the content populated in the other fields.
-Currently, each email recipient will receive its own email.
-This populates the TO field.</p>
+<dl class="simple" id="api-field-flyteidl-admin-projectdomainattributes-project">
+<dt>project</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) Unique project id for which this set of attributes will be applied.</p>
 </dd>
 </dl>
-<dl class="simple" id="api-field-flyteidl-admin-emailmessage-sender-email">
-<dt>sender_email</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) The email of the sender.
-This populates the FROM field.</p>
+<dl class="simple" id="api-field-flyteidl-admin-projectdomainattributes-domain">
+<dt>domain</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) Unique domain id for which this set of attributes will be applied.</p>
 </dd>
 </dl>
-<dl class="simple" id="api-field-flyteidl-admin-emailmessage-subject-line">
-<dt>subject_line</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) The content of the subject line.
-This populates the SUBJECT field.</p>
+<dl class="simple" id="api-field-flyteidl-admin-projectdomainattributes-attributes">
+<dt>attributes</dt><dd><p>(map&lt;<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>, <a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>&gt;) Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
+Map keys are the <em>case-sensitive</em> names of variables in templatized resource files.
+Map values should be the custom values which get substituted during resource creation.</p>
 </dd>
 </dl>
-<dl class="simple" id="api-field-flyteidl-admin-emailmessage-body">
-<dt>body</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) The content of the email body.
-This populates the BODY field.</p>
+</div>
+<div class="section" id="flyteidl-admin-projectdomainattributesupdaterequest">
+<span id="api-msg-flyteidl-admin-projectdomainattributesupdaterequest"></span><h2>flyteidl.admin.ProjectDomainAttributesUpdateRequest<a class="headerlink" href="#flyteidl-admin-projectdomainattributesupdaterequest" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_domain_attributes.proto#L19">[flyteidl.admin.ProjectDomainAttributesUpdateRequest proto]</a></p>
+<p>Sets custom attributes for a project-domain combination.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;attributes&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="simple" id="api-field-flyteidl-admin-projectdomainattributesupdaterequest-attributes">
+<dt>attributes</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-admin-projectdomainattributes"><span class="std std-ref">flyteidl.admin.ProjectDomainAttributes</span></a>)</p>
 </dd>
 </dl>
+</div>
+<div class="section" id="flyteidl-admin-projectdomainattributesupdateresponse">
+<span id="api-msg-flyteidl-admin-projectdomainattributesupdateresponse"></span><h2>flyteidl.admin.ProjectDomainAttributesUpdateResponse<a class="headerlink" href="#flyteidl-admin-projectdomainattributesupdateresponse" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_domain_attributes.proto#L24">[flyteidl.admin.ProjectDomainAttributesUpdateResponse proto]</a></p>
+<p>Purposefully empty, may be populated in the future.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -232,10 +244,10 @@ This populates the BODY field.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="project.proto.html" class="btn btn-neutral float-right" title="project.proto" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="schedule.proto.html" class="btn btn-neutral float-right" title="schedule.proto" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="node_execution.proto.html" class="btn btn-neutral float-left" title="node_execution.proto" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="project.proto.html" class="btn btn-neutral float-left" title="project.proto" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

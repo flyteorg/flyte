@@ -300,7 +300,7 @@
 
 <div class="viewcode-block" id="SdkTask.fetch"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.fetch">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
-    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function uses the engine loader to call create a hydrated task from Admin.</span>
 <span class="sd">        :param Text project:</span>
@@ -309,7 +309,6 @@
 <span class="sd">        :param Text version:</span>
 <span class="sd">        :rtype: SdkTask</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">version</span> <span class="o">=</span> <span class="n">version</span> <span class="ow">or</span> <span class="n">_internal_config</span><span class="o">.</span><span class="n">VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="n">task_id</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">TASK</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="n">admin_task</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">fetch_task</span><span class="p">(</span><span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">)</span>
         <span class="n">sdk_task</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">admin_task</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">compiled_task</span><span class="o">.</span><span class="n">template</span><span class="p">)</span>

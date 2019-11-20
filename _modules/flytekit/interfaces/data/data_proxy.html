@@ -154,11 +154,13 @@
   <h1>Source code for flytekit.interfaces.data.data_proxy</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span><span class="p">,</span> <span class="n">platform</span> <span class="k">as</span> <span class="n">_platform_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.interfaces.data.s3</span> <span class="k">import</span> <span class="n">s3proxy</span> <span class="k">as</span> <span class="n">_s3proxy</span>
+<span class="kn">from</span> <span class="nn">flytekit.interfaces.data.gcs</span> <span class="k">import</span> <span class="n">gcs_proxy</span> <span class="k">as</span> <span class="n">_gcs_proxy</span>
 <span class="kn">from</span> <span class="nn">flytekit.interfaces.data.local</span> <span class="k">import</span> <span class="n">local_file_proxy</span> <span class="k">as</span> <span class="n">_local_file_proxy</span>
+<span class="kn">from</span> <span class="nn">flytekit.interfaces.data.http</span> <span class="k">import</span> <span class="n">http_data_proxy</span> <span class="k">as</span> <span class="n">_http_data_proxy</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exception</span>
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">_common_utils</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">_common_utils</span><span class="p">,</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
 
@@ -211,14 +213,35 @@
 
 
 <div class="viewcode-block" id="RemoteDataContext"><a class="viewcode-back" href="../../../../flytekit/flytekit.interfaces.data.html#flytekit.interfaces.data.data_proxy.RemoteDataContext">[docs]</a><span class="k">class</span> <span class="nc">RemoteDataContext</span><span class="p">(</span><span class="n">_OutputDataContext</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RemoteDataContext</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">_s3proxy</span><span class="o">.</span><span class="n">AwsS3Proxy</span><span class="p">())</span></div>
+
+    <span class="n">_CLOUD_PROVIDER_TO_PROXIES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">_constants</span><span class="o">.</span><span class="n">CloudProvider</span><span class="o">.</span><span class="n">AWS</span><span class="p">:</span> <span class="n">_s3proxy</span><span class="o">.</span><span class="n">AwsS3Proxy</span><span class="p">(),</span>
+        <span class="n">_constants</span><span class="o">.</span><span class="n">CloudProvider</span><span class="o">.</span><span class="n">GCP</span><span class="p">:</span> <span class="n">_gcs_proxy</span><span class="o">.</span><span class="n">GCSProxy</span><span class="p">(),</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cloud_provider</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param Optional[Text] cloud_provider: From flytekit.common.constants.CloudProvider enum</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cloud_provider</span> <span class="o">=</span> <span class="n">cloud_provider</span> <span class="ow">or</span> <span class="n">_platform_config</span><span class="o">.</span><span class="n">CLOUD_PROVIDER</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">proxy</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_CLOUD_PROVIDER_TO_PROXIES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cloud_provider</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">proxy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_user_exception</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
+                <span class="s2">&quot;Configured cloud provider is not supported for data I/O.  Received: </span><span class="si">{}</span><span class="s2">, expected one of: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">cloud_provider</span><span class="p">,</span>
+                    <span class="nb">list</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_CLOUD_PROVIDER_TO_PROXIES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RemoteDataContext</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">proxy</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Data"><a class="viewcode-back" href="../../../../flytekit/flytekit.interfaces.data.html#flytekit.interfaces.data.data_proxy.Data">[docs]</a><span class="k">class</span> <span class="nc">Data</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="c1"># TODO: More proxies for more environments.</span>
     <span class="n">_DATA_PROXIES</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;s3:/&quot;</span><span class="p">:</span> <span class="n">_s3proxy</span><span class="o">.</span><span class="n">AwsS3Proxy</span><span class="p">()</span>
+        <span class="s2">&quot;s3:/&quot;</span><span class="p">:</span> <span class="n">_s3proxy</span><span class="o">.</span><span class="n">AwsS3Proxy</span><span class="p">(),</span>
+        <span class="s2">&quot;gs:/&quot;</span><span class="p">:</span> <span class="n">_gcs_proxy</span><span class="o">.</span><span class="n">GCSProxy</span><span class="p">(),</span>
+        <span class="s2">&quot;http://&quot;</span><span class="p">:</span> <span class="n">_http_data_proxy</span><span class="o">.</span><span class="n">HttpFileProxy</span><span class="p">(),</span>
+        <span class="s2">&quot;https://&quot;</span><span class="p">:</span> <span class="n">_http_data_proxy</span><span class="o">.</span><span class="n">HttpFileProxy</span><span class="p">(),</span>
     <span class="p">}</span>
 
     <span class="nd">@classmethod</span>
@@ -227,7 +250,10 @@
 <span class="sd">        :param Text path:</span>
 <span class="sd">        :rtype: flytekit.interfaces.data.common.DataProxy</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_DATA_PROXIES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="n">_OutputDataContext</span><span class="o">.</span><span class="n">get_default_proxy</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_DATA_PROXIES</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">_OutputDataContext</span><span class="o">.</span><span class="n">get_default_proxy</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Data.data_exists"><a class="viewcode-back" href="../../../../flytekit/flytekit.interfaces.data.html#flytekit.interfaces.data.data_proxy.Data.data_exists">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">data_exists</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>

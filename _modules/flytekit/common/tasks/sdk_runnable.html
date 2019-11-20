@@ -258,7 +258,7 @@
         <span class="n">args</span><span class="p">,</span>
         <span class="n">resources</span><span class="p">,</span>
         <span class="n">env</span><span class="p">,</span>
-        <span class="n">config</span>
+        <span class="n">config</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SdkRunnableContainer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -519,7 +519,7 @@
             <span class="n">gpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">memory_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span>
+            <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text storage_request:</span>
@@ -531,6 +531,7 @@
 <span class="sd">        :param Text gpu_limit:</span>
 <span class="sd">        :param Text memory_limit:</span>
 <span class="sd">        :param dict[Text,Text] environment:</span>
+<span class="sd">        :param cls Optional[type]: Type of container to instantiate. Generally should subclass SdkRunnableContainer.</span>
 <span class="sd">        :rtype: flytekit.models.task.Container</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">storage_limit</span> <span class="o">=</span> <span class="n">storage_limit</span> <span class="ow">or</span> <span class="n">_resource_config</span><span class="o">.</span><span class="n">DEFAULT_STORAGE_LIMIT</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -602,7 +603,7 @@
                 <span class="p">)</span>
             <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">SdkRunnableContainer</span><span class="p">(</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span> <span class="ow">or</span> <span class="n">SdkRunnableContainer</span><span class="p">)(</span>
             <span class="n">command</span><span class="o">=</span><span class="p">[],</span>
             <span class="n">args</span><span class="o">=</span><span class="p">[</span>
                 <span class="s2">&quot;pyflyte-execute&quot;</span><span class="p">,</span>
@@ -651,7 +652,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_argname_in_function_definition</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValidationException</span><span class="p">(</span>
                     <span class="s2">&quot;The output named &#39;</span><span class="si">{}</span><span class="s2">&#39; was not specified in the task function.  Therefore, this output cannot be &quot;</span>
-                    <span class="s2">&quot;provided to the task.&quot;</span>
+                    <span class="s2">&quot;provided to the task.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_banned_outputs</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValidationException</span><span class="p">(</span>
