@@ -154,3 +154,14 @@ Next, open ``propeller/plugins/config.yaml`` and remove the `default-env-vars <h
 Now if you re-run ``kustomize build flyte > flyte_generated.yaml``, you should see that the configmaps have been updated.
 
 Run ``kubectl apply -f flyte_generated.yaml`` to deploy these changes to your cluster for a production-ready deployment.
+
+Dynamically Configured Projects
+*******************************
+
+As your Flyte user-base evolves, adding new projects is as simple as registering them through the cli ::
+
+    flyte-cli -h {{ your-flyte-admin-host.com }} register-project --identifier myuniqueworkflow --name FriendlyWorkflowName 
+
+A cron which runs at the cadence specified in flyteadmin config will ensure that all the kubernetes resources necessary for the new project are created and new workflows can successfully
+be registered and executed under the new project.
+

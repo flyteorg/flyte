@@ -28,6 +28,14 @@ flytekit.configuration.common module
    :undoc-members:
    :show-inheritance:
 
+flytekit.configuration.gcp module
+---------------------------------
+
+.. automodule:: flytekit.configuration.gcp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 flytekit.configuration.internal module
 --------------------------------------
 
