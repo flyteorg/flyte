@@ -7,7 +7,7 @@ Home:  https://flyte.org
 
 Docs:  https://lyft.github.io/flyte
 
-Slack:  https://flyte-org.slack.com
+Slack:  [https://flyte-org.slack.com](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform)
 
 Twitter: https://twitter.com/flyteorg
 
