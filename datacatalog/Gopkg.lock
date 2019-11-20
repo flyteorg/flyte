@@ -161,10 +161,11 @@
   revision = "611e8accdfc92c4187d399e95ce826046d4c8d73"
 
 [[projects]]
-  digest = "1:07f4fafe81587b642166199f41c3edcca12929fcfcc0261b00be5dea2f968f44"
+  digest = "1:1fc0224cd174e9adfe0520b160dc6ff836e2d8a2c4393e7faa2466b5e9cb2a3f"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
+    "protoc-gen-go/descriptor",
     "ptypes",
     "ptypes/any",
     "ptypes/duration",
@@ -346,11 +347,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2339820c575323b56a7f94146a2549fd344c51c637fa5b8bafae9695ffa6e1a5"
+  digest = "1:2d0821b201329591162ddfd49ce27d9e103b0b11fb68785df5f2d2c6b186da49"
   name = "github.com/ncw/swift"
   packages = ["."]
   pruneopts = "UT"
-  revision = "27a552ee74bcec40cfd6072b40c536fdf52509f6"
+  revision = "017f012e58fa8f056707eb85ce9f794ba9beec6c"
 
 [[projects]]
   digest = "1:6eea828983c70075ca297bb915ffbcfd3e34c5a50affd94428a65df955c0ff9c"
@@ -545,7 +546,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "2180aed2234323691e9fd264fb1d32d20ff04b27"
+  revision = "f9c8255933865a6f8452ccf0cc47ac980da5ac56"
 
 [[projects]]
   branch = "master"
@@ -567,7 +568,7 @@
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "52ab431487773bc9dd1b0766228b1cf3944126bf"
+  revision = "b5d5184f72d2900cd61b7676edc45ad9300e26a9"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -604,7 +605,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:73740b1d1cb765a464a57667253863185376e28558fbafe13e94f1cfc6259af9"
+  digest = "1:e608ef3f2ff06e32d2fb807e7df2f21189be6a9d08498c65d33f4b28caaec313"
   name = "google.golang.org/api"
   packages = [
     "googleapi",
@@ -618,7 +619,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "9be9b80238d8df282648ab12b51efd20faa8fa37"
+  revision = "006ab4afe25e899e4ec545ce1cbfdaed675d15d8"
 
 [[projects]]
   digest = "1:3c03b58f57452764a4499c55c582346c0ee78c8a5033affe5bdfd9efd3da5bd1"
@@ -648,7 +649,7 @@
   revision = "83cc0476cb11ea0da33dacd4c6354ab192de6fe6"
 
 [[projects]]
-  digest = "1:b59ce3ddb11daeeccccc9cb3183b58ebf8e9a779f1c853308cd91612e817a301"
+  digest = "1:24c7bbb52f35264c506e5d404a257408937953cab7f39b898bd7edde0103b52a"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -681,6 +682,8 @@
     "metadata",
     "naming",
     "peer",
+    "reflection",
+    "reflection/grpc_reflection_v1alpha",
     "resolver",
     "serviceconfig",
     "stats",
@@ -753,6 +756,7 @@
     "github.com/stretchr/testify/mock",
     "google.golang.org/grpc",
     "google.golang.org/grpc/codes",
+    "google.golang.org/grpc/reflection",
     "google.golang.org/grpc/status",
   ]
   solver-name = "gps-cdcl"

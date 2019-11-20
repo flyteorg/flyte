@@ -11,6 +11,7 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 var serveCmd = &cobra.Command{
@@ -53,6 +54,7 @@ func serveInsecure(ctx context.Context, cfg *config.Config) error {
 func newGRPCServer(_ context.Context) *grpc.Server {
 	grpcServer := grpc.NewServer()
 	datacatalog.RegisterDataCatalogServer(grpcServer, datacatalogservice.NewDataCatalogService())
+	reflection.Register(grpcServer)
 	return grpcServer
 }
 

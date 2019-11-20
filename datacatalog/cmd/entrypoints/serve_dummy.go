@@ -10,6 +10,7 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 var serveDummyCmd = &cobra.Command{
@@ -51,5 +52,6 @@ func serveDummy(ctx context.Context, cfg *config.Config) error {
 func newGRPCDummyServer(_ context.Context) *grpc.Server {
 	grpcServer := grpc.NewServer()
 	datacatalog.RegisterDataCatalogServer(grpcServer, &datacatalogservice.DataCatalogService{})
+	reflection.Register(grpcServer)
 	return grpcServer
 }
