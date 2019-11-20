@@ -12,14 +12,6 @@ flytekit.bin.entrypoint module
    :undoc-members:
    :show-inheritance:
 
-flytekit.bin.spark\_executor module
------------------------------------
-
-.. automodule:: flytekit.bin.spark_executor
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 Module contents
 ---------------

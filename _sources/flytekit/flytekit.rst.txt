@@ -11,6 +11,7 @@ Subpackages
    flytekit.clis
    flytekit.common
    flytekit.configuration
+   flytekit.contrib
    flytekit.engines
    flytekit.interfaces
    flytekit.models

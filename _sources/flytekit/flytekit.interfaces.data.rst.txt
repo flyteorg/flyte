@@ -6,6 +6,8 @@ Subpackages
 
 .. toctree::
 
+   flytekit.interfaces.data.gcs
+   flytekit.interfaces.data.http
    flytekit.interfaces.data.local
    flytekit.interfaces.data.s3
 
