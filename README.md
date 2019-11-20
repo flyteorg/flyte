@@ -16,12 +16,13 @@ Twitter: https://twitter.com/flyteorg
 Repo | Language | Purpose
 --- | --- | ---
 [flyte](https://github.com/lyft/flyte) | RST | home, documentation, issues
-[flyteidl](https://github.com/lyft/flyteidl) | IDL | interface definitions
+[flyteidl](https://github.com/lyft/flyteidl) | Protobuf | interface definitions
 [flytepropeller](https://github.com/lyft/flytepropeller) | Go | execution engine
 [flyteadmin](https://github.com/lyft/flyteadmin) | Go | control plane
 [flytekit](https://github.com/lyft/flytekit) | Python | python SDK and tools
 [flyteconsole](https://github.com/lyft/flyteconsole) | Typescript | admin console
-[flyteplugins](https://github.com/lyft/flyteplugins) | Go  | Flyte plugins
+[datacatalog](https://github.com/lyft/datacatalog) | Go  | manage input & output artifacts
+[flyteplugins](https://github.com/lyft/flyteplugins) | Go  | flyte plugins
 [flytestdlib](https://github.com/lyft/flytestdlib) |  Go | standard library
 [flytesnacks](https://github.com/lyft/flytesnacks) | Python | examples, tips, and tricks
 
@@ -29,5 +30,5 @@ Repo | Language | Purpose
 
 Repo | Language | Purpose
 --- | --- | ---
-[Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go | Apache Spark 
+[Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go | Apache Spark batch
 [Flink](https://github.com/lyft/flinkk8soperator) | Go | Apache Flink streaming
