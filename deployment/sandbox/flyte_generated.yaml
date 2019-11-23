@@ -708,10 +708,9 @@ data:
           - container
           - sidecar
           - spark
-          - waitable-task-executor
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-524bk7mh7f
+  name: flyte-propeller-config-55gc695955
   namespace: flyte
 ---
 apiVersion: v1
@@ -722,14 +721,11 @@ data:
         # Either create this file with your username with the real token, or set the QUBOLE_API_KEY environment variable
         # See the secrets_manager.go file in the plugins repo for usage.  Since the dev/test deployment of
         # this has a dummy QUBOLE_API_KEY env var built in, this fake path won't break anything.
-        quboleTokenPath: "/Path/To/QUBOLE_CLIENT_TOKEN"
-        resourceManagerType: redis
-        redisHostPath: redis-resource-manager.flyte:6379
-        redisHostKey: mypassword
+        quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"
         quboleLimit: 10
 kind: ConfigMap
 metadata:
-  name: flyte-qubole-config-h626c9t6f7
+  name: flyte-qubole-config-tc49528ckt
   namespace: flyte
 ---
 apiVersion: v1
@@ -754,17 +750,6 @@ data:
 kind: ConfigMap
 metadata:
   name: flyte-spark-config-h72bmtggc2
-  namespace: flyte
----
-apiVersion: v1
-data:
-  config.yaml: |
-    plugins:
-      waitable:
-        console-uri: http://localhost:30081/console
-kind: ConfigMap
-metadata:
-  name: flyte-waitable-config-g8gch5968h
   namespace: flyte
 ---
 apiVersion: v1
@@ -1152,8 +1137,6 @@ spec:
           name: qubole-config-volume
         - mountPath: /etc/flyte/config-container
           name: container-config-volume
-        - mountPath: /etc/flyte/config-waitable
-          name: waitable-config-volume
         - mountPath: /etc/flyte/config-spark
           name: spark-config-volume
         - mountPath: /etc/flyte/config
@@ -1163,19 +1146,16 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-qubole-config-h626c9t6f7
+          name: flyte-qubole-config-tc49528ckt
         name: qubole-config-volume
       - configMap:
           name: flyte-container-config-5k78b9cm42
         name: container-config-volume
       - configMap:
-          name: flyte-waitable-config-g8gch5968h
-        name: waitable-config-volume
-      - configMap:
           name: flyte-spark-config-h72bmtggc2
         name: spark-config-volume
       - configMap:
-          name: flyte-propeller-config-524bk7mh7f
+          name: flyte-propeller-config-55gc695955
         name: config-volume
       - configMap:
           name: flyte-plugin-config-b525btf774

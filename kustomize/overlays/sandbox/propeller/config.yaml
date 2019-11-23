@@ -64,4 +64,3 @@ tasks:
       - container
       - sidecar
       - spark
-      - waitable-task-executor
