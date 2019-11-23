@@ -538,9 +538,13 @@ data:
     logger:
       show-source: true
       level: 5
-    application:
+    server:
       httpPort: 8088
       grpcPort: 8089
+      security:
+        secure: false
+        allowCors: false
+        useAuth: false
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
       profilerPort: 10254
@@ -598,7 +602,7 @@ data:
       refresh: 5m
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-44hkc4cmdg
+  name: flyte-admin-config-7tbh7b6745
   namespace: flyte
 ---
 apiVersion: v1
@@ -622,12 +626,6 @@ apiVersion: v1
 data:
   config.yaml: |
     plugins:
-      enabled-plugins:
-        - container
-        - spark
-        - waitable
-        - hiveExecutor
-        - sidecar
       logs:
         kubernetes-enabled: true
         kubernetes-url: "http://localhost:30082"
@@ -638,7 +636,7 @@ data:
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
 kind: ConfigMap
 metadata:
-  name: flyte-plugin-config-mkhh79kf6f
+  name: flyte-plugin-config-b525btf774
   namespace: flyte
 ---
 apiVersion: v1
@@ -674,6 +672,12 @@ data:
           type: bucket
           rate: 10
           capacity: 100
+      resourcemanager:
+        type: redis
+        resourceMaxQuota: 10000
+        redis:
+          hostPath: redis-resource-manager.flyte:6379
+          hostKey: mypassword
     logger:
       show-source: true
       level: 5
@@ -698,9 +702,16 @@ data:
       endpoint: datacatalog:89
       type: datacatalog
       insecure: true
+    tasks:
+      task-plugins:
+        enabled-plugins:
+          - container
+          - sidecar
+          - spark
+          - waitable-task-executor
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-df4bf7dg67
+  name: flyte-propeller-config-524bk7mh7f
   namespace: flyte
 ---
 apiVersion: v1
@@ -971,7 +982,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.1.4
+        image: docker.io/lyft/flyteadmin:v0.1.5
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -1022,7 +1033,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.1.1
+        image: docker.io/lyft/flyteadmin:v0.1.5
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -1033,24 +1044,9 @@ spec:
         - --logtostderr
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
-        - migrate
-        - seed-projects
-        - flytesnacks
-        - flytetester
-        image: docker.io/lyft/flyteadmin:v0.1.1
-        imagePullPolicy: IfNotPresent
-        name: seed-projects
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
-      - command:
-        - flyteadmin
-        - --logtostderr
-        - --config
-        - /etc/flyte/config/flyteadmin_config.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.1.1
+        image: docker.io/lyft/flyteadmin:v0.1.5
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -1066,7 +1062,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-44hkc4cmdg
+          name: flyte-admin-config-7tbh7b6745
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1126,7 +1122,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.1.9
+        app.kubernetes.io/version: 0.1.14
     spec:
       containers:
       - args:
@@ -1141,7 +1137,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.1.9
+        image: docker.io/lyft/flytepropeller:v0.1.14
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -1179,10 +1175,10 @@ spec:
           name: flyte-spark-config-h72bmtggc2
         name: spark-config-volume
       - configMap:
-          name: flyte-propeller-config-df4bf7dg67
+          name: flyte-propeller-config-524bk7mh7f
         name: config-volume
       - configMap:
-          name: flyte-plugin-config-mkhh79kf6f
+          name: flyte-plugin-config-b525btf774
         name: plugin-config-volume
 ---
 apiVersion: apps/v1
@@ -1468,7 +1464,7 @@ spec:
               name: clusterresource-template-dgc9fcm2kh
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-44hkc4cmdg
+              name: flyte-admin-config-7tbh7b6745
             name: config-volume
   schedule: '*/1 * * * *'
 ---

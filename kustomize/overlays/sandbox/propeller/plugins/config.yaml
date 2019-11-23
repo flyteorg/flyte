@@ -1,10 +1,4 @@
 plugins:
-  enabled-plugins:
-    - container
-    - spark
-    - waitable
-    - hiveExecutor
-    - sidecar
   logs:
     kubernetes-enabled: true
     kubernetes-url: "http://localhost:30082"
