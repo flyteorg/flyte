@@ -1029,6 +1029,21 @@ spec:
         - --logtostderr
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
+        - migrate
+        - seed-projects
+        - flytesnacks
+        - flytetester
+        image: docker.io/lyft/flyteadmin:v0.1.5
+        imagePullPolicy: IfNotPresent
+        name: seed-projects
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      - command:
+        - flyteadmin
+        - --logtostderr
+        - --config
+        - /etc/flyte/config/flyteadmin_config.yaml
         - clusterresource
         - sync
         image: docker.io/lyft/flyteadmin:v0.1.5
