@@ -7,10 +7,10 @@ Flyte Propeller
 :target: https://github.com/lyft/flytepropeller/releases/latest
 
 .. image:: https://godoc.org/github.com/lyft/flytepropeller?status.svg
-:target: https://godoc.org/github.com/lyft/flytepropeller)
+:target: https://godoc.org/github.com/lyft/flytepropeller
 
 .. image:: https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg
-:target: http://www.apache.org/licenses/LICENSE-2.0.html)
+:target: http://www.apache.org/licenses/LICENSE-2.0.html
 
 .. image:: https://img.shields.io/codecov/c/github/lyft/flytepropeller.svg
 :target: https://codecov.io/gh/lyft/flytepropeller
