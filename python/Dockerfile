@@ -30,7 +30,7 @@ COPY . .
 
 # Set this environment variable. It will be used by the flytekit SDK during the registration/compilation steps
 ARG IMAGE_TAG
-ENV FLYTE_INTERNAL_IMAGE "docker.io/lyft/flytesnacks:$IMAGE_TAG"
+ENV FLYTE_INTERNAL_IMAGE "docker.io/lyft/$IMAGE_TAG"
 
 # Enable the virtualenv for this image. Note this relies on the VENV variable we've set in this image.
 ENTRYPOINT ["/opt/flytekit_venv"]
