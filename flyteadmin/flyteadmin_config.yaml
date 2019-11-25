@@ -5,6 +5,7 @@
 server:
   httpPort: 8088
   grpcPort: 8089
+  grpcServerReflection: true
   security:
     secure: false
     ssl:

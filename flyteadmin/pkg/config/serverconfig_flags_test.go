@@ -143,6 +143,28 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_grpcServerReflection", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vBool, err := cmdFlags.GetBool("grpcServerReflection"); err == nil {
+				assert.Equal(t, bool(defaultServerConfig.GrpcServerReflection), vBool)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("grpcServerReflection", testValue)
+			if vBool, err := cmdFlags.GetBool("grpcServerReflection"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.GrpcServerReflection)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_kube-config", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly

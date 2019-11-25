@@ -921,7 +921,7 @@
   revision = "919d9bdd9fe6f1a5dd95ce5d5e4cdb8fd3c516d0"
 
 [[projects]]
-  digest = "1:0c0ea0f0ccec8a112245dd3ca0c3b304224ede9afd4b7a2b482a7b48471ef894"
+  digest = "1:ca45e0a856db4fdac5d23492fed11be07e5c86c62a26ed0bbd63f89fbb23b6a4"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -954,6 +954,8 @@
     "metadata",
     "naming",
     "peer",
+    "reflection",
+    "reflection/grpc_reflection_v1alpha",
     "resolver",
     "serviceconfig",
     "stats",
@@ -1239,6 +1241,7 @@
     "google.golang.org/grpc/credentials",
     "google.golang.org/grpc/grpclog",
     "google.golang.org/grpc/metadata",
+    "google.golang.org/grpc/reflection",
     "google.golang.org/grpc/status",
     "gopkg.in/gormigrate.v1",
     "k8s.io/apimachinery/pkg/api/errors",
