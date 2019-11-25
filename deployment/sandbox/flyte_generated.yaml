@@ -1342,8 +1342,6 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: "10254"
         prometheus.io/scrape: "true"
-      initializers:
-        pending: []
       labels:
         app.kubernetes.io/name: sparkoperator
         app.kubernetes.io/version: v2.4.0-v1alpha1
