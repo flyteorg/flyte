@@ -43,6 +43,7 @@ func (cfg ServerConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("ServerConfig", pflag.ExitOnError)
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "httpPort"), defaultServerConfig.HTTPPort, "On which http port to serve admin")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "grpcPort"), defaultServerConfig.GrpcPort, "On which grpc port to serve admin")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "grpcServerReflection"), defaultServerConfig.GrpcServerReflection, "Enable GRPC Server Reflection")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kube-config"), defaultServerConfig.KubeConfig, "Path to kubernetes client config file.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "master"), defaultServerConfig.Master, "The address of the Kubernetes API server.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "security.secure"), defaultServerConfig.Security.Secure, "")

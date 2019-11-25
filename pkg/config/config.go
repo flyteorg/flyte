@@ -12,11 +12,12 @@ const SectionKey = "server"
 //go:generate pflags ServerConfig --default-var=defaultServerConfig
 
 type ServerConfig struct {
-	HTTPPort   int                   `json:"httpPort" pflag:",On which http port to serve admin"`
-	GrpcPort   int                   `json:"grpcPort" pflag:",On which grpc port to serve admin"`
-	KubeConfig string                `json:"kube-config" pflag:",Path to kubernetes client config file."`
-	Master     string                `json:"master" pflag:",The address of the Kubernetes API server."`
-	Security   ServerSecurityOptions `json:"security"`
+	HTTPPort             int                   `json:"httpPort" pflag:",On which http port to serve admin"`
+	GrpcPort             int                   `json:"grpcPort" pflag:",On which grpc port to serve admin"`
+	GrpcServerReflection bool                  `json:"grpcServerReflection" pflag:",Enable GRPC Server Reflection"`
+	KubeConfig           string                `json:"kube-config" pflag:",Path to kubernetes client config file."`
+	Master               string                `json:"master" pflag:",The address of the Kubernetes API server."`
+	Security             ServerSecurityOptions `json:"security"`
 }
 
 type ServerSecurityOptions struct {
