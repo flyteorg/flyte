@@ -96,6 +96,8 @@ type PluginManager struct {
 	resourceToWatch runtime.Object
 	kubeClient      pluginsCore.KubeClient
 	metrics         PluginMetrics
+	backoffHandlers map[string]BackOffHandler
+
 }
 
 func (e *PluginManager) GetProperties() pluginsCore.PluginProperties {
@@ -104,6 +106,65 @@ func (e *PluginManager) GetProperties() pluginsCore.PluginProperties {
 
 func (e *PluginManager) GetID() string {
 	return e.id
+}
+
+const backOffMultiplier = 2
+const minBackoffTime = time.Second * 30
+const maxBackoffTime = time.Minute * 10
+
+type BackOffHandler struct {
+	multiplier       int
+	waitDuration     time.Duration // redundant, can be deduced from multiplier
+	nextEligibleTime time.Time
+}
+
+// act based on current backoff interval and set the next one accordingly
+func (b *BackOffHandler) handle(operation func() error) error {
+
+	// check if current backoff interval has elapsed
+	if b.nextEligibleTime.Before(time.Now()) {
+		err := operation() // execute request
+		if err == nil {
+			b.multiplier = backOffMultiplier
+			b.nextEligibleTime = time.Now()
+			b.waitDuration = minBackoffTime
+			return nil
+		} else {
+			b.waitDuration = b.waitDuration * time.Duration(b.multiplier)
+
+			if b.waitDuration > maxBackoffTime {
+				b.waitDuration = maxBackoffTime
+			}
+			b.nextEligibleTime = time.Now().Add(b.waitDuration)
+			b.multiplier = b.multiplier * backOffMultiplier
+
+			// TODO ssingh move this error to some better place
+			return errors.Wrapf("BackOff", err, "failed to do something")
+		}
+	}
+
+	return errors.Errorf("BackOff", "need to wait more")
+}
+
+
+// TODO ssingh: clean it and move to its right place
+func IsBackoffError(err error) bool {
+	code, found := stdErrors.GetErrorCode(err)
+	if found && code == "BackOff" {
+		return true
+	}
+
+	return false
+}
+
+func (e *PluginManager) getBackOffHandler(key string) BackOffHandler {
+	if handler, found := e.backoffHandlers[key]; found {
+		return handler
+	}
+
+	// TODO ssingh: make it threadsafe
+	e.backoffHandlers[key] = BackOffHandler{multiplier: backOffMultiplier, nextEligibleTime: time.Now(), waitDuration: minBackoffTime}
+	return e.backoffHandlers[key]
 }
 
 func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
@@ -116,14 +177,33 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 	AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GroupVersionKind(), o.GetNamespace(), o.GetName())
 
-	err = e.kubeClient.GetClient().Create(ctx, o)
+	var nonRetryableError error
+	key := fmt.Sprintf("%v,%v", o.GroupVersionKind().String(), o.GetNamespace())
+	err = e.getBackOffHandler(key).handle(func() error {
+		err1 := e.kubeClient.GetClient().Create(ctx, o)
+		if err1 == nil {
+			return nil
+		}
+
+		// retryable with backoff error
+		if k8serrors.IsForbidden(err1) && strings.Contains(err1.Error(), "exceeded quota") {
+			return err1
+		}
+
+		nonRetryableError = err1
+		return nil
+	})
+	if err == nil {
+		err = nonRetryableError
+	}
+
+	
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
-		if k8serrors.IsForbidden(err) {
-			if strings.Contains(err.Error(), "exceeded quota") {
-				// TODO: Quota errors are retried forever, it would be good to have support for backoff strategy.
-				logger.Warnf(ctx, "Failed to launch job, resource quota exceeded. err: %v", err)
-				return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(time.Now(), pluginsCore.DefaultPhaseVersion, "failed to launch job, resource quota exceeded.")), nil
-			}
+		if IsBackoffError(err) {
+			// TODO: Quota errors are retried forever, it would be good to have support for backoff strategy.
+			logger.Warnf(ctx, "Failed to launch job, resource quota exceeded. err: %v", err)
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(time.Now(), pluginsCore.DefaultPhaseVersion, "failed to launch job, resource quota exceeded.")), nil
+		} else if k8serrors.IsForbidden(err){
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
 		} else if k8serrors.IsBadRequest(err) || k8serrors.IsInvalid(err) {
 			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
