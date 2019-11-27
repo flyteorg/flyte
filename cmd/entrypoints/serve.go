@@ -39,7 +39,7 @@ func init() {
 
 // Create and start the gRPC server
 func serveInsecure(ctx context.Context, cfg *config.Config) error {
-	grpcServer := newGRPCServer(ctx)
+	grpcServer := newGRPCServer(ctx, cfg)
 
 	grpcListener, err := net.Listen("tcp", cfg.GetGrpcHostAddress())
 	if err != nil {
@@ -51,10 +51,12 @@ func serveInsecure(ctx context.Context, cfg *config.Config) error {
 }
 
 // Creates a new GRPC Server with all the configuration
-func newGRPCServer(_ context.Context) *grpc.Server {
+func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
 	grpcServer := grpc.NewServer()
 	datacatalog.RegisterDataCatalogServer(grpcServer, datacatalogservice.NewDataCatalogService())
-	reflection.Register(grpcServer)
+	if cfg.GrpcServerReflection {
+		reflection.Register(grpcServer)
+	}
 	return grpcServer
 }
 
