@@ -11,9 +11,10 @@ const SectionKey = "application"
 //go:generate pflags Config
 
 type Config struct {
-	GrpcPort int  `json:"grpcPort" pflag:",On which grpc port to serve Catalog"`
-	HTTPPort int  `json:"httpPort" pflag:",On which http port to serve Catalog"`
-	Secure   bool `json:"secure" pflag:",Whether to run Catalog in secure mode or not"`
+	GrpcPort             int  `json:"grpcPort" pflag:",On which grpc port to serve Catalog"`
+	GrpcServerReflection bool `json:"grpcServerReflection" pflag:",Enable GRPC Server Reflection"`
+	HTTPPort             int  `json:"httpPort" pflag:",On which http port to serve Catalog"`
+	Secure               bool `json:"secure" pflag:",Whether to run Catalog in secure mode or not"`
 }
 
 var applicationConfig = config.MustRegisterSection(SectionKey, &Config{})
