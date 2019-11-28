@@ -9,7 +9,7 @@ function run_kubectl {
   kubectl apply -f "$DEPLOY_FILE"
 }
 
-if [ "$CONTEXT" == "docker-for-desktop" ] || [ "$CLUSTER" == "docker-desktop" ]; then
+if [ "$CONTEXT" = "docker-for-desktop" ] || [ "$CONTEXT" = "docker-desktop" ]; then
   run_kubectl
 else
   echo "$CONTEXT is not a docker-desktop cluster"
