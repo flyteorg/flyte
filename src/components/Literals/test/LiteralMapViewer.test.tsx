@@ -4,7 +4,7 @@ import * as React from 'react';
 import { LiteralMap } from 'models';
 import { LiteralMapViewer } from '../LiteralMapViewer';
 
-describe('Literals/LiteralMapViewer', () => {
+describe('LiteralMapViewer', () => {
     it('renders sorted keys', () => {
         const literals: LiteralMap = {
             literals: {

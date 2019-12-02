@@ -4,7 +4,7 @@ import * as React from 'react';
 import { ProtobufStruct } from 'models';
 import { ProtobufStructValue } from '../ProtobufStructValue';
 
-describe('Scalars/ProtobufStructValue', () => {
+describe('ProtobufStructValue', () => {
     it('renders sorted keys', () => {
         const struct: ProtobufStruct = {
             fields: {
