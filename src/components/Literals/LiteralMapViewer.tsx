@@ -1,4 +1,5 @@
 import * as classnames from 'classnames';
+import { sortedObjectEntries } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
 import { Literal, LiteralMap } from 'models';
 import * as React from 'react';
@@ -22,7 +23,7 @@ export const LiteralMapViewer: React.FC<{
                 commonStyles.listUnstyled
             )}
         >
-            {Object.entries(literals).map(([key, value]) => (
+            {sortedObjectEntries(literals).map(([key, value]) => (
                 <li key={key}>
                     <LiteralValue label={key} literal={value as Literal} />
                 </li>

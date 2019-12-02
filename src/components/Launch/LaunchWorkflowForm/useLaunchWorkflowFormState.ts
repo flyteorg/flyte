@@ -1,3 +1,4 @@
+import { sortedObjectEntries } from 'common/utils';
 import { useAPIContext } from 'components/data/apiContext';
 import {
     useFetchableData,
@@ -53,7 +54,7 @@ function getInputs(workflow: Workflow, launchPlan: LaunchPlan): ParsedInput[] {
 
     const workflowInputs = getWorkflowInputs(workflow);
     const launchPlanInputs = launchPlan.closure.expectedInputs.parameters;
-    return Object.entries(launchPlanInputs).map(value => {
+    return sortedObjectEntries(launchPlanInputs).map(value => {
         const [name, parameter] = value;
         const required = !!(parameter.default || parameter.required);
         const workflowInput = workflowInputs[name];
