@@ -11,7 +11,7 @@ echo $pods | while read -a podarray; do
   for i in "${podarray[@]}"; do
       echo "Logs for ${i}"
       echo "------------------------------------------"
-      kubectl -n flyte logs $i
+      kubectl -n flyte logs $i --all-containers
   done  
 done
 
