@@ -1,9 +1,13 @@
 logger:
   show-source: true
   level: 5
-application:
+server:
   httpPort: 8088
   grpcPort: 8089
+  security:
+    secure: false
+    useAuth: false
+    allowCors: false
 flyteadmin:
   roleNameKey: "iam.amazonaws.com/role"
   profilerPort: 10254
