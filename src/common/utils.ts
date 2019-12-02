@@ -86,14 +86,14 @@ export function createCorsProxyURL(path: string) {
     );
 }
 
-/** Returns entires for an object, sorted lexographically */
+/** Returns entires for an object, sorted lexicographically */
 export function sortedObjectEntries(
     object: Object
 ): ReturnType<typeof Object.entries> {
     return Object.entries(object).sort((a, b) => a[0].localeCompare(b[0]));
 }
 
-/** Returns keys for an objext, sorted lexographically */
+/** Returns keys for an objext, sorted lexicographically */
 export function sortedObjectKeys(
     object: Object
 ): ReturnType<typeof Object.keys> {
