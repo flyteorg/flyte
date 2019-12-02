@@ -2,7 +2,7 @@ FROM node:8 as builder
 
 RUN npm install -g yarn@1.9
 WORKDIR /code/flyteconsole
-COPY package*.json yarn.lock ./
+COPY package*.json yarn.lock .snyk ./
 RUN : \
   # install production dependencies
   && yarn install --production \
