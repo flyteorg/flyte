@@ -543,8 +543,8 @@ data:
       grpcPort: 8089
       security:
         secure: false
-        allowCors: false
         useAuth: false
+        allowCors: false
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
       profilerPort: 10254
@@ -602,7 +602,7 @@ data:
       refresh: 5m
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-7tbh7b6745
+  name: flyte-admin-config-4k466cfctf
   namespace: flyte
 ---
 apiVersion: v1
@@ -1062,7 +1062,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-7tbh7b6745
+          name: flyte-admin-config-4k466cfctf
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1457,7 +1457,7 @@ spec:
               name: clusterresource-template-dgc9fcm2kh
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-7tbh7b6745
+              name: flyte-admin-config-4k466cfctf
             name: config-volume
   schedule: '*/1 * * * *'
 ---

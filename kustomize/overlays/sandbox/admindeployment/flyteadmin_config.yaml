@@ -6,8 +6,8 @@ server:
   grpcPort: 8089
   security:
     secure: false
-    allowCors: false
     useAuth: false
+    allowCors: false
 flyteadmin:
   roleNameKey: "iam.amazonaws.com/role"
   profilerPort: 10254
