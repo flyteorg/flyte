@@ -1,4 +1,5 @@
 import * as classnames from 'classnames';
+import { sortedObjectEntries } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
 import { ProtobufListValue, ProtobufStruct, ProtobufValue } from 'models';
 import * as React from 'react';
@@ -63,7 +64,7 @@ export const ProtobufStructValue: React.FC<{
                 commonStyles.listUnstyled
             )}
         >
-            {Object.entries(fields).map(([key, value]) => (
+            {sortedObjectEntries(fields).map(([key, value]) => (
                 <li key={key}>
                     <RenderedProtobufValue label={key} value={value} />
                 </li>

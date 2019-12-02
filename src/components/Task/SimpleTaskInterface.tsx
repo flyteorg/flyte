@@ -1,5 +1,6 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { noneString } from 'common/constants';
+import { sortedObjectKeys } from 'common/utils';
 import { DetailsGroup } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import {
@@ -30,11 +31,11 @@ const VariablesList: React.FC<{ variables: Record<string, Variable> }> = ({
 }) => {
     const commonStyles = useCommonStyles();
     const styles = useStyles();
-    const output = Object.keys(variables).reduce<React.ReactNode[]>(
+    const output = sortedObjectKeys(variables).reduce<React.ReactNode[]>(
         (out, name, idx) => {
             const variable = variables[name];
             out.push(
-                <span>
+                <span key={`${name}-label`}>
                     {idx > 0 ? ', ' : ''}
                     {name}
                 </span>
@@ -44,7 +45,10 @@ const VariablesList: React.FC<{ variables: Record<string, Variable> }> = ({
             );
             if (typeString.length > 0) {
                 out.push(
-                    <span className={styles.typeAnnotationContainer}>
+                    <span
+                        key={`${name}-type`}
+                        className={styles.typeAnnotationContainer}
+                    >
                         (<span className={styles.typeAnnotation}>
                             {typeString}
                         </span>)
