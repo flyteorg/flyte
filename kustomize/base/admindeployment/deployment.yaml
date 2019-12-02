@@ -37,7 +37,7 @@ spec:
           mountPath: /etc/flyte/config
       containers:
       - name: flyteadmin
-        image: docker.io/lyft/flyteadmin:v0.1.4
+        image: docker.io/lyft/flyteadmin:v0.1.5
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "serve"]
         ports:
