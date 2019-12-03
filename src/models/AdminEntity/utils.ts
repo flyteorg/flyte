@@ -1,10 +1,6 @@
 import { env } from 'common/env';
 import { createDebugLogger } from 'common/log';
-import {
-    createCorsProxyURL,
-    createLocalURL,
-    ensureSlashPrefixed
-} from 'common/utils';
+import { createLocalURL, ensureSlashPrefixed } from 'common/utils';
 
 import {
     AdminEntityTransformer,
@@ -22,7 +18,7 @@ const redirectParam = 'redirect_url';
 export function adminApiUrl(url: string) {
     const finalUrl = ensureSlashPrefixed(url);
     if (env.ADMIN_API_URL) {
-        return createCorsProxyURL(`${env.ADMIN_API_URL}/api/v1${finalUrl}`);
+        return `${env.ADMIN_API_URL}/api/v1${finalUrl}`;
     }
     return createLocalURL(`/api/v1${finalUrl}`);
 }
@@ -31,8 +27,7 @@ export function getLoginUrl(redirectUrl: string = window.location.href) {
     const baseUrl = env.ADMIN_API_URL
         ? `${env.ADMIN_API_URL}${loginEndpoint}`
         : createLocalURL(loginEndpoint);
-    const encodedRedirect = encodeURIComponent(redirectUrl);
-    return `${baseUrl}?${redirectParam}=${encodedRedirect}`;
+    return `${baseUrl}?${redirectParam}=${redirectUrl}`;
 }
 
 export function getProfileUrl() {
