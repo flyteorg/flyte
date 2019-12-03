@@ -90,10 +90,26 @@ func TestVerifyCsrfCookie(t *testing.T) {
 }
 
 func TestNewRedirectCookie(t *testing.T) {
-	ctx := context.Background()
-	cookie := NewRedirectCookie(ctx, "/console")
-	assert.NotNil(t, cookie)
-	assert.Equal(t, "/console", cookie.Value)
+	t.Run("test local path", func(t *testing.T) {
+		ctx := context.Background()
+		cookie := NewRedirectCookie(ctx, "/console")
+		assert.NotNil(t, cookie)
+		assert.Equal(t, "/console", cookie.Value)
+	})
+
+	t.Run("test external domain", func(t *testing.T) {
+		ctx := context.Background()
+		cookie := NewRedirectCookie(ctx, "http://www.example.com/postLogin")
+		assert.NotNil(t, cookie)
+		assert.Equal(t, "http://www.example.com/postLogin", cookie.Value)
+	})
+
+	t.Run("uses same-site lax policy", func(t *testing.T) {
+		ctx := context.Background()
+		cookie := NewRedirectCookie(ctx, "http://www.example.com/postLogin")
+		assert.NotNil(t, cookie)
+		assert.Equal(t, http.SameSiteLaxMode, cookie.SameSite)
+	})
 }
 
 func TestGetAuthFlowEndRedirect(t *testing.T) {

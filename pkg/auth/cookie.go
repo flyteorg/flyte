@@ -116,8 +116,8 @@ func NewRedirectCookie(ctx context.Context, redirectURL string) *http.Cookie {
 
 	return &http.Cookie{
 		Name:     redirectURLCookieName,
-		Value:    urlObj.EscapedPath(),
-		SameSite: http.SameSiteStrictMode,
+		Value:    urlObj.String(),
+		SameSite: http.SameSiteLaxMode,
 		HttpOnly: true,
 	}
 }
