@@ -25,7 +25,8 @@ type BranchNodeState struct {
 type DynamicNodePhase uint8
 
 type DynamicNodeState struct {
-	Phase v1alpha1.DynamicNodePhase
+	Phase  v1alpha1.DynamicNodePhase
+	Reason string
 }
 
 type WorkflowNodeState struct {
