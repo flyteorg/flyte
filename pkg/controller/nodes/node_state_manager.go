@@ -66,7 +66,9 @@ func (n nodeStateManager) GetDynamicNodeState() handler.DynamicNodeState {
 	ds := handler.DynamicNodeState{}
 	if dn != nil {
 		ds.Phase = dn.GetDynamicNodePhase()
+		ds.Reason = dn.GetDynamicNodeReason()
 	}
+
 	return ds
 }
 

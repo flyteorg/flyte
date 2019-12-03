@@ -150,6 +150,7 @@ func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n *nodeStateMa
 	if n.d != nil {
 		t := s.GetOrCreateDynamicNodeStatus()
 		t.SetDynamicNodePhase(n.d.Phase)
+		t.SetDynamicNodeReason(n.d.Reason)
 	}
 
 	// Update branch node status

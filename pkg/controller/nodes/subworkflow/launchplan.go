@@ -22,7 +22,7 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 	nodeInputs, err := nCtx.InputReader().Get(ctx)
 	if err != nil {
 		errMsg := fmt.Sprintf("Failed to read input. Error [%s]", err)
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.RuntimeExecutionError), errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, errMsg, nil)), nil
 	}
 
 	w := nCtx.Workflow()
@@ -33,7 +33,7 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 		nodeStatus.GetAttempts(),
 	)
 	if err != nil {
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.RuntimeExecutionError), "failed to create unique ID", nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, "failed to create unique ID", nil)), nil
 	}
 
 	launchCtx := launchplan.LaunchContext{
@@ -50,7 +50,7 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 		if launchplan.IsAlreadyExists(err) {
 			logger.Infof(ctx, "Execution already exists [%s].", childID.Name)
 		} else if launchplan.IsUserError(err) {
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.RuntimeExecutionError), "failed to create unique ID", &handler.ExecutionInfo{
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, "failed to create unique ID", &handler.ExecutionInfo{
 				WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
 			})), nil
 		} else {
@@ -78,7 +78,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 
 	if err != nil {
 		// THIS SHOULD NEVER HAPPEN
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.RuntimeExecutionError), "failed to create unique ID", nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, "failed to create unique ID", nil)), nil
 	}
 
 	wfStatusClosure, err := l.launchPlan.GetStatus(ctx, childID)
@@ -86,7 +86,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 		if launchplan.IsNotFound(err) { // NotFound
 			errorCode, _ := errors.GetErrorCode(err)
 			err = errors.Wrapf(errorCode, nCtx.NodeID(), err, "launch-plan not found")
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errorCode), err.Error(), &handler.ExecutionInfo{
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errorCode, err.Error(), &handler.ExecutionInfo{
 				WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
 			})), nil
 		}
@@ -107,7 +107,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 	case core.WorkflowExecution_ABORTED:
 		wErr = fmt.Errorf("launchplan execution aborted")
 		err = errors.Wrapf(errors.RemoteChildWorkflowExecutionFailed, nCtx.NodeID(), wErr, "launchplan [%s] failed", childID.Name)
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.RemoteChildWorkflowExecutionFailed), err.Error(), &handler.ExecutionInfo{
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RemoteChildWorkflowExecutionFailed, err.Error(), &handler.ExecutionInfo{
 			WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
 		})), nil
 	case core.WorkflowExecution_FAILED:
@@ -115,7 +115,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 		if wfStatusClosure.GetError() != nil {
 			errMsg = fmt.Sprintf(" errorCode[%s]: %s", wfStatusClosure.GetError().Code, wfStatusClosure.GetError().Message)
 		}
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.RemoteChildWorkflowExecutionFailed), errMsg, &handler.ExecutionInfo{
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RemoteChildWorkflowExecutionFailed, errMsg, &handler.ExecutionInfo{
 			WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
 		})), nil
 	case core.WorkflowExecution_SUCCEEDED:

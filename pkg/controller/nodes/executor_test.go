@@ -480,7 +480,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 	}
 
 	// Recursion test with child Node not yet started
-	{
+	t.Run("ChildNodeNotYetStarted", func(t *testing.T) {
 		nodeN0 := "n0"
 		nodeN2 := "n2"
 		ctx := context.Background()
@@ -594,10 +594,10 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				assert.Equal(t, test.expectedPhase, s.NodePhase, "expected: %s, received %s", test.expectedPhase.String(), s.NodePhase.String())
 			})
 		}
-	}
+	})
 
 	// Recurse Child Node Queued previously
-	{
+	t.Run("ChildNodeQueuedPreviously", func(t *testing.T) {
 		tests := []struct {
 			name              string
 			currentNodePhase  v1alpha1.NodePhase
@@ -697,10 +697,10 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				assert.Equal(t, test.eventRecorded, called, "event recording expected: %v, but got %v", test.eventRecorded, called)
 			})
 		}
-	}
+	})
 
 	// Recurse Child Node started previously
-	{
+	t.Run("ChildNodeStartedPreviously", func(t *testing.T) {
 		tests := []struct {
 			name              string
 			currentNodePhase  v1alpha1.NodePhase
@@ -716,9 +716,11 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 			}, false, false, core.NodeExecution_RUNNING, 0},
 
-			{"running->retryablefailure", v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseRetryableFailure, executors.NodePhasePending, func() (handler.Transition, error) {
-				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("x", "y", nil)), nil
-			}, false, false, core.NodeExecution_FAILED, 1},
+			{"running->failing", v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, executors.NodePhasePending,
+				func() (handler.Transition, error) {
+					return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("x", "y", nil)), nil
+				},
+				false, true, core.NodeExecution_FAILED, 0},
 
 			{"(retryablefailure->running", v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseRunning, executors.NodePhasePending, func() (handler.Transition, error) {
 				return handler.UnknownTransition, fmt.Errorf("should not be invoked")
@@ -786,11 +788,11 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				}
 				assert.Equal(t, test.expectedPhase, s.NodePhase, "expected: %s, received %s", test.expectedPhase.String(), s.NodePhase.String())
 				assert.Equal(t, uint32(test.attempts), mockNodeStatus.GetAttempts())
-				assert.Equal(t, test.expectedNodePhase, mockNodeStatus.GetPhase(), "expected %s, received %s", test.expectedNodePhase.String(), mockNodeStatus.GetPhase().String())
+				assert.Equal(t, test.expectedNodePhase.String(), mockNodeStatus.GetPhase().String(), "expected %s, received %s", test.expectedNodePhase.String(), mockNodeStatus.GetPhase().String())
 				assert.Equal(t, test.eventRecorded, called, "event recording expected: %v, but got %v", test.eventRecorded, called)
 			})
 		}
-	}
+	})
 
 	// Extinguished retries
 	t.Run("retries-exhausted", func(t *testing.T) {
@@ -815,7 +817,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		s, err := exec.RecursiveNodeHandler(ctx, mockWf, startNode)
 		assert.NoError(t, err)
 		assert.Equal(t, executors.NodePhasePending.String(), s.NodePhase.String())
-		assert.Equal(t, uint32(1), mockNodeStatus.GetAttempts())
+		assert.Equal(t, uint32(0), mockNodeStatus.GetAttempts())
 		assert.Equal(t, v1alpha1.NodePhaseFailing.String(), mockNodeStatus.GetPhase().String())
 	})
 
@@ -842,8 +844,8 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		s, err := exec.RecursiveNodeHandler(ctx, mockWf, startNode)
 		assert.NoError(t, err)
 		assert.Equal(t, executors.NodePhasePending.String(), s.NodePhase.String())
-		assert.Equal(t, uint32(1), mockNodeStatus.GetAttempts())
-		assert.Equal(t, v1alpha1.NodePhaseRetryableFailure.String(), mockNodeStatus.GetPhase().String())
+		assert.Equal(t, uint32(0), mockNodeStatus.GetAttempts())
+		assert.Equal(t, v1alpha1.NodePhaseFailing.String(), mockNodeStatus.GetPhase().String())
 	})
 }
 
