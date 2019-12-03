@@ -1,0 +1,33 @@
+import Link from '@material-ui/core/Link';
+import { makeStyles, Theme } from '@material-ui/core/styles';
+import { WaitForData } from 'components/common';
+import { getLoginUrl } from 'models';
+import * as React from 'react';
+import { useUserProfile } from './useUserProfile';
+
+const useStyles = makeStyles((theme: Theme) => ({
+    container: {
+        color: theme.palette.common.white
+    }
+}));
+
+const LoginLink: React.FC = () => (
+    <Link href={getLoginUrl()} color="inherit">
+        Login
+    </Link>
+);
+
+export const UserInformation: React.FC<{}> = () => {
+    const profile = useUserProfile();
+    return (
+        <WaitForData spinnerVariant="none" {...profile}>
+            <div className={useStyles().container}>
+                {profile.value == null ? (
+                    <LoginLink />
+                ) : (
+                    profile.value.preferredUsername
+                )}
+            </div>
+        </WaitForData>
+    );
+};

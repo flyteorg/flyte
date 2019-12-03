@@ -162,3 +162,13 @@ export type IdentifierScope =
     | DomainIdentifierScope
     | NameIdentifierScope
     | Identifier;
+
+export interface UserProfile {
+    sub: string;
+    name: string;
+    preferredUsername: string;
+    givenName: string;
+    familyName: string;
+    email: string;
+    picture: string;
+}

@@ -14,6 +14,9 @@ import {
 } from './types';
 
 const debug = createDebugLogger('adminEntity');
+const loginEndpoint = '/login';
+const profileEndpoint = '/me';
+const redirectParam = 'redirect_url';
 
 /** Converts a path into a full Admin API url */
 export function adminApiUrl(url: string) {
@@ -22,6 +25,21 @@ export function adminApiUrl(url: string) {
         return createCorsProxyURL(`${env.ADMIN_API_URL}/api/v1${finalUrl}`);
     }
     return createLocalURL(`/api/v1${finalUrl}`);
+}
+
+export function getLoginUrl(redirectUrl: string = window.location.href) {
+    const baseUrl = env.ADMIN_API_URL
+        ? `${env.ADMIN_API_URL}${loginEndpoint}`
+        : createLocalURL(loginEndpoint);
+    const encodedRedirect = encodeURIComponent(redirectUrl);
+    return `${baseUrl}?${redirectParam}=${encodedRedirect}`;
+}
+
+export function getProfileUrl() {
+    if (env.ADMIN_API_URL) {
+        return `${env.ADMIN_API_URL}${profileEndpoint}`;
+    }
+    return createLocalURL(profileEndpoint);
 }
 
 // Helper to log out the contents of a protobuf response, since the Network tab
