@@ -11,7 +11,11 @@ echo $pods | while read -a podarray; do
   for i in "${podarray[@]}"; do
       echo "Logs for ${i}"
       echo "------------------------------------------"
-      kubectl -n flyte logs $i --all-containers
-  done  
+      if [[ $string == *"flyteadmin"* ]]; then
+        kubectl -n flyte logs $i -c flyteadmin
+      else
+        kubectl -n flyte logs $i
+      fi
+  done
 done
 
