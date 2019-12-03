@@ -166,6 +166,14 @@ func GetAllocationToken(ctx context.Context, resourceNamespace core.ResourceName
 	return newState, nil
 }
 
+func validateQuboleHiveJob(hiveJob plugins.QuboleHiveJob) error {
+	if hiveJob.Query == nil {
+		return errors.Errorf(errors.BadTaskSpecification,
+			"Query could not be found. Please ensure that you are at least on Flytekit version 0.3.0 or later.")
+	}
+	return nil
+}
+
 // This function is the link between the output written by the SDK, and the execution side. It extracts the query
 // out of the task template.
 func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
@@ -179,6 +187,10 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 	hiveJob := plugins.QuboleHiveJob{}
 	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &hiveJob)
 	if err != nil {
+		return "", "", []string{}, 0, err
+	}
+
+	if err := validateQuboleHiveJob(hiveJob); err != nil {
 		return "", "", []string{}, 0, err
 	}
 

@@ -2,6 +2,7 @@ package hive
 
 import (
 	"context"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
 	"net/url"
 	"testing"
 
@@ -75,6 +76,16 @@ func TestGetQueryInfo(t *testing.T) {
 	assert.Equal(t, "default", cluster)
 	assert.Equal(t, []string{"flyte_plugin_test"}, tags)
 	assert.Equal(t, 500, int(timeout))
+}
+
+func TestValidateQuboleHiveJob(t *testing.T) {
+	hiveJob := plugins.QuboleHiveJob{
+		ClusterLabel: "default",
+		Tags:         []string{"flyte_plugin_test"},
+		Query:        nil,
+	}
+	err := validateQuboleHiveJob(hiveJob)
+	assert.Error(t, err)
 }
 
 func TestConstructTaskLog(t *testing.T) {
