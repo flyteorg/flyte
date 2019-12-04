@@ -30,9 +30,12 @@ type ServerSecurityOptions struct {
 	// Note that CORS only applies to Admin's API endpoints. The health check endpoint for instance is unaffected.
 	// Please obviously evaluate security concerns before turning this on.
 	AllowCors bool `json:"allowCors"`
-	// TODO: Go through the gorilla library and resolve singular vs plural. It should be singular, but what else is the library doing?
+	// Defines origins which are allowed to make CORS requests. This list should _not_ contain "*", as that
+	// will make CORS header responses incompatible with the `withCredentials=true` setting.
 	AllowedOrigins []string `json:"allowedOrigins"`
-	// These are the Access-Control-Request-Headers that the server will respond to
+	// These are the Access-Control-Request-Headers that the server will respond to.
+	// By default, the server will allow Accept, Accept-Language, Content-Language, and Content-Type.
+	// User this setting to add any additional headers which are needed
 	AllowedHeaders []string `json:"allowedHeaders"`
 }
 
