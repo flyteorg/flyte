@@ -45,7 +45,7 @@ function run_flyte_examples()
     # Launch test
     kubectl -n flyte create -f $DIR/tests/endtoend.yaml
     # Wait at most five minutes for things to pass
-    /usr/bin/timeout 600 $DIR/test_monitor.sh
+    /usr/bin/timeout 800 $DIR/test_monitor.sh
     return $?
 }
 
