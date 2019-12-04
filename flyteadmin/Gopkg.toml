@@ -42,6 +42,10 @@
   version = "1.1.0"
 
 [[constraint]]
+  name = "github.com/gorilla/handlers"
+  version = "^1.4.0"
+
+[[constraint]]
   name = "github.com/grpc-ecosystem/grpc-gateway"
   version = "1.5.1"
 

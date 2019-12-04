@@ -5,6 +5,8 @@ import (
 	"crypto/tls"
 	"fmt"
 
+	"github.com/gorilla/handlers"
+
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/lyft/flyteadmin/pkg/auth"
@@ -35,6 +37,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
+
+var defaultCorsHeaders = []string{"Content-Type"}
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -142,30 +146,10 @@ func newHTTPServer(ctx context.Context, cfg *config.ServerConfig, authContext in
 
 		// This option translates HTTP authorization data (cookies) into a gRPC metadata field
 		gwmuxOptions = append(gwmuxOptions, runtime.WithMetadata(auth.GetHTTPRequestCookieToMetadataHandler(authContext)))
-
-		if cfg.Security.AllowCors {
-			// In addition to serving preflight requests below, the server also needs to send a CORS header for all requests,
-			// including simple requests like GET that do not trigger a preflight call.
-			gwmuxOptions = append(gwmuxOptions, runtime.WithForwardResponseOption(server.GetForwardResponseOptionHandler(
-				cfg.Security.AllowedOrigins)))
-		}
 	}
 
 	// Create the grpc-gateway server with the options specified
 	gwmux := runtime.NewServeMux(gwmuxOptions...)
-
-	// Enable CORS if necessary on the gateway mux by adding a handler for all OPTIONS requests.
-	if cfg.Security.AllowCors {
-		globPattern := server.GetGlobPattern()
-		decorator := auth.GetCorsDecorator(ctx, cfg.Security.AllowedOrigins, cfg.Security.AllowedHeaders)
-		// This uses the glob/noop pattern, and installs a co-opted version of the healthcheck function that knows how
-		// to serve options requests. Note that this is installed on the grpc-gateway ServeMux object. This means
-		// other endpoints like the auth endpoints (if-enabled) are not affected.
-		gwmux.Handle(http.MethodOptions, globPattern, func(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			decorator(http.HandlerFunc(healthCheckFunc)).ServeHTTP(w, r)
-		})
-	}
 
 	err := flyteService.RegisterAdminServiceHandlerFromEndpoint(ctx, gwmux, grpcAddress, grpcConnectionOpts)
 	if err != nil {
@@ -216,7 +200,20 @@ func serveGatewayInsecure(ctx context.Context, cfg *config.ServerConfig) error {
 	if err != nil {
 		return err
 	}
-	err = http.ListenAndServe(cfg.GetHostAddress(), httpServer)
+
+	var handler http.Handler
+	if cfg.Security.AllowCors {
+		handler = handlers.CORS(
+			handlers.AllowCredentials(),
+			handlers.AllowedHeaders(cfg.Security.AllowedHeaders),
+			handlers.AllowedOrigins(append(defaultCorsHeaders, cfg.Security.AllowedOrigins...)),
+			handlers.AllowedMethods([]string{"GET", "POST", "DELETE", "HEAD", "PUT", "PATCH"}),
+		)(httpServer)
+	} else {
+		handler = httpServer
+	}
+
+	err = http.ListenAndServe(cfg.GetHostAddress(), handler)
 	if err != nil {
 		return errors.Wrapf(err, "failed to Start HTTP Server")
 	}
