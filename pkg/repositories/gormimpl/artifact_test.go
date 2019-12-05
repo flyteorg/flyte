@@ -240,7 +240,7 @@ func TestListArtifactsWithPartition(t *testing.T) {
 	expectedPartitionResponse := getDBPartitionResponse(artifact)
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT "artifacts".* FROM "artifacts" JOIN partitions ON artifacts.artifact_id = partitions.artifact_id WHERE "artifacts"."deleted_at" IS NULL AND ((partitions.key1 = val1) AND (partitions.key2 = val2) AND (artifacts.dataset_uuid = test-uuid)) ORDER BY artifacts.created_at desc LIMIT 10 OFFSET 10`).WithReply(expectedArtifactResponse)
+		`SELECT "artifacts".* FROM "artifacts" JOIN partitions partitions0 ON artifacts.artifact_id = partitions0.artifact_id WHERE "artifacts"."deleted_at" IS NULL AND ((partitions0.key = val1) AND (partitions0.val = val2) AND (artifacts.dataset_uuid = test-uuid)) ORDER BY artifacts.created_at desc LIMIT 10 OFFSET 10`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123))))`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
@@ -248,12 +248,14 @@ func TestListArtifactsWithPartition(t *testing.T) {
 
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	listInput := models.ListModelsInput{
-		JoinEntityToConditionMap: map[common.Entity]models.ModelJoinCondition{
-			common.Partition: NewGormJoinCondition(common.Artifact, common.Partition),
-		},
-		Filters: []models.ModelValueFilter{
-			NewGormValueFilter(common.Partition, common.Equal, "key1", "val1"),
-			NewGormValueFilter(common.Partition, common.Equal, "key2", "val2"),
+		ModelFilters: []models.ModelFilter{
+			{Entity: common.Partition,
+				JoinCondition: NewGormJoinCondition(common.Artifact, common.Partition),
+				ValueFilters: []models.ModelValueFilter{
+					NewGormValueFilter(common.Equal, "key", "val1"),
+					NewGormValueFilter(common.Equal, "val", "val2"),
+				},
+			},
 		},
 		Offset:        10,
 		Limit:         10,

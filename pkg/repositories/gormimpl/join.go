@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	joinCondition = "JOIN %s ON %s"
-	joinEquals    = "%s.%s = %s.%s"
-	joinSeparator = " AND "
+	joinCondition = "JOIN %s %s ON %s" // Format for the join: JOIN <table name> <table alias> ON <columns to join>
+	joinEquals    = "%s.%s = %s.%s"    // Format for the columns to join: <tableAlias>.<column> = <tableAlias>.<column>
+	joinSeparator = " AND "            // Separator if there's more than one joining column
 )
 
 // JoinOnMap is a map of the properties for joining source table to joining table
@@ -36,7 +36,7 @@ type gormJoinConditionImpl struct {
 }
 
 // Get the GORM expression to JOIN two entities. The output should be a valid input into tx.Join()
-func (g *gormJoinConditionImpl) GetJoinOnDBQueryExpression(sourceTableName string, joiningTableName string) (string, error) {
+func (g *gormJoinConditionImpl) GetJoinOnDBQueryExpression(sourceTableName string, joiningTableName string, joiningTableAlias string) (string, error) {
 	joinOnFieldMap, err := g.getJoinOnFields()
 
 	if err != nil {
@@ -45,11 +45,11 @@ func (g *gormJoinConditionImpl) GetJoinOnDBQueryExpression(sourceTableName strin
 
 	joinFields := make([]string, 0, len(joinOnFieldMap))
 	for sourceField, joiningField := range joinOnFieldMap {
-		joinFieldCondition := fmt.Sprintf(joinEquals, sourceTableName, sourceField, joiningTableName, joiningField)
+		joinFieldCondition := fmt.Sprintf(joinEquals, sourceTableName, sourceField, joiningTableAlias, joiningField)
 		joinFields = append(joinFields, joinFieldCondition)
 	}
 
-	return fmt.Sprintf(joinCondition, joiningTableName, strings.Join(joinFields, joinSeparator)), nil
+	return fmt.Sprintf(joinCondition, joiningTableName, joiningTableAlias, strings.Join(joinFields, joinSeparator)), nil
 }
 
 // Get the properties necessary to join two GORM models
