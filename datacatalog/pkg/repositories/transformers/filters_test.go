@@ -10,16 +10,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func assertJoinExpression(t *testing.T, listInput models.ListModelsInput, joiningEntity common.Entity, sourceTableName string, joiningTableName string, expectedJoinStatement string) {
-	joinCondition, ok := listInput.JoinEntityToConditionMap[joiningEntity]
-	assert.True(t, ok)
-	expr, err := joinCondition.GetJoinOnDBQueryExpression(sourceTableName, joiningTableName)
+func assertJoinExpression(t *testing.T, joinCondition models.ModelJoinCondition, sourceTableName string, joiningTableName string, joiningTableAlias string, expectedJoinStatement string) {
+	expr, err := joinCondition.GetJoinOnDBQueryExpression(sourceTableName, joiningTableName, joiningTableAlias)
 	assert.NoError(t, err)
 	assert.Equal(t, expr, expectedJoinStatement)
 }
 
-func assertFilterExpression(t *testing.T, filter models.ModelValueFilter, expectedEntity common.Entity, tableName string, expectedStatement string, expectedArgs interface{}) {
-	assert.Equal(t, filter.GetDBEntity(), expectedEntity)
+func assertFilterExpression(t *testing.T, filter models.ModelValueFilter, tableName string, expectedStatement string, expectedArgs interface{}) {
 	expr, err := filter.GetDBQueryExpression(tableName)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedStatement, expr.Query)
@@ -61,20 +58,27 @@ func TestListInputWithPartitionsAndTags(t *testing.T) {
 	listInput, err := FilterToListInput(context.Background(), common.Artifact, filter)
 	assert.NoError(t, err)
 
-	// Should have 5 filters: 2 for each partition filter, 1 for tag filter
-	assert.Len(t, listInput.Filters, 5)
+	// Should have 3 filters: 2 for partitions, 1 for tag
+	assert.Len(t, listInput.ModelFilters, 3)
 
-	assertFilterExpression(t, listInput.Filters[0], common.Partition, "partitions", "partitions.key = ?", "key1")
-	assertFilterExpression(t, listInput.Filters[1], common.Partition, "partitions", "partitions.value = ?", "val1")
-	assertFilterExpression(t, listInput.Filters[2], common.Partition, "partitions", "partitions.key = ?", "key2")
-	assertFilterExpression(t, listInput.Filters[3], common.Partition, "partitions", "partitions.value = ?", "val2")
-	assertFilterExpression(t, listInput.Filters[4], common.Tag, "tags", "tags.tag_name = ?", "special")
+	assertFilterExpression(t, listInput.ModelFilters[0].ValueFilters[0], "partitions",
+		"partitions.key = ?", "key1")
+	assertFilterExpression(t, listInput.ModelFilters[0].ValueFilters[1], "partitions",
+		"partitions.value = ?", "val1")
+	assertJoinExpression(t, listInput.ModelFilters[0].JoinCondition, "artifacts", "partitions",
+		"p1", "JOIN partitions p1 ON artifacts.artifact_id = p1.artifact_id")
 
-	// even though there are 5 filters, we only need 2 joins on Partition and Tag
-	assert.Len(t, listInput.JoinEntityToConditionMap, 2)
+	assertFilterExpression(t, listInput.ModelFilters[1].ValueFilters[0], "partitions",
+		"partitions.key = ?", "key2")
+	assertFilterExpression(t, listInput.ModelFilters[1].ValueFilters[1], "partitions",
+		"partitions.value = ?", "val2")
+	assertJoinExpression(t, listInput.ModelFilters[1].JoinCondition, "artifacts", "partitions",
+		"p2", "JOIN partitions p2 ON artifacts.artifact_id = p2.artifact_id")
 
-	assertJoinExpression(t, listInput, common.Partition, "artifacts", "partitions", "JOIN partitions ON artifacts.artifact_id = partitions.artifact_id")
-	assertJoinExpression(t, listInput, common.Tag, "artifacts", "tags", "JOIN tags ON artifacts.artifact_id = tags.artifact_id")
+	assertFilterExpression(t, listInput.ModelFilters[2].ValueFilters[0], "tags",
+		"tags.tag_name = ?", "special")
+	assertJoinExpression(t, listInput.ModelFilters[2].JoinCondition, "artifacts", "tags",
+		"t1", "JOIN tags t1 ON artifacts.artifact_id = t1.artifact_id")
 
 }
 

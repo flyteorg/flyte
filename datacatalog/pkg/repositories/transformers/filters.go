@@ -23,38 +23,24 @@ var comparisonOperatorMap = map[datacatalog.SinglePropertyFilter_ComparisonOpera
 }
 
 func FilterToListInput(ctx context.Context, sourceEntity common.Entity, filterExpression *datacatalog.FilterExpression) (models.ListModelsInput, error) {
-	// ListInput is composed of ModelFilters and ModelJoins. Let's construct those filters and joins.
-	modelFilters := make([]models.ModelValueFilter, 0, len(filterExpression.GetFilters()))
-	joinModelMap := make(map[common.Entity]models.ModelJoinCondition)
+	// ListInput is composed of filters and joins for multiple entities, lets construct that
+	modelFilters := make([]models.ModelFilter, 0, len(filterExpression.GetFilters()))
 
-	// First construct the model filters
+	// Construct the ModelFilter for each PropertyFilter
 	for _, filter := range filterExpression.GetFilters() {
-		modelPropertyFilters, err := constructModelValueFilters(ctx, filter)
+		modelFilter, err := constructModelFilter(ctx, filter, sourceEntity)
 		if err != nil {
 			return models.ListModelsInput{}, err
 		}
-
-		modelFilters = append(modelFilters, modelPropertyFilters...)
+		modelFilters = append(modelFilters, modelFilter)
 	}
 
-	// Then add necessary joins if there are filters that are not the source entity
-	for _, modelFilter := range modelFilters {
-		joinEntity := modelFilter.GetDBEntity()
-		if _, exists := joinModelMap[joinEntity]; !exists && sourceEntity != joinEntity {
-			joinModelMap[joinEntity] = gormimpl.NewGormJoinCondition(sourceEntity, joinEntity)
-		}
-
-	}
-
-	// Need to add limit/offset/Sort
 	return models.ListModelsInput{
-		Filters:                  modelFilters,
-		JoinEntityToConditionMap: joinModelMap,
+		ModelFilters: modelFilters,
 	}, nil
 }
 
-func constructModelValueFilters(ctx context.Context, singleFilter *datacatalog.SinglePropertyFilter) ([]models.ModelValueFilter, error) {
-	modelValueFilters := make([]models.ModelValueFilter, 0, 1)
+func constructModelFilter(ctx context.Context, singleFilter *datacatalog.SinglePropertyFilter, sourceEntity common.Entity) (models.ModelFilter, error) {
 	operator := comparisonOperatorMap[singleFilter.Operator]
 
 	switch propertyFilter := singleFilter.GetPropertyFilter().(type) {
@@ -68,14 +54,20 @@ func constructModelValueFilters(ctx context.Context, singleFilter *datacatalog.S
 
 			logger.Debugf(ctx, "Constructing partition key:[%v], val:[%v] filter", key, value)
 			if err := validators.ValidateEmptyStringField(key, "PartitionKey"); err != nil {
-				return nil, err
+				return models.ModelFilter{}, err
 			}
 			if err := validators.ValidateEmptyStringField(value, "PartitionValue"); err != nil {
-				return nil, err
+				return models.ModelFilter{}, err
 			}
-			partitionKeyFilter := gormimpl.NewGormValueFilter(common.Partition, operator, partitionKeyFieldName, key)
-			partitionValueFilter := gormimpl.NewGormValueFilter(common.Partition, operator, partitionValueFieldName, value)
-			modelValueFilters = append(modelValueFilters, partitionKeyFilter, partitionValueFilter)
+			partitionKeyFilter := gormimpl.NewGormValueFilter(operator, partitionKeyFieldName, key)
+			partitionValueFilter := gormimpl.NewGormValueFilter(operator, partitionValueFieldName, value)
+			modelValueFilters := []models.ModelValueFilter{partitionKeyFilter, partitionValueFilter}
+
+			return models.ModelFilter{
+				Entity:        common.Partition,
+				ValueFilters:  modelValueFilters,
+				JoinCondition: gormimpl.NewGormJoinCondition(sourceEntity, common.Partition),
+			}, nil
 		}
 	case *datacatalog.SinglePropertyFilter_TagFilter:
 		switch tagProperty := propertyFilter.TagFilter.GetProperty().(type) {
@@ -83,11 +75,17 @@ func constructModelValueFilters(ctx context.Context, singleFilter *datacatalog.S
 			tagName := tagProperty.TagName
 			logger.Debugf(ctx, "Constructing Tag filter name:[%v]", tagName)
 			if err := validators.ValidateEmptyStringField(tagProperty.TagName, "TagName"); err != nil {
-				return nil, err
+				return models.ModelFilter{}, err
 			}
-			tagNameFilter := gormimpl.NewGormValueFilter(common.Tag, operator, tagNameFieldName, tagName)
-			modelValueFilters = append(modelValueFilters, tagNameFilter)
+			tagNameFilter := gormimpl.NewGormValueFilter(operator, tagNameFieldName, tagName)
+			modelValueFilters := []models.ModelValueFilter{tagNameFilter}
+
+			return models.ModelFilter{
+				Entity:        common.Tag,
+				ValueFilters:  modelValueFilters,
+				JoinCondition: gormimpl.NewGormJoinCondition(sourceEntity, common.Tag),
+			}, nil
 		}
 	}
-	return modelValueFilters, nil
+	return models.ModelFilter{}, nil
 }

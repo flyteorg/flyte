@@ -1,10 +1,16 @@
 package gormimpl
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 	"github.com/lyft/datacatalog/pkg/common"
 	"github.com/lyft/datacatalog/pkg/repositories/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
+)
+
+const (
+	tableAliasFormat = "%s%d" // Table Alias is the "<table name><index>"
 )
 
 var entityToModel = map[common.Entity]interface{}{
@@ -23,35 +29,34 @@ func applyListModelsInput(tx *gorm.DB, sourceEntity common.Entity, in models.Lis
 	}
 
 	sourceTableName := tx.NewScope(sourceModel).TableName()
-	for joiningEntity, joinCondition := range in.JoinEntityToConditionMap {
-		joiningModel, ok := entityToModel[joiningEntity]
+	for modelIndex, modelFilter := range in.ModelFilters {
+		entity := modelFilter.Entity
+		filterModel, ok := entityToModel[entity]
 		if !ok {
-			return nil, errors.GetInvalidEntityError(joiningEntity)
+			return nil, errors.GetInvalidEntityError(entity)
+		}
+		tableName := tx.NewScope(filterModel).TableName()
+		tableAlias := tableName
+
+		// Optionally add the join condition if this filter has one
+		if joinCondition := modelFilter.JoinCondition; joinCondition != nil {
+			// if there is a join associated with the filter, we should use an alias
+			tableAlias = fmt.Sprintf(tableAliasFormat, tableName, modelIndex)
+			joinExpression, err := joinCondition.GetJoinOnDBQueryExpression(sourceTableName, tableName, tableAlias)
+			if err != nil {
+				return nil, err
+			}
+			tx = tx.Joins(joinExpression)
 		}
 
-		joiningTableName := tx.NewScope(joiningModel).TableName()
-		joinExpression, err := joinCondition.GetJoinOnDBQueryExpression(sourceTableName, joiningTableName)
-		if err != nil {
-			return nil, err
+		for _, whereFilter := range modelFilter.ValueFilters {
+			dbQueryExpr, err := whereFilter.GetDBQueryExpression(tableAlias)
+
+			if err != nil {
+				return nil, err
+			}
+			tx = tx.Where(dbQueryExpr.Query, dbQueryExpr.Args)
 		}
-		tx = tx.Joins(joinExpression)
-	}
-
-	for _, whereFilter := range in.Filters {
-		filterEntity := whereFilter.GetDBEntity()
-		filterModel, ok := entityToModel[filterEntity]
-		if !ok {
-			return nil, errors.GetInvalidEntityError(filterEntity)
-		}
-
-		entityTableName := tx.NewScope(filterModel).TableName()
-
-		dbQueryExpr, err := whereFilter.GetDBQueryExpression(entityTableName)
-
-		if err != nil {
-			return nil, err
-		}
-		tx = tx.Where(dbQueryExpr.Query, dbQueryExpr.Args)
 	}
 
 	tx = tx.Limit(in.Limit)

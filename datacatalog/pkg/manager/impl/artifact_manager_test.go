@@ -532,15 +532,13 @@ func TestListArtifact(t *testing.T) {
 					dataset.Version == expectedDataset.Id.Version
 			}),
 			mock.MatchedBy(func(listInput models.ListModelsInput) bool {
-				return len(listInput.Filters) == 5 &&
-					len(listInput.JoinEntityToConditionMap) == 2 &&
-					listInput.Filters[0].GetDBEntity() == common.Partition &&
-					listInput.Filters[1].GetDBEntity() == common.Partition &&
-					listInput.Filters[2].GetDBEntity() == common.Partition &&
-					listInput.Filters[3].GetDBEntity() == common.Partition &&
-					listInput.Filters[4].GetDBEntity() == common.Tag &&
-					listInput.JoinEntityToConditionMap[common.Partition] != nil &&
-					listInput.JoinEntityToConditionMap[common.Tag] != nil &&
+				return len(listInput.ModelFilters) == 3 &&
+					listInput.ModelFilters[0].Entity == common.Partition &&
+					len(listInput.ModelFilters[0].ValueFilters) == 2 &&
+					listInput.ModelFilters[1].Entity == common.Partition &&
+					len(listInput.ModelFilters[1].ValueFilters) == 2 &&
+					listInput.ModelFilters[2].Entity == common.Tag &&
+					len(listInput.ModelFilters[2].ValueFilters) == 1 &&
 					listInput.Limit == 50 &&
 					listInput.Offset == 0
 			})).Return(mockArtifacts, nil)
@@ -574,8 +572,7 @@ func TestListArtifact(t *testing.T) {
 					dataset.Version == expectedDataset.Id.Version
 			}),
 			mock.MatchedBy(func(listInput models.ListModelsInput) bool {
-				return len(listInput.Filters) == 0 &&
-					len(listInput.JoinEntityToConditionMap) == 0
+				return len(listInput.ModelFilters) == 0
 			})).Return(mockArtifacts, nil)
 
 		artifactResponse, err := artifactManager.ListArtifacts(ctx, datacatalog.ListArtifactsRequest{Dataset: expectedDataset.Id, Filter: filter})

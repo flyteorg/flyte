@@ -14,14 +14,9 @@ const (
 )
 
 type gormValueFilterImpl struct {
-	entity             common.Entity
 	comparisonOperator common.ComparisonOperator
 	field              string
 	value              interface{}
-}
-
-func (g *gormValueFilterImpl) GetDBEntity() common.Entity {
-	return g.entity
 }
 
 // Get the GORM expression to filter by a model's property. The output should be a valid input into tx.Where()
@@ -37,9 +32,8 @@ func (g *gormValueFilterImpl) GetDBQueryExpression(tableName string) (models.DBQ
 }
 
 // Construct the container necessary to issue a db query to filter in GORM
-func NewGormValueFilter(entity common.Entity, comparisonOperator common.ComparisonOperator, field string, value interface{}) models.ModelValueFilter {
+func NewGormValueFilter(comparisonOperator common.ComparisonOperator, field string, value interface{}) models.ModelValueFilter {
 	return &gormValueFilterImpl{
-		entity:             entity,
 		comparisonOperator: comparisonOperator,
 		field:              field,
 		value:              value,
