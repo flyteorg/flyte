@@ -80,6 +80,7 @@ anaconda-mode/
 *.so
 *.dylib
 vendor/
+bin/
 
 # Test binary, build with 'go test -c'
 *.test

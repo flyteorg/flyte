@@ -1,10 +1,9 @@
 before:
   hooks:
-    - dep ensure -vendor-only
+    - go mod download
 builds:
   - env:
       - CGO_ENABLED=0
-      - GO111MODULE=off
     main: ./cli/pflags/main.go
     binary: pflags
     goos:
