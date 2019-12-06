@@ -8,6 +8,7 @@ import {
     RequestConfig
 } from 'models/AdminEntity';
 
+import { log } from 'common/log';
 import { transformRequestError } from 'models/AdminEntity/transformRequestError';
 import { defaultAxiosConfig, identifierPrefixes } from './constants';
 import {
@@ -106,6 +107,11 @@ export const listNamedEntities = (
     );
 };
 
+/** Fetches the current user profile. NOTE: This will *not* fail in cases
+ * where the user is not logged in or the session is expired. Admin does not
+ * distinguish between these cases, so the profile will be `null` in both cases.
+ * A value of `null` indicates that a redirect to the login endpoint is needed.
+ */
 export const getUserProfile = async () => {
     const path = getProfileUrl();
     try {
@@ -113,7 +119,7 @@ export const getUserProfile = async () => {
         return data;
     } catch (e) {
         const { message } = transformRequestError(e, path);
-        console.error(`Failed to fetch user profile: ${message}`);
+        log.error(`Failed to fetch user profile: ${message}`);
         return null;
     }
 };

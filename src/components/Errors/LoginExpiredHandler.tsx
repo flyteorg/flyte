@@ -13,6 +13,9 @@ import * as React from 'react';
 const title = 'Your login session has expired';
 const description = 'Please re-authenticate to continue.';
 
+/** Detects expired login state via context and displays a Dialog directing
+ * the user to re-authenticate.
+ */
 export const LoginExpiredHandler: React.FC = () => {
     const { loginStatus } = useAPIContext();
     return (

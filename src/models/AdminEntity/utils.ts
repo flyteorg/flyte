@@ -23,6 +23,9 @@ export function adminApiUrl(url: string) {
     return createLocalURL(`/api/v1${finalUrl}`);
 }
 
+/** Constructs a url for redirecting to the Admin login endpoint and returning
+ * to the current location after completing the flow.
+ */
 export function getLoginUrl(redirectUrl: string = window.location.href) {
     const baseUrl = env.ADMIN_API_URL
         ? `${env.ADMIN_API_URL}${loginEndpoint}`
@@ -30,6 +33,7 @@ export function getLoginUrl(redirectUrl: string = window.location.href) {
     return `${baseUrl}?${redirectParam}=${redirectUrl}`;
 }
 
+/** Constructs a URL for fetching the current user profile. */
 export function getProfileUrl() {
     if (env.ADMIN_API_URL) {
         return `${env.ADMIN_API_URL}${profileEndpoint}`;

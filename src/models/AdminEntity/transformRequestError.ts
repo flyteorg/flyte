@@ -1,6 +1,7 @@
 import { AxiosError } from 'axios';
 import { NotAuthorizedError, NotFoundError } from 'errors/fetchErrors';
 
+/** Detects special cases for errors returned from Axios and lets others pass through. */
 export function transformRequestError(e: Error, path: string) {
     const error = e as AxiosError;
     if (!error.response) {

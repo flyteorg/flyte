@@ -42,7 +42,7 @@ export const APIContext = React.createContext<APIContextValue>(
     defaultAPIContextValue
 );
 
-export function useLoginStatus(): LoginStatus {
+function useLoginStatus(): LoginStatus {
     const [expired, setExpired] = React.useState(false);
     return {
         expired,
@@ -50,6 +50,7 @@ export function useLoginStatus(): LoginStatus {
     };
 }
 
+/** Creates a state object that can be used as the value for APIContext.Provider */
 export function useAPIState(): APIContextValue {
     return {
         ...defaultAPIContextValue,
@@ -57,6 +58,7 @@ export function useAPIState(): APIContextValue {
     };
 }
 
+/** Convenience hook for consuming the `APIContext` */
 export function useAPIContext() {
     return React.useContext(APIContext);
 }

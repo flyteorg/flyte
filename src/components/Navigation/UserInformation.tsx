@@ -17,6 +17,7 @@ const LoginLink: React.FC = () => (
     </Link>
 );
 
+/** Displays user info if logged in, or a login link otherwise. */
 export const UserInformation: React.FC<{}> = () => {
     const profile = useUserProfile();
     return (
