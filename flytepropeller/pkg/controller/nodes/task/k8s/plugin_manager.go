@@ -3,6 +3,10 @@ package k8s
 import (
 	"context"
 	"fmt"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	"math"
+	"regexp"
 	"strings"
 	"time"
 
@@ -96,8 +100,8 @@ type PluginManager struct {
 	resourceToWatch runtime.Object
 	kubeClient      pluginsCore.KubeClient
 	metrics         PluginMetrics
-	backoffHandlers map[string]BackOffHandler
-
+	// Per namespace-resource
+	backoffHandlers map[string]*ResourceAwareBackOffHandler
 }
 
 func (e *PluginManager) GetProperties() pluginsCore.PluginProperties {
@@ -108,35 +112,35 @@ func (e *PluginManager) GetID() string {
 	return e.id
 }
 
-const backOffMultiplier = 2
-const minBackoffTime = time.Second * 30
-const maxBackoffTime = time.Minute * 10
+type BackOffConstraintComparator func(int, int) bool
 
-type BackOffHandler struct {
-	multiplier       int
-	waitDuration     time.Duration // redundant, can be deduced from multiplier
+const backOffBase = time.Second * 2 // b in b^n
+const minBackoffTime = time.Second * 0
+const maxBackoffTime = time.Minute * 10 // the max time is 10 minutes
+
+type SimpleBackOffHandler struct {
+	backOffExponent  int
 	nextEligibleTime time.Time
 }
 
 // act based on current backoff interval and set the next one accordingly
-func (b *BackOffHandler) handle(operation func() error) error {
-
+func (b *SimpleBackOffHandler) handle(operation func() error) error {
 	// check if current backoff interval has elapsed
-	if b.nextEligibleTime.Before(time.Now()) {
+	now := time.Now()
+	if b.nextEligibleTime.Before(now) {
 		err := operation() // execute request
 		if err == nil {
-			b.multiplier = backOffMultiplier
+			b.backOffExponent = 0
 			b.nextEligibleTime = time.Now()
-			b.waitDuration = minBackoffTime
 			return nil
 		} else {
-			b.waitDuration = b.waitDuration * time.Duration(b.multiplier)
-
-			if b.waitDuration > maxBackoffTime {
-				b.waitDuration = maxBackoffTime
+			backOffDuration := time.Duration(math.Pow(float64(backOffBase), float64(b.backOffExponent)))
+			if backOffDuration > maxBackoffTime {
+				backOffDuration = maxBackoffTime
 			}
-			b.nextEligibleTime = time.Now().Add(b.waitDuration)
-			b.multiplier = b.multiplier * backOffMultiplier
+
+			b.nextEligibleTime = time.Now().Add(backOffDuration)
+			b.backOffExponent += 1
 
 			// TODO ssingh move this error to some better place
 			return errors.Wrapf("BackOff", err, "failed to do something")
@@ -146,6 +150,130 @@ func (b *BackOffHandler) handle(operation func() error) error {
 	return errors.Errorf("BackOff", "need to wait more")
 }
 
+func (b *SimpleBackOffHandler) isEligible() bool {
+	return b.nextEligibleTime.Before(time.Now())
+}
+
+func (b *SimpleBackOffHandler) reset() {
+	b.backOffExponent = 0
+	b.nextEligibleTime = time.Now()
+}
+
+type ResourceCeilings struct {
+	resourceCeilings v1.ResourceList
+}
+
+func (r *ResourceCeilings) isEligible(requestedResourceList v1.ResourceList) bool {
+	eligibility := true
+	for reqResource, reqQuantity := range requestedResourceList {
+		eligibility = eligibility && (reqQuantity.Cmp(r.resourceCeilings[reqResource]) == -1)
+	}
+	return eligibility
+}
+
+func (r *ResourceCeilings) update(reqResource v1.ResourceName, reqQuantity resource.Quantity) {
+	if currentCeiling, ok := r.resourceCeilings[reqResource]; !ok || reqQuantity.Cmp(currentCeiling) == -1 {
+		r.resourceCeilings[reqResource] = reqQuantity
+	}
+}
+
+func (r *ResourceCeilings) updateAll(resources v1.ResourceList) {
+	for reqResource, reqQuantity := range resources {
+		r.update(reqResource, reqQuantity)
+	}
+}
+
+func (r *ResourceCeilings) reset(resource v1.ResourceName) {
+	r.resourceCeilings[resource] = r.inf()
+}
+
+func (r *ResourceCeilings) resetAll() {
+	for resource := range r.resourceCeilings {
+		r.reset(resource)
+	}
+}
+
+func (r *ResourceCeilings) inf() resource.Quantity {
+	// A hack to represent RESOURCE_MAX
+	return resource.MustParse("1Ei")
+}
+
+type ResourceAwareBackOffHandler struct {
+	SimpleBackOffHandler
+	ResourceCeilings
+}
+
+// Act based on current backoff interval and set the next one accordingly
+func (h *ResourceAwareBackOffHandler) handle(ctx context.Context, operation func() error, requestedResourceList v1.ResourceList) error {
+
+	if h.ResourceCeilings.isEligible(requestedResourceList) {
+		// if the requested resource is lower than what we previously blocked,
+		// we let this request go ahead and try it
+
+		err := operation()
+		if err == nil {
+			// Succeeded: reset the resource ceiling, and reset the backoff
+			logger.Infof(ctx, "Operation with a smaller resource request succeeded\n")
+			h.ResourceCeilings.resetAll()
+			h.SimpleBackOffHandler.reset()
+			return nil
+		} else if err != nil {
+			if IsResourceQuotaExceeded(err) {
+				logger.Errorf(ctx, "Failed to run the operation due to insufficient resource: [%v]\n", err)
+				h.ResourceCeilings.updateAll(requestedResourceList)
+			} else {
+				logger.Errorf(ctx, "Failed to run the operation: [%v]\n", err)
+			}
+			return err
+		}
+	} else {
+		// If the requested resource quantity exceed the ceiling, we will let the backoff take care of the exec
+		err := h.SimpleBackOffHandler.handle(operation)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to run the operation because of backoff: [%v]\n", err)
+			return err
+		}
+	}
+	return nil
+	// return errors.Errorf("BackOff", "need to wait more")
+}
+
+func IsResourceQuotaExceeded(err error) bool {
+	return k8serrors.IsForbidden(err) && strings.Contains(err.Error(), "exceeded quota")
+}
+
+func GetResourceAndQuantityRequested(err error) v1.ResourceList {
+	// re := regexp.MustCompile(`(?P<part>(?P<key>requested|used|limited): limits.(?P<resource_type>[a-zA-Z]+)=(?P<quantity_expr>[a-zA-Z0-9]+))`)
+	// Playground: https://play.golang.org/p/oOr6CMmW7IE
+	re := regexp.MustCompile(`(?P<key>requested): limits.(?P<resource_type>[a-zA-Z]+)=(?P<quantity_expr>[a-zA-Z0-9]+)`)
+	matches := re.FindAllStringSubmatch(err.Error(), -1)
+
+	// re := regexp.MustCompile(`(?P<part>(?P<key>requested): limits.(?P<resource_type>[a-zA-Z]+)=(?P<quantity_expr>[a-zA-Z0-9]+))`)
+	// matches := re.FindAllStringSubmatch(err.Error(), -1)
+
+	var temp []map[string]string
+
+	for i, mat := range matches {
+		temp[i] = make(map[string]string)
+		for j, name := range re.SubexpNames() {
+			if j != 0 && name != "" {
+				temp[i][name] = mat[j]
+			}
+		}
+	}
+
+	var requestedResources v1.ResourceList
+	for _, part := range temp {
+		if part["key"] != "requested" {
+			continue
+		}
+		resourceName := v1.ResourceName(part["resource_type"])
+		resourceQuantity := resource.MustParse(part["quantity_expr"])
+		requestedResources[resourceName] = resourceQuantity
+	}
+
+	return requestedResources
+}
 
 // TODO ssingh: clean it and move to its right place
 func IsBackoffError(err error) bool {
@@ -157,13 +285,22 @@ func IsBackoffError(err error) bool {
 	return false
 }
 
-func (e *PluginManager) getBackOffHandler(key string) BackOffHandler {
+func (e *PluginManager) getBackOffHandler(key string) *ResourceAwareBackOffHandler {
 	if handler, found := e.backoffHandlers[key]; found {
 		return handler
 	}
 
 	// TODO ssingh: make it threadsafe
-	e.backoffHandlers[key] = BackOffHandler{multiplier: backOffMultiplier, nextEligibleTime: time.Now(), waitDuration: minBackoffTime}
+	e.backoffHandlers[key] = &ResourceAwareBackOffHandler{
+		SimpleBackOffHandler: SimpleBackOffHandler{
+			backOffExponent:  0,
+			nextEligibleTime: time.Now(),
+		},
+		// TODO changhong: initialize this field with proper value
+		ResourceCeilings: ResourceCeilings{
+			resourceCeilings: v1.ResourceList{},
+		},
+	}
 	return e.backoffHandlers[key]
 }
 
@@ -177,33 +314,33 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 	AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GroupVersionKind(), o.GetNamespace(), o.GetName())
 
-	var nonRetryableError error
 	key := fmt.Sprintf("%v,%v", o.GroupVersionKind().String(), o.GetNamespace())
-	err = e.getBackOffHandler(key).handle(func() error {
-		err1 := e.kubeClient.GetClient().Create(ctx, o)
-		if err1 == nil {
-			return nil
-		}
 
-		// retryable with backoff error
-		if k8serrors.IsForbidden(err1) && strings.Contains(err1.Error(), "exceeded quota") {
-			return err1
-		}
-
-		nonRetryableError = err1
-		return nil
-	})
-	if err == nil {
-		err = nonRetryableError
+	pod, casted := o.(*v1.Pod)
+	if !casted || pod.Spec.Containers == nil {
+		// return a proper error here
 	}
 
-	
+	var podRequestedResources v1.ResourceList
+
+	// Collect the resource requests from all the containers in the pod whose creation is to be attempted
+	// to decide whether we can the pod during the back off period
+	for _, container := range pod.Spec.Containers {
+		for k, v := range container.Resources.Limits {
+			podRequestedResources[k].Add(v)
+		}
+	}
+
+	err = e.getBackOffHandler(key).handle(ctx, func() error {
+		return e.kubeClient.GetClient().Create(ctx, o)
+	}, podRequestedResources)
+
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		if IsBackoffError(err) {
 			// TODO: Quota errors are retried forever, it would be good to have support for backoff strategy.
 			logger.Warnf(ctx, "Failed to launch job, resource quota exceeded. err: %v", err)
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(time.Now(), pluginsCore.DefaultPhaseVersion, "failed to launch job, resource quota exceeded.")), nil
-		} else if k8serrors.IsForbidden(err){
+		} else if k8serrors.IsForbidden(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
 		} else if k8serrors.IsBadRequest(err) || k8serrors.IsInvalid(err) {
 			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
