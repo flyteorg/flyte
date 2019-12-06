@@ -13,14 +13,25 @@ type APIFunctions = typeof CommonAPI &
     typeof TaskAPI &
     typeof WorkflowAPI;
 
-export interface APIContextValue extends APIFunctions {}
+export interface LoginStatus {
+    expired: boolean;
+    setExpired(expired: boolean): void;
+}
+export interface APIContextValue extends APIFunctions {
+    loginStatus: LoginStatus;
+}
+
 export const defaultAPIContextValue = {
     ...CommonAPI,
     ...ExecutionAPI,
     ...LaunchAPI,
     ...ProjectAPI,
     ...TaskAPI,
-    ...WorkflowAPI
+    ...WorkflowAPI,
+    loginStatus: {
+        expired: false,
+        setExpired: () => {}
+    }
 };
 
 /** Exposes all of the model layer api functions for use by data fetching
@@ -30,6 +41,21 @@ export const defaultAPIContextValue = {
 export const APIContext = React.createContext<APIContextValue>(
     defaultAPIContextValue
 );
+
+export function useLoginStatus(): LoginStatus {
+    const [expired, setExpired] = React.useState(false);
+    return {
+        expired,
+        setExpired
+    };
+}
+
+export function useAPIState(): APIContextValue {
+    return {
+        ...defaultAPIContextValue,
+        loginStatus: useLoginStatus()
+    };
+}
 
 export function useAPIContext() {
     return React.useContext(APIContext);

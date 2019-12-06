@@ -1,7 +1,7 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import { NotFoundError } from 'errors';
+import axios, { AxiosRequestConfig } from 'axios';
 
 import { generateAdminApiQuery } from './AdminApiQuery';
+import { transformRequestError } from './transformRequestError';
 import {
     AdminEntityTransformer,
     DecodableType,
@@ -47,18 +47,12 @@ async function request(
         withCredentials: true
     };
 
-    const { data } = await axios.request(finalOptions);
-    return data;
-}
-
-function transformRequestError(e: Error, path: string) {
-    // For a NotFound response, we'll throw a special error to allow
-    // client code and components to handle separately
-    const error = e as AxiosError;
-    if (error.response && error.response.status === 404) {
-        return new NotFoundError(path);
+    try {
+        const { data } = await axios.request(finalOptions);
+        return data;
+    } catch (e) {
+        throw transformRequestError(e, endpoint);
     }
-    return e;
 }
 
 /** A generic getter function for fetching protobuf data from a given URL.
@@ -104,14 +98,10 @@ export async function getAdminEntity<ResponseType, TransformedType>(
     }: GetEntityParams<ResponseType, TransformedType>,
     config?: RequestConfig
 ): Promise<TransformedType> {
-    try {
-        const data: ArrayBuffer = await request('get', path, config);
-        const decoded = decodeProtoResponse(data, messageType);
-        logProtoResponse(path, decoded);
-        return transform(decoded) as TransformedType;
-    } catch (e) {
-        throw transformRequestError(e, path);
-    }
+    const data: ArrayBuffer = await request('get', path, config);
+    const decoded = decodeProtoResponse(data, messageType);
+    logProtoResponse(path, decoded);
+    return transform(decoded) as TransformedType;
 }
 
 export interface PostEntityParams<RequestType, ResponseType, TransformedType> {
@@ -141,18 +131,10 @@ export async function postAdminEntity<
     }: PostEntityParams<RequestType, ResponseType, TransformedType>,
     config?: RequestConfig
 ): Promise<TransformedType> {
-    try {
-        const body = encodeProtoPayload(data, requestMessageType);
-        const finalConfig = { ...config, data: body };
-        const responseData: ArrayBuffer = await request(
-            method,
-            path,
-            finalConfig
-        );
-        const decoded = decodeProtoResponse(responseData, responseMessageType);
-        logProtoResponse(path, decoded);
-        return transform(decoded) as TransformedType;
-    } catch (e) {
-        throw transformRequestError(e, path);
-    }
+    const body = encodeProtoPayload(data, requestMessageType);
+    const finalConfig = { ...config, data: body };
+    const responseData: ArrayBuffer = await request(method, path, finalConfig);
+    const decoded = decodeProtoResponse(responseData, responseMessageType);
+    logProtoResponse(path, decoded);
+    return transform(decoded) as TransformedType;
 }

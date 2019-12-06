@@ -1,9 +1,9 @@
 import Link from '@material-ui/core/Link';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { WaitForData } from 'components/common';
+import { useUserProfile } from 'components/hooks/useUserProfile';
 import { getLoginUrl } from 'models';
 import * as React from 'react';
-import { useUserProfile } from './useUserProfile';
 
 const useStyles = makeStyles((theme: Theme) => ({
     container: {

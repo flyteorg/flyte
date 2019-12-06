@@ -5,6 +5,7 @@ module.exports = {
         }
     },
     verbose: false,
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'node'],
     modulePaths: ['<rootDir>/src'],
     roots: ['<rootDir>/src'],
     testPathIgnorePatterns: [

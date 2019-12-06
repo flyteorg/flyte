@@ -1,16 +1,11 @@
 import { useFetchableData } from 'components/hooks';
-import { UserProfile } from 'models';
-
-// TODO
-async function fetchUserProfile() {
-    return Promise.resolve(null);
-}
+import { getUserProfile, UserProfile } from 'models';
 
 export function useUserProfile() {
     return useFetchableData<UserProfile | null>({
         debugName: 'UserProfile',
         defaultValue: null,
-        doFetch: fetchUserProfile,
+        doFetch: getUserProfile,
         useCache: true
     });
 }

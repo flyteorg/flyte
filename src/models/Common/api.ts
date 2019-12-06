@@ -1,17 +1,21 @@
+import axios from 'axios';
 import { Admin, Core } from 'flyteidl';
 import {
     defaultPaginationConfig,
     getAdminEntity,
+    getProfileUrl,
     PaginatedEntityResponse,
     RequestConfig
 } from 'models/AdminEntity';
 
-import { identifierPrefixes } from './constants';
+import { transformRequestError } from 'models/AdminEntity/transformRequestError';
+import { defaultAxiosConfig, identifierPrefixes } from './constants';
 import {
     IdentifierScope,
     NamedEntity,
     NamedEntityIdentifier,
-    ResourceType
+    ResourceType,
+    UserProfile
 } from './types';
 import { makeIdentifierPath, makeNamedEntityPath } from './utils';
 
@@ -100,4 +104,16 @@ export const listNamedEntities = (
         },
         { ...defaultPaginationConfig, ...requestConfig }
     );
+};
+
+export const getUserProfile = async () => {
+    const path = getProfileUrl();
+    try {
+        const { data } = await axios.get<UserProfile>(path, defaultAxiosConfig);
+        return data;
+    } catch (e) {
+        const { message } = transformRequestError(e, path);
+        console.error(`Failed to fetch user profile: ${message}`);
+        return null;
+    }
 };
