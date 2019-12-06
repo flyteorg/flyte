@@ -547,6 +547,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockWf.On("GetExecutionStatus").Return(mockWfStatus)
 			mockWf.On("GetTask", taskID0).Return(tk, nil)
 			mockWf.On("GetTask", taskID).Return(tk, nil)
+			mockWf.On("GetLabels").Return(make(map[string]string))
 			mockWfStatus.On("GetDataDir").Return(storage.DataReference("x"))
 			return mockWf, mockN2Status
 		}
