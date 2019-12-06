@@ -1,6 +1,6 @@
 .PHONY: lint
 lint: #lints the package for common code smells
-	which golangci-lint || GO111MODULE=on go install github.com/golangci/golangci-lint/cmd/golangci-lint
+	which golangci-lint || go install github.com/golangci/golangci-lint/cmd/golangci-lint
 	golangci-lint run
 
 # If code is failing goimports linter, this will fix.
@@ -11,8 +11,7 @@ goimports:
 
 .PHONY: install
 install: #download dependencies (including test deps) for the package
-	which dep || (curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh)
-	dep ensure
+	go mod download
 
 .PHONY: test_unit
 test_unit:

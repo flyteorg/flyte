@@ -3,14 +3,13 @@ package api
 import (
 	"context"
 	"fmt"
-	"go/token"
 	"go/types"
 	"path/filepath"
 	"strings"
 
 	"github.com/lyft/flytestdlib/logger"
 
-	"go/importer"
+	"golang.org/x/tools/go/packages"
 
 	"github.com/ernesto-jimenez/gogen/gogenutil"
 )
@@ -301,7 +300,7 @@ func NewGenerator(pkg, targetTypeName, defaultVariableName string) (*PFlagProvid
 		pkg = gogenutil.StripGopath(pkg)
 	}
 
-	targetPackage, err := importer.ForCompiler(token.NewFileSet(), "source", nil).Import(pkg)
+	targetPackage, err := loadPackage(pkg)
 	if err != nil {
 		return nil, err
 	}
@@ -336,6 +335,18 @@ func NewGenerator(pkg, targetTypeName, defaultVariableName string) (*PFlagProvid
 		pkg:        targetPackage,
 		defaultVar: defaultVar,
 	}, nil
+}
+
+func loadPackage(pkg string) (*types.Package, error) {
+	config := &packages.Config{
+		Mode: packages.NeedTypes | packages.NeedTypesInfo,
+	}
+	loadedPkgs, err := packages.Load(config, pkg)
+	if err != nil {
+		return nil, err
+	}
+	targetPackage := loadedPkgs[0].Types
+	return targetPackage, nil
 }
 
 func (g PFlagProviderGenerator) GetTargetPackage() *types.Package {
