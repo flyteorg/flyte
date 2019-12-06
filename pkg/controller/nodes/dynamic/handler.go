@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Masterminds/semver"
-
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
@@ -34,9 +32,6 @@ import (
 //go:generate mockery -all -case=underscore
 
 const dynamicNodeID = "dynamic-node"
-
-// TODO: Remove after deploying version 0.2.4
-var arrayFlyteKitVersion = semver.MustParse("0.2.3")
 
 type TaskNodeHandler interface {
 	handler.Node
@@ -257,17 +252,8 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Con
 			// TODO: This is a hack since array tasks' interfaces are malformed. Remove after
 			// FlyteKit version that generates the right interfaces is deployed.
 			if t.Type == "container_array" {
-				isBelow, err := isFlyteKitVersionBelow(t.GetMetadata().Runtime, arrayFlyteKitVersion)
-				if err != nil {
-					logger.Warnf(ctx, "Failed to validate flytekit version of task [%v] will skip array"+
-						" interface manipulation.", t.GetId())
-					continue
-				}
-
-				if isBelow {
-					iface := t.GetInterface()
-					iface.Outputs = makeArrayInterface(iface.Outputs)
-				}
+				iface := t.GetInterface()
+				iface.Outputs = makeArrayInterface(iface.Outputs)
 			}
 		}
 	}
