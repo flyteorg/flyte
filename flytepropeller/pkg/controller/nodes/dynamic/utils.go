@@ -3,8 +3,6 @@ package dynamic
 import (
 	"context"
 
-	"github.com/Masterminds/semver"
-
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -77,23 +75,6 @@ func compileTasks(_ context.Context, tasks []*core.TaskTemplate) ([]*core.Compil
 	}
 
 	return compiledTasks, nil
-}
-
-func isFlyteKitVersionBelow(runtime *core.RuntimeMetadata, ver *semver.Version) (bool, error) {
-	if runtime == nil {
-		return false, nil
-	}
-
-	if runtime.Type != core.RuntimeMetadata_FLYTE_SDK {
-		return false, nil
-	}
-
-	v, err := semver.NewVersion(runtime.Version)
-	if err != nil {
-		return false, err
-	}
-
-	return v.LessThan(ver), nil
 }
 
 func makeArrayInterface(varMap *core.VariableMap) *core.VariableMap {
