@@ -38,6 +38,14 @@ func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData
 }
 
 func FromArtifactModel(artifact models.Artifact) (datacatalog.Artifact, error) {
+	datasetID := datacatalog.DatasetID{
+		Project: artifact.DatasetProject,
+		Domain:  artifact.DatasetDomain,
+		Name:    artifact.DatasetName,
+		Version: artifact.DatasetVersion,
+		UUID:    artifact.DatasetUUID,
+	}
+
 	metadata, err := unmarshalMetadata(artifact.SerializedMetadata)
 	if err != nil {
 		return datacatalog.Artifact{}, err
@@ -51,17 +59,16 @@ func FromArtifactModel(artifact models.Artifact) (datacatalog.Artifact, error) {
 		}
 	}
 
+	tags := make([]*datacatalog.Tag, len(artifact.Tags))
+	for i, tag := range artifact.Tags {
+		tags[i] = FromTagModel(datasetID, tag)
+	}
 	return datacatalog.Artifact{
-		Id: artifact.ArtifactID,
-		Dataset: &datacatalog.DatasetID{
-			Project: artifact.DatasetProject,
-			Domain:  artifact.DatasetDomain,
-			Name:    artifact.DatasetName,
-			Version: artifact.DatasetVersion,
-			UUID:    artifact.DatasetUUID,
-		},
+		Id:         artifact.ArtifactID,
+		Dataset:    &datasetID,
 		Metadata:   metadata,
 		Partitions: partitions,
+		Tags:       tags,
 	}, nil
 }
 

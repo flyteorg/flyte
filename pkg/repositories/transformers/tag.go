@@ -14,3 +14,11 @@ func ToTagKey(datasetID datacatalog.DatasetID, tagName string) models.TagKey {
 		TagName:        tagName,
 	}
 }
+
+func FromTagModel(datasetID datacatalog.DatasetID, tag models.Tag) *datacatalog.Tag {
+	return &datacatalog.Tag{
+		Name:       tag.TagName,
+		ArtifactId: tag.ArtifactID,
+		Dataset:    &datasetID,
+	}
+}
