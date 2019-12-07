@@ -1,44 +1,10 @@
-import { fireEvent, render, wait } from '@testing-library/react';
+import { render, wait } from '@testing-library/react';
 import * as React from 'react';
 
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
-import {
-    APIContext,
-    APIContextValue,
-    useAPIState
-} from 'components/data/apiContext';
-import { useFetchableData } from 'components/hooks';
-import { NotAuthorizedError } from 'errors';
+import { APIContext } from 'components/data/apiContext';
 import { getUserProfile, UserProfile } from 'models';
 import { UserInformation } from '../UserInformation';
-
-function useTriggerNotAuthorizedFetchable() {
-    return useFetchableData<{}>({
-        defaultValue: {},
-        autoFetch: false,
-        doFetch: () => Promise.reject(new NotAuthorizedError())
-    });
-}
-
-const LoginExpiredContent: React.FC = () => {
-    const fetchable = useTriggerNotAuthorizedFetchable();
-    const onClick = () => fetchable.fetch();
-    return (
-        <>
-            <button onClick={onClick}>Trigger</button>
-            <UserInformation />
-        </>
-    );
-};
-
-const LoginExpiredContainer: React.FC = () => {
-    const apiState = useAPIState();
-    return (
-        <APIContext.Provider value={apiState}>
-            <LoginExpiredContent />
-        </APIContext.Provider>
-    );
-};
 
 describe('UserInformation', () => {
     const sampleUserProfile: UserProfile = {
