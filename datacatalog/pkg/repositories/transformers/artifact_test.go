@@ -32,6 +32,12 @@ func getTestPartitions() []models.Partition {
 	}
 }
 
+func getTestTags() []models.Tag {
+	return []models.Tag{
+		{TagKey: models.TagKey{TagName: "test"}},
+	}
+}
+
 func getDatasetModel() models.Dataset {
 	return models.Dataset{
 		DatasetKey: models.DatasetKey{
@@ -104,10 +110,8 @@ func TestFromArtifactModel(t *testing.T) {
 			ArtifactID:     "id1",
 		},
 		SerializedMetadata: []byte{},
-		Partitions: []models.Partition{
-			{DatasetUUID: "test-uuid", Key: "key1", Value: "value1"},
-			{DatasetUUID: "test-uuid", Key: "key2", Value: "value2"},
-		},
+		Partitions:         getTestPartitions(),
+		Tags:               getTestTags(),
 	}
 
 	actual, err := FromArtifactModel(artifactModel)
@@ -119,7 +123,13 @@ func TestFromArtifactModel(t *testing.T) {
 	assert.Equal(t, artifactModel.DatasetVersion, actual.Dataset.Version)
 
 	assert.Len(t, actual.Partitions, 2)
-	assert.EqualValues(t, artifactModel.Partitions, getTestPartitions())
+	assert.EqualValues(t, artifactModel.Partitions[0].Key, actual.Partitions[0].Key)
+	assert.EqualValues(t, artifactModel.Partitions[0].Value, actual.Partitions[0].Value)
+	assert.EqualValues(t, artifactModel.Partitions[1].Value, actual.Partitions[1].Value)
+	assert.EqualValues(t, artifactModel.Partitions[1].Value, actual.Partitions[1].Value)
+
+	assert.Len(t, actual.Tags, 1)
+	assert.EqualValues(t, artifactModel.Tags[0].TagName, actual.Tags[0].Name)
 }
 
 func TestToArtifactKey(t *testing.T) {

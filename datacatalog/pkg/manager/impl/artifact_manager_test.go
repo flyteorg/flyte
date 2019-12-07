@@ -49,16 +49,16 @@ func getTestStringLiteral() *core.Literal {
 }
 
 func getTestArtifact() *datacatalog.Artifact {
-
+	datasetID := &datacatalog.DatasetID{
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "test-name",
+		Version: "test-version",
+		UUID:    "test-uuid",
+	}
 	return &datacatalog.Artifact{
-		Id: "test-id",
-		Dataset: &datacatalog.DatasetID{
-			Project: "test-project",
-			Domain:  "test-domain",
-			Name:    "test-name",
-			Version: "test-version",
-			UUID:    "test-uuid",
-		},
+		Id:      "test-id",
+		Dataset: datasetID,
 		Metadata: &datacatalog.Metadata{
 			KeyMap: map[string]string{"key1": "value1"},
 		},
@@ -71,6 +71,9 @@ func getTestArtifact() *datacatalog.Artifact {
 		Partitions: []*datacatalog.Partition{
 			{Key: "key1", Value: "value1"},
 			{Key: "key2", Value: "value2"},
+		},
+		Tags: []*datacatalog.Tag{
+			{Name: "test-tag", Dataset: datasetID, ArtifactId: "test-id"},
 		},
 	}
 }
@@ -127,6 +130,9 @@ func getExpectedArtifactModel(ctx context.Context, t *testing.T, datastore *stor
 		Partitions: []models.Partition{
 			{Key: "key1", Value: "value1"},
 			{Key: "key2", Value: "value2"},
+		},
+		Tags: []models.Tag{
+			{TagKey: models.TagKey{TagName: "test-tag"}, DatasetUUID: expectedDataset.UUID, ArtifactID: artifact.Id},
 		},
 	}
 }

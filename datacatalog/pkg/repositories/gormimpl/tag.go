@@ -42,9 +42,12 @@ func (h *tagRepo) Get(ctx context.Context, in models.TagKey) (models.Tag, error)
 	defer timer.Stop()
 
 	var tag models.Tag
-	result := h.db.Preload("Artifact").Preload("Artifact.ArtifactData").Find(&tag, &models.Tag{
-		TagKey: in,
-	})
+	result := h.db.Preload("Artifact").Preload("Artifact.ArtifactData").
+		Preload("Artifact.Partitions").Preload("Artifact.Tags").
+		Order("tags.created_at DESC").
+		First(&tag, &models.Tag{
+			TagKey: in,
+		})
 
 	if result.Error != nil {
 		return models.Tag{}, h.errorTransformer.ToDataCatalogError(result.Error)
