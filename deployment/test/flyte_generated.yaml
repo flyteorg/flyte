@@ -519,10 +519,9 @@ data:
         enabled-plugins:
           - container
           - sidecar
-          - spark
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-7m9m9f2db6
+  name: flyte-propeller-config-4tfk9mf458
   namespace: flyte
 ---
 apiVersion: v1
@@ -782,7 +781,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-7m9m9f2db6
+          name: flyte-propeller-config-4tfk9mf458
         name: config-volume
       - configMap:
           name: flyte-plugin-config-b525btf774
