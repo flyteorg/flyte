@@ -448,9 +448,6 @@ apiVersion: v1
 data:
   config.yaml: |
     plugins:
-      enabled-plugins:
-        - container
-        - sidecar
       logs:
         kubernetes-enabled: true
         kubernetes-url: "http://localhost:30082"
@@ -461,7 +458,7 @@ data:
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
 kind: ConfigMap
 metadata:
-  name: flyte-plugin-config-g2248g9ftb
+  name: flyte-plugin-config-b525btf774
   namespace: flyte
 ---
 apiVersion: v1
@@ -517,9 +514,15 @@ data:
     admin:
       endpoint: flyteadmin:81
       insecure: true
+    tasks:
+      task-plugins:
+        enabled-plugins:
+          - container
+          - sidecar
+          - spark
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-d84t25m6f4
+  name: flyte-propeller-config-7m9m9f2db6
   namespace: flyte
 ---
 apiVersion: v1
@@ -630,7 +633,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.1.5
+        image: docker.io/lyft/flyteadmin:v0.1.6
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -681,7 +684,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.1.5
+        image: docker.io/lyft/flyteadmin:v0.1.6
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -696,7 +699,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flytetester
-        image: docker.io/lyft/flyteadmin:v0.1.5
+        image: docker.io/lyft/flyteadmin:v0.1.6
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -709,7 +712,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.1.5
+        image: docker.io/lyft/flyteadmin:v0.1.6
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -748,7 +751,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.1.15
+        app.kubernetes.io/version: 0.1.16
     spec:
       containers:
       - args:
@@ -761,7 +764,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.1.15
+        image: docker.io/lyft/flytepropeller:v0.1.16
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -779,10 +782,10 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-d84t25m6f4
+          name: flyte-propeller-config-7m9m9f2db6
         name: config-volume
       - configMap:
-          name: flyte-plugin-config-g2248g9ftb
+          name: flyte-plugin-config-b525btf774
         name: plugin-config-volume
 ---
 apiVersion: apps/v1
@@ -1007,7 +1010,7 @@ spec:
             - /etc/flyte/config/flyteadmin_config.yaml
             - clusterresource
             - sync
-            image: docker.io/lyft/flyteadmin:v0.1.1
+            image: docker.io/lyft/flyteadmin:v0.1.6
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
