@@ -12,10 +12,12 @@ import (
 
 	"database/sql/driver"
 
+	"github.com/lyft/datacatalog/pkg/common"
 	datacatalog_error "github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	"github.com/lyft/datacatalog/pkg/repositories/utils"
+	datacatalog "github.com/lyft/datacatalog/protos/gen"
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
@@ -39,6 +41,32 @@ func getTestDataset() models.Dataset {
 			{Name: "key2"},
 		},
 	}
+}
+
+// Raw db response to return on raw queries for datasets
+func getDBDatasetResponse(dataset models.Dataset) []map[string]interface{} {
+	expectedDatasetResponse := make([]map[string]interface{}, 0)
+	sampleDataset := make(map[string]interface{})
+	sampleDataset["project"] = dataset.Project
+	sampleDataset["domain"] = dataset.Domain
+	sampleDataset["name"] = dataset.Name
+	sampleDataset["version"] = dataset.Version
+	sampleDataset["uuid"] = getDatasetUUID()
+	expectedDatasetResponse = append(expectedDatasetResponse, sampleDataset)
+	return expectedDatasetResponse
+}
+
+func getDBPartitionKeysResponse(datasets []models.Dataset) []map[string]interface{} {
+	expectedPartitionKeyResponse := make([]map[string]interface{}, 0)
+
+	for _, dataset := range datasets {
+		samplePartitionKey := make(map[string]interface{})
+		samplePartitionKey["name"] = "key1"
+		samplePartitionKey["dataset_uuid"] = dataset.UUID
+		expectedPartitionKeyResponse = append(expectedPartitionKeyResponse, samplePartitionKey)
+	}
+
+	return expectedPartitionKeyResponse
 }
 
 // sql will generate a uuid
@@ -217,4 +245,76 @@ func TestCreateDatasetAlreadyExists(t *testing.T) {
 	dcErr, ok := err.(datacatalog_error.DataCatalogError)
 	assert.True(t, ok)
 	assert.Equal(t, dcErr.Code(), codes.AlreadyExists)
+}
+
+func TestListDatasets(t *testing.T) {
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	dataset := getTestDataset()
+	dataset.UUID = getDatasetUUID()
+	expectedDatasetDBResponse := getDBDatasetResponse(dataset)
+
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL LIMIT 10 OFFSET 0`).WithReply(expectedDatasetDBResponse)
+
+	expectedPartitionKeyResponse := getDBPartitionKeysResponse([]models.Dataset{dataset})
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys"  WHERE "partition_keys"."deleted_at" IS NULL AND (("dataset_uuid" IN (test-uuid)))`).WithReply(expectedPartitionKeyResponse)
+	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	listInput := models.ListModelsInput{
+		Limit: 10,
+	}
+	datasets, err := datasetRepo.List(context.Background(), listInput)
+	assert.NoError(t, err)
+	assert.Len(t, datasets, 1)
+	assert.Equal(t, datasets[0].Project, dataset.Project)
+	assert.Equal(t, datasets[0].Domain, dataset.Domain)
+	assert.Equal(t, datasets[0].Name, dataset.Name)
+	assert.Equal(t, datasets[0].Version, dataset.Version)
+	assert.Len(t, datasets[0].PartitionKeys, 1)
+	assert.Equal(t, datasets[0].PartitionKeys[0].Name, "key1")
+}
+
+func TestListDatasetWithFilter(t *testing.T) {
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	dataset := getTestDataset()
+	dataset.UUID = getDatasetUUID()
+	expectedDatasetDBResponse := getDBDatasetResponse(dataset)
+
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL AND ((datasets.project = p) AND (datasets.domain = d)) ORDER BY datasets.created_at desc LIMIT 10 OFFSET 10`).WithReply(expectedDatasetDBResponse)
+
+	expectedPartitionKeyResponse := getDBPartitionKeysResponse([]models.Dataset{dataset})
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys"  WHERE "partition_keys"."deleted_at" IS NULL AND (("dataset_uuid" IN (test-uuid)))`).WithReply(expectedPartitionKeyResponse)
+
+	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	listInput := models.ListModelsInput{
+		ModelFilters: []models.ModelFilter{
+			{
+				Entity: common.Dataset,
+				ValueFilters: []models.ModelValueFilter{
+					NewGormValueFilter(common.Equal, "project", "p"),
+				},
+			},
+			{
+				Entity: common.Dataset,
+				ValueFilters: []models.ModelValueFilter{
+					NewGormValueFilter(common.Equal, "domain", "d"),
+				},
+			},
+		},
+		Offset:        10,
+		Limit:         10,
+		SortParameter: NewGormSortParameter(datacatalog.PaginationOptions_CREATION_TIME, datacatalog.PaginationOptions_DESCENDING),
+	}
+	datasets, err := datasetRepo.List(context.Background(), listInput)
+	assert.NoError(t, err)
+	assert.Equal(t, datasets[0].Project, dataset.Project)
+	assert.Equal(t, datasets[0].Domain, dataset.Domain)
+	assert.Equal(t, datasets[0].Name, dataset.Name)
+	assert.Equal(t, datasets[0].Version, dataset.Version)
+	assert.Len(t, datasets[0].PartitionKeys, 1)
+	assert.Equal(t, datasets[0].PartitionKeys[0].Name, "key1")
 }

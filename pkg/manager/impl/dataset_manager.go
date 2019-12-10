@@ -2,15 +2,16 @@ package impl
 
 import (
 	"context"
+	"strconv"
 	"time"
 
+	"github.com/lyft/datacatalog/pkg/common"
+	"github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/datacatalog/pkg/manager/impl/validators"
 	"github.com/lyft/datacatalog/pkg/manager/interfaces"
 	"github.com/lyft/datacatalog/pkg/repositories"
 	"github.com/lyft/datacatalog/pkg/repositories/transformers"
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
-
-	"github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
@@ -26,6 +27,8 @@ type datasetMetrics struct {
 	createErrorCounter      labeled.Counter
 	getSuccessCounter       labeled.Counter
 	getErrorCounter         labeled.Counter
+	listSuccessCounter      labeled.Counter
+	listFailureCounter      labeled.Counter
 	transformerErrorCounter labeled.Counter
 	validationErrorCounter  labeled.Counter
 	alreadyExistsCounter    labeled.Counter
@@ -129,6 +132,63 @@ func (dm *datasetManager) GetDataset(ctx context.Context, request datacatalog.Ge
 	}, nil
 }
 
+// List Datasets with optional filtering and pagination
+func (dm *datasetManager) ListDatasets(ctx context.Context, request datacatalog.ListDatasetsRequest) (*datacatalog.ListDatasetsResponse, error) {
+	err := validators.ValidateListDatasetsRequest(&request)
+	if err != nil {
+		logger.Warningf(ctx, "Invalid list datasets request %v, err: %v", request, err)
+		dm.systemMetrics.validationErrorCounter.Inc(ctx)
+		return nil, err
+	}
+
+	// Get the list inputs
+	listInput, err := transformers.FilterToListInput(ctx, common.Dataset, request.GetFilter())
+	if err != nil {
+		logger.Warningf(ctx, "Invalid list datasets request %v, err: %v", request, err)
+		dm.systemMetrics.validationErrorCounter.Inc(ctx)
+		return nil, err
+	}
+
+	err = transformers.ApplyPagination(request.Pagination, &listInput)
+	if err != nil {
+		logger.Warningf(ctx, "Invalid pagination options in list datasets request %v, err: %v", request, err)
+		dm.systemMetrics.validationErrorCounter.Inc(ctx)
+		return nil, err
+	}
+
+	// Perform the list with the dataset and listInput filters
+	datasetModels, err := dm.repo.DatasetRepo().List(ctx, listInput)
+	if err != nil {
+		logger.Errorf(ctx, "Unable to list Datasets err: %v", err)
+		dm.systemMetrics.listFailureCounter.Inc(ctx)
+		return nil, err
+	}
+
+	// convert returned models into entity list
+	datasetList := make([]*datacatalog.Dataset, len(datasetModels))
+	transformerErrs := make([]error, 0)
+	for idx, datasetModel := range datasetModels {
+		dataset, err := transformers.FromDatasetModel(datasetModel)
+		if err != nil {
+			logger.Errorf(ctx, "Unable to transform Dataset %+v err: %v", dataset.Id, err)
+			transformerErrs = append(transformerErrs, err)
+		}
+
+		datasetList[idx] = dataset
+	}
+
+	if len(transformerErrs) > 0 {
+		dm.systemMetrics.listFailureCounter.Inc(ctx)
+		return nil, errors.NewCollectedErrors(codes.Internal, transformerErrs)
+	}
+
+	token := strconv.Itoa(int(listInput.Offset) + len(datasetList))
+
+	logger.Debugf(ctx, "Listed %v matching datasets successfully", len(datasetList))
+	dm.systemMetrics.listSuccessCounter.Inc(ctx)
+	return &datacatalog.ListDatasetsResponse{Datasets: datasetList, NextToken: token}, nil
+}
+
 func NewDatasetManager(repo repositories.RepositoryInterface, store *storage.DataStore, datasetScope promutils.Scope) interfaces.DatasetManager {
 	return &datasetManager{
 		repo:  repo,
@@ -145,6 +205,8 @@ func NewDatasetManager(repo repositories.RepositoryInterface, store *storage.Dat
 			validationErrorCounter:  labeled.NewCounter("validation_failed_count", "The number of times validation failed", datasetScope, labeled.EmitUnlabeledMetric),
 			alreadyExistsCounter:    labeled.NewCounter("already_exists_count", "The number of times a dataset already exists", datasetScope, labeled.EmitUnlabeledMetric),
 			doesNotExistCounter:     labeled.NewCounter("does_not_exists_count", "The number of times a dataset was not found", datasetScope, labeled.EmitUnlabeledMetric),
+			listSuccessCounter:      labeled.NewCounter("list_success_count", "The number of times list dataset succeeded", datasetScope, labeled.EmitUnlabeledMetric),
+			listFailureCounter:      labeled.NewCounter("list_failure_count", "The number of times list dataset failed", datasetScope, labeled.EmitUnlabeledMetric),
 		},
 	}
 }
