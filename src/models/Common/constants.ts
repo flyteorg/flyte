@@ -1,3 +1,7 @@
+import axios, { AxiosRequestConfig, AxiosTransformer } from 'axios';
+import * as camelcaseKeys from 'camelcase-keys';
+import * as snakecaseKeys from 'snakecase-keys';
+import { isObject } from 'util';
 import { LiteralMapBlob, ResourceType } from './types';
 
 export const endpointPrefixes = {
@@ -22,4 +26,21 @@ export const identifierPrefixes: { [k in ResourceType]: string } = {
 
 export const emptyLiteralMapBlob: LiteralMapBlob = {
     values: { literals: {} }
+};
+
+/** Config object that can be used for requests that are not sent to
+ * the Admin entity API (`/api/v1/...`), such as the `/me` endpoint. This config
+ * ensures that requests/responses are correctly converted and that cookies are
+ * included.
+ */
+export const defaultAxiosConfig: AxiosRequestConfig = {
+    transformRequest: [
+        (data: any) => (isObject(data) ? snakecaseKeys(data) : data),
+        ...(axios.defaults.transformRequest as AxiosTransformer[])
+    ],
+    transformResponse: [
+        ...(axios.defaults.transformResponse as AxiosTransformer[]),
+        camelcaseKeys
+    ],
+    withCredentials: true
 };

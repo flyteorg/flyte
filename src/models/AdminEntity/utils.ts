@@ -1,10 +1,6 @@
 import { env } from 'common/env';
 import { createDebugLogger } from 'common/log';
-import {
-    createCorsProxyURL,
-    createLocalURL,
-    ensureSlashPrefixed
-} from 'common/utils';
+import { createLocalURL, ensureSlashPrefixed } from 'common/utils';
 
 import {
     AdminEntityTransformer,
@@ -14,14 +10,35 @@ import {
 } from './types';
 
 const debug = createDebugLogger('adminEntity');
+const loginEndpoint = '/login';
+const profileEndpoint = '/me';
+const redirectParam = 'redirect_url';
 
 /** Converts a path into a full Admin API url */
 export function adminApiUrl(url: string) {
     const finalUrl = ensureSlashPrefixed(url);
     if (env.ADMIN_API_URL) {
-        return createCorsProxyURL(`${env.ADMIN_API_URL}/api/v1${finalUrl}`);
+        return `${env.ADMIN_API_URL}/api/v1${finalUrl}`;
     }
     return createLocalURL(`/api/v1${finalUrl}`);
+}
+
+/** Constructs a url for redirecting to the Admin login endpoint and returning
+ * to the current location after completing the flow.
+ */
+export function getLoginUrl(redirectUrl: string = window.location.href) {
+    const baseUrl = env.ADMIN_API_URL
+        ? `${env.ADMIN_API_URL}${loginEndpoint}`
+        : createLocalURL(loginEndpoint);
+    return `${baseUrl}?${redirectParam}=${redirectUrl}`;
+}
+
+/** Constructs a URL for fetching the current user profile. */
+export function getProfileUrl() {
+    if (env.ADMIN_API_URL) {
+        return `${env.ADMIN_API_URL}${profileEndpoint}`;
+    }
+    return createLocalURL(profileEndpoint);
 }
 
 // Helper to log out the contents of a protobuf response, since the Network tab

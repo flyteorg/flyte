@@ -1,17 +1,22 @@
+import axios from 'axios';
 import { Admin, Core } from 'flyteidl';
 import {
     defaultPaginationConfig,
     getAdminEntity,
+    getProfileUrl,
     PaginatedEntityResponse,
     RequestConfig
 } from 'models/AdminEntity';
 
-import { identifierPrefixes } from './constants';
+import { log } from 'common/log';
+import { transformRequestError } from 'models/AdminEntity/transformRequestError';
+import { defaultAxiosConfig, identifierPrefixes } from './constants';
 import {
     IdentifierScope,
     NamedEntity,
     NamedEntityIdentifier,
-    ResourceType
+    ResourceType,
+    UserProfile
 } from './types';
 import { makeIdentifierPath, makeNamedEntityPath } from './utils';
 
@@ -100,4 +105,21 @@ export const listNamedEntities = (
         },
         { ...defaultPaginationConfig, ...requestConfig }
     );
+};
+
+/** Fetches the current user profile. NOTE: This will *not* fail in cases
+ * where the user is not logged in or the session is expired. Admin does not
+ * distinguish between these cases, so the profile will be `null` in both cases.
+ * A value of `null` indicates that a redirect to the login endpoint is needed.
+ */
+export const getUserProfile = async () => {
+    const path = getProfileUrl();
+    try {
+        const { data } = await axios.get<UserProfile>(path, defaultAxiosConfig);
+        return data;
+    } catch (e) {
+        const { message } = transformRequestError(e, path);
+        log.error(`Failed to fetch user profile: ${message}`);
+        return null;
+    }
 };

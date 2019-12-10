@@ -1,4 +1,4 @@
-import 'jest-dom/extend-expect';
+import '@testing-library/jest-dom/extend-expect';
 
 // Make sure the env object exists in a sane way
 window.env = {

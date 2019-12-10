@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from 'react';
 
 import { createDebugLogger } from 'common/log';
 import { CacheContext, getCacheKey } from 'components/Cache';
+import { useAPIContext } from 'components/data/apiContext';
+import { NotAuthorizedError } from 'errors';
 import { FetchableData, FetchFn } from './types';
 
 const log = createDebugLogger('useFetchableData');
@@ -67,6 +69,7 @@ export function useFetchableData<T extends object, DataType>(
     const [hasLoaded, setHasLoaded] = useState(false);
     const [value, setValue] = useState<T>(defaultValue);
     const cache = useContext(CacheContext);
+    const apiContext = useAPIContext();
 
     let cancelled = false;
     const cancel = () => {
@@ -95,13 +98,16 @@ export function useFetchableData<T extends object, DataType>(
     };
 
     const onError = (error: Error) => {
+        if (error instanceof NotAuthorizedError) {
+            apiContext.loginStatus.setExpired(true);
+        }
         if (cancelled) {
             return Promise.reject(error);
         }
         setLastError(error instanceof Error ? error : new Error(error));
         setFetchState(null);
         setLoading(false);
-        return Promise.reject(error);
+        return Promise.resolve(defaultValue);
     };
 
     const fetch = async ({ force } = { force: false }) => {

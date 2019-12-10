@@ -27,19 +27,6 @@ describe('AdminEntity/utils', () => {
             expect(adminApiUrl('/abc').indexOf(window.location.origin)).toBe(0);
         });
 
-        it('Appends cors proxy prefix if using an Admin url override', () => {
-            expect(
-                adminApiUrl('/abc').indexOf(
-                    `${window.location.origin}${corsPrefix}`
-                )
-            ).toBe(0);
-        });
-
-        it('Does not use cors proxy if no admin url env variable is set', () => {
-            env.ADMIN_API_URL = '';
-            expect(adminApiUrl('/abc').indexOf(corsPrefix)).toBe(-1);
-        });
-
         it('adds leading slash if missing', () => {
             const url = adminApiUrl('test');
             expect(url.substring(url.length - 5)).toBe('/test');

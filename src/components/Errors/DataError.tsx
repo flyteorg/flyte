@@ -6,7 +6,7 @@ import * as React from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 
 import { NotFound } from 'components/NotFound';
-import { NotFoundError } from 'errors';
+import { NotAuthorizedError, NotFoundError } from 'errors';
 
 const useStyles = makeStyles((theme: Theme) => ({
     container: {
@@ -29,6 +29,10 @@ export const DataError: React.FC<DataErrorProps> = ({
     const styles = useStyles();
     if (error instanceof NotFoundError) {
         return <NotFound />;
+    }
+    // For NotAuthorized, we will be displaying a global error.
+    if (error instanceof NotAuthorizedError) {
+        return null;
     }
 
     const description = error ? error.message : undefined;
