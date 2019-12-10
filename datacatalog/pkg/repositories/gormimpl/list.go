@@ -38,9 +38,10 @@ func applyListModelsInput(tx *gorm.DB, sourceEntity common.Entity, in models.Lis
 		tableName := tx.NewScope(filterModel).TableName()
 		tableAlias := tableName
 
-		// Optionally add the join condition if this filter has one
-		if joinCondition := modelFilter.JoinCondition; joinCondition != nil {
+		// Optionally add the join condition if the entity we need isn't the source
+		if sourceEntity != modelFilter.Entity {
 			// if there is a join associated with the filter, we should use an alias
+			joinCondition := modelFilter.JoinCondition
 			tableAlias = fmt.Sprintf(tableAliasFormat, tableName, modelIndex)
 			joinExpression, err := joinCondition.GetJoinOnDBQueryExpression(sourceTableName, tableName, tableAlias)
 			if err != nil {

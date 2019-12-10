@@ -11,6 +11,7 @@ service DataCatalog {
     rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse);
     rpc AddTag (AddTagRequest) returns (AddTagResponse);
     rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse);
+    rpc ListDatasets (ListDatasetsRequest) returns (ListDatasetsResponse);
 }
 
 message CreateDatasetRequest {
@@ -71,6 +72,22 @@ message ListArtifactsRequest {
 message ListArtifactsResponse {
     // The list of artifacts
     repeated Artifact artifacts = 1;
+    // Token to use to request the next page, pass this into the next requests PaginationOptions
+    string next_token = 2;
+}
+
+// List the datasets for the given query
+message ListDatasetsRequest {
+    // Apply the filter expression to this query
+    FilterExpression filter = 1;
+    // Pagination options to get a page of datasetes
+    PaginationOptions pagination = 2;
+}
+
+// List the datasets response with token for next pagination
+message ListDatasetsResponse {
+    // The list of datasets
+    repeated Dataset datasets = 1;
     // Token to use to request the next page, pass this into the next requests PaginationOptions
     string next_token = 2;
 }

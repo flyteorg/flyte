@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jinzhu/gorm"
+	"github.com/lyft/datacatalog/pkg/common"
 	"github.com/lyft/datacatalog/pkg/repositories/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/interfaces"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
@@ -60,4 +61,24 @@ func (h *dataSetRepo) Get(ctx context.Context, in models.DatasetKey) (models.Dat
 	}
 
 	return ds, nil
+}
+
+func (h *dataSetRepo) List(ctx context.Context, in models.ListModelsInput) ([]models.Dataset, error) {
+	timer := h.repoMetrics.ListDuration.Start(ctx)
+	defer timer.Stop()
+
+	// apply filters and joins
+	tx, err := applyListModelsInput(h.db, common.Dataset, in)
+	if err != nil {
+		return nil, err
+	} else if tx.Error != nil {
+		return []models.Dataset{}, h.errorTransformer.ToDataCatalogError(tx.Error)
+	}
+
+	datasets := make([]models.Dataset, 0)
+	tx = tx.Preload("PartitionKeys").Find(&datasets)
+	if tx.Error != nil {
+		return []models.Dataset{}, h.errorTransformer.ToDataCatalogError(tx.Error)
+	}
+	return datasets, nil
 }

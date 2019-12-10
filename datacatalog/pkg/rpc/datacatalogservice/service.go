@@ -49,6 +49,10 @@ func (s *DataCatalogService) AddTag(ctx context.Context, request *catalog.AddTag
 	return s.TagManager.AddTag(ctx, *request)
 }
 
+func (s *DataCatalogService) ListDatasets(ctx context.Context, request *catalog.ListDatasetsRequest) (*catalog.ListDatasetsResponse, error) {
+	return s.DatasetManager.ListDatasets(ctx, *request)
+}
+
 func NewDataCatalogService() *DataCatalogService {
 	configProvider := runtime.NewConfigurationProvider()
 	dataCatalogConfig := configProvider.ApplicationConfiguration().GetDataCatalogConfig()

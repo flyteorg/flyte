@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"github.com/lyft/datacatalog/pkg/common"
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
 )
 
@@ -28,6 +29,28 @@ func ValidateDatasetID(ds *datacatalog.DatasetID) error {
 	}
 	if err := ValidateEmptyStringField(ds.Version, datasetVersion); err != nil {
 		return err
+	}
+	return nil
+}
+
+// Ensure list Datasets request is properly constructed
+func ValidateListDatasetsRequest(request *datacatalog.ListDatasetsRequest) error {
+	if request.Pagination != nil {
+		err := ValidatePagination(*request.Pagination)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Datasets cannot be filtered by tag, partitions or artifacts
+	for _, filter := range request.Filter.GetFilters() {
+		if filter.GetTagFilter() != nil {
+			return NewInvalidFilterError(common.Dataset, common.Tag)
+		} else if filter.GetPartitionFilter() != nil {
+			return NewInvalidFilterError(common.Dataset, common.Partition)
+		} else if filter.GetArtifactFilter() != nil {
+			return NewInvalidFilterError(common.Dataset, common.Artifact)
+		}
 	}
 	return nil
 }
