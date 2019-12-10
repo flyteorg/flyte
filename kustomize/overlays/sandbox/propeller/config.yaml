@@ -28,6 +28,12 @@ propeller:
       type: bucket
       rate: 10
       capacity: 100
+  resourcemanager:
+    type: redis
+    resourceMaxQuota: 10000
+    redis:
+      hostPath: redis-resource-manager.flyte:6379
+      hostKey: mypassword
 logger:
   show-source: true
   level: 5
@@ -52,3 +58,9 @@ catalog-cache:
   endpoint: datacatalog:89
   type: datacatalog
   insecure: true
+tasks:
+  task-plugins:
+    enabled-plugins:
+      - container
+      - sidecar
+      - spark

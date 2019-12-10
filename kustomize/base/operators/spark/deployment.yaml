@@ -23,8 +23,6 @@ spec:
       labels:
         app.kubernetes.io/name: sparkoperator
         app.kubernetes.io/version: v2.4.0-v1alpha1
-      initializers:
-        pending: []
     spec:
       serviceAccountName: sparkoperator
       containers:

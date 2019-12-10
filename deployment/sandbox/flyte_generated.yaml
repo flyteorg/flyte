@@ -626,12 +626,6 @@ apiVersion: v1
 data:
   config.yaml: |
     plugins:
-      enabled-plugins:
-        - container
-        - spark
-        - waitable
-        - hiveExecutor
-        - sidecar
       logs:
         kubernetes-enabled: true
         kubernetes-url: "http://localhost:30082"
@@ -642,7 +636,7 @@ data:
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
 kind: ConfigMap
 metadata:
-  name: flyte-plugin-config-mkhh79kf6f
+  name: flyte-plugin-config-b525btf774
   namespace: flyte
 ---
 apiVersion: v1
@@ -678,6 +672,12 @@ data:
           type: bucket
           rate: 10
           capacity: 100
+      resourcemanager:
+        type: redis
+        resourceMaxQuota: 10000
+        redis:
+          hostPath: redis-resource-manager.flyte:6379
+          hostKey: mypassword
     logger:
       show-source: true
       level: 5
@@ -702,9 +702,15 @@ data:
       endpoint: datacatalog:89
       type: datacatalog
       insecure: true
+    tasks:
+      task-plugins:
+        enabled-plugins:
+          - container
+          - sidecar
+          - spark
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-df4bf7dg67
+  name: flyte-propeller-config-55gc695955
   namespace: flyte
 ---
 apiVersion: v1
@@ -712,17 +718,11 @@ data:
   config.yaml: |
     plugins:
       qubole:
-        # Either create this file with your username with the real token, or set the QUBOLE_API_KEY environment variable
-        # See the secrets_manager.go file in the plugins repo for usage.  Since the dev/test deployment of
-        # this has a dummy QUBOLE_API_KEY env var built in, this fake path won't break anything.
-        quboleTokenPath: "/Path/To/QUBOLE_CLIENT_TOKEN"
-        resourceManagerType: redis
-        redisHostPath: redis-resource-manager.flyte:6379
-        redisHostKey: mypassword
+        quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"
         quboleLimit: 10
 kind: ConfigMap
 metadata:
-  name: flyte-qubole-config-h626c9t6f7
+  name: flyte-qubole-config-t7226b4tck
   namespace: flyte
 ---
 apiVersion: v1
@@ -747,17 +747,6 @@ data:
 kind: ConfigMap
 metadata:
   name: flyte-spark-config-h72bmtggc2
-  namespace: flyte
----
-apiVersion: v1
-data:
-  config.yaml: |
-    plugins:
-      waitable:
-        console-uri: http://localhost:30081/console
-kind: ConfigMap
-metadata:
-  name: flyte-waitable-config-g8gch5968h
   namespace: flyte
 ---
 apiVersion: v1
@@ -975,7 +964,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.1.5
+        image: docker.io/lyft/flyteadmin:v0.1.6
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -1026,7 +1015,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.1.1
+        image: docker.io/lyft/flyteadmin:v0.1.6
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -1041,7 +1030,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flytetester
-        image: docker.io/lyft/flyteadmin:v0.1.1
+        image: docker.io/lyft/flyteadmin:v0.1.6
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -1054,7 +1043,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.1.1
+        image: docker.io/lyft/flyteadmin:v0.1.6
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -1094,7 +1083,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: docker.io/lyft/flyteconsole:v0.1.0
+        image: docker.io/lyft/flyteconsole:v0.2.0
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -1130,7 +1119,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.1.9
+        app.kubernetes.io/version: 0.1.16
     spec:
       containers:
       - args:
@@ -1145,7 +1134,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.1.9
+        image: docker.io/lyft/flytepropeller:v0.1.16
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -1160,8 +1149,6 @@ spec:
           name: qubole-config-volume
         - mountPath: /etc/flyte/config-container
           name: container-config-volume
-        - mountPath: /etc/flyte/config-waitable
-          name: waitable-config-volume
         - mountPath: /etc/flyte/config-spark
           name: spark-config-volume
         - mountPath: /etc/flyte/config
@@ -1171,22 +1158,19 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-qubole-config-h626c9t6f7
+          name: flyte-qubole-config-t7226b4tck
         name: qubole-config-volume
       - configMap:
           name: flyte-container-config-5k78b9cm42
         name: container-config-volume
       - configMap:
-          name: flyte-waitable-config-g8gch5968h
-        name: waitable-config-volume
-      - configMap:
           name: flyte-spark-config-h72bmtggc2
         name: spark-config-volume
       - configMap:
-          name: flyte-propeller-config-df4bf7dg67
+          name: flyte-propeller-config-55gc695955
         name: config-volume
       - configMap:
-          name: flyte-plugin-config-mkhh79kf6f
+          name: flyte-plugin-config-b525btf774
         name: plugin-config-volume
 ---
 apiVersion: apps/v1
@@ -1355,8 +1339,6 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: "10254"
         prometheus.io/scrape: "true"
-      initializers:
-        pending: []
       labels:
         app.kubernetes.io/name: sparkoperator
         app.kubernetes.io/version: v2.4.0-v1alpha1
@@ -1457,7 +1439,7 @@ spec:
             - /etc/flyte/config/flyteadmin_config.yaml
             - clusterresource
             - sync
-            image: docker.io/lyft/flyteadmin:v0.1.1
+            image: docker.io/lyft/flyteadmin:v0.1.6
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:

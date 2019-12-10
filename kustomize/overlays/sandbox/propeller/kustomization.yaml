@@ -16,9 +16,6 @@ configMapGenerator:
 - name: flyte-spark-config
   files:
     - plugins/spark/config.yaml
-- name: flyte-waitable-config
-  files:
-    - plugins/waitable/config.yaml
 - name: flyte-container-config
   files:
     - plugins/container/config.yaml
@@ -30,6 +27,5 @@ patches:
 - propeller.yaml
 # add the volumemount for each plugin configmap
 - plugins/spark/propeller-patch.yaml
-- plugins/waitable/propeller-patch.yaml
 - plugins/container/propeller-patch.yaml
 - plugins/qubole/propeller-patch.yaml

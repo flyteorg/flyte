@@ -22,5 +22,10 @@ docker run \
   lyft/dockernetes:7692164d7e6b3963bbcc39a3f5510495509cb71a /sbin/init
 
 # wait for the system to initalize, then run execute.sh
-docker exec \
-  dockernetes /flyte/end2end/dockernetes_run.sh /flyte/end2end/execute.sh
+if [ -n "$DOCKERNETES_DEBUG" ]; then
+  docker exec -it \
+    dockernetes /flyte/end2end/dockernetes_run.sh /flyte/end2end/execute.sh
+else
+  docker exec \
+    dockernetes /flyte/end2end/dockernetes_run.sh /flyte/end2end/execute.sh
+fi

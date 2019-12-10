@@ -48,3 +48,8 @@ event:
 admin:
   endpoint: flyteadmin:81
   insecure: true
+tasks:
+  task-plugins:
+    enabled-plugins:
+      - container
+      - sidecar

@@ -1,3 +1,0 @@
-plugins:
-  waitable:
-    console-uri: http://localhost:30081/console
