@@ -205,8 +205,8 @@ func serveGatewayInsecure(ctx context.Context, cfg *config.ServerConfig) error {
 	if cfg.Security.AllowCors {
 		handler = handlers.CORS(
 			handlers.AllowCredentials(),
-			handlers.AllowedHeaders(cfg.Security.AllowedHeaders),
-			handlers.AllowedOrigins(append(defaultCorsHeaders, cfg.Security.AllowedOrigins...)),
+			handlers.AllowedOrigins(cfg.Security.AllowedOrigins),
+			handlers.AllowedHeaders(append(defaultCorsHeaders, cfg.Security.AllowedHeaders...)),
 			handlers.AllowedMethods([]string{"GET", "POST", "DELETE", "HEAD", "PUT", "PATCH"}),
 		)(httpServer)
 	} else {
