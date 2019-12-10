@@ -1,7 +1,4 @@
 plugins:
   qubole:
-    # Either create this file with your username with the real token, or set the QUBOLE_API_KEY environment variable
-    # See the secrets_manager.go file in the plugins repo for usage.  Since the dev/test deployment of
-    # this has a dummy QUBOLE_API_KEY env var built in, this fake path won't break anything.
     quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"
     quboleLimit: 10

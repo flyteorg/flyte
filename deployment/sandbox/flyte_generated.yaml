@@ -718,14 +718,11 @@ data:
   config.yaml: |
     plugins:
       qubole:
-        # Either create this file with your username with the real token, or set the QUBOLE_API_KEY environment variable
-        # See the secrets_manager.go file in the plugins repo for usage.  Since the dev/test deployment of
-        # this has a dummy QUBOLE_API_KEY env var built in, this fake path won't break anything.
         quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"
         quboleLimit: 10
 kind: ConfigMap
 metadata:
-  name: flyte-qubole-config-tc49528ckt
+  name: flyte-qubole-config-t7226b4tck
   namespace: flyte
 ---
 apiVersion: v1
@@ -1161,7 +1158,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-qubole-config-tc49528ckt
+          name: flyte-qubole-config-t7226b4tck
         name: qubole-config-volume
       - configMap:
           name: flyte-container-config-5k78b9cm42
