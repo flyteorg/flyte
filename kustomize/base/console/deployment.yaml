@@ -21,7 +21,7 @@ spec:
         emptyDir: {}
       containers:
       - name: flyteconsole
-        image: docker.io/lyft/flyteconsole:v0.2.0
+        image: docker.io/lyft/flyteconsole:v0.2.1
         # args: []
         ports:
         - containerPort: 8080
