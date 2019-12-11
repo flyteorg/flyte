@@ -10,8 +10,8 @@ import (
 var cfgSection = config.MustRegisterSubSection("catalogCache", defaultConfig)
 
 type Config struct {
-	ReaderWorkqueueConfig workqueue.Config
-	WriterWorkqueueConfig workqueue.Config
+	ReaderWorkqueueConfig workqueue.Config `json:"reader" pflag:",Catalog reader workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system."`
+	WriterWorkqueueConfig workqueue.Config `json:"writer" pflag:",Catalog writer workqueue config. Make sure the index cache must be big enough to accommodate the biggest array task allowed to run on the system."`
 }
 
 var defaultConfig = &Config{
