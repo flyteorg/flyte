@@ -23,6 +23,11 @@ func (_m *MutableNodeStatus) ClearDynamicNodeStatus() {
 	_m.Called()
 }
 
+// ClearLastAttemptStartedAt provides a mock function with given fields:
+func (_m *MutableNodeStatus) ClearLastAttemptStartedAt() {
+	_m.Called()
+}
+
 // ClearTaskStatus provides a mock function with given fields:
 func (_m *MutableNodeStatus) ClearTaskStatus() {
 	_m.Called()

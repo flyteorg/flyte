@@ -6,6 +6,7 @@ import (
 	"github.com/lyft/flytepropeller/pkg/compiler/common"
 	"github.com/lyft/flytepropeller/pkg/compiler/errors"
 	"github.com/lyft/flytepropeller/pkg/utils"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Gets the compiled subgraph if this node contains an inline-declared coreWorkflow. Otherwise nil.
@@ -45,13 +46,24 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		return nil, false
 	}
 
+	timeout, err := computeDeadline(n)
+	// TODO: Active deadline accounts for the retries and queueing delays. using active deadline = execution deadline.
+	var activeDeadline *v1.Duration
+	if timeout != nil {
+		activeDeadline = &v1.Duration{Duration: 2 * timeout.Duration}
+	}
+	if err != nil {
+		errs.Collect(errors.NewSyntaxError(n.GetId(), "node:metadata:timeout", nil))
+		return nil, !errs.HasErrors()
+	}
 	nodeSpec := &v1alpha1.NodeSpec{
-		ID:                    n.GetId(),
-		RetryStrategy:         computeRetryStrategy(n, task),
-		Resources:             res,
-		OutputAliases:         toAliasValueArray(n.GetOutputAliases()),
-		InputBindings:         toBindingValueArray(n.GetInputs()),
-		ActiveDeadlineSeconds: computeActiveDeadlineSeconds(n, task),
+		ID:                n.GetId(),
+		RetryStrategy:     computeRetryStrategy(n, task),
+		ExecutionDeadline: timeout,
+		Resources:         res,
+		OutputAliases:     toAliasValueArray(n.GetOutputAliases()),
+		InputBindings:     toBindingValueArray(n.GetInputs()),
+		ActiveDeadline:    activeDeadline,
 	}
 
 	switch v := n.GetTarget().(type) {

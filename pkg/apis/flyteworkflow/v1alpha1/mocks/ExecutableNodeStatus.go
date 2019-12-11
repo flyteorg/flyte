@@ -23,6 +23,11 @@ func (_m *ExecutableNodeStatus) ClearDynamicNodeStatus() {
 	_m.Called()
 }
 
+// ClearLastAttemptStartedAt provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) ClearLastAttemptStartedAt() {
+	_m.Called()
+}
+
 // ClearTaskStatus provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) ClearTaskStatus() {
 	_m.Called()
@@ -159,6 +164,40 @@ func (_m *ExecutableNodeStatus) GetDynamicNodeStatus() v1alpha1.MutableDynamicNo
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(v1alpha1.MutableDynamicNodeStatus)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNodeStatus_GetLastAttemptStartedAt struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_GetLastAttemptStartedAt) Return(_a0 *v1.Time) *ExecutableNodeStatus_GetLastAttemptStartedAt {
+	return &ExecutableNodeStatus_GetLastAttemptStartedAt{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnGetLastAttemptStartedAt() *ExecutableNodeStatus_GetLastAttemptStartedAt {
+	c := _m.On("GetLastAttemptStartedAt")
+	return &ExecutableNodeStatus_GetLastAttemptStartedAt{Call: c}
+}
+
+func (_m *ExecutableNodeStatus) OnGetLastAttemptStartedAtMatch(matchers ...interface{}) *ExecutableNodeStatus_GetLastAttemptStartedAt {
+	c := _m.On("GetLastAttemptStartedAt", matchers...)
+	return &ExecutableNodeStatus_GetLastAttemptStartedAt{Call: c}
+}
+
+// GetLastAttemptStartedAt provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetLastAttemptStartedAt() *v1.Time {
+	ret := _m.Called()
+
+	var r0 *v1.Time
+	if rf, ok := ret.Get(0).(func() *v1.Time); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v1.Time)
 		}
 	}
 
