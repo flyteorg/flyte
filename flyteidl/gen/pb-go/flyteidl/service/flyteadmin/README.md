@@ -65,6 +65,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [AdminAbortMetadata](docs/AdminAbortMetadata.md)
  - [AdminAnnotations](docs/AdminAnnotations.md)
  - [AdminAuth](docs/AdminAuth.md)
  - [AdminDomain](docs/AdminDomain.md)

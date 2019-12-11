@@ -6783,6 +6783,764 @@ public final class ExecutionOuterClass {
 
   }
 
+  public interface AbortMetadataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.AbortMetadata)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * In the case of a user-specified abort, this will pass along the user-supplied cause.
+     * </pre>
+     *
+     * <code>string cause = 1;</code>
+     */
+    java.lang.String getCause();
+    /**
+     * <pre>
+     * In the case of a user-specified abort, this will pass along the user-supplied cause.
+     * </pre>
+     *
+     * <code>string cause = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getCauseBytes();
+
+    /**
+     * <pre>
+     * Identifies the entity (if any) responsible for terminating the execution
+     * </pre>
+     *
+     * <code>string principal = 2;</code>
+     */
+    java.lang.String getPrincipal();
+    /**
+     * <pre>
+     * Identifies the entity (if any) responsible for terminating the execution
+     * </pre>
+     *
+     * <code>string principal = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getPrincipalBytes();
+  }
+  /**
+   * Protobuf type {@code flyteidl.admin.AbortMetadata}
+   */
+  public  static final class AbortMetadata extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.AbortMetadata)
+      AbortMetadataOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use AbortMetadata.newBuilder() to construct.
+    private AbortMetadata(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private AbortMetadata() {
+      cause_ = "";
+      principal_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private AbortMetadata(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              cause_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              principal_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_AbortMetadata_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_AbortMetadata_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.ExecutionOuterClass.AbortMetadata.class, flyteidl.admin.ExecutionOuterClass.AbortMetadata.Builder.class);
+    }
+
+    public static final int CAUSE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object cause_;
+    /**
+     * <pre>
+     * In the case of a user-specified abort, this will pass along the user-supplied cause.
+     * </pre>
+     *
+     * <code>string cause = 1;</code>
+     */
+    public java.lang.String getCause() {
+      java.lang.Object ref = cause_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        cause_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * In the case of a user-specified abort, this will pass along the user-supplied cause.
+     * </pre>
+     *
+     * <code>string cause = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCauseBytes() {
+      java.lang.Object ref = cause_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        cause_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PRINCIPAL_FIELD_NUMBER = 2;
+    private volatile java.lang.Object principal_;
+    /**
+     * <pre>
+     * Identifies the entity (if any) responsible for terminating the execution
+     * </pre>
+     *
+     * <code>string principal = 2;</code>
+     */
+    public java.lang.String getPrincipal() {
+      java.lang.Object ref = principal_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        principal_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Identifies the entity (if any) responsible for terminating the execution
+     * </pre>
+     *
+     * <code>string principal = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPrincipalBytes() {
+      java.lang.Object ref = principal_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        principal_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getCauseBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, cause_);
+      }
+      if (!getPrincipalBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, principal_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getCauseBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, cause_);
+      }
+      if (!getPrincipalBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, principal_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.ExecutionOuterClass.AbortMetadata)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.ExecutionOuterClass.AbortMetadata other = (flyteidl.admin.ExecutionOuterClass.AbortMetadata) obj;
+
+      if (!getCause()
+          .equals(other.getCause())) return false;
+      if (!getPrincipal()
+          .equals(other.getPrincipal())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CAUSE_FIELD_NUMBER;
+      hash = (53 * hash) + getCause().hashCode();
+      hash = (37 * hash) + PRINCIPAL_FIELD_NUMBER;
+      hash = (53 * hash) + getPrincipal().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.ExecutionOuterClass.AbortMetadata prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.admin.AbortMetadata}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.AbortMetadata)
+        flyteidl.admin.ExecutionOuterClass.AbortMetadataOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_AbortMetadata_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_AbortMetadata_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.ExecutionOuterClass.AbortMetadata.class, flyteidl.admin.ExecutionOuterClass.AbortMetadata.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.ExecutionOuterClass.AbortMetadata.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        cause_ = "";
+
+        principal_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_AbortMetadata_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ExecutionOuterClass.AbortMetadata getDefaultInstanceForType() {
+        return flyteidl.admin.ExecutionOuterClass.AbortMetadata.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ExecutionOuterClass.AbortMetadata build() {
+        flyteidl.admin.ExecutionOuterClass.AbortMetadata result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ExecutionOuterClass.AbortMetadata buildPartial() {
+        flyteidl.admin.ExecutionOuterClass.AbortMetadata result = new flyteidl.admin.ExecutionOuterClass.AbortMetadata(this);
+        result.cause_ = cause_;
+        result.principal_ = principal_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.ExecutionOuterClass.AbortMetadata) {
+          return mergeFrom((flyteidl.admin.ExecutionOuterClass.AbortMetadata)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.ExecutionOuterClass.AbortMetadata other) {
+        if (other == flyteidl.admin.ExecutionOuterClass.AbortMetadata.getDefaultInstance()) return this;
+        if (!other.getCause().isEmpty()) {
+          cause_ = other.cause_;
+          onChanged();
+        }
+        if (!other.getPrincipal().isEmpty()) {
+          principal_ = other.principal_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.ExecutionOuterClass.AbortMetadata parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.ExecutionOuterClass.AbortMetadata) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object cause_ = "";
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user-supplied cause.
+       * </pre>
+       *
+       * <code>string cause = 1;</code>
+       */
+      public java.lang.String getCause() {
+        java.lang.Object ref = cause_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          cause_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user-supplied cause.
+       * </pre>
+       *
+       * <code>string cause = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCauseBytes() {
+        java.lang.Object ref = cause_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          cause_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user-supplied cause.
+       * </pre>
+       *
+       * <code>string cause = 1;</code>
+       */
+      public Builder setCause(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        cause_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user-supplied cause.
+       * </pre>
+       *
+       * <code>string cause = 1;</code>
+       */
+      public Builder clearCause() {
+        
+        cause_ = getDefaultInstance().getCause();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user-supplied cause.
+       * </pre>
+       *
+       * <code>string cause = 1;</code>
+       */
+      public Builder setCauseBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        cause_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object principal_ = "";
+      /**
+       * <pre>
+       * Identifies the entity (if any) responsible for terminating the execution
+       * </pre>
+       *
+       * <code>string principal = 2;</code>
+       */
+      public java.lang.String getPrincipal() {
+        java.lang.Object ref = principal_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          principal_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Identifies the entity (if any) responsible for terminating the execution
+       * </pre>
+       *
+       * <code>string principal = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPrincipalBytes() {
+        java.lang.Object ref = principal_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          principal_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Identifies the entity (if any) responsible for terminating the execution
+       * </pre>
+       *
+       * <code>string principal = 2;</code>
+       */
+      public Builder setPrincipal(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        principal_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Identifies the entity (if any) responsible for terminating the execution
+       * </pre>
+       *
+       * <code>string principal = 2;</code>
+       */
+      public Builder clearPrincipal() {
+        
+        principal_ = getDefaultInstance().getPrincipal();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Identifies the entity (if any) responsible for terminating the execution
+       * </pre>
+       *
+       * <code>string principal = 2;</code>
+       */
+      public Builder setPrincipalBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        principal_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.AbortMetadata)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.AbortMetadata)
+    private static final flyteidl.admin.ExecutionOuterClass.AbortMetadata DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.ExecutionOuterClass.AbortMetadata();
+    }
+
+    public static flyteidl.admin.ExecutionOuterClass.AbortMetadata getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<AbortMetadata>
+        PARSER = new com.google.protobuf.AbstractParser<AbortMetadata>() {
+      @java.lang.Override
+      public AbortMetadata parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new AbortMetadata(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<AbortMetadata> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<AbortMetadata> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.ExecutionOuterClass.AbortMetadata getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface ExecutionClosureOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.ExecutionClosure)
       com.google.protobuf.MessageOrBuilder {
@@ -6842,18 +7600,43 @@ public final class ExecutionOuterClass {
      * In the case of a user-specified abort, this will pass along the user-supplied cause.
      * </pre>
      *
-     * <code>string abort_cause = 10;</code>
+     * <code>string abort_cause = 10 [deprecated = true];</code>
      */
-    java.lang.String getAbortCause();
+    @java.lang.Deprecated java.lang.String getAbortCause();
     /**
      * <pre>
      * In the case of a user-specified abort, this will pass along the user-supplied cause.
      * </pre>
      *
-     * <code>string abort_cause = 10;</code>
+     * <code>string abort_cause = 10 [deprecated = true];</code>
      */
-    com.google.protobuf.ByteString
+    @java.lang.Deprecated com.google.protobuf.ByteString
         getAbortCauseBytes();
+
+    /**
+     * <pre>
+     * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+     */
+    boolean hasAbortMetadata();
+    /**
+     * <pre>
+     * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+     */
+    flyteidl.admin.ExecutionOuterClass.AbortMetadata getAbortMetadata();
+    /**
+     * <pre>
+     * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+     */
+    flyteidl.admin.ExecutionOuterClass.AbortMetadataOrBuilder getAbortMetadataOrBuilder();
 
     /**
      * <pre>
@@ -7226,9 +8009,9 @@ public final class ExecutionOuterClass {
               break;
             }
             case 74: {
-              if (!((mutable_bitField0_ & 0x00000200) != 0)) {
+              if (!((mutable_bitField0_ & 0x00000400) != 0)) {
                 notifications_ = new java.util.ArrayList<flyteidl.admin.Common.Notification>();
-                mutable_bitField0_ |= 0x00000200;
+                mutable_bitField0_ |= 0x00000400;
               }
               notifications_.add(
                   input.readMessage(flyteidl.admin.Common.Notification.parser(), extensionRegistry));
@@ -7253,6 +8036,20 @@ public final class ExecutionOuterClass {
 
               break;
             }
+            case 98: {
+              flyteidl.admin.ExecutionOuterClass.AbortMetadata.Builder subBuilder = null;
+              if (outputResultCase_ == 12) {
+                subBuilder = ((flyteidl.admin.ExecutionOuterClass.AbortMetadata) outputResult_).toBuilder();
+              }
+              outputResult_ =
+                  input.readMessage(flyteidl.admin.ExecutionOuterClass.AbortMetadata.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.admin.ExecutionOuterClass.AbortMetadata) outputResult_);
+                outputResult_ = subBuilder.buildPartial();
+              }
+              outputResultCase_ = 12;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -7268,7 +8065,7 @@ public final class ExecutionOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000200) != 0)) {
+        if (((mutable_bitField0_ & 0x00000400) != 0)) {
           notifications_ = java.util.Collections.unmodifiableList(notifications_);
         }
         this.unknownFields = unknownFields.build();
@@ -7295,7 +8092,8 @@ public final class ExecutionOuterClass {
         implements com.google.protobuf.Internal.EnumLite {
       OUTPUTS(1),
       ERROR(2),
-      ABORT_CAUSE(10),
+      @java.lang.Deprecated ABORT_CAUSE(10),
+      ABORT_METADATA(12),
       OUTPUTRESULT_NOT_SET(0);
       private final int value;
       private OutputResultCase(int value) {
@@ -7314,6 +8112,7 @@ public final class ExecutionOuterClass {
           case 1: return OUTPUTS;
           case 2: return ERROR;
           case 10: return ABORT_CAUSE;
+          case 12: return ABORT_METADATA;
           case 0: return OUTPUTRESULT_NOT_SET;
           default: return null;
         }
@@ -7411,9 +8210,9 @@ public final class ExecutionOuterClass {
      * In the case of a user-specified abort, this will pass along the user-supplied cause.
      * </pre>
      *
-     * <code>string abort_cause = 10;</code>
+     * <code>string abort_cause = 10 [deprecated = true];</code>
      */
-    public java.lang.String getAbortCause() {
+    @java.lang.Deprecated public java.lang.String getAbortCause() {
       java.lang.Object ref = "";
       if (outputResultCase_ == 10) {
         ref = outputResult_;
@@ -7435,9 +8234,9 @@ public final class ExecutionOuterClass {
      * In the case of a user-specified abort, this will pass along the user-supplied cause.
      * </pre>
      *
-     * <code>string abort_cause = 10;</code>
+     * <code>string abort_cause = 10 [deprecated = true];</code>
      */
-    public com.google.protobuf.ByteString
+    @java.lang.Deprecated public com.google.protobuf.ByteString
         getAbortCauseBytes() {
       java.lang.Object ref = "";
       if (outputResultCase_ == 10) {
@@ -7454,6 +8253,44 @@ public final class ExecutionOuterClass {
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int ABORT_METADATA_FIELD_NUMBER = 12;
+    /**
+     * <pre>
+     * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+     */
+    public boolean hasAbortMetadata() {
+      return outputResultCase_ == 12;
+    }
+    /**
+     * <pre>
+     * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+     */
+    public flyteidl.admin.ExecutionOuterClass.AbortMetadata getAbortMetadata() {
+      if (outputResultCase_ == 12) {
+         return (flyteidl.admin.ExecutionOuterClass.AbortMetadata) outputResult_;
+      }
+      return flyteidl.admin.ExecutionOuterClass.AbortMetadata.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+     */
+    public flyteidl.admin.ExecutionOuterClass.AbortMetadataOrBuilder getAbortMetadataOrBuilder() {
+      if (outputResultCase_ == 12) {
+         return (flyteidl.admin.ExecutionOuterClass.AbortMetadata) outputResult_;
+      }
+      return flyteidl.admin.ExecutionOuterClass.AbortMetadata.getDefaultInstance();
     }
 
     public static final int COMPUTED_INPUTS_FIELD_NUMBER = 3;
@@ -7794,6 +8631,9 @@ public final class ExecutionOuterClass {
       if (workflowId_ != null) {
         output.writeMessage(11, getWorkflowId());
       }
+      if (outputResultCase_ == 12) {
+        output.writeMessage(12, (flyteidl.admin.ExecutionOuterClass.AbortMetadata) outputResult_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -7845,6 +8685,10 @@ public final class ExecutionOuterClass {
       if (workflowId_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(11, getWorkflowId());
+      }
+      if (outputResultCase_ == 12) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(12, (flyteidl.admin.ExecutionOuterClass.AbortMetadata) outputResult_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -7908,6 +8752,10 @@ public final class ExecutionOuterClass {
           if (!getAbortCause()
               .equals(other.getAbortCause())) return false;
           break;
+        case 12:
+          if (!getAbortMetadata()
+              .equals(other.getAbortMetadata())) return false;
+          break;
         case 0:
         default:
       }
@@ -7964,6 +8812,10 @@ public final class ExecutionOuterClass {
         case 10:
           hash = (37 * hash) + ABORT_CAUSE_FIELD_NUMBER;
           hash = (53 * hash) + getAbortCause().hashCode();
+          break;
+        case 12:
+          hash = (37 * hash) + ABORT_METADATA_FIELD_NUMBER;
+          hash = (53 * hash) + getAbortMetadata().hashCode();
           break;
         case 0:
         default:
@@ -8140,7 +8992,7 @@ public final class ExecutionOuterClass {
         }
         if (notificationsBuilder_ == null) {
           notifications_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000200);
+          bitField0_ = (bitField0_ & ~0x00000400);
         } else {
           notificationsBuilder_.clear();
         }
@@ -8197,6 +9049,13 @@ public final class ExecutionOuterClass {
         if (outputResultCase_ == 10) {
           result.outputResult_ = outputResult_;
         }
+        if (outputResultCase_ == 12) {
+          if (abortMetadataBuilder_ == null) {
+            result.outputResult_ = outputResult_;
+          } else {
+            result.outputResult_ = abortMetadataBuilder_.build();
+          }
+        }
         if (computedInputsBuilder_ == null) {
           result.computedInputs_ = computedInputs_;
         } else {
@@ -8224,9 +9083,9 @@ public final class ExecutionOuterClass {
           result.updatedAt_ = updatedAtBuilder_.build();
         }
         if (notificationsBuilder_ == null) {
-          if (((bitField0_ & 0x00000200) != 0)) {
+          if (((bitField0_ & 0x00000400) != 0)) {
             notifications_ = java.util.Collections.unmodifiableList(notifications_);
-            bitField0_ = (bitField0_ & ~0x00000200);
+            bitField0_ = (bitField0_ & ~0x00000400);
           }
           result.notifications_ = notifications_;
         } else {
@@ -8309,7 +9168,7 @@ public final class ExecutionOuterClass {
           if (!other.notifications_.isEmpty()) {
             if (notifications_.isEmpty()) {
               notifications_ = other.notifications_;
-              bitField0_ = (bitField0_ & ~0x00000200);
+              bitField0_ = (bitField0_ & ~0x00000400);
             } else {
               ensureNotificationsIsMutable();
               notifications_.addAll(other.notifications_);
@@ -8322,7 +9181,7 @@ public final class ExecutionOuterClass {
               notificationsBuilder_.dispose();
               notificationsBuilder_ = null;
               notifications_ = other.notifications_;
-              bitField0_ = (bitField0_ & ~0x00000200);
+              bitField0_ = (bitField0_ & ~0x00000400);
               notificationsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getNotificationsFieldBuilder() : null;
@@ -8347,6 +9206,10 @@ public final class ExecutionOuterClass {
             outputResultCase_ = 10;
             outputResult_ = other.outputResult_;
             onChanged();
+            break;
+          }
+          case ABORT_METADATA: {
+            mergeAbortMetadata(other.getAbortMetadata());
             break;
           }
           case OUTPUTRESULT_NOT_SET: {
@@ -8747,9 +9610,9 @@ public final class ExecutionOuterClass {
        * In the case of a user-specified abort, this will pass along the user-supplied cause.
        * </pre>
        *
-       * <code>string abort_cause = 10;</code>
+       * <code>string abort_cause = 10 [deprecated = true];</code>
        */
-      public java.lang.String getAbortCause() {
+      @java.lang.Deprecated public java.lang.String getAbortCause() {
         java.lang.Object ref = "";
         if (outputResultCase_ == 10) {
           ref = outputResult_;
@@ -8771,9 +9634,9 @@ public final class ExecutionOuterClass {
        * In the case of a user-specified abort, this will pass along the user-supplied cause.
        * </pre>
        *
-       * <code>string abort_cause = 10;</code>
+       * <code>string abort_cause = 10 [deprecated = true];</code>
        */
-      public com.google.protobuf.ByteString
+      @java.lang.Deprecated public com.google.protobuf.ByteString
           getAbortCauseBytes() {
         java.lang.Object ref = "";
         if (outputResultCase_ == 10) {
@@ -8796,9 +9659,9 @@ public final class ExecutionOuterClass {
        * In the case of a user-specified abort, this will pass along the user-supplied cause.
        * </pre>
        *
-       * <code>string abort_cause = 10;</code>
+       * <code>string abort_cause = 10 [deprecated = true];</code>
        */
-      public Builder setAbortCause(
+      @java.lang.Deprecated public Builder setAbortCause(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
@@ -8813,9 +9676,9 @@ public final class ExecutionOuterClass {
        * In the case of a user-specified abort, this will pass along the user-supplied cause.
        * </pre>
        *
-       * <code>string abort_cause = 10;</code>
+       * <code>string abort_cause = 10 [deprecated = true];</code>
        */
-      public Builder clearAbortCause() {
+      @java.lang.Deprecated public Builder clearAbortCause() {
         if (outputResultCase_ == 10) {
           outputResultCase_ = 0;
           outputResult_ = null;
@@ -8828,9 +9691,9 @@ public final class ExecutionOuterClass {
        * In the case of a user-specified abort, this will pass along the user-supplied cause.
        * </pre>
        *
-       * <code>string abort_cause = 10;</code>
+       * <code>string abort_cause = 10 [deprecated = true];</code>
        */
-      public Builder setAbortCauseBytes(
+      @java.lang.Deprecated public Builder setAbortCauseBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
@@ -8840,6 +9703,178 @@ public final class ExecutionOuterClass {
         outputResult_ = value;
         onChanged();
         return this;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.ExecutionOuterClass.AbortMetadata, flyteidl.admin.ExecutionOuterClass.AbortMetadata.Builder, flyteidl.admin.ExecutionOuterClass.AbortMetadataOrBuilder> abortMetadataBuilder_;
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+       */
+      public boolean hasAbortMetadata() {
+        return outputResultCase_ == 12;
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+       */
+      public flyteidl.admin.ExecutionOuterClass.AbortMetadata getAbortMetadata() {
+        if (abortMetadataBuilder_ == null) {
+          if (outputResultCase_ == 12) {
+            return (flyteidl.admin.ExecutionOuterClass.AbortMetadata) outputResult_;
+          }
+          return flyteidl.admin.ExecutionOuterClass.AbortMetadata.getDefaultInstance();
+        } else {
+          if (outputResultCase_ == 12) {
+            return abortMetadataBuilder_.getMessage();
+          }
+          return flyteidl.admin.ExecutionOuterClass.AbortMetadata.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+       */
+      public Builder setAbortMetadata(flyteidl.admin.ExecutionOuterClass.AbortMetadata value) {
+        if (abortMetadataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          outputResult_ = value;
+          onChanged();
+        } else {
+          abortMetadataBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 12;
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+       */
+      public Builder setAbortMetadata(
+          flyteidl.admin.ExecutionOuterClass.AbortMetadata.Builder builderForValue) {
+        if (abortMetadataBuilder_ == null) {
+          outputResult_ = builderForValue.build();
+          onChanged();
+        } else {
+          abortMetadataBuilder_.setMessage(builderForValue.build());
+        }
+        outputResultCase_ = 12;
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+       */
+      public Builder mergeAbortMetadata(flyteidl.admin.ExecutionOuterClass.AbortMetadata value) {
+        if (abortMetadataBuilder_ == null) {
+          if (outputResultCase_ == 12 &&
+              outputResult_ != flyteidl.admin.ExecutionOuterClass.AbortMetadata.getDefaultInstance()) {
+            outputResult_ = flyteidl.admin.ExecutionOuterClass.AbortMetadata.newBuilder((flyteidl.admin.ExecutionOuterClass.AbortMetadata) outputResult_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            outputResult_ = value;
+          }
+          onChanged();
+        } else {
+          if (outputResultCase_ == 12) {
+            abortMetadataBuilder_.mergeFrom(value);
+          }
+          abortMetadataBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 12;
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+       */
+      public Builder clearAbortMetadata() {
+        if (abortMetadataBuilder_ == null) {
+          if (outputResultCase_ == 12) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+            onChanged();
+          }
+        } else {
+          if (outputResultCase_ == 12) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+          }
+          abortMetadataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+       */
+      public flyteidl.admin.ExecutionOuterClass.AbortMetadata.Builder getAbortMetadataBuilder() {
+        return getAbortMetadataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+       */
+      public flyteidl.admin.ExecutionOuterClass.AbortMetadataOrBuilder getAbortMetadataOrBuilder() {
+        if ((outputResultCase_ == 12) && (abortMetadataBuilder_ != null)) {
+          return abortMetadataBuilder_.getMessageOrBuilder();
+        } else {
+          if (outputResultCase_ == 12) {
+            return (flyteidl.admin.ExecutionOuterClass.AbortMetadata) outputResult_;
+          }
+          return flyteidl.admin.ExecutionOuterClass.AbortMetadata.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * In the case of a user-specified abort, this will pass along the user and their supplied cause.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AbortMetadata abort_metadata = 12;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.ExecutionOuterClass.AbortMetadata, flyteidl.admin.ExecutionOuterClass.AbortMetadata.Builder, flyteidl.admin.ExecutionOuterClass.AbortMetadataOrBuilder> 
+          getAbortMetadataFieldBuilder() {
+        if (abortMetadataBuilder_ == null) {
+          if (!(outputResultCase_ == 12)) {
+            outputResult_ = flyteidl.admin.ExecutionOuterClass.AbortMetadata.getDefaultInstance();
+          }
+          abortMetadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.ExecutionOuterClass.AbortMetadata, flyteidl.admin.ExecutionOuterClass.AbortMetadata.Builder, flyteidl.admin.ExecutionOuterClass.AbortMetadataOrBuilder>(
+                  (flyteidl.admin.ExecutionOuterClass.AbortMetadata) outputResult_,
+                  getParentForChildren(),
+                  isClean());
+          outputResult_ = null;
+        }
+        outputResultCase_ = 12;
+        onChanged();;
+        return abortMetadataBuilder_;
       }
 
       private flyteidl.core.Literals.LiteralMap computedInputs_;
@@ -9684,9 +10719,9 @@ public final class ExecutionOuterClass {
       private java.util.List<flyteidl.admin.Common.Notification> notifications_ =
         java.util.Collections.emptyList();
       private void ensureNotificationsIsMutable() {
-        if (!((bitField0_ & 0x00000200) != 0)) {
+        if (!((bitField0_ & 0x00000400) != 0)) {
           notifications_ = new java.util.ArrayList<flyteidl.admin.Common.Notification>(notifications_);
-          bitField0_ |= 0x00000200;
+          bitField0_ |= 0x00000400;
          }
       }
 
@@ -9902,7 +10937,7 @@ public final class ExecutionOuterClass {
       public Builder clearNotifications() {
         if (notificationsBuilder_ == null) {
           notifications_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000200);
+          bitField0_ = (bitField0_ & ~0x00000400);
           onChanged();
         } else {
           notificationsBuilder_.clear();
@@ -10021,7 +11056,7 @@ public final class ExecutionOuterClass {
           notificationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.admin.Common.Notification, flyteidl.admin.Common.Notification.Builder, flyteidl.admin.Common.NotificationOrBuilder>(
                   notifications_,
-                  ((bitField0_ & 0x00000200) != 0),
+                  ((bitField0_ & 0x00000400) != 0),
                   getParentForChildren(),
                   isClean());
           notifications_ = null;
@@ -10260,17 +11295,17 @@ public final class ExecutionOuterClass {
      * Identifier of the entity that triggered this execution.
      * </pre>
      *
-     * <code>string principal = 2;</code>
+     * <code>string principal = 2 [deprecated = true];</code>
      */
-    java.lang.String getPrincipal();
+    @java.lang.Deprecated java.lang.String getPrincipal();
     /**
      * <pre>
      * Identifier of the entity that triggered this execution.
      * </pre>
      *
-     * <code>string principal = 2;</code>
+     * <code>string principal = 2 [deprecated = true];</code>
      */
-    com.google.protobuf.ByteString
+    @java.lang.Deprecated com.google.protobuf.ByteString
         getPrincipalBytes();
 
     /**
@@ -10699,9 +11734,9 @@ public final class ExecutionOuterClass {
      * Identifier of the entity that triggered this execution.
      * </pre>
      *
-     * <code>string principal = 2;</code>
+     * <code>string principal = 2 [deprecated = true];</code>
      */
-    public java.lang.String getPrincipal() {
+    @java.lang.Deprecated public java.lang.String getPrincipal() {
       java.lang.Object ref = principal_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -10718,9 +11753,9 @@ public final class ExecutionOuterClass {
      * Identifier of the entity that triggered this execution.
      * </pre>
      *
-     * <code>string principal = 2;</code>
+     * <code>string principal = 2 [deprecated = true];</code>
      */
-    public com.google.protobuf.ByteString
+    @java.lang.Deprecated public com.google.protobuf.ByteString
         getPrincipalBytes() {
       java.lang.Object ref = principal_;
       if (ref instanceof java.lang.String) {
@@ -11354,9 +12389,9 @@ public final class ExecutionOuterClass {
        * Identifier of the entity that triggered this execution.
        * </pre>
        *
-       * <code>string principal = 2;</code>
+       * <code>string principal = 2 [deprecated = true];</code>
        */
-      public java.lang.String getPrincipal() {
+      @java.lang.Deprecated public java.lang.String getPrincipal() {
         java.lang.Object ref = principal_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
@@ -11373,9 +12408,9 @@ public final class ExecutionOuterClass {
        * Identifier of the entity that triggered this execution.
        * </pre>
        *
-       * <code>string principal = 2;</code>
+       * <code>string principal = 2 [deprecated = true];</code>
        */
-      public com.google.protobuf.ByteString
+      @java.lang.Deprecated public com.google.protobuf.ByteString
           getPrincipalBytes() {
         java.lang.Object ref = principal_;
         if (ref instanceof String) {
@@ -11393,9 +12428,9 @@ public final class ExecutionOuterClass {
        * Identifier of the entity that triggered this execution.
        * </pre>
        *
-       * <code>string principal = 2;</code>
+       * <code>string principal = 2 [deprecated = true];</code>
        */
-      public Builder setPrincipal(
+      @java.lang.Deprecated public Builder setPrincipal(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
@@ -11410,9 +12445,9 @@ public final class ExecutionOuterClass {
        * Identifier of the entity that triggered this execution.
        * </pre>
        *
-       * <code>string principal = 2;</code>
+       * <code>string principal = 2 [deprecated = true];</code>
        */
-      public Builder clearPrincipal() {
+      @java.lang.Deprecated public Builder clearPrincipal() {
         
         principal_ = getDefaultInstance().getPrincipal();
         onChanged();
@@ -11423,9 +12458,9 @@ public final class ExecutionOuterClass {
        * Identifier of the entity that triggered this execution.
        * </pre>
        *
-       * <code>string principal = 2;</code>
+       * <code>string principal = 2 [deprecated = true];</code>
        */
-      public Builder setPrincipalBytes(
+      @java.lang.Deprecated public Builder setPrincipalBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
@@ -17865,6 +18900,11 @@ public final class ExecutionOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_LiteralMapBlob_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_AbortMetadata_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_AbortMetadata_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_ExecutionClosure_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -17937,53 +18977,56 @@ public final class ExecutionOuterClass {
       "tionList\022-\n\nexecutions\030\001 \003(\0132\031.flyteidl." +
       "admin.Execution\022\r\n\005token\030\002 \001(\t\"T\n\016Litera" +
       "lMapBlob\022+\n\006values\030\001 \001(\0132\031.flyteidl.core" +
-      ".LiteralMapH\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"\256\004\n" +
-      "\020ExecutionClosure\0221\n\007outputs\030\001 \001(\0132\036.fly" +
-      "teidl.admin.LiteralMapBlobH\000\022.\n\005error\030\002 " +
-      "\001(\0132\035.flyteidl.core.ExecutionErrorH\000\022\025\n\013" +
-      "abort_cause\030\n \001(\tH\000\0226\n\017computed_inputs\030\003" +
-      " \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001\0225\n\005p" +
-      "hase\030\004 \001(\0162&.flyteidl.core.WorkflowExecu" +
-      "tion.Phase\022.\n\nstarted_at\030\005 \001(\0132\032.google." +
-      "protobuf.Timestamp\022+\n\010duration\030\006 \001(\0132\031.g" +
-      "oogle.protobuf.Duration\022.\n\ncreated_at\030\007 " +
-      "\001(\0132\032.google.protobuf.Timestamp\022.\n\nupdat" +
-      "ed_at\030\010 \001(\0132\032.google.protobuf.Timestamp\022" +
-      "3\n\rnotifications\030\t \003(\0132\034.flyteidl.admin." +
-      "Notification\022.\n\013workflow_id\030\013 \001(\0132\031.flyt" +
-      "eidl.core.IdentifierB\017\n\routput_result\"\222\003" +
-      "\n\021ExecutionMetadata\022=\n\004mode\030\001 \001(\0162/.flyt" +
-      "eidl.admin.ExecutionMetadata.ExecutionMo" +
-      "de\022\021\n\tprincipal\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220" +
-      "\n\014scheduled_at\030\004 \001(\0132\032.google.protobuf.T" +
-      "imestamp\022E\n\025parent_node_execution\030\005 \001(\0132" +
-      "&.flyteidl.core.NodeExecutionIdentifier\022" +
-      "G\n\023reference_execution\030\020 \001(\0132*.flyteidl." +
-      "core.WorkflowExecutionIdentifier\"X\n\rExec" +
-      "utionMode\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006" +
-      "SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORKFLOW" +
-      "\020\004\"G\n\020NotificationList\0223\n\rnotifications\030" +
-      "\001 \003(\0132\034.flyteidl.admin.Notification\"\357\002\n\r" +
-      "ExecutionSpec\022.\n\013launch_plan\030\001 \001(\0132\031.fly" +
-      "teidl.core.Identifier\022-\n\006inputs\030\002 \001(\0132\031." +
-      "flyteidl.core.LiteralMapB\002\030\001\0223\n\010metadata" +
-      "\030\003 \001(\0132!.flyteidl.admin.ExecutionMetadat" +
-      "a\0229\n\rnotifications\030\005 \001(\0132 .flyteidl.admi" +
-      "n.NotificationListH\000\022\025\n\013disable_all\030\006 \001(" +
-      "\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyteidl.admin.Lab" +
-      "els\0220\n\013annotations\030\010 \001(\0132\033.flyteidl.admi" +
-      "n.AnnotationsB\030\n\026notification_overridesJ" +
-      "\004\010\004\020\005\"b\n\031ExecutionTerminateRequest\0226\n\002id" +
-      "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution" +
-      "Identifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTe" +
-      "rminateResponse\"Y\n\037WorkflowExecutionGetD" +
-      "ataRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.W" +
-      "orkflowExecutionIdentifier\"u\n WorkflowEx" +
-      "ecutionGetDataResponse\022(\n\007outputs\030\001 \001(\0132" +
-      "\027.flyteidl.admin.UrlBlob\022\'\n\006inputs\030\002 \001(\013" +
-      "2\027.flyteidl.admin.UrlBlobB3Z1github.com/" +
-      "lyft/flyteidl/gen/pb-go/flyteidl/adminb\006" +
-      "proto3"
+      ".LiteralMapH\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"1\n\r" +
+      "AbortMetadata\022\r\n\005cause\030\001 \001(\t\022\021\n\tprincipa" +
+      "l\030\002 \001(\t\"\353\004\n\020ExecutionClosure\0221\n\007outputs\030" +
+      "\001 \001(\0132\036.flyteidl.admin.LiteralMapBlobH\000\022" +
+      ".\n\005error\030\002 \001(\0132\035.flyteidl.core.Execution" +
+      "ErrorH\000\022\031\n\013abort_cause\030\n \001(\tB\002\030\001H\000\0227\n\016ab" +
+      "ort_metadata\030\014 \001(\0132\035.flyteidl.admin.Abor" +
+      "tMetadataH\000\0226\n\017computed_inputs\030\003 \001(\0132\031.f" +
+      "lyteidl.core.LiteralMapB\002\030\001\0225\n\005phase\030\004 \001" +
+      "(\0162&.flyteidl.core.WorkflowExecution.Pha" +
+      "se\022.\n\nstarted_at\030\005 \001(\0132\032.google.protobuf" +
+      ".Timestamp\022+\n\010duration\030\006 \001(\0132\031.google.pr" +
+      "otobuf.Duration\022.\n\ncreated_at\030\007 \001(\0132\032.go" +
+      "ogle.protobuf.Timestamp\022.\n\nupdated_at\030\010 " +
+      "\001(\0132\032.google.protobuf.Timestamp\0223\n\rnotif" +
+      "ications\030\t \003(\0132\034.flyteidl.admin.Notifica" +
+      "tion\022.\n\013workflow_id\030\013 \001(\0132\031.flyteidl.cor" +
+      "e.IdentifierB\017\n\routput_result\"\226\003\n\021Execut" +
+      "ionMetadata\022=\n\004mode\030\001 \001(\0162/.flyteidl.adm" +
+      "in.ExecutionMetadata.ExecutionMode\022\025\n\tpr" +
+      "incipal\030\002 \001(\tB\002\030\001\022\017\n\007nesting\030\003 \001(\r\0220\n\014sc" +
+      "heduled_at\030\004 \001(\0132\032.google.protobuf.Times" +
+      "tamp\022E\n\025parent_node_execution\030\005 \001(\0132&.fl" +
+      "yteidl.core.NodeExecutionIdentifier\022G\n\023r" +
+      "eference_execution\030\020 \001(\0132*.flyteidl.core" +
+      ".WorkflowExecutionIdentifier\"X\n\rExecutio" +
+      "nMode\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006SYST" +
+      "EM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORKFLOW\020\004\"G" +
+      "\n\020NotificationList\0223\n\rnotifications\030\001 \003(" +
+      "\0132\034.flyteidl.admin.Notification\"\357\002\n\rExec" +
+      "utionSpec\022.\n\013launch_plan\030\001 \001(\0132\031.flyteid" +
+      "l.core.Identifier\022-\n\006inputs\030\002 \001(\0132\031.flyt" +
+      "eidl.core.LiteralMapB\002\030\001\0223\n\010metadata\030\003 \001" +
+      "(\0132!.flyteidl.admin.ExecutionMetadata\0229\n" +
+      "\rnotifications\030\005 \001(\0132 .flyteidl.admin.No" +
+      "tificationListH\000\022\025\n\013disable_all\030\006 \001(\010H\000\022" +
+      "&\n\006labels\030\007 \001(\0132\026.flyteidl.admin.Labels\022" +
+      "0\n\013annotations\030\010 \001(\0132\033.flyteidl.admin.An" +
+      "notationsB\030\n\026notification_overridesJ\004\010\004\020" +
+      "\005\"b\n\031ExecutionTerminateRequest\0226\n\002id\030\001 \001" +
+      "(\0132*.flyteidl.core.WorkflowExecutionIden" +
+      "tifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTermin" +
+      "ateResponse\"Y\n\037WorkflowExecutionGetDataR" +
+      "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf" +
+      "lowExecutionIdentifier\"u\n WorkflowExecut" +
+      "ionGetDataResponse\022(\n\007outputs\030\001 \001(\0132\027.fl" +
+      "yteidl.admin.UrlBlob\022\'\n\006inputs\030\002 \001(\0132\027.f" +
+      "lyteidl.admin.UrlBlobB3Z1github.com/lyft" +
+      "/flyteidl/gen/pb-go/flyteidl/adminb\006prot" +
+      "o3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18045,50 +19088,56 @@ public final class ExecutionOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LiteralMapBlob_descriptor,
         new java.lang.String[] { "Values", "Uri", "Data", });
-    internal_static_flyteidl_admin_ExecutionClosure_descriptor =
+    internal_static_flyteidl_admin_AbortMetadata_descriptor =
       getDescriptor().getMessageTypes().get(7);
+    internal_static_flyteidl_admin_AbortMetadata_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_AbortMetadata_descriptor,
+        new java.lang.String[] { "Cause", "Principal", });
+    internal_static_flyteidl_admin_ExecutionClosure_descriptor =
+      getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_admin_ExecutionClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionClosure_descriptor,
-        new java.lang.String[] { "Outputs", "Error", "AbortCause", "ComputedInputs", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "Notifications", "WorkflowId", "OutputResult", });
+        new java.lang.String[] { "Outputs", "Error", "AbortCause", "AbortMetadata", "ComputedInputs", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "Notifications", "WorkflowId", "OutputResult", });
     internal_static_flyteidl_admin_ExecutionMetadata_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_admin_ExecutionMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionMetadata_descriptor,
         new java.lang.String[] { "Mode", "Principal", "Nesting", "ScheduledAt", "ParentNodeExecution", "ReferenceExecution", });
     internal_static_flyteidl_admin_NotificationList_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_admin_NotificationList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NotificationList_descriptor,
         new java.lang.String[] { "Notifications", });
     internal_static_flyteidl_admin_ExecutionSpec_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_admin_ExecutionSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionSpec_descriptor,
         new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "NotificationOverrides", });
     internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_flyteidl_admin_ExecutionTerminateRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor,
         new java.lang.String[] { "Id", "Cause", });
     internal_static_flyteidl_admin_ExecutionTerminateResponse_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_flyteidl_admin_ExecutionTerminateResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionTerminateResponse_descriptor,
         new java.lang.String[] { });
     internal_static_flyteidl_admin_WorkflowExecutionGetDataRequest_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_flyteidl_admin_WorkflowExecutionGetDataRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_WorkflowExecutionGetDataRequest_descriptor,
         new java.lang.String[] { "Id", });
     internal_static_flyteidl_admin_WorkflowExecutionGetDataResponse_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_flyteidl_admin_WorkflowExecutionGetDataResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_WorkflowExecutionGetDataResponse_descriptor,

@@ -89,6 +89,14 @@ message LiteralMapBlob {
     }
 }
 
+message AbortMetadata {
+    // In the case of a user-specified abort, this will pass along the user-supplied cause.
+    string cause    = 1;
+
+    // Identifies the entity (if any) responsible for terminating the execution
+    string principal      = 2;
+}
+
 // Encapsulates the results of the Execution
 message ExecutionClosure {
     // A result produced by a terminated execution.
@@ -101,7 +109,10 @@ message ExecutionClosure {
         core.ExecutionError error		= 2;
 
         // In the case of a user-specified abort, this will pass along the user-supplied cause.
-        string abort_cause                      = 10;
+        string abort_cause                      = 10 [deprecated=true];
+
+        // In the case of a user-specified abort, this will pass along the user and their supplied cause.
+        AbortMetadata abort_metadata            = 12;
     }
 
     // Inputs computed and passed for execution.
@@ -155,7 +166,7 @@ message ExecutionMetadata {
     ExecutionMode mode    = 1; // [(validate.rules).enum.defined_only = true];
 
     // Identifier of the entity that triggered this execution.
-    string principal      = 2;
+    string principal      = 2 [deprecated=true];
 
     // Indicates the "nestedness" of this execution.
     // If a user launches a workflow execution, the default nesting is 0.

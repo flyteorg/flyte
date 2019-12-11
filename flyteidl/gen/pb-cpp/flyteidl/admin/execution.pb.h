@@ -48,7 +48,7 @@ struct TableStruct_flyteidl_2fadmin_2fexecution_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[15]
+  static const ::google::protobuf::internal::ParseTable schema[16]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -57,6 +57,9 @@ struct TableStruct_flyteidl_2fadmin_2fexecution_2eproto {
 void AddDescriptors_flyteidl_2fadmin_2fexecution_2eproto();
 namespace flyteidl {
 namespace admin {
+class AbortMetadata;
+class AbortMetadataDefaultTypeInternal;
+extern AbortMetadataDefaultTypeInternal _AbortMetadata_default_instance_;
 class Execution;
 class ExecutionDefaultTypeInternal;
 extern ExecutionDefaultTypeInternal _Execution_default_instance_;
@@ -106,6 +109,7 @@ extern WorkflowExecutionGetRequestDefaultTypeInternal _WorkflowExecutionGetReque
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
+template<> ::flyteidl::admin::AbortMetadata* Arena::CreateMaybeMessage<::flyteidl::admin::AbortMetadata>(Arena*);
 template<> ::flyteidl::admin::Execution* Arena::CreateMaybeMessage<::flyteidl::admin::Execution>(Arena*);
 template<> ::flyteidl::admin::ExecutionClosure* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionClosure>(Arena*);
 template<> ::flyteidl::admin::ExecutionCreateRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionCreateRequest>(Arena*);
@@ -1101,6 +1105,141 @@ class LiteralMapBlob final :
 };
 // -------------------------------------------------------------------
 
+class AbortMetadata final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.AbortMetadata) */ {
+ public:
+  AbortMetadata();
+  virtual ~AbortMetadata();
+
+  AbortMetadata(const AbortMetadata& from);
+
+  inline AbortMetadata& operator=(const AbortMetadata& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  AbortMetadata(AbortMetadata&& from) noexcept
+    : AbortMetadata() {
+    *this = ::std::move(from);
+  }
+
+  inline AbortMetadata& operator=(AbortMetadata&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const AbortMetadata& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const AbortMetadata* internal_default_instance() {
+    return reinterpret_cast<const AbortMetadata*>(
+               &_AbortMetadata_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(AbortMetadata* other);
+  friend void swap(AbortMetadata& a, AbortMetadata& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline AbortMetadata* New() const final {
+    return CreateMaybeMessage<AbortMetadata>(nullptr);
+  }
+
+  AbortMetadata* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<AbortMetadata>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const AbortMetadata& from);
+  void MergeFrom(const AbortMetadata& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AbortMetadata* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string cause = 1;
+  void clear_cause();
+  static const int kCauseFieldNumber = 1;
+  const ::std::string& cause() const;
+  void set_cause(const ::std::string& value);
+  #if LANG_CXX11
+  void set_cause(::std::string&& value);
+  #endif
+  void set_cause(const char* value);
+  void set_cause(const char* value, size_t size);
+  ::std::string* mutable_cause();
+  ::std::string* release_cause();
+  void set_allocated_cause(::std::string* cause);
+
+  // string principal = 2;
+  void clear_principal();
+  static const int kPrincipalFieldNumber = 2;
+  const ::std::string& principal() const;
+  void set_principal(const ::std::string& value);
+  #if LANG_CXX11
+  void set_principal(::std::string&& value);
+  #endif
+  void set_principal(const char* value);
+  void set_principal(const char* value, size_t size);
+  ::std::string* mutable_principal();
+  ::std::string* release_principal();
+  void set_allocated_principal(::std::string* principal);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.AbortMetadata)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr cause_;
+  ::google::protobuf::internal::ArenaStringPtr principal_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fexecution_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ExecutionClosure final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ExecutionClosure) */ {
  public:
@@ -1137,6 +1276,7 @@ class ExecutionClosure final :
     kOutputs = 1,
     kError = 2,
     kAbortCause = 10,
+    kAbortMetadata = 12,
     OUTPUT_RESULT_NOT_SET = 0,
   };
 
@@ -1146,7 +1286,7 @@ class ExecutionClosure final :
                &_ExecutionClosure_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(ExecutionClosure* other);
   friend void swap(ExecutionClosure& a, ExecutionClosure& b) {
@@ -1293,22 +1433,31 @@ class ExecutionClosure final :
   ::flyteidl::core::ExecutionError* mutable_error();
   void set_allocated_error(::flyteidl::core::ExecutionError* error);
 
-  // string abort_cause = 10;
+  // string abort_cause = 10 [deprecated = true];
   private:
   bool has_abort_cause() const;
   public:
-  void clear_abort_cause();
-  static const int kAbortCauseFieldNumber = 10;
-  const ::std::string& abort_cause() const;
-  void set_abort_cause(const ::std::string& value);
+  PROTOBUF_DEPRECATED void clear_abort_cause();
+  PROTOBUF_DEPRECATED static const int kAbortCauseFieldNumber = 10;
+  PROTOBUF_DEPRECATED const ::std::string& abort_cause() const;
+  PROTOBUF_DEPRECATED void set_abort_cause(const ::std::string& value);
   #if LANG_CXX11
-  void set_abort_cause(::std::string&& value);
+  PROTOBUF_DEPRECATED void set_abort_cause(::std::string&& value);
   #endif
-  void set_abort_cause(const char* value);
-  void set_abort_cause(const char* value, size_t size);
-  ::std::string* mutable_abort_cause();
-  ::std::string* release_abort_cause();
-  void set_allocated_abort_cause(::std::string* abort_cause);
+  PROTOBUF_DEPRECATED void set_abort_cause(const char* value);
+  PROTOBUF_DEPRECATED void set_abort_cause(const char* value, size_t size);
+  PROTOBUF_DEPRECATED ::std::string* mutable_abort_cause();
+  PROTOBUF_DEPRECATED ::std::string* release_abort_cause();
+  PROTOBUF_DEPRECATED void set_allocated_abort_cause(::std::string* abort_cause);
+
+  // .flyteidl.admin.AbortMetadata abort_metadata = 12;
+  bool has_abort_metadata() const;
+  void clear_abort_metadata();
+  static const int kAbortMetadataFieldNumber = 12;
+  const ::flyteidl::admin::AbortMetadata& abort_metadata() const;
+  ::flyteidl::admin::AbortMetadata* release_abort_metadata();
+  ::flyteidl::admin::AbortMetadata* mutable_abort_metadata();
+  void set_allocated_abort_metadata(::flyteidl::admin::AbortMetadata* abort_metadata);
 
   void clear_output_result();
   OutputResultCase output_result_case() const;
@@ -1318,6 +1467,7 @@ class ExecutionClosure final :
   void set_has_outputs();
   void set_has_error();
   void set_has_abort_cause();
+  void set_has_abort_metadata();
 
   inline bool has_output_result() const;
   inline void clear_has_output_result();
@@ -1336,6 +1486,7 @@ class ExecutionClosure final :
     ::flyteidl::admin::LiteralMapBlob* outputs_;
     ::flyteidl::core::ExecutionError* error_;
     ::google::protobuf::internal::ArenaStringPtr abort_cause_;
+    ::flyteidl::admin::AbortMetadata* abort_metadata_;
   } output_result_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -1382,7 +1533,7 @@ class ExecutionMetadata final :
                &_ExecutionMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(ExecutionMetadata* other);
   friend void swap(ExecutionMetadata& a, ExecutionMetadata& b) {
@@ -1471,19 +1622,19 @@ class ExecutionMetadata final :
 
   // accessors -------------------------------------------------------
 
-  // string principal = 2;
-  void clear_principal();
-  static const int kPrincipalFieldNumber = 2;
-  const ::std::string& principal() const;
-  void set_principal(const ::std::string& value);
+  // string principal = 2 [deprecated = true];
+  PROTOBUF_DEPRECATED void clear_principal();
+  PROTOBUF_DEPRECATED static const int kPrincipalFieldNumber = 2;
+  PROTOBUF_DEPRECATED const ::std::string& principal() const;
+  PROTOBUF_DEPRECATED void set_principal(const ::std::string& value);
   #if LANG_CXX11
-  void set_principal(::std::string&& value);
+  PROTOBUF_DEPRECATED void set_principal(::std::string&& value);
   #endif
-  void set_principal(const char* value);
-  void set_principal(const char* value, size_t size);
-  ::std::string* mutable_principal();
-  ::std::string* release_principal();
-  void set_allocated_principal(::std::string* principal);
+  PROTOBUF_DEPRECATED void set_principal(const char* value);
+  PROTOBUF_DEPRECATED void set_principal(const char* value, size_t size);
+  PROTOBUF_DEPRECATED ::std::string* mutable_principal();
+  PROTOBUF_DEPRECATED ::std::string* release_principal();
+  PROTOBUF_DEPRECATED void set_allocated_principal(::std::string* principal);
 
   // .google.protobuf.Timestamp scheduled_at = 4;
   bool has_scheduled_at() const;
@@ -1578,7 +1729,7 @@ class NotificationList final :
                &_NotificationList_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(NotificationList* other);
   friend void swap(NotificationList& a, NotificationList& b) {
@@ -1702,7 +1853,7 @@ class ExecutionSpec final :
                &_ExecutionSpec_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(ExecutionSpec* other);
   friend void swap(ExecutionSpec& a, ExecutionSpec& b) {
@@ -1889,7 +2040,7 @@ class ExecutionTerminateRequest final :
                &_ExecutionTerminateRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(ExecutionTerminateRequest* other);
   friend void swap(ExecutionTerminateRequest& a, ExecutionTerminateRequest& b) {
@@ -2019,7 +2170,7 @@ class ExecutionTerminateResponse final :
                &_ExecutionTerminateResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(ExecutionTerminateResponse* other);
   friend void swap(ExecutionTerminateResponse& a, ExecutionTerminateResponse& b) {
@@ -2124,7 +2275,7 @@ class WorkflowExecutionGetDataRequest final :
                &_WorkflowExecutionGetDataRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   void Swap(WorkflowExecutionGetDataRequest* other);
   friend void swap(WorkflowExecutionGetDataRequest& a, WorkflowExecutionGetDataRequest& b) {
@@ -2239,7 +2390,7 @@ class WorkflowExecutionGetDataResponse final :
                &_WorkflowExecutionGetDataResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(WorkflowExecutionGetDataResponse* other);
   friend void swap(WorkflowExecutionGetDataResponse& a, WorkflowExecutionGetDataResponse& b) {
@@ -3170,6 +3321,116 @@ inline LiteralMapBlob::DataCase LiteralMapBlob::data_case() const {
 }
 // -------------------------------------------------------------------
 
+// AbortMetadata
+
+// string cause = 1;
+inline void AbortMetadata::clear_cause() {
+  cause_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& AbortMetadata::cause() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.AbortMetadata.cause)
+  return cause_.GetNoArena();
+}
+inline void AbortMetadata::set_cause(const ::std::string& value) {
+  
+  cause_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.AbortMetadata.cause)
+}
+#if LANG_CXX11
+inline void AbortMetadata::set_cause(::std::string&& value) {
+  
+  cause_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.AbortMetadata.cause)
+}
+#endif
+inline void AbortMetadata::set_cause(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  cause_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.AbortMetadata.cause)
+}
+inline void AbortMetadata::set_cause(const char* value, size_t size) {
+  
+  cause_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.AbortMetadata.cause)
+}
+inline ::std::string* AbortMetadata::mutable_cause() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.AbortMetadata.cause)
+  return cause_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* AbortMetadata::release_cause() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.AbortMetadata.cause)
+  
+  return cause_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void AbortMetadata::set_allocated_cause(::std::string* cause) {
+  if (cause != nullptr) {
+    
+  } else {
+    
+  }
+  cause_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), cause);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.AbortMetadata.cause)
+}
+
+// string principal = 2;
+inline void AbortMetadata::clear_principal() {
+  principal_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& AbortMetadata::principal() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.AbortMetadata.principal)
+  return principal_.GetNoArena();
+}
+inline void AbortMetadata::set_principal(const ::std::string& value) {
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.AbortMetadata.principal)
+}
+#if LANG_CXX11
+inline void AbortMetadata::set_principal(::std::string&& value) {
+  
+  principal_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.AbortMetadata.principal)
+}
+#endif
+inline void AbortMetadata::set_principal(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.AbortMetadata.principal)
+}
+inline void AbortMetadata::set_principal(const char* value, size_t size) {
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.AbortMetadata.principal)
+}
+inline ::std::string* AbortMetadata::mutable_principal() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.AbortMetadata.principal)
+  return principal_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* AbortMetadata::release_principal() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.AbortMetadata.principal)
+  
+  return principal_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void AbortMetadata::set_allocated_principal(::std::string* principal) {
+  if (principal != nullptr) {
+    
+  } else {
+    
+  }
+  principal_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), principal);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.AbortMetadata.principal)
+}
+
+// -------------------------------------------------------------------
+
 // ExecutionClosure
 
 // .flyteidl.admin.LiteralMapBlob outputs = 1;
@@ -3248,7 +3509,7 @@ inline ::flyteidl::core::ExecutionError* ExecutionClosure::mutable_error() {
   return output_result_.error_;
 }
 
-// string abort_cause = 10;
+// string abort_cause = 10 [deprecated = true];
 inline bool ExecutionClosure::has_abort_cause() const {
   return output_result_case() == kAbortCause;
 }
@@ -3338,6 +3599,47 @@ inline void ExecutionClosure::set_allocated_abort_cause(::std::string* abort_cau
     output_result_.abort_cause_.UnsafeSetDefault(abort_cause);
   }
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionClosure.abort_cause)
+}
+
+// .flyteidl.admin.AbortMetadata abort_metadata = 12;
+inline bool ExecutionClosure::has_abort_metadata() const {
+  return output_result_case() == kAbortMetadata;
+}
+inline void ExecutionClosure::set_has_abort_metadata() {
+  _oneof_case_[0] = kAbortMetadata;
+}
+inline void ExecutionClosure::clear_abort_metadata() {
+  if (has_abort_metadata()) {
+    delete output_result_.abort_metadata_;
+    clear_has_output_result();
+  }
+}
+inline ::flyteidl::admin::AbortMetadata* ExecutionClosure::release_abort_metadata() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionClosure.abort_metadata)
+  if (has_abort_metadata()) {
+    clear_has_output_result();
+      ::flyteidl::admin::AbortMetadata* temp = output_result_.abort_metadata_;
+    output_result_.abort_metadata_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::admin::AbortMetadata& ExecutionClosure::abort_metadata() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionClosure.abort_metadata)
+  return has_abort_metadata()
+      ? *output_result_.abort_metadata_
+      : *reinterpret_cast< ::flyteidl::admin::AbortMetadata*>(&::flyteidl::admin::_AbortMetadata_default_instance_);
+}
+inline ::flyteidl::admin::AbortMetadata* ExecutionClosure::mutable_abort_metadata() {
+  if (!has_abort_metadata()) {
+    clear_output_result();
+    set_has_abort_metadata();
+    output_result_.abort_metadata_ = CreateMaybeMessage< ::flyteidl::admin::AbortMetadata >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionClosure.abort_metadata)
+  return output_result_.abort_metadata_;
 }
 
 // .flyteidl.core.LiteralMap computed_inputs = 3 [deprecated = true];
@@ -3682,7 +3984,7 @@ inline void ExecutionMetadata::set_mode(::flyteidl::admin::ExecutionMetadata_Exe
   // @@protoc_insertion_point(field_set:flyteidl.admin.ExecutionMetadata.mode)
 }
 
-// string principal = 2;
+// string principal = 2 [deprecated = true];
 inline void ExecutionMetadata::clear_principal() {
   principal_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4482,6 +4784,8 @@ inline void WorkflowExecutionGetDataResponse::set_allocated_inputs(::flyteidl::a
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -22,6 +22,7 @@ from flyteadmin.api.admin_service_api import AdminServiceApi
 from flyteadmin.api_client import ApiClient
 from flyteadmin.configuration import Configuration
 # import models into sdk package
+from flyteadmin.models.admin_abort_metadata import AdminAbortMetadata
 from flyteadmin.models.admin_annotations import AdminAnnotations
 from flyteadmin.models.admin_auth import AdminAuth
 from flyteadmin.models.admin_domain import AdminDomain

@@ -16,6 +16,7 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.admin_abort_metadata import AdminAbortMetadata  # noqa: F401,E501
 from flyteadmin.models.admin_literal_map_blob import AdminLiteralMapBlob  # noqa: F401,E501
 from flyteadmin.models.admin_notification import AdminNotification  # noqa: F401,E501
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
@@ -41,6 +42,7 @@ class AdminExecutionClosure(object):
         'outputs': 'AdminLiteralMapBlob',
         'error': 'CoreExecutionError',
         'abort_cause': 'str',
+        'abort_metadata': 'AdminAbortMetadata',
         'computed_inputs': 'CoreLiteralMap',
         'phase': 'CoreWorkflowExecutionPhase',
         'started_at': 'datetime',
@@ -55,6 +57,7 @@ class AdminExecutionClosure(object):
         'outputs': 'outputs',
         'error': 'error',
         'abort_cause': 'abort_cause',
+        'abort_metadata': 'abort_metadata',
         'computed_inputs': 'computed_inputs',
         'phase': 'phase',
         'started_at': 'started_at',
@@ -65,12 +68,13 @@ class AdminExecutionClosure(object):
         'workflow_id': 'workflow_id'
     }
 
-    def __init__(self, outputs=None, error=None, abort_cause=None, computed_inputs=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, notifications=None, workflow_id=None):  # noqa: E501
+    def __init__(self, outputs=None, error=None, abort_cause=None, abort_metadata=None, computed_inputs=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, notifications=None, workflow_id=None):  # noqa: E501
         """AdminExecutionClosure - a model defined in Swagger"""  # noqa: E501
 
         self._outputs = None
         self._error = None
         self._abort_cause = None
+        self._abort_metadata = None
         self._computed_inputs = None
         self._phase = None
         self._started_at = None
@@ -87,6 +91,8 @@ class AdminExecutionClosure(object):
             self.error = error
         if abort_cause is not None:
             self.abort_cause = abort_cause
+        if abort_metadata is not None:
+            self.abort_metadata = abort_metadata
         if computed_inputs is not None:
             self.computed_inputs = computed_inputs
         if phase is not None:
@@ -172,6 +178,29 @@ class AdminExecutionClosure(object):
         """
 
         self._abort_cause = abort_cause
+
+    @property
+    def abort_metadata(self):
+        """Gets the abort_metadata of this AdminExecutionClosure.  # noqa: E501
+
+        In the case of a user-specified abort, this will pass along the user and their supplied cause.  # noqa: E501
+
+        :return: The abort_metadata of this AdminExecutionClosure.  # noqa: E501
+        :rtype: AdminAbortMetadata
+        """
+        return self._abort_metadata
+
+    @abort_metadata.setter
+    def abort_metadata(self, abort_metadata):
+        """Sets the abort_metadata of this AdminExecutionClosure.
+
+        In the case of a user-specified abort, this will pass along the user and their supplied cause.  # noqa: E501
+
+        :param abort_metadata: The abort_metadata of this AdminExecutionClosure.  # noqa: E501
+        :type: AdminAbortMetadata
+        """
+
+        self._abort_metadata = abort_metadata
 
     @property
     def computed_inputs(self):

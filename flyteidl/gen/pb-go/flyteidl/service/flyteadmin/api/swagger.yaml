@@ -2153,6 +2153,19 @@ definitions:
     - "CSV"
     - "JSON"
     default: "UNKNOWN"
+  adminAbortMetadata:
+    type: "object"
+    properties:
+      cause:
+        type: "string"
+        description: "In the case of a user-specified abort, this will pass along\
+          \ the user-supplied cause."
+      principal:
+        type: "string"
+        title: "Identifies the entity (if any) responsible for terminating the execution"
+    example:
+      principal: "principal"
+      cause: "cause"
   adminAnnotations:
     type: "object"
     properties:
@@ -2240,6 +2253,9 @@ definitions:
           version: "version"
         computed_inputs:
           literals: {}
+        abort_metadata:
+          principal: "principal"
+          cause: "cause"
         updated_at: "2000-01-23T04:56:07.000+00:00"
         started_at: "2000-01-23T04:56:07.000+00:00"
         created_at: "2000-01-23T04:56:07.000+00:00"
@@ -2355,6 +2371,10 @@ definitions:
         type: "string"
         description: "In the case of a user-specified abort, this will pass along\
           \ the user-supplied cause."
+      abort_metadata:
+        description: "In the case of a user-specified abort, this will pass along\
+          \ the user and their supplied cause."
+        $ref: "#/definitions/adminAbortMetadata"
       computed_inputs:
         title: "Inputs computed and passed for execution.\ncomputed_inputs depends\
           \ on inputs in ExecutionSpec, fixed and default inputs in launch plan"
@@ -2404,6 +2424,9 @@ definitions:
         version: "version"
       computed_inputs:
         literals: {}
+      abort_metadata:
+        principal: "principal"
+        cause: "cause"
       updated_at: "2000-01-23T04:56:07.000+00:00"
       started_at: "2000-01-23T04:56:07.000+00:00"
       created_at: "2000-01-23T04:56:07.000+00:00"
@@ -2514,6 +2537,9 @@ definitions:
             version: "version"
           computed_inputs:
             literals: {}
+          abort_metadata:
+            principal: "principal"
+            cause: "cause"
           updated_at: "2000-01-23T04:56:07.000+00:00"
           started_at: "2000-01-23T04:56:07.000+00:00"
           created_at: "2000-01-23T04:56:07.000+00:00"
@@ -2635,6 +2661,9 @@ definitions:
             version: "version"
           computed_inputs:
             literals: {}
+          abort_metadata:
+            principal: "principal"
+            cause: "cause"
           updated_at: "2000-01-23T04:56:07.000+00:00"
           started_at: "2000-01-23T04:56:07.000+00:00"
           created_at: "2000-01-23T04:56:07.000+00:00"

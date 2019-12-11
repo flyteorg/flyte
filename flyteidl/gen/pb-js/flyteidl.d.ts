@@ -6705,6 +6705,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an AbortMetadata. */
+        interface IAbortMetadata {
+
+            /** AbortMetadata cause */
+            cause?: (string|null);
+
+            /** AbortMetadata principal */
+            principal?: (string|null);
+        }
+
+        /** Represents an AbortMetadata. */
+        class AbortMetadata implements IAbortMetadata {
+
+            /**
+             * Constructs a new AbortMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IAbortMetadata);
+
+            /** AbortMetadata cause. */
+            public cause: string;
+
+            /** AbortMetadata principal. */
+            public principal: string;
+
+            /**
+             * Creates a new AbortMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AbortMetadata instance
+             */
+            public static create(properties?: flyteidl.admin.IAbortMetadata): flyteidl.admin.AbortMetadata;
+
+            /**
+             * Encodes the specified AbortMetadata message. Does not implicitly {@link flyteidl.admin.AbortMetadata.verify|verify} messages.
+             * @param message AbortMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IAbortMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an AbortMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns AbortMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.AbortMetadata;
+
+            /**
+             * Verifies an AbortMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an ExecutionClosure. */
         interface IExecutionClosure {
 
@@ -6716,6 +6774,9 @@ export namespace flyteidl {
 
             /** ExecutionClosure abortCause */
             abortCause?: (string|null);
+
+            /** ExecutionClosure abortMetadata */
+            abortMetadata?: (flyteidl.admin.IAbortMetadata|null);
 
             /** ExecutionClosure computedInputs */
             computedInputs?: (flyteidl.core.ILiteralMap|null);
@@ -6760,6 +6821,9 @@ export namespace flyteidl {
             /** ExecutionClosure abortCause. */
             public abortCause: string;
 
+            /** ExecutionClosure abortMetadata. */
+            public abortMetadata?: (flyteidl.admin.IAbortMetadata|null);
+
             /** ExecutionClosure computedInputs. */
             public computedInputs?: (flyteidl.core.ILiteralMap|null);
 
@@ -6785,7 +6849,7 @@ export namespace flyteidl {
             public workflowId?: (flyteidl.core.IIdentifier|null);
 
             /** ExecutionClosure outputResult. */
-            public outputResult?: ("outputs"|"error"|"abortCause");
+            public outputResult?: ("outputs"|"error"|"abortCause"|"abortMetadata");
 
             /**
              * Creates a new ExecutionClosure instance using the specified properties.

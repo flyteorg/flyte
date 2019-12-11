@@ -20,6 +20,8 @@ type AdminExecutionClosure struct {
 	Error_ *CoreExecutionError `json:"error,omitempty"`
 	// In the case of a user-specified abort, this will pass along the user-supplied cause.
 	AbortCause string `json:"abort_cause,omitempty"`
+	// In the case of a user-specified abort, this will pass along the user and their supplied cause.
+	AbortMetadata *AdminAbortMetadata `json:"abort_metadata,omitempty"`
 	ComputedInputs *CoreLiteralMap `json:"computed_inputs,omitempty"`
 	// Most recent recorded phase for the execution.
 	Phase *CoreWorkflowExecutionPhase `json:"phase,omitempty"`

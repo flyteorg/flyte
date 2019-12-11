@@ -16012,6 +16012,133 @@ export const flyteidl = $root.flyteidl = (() => {
             return LiteralMapBlob;
         })();
 
+        admin.AbortMetadata = (function() {
+
+            /**
+             * Properties of an AbortMetadata.
+             * @memberof flyteidl.admin
+             * @interface IAbortMetadata
+             * @property {string|null} [cause] AbortMetadata cause
+             * @property {string|null} [principal] AbortMetadata principal
+             */
+
+            /**
+             * Constructs a new AbortMetadata.
+             * @memberof flyteidl.admin
+             * @classdesc Represents an AbortMetadata.
+             * @implements IAbortMetadata
+             * @constructor
+             * @param {flyteidl.admin.IAbortMetadata=} [properties] Properties to set
+             */
+            function AbortMetadata(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * AbortMetadata cause.
+             * @member {string} cause
+             * @memberof flyteidl.admin.AbortMetadata
+             * @instance
+             */
+            AbortMetadata.prototype.cause = "";
+
+            /**
+             * AbortMetadata principal.
+             * @member {string} principal
+             * @memberof flyteidl.admin.AbortMetadata
+             * @instance
+             */
+            AbortMetadata.prototype.principal = "";
+
+            /**
+             * Creates a new AbortMetadata instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.AbortMetadata
+             * @static
+             * @param {flyteidl.admin.IAbortMetadata=} [properties] Properties to set
+             * @returns {flyteidl.admin.AbortMetadata} AbortMetadata instance
+             */
+            AbortMetadata.create = function create(properties) {
+                return new AbortMetadata(properties);
+            };
+
+            /**
+             * Encodes the specified AbortMetadata message. Does not implicitly {@link flyteidl.admin.AbortMetadata.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.AbortMetadata
+             * @static
+             * @param {flyteidl.admin.IAbortMetadata} message AbortMetadata message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            AbortMetadata.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.cause != null && message.hasOwnProperty("cause"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.cause);
+                if (message.principal != null && message.hasOwnProperty("principal"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.principal);
+                return writer;
+            };
+
+            /**
+             * Decodes an AbortMetadata message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.AbortMetadata
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.AbortMetadata} AbortMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            AbortMetadata.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.AbortMetadata();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.cause = reader.string();
+                        break;
+                    case 2:
+                        message.principal = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies an AbortMetadata message.
+             * @function verify
+             * @memberof flyteidl.admin.AbortMetadata
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            AbortMetadata.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.cause != null && message.hasOwnProperty("cause"))
+                    if (!$util.isString(message.cause))
+                        return "cause: string expected";
+                if (message.principal != null && message.hasOwnProperty("principal"))
+                    if (!$util.isString(message.principal))
+                        return "principal: string expected";
+                return null;
+            };
+
+            return AbortMetadata;
+        })();
+
         admin.ExecutionClosure = (function() {
 
             /**
@@ -16021,6 +16148,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.admin.ILiteralMapBlob|null} [outputs] ExecutionClosure outputs
              * @property {flyteidl.core.IExecutionError|null} [error] ExecutionClosure error
              * @property {string|null} [abortCause] ExecutionClosure abortCause
+             * @property {flyteidl.admin.IAbortMetadata|null} [abortMetadata] ExecutionClosure abortMetadata
              * @property {flyteidl.core.ILiteralMap|null} [computedInputs] ExecutionClosure computedInputs
              * @property {flyteidl.core.WorkflowExecution.Phase|null} [phase] ExecutionClosure phase
              * @property {google.protobuf.ITimestamp|null} [startedAt] ExecutionClosure startedAt
@@ -16070,6 +16198,14 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              */
             ExecutionClosure.prototype.abortCause = "";
+
+            /**
+             * ExecutionClosure abortMetadata.
+             * @member {flyteidl.admin.IAbortMetadata|null|undefined} abortMetadata
+             * @memberof flyteidl.admin.ExecutionClosure
+             * @instance
+             */
+            ExecutionClosure.prototype.abortMetadata = null;
 
             /**
              * ExecutionClosure computedInputs.
@@ -16140,12 +16276,12 @@ export const flyteidl = $root.flyteidl = (() => {
 
             /**
              * ExecutionClosure outputResult.
-             * @member {"outputs"|"error"|"abortCause"|undefined} outputResult
+             * @member {"outputs"|"error"|"abortCause"|"abortMetadata"|undefined} outputResult
              * @memberof flyteidl.admin.ExecutionClosure
              * @instance
              */
             Object.defineProperty(ExecutionClosure.prototype, "outputResult", {
-                get: $util.oneOfGetter($oneOfFields = ["outputs", "error", "abortCause"]),
+                get: $util.oneOfGetter($oneOfFields = ["outputs", "error", "abortCause", "abortMetadata"]),
                 set: $util.oneOfSetter($oneOfFields)
             });
 
@@ -16196,6 +16332,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 10, wireType 2 =*/82).string(message.abortCause);
                 if (message.workflowId != null && message.hasOwnProperty("workflowId"))
                     $root.flyteidl.core.Identifier.encode(message.workflowId, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
+                if (message.abortMetadata != null && message.hasOwnProperty("abortMetadata"))
+                    $root.flyteidl.admin.AbortMetadata.encode(message.abortMetadata, writer.uint32(/* id 12, wireType 2 =*/98).fork()).ldelim();
                 return writer;
             };
 
@@ -16225,6 +16363,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 10:
                         message.abortCause = reader.string();
+                        break;
+                    case 12:
+                        message.abortMetadata = $root.flyteidl.admin.AbortMetadata.decode(reader, reader.uint32());
                         break;
                     case 3:
                         message.computedInputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
@@ -16296,6 +16437,16 @@ export const flyteidl = $root.flyteidl = (() => {
                     properties.outputResult = 1;
                     if (!$util.isString(message.abortCause))
                         return "abortCause: string expected";
+                }
+                if (message.abortMetadata != null && message.hasOwnProperty("abortMetadata")) {
+                    if (properties.outputResult === 1)
+                        return "outputResult: multiple values";
+                    properties.outputResult = 1;
+                    {
+                        let error = $root.flyteidl.admin.AbortMetadata.verify(message.abortMetadata);
+                        if (error)
+                            return "abortMetadata." + error;
+                    }
                 }
                 if (message.computedInputs != null && message.hasOwnProperty("computedInputs")) {
                     let error = $root.flyteidl.core.LiteralMap.verify(message.computedInputs);

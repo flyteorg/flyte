@@ -2484,6 +2484,19 @@
       ],
       "default": "UNKNOWN"
     },
+    "adminAbortMetadata": {
+      "type": "object",
+      "properties": {
+        "cause": {
+          "type": "string",
+          "description": "In the case of a user-specified abort, this will pass along the user-supplied cause."
+        },
+        "principal": {
+          "type": "string",
+          "title": "Identifies the entity (if any) responsible for terminating the execution"
+        }
+      }
+    },
     "adminAnnotations": {
       "type": "object",
       "properties": {
@@ -2566,6 +2579,10 @@
         "abort_cause": {
           "type": "string",
           "description": "In the case of a user-specified abort, this will pass along the user-supplied cause."
+        },
+        "abort_metadata": {
+          "$ref": "#/definitions/adminAbortMetadata",
+          "description": "In the case of a user-specified abort, this will pass along the user and their supplied cause."
         },
         "computed_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
