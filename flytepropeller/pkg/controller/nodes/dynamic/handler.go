@@ -367,6 +367,15 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 			nil
 	}
 
+	if state.HasTimedOut() {
+		if dynamicWorkflow.GetOnFailureNode() != nil {
+			// TODO Once we migrate to closure node we need to handle subworkflow using the subworkflow handler
+			logger.Errorf(ctx, "We do not support failure nodes in dynamic workflow today")
+		}
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("DynamicNodeTimeout", "timed out", nil)),
+			handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: "dynamic node timed out"}, nil
+	}
+
 	if state.IsComplete() {
 		var o *handler.OutputInfo
 		// If the WF interface has outputs, validate that the outputs file was written.

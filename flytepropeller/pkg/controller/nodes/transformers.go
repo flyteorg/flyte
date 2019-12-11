@@ -113,8 +113,10 @@ func ToNodePhase(p handler.EPhase) (v1alpha1.NodePhase, error) {
 		return v1alpha1.NodePhaseSucceeding, nil
 	case handler.EPhaseFailed:
 		return v1alpha1.NodePhaseFailing, nil
+	case handler.EPhaseTimedout:
+		return v1alpha1.NodePhaseTimingOut, nil
 	}
-	return v1alpha1.NodePhaseNotYetStarted, fmt.Errorf("no know conversion from handlerPhase[%d] to NodePhase", p)
+	return v1alpha1.NodePhaseNotYetStarted, fmt.Errorf("no known conversion from handlerPhase[%d] to NodePhase", p)
 }
 
 func ToK8sTime(t time.Time) v1.Time {
