@@ -1,6 +1,7 @@
 .PHONY: lint
 lint: #lints the package for common code smells
-	which golangci-lint || go install github.com/golangci/golangci-lint/cmd/golangci-lint
+	# install outside of current module, workaround https://github.com/golang/go/issues/30515
+	which golangci-lint || (cd /tmp && go get github.com/golangci/golangci-lint/cmd/golangci-lint && cd -)
 	golangci-lint run
 
 # If code is failing goimports linter, this will fix.
