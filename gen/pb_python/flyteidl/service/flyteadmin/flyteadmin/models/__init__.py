@@ -15,6 +15,7 @@
 from __future__ import absolute_import
 
 # import models into model package
+from flyteadmin.models.admin_abort_metadata import AdminAbortMetadata
 from flyteadmin.models.admin_annotations import AdminAnnotations
 from flyteadmin.models.admin_auth import AdminAuth
 from flyteadmin.models.admin_domain import AdminDomain

@@ -26,7 +26,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n\x1e\x66lyteidl/admin/execution.proto\x12\x0e\x66lyteidl.admin\x1a\x1b\x66lyteidl/admin/common.proto\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1e\x66lyteidl/core/identifier.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9f\x01\n\x16\x45xecutionCreateRequest\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12+\n\x04spec\x18\x04 \x01(\x0b\x32\x1d.flyteidl.admin.ExecutionSpec\x12)\n\x06inputs\x18\x05 \x01(\x0b\x32\x19.flyteidl.core.LiteralMap\"`\n\x18\x45xecutionRelaunchRequest\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\x12\x0c\n\x04name\x18\x03 \x01(\t\"Q\n\x17\x45xecutionCreateResponse\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\"U\n\x1bWorkflowExecutionGetRequest\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\"\xa3\x01\n\tExecution\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\x12+\n\x04spec\x18\x02 \x01(\x0b\x32\x1d.flyteidl.admin.ExecutionSpec\x12\x31\n\x07\x63losure\x18\x03 \x01(\x0b\x32 .flyteidl.admin.ExecutionClosure\"M\n\rExecutionList\x12-\n\nexecutions\x18\x01 \x03(\x0b\x32\x19.flyteidl.admin.Execution\x12\r\n\x05token\x18\x02 \x01(\t\"T\n\x0eLiteralMapBlob\x12+\n\x06values\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapH\x00\x12\r\n\x03uri\x18\x02 \x01(\tH\x00\x42\x06\n\x04\x64\x61ta\"\xae\x04\n\x10\x45xecutionClosure\x12\x31\n\x07outputs\x18\x01 \x01(\x0b\x32\x1e.flyteidl.admin.LiteralMapBlobH\x00\x12.\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x1d.flyteidl.core.ExecutionErrorH\x00\x12\x15\n\x0b\x61\x62ort_cause\x18\n \x01(\tH\x00\x12\x36\n\x0f\x63omputed_inputs\x18\x03 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapB\x02\x18\x01\x12\x35\n\x05phase\x18\x04 \x01(\x0e\x32&.flyteidl.core.WorkflowExecution.Phase\x12.\n\nstarted_at\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12+\n\x08\x64uration\x18\x06 \x01(\x0b\x32\x19.google.protobuf.Duration\x12.\n\ncreated_at\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12.\n\nupdated_at\x18\x08 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x33\n\rnotifications\x18\t \x03(\x0b\x32\x1c.flyteidl.admin.Notification\x12.\n\x0bworkflow_id\x18\x0b \x01(\x0b\x32\x19.flyteidl.core.IdentifierB\x0f\n\routput_result\"\x92\x03\n\x11\x45xecutionMetadata\x12=\n\x04mode\x18\x01 \x01(\x0e\x32/.flyteidl.admin.ExecutionMetadata.ExecutionMode\x12\x11\n\tprincipal\x18\x02 \x01(\t\x12\x0f\n\x07nesting\x18\x03 \x01(\r\x12\x30\n\x0cscheduled_at\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x45\n\x15parent_node_execution\x18\x05 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifier\x12G\n\x13reference_execution\x18\x10 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\"X\n\rExecutionMode\x12\n\n\x06MANUAL\x10\x00\x12\r\n\tSCHEDULED\x10\x01\x12\n\n\x06SYSTEM\x10\x02\x12\x0c\n\x08RELAUNCH\x10\x03\x12\x12\n\x0e\x43HILD_WORKFLOW\x10\x04\"G\n\x10NotificationList\x12\x33\n\rnotifications\x18\x01 \x03(\x0b\x32\x1c.flyteidl.admin.Notification\"\xef\x02\n\rExecutionSpec\x12.\n\x0blaunch_plan\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12-\n\x06inputs\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapB\x02\x18\x01\x12\x33\n\x08metadata\x18\x03 \x01(\x0b\x32!.flyteidl.admin.ExecutionMetadata\x12\x39\n\rnotifications\x18\x05 \x01(\x0b\x32 .flyteidl.admin.NotificationListH\x00\x12\x15\n\x0b\x64isable_all\x18\x06 \x01(\x08H\x00\x12&\n\x06labels\x18\x07 \x01(\x0b\x32\x16.flyteidl.admin.Labels\x12\x30\n\x0b\x61nnotations\x18\x08 \x01(\x0b\x32\x1b.flyteidl.admin.AnnotationsB\x18\n\x16notification_overridesJ\x04\x08\x04\x10\x05\"b\n\x19\x45xecutionTerminateRequest\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\x12\r\n\x05\x63\x61use\x18\x02 \x01(\t\"\x1c\n\x1a\x45xecutionTerminateResponse\"Y\n\x1fWorkflowExecutionGetDataRequest\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\"u\n WorkflowExecutionGetDataResponse\x12(\n\x07outputs\x18\x01 \x01(\x0b\x32\x17.flyteidl.admin.UrlBlob\x12\'\n\x06inputs\x18\x02 \x01(\x0b\x32\x17.flyteidl.admin.UrlBlobB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n\x1e\x66lyteidl/admin/execution.proto\x12\x0e\x66lyteidl.admin\x1a\x1b\x66lyteidl/admin/common.proto\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1e\x66lyteidl/core/identifier.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9f\x01\n\x16\x45xecutionCreateRequest\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12+\n\x04spec\x18\x04 \x01(\x0b\x32\x1d.flyteidl.admin.ExecutionSpec\x12)\n\x06inputs\x18\x05 \x01(\x0b\x32\x19.flyteidl.core.LiteralMap\"`\n\x18\x45xecutionRelaunchRequest\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\x12\x0c\n\x04name\x18\x03 \x01(\t\"Q\n\x17\x45xecutionCreateResponse\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\"U\n\x1bWorkflowExecutionGetRequest\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\"\xa3\x01\n\tExecution\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\x12+\n\x04spec\x18\x02 \x01(\x0b\x32\x1d.flyteidl.admin.ExecutionSpec\x12\x31\n\x07\x63losure\x18\x03 \x01(\x0b\x32 .flyteidl.admin.ExecutionClosure\"M\n\rExecutionList\x12-\n\nexecutions\x18\x01 \x03(\x0b\x32\x19.flyteidl.admin.Execution\x12\r\n\x05token\x18\x02 \x01(\t\"T\n\x0eLiteralMapBlob\x12+\n\x06values\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapH\x00\x12\r\n\x03uri\x18\x02 \x01(\tH\x00\x42\x06\n\x04\x64\x61ta\"1\n\rAbortMetadata\x12\r\n\x05\x63\x61use\x18\x01 \x01(\t\x12\x11\n\tprincipal\x18\x02 \x01(\t\"\xeb\x04\n\x10\x45xecutionClosure\x12\x31\n\x07outputs\x18\x01 \x01(\x0b\x32\x1e.flyteidl.admin.LiteralMapBlobH\x00\x12.\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x1d.flyteidl.core.ExecutionErrorH\x00\x12\x19\n\x0b\x61\x62ort_cause\x18\n \x01(\tB\x02\x18\x01H\x00\x12\x37\n\x0e\x61\x62ort_metadata\x18\x0c \x01(\x0b\x32\x1d.flyteidl.admin.AbortMetadataH\x00\x12\x36\n\x0f\x63omputed_inputs\x18\x03 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapB\x02\x18\x01\x12\x35\n\x05phase\x18\x04 \x01(\x0e\x32&.flyteidl.core.WorkflowExecution.Phase\x12.\n\nstarted_at\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12+\n\x08\x64uration\x18\x06 \x01(\x0b\x32\x19.google.protobuf.Duration\x12.\n\ncreated_at\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12.\n\nupdated_at\x18\x08 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x33\n\rnotifications\x18\t \x03(\x0b\x32\x1c.flyteidl.admin.Notification\x12.\n\x0bworkflow_id\x18\x0b \x01(\x0b\x32\x19.flyteidl.core.IdentifierB\x0f\n\routput_result\"\x96\x03\n\x11\x45xecutionMetadata\x12=\n\x04mode\x18\x01 \x01(\x0e\x32/.flyteidl.admin.ExecutionMetadata.ExecutionMode\x12\x15\n\tprincipal\x18\x02 \x01(\tB\x02\x18\x01\x12\x0f\n\x07nesting\x18\x03 \x01(\r\x12\x30\n\x0cscheduled_at\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x45\n\x15parent_node_execution\x18\x05 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifier\x12G\n\x13reference_execution\x18\x10 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\"X\n\rExecutionMode\x12\n\n\x06MANUAL\x10\x00\x12\r\n\tSCHEDULED\x10\x01\x12\n\n\x06SYSTEM\x10\x02\x12\x0c\n\x08RELAUNCH\x10\x03\x12\x12\n\x0e\x43HILD_WORKFLOW\x10\x04\"G\n\x10NotificationList\x12\x33\n\rnotifications\x18\x01 \x03(\x0b\x32\x1c.flyteidl.admin.Notification\"\xef\x02\n\rExecutionSpec\x12.\n\x0blaunch_plan\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12-\n\x06inputs\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapB\x02\x18\x01\x12\x33\n\x08metadata\x18\x03 \x01(\x0b\x32!.flyteidl.admin.ExecutionMetadata\x12\x39\n\rnotifications\x18\x05 \x01(\x0b\x32 .flyteidl.admin.NotificationListH\x00\x12\x15\n\x0b\x64isable_all\x18\x06 \x01(\x08H\x00\x12&\n\x06labels\x18\x07 \x01(\x0b\x32\x16.flyteidl.admin.Labels\x12\x30\n\x0b\x61nnotations\x18\x08 \x01(\x0b\x32\x1b.flyteidl.admin.AnnotationsB\x18\n\x16notification_overridesJ\x04\x08\x04\x10\x05\"b\n\x19\x45xecutionTerminateRequest\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\x12\r\n\x05\x63\x61use\x18\x02 \x01(\t\"\x1c\n\x1a\x45xecutionTerminateResponse\"Y\n\x1fWorkflowExecutionGetDataRequest\x12\x36\n\x02id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\"u\n WorkflowExecutionGetDataResponse\x12(\n\x07outputs\x18\x01 \x01(\x0b\x32\x17.flyteidl.admin.UrlBlob\x12\'\n\x06inputs\x18\x02 \x01(\x0b\x32\x17.flyteidl.admin.UrlBlobB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
   ,
   dependencies=[flyteidl_dot_admin_dot_common__pb2.DESCRIPTOR,flyteidl_dot_core_dot_literals__pb2.DESCRIPTOR,flyteidl_dot_core_dot_execution__pb2.DESCRIPTOR,flyteidl_dot_core_dot_identifier__pb2.DESCRIPTOR,google_dot_protobuf_dot_duration__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -61,8 +61,8 @@ _EXECUTIONMETADATA_EXECUTIONMODE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1874,
-  serialized_end=1962,
+  serialized_start=1990,
+  serialized_end=2078,
 )
 _sym_db.RegisterEnumDescriptor(_EXECUTIONMETADATA_EXECUTIONMODE)
 
@@ -350,6 +350,44 @@ _LITERALMAPBLOB = _descriptor.Descriptor(
 )
 
 
+_ABORTMETADATA = _descriptor.Descriptor(
+  name='AbortMetadata',
+  full_name='flyteidl.admin.AbortMetadata',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='cause', full_name='flyteidl.admin.AbortMetadata.cause', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='principal', full_name='flyteidl.admin.AbortMetadata.principal', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=998,
+  serialized_end=1047,
+)
+
+
 _EXECUTIONCLOSURE = _descriptor.Descriptor(
   name='ExecutionClosure',
   full_name='flyteidl.admin.ExecutionClosure',
@@ -377,58 +415,65 @@ _EXECUTIONCLOSURE = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
+      serialized_options=_b('\030\001'), file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='abort_metadata', full_name='flyteidl.admin.ExecutionClosure.abort_metadata', index=3,
+      number=12, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='computed_inputs', full_name='flyteidl.admin.ExecutionClosure.computed_inputs', index=3,
+      name='computed_inputs', full_name='flyteidl.admin.ExecutionClosure.computed_inputs', index=4,
       number=3, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=_b('\030\001'), file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='phase', full_name='flyteidl.admin.ExecutionClosure.phase', index=4,
+      name='phase', full_name='flyteidl.admin.ExecutionClosure.phase', index=5,
       number=4, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='started_at', full_name='flyteidl.admin.ExecutionClosure.started_at', index=5,
+      name='started_at', full_name='flyteidl.admin.ExecutionClosure.started_at', index=6,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='duration', full_name='flyteidl.admin.ExecutionClosure.duration', index=6,
+      name='duration', full_name='flyteidl.admin.ExecutionClosure.duration', index=7,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='created_at', full_name='flyteidl.admin.ExecutionClosure.created_at', index=7,
+      name='created_at', full_name='flyteidl.admin.ExecutionClosure.created_at', index=8,
       number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='updated_at', full_name='flyteidl.admin.ExecutionClosure.updated_at', index=8,
+      name='updated_at', full_name='flyteidl.admin.ExecutionClosure.updated_at', index=9,
       number=8, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='notifications', full_name='flyteidl.admin.ExecutionClosure.notifications', index=9,
+      name='notifications', full_name='flyteidl.admin.ExecutionClosure.notifications', index=10,
       number=9, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='workflow_id', full_name='flyteidl.admin.ExecutionClosure.workflow_id', index=10,
+      name='workflow_id', full_name='flyteidl.admin.ExecutionClosure.workflow_id', index=11,
       number=11, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -449,8 +494,8 @@ _EXECUTIONCLOSURE = _descriptor.Descriptor(
       name='output_result', full_name='flyteidl.admin.ExecutionClosure.output_result',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=999,
-  serialized_end=1557,
+  serialized_start=1050,
+  serialized_end=1669,
 )
 
 
@@ -474,7 +519,7 @@ _EXECUTIONMETADATA = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      serialized_options=_b('\030\001'), file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='nesting', full_name='flyteidl.admin.ExecutionMetadata.nesting', index=2,
       number=3, type=13, cpp_type=3, label=1,
@@ -516,8 +561,8 @@ _EXECUTIONMETADATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1560,
-  serialized_end=1962,
+  serialized_start=1672,
+  serialized_end=2078,
 )
 
 
@@ -547,8 +592,8 @@ _NOTIFICATIONLIST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1964,
-  serialized_end=2035,
+  serialized_start=2080,
+  serialized_end=2151,
 )
 
 
@@ -623,8 +668,8 @@ _EXECUTIONSPEC = _descriptor.Descriptor(
       name='notification_overrides', full_name='flyteidl.admin.ExecutionSpec.notification_overrides',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=2038,
-  serialized_end=2405,
+  serialized_start=2154,
+  serialized_end=2521,
 )
 
 
@@ -661,8 +706,8 @@ _EXECUTIONTERMINATEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2407,
-  serialized_end=2505,
+  serialized_start=2523,
+  serialized_end=2621,
 )
 
 
@@ -685,8 +730,8 @@ _EXECUTIONTERMINATERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2507,
-  serialized_end=2535,
+  serialized_start=2623,
+  serialized_end=2651,
 )
 
 
@@ -716,8 +761,8 @@ _WORKFLOWEXECUTIONGETDATAREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2537,
-  serialized_end=2626,
+  serialized_start=2653,
+  serialized_end=2742,
 )
 
 
@@ -754,8 +799,8 @@ _WORKFLOWEXECUTIONGETDATARESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2628,
-  serialized_end=2745,
+  serialized_start=2744,
+  serialized_end=2861,
 )
 
 _EXECUTIONCREATEREQUEST.fields_by_name['spec'].message_type = _EXECUTIONSPEC
@@ -776,6 +821,7 @@ _LITERALMAPBLOB.oneofs_by_name['data'].fields.append(
 _LITERALMAPBLOB.fields_by_name['uri'].containing_oneof = _LITERALMAPBLOB.oneofs_by_name['data']
 _EXECUTIONCLOSURE.fields_by_name['outputs'].message_type = _LITERALMAPBLOB
 _EXECUTIONCLOSURE.fields_by_name['error'].message_type = flyteidl_dot_core_dot_execution__pb2._EXECUTIONERROR
+_EXECUTIONCLOSURE.fields_by_name['abort_metadata'].message_type = _ABORTMETADATA
 _EXECUTIONCLOSURE.fields_by_name['computed_inputs'].message_type = flyteidl_dot_core_dot_literals__pb2._LITERALMAP
 _EXECUTIONCLOSURE.fields_by_name['phase'].enum_type = flyteidl_dot_core_dot_execution__pb2._WORKFLOWEXECUTION_PHASE
 _EXECUTIONCLOSURE.fields_by_name['started_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
@@ -793,6 +839,9 @@ _EXECUTIONCLOSURE.fields_by_name['error'].containing_oneof = _EXECUTIONCLOSURE.o
 _EXECUTIONCLOSURE.oneofs_by_name['output_result'].fields.append(
   _EXECUTIONCLOSURE.fields_by_name['abort_cause'])
 _EXECUTIONCLOSURE.fields_by_name['abort_cause'].containing_oneof = _EXECUTIONCLOSURE.oneofs_by_name['output_result']
+_EXECUTIONCLOSURE.oneofs_by_name['output_result'].fields.append(
+  _EXECUTIONCLOSURE.fields_by_name['abort_metadata'])
+_EXECUTIONCLOSURE.fields_by_name['abort_metadata'].containing_oneof = _EXECUTIONCLOSURE.oneofs_by_name['output_result']
 _EXECUTIONMETADATA.fields_by_name['mode'].enum_type = _EXECUTIONMETADATA_EXECUTIONMODE
 _EXECUTIONMETADATA.fields_by_name['scheduled_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 _EXECUTIONMETADATA.fields_by_name['parent_node_execution'].message_type = flyteidl_dot_core_dot_identifier__pb2._NODEEXECUTIONIDENTIFIER
@@ -822,6 +871,7 @@ DESCRIPTOR.message_types_by_name['WorkflowExecutionGetRequest'] = _WORKFLOWEXECU
 DESCRIPTOR.message_types_by_name['Execution'] = _EXECUTION
 DESCRIPTOR.message_types_by_name['ExecutionList'] = _EXECUTIONLIST
 DESCRIPTOR.message_types_by_name['LiteralMapBlob'] = _LITERALMAPBLOB
+DESCRIPTOR.message_types_by_name['AbortMetadata'] = _ABORTMETADATA
 DESCRIPTOR.message_types_by_name['ExecutionClosure'] = _EXECUTIONCLOSURE
 DESCRIPTOR.message_types_by_name['ExecutionMetadata'] = _EXECUTIONMETADATA
 DESCRIPTOR.message_types_by_name['NotificationList'] = _NOTIFICATIONLIST
@@ -881,6 +931,13 @@ LiteralMapBlob = _reflection.GeneratedProtocolMessageType('LiteralMapBlob', (_me
   ))
 _sym_db.RegisterMessage(LiteralMapBlob)
 
+AbortMetadata = _reflection.GeneratedProtocolMessageType('AbortMetadata', (_message.Message,), dict(
+  DESCRIPTOR = _ABORTMETADATA,
+  __module__ = 'flyteidl.admin.execution_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.AbortMetadata)
+  ))
+_sym_db.RegisterMessage(AbortMetadata)
+
 ExecutionClosure = _reflection.GeneratedProtocolMessageType('ExecutionClosure', (_message.Message,), dict(
   DESCRIPTOR = _EXECUTIONCLOSURE,
   __module__ = 'flyteidl.admin.execution_pb2'
@@ -939,6 +996,8 @@ _sym_db.RegisterMessage(WorkflowExecutionGetDataResponse)
 
 
 DESCRIPTOR._options = None
+_EXECUTIONCLOSURE.fields_by_name['abort_cause']._options = None
 _EXECUTIONCLOSURE.fields_by_name['computed_inputs']._options = None
+_EXECUTIONMETADATA.fields_by_name['principal']._options = None
 _EXECUTIONSPEC.fields_by_name['inputs']._options = None
 # @@protoc_insertion_point(module_scope)

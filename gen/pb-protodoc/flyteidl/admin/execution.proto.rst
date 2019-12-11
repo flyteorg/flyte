@@ -241,12 +241,41 @@ uri
   
 
 
+.. _api_msg_flyteidl.admin.AbortMetadata:
+
+flyteidl.admin.AbortMetadata
+----------------------------
+
+`[flyteidl.admin.AbortMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L91>`_
+
+
+.. code-block:: json
+
+  {
+    "cause": "...",
+    "principal": "..."
+  }
+
+.. _api_field_flyteidl.admin.AbortMetadata.cause:
+
+cause
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) In the case of a user-specified abort, this will pass along the user-supplied cause.
+  
+  
+.. _api_field_flyteidl.admin.AbortMetadata.principal:
+
+principal
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Identifies the entity (if any) responsible for terminating the execution
+  
+  
+
+
 .. _api_msg_flyteidl.admin.ExecutionClosure:
 
 flyteidl.admin.ExecutionClosure
 -------------------------------
 
-`[flyteidl.admin.ExecutionClosure proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L92>`_
+`[flyteidl.admin.ExecutionClosure proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L100>`_
 
 Encapsulates the results of the Execution
 
@@ -256,6 +285,7 @@ Encapsulates the results of the Execution
     "outputs": "{...}",
     "error": "{...}",
     "abort_cause": "...",
+    "abort_metadata": "{...}",
     "computed_inputs": "{...}",
     "phase": "...",
     "started_at": "{...}",
@@ -275,7 +305,7 @@ outputs
   A pending (non-terminal) execution will not have any output result.
   
   
-  Only one of :ref:`outputs <api_field_flyteidl.admin.ExecutionClosure.outputs>`, :ref:`error <api_field_flyteidl.admin.ExecutionClosure.error>`, :ref:`abort_cause <api_field_flyteidl.admin.ExecutionClosure.abort_cause>` may be set.
+  Only one of :ref:`outputs <api_field_flyteidl.admin.ExecutionClosure.outputs>`, :ref:`error <api_field_flyteidl.admin.ExecutionClosure.error>`, :ref:`abort_cause <api_field_flyteidl.admin.ExecutionClosure.abort_cause>`, :ref:`abort_metadata <api_field_flyteidl.admin.ExecutionClosure.abort_metadata>` may be set.
   
 .. _api_field_flyteidl.admin.ExecutionClosure.error:
 
@@ -286,7 +316,7 @@ error
   A pending (non-terminal) execution will not have any output result.
   
   
-  Only one of :ref:`outputs <api_field_flyteidl.admin.ExecutionClosure.outputs>`, :ref:`error <api_field_flyteidl.admin.ExecutionClosure.error>`, :ref:`abort_cause <api_field_flyteidl.admin.ExecutionClosure.abort_cause>` may be set.
+  Only one of :ref:`outputs <api_field_flyteidl.admin.ExecutionClosure.outputs>`, :ref:`error <api_field_flyteidl.admin.ExecutionClosure.error>`, :ref:`abort_cause <api_field_flyteidl.admin.ExecutionClosure.abort_cause>`, :ref:`abort_metadata <api_field_flyteidl.admin.ExecutionClosure.abort_metadata>` may be set.
   
 .. _api_field_flyteidl.admin.ExecutionClosure.abort_cause:
 
@@ -297,7 +327,18 @@ abort_cause
   A pending (non-terminal) execution will not have any output result.
   
   
-  Only one of :ref:`outputs <api_field_flyteidl.admin.ExecutionClosure.outputs>`, :ref:`error <api_field_flyteidl.admin.ExecutionClosure.error>`, :ref:`abort_cause <api_field_flyteidl.admin.ExecutionClosure.abort_cause>` may be set.
+  Only one of :ref:`outputs <api_field_flyteidl.admin.ExecutionClosure.outputs>`, :ref:`error <api_field_flyteidl.admin.ExecutionClosure.error>`, :ref:`abort_cause <api_field_flyteidl.admin.ExecutionClosure.abort_cause>`, :ref:`abort_metadata <api_field_flyteidl.admin.ExecutionClosure.abort_metadata>` may be set.
+  
+.. _api_field_flyteidl.admin.ExecutionClosure.abort_metadata:
+
+abort_metadata
+  (:ref:`flyteidl.admin.AbortMetadata <api_msg_flyteidl.admin.AbortMetadata>`) In the case of a user-specified abort, this will pass along the user and their supplied cause.
+  
+  A result produced by a terminated execution.
+  A pending (non-terminal) execution will not have any output result.
+  
+  
+  Only one of :ref:`outputs <api_field_flyteidl.admin.ExecutionClosure.outputs>`, :ref:`error <api_field_flyteidl.admin.ExecutionClosure.error>`, :ref:`abort_cause <api_field_flyteidl.admin.ExecutionClosure.abort_cause>`, :ref:`abort_metadata <api_field_flyteidl.admin.ExecutionClosure.abort_metadata>` may be set.
   
 .. _api_field_flyteidl.admin.ExecutionClosure.computed_inputs:
 
@@ -357,7 +398,7 @@ workflow_id
 flyteidl.admin.ExecutionMetadata
 --------------------------------
 
-`[flyteidl.admin.ExecutionMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L136>`_
+`[flyteidl.admin.ExecutionMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L147>`_
 
 Represents attributes about an execution which are not required to launch the execution but are useful to record.
 These attributes are assigned at launch time and do not change.
@@ -419,7 +460,7 @@ reference_execution
 Enum flyteidl.admin.ExecutionMetadata.ExecutionMode
 ---------------------------------------------------
 
-`[flyteidl.admin.ExecutionMetadata.ExecutionMode proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L138>`_
+`[flyteidl.admin.ExecutionMetadata.ExecutionMode proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L149>`_
 
 The method by which this execution was launched.
 
@@ -459,7 +500,7 @@ CHILD_WORKFLOW
 flyteidl.admin.NotificationList
 -------------------------------
 
-`[flyteidl.admin.NotificationList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L177>`_
+`[flyteidl.admin.NotificationList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L188>`_
 
 
 .. code-block:: json
@@ -480,7 +521,7 @@ notifications
 flyteidl.admin.ExecutionSpec
 ----------------------------
 
-`[flyteidl.admin.ExecutionSpec proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L183>`_
+`[flyteidl.admin.ExecutionSpec proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L194>`_
 
 An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime
 of an execution as it progresses across phase changes..
@@ -554,7 +595,7 @@ annotations
 flyteidl.admin.ExecutionTerminateRequest
 ----------------------------------------
 
-`[flyteidl.admin.ExecutionTerminateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L218>`_
+`[flyteidl.admin.ExecutionTerminateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L229>`_
 
 Request to terminate an in-progress execution.  This action is irreversible.
 If an execution is already terminated, this request will simply be a no-op.
@@ -588,7 +629,7 @@ cause
 flyteidl.admin.ExecutionTerminateResponse
 -----------------------------------------
 
-`[flyteidl.admin.ExecutionTerminateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L226>`_
+`[flyteidl.admin.ExecutionTerminateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L237>`_
 
 
 .. code-block:: json
@@ -603,7 +644,7 @@ flyteidl.admin.ExecutionTerminateResponse
 flyteidl.admin.WorkflowExecutionGetDataRequest
 ----------------------------------------------
 
-`[flyteidl.admin.WorkflowExecutionGetDataRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L231>`_
+`[flyteidl.admin.WorkflowExecutionGetDataRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L242>`_
 
 Request structure to fetch inputs and output urls for an execution.
 
@@ -626,7 +667,7 @@ id
 flyteidl.admin.WorkflowExecutionGetDataResponse
 -----------------------------------------------
 
-`[flyteidl.admin.WorkflowExecutionGetDataResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L237>`_
+`[flyteidl.admin.WorkflowExecutionGetDataResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L248>`_
 
 Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution.
 
