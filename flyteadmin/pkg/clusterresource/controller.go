@@ -15,8 +15,6 @@ import (
 
 	"github.com/lyft/flyteadmin/pkg/executioncluster/interfaces"
 
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 
@@ -285,18 +283,27 @@ func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName,
 		}
 		for _, target := range c.executionCluster.GetAllValidTargets() {
 			k8sObjCopy := k8sObj.DeepCopyObject()
+			logger.Debugf(ctx, "Attempting to create resource [%+v](%+v) in cluster [%v] for namespace [%s]",
+				k8sObj.GetObjectKind().GroupVersionKind().Kind, k8sObj, target.ID, namespace)
 			err = target.Client.Create(ctx, k8sObjCopy)
 			if err != nil {
 				if k8serrors.IsAlreadyExists(err) {
 					logger.Debugf(ctx, "Resource [%+v] in namespace [%s] already exists - attempting update instead",
 						k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
 					c.metrics.AppliedTemplateExists.Inc()
-					err = target.Client.Patch(ctx, k8sObjCopy, client.MergeFrom(k8sObjCopy))
+					// Use a strategic-merge-patch to mimic `kubectl apply` behavior.
+					// Kubectl defaults to using the StrategicMergePatch strategy.
+					// However the controller-runtime only has an implementation for MergePatch which we were formerly
+					// using but failed to actually always merge resources in the Patch call.
+					err = target.Client.Patch(ctx, k8sObjCopy, StrategicMergeFrom(k8sObjCopy))
 					if err != nil {
 						c.metrics.TemplateUpdateErrors.Inc()
 						logger.Infof(ctx, "Failed to update resource [%+v] in namespace [%s] with err :%v",
 							k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace, err)
 						collectedErrs = append(collectedErrs, err)
+					} else {
+						logger.Debugf(ctx, "Successfully updated resource [%+v] in namespace [%s]",
+							k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
 					}
 					c.appliedTemplates[namespace][templateFile.Name()] = templateFile.ModTime()
 				} else {
