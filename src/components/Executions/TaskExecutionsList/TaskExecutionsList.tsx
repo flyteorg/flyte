@@ -1,5 +1,5 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { compareTimestampsAscending } from 'common/utils';
+import { noExecutionsFoundString } from 'common/constants';
 import { NonIdealState, WaitForData } from 'components/common';
 import { NodeExecution, TaskExecution } from 'models';
 import * as React from 'react';
@@ -20,13 +20,6 @@ interface TaskExecutionsListProps {
     nodeExecution: NodeExecution;
 }
 
-function compareTaskExecutionCreatedAtAscending(
-    a: TaskExecution,
-    b: TaskExecution
-) {
-    return compareTimestampsAscending(a.closure.createdAt, b.closure.createdAt);
-}
-
 const TaskExecutionsListContent: React.FC<{
     taskExecutions: TaskExecution[];
 }> = ({ taskExecutions }) => {
@@ -36,20 +29,18 @@ const TaskExecutionsListContent: React.FC<{
             <NonIdealState
                 className={styles.noExecutionsMessage}
                 size="small"
-                title="No executions found"
+                title={noExecutionsFoundString}
             />
         );
     }
     return (
         <>
-            {taskExecutions
-                .sort(compareTaskExecutionCreatedAtAscending)
-                .map(taskExecution => (
-                    <TaskExecutionsListItem
-                        key={getUniqueTaskExecutionName(taskExecution)}
-                        taskExecution={taskExecution}
-                    />
-                ))}
+            {taskExecutions.map(taskExecution => (
+                <TaskExecutionsListItem
+                    key={getUniqueTaskExecutionName(taskExecution)}
+                    taskExecution={taskExecution}
+                />
+            ))}
         </>
     );
 };
