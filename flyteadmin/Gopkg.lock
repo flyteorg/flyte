@@ -453,7 +453,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:8368e5eabb1a11c2deeb11c7ee8f4e060f541e5f298c37f11af3f15cf5fecedf"
+  digest = "1:adf75c64d9fd1b82df8924fec495eb015ab53e5b2db6db1c2b1b8b1c27145848"
   name = "github.com/lyft/flyteidl"
   packages = [
     "clients/go/admin",
@@ -466,9 +466,9 @@
     "gen/pb-go/flyteidl/service",
   ]
   pruneopts = "UT"
-  revision = "03aa3a0b237eea7e1aeda1f7e407e9ab95efd4a9"
+  revision = "4e175db2a7338f787fc7e939417718e59af639a4"
   source = "https://github.com/lyft/flyteidl"
-  version = "v0.16.1"
+  version = "v0.16.2"
 
 [[projects]]
   digest = "1:938998e14bd5e42c54f3b640a41d869eb79029ad7c623fa47c604b8480c781fc"
@@ -1199,7 +1199,6 @@
     "github.com/grpc-ecosystem/go-grpc-middleware/auth",
     "github.com/grpc-ecosystem/go-grpc-prometheus",
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
-    "github.com/grpc-ecosystem/grpc-gateway/utilities",
     "github.com/grpc/grpc-go/credentials/oauth",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/postgres",

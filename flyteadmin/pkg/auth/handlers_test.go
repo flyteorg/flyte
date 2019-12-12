@@ -16,7 +16,7 @@ import (
 
 func TestWithUserEmail(t *testing.T) {
 	ctx := WithUserEmail(context.Background(), "abc")
-	assert.Equal(t, "abc", ctx.Value(emailContextKey))
+	assert.Equal(t, "abc", ctx.Value(PrincipalContextKey))
 }
 
 func TestGetLoginHandler(t *testing.T) {

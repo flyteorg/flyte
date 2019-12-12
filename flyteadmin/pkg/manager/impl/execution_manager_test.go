@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/lyft/flyteadmin/pkg/auth"
+
 	"github.com/lyft/flyteadmin/pkg/common"
 	commonMocks "github.com/lyft/flyteadmin/pkg/common/mocks"
 
@@ -192,6 +194,15 @@ func getMockRepositoryForExecTest() repositories.RepositoryInterface {
 
 func TestCreateExecution(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
+	principal := "principal"
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(
+		func(ctx context.Context, input models.Execution) error {
+			var spec admin.ExecutionSpec
+			err := proto.Unmarshal(input.Spec, &spec)
+			assert.NoError(t, err)
+			assert.Equal(t, principal, spec.Metadata.Principal)
+			return nil
+		})
 	setDefaultLpCallbackForExecTest(repository)
 	mockExecutor := workflowengineMocks.NewMockExecutor()
 	mockExecutor.(*workflowengineMocks.MockExecutor).SetExecuteWorkflowCallback(
@@ -212,7 +223,11 @@ func TestCreateExecution(t *testing.T) {
 		repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockExecutor,
 		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL)
 	request := testutils.GetExecutionRequest()
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	request.Spec.Metadata = &admin.ExecutionMetadata{
+		Principal: "unused - populated from authenticated context",
+	}
+	ctx := context.WithValue(context.Background(), auth.PrincipalContextKey, principal)
+	response, err := execManager.CreateExecution(ctx, request, requestedAt)
 	assert.Nil(t, err)
 
 	expectedResponse := &admin.ExecutionCreateResponse{
@@ -1791,6 +1806,7 @@ func TestTerminateExecution(t *testing.T) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 
 	abortCause := "abort cause"
+	principal := "principal"
 	updateExecutionFunc := func(
 		context context.Context, execution models.Execution) error {
 		assert.Equal(t, "project", execution.Project)
@@ -1805,6 +1821,14 @@ func TestTerminateExecution(t *testing.T) {
 			"an abort call should not change ExecutionUpdatedAt until a corresponding execution event is received")
 		assert.Equal(t, abortCause, execution.AbortCause)
 		assert.Equal(t, testCluster, execution.Cluster)
+
+		var unmarshaledClosure admin.ExecutionClosure
+		err := proto.Unmarshal(execution.Closure, &unmarshaledClosure)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(&admin.AbortMetadata{
+			Cause:     abortCause,
+			Principal: principal,
+		}, unmarshaledClosure.GetAbortMetadata()))
 		return nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateExecutionCallback(updateExecutionFunc)
@@ -1823,7 +1847,8 @@ func TestTerminateExecution(t *testing.T) {
 		repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockExecutor,
 		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL)
 
-	resp, err := execManager.TerminateExecution(context.Background(), admin.ExecutionTerminateRequest{
+	ctx := context.WithValue(context.Background(), auth.PrincipalContextKey, principal)
+	resp, err := execManager.TerminateExecution(ctx, admin.ExecutionTerminateRequest{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",

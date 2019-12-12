@@ -30,11 +30,19 @@ type CreateExecutionModelInput struct {
 	Cluster               string
 	InputsURI             storage.DataReference
 	UserInputsURI         storage.DataReference
+	Principal             string
 }
 
 // Transforms a ExecutionCreateRequest to a Execution model
 func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, error) {
-	spec, err := proto.Marshal(input.RequestSpec)
+	requestSpec := input.RequestSpec
+	if len(input.Principal) > 0 {
+		if requestSpec.Metadata == nil {
+			requestSpec.Metadata = &admin.ExecutionMetadata{}
+		}
+		requestSpec.Metadata.Principal = input.Principal
+	}
+	spec, err := proto.Marshal(requestSpec)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Failed to serialize execution spec: %v", err)
 	}
@@ -86,7 +94,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 
 // Updates an existing model given a WorkflowExecution event.
 func UpdateExecutionModelState(
-	execution *models.Execution, request admin.WorkflowExecutionEventRequest, abortCause *string) error {
+	execution *models.Execution, request admin.WorkflowExecutionEventRequest) error {
 	var executionClosure admin.ExecutionClosure
 	err := proto.Unmarshal(execution.Closure, &executionClosure)
 	if err != nil {
@@ -136,9 +144,29 @@ func UpdateExecutionModelState(
 		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
 	}
 	execution.Closure = marshaledClosure
-	if abortCause != nil {
-		execution.AbortCause = *abortCause
+	return nil
+}
+
+// The execution abort metadata is recorded but the phase is not actually updated *until* the abort event is propagated
+// by flytepropeller. The metadata is preemptively saved at the time of the abort.
+func SetExecutionAborted(execution *models.Execution, cause, principal string) error {
+	var closure admin.ExecutionClosure
+	err := proto.Unmarshal(execution.Closure, &closure)
+	if err != nil {
+		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution closure: %v", err)
 	}
+	closure.OutputResult = &admin.ExecutionClosure_AbortMetadata{
+		AbortMetadata: &admin.AbortMetadata{
+			Cause:     cause,
+			Principal: principal,
+		},
+	}
+	marshaledClosure, err := proto.Marshal(&closure)
+	if err != nil {
+		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
+	}
+	execution.Closure = marshaledClosure
+	execution.AbortCause = cause
 	return nil
 }
 
@@ -162,9 +190,13 @@ func FromExecutionModel(executionModel models.Execution) (*admin.Execution, erro
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal closure")
 	}
 	id := GetExecutionIdentifier(&executionModel)
-	if executionModel.Phase == core.WorkflowExecution_ABORTED.String() {
-		closure.OutputResult = &admin.ExecutionClosure_AbortCause{
-			AbortCause: executionModel.AbortCause,
+	if executionModel.Phase == core.WorkflowExecution_ABORTED.String() && closure.GetAbortMetadata() == nil {
+		// In the case of data predating the AbortMetadata field we manually set it in the closure only
+		// if it does not yet exist.
+		closure.OutputResult = &admin.ExecutionClosure_AbortMetadata{
+			AbortMetadata: &admin.AbortMetadata{
+				Cause: executionModel.AbortCause,
+			},
 		}
 	}
 
