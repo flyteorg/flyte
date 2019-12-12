@@ -135,18 +135,6 @@ export const imageAndFontsRule: webpack.Rule = {
     use: fileLoader
 };
 
-/** Sass rule with CSS modules support */
-export const cssRule: webpack.Rule = {
-    test: /\.css$/,
-    use: [
-        'style-loader',
-        {
-            loader: 'css-loader',
-            options: { sourceMap: isDev }
-        }
-    ]
-};
-
 /** Generates HTML file that includes webpack assets */
 export const htmlPlugin = new HTMLWebpackPlugin({
     template: './src/assets/index.html',
@@ -187,7 +175,6 @@ export const htmlExternalsPlugin = new HTMLExternalsWebpackPlugin({
 
 /** Gzip assets */
 export const compressionPlugin = new CompressionWebpackPlugin({
-    asset: '[path].gz[query]',
     algorithm: 'gzip',
     test: /\.(js|css|html)$/,
     threshold: 10240,
@@ -247,7 +234,7 @@ export const clientConfig: webpack.Configuration = {
     },
     externals: isProd ? clientExternals : undefined,
     module: {
-        rules: [sourceMapRule, typescriptRule, imageAndFontsRule, cssRule]
+        rules: [sourceMapRule, typescriptRule, imageAndFontsRule]
     },
     optimization: {
         noEmitOnErrors: isDev,
@@ -326,7 +313,7 @@ export const serverConfig: webpack.Configuration = {
     devtool: isProd ? devtool : undefined,
     entry: ['babel-polyfill', './src/server'],
     module: {
-        rules: [sourceMapRule, typescriptRule, imageAndFontsRule, cssRule]
+        rules: [sourceMapRule, typescriptRule, imageAndFontsRule]
     },
     externals: [nodeExternals({ whitelist: /lyft/ })],
     output: {
