@@ -107,9 +107,11 @@ func (e execContext) GetLabels() map[string]string {
 
 func newNodeExecContext(_ context.Context, store *storage.DataStore, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, maxDatasetSize int64, er events.TaskEventRecorder, tr handler.TaskReader, nsm *nodeStateManager, enqueueOwner func() error) *execContext {
 	md := execMetadata{WorkflowMeta: w}
-	nodeLabels := md.GetLabels()
-	if nodeLabels == nil {
-		nodeLabels = make(map[string]string)
+
+	// Copying the labels before updating it for this node
+	nodeLabels := make(map[string]string)
+	for k, v := range md.GetLabels() {
+		nodeLabels[k] = v
 	}
 	nodeLabels[NodeIDLabel] = utils.SanitizeLabelValue(node.GetID())
 	if tr != nil && tr.GetTaskID() != nil {
