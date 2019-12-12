@@ -1,4 +1,5 @@
 import { Typography } from '@material-ui/core';
+import { noExecutionsFoundString } from 'common/constants';
 import * as React from 'react';
 import { useExecutionTableStyles } from './styles';
 
@@ -10,7 +11,7 @@ export const NoExecutionsContent: React.FC<{ size?: SizeVariant }> = ({
 }) => (
     <div className={useExecutionTableStyles().noRowsContent}>
         <Typography variant={size === 'large' ? 'h6' : 'body1'}>
-            No Executions found.
+            {noExecutionsFoundString}
         </Typography>
     </div>
 );

@@ -1,6 +1,7 @@
 import Link from '@material-ui/core/Link';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import * as classnames from 'classnames';
+import { noExecutionsFoundString } from 'common/constants';
 import {
     dateFromNow,
     formatDateUTC,
@@ -211,7 +212,7 @@ export const WorkflowExecutionsTable: React.FC<
             <DataList
                 {...props}
                 onRetry={retry}
-                noRowsContent="No executions found."
+                noRowsContent={noExecutionsFoundString}
                 ref={listRef}
                 rowContentRenderer={rowRenderer}
             />

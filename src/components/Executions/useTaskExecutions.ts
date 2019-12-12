@@ -1,13 +1,14 @@
+import { useAPIContext } from 'components/data/apiContext';
 import { every } from 'lodash';
 import {
     ExecutionData,
-    getTaskExecutionData,
     limits,
-    listTaskExecutions,
     NodeExecution,
     NodeExecutionIdentifier,
+    SortDirection,
     TaskExecution,
-    TaskExecutionIdentifier
+    TaskExecutionIdentifier,
+    taskSortFields
 } from 'models';
 import { useDataRefresher } from '../hooks';
 import { FetchableData } from '../hooks/types';
@@ -15,24 +16,27 @@ import { useFetchableData } from '../hooks/useFetchableData';
 import { executionRefreshIntervalMs } from './constants';
 import { nodeExecutionIsTerminal, taskExecutionIsTerminal } from './utils';
 
-const doFetchTaskExecutions = async (id: NodeExecutionIdentifier) => {
-    const { entities } = await listTaskExecutions(id, {
-        limit: limits.NONE
-    });
-    return entities;
-};
-
 /** A hook for fetching the list of TaskExecutions associated with a
  * NodeExecution
  */
 export function useTaskExecutions(
     id: NodeExecutionIdentifier
 ): FetchableData<TaskExecution[]> {
+    const { listTaskExecutions } = useAPIContext();
     return useFetchableData<TaskExecution[], NodeExecutionIdentifier>(
         {
             debugName: 'TaskExecutions',
             defaultValue: [],
-            doFetch: doFetchTaskExecutions
+            doFetch: async (id: NodeExecutionIdentifier) => {
+                const { entities } = await listTaskExecutions(id, {
+                    limit: limits.NONE,
+                    sort: {
+                        key: taskSortFields.createdAt,
+                        direction: SortDirection.ASCENDING
+                    }
+                });
+                return entities;
+            }
         },
         id
     );
@@ -42,6 +46,7 @@ export function useTaskExecutions(
 export function useTaskExecutionData(
     id: TaskExecutionIdentifier
 ): FetchableData<ExecutionData> {
+    const { getTaskExecutionData } = useAPIContext();
     return useFetchableData<ExecutionData, TaskExecutionIdentifier>(
         {
             debugName: 'TaskExecutionData',

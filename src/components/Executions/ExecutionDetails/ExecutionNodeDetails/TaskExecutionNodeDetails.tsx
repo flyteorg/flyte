@@ -2,6 +2,7 @@ import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import * as React from 'react';
 const { useContext } = React;
+import { noExecutionsFoundString } from 'common/constants';
 import { NonIdealState, SectionHeader } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import { TaskExecutionsList } from 'components/Executions';
@@ -35,7 +36,7 @@ const NoTaskDetailsAvailable: React.FC = () => (
 const NoExecutionsAvailable: React.FC = () => (
     <NonIdealState
         description="This node has not been executed"
-        title="No Executions available"
+        title={noExecutionsFoundString}
         size="small"
     />
 );

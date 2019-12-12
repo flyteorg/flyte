@@ -12,6 +12,7 @@ export const navBarContentId = 'nav-bar-content';
 export const unknownValueString = '(unknown)';
 export const noDescriptionString = '(No description)';
 export const noneString = '(none)';
+export const noExecutionsFoundString = 'No executions found.';
 
 export const externalLinks = {
     // TODO: add flyte docs and feedback links when we have them

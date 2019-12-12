@@ -1,6 +1,7 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import * as classnames from 'classnames';
+import { noExecutionsFoundString } from 'common/constants';
 import { ListProps } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import {
@@ -136,7 +137,7 @@ export const DataTableImpl: React.FC<DataTableImplProps> = props => {
 
     const noRowsRenderer = () => (
         <div className={styles.noRowsContent}>
-            <Typography variant="h6">No executions found.</Typography>
+            <Typography variant="h6">{noExecutionsFoundString}</Typography>
         </div>
     );
 
