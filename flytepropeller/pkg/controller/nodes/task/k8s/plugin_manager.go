@@ -114,8 +114,7 @@ func (e *PluginManager) GetID() string {
 
 type BackOffConstraintComparator func(int, int) bool
 
-const backOffBase = time.Second * 2 // b in b^n
-const minBackoffTime = time.Second * 0
+const backOffBase = time.Second * 2     // b in b^n
 const maxBackoffTime = time.Minute * 10 // the max time is 10 minutes
 
 type SimpleBackOffHandler struct {
@@ -220,7 +219,12 @@ func (h *ResourceAwareBackOffHandler) handle(ctx context.Context, operation func
 		} else if err != nil {
 			if IsResourceQuotaExceeded(err) {
 				logger.Errorf(ctx, "Failed to run the operation due to insufficient resource: [%v]\n", err)
-				h.ResourceCeilings.updateAll(requestedResourceList)
+
+				// When lowering the ceiling, we only want to lower the ceiling that actually needs to be lowered.
+				// For example, if the creation of a pod requiring X cpus and Y memory got rejected because of
+				// 	insufficient memory, we should only lower the ceiling of memory to Y, without touching the cpu ceiling
+				newCeiling := GetResourceAndQuantityRequested(err)
+				h.ResourceCeilings.updateAll(newCeiling)
 			} else {
 				logger.Errorf(ctx, "Failed to run the operation: [%v]\n", err)
 			}
@@ -324,7 +328,7 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 	var podRequestedResources v1.ResourceList
 
 	// Collect the resource requests from all the containers in the pod whose creation is to be attempted
-	// to decide whether we can the pod during the back off period
+	// to decide whether we should try the pod creation during the back off period
 	for _, container := range pod.Spec.Containers {
 		for k, v := range container.Resources.Limits {
 			podRequestedResources[k].Add(v)
