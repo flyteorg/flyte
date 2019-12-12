@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/lyft/flyteadmin/pkg/auth"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	dataInterfaces "github.com/lyft/flyteadmin/pkg/data/interfaces"
@@ -42,6 +44,7 @@ import (
 const parentContainerQueueKey = "parent_queue"
 const childContainerQueueKey = "child_queue"
 const noSourceExecutionID = 0
+const principalContextKeyFormat = "%v"
 
 // Map of [project] -> map of [domain] -> stop watch
 type projectDomainScopedStopWatchMap = map[string]map[string]*promutils.StopWatch
@@ -78,6 +81,15 @@ type ExecutionManager struct {
 	userMetrics        executionUserMetrics
 	notificationClient notificationInterfaces.Publisher
 	urlData            dataInterfaces.RemoteURLInterface
+}
+
+// Returns the unique string which identifies the authenticated end user (if any).
+func getUser(ctx context.Context) string {
+	principalContextUser := ctx.Value(auth.PrincipalContextKey)
+	if principalContextUser != nil {
+		return fmt.Sprintf(principalContextKeyFormat, principalContextUser)
+	}
+	return ""
 }
 
 func (m *ExecutionManager) populateExecutionQueue(
@@ -291,6 +303,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		Cluster:               execInfo.Cluster,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,
+		Principal:             getUser(ctx),
 	})
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
@@ -554,7 +567,7 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		return nil, errors.NewAlreadyInTerminalStateError(ctx, errorMsg, curPhase)
 	}
 
-	err = transformers.UpdateExecutionModelState(executionModel, request, nil)
+	err = transformers.UpdateExecutionModelState(executionModel, request)
 	if err != nil {
 		logger.Debugf(ctx, "failed to transform updated workflow execution model [%+v] after receiving event with err: %v",
 			request.Event.ExecutionId, err)
@@ -848,7 +861,11 @@ func (m *ExecutionManager) TerminateExecution(
 		return nil, err
 	}
 
-	executionModel.AbortCause = request.Cause
+	err = transformers.SetExecutionAborted(&executionModel, request.Cause, getUser(ctx))
+	if err != nil {
+		logger.Debugf(ctx, "failed to add abort metadata for execution [%+v] with err: %v", request.Id, err)
+		return nil, err
+	}
 	err = m.db.ExecutionRepo().UpdateExecution(ctx, executionModel)
 	if err != nil {
 		logger.Debugf(ctx, "failed to save abort cause for terminated execution: %+v with err: %v", request.Id, err)
