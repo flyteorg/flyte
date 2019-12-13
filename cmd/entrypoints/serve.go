@@ -147,6 +147,10 @@ func newHTTPServer(ctx context.Context, cfg *config.ServerConfig, authContext in
 
 		// This option translates HTTP authorization data (cookies) into a gRPC metadata field
 		gwmuxOptions = append(gwmuxOptions, runtime.WithMetadata(auth.GetHTTPRequestCookieToMetadataHandler(authContext)))
+
+		// In an attempt to be able to selectively enforce whether or not authentication is required, we're going to tag
+		// the requests that come from the HTTP gateway. See the enforceHttp/Grpc options for more information.
+		gwmuxOptions = append(gwmuxOptions, runtime.WithMetadata(auth.GetHTTPMetadataTaggingHandler(authContext)))
 	}
 
 	// Create the grpc-gateway server with the options specified

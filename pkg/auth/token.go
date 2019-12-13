@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc"
+	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/lyft/flyteadmin/pkg/auth/config"
 	"github.com/lyft/flytestdlib/errors"
 	"github.com/lyft/flytestdlib/logger"
@@ -53,4 +54,22 @@ func ParseAndValidate(ctx context.Context, claims config.Claims, accessToken str
 		return idToken, flyteErr
 	}
 	return idToken, nil
+}
+
+// This function attempts to extract a token from the context, and will then call the validation function, passing up
+// any errors.
+func GetAndValidateTokenObjectFromContext(ctx context.Context, claims config.Claims,
+	provider *oidc.Provider) (*oidc.IDToken, error) {
+
+	tokenStr, err := grpcauth.AuthFromMD(ctx, BearerScheme)
+	if err != nil {
+		logger.Debugf(ctx, "Could not retrieve bearer token from metadata %v", err)
+		return nil, errors.Wrapf(ErrJwtValidation, err, "Could not retrieve bearer token from metadata")
+	}
+	if tokenStr == "" {
+		logger.Debugf(ctx, "Found Bearer scheme but token was blank")
+		return nil, errors.Errorf(ErrJwtValidation, "Bearer token is blank")
+	}
+
+	return ParseAndValidate(ctx, claims, tokenStr, provider)
 }
