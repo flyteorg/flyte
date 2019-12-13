@@ -136,6 +136,7 @@ func newHTTPServer(ctx context.Context, cfg *config.ServerConfig, authContext in
 		// Add HTTP handlers for OAuth2 endpoints
 		mux.HandleFunc("/login", auth.RefreshTokensIfExists(ctx, authContext,
 			auth.GetLoginHandler(ctx, authContext)))
+		mux.HandleFunc("/logout", auth.GetLogoutEndpointHandler(ctx, authContext))
 		mux.HandleFunc("/callback", auth.GetCallbackHandler(ctx, authContext))
 		// Install the user info endpoint if there is a user info url configured.
 		if authContext.GetUserInfoURL() != nil && authContext.GetUserInfoURL().String() != "" {

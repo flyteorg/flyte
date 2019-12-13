@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
@@ -62,4 +63,32 @@ func TestCookieManager_RetrieveTokenValues(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "access", access)
 	assert.Equal(t, "refresh", refresh)
+}
+
+func TestGetLogoutAccessCookie(t *testing.T) {
+	cookie := getLogoutAccessCookie()
+	assert.True(t, time.Now().After(cookie.Expires))
+}
+
+func TestGetLogoutRefreshCookie(t *testing.T) {
+	cookie := getLogoutRefreshCookie()
+	assert.True(t, time.Now().After(cookie.Expires))
+}
+
+func TestCookieManager_DeleteCookies(t *testing.T) {
+	ctx := context.Background()
+
+	// These were generated for unit testing only.
+	hashKeyEncoded := "wG4pE1ccdw/pHZ2ml8wrD5VJkOtLPmBpWbKHmezWXktGaFbRoAhXidWs8OpbA3y7N8vyZhz1B1E37+tShWC7gA" //nolint:goconst
+	blockKeyEncoded := "afyABVgGOvWJFxVyOvCWCupoTn6BkNl4SOHmahho16Q"                                           //nolint:goconst
+
+	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded)
+	assert.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	manager.DeleteCookies(ctx, w)
+	cookies := w.Result().Cookies()
+	assert.Equal(t, 2, len(cookies))
+	assert.True(t, time.Now().After(cookies[0].Expires))
+	assert.True(t, time.Now().After(cookies[1].Expires))
 }
