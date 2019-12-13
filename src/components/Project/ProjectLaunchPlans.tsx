@@ -13,9 +13,10 @@ export interface ProjectLaunchPlansRouteParams {
 }
 
 /** The tab/page content for viewing a project's launch plans */
-export const ProjectLaunchPlansContainer: React.FC<
-    ProjectLaunchPlansRouteParams
-> = ({ projectId: project, domainId: domain }) => {
+export const ProjectLaunchPlansContainer: React.FC<ProjectLaunchPlansRouteParams> = ({
+    projectId: project,
+    domainId: domain
+}) => {
     const launchPlans = useLaunchPlans(
         { domain, project },
         {

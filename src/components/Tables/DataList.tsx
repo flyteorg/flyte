@@ -193,7 +193,7 @@ let DataList: React.RefForwardingComponent<DataListRef, DataListProps> = (
     const styles = useStyles();
 
     if (props.width && props.height) {
-        return <DataListImpl {...props as DataListImplProps} />;
+        return <DataListImpl {...(props as DataListImplProps)} />;
     }
     return (
         <div

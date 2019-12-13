@@ -171,7 +171,7 @@ export const DataTableImpl: React.FC<DataTableImplProps> = props => {
 
     const loadMoreRows = () => props.fetch();
 
-    const getRowHeight: ((info: Index) => number) = ({ index }) => {
+    const getRowHeight: (info: Index) => number = ({ index }) => {
         if (index === items.length) {
             return loadMoreRowHeight;
         }
@@ -195,7 +195,9 @@ export const DataTableImpl: React.FC<DataTableImplProps> = props => {
                 rowHeight={getRowHeight}
                 width={width - tablePadding * 2}
             >
-                {columns.map(props => <Column {...props} key={props.key} />)}
+                {columns.map(props => (
+                    <Column {...props} key={props.key} />
+                ))}
             </Table>
         </>
     );
@@ -211,7 +213,7 @@ export const DataTable = (props: DataTableProps) => {
     const styles = useStyles();
 
     if (props.width && props.height) {
-        return <DataTableImpl {...props as DataTableImplProps} />;
+        return <DataTableImpl {...(props as DataTableImplProps)} />;
     }
     return (
         <div

@@ -17,7 +17,7 @@ export const noLogsFoundString = 'No logs found';
 
 /** Shared values for color/text/etc for each execution phase */
 export const workflowExecutionPhaseConstants: {
-    [key in WorkflowExecutionPhase]: ExecutionPhaseConstants
+    [key in WorkflowExecutionPhase]: ExecutionPhaseConstants;
 } = {
     [WorkflowExecutionPhase.ABORTED]: {
         badgeColor: statusColors.SKIPPED,
@@ -68,7 +68,7 @@ export const workflowExecutionPhaseConstants: {
 
 /** Shared values for color/text/etc for each node execution phase */
 export const nodeExecutionPhaseConstants: {
-    [key in NodeExecutionPhase]: ExecutionPhaseConstants
+    [key in NodeExecutionPhase]: ExecutionPhaseConstants;
 } = {
     [NodeExecutionPhase.ABORTED]: {
         badgeColor: statusColors.FAILURE,
@@ -119,7 +119,7 @@ export const nodeExecutionPhaseConstants: {
 
 /** Shared values for color/text/etc for each node execution phase */
 export const taskExecutionPhaseConstants: {
-    [key in TaskExecutionPhase]: ExecutionPhaseConstants
+    [key in TaskExecutionPhase]: ExecutionPhaseConstants;
 } = {
     [TaskExecutionPhase.ABORTED]: {
         badgeColor: statusColors.FAILURE,
@@ -154,7 +154,7 @@ export const taskExecutionPhaseConstants: {
 };
 
 export const taskTypeToNodeExecutionDisplayType: {
-    [k in TaskType]: NodeExecutionDisplayType
+    [k in TaskType]: NodeExecutionDisplayType;
 } = {
     [TaskType.ARRAY]: NodeExecutionDisplayType.ArrayTask,
     [TaskType.BATCH_HIVE]: NodeExecutionDisplayType.BatchHiveTask,

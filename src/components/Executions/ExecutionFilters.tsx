@@ -29,10 +29,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 const RenderFilter: React.FC<{ filter: FilterState }> = ({ filter }) => {
     switch (filter.type) {
         case 'single':
-            return <SingleSelectForm {...filter as SingleFilterState<any>} />;
+            return <SingleSelectForm {...(filter as SingleFilterState<any>)} />;
         case 'multi':
             return (
-                <MultiSelectForm {...filter as MultiFilterState<any, any>} />
+                <MultiSelectForm {...(filter as MultiFilterState<any, any>)} />
             );
         case 'search':
             const state = filter as SearchFilterState;

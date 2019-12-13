@@ -14,21 +14,18 @@ export interface WorkflowExecutionChildrenProps {
 }
 
 /** Renders a nested list of row items for children of a WorkflowExecution */
-export const WorkflowExecutionChildren: React.FC<
-    WorkflowExecutionChildrenProps
-> = ({ execution }) => {
+export const WorkflowExecutionChildren: React.FC<WorkflowExecutionChildrenProps> = ({
+    execution
+}) => {
     // Note: Not applying a filter to nested node executions
     const { workflow, nodeExecutions } = useWorkflowExecutionState(execution);
 
     const columnStyles = useColumnStyles();
     // Memoizing columns so they won't be re-generated unless the styles change
-    const { columns, Skeleton } = React.useMemo(
-        () => {
-            const columns = generateColumns(columnStyles);
-            return { columns, Skeleton: generateRowSkeleton(columns) };
-        },
-        [columnStyles]
-    );
+    const { columns, Skeleton } = React.useMemo(() => {
+        const columns = generateColumns(columnStyles);
+        return { columns, Skeleton: generateRowSkeleton(columns) };
+    }, [columnStyles]);
     return (
         <WaitForData
             spinnerVariant="medium"

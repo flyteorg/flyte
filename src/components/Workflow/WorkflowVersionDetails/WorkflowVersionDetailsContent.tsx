@@ -6,9 +6,9 @@ export interface WorkflowVersionDetailsContentProps {
     workflow: Workflow;
 }
 
-export const WorkflowVersionDetailsContent: React.FC<
-    WorkflowVersionDetailsContentProps
-> = ({ workflow }) => {
+export const WorkflowVersionDetailsContent: React.FC<WorkflowVersionDetailsContentProps> = ({
+    workflow
+}) => {
     const { id } = workflow;
     return (
         <>

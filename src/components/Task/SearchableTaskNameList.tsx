@@ -96,9 +96,10 @@ const TaskNameRow: React.FC<TaskNameRowProps> = ({ label, entityName }) => {
 };
 
 /** Renders a searchable list of Task names, with associated metadata */
-export const SearchableTaskNameList: React.FC<
-    Omit<SearchableNamedEntityListProps, 'renderItem'>
-> = props => {
+export const SearchableTaskNameList: React.FC<Omit<
+    SearchableNamedEntityListProps,
+    'renderItem'
+>> = props => {
     const renderItem = ({
         key,
         value,

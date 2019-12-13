@@ -30,37 +30,31 @@ export function useDataRefresher<T, IDType extends object | string>(
     // Default refresh implementation is just to fetch the current entity
     const doRefresh = refreshConfig.doRefresh || defaultRefresh;
 
-    useEffect(
-        () => {
-            let timerId: number = 0;
+    useEffect(() => {
+        let timerId: number = 0;
 
-            const clear = () => {
-                if (timerId === 0) {
-                    return;
-                }
-
-                log(`${debugName} detaching data refresher`);
-                window.clearInterval(timerId);
-            };
-
-            if (!hasLoaded || isFinal || lastError) {
-                if (lastError) {
-                    log(
-                        `${debugName} not refreshing fetchable because it is in an error state`,
-                        fetchable
-                    );
-                }
-            } else {
-                log(`${debugName} attaching data refresher`);
-                timerId = window.setInterval(
-                    () => doRefresh(fetchable),
-                    interval
-                );
+        const clear = () => {
+            if (timerId === 0) {
+                return;
             }
 
-            // When this effect is cleaned up, we should stop refreshing
-            return clear;
-        },
-        [getCacheKey(id), hasLoaded, isFinal, lastError]
-    );
+            log(`${debugName} detaching data refresher`);
+            window.clearInterval(timerId);
+        };
+
+        if (!hasLoaded || isFinal || lastError) {
+            if (lastError) {
+                log(
+                    `${debugName} not refreshing fetchable because it is in an error state`,
+                    fetchable
+                );
+            }
+        } else {
+            log(`${debugName} attaching data refresher`);
+            timerId = window.setInterval(() => doRefresh(fetchable), interval);
+        }
+
+        // When this effect is cleaned up, we should stop refreshing
+        return clear;
+    }, [getCacheKey(id), hasLoaded, isFinal, lastError]);
 }

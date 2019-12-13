@@ -18,9 +18,9 @@ import { NodeExecutionChildren } from '../NodeExecutionChildren';
 
 describe('NodeExecutionChildren', () => {
     let nodeExecution: DetailedNodeExecution;
-    let mockListTaskExecutions: jest.Mock<
-        ReturnType<typeof listTaskExecutions>
-    >;
+    let mockListTaskExecutions: jest.Mock<ReturnType<
+        typeof listTaskExecutions
+    >>;
 
     const renderChildren = () =>
         render(

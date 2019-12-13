@@ -141,31 +141,23 @@ export const useSearchableListState = <T extends {}>({
         SearchResult<T>[]
     >([]);
 
-    useEffect(
-        () => {
-            setUnfilteredResults(toSearchResults(items, propertyGetter));
-            setPreparedItems(
-                items.map(value => ({
-                    value,
-                    prepared: fuzzysort.prepare(
-                        getProperty(value, propertyGetter)
-                    )
-                }))
-            );
-        },
-        [items]
-    );
+    useEffect(() => {
+        setUnfilteredResults(toSearchResults(items, propertyGetter));
+        setPreparedItems(
+            items.map(value => ({
+                value,
+                prepared: fuzzysort.prepare(getProperty(value, propertyGetter))
+            }))
+        );
+    }, [items]);
 
-    useEffect(
-        () => {
-            setResults(
-                searchString.length === 0
-                    ? unfilteredResults
-                    : getFilteredItems(preparedItems, searchString)
-            );
-        },
-        [preparedItems, unfilteredResults, searchString]
-    );
+    useEffect(() => {
+        setResults(
+            searchString.length === 0
+                ? unfilteredResults
+                : getFilteredItems(preparedItems, searchString)
+        );
+    }, [preparedItems, unfilteredResults, searchString]);
 
     return {
         results,

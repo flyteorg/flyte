@@ -13,9 +13,11 @@ export interface WorkflowLaunchPlansRouteParams {
 }
 
 /** The tab/page content for viewing a workflow's launch plans */
-export const WorkflowLaunchPlansContainer: React.FC<
-    WorkflowLaunchPlansRouteParams
-> = ({ projectId: project, domainId: domain, workflowName: name }) => {
+export const WorkflowLaunchPlansContainer: React.FC<WorkflowLaunchPlansRouteParams> = ({
+    projectId: project,
+    domainId: domain,
+    workflowName: name
+}) => {
     const launchPlans = useLaunchPlans(
         { domain, name, project },
         {

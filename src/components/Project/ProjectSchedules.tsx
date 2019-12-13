@@ -13,9 +13,10 @@ export interface ProjectSchedulesRouteParams {
 }
 
 /** The tab/page content for viewing a project's schedules */
-export const ProjectSchedulesContainer: React.FC<
-    ProjectSchedulesRouteParams
-> = ({ projectId: project, domainId: domain }) => {
+export const ProjectSchedulesContainer: React.FC<ProjectSchedulesRouteParams> = ({
+    projectId: project,
+    domainId: domain
+}) => {
     const launchPlans = useLaunchPlans(
         { domain, project },
         {

@@ -208,7 +208,7 @@ export type ColorSpectrumType =
     | 'gray100';
 
 export const COLOR_SPECTRUM: {
-    [key in ColorSpectrumType]: { color: string; value: number }
+    [key in ColorSpectrumType]: { color: string; value: number };
 } = {
     white: {
         color: '#FFFFFF',

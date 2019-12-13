@@ -39,13 +39,10 @@ export function usePagination<T, FetchArgType>(
     const cache = useContext(CacheContext);
 
     // Reset our state if the pagination config changes
-    useEffect(
-        () => {
-            setToken('');
-            setMoreItemsAvailable(false);
-        },
-        [cacheKey]
-    );
+    useEffect(() => {
+        setToken('');
+        setMoreItemsAvailable(false);
+    }, [cacheKey]);
 
     const fetch: FetchFn<T[], PaginationConfig<FetchArgType>> = async (
         params,

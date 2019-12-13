@@ -56,9 +56,7 @@ function routeParamsToTaskExecutionId(
     };
 }
 
-export const TaskExecutionDetailsContainer: React.FC<
-    TaskExecutionDetailsProps
-> = props => {
+export const TaskExecutionDetailsContainer: React.FC<TaskExecutionDetailsProps> = props => {
     const taskExecutionId = routeParamsToTaskExecutionId(props);
     const taskExecution = useTaskExecution(taskExecutionId);
 

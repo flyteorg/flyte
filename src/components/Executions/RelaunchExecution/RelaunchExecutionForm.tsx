@@ -38,9 +38,9 @@ export const RelaunchExecutionForm: React.FC<{
             <Typography className={styles.text} variant="body1">
                 This will relaunch the execution using the same inputs.
                 {lastError && (
-                    <div className={commonStyles.errorText}>{`${
-                        lastError.message
-                    }`}</div>
+                    <div
+                        className={commonStyles.errorText}
+                    >{`${lastError.message}`}</div>
                 )}
             </Typography>
             <div className={commonStyles.formButtonGroup}>

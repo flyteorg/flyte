@@ -14,9 +14,11 @@ export interface WorkflowVersionsRouteParams {
 }
 
 /** The tab/page content for viewing a workflow's versions */
-export const WorkflowVersionsContainer: React.FC<
-    WorkflowVersionsRouteParams
-> = ({ projectId: project, domainId: domain, workflowName: name }) => {
+export const WorkflowVersionsContainer: React.FC<WorkflowVersionsRouteParams> = ({
+    projectId: project,
+    domainId: domain,
+    workflowName: name
+}) => {
     const workflows = useWorkflows(
         { domain, name, project },
         {

@@ -14,9 +14,9 @@ import { TaskExecutionsList } from '../TaskExecutionsList';
 
 describe('TaskExecutionsList', () => {
     let nodeExecution: NodeExecution;
-    let mockListTaskExecutions: jest.Mock<
-        ReturnType<typeof listTaskExecutions>
-    >;
+    let mockListTaskExecutions: jest.Mock<ReturnType<
+        typeof listTaskExecutions
+    >>;
 
     const renderList = () =>
         render(

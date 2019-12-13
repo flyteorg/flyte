@@ -20,9 +20,10 @@ interface ProjectRecentExecutionsProps {
     project: string;
 }
 
-export const ProjectRecentExecutions: React.FC<
-    ProjectRecentExecutionsProps
-> = ({ domain, project }) => {
+export const ProjectRecentExecutions: React.FC<ProjectRecentExecutionsProps> = ({
+    domain,
+    project
+}) => {
     const styles = useStyles();
 
     const sort = {

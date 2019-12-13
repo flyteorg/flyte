@@ -23,9 +23,7 @@ const scrollbarPadding = scrollbarSize();
  * NodeExecutions are expandable and will potentially render a list of child
  * TaskExecutions
  */
-export const NodeExecutionsTable: React.FC<
-    NodeExecutionsTableProps
-> = props => {
+export const NodeExecutionsTable: React.FC<NodeExecutionsTableProps> = props => {
     const state = useNodeExecutionsTableState(props);
     const commonStyles = useCommonStyles();
     const tableStyles = useExecutionTableStyles();

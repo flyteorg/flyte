@@ -35,13 +35,10 @@ export const TaskExecutionChildren: React.FC<TaskExecutionChildrenProps> = ({
 
     const columnStyles = useColumnStyles();
     // Memoizing columns so they won't be re-generated unless the styles change
-    const { columns, Skeleton } = React.useMemo(
-        () => {
-            const columns = generateColumns(columnStyles);
-            return { columns, Skeleton: generateRowSkeleton(columns) };
-        },
-        [columnStyles]
-    );
+    const { columns, Skeleton } = React.useMemo(() => {
+        const columns = generateColumns(columnStyles);
+        return { columns, Skeleton: generateRowSkeleton(columns) };
+    }, [columnStyles]);
     return (
         <WaitForData
             spinnerVariant="medium"

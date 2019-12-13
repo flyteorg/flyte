@@ -12,9 +12,10 @@ export interface ProjectExecutionsRouteParams {
 }
 
 /** The tab/page content for viewing a project's executions */
-export const ProjectExecutionsContainer: React.FC<
-    ProjectExecutionsRouteParams
-> = ({ projectId: project, domainId: domain }) => {
+export const ProjectExecutionsContainer: React.FC<ProjectExecutionsRouteParams> = ({
+    projectId: project,
+    domainId: domain
+}) => {
     const sort = {
         key: executionSortFields.createdAt,
         direction: SortDirection.DESCENDING

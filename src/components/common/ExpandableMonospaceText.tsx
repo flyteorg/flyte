@@ -112,9 +112,10 @@ export interface ExpandableMonospaceTextProps {
 /** An expandable/collapsible container which renders the provided text in a
  * monospace font. It also provides a button to copy the text.
  */
-export const ExpandableMonospaceText: React.FC<
-    ExpandableMonospaceTextProps
-> = ({ onExpandCollapse, text }) => {
+export const ExpandableMonospaceText: React.FC<ExpandableMonospaceTextProps> = ({
+    onExpandCollapse,
+    text
+}) => {
     const [expanded, setExpanded] = React.useState(false);
     const styles = useExpandableMonospaceTextStyles();
     const onClickExpand = () => {

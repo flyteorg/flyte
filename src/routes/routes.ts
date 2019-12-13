@@ -91,9 +91,7 @@ export class Routes {
                     domain,
                     `/workflows/${workflowName}/${workflowTabIds.executions}`
                 ),
-            path: `${projectDomainBasePath}/workflows/:workflowName/${
-                workflowTabIds.executions
-            }`
+            path: `${projectDomainBasePath}/workflows/:workflowName/${workflowTabIds.executions}`
         },
         Versions: {
             makeUrl: (project: string, domain: string, workflowName: string) =>
@@ -102,9 +100,7 @@ export class Routes {
                     domain,
                     `/workflows/${workflowName}/${workflowTabIds.versions}`
                 ),
-            path: `${projectDomainBasePath}/workflows/:workflowName/${
-                workflowTabIds.versions
-            }`
+            path: `${projectDomainBasePath}/workflows/:workflowName/${workflowTabIds.versions}`
         },
         LaunchPlans: {
             makeUrl: (project: string, domain: string, workflowName: string) =>
@@ -113,9 +109,7 @@ export class Routes {
                     domain,
                     `/workflows/${workflowName}/${workflowTabIds.launchPlans}`
                 ),
-            path: `${projectDomainBasePath}/workflows/:workflowName/${
-                workflowTabIds.launchPlans
-            }`
+            path: `${projectDomainBasePath}/workflows/:workflowName/${workflowTabIds.launchPlans}`
         },
         Schedules: {
             makeUrl: (project: string, domain: string, workflowName: string) =>
@@ -124,9 +118,7 @@ export class Routes {
                     domain,
                     `/workflows/${workflowName}/${workflowTabIds.schedules}`
                 ),
-            path: `${projectDomainBasePath}/workflows/:workflowName/${
-                workflowTabIds.schedules
-            }`
+            path: `${projectDomainBasePath}/workflows/:workflowName/${workflowTabIds.schedules}`
         }
     };
 

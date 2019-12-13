@@ -12,9 +12,9 @@ import { StatusIndicator } from './StatusIndicator';
 /** Renders DAGNodes with colors based on their node type, as well as dots to
  * indicate the execution status
  */
-export const TaskExecutionNode: React.FC<
-    NodeRendererProps<DAGNode>
-> = props => {
+export const TaskExecutionNode: React.FC<NodeRendererProps<
+    DAGNode
+>> = props => {
     const { node, config, selected } = props;
     const nodeExecutions = React.useContext(NodeExecutionsContext);
     const nodeExecution = nodeExecutions[node.id];

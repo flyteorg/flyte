@@ -47,22 +47,16 @@ export function useSearchFilterState({
         button.setOpen(false);
     };
 
-    useEffect(
-        () => {
-            const queryValue = value === defaultValue ? undefined : value;
-            setQueryStateValue(queryStateKey, queryValue);
-        },
-        [value, queryStateKey]
-    );
+    useEffect(() => {
+        const queryValue = value === defaultValue ? undefined : value;
+        setQueryStateValue(queryStateKey, queryValue);
+    }, [value, queryStateKey]);
 
-    useEffect(
-        () => {
-            if (queryStateValue) {
-                setValue(queryStateValue);
-            }
-        },
-        [queryStateValue]
-    );
+    useEffect(() => {
+        if (queryStateValue) {
+            setValue(queryStateValue);
+        }
+    }, [queryStateValue]);
 
     const getFilter = () =>
         value
