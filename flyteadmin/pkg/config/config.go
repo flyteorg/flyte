@@ -48,7 +48,7 @@ var defaultServerConfig = &ServerConfig{
 	Security: ServerSecurityOptions{
 		Oauth: config2.OAuthOptions{
 			// Please see the comments in this struct's definition for more information
-			HTTPAuthorizationHeader: "placeholder",
+			HTTPAuthorizationHeader: "flyte-authorization",
 			GrpcAuthorizationHeader: "flyte-authorization",
 		},
 	},

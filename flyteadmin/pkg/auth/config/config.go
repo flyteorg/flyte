@@ -51,6 +51,13 @@ type OAuthOptions struct {
 	// name. Instead, there is a gRPC interceptor, GetAuthenticationCustomMetadataInterceptor, that will translate
 	// incoming metadata headers with this config setting's name, into that standard header
 	GrpcAuthorizationHeader string `json:"grpcAuthorizationHeader"`
+
+	// To help ease migration, it was helpful to be able to only selectively enforce authentication.  The
+	// dimension that made the most sense to cut by at time of writing is HTTP vs gRPC as the web UI mainly used HTTP
+	// and the backend used mostly gRPC.  Cutting by individual endpoints is another option but it possibly falls more
+	// into the realm of authorization rather than authentication.
+	DisableForHTTP bool `json:"disableForHttp"`
+	DisableForGrpc bool `json:"disableForGrpc"`
 }
 
 type Claims struct {
