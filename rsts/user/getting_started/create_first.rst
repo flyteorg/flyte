@@ -9,15 +9,16 @@ The easiest way to author a Flyte Workflow is using the provided python SDK call
 You can save some effort by cloning the ``flytesnacks`` repo, and re-initializing it as a new git repository ::
 
   git clone git@github.com:lyft/flytesnacks.git myflyteproject
-  cd myworkflow
+  cd myflyteproject
   rm -rf .git
   git init
+  cd python
 
 now open the "Makefile" and change the first line to ``IMAGE_NAME=myflyteproject``
 
 Let's also remove the existing python task so we can write one from scratch. ::
 
-  rm workflows/edges.py
+  rm single_step/edges.py
 
 Creating a Project
 ******************
