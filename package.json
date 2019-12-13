@@ -132,7 +132,7 @@
     "debug": "^3.1.0",
     "dom-helpers": "^3.4.0",
     "eslint": "^5.12.1",
-    "eslint-plugin-react-hooks": "^1.0.1",
+    "eslint-plugin-react-hooks": "^2.3.0",
     "favicons-webpack-plugin": "^1.0.2",
     "file-loader": "^1.1.11",
     "fork-ts-checker-webpack-plugin": "^0.4.1",
