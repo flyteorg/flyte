@@ -49,9 +49,11 @@ const VariablesList: React.FC<{ variables: Record<string, Variable> }> = ({
                         key={`${name}-type`}
                         className={styles.typeAnnotationContainer}
                     >
-                        (<span className={styles.typeAnnotation}>
+                        (
+                        <span className={styles.typeAnnotation}>
                             {typeString}
-                        </span>)
+                        </span>
+                        )
                     </span>
                 );
             }

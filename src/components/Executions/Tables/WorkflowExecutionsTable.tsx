@@ -144,9 +144,7 @@ export interface WorkflowExecutionsTableProps extends ListProps<Execution> {}
 /** Renders a table of WorkflowExecution records. Executions with errors will
  * have an expanadable container rendered as part of the table row.
  */
-export const WorkflowExecutionsTable: React.FC<
-    WorkflowExecutionsTableProps
-> = props => {
+export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = props => {
     const executions = props.value;
     const state = useWorkflowExecutionsTableState();
     const commonStyles = useCommonStyles();

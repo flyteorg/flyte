@@ -25,9 +25,11 @@ const executionRefreshConfig: RefreshConfig<Execution> = {
 };
 
 /** The view component for the Execution Details page */
-export const ExecutionDetailsContainer: React.FC<
-    ExecutionDetailsRouteParams
-> = ({ executionId, domainId, projectId }) => {
+export const ExecutionDetailsContainer: React.FC<ExecutionDetailsRouteParams> = ({
+    executionId,
+    domainId,
+    projectId
+}) => {
     const id = {
         project: projectId,
         domain: domainId,

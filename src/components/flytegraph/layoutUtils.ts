@@ -45,7 +45,7 @@ function findNeededHorizontalColumnScale(columns: ColumnMeasurement[]) {
         const newSpacing = oldSpacing + overlap;
         return Math.max(
             currentMax,
-            newSpacing / oldSpacing * nodeSpacingMultiplier
+            (newSpacing / oldSpacing) * nodeSpacingMultiplier
         );
     }, 0);
 }

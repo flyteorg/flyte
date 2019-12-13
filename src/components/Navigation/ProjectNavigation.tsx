@@ -108,14 +108,13 @@ const ProjectNavigationImpl: React.FC<ProjectNavigationRouteParams> = ({
 
     return (
         <>
-            {project.value &&
-                projects.value && (
-                    <ProjectSelector
-                        projects={projects.value}
-                        selectedProject={project.value}
-                        onProjectSelected={onProjectSelected}
-                    />
-                )}
+            {project.value && projects.value && (
+                <ProjectSelector
+                    projects={projects.value}
+                    selectedProject={project.value}
+                    onProjectSelected={onProjectSelected}
+                />
+            )}
             <div className={styles.navLinksContainer}>
                 {Object.values(routes).map(
                     ({ isActive, path, icon: Icon, text }) => (

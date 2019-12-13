@@ -8,16 +8,13 @@ import { ButtonCircularProgress } from '../ButtonCircularProgress';
 
 const ButtonWithProgress: React.FC = () => {
     const [loading, setLoading] = React.useState(false);
-    React.useEffect(
-        () => {
-            if (loading) {
-                const timeout = setTimeout(() => setLoading(false), 2000);
-                return () => clearTimeout(timeout);
-            }
-            return;
-        },
-        [loading]
-    );
+    React.useEffect(() => {
+        if (loading) {
+            const timeout = setTimeout(() => setLoading(false), 2000);
+            return () => clearTimeout(timeout);
+        }
+        return;
+    }, [loading]);
     const onClick = () => setLoading(true);
     return (
         <div>

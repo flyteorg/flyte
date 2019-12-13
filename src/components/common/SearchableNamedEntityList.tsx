@@ -89,9 +89,10 @@ export interface SearchableNamedEntityListProps {
 
 const nameSearchPropertyGetter = ({ id }: SearchableNamedEntity) => id.name;
 /** Base component functionalityfor rendering NamedEntities (Workflow/Task/LaunchPlan) */
-export const SearchableNamedEntityList: React.FC<
-    SearchableNamedEntityListProps
-> = ({ names, renderItem }) => {
+export const SearchableNamedEntityList: React.FC<SearchableNamedEntityListProps> = ({
+    names,
+    renderItem
+}) => {
     const styles = useNamedEntityListStyles();
     const searchValues = names.map(name => ({
         ...name,

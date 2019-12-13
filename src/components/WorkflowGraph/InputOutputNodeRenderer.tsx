@@ -21,9 +21,7 @@ interface InputOutputNodeRendererProps extends NodeRendererProps<DAGNode> {
 }
 
 /** Special case renderer for the start/end nodes in a graph */
-export const InputOutputNodeRenderer: React.FC<
-    InputOutputNodeRendererProps
-> = props => {
+export const InputOutputNodeRenderer: React.FC<InputOutputNodeRendererProps> = props => {
     const { node, config, label } = props;
     const fillColor = taskColors[TaskType.UNKNOWN];
     const textWidth = getTextWidthForLabel(label, config.fontSize);

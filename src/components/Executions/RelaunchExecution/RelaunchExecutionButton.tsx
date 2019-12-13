@@ -14,9 +14,10 @@ interface RelaunchExecutionButtonProps {
 /** A button which manages the state and popover interaction used by a
  * `RelaunchExecutionForm`
  */
-export const RelaunchExecutionButton: React.FC<
-    RelaunchExecutionButtonProps
-> = ({ className, execution }) => {
+export const RelaunchExecutionButton: React.FC<RelaunchExecutionButtonProps> = ({
+    className,
+    execution
+}) => {
     const renderContent = (onClose: FormCloseHandler) => (
         <RelaunchExecutionForm execution={execution} onClose={onClose} />
     );

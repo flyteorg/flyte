@@ -62,13 +62,11 @@ stories.addDecorator(story => {
     React.useEffect(() => {
         const executionsResponse = createMockTaskExecutionsListResponse(3);
         const mock = new AxiosMockAdapter(axios);
-        mock
-            .onGet(/.*\/task_executions\/.*/)
-            .reply(() => [
-                200,
-                encodeProtoPayload(executionsResponse, Admin.TaskExecutionList),
-                { 'Content-Type': 'application/octet-stream' }
-            ]);
+        mock.onGet(/.*\/task_executions\/.*/).reply(() => [
+            200,
+            encodeProtoPayload(executionsResponse, Admin.TaskExecutionList),
+            { 'Content-Type': 'application/octet-stream' }
+        ]);
         return () => mock.restore();
     });
     return (

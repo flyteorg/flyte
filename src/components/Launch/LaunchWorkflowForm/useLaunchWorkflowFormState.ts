@@ -99,13 +99,10 @@ function useFormInputsState(parsedInputs: ParsedInput[]): FormInputsState {
             setValues({ ...values, [parsed.name]: value })
     }));
 
-    useEffect(
-        () => {
-            // TODO: Use default values from inputs
-            setValues({});
-        },
-        [parsedInputs]
-    );
+    useEffect(() => {
+        // TODO: Use default values from inputs
+        setValues({});
+    }, [parsedInputs]);
 
     return {
         inputs
@@ -113,16 +110,13 @@ function useFormInputsState(parsedInputs: ParsedInput[]): FormInputsState {
 }
 
 export function useWorkflowSelectorOptions(workflows: Workflow[]) {
-    return useMemo(
-        () => {
-            const options = workflowsToSearchableSelectorOptions(workflows);
-            if (options.length > 0) {
-                options[0].description = 'latest';
-            }
-            return options;
-        },
-        [workflows]
-    );
+    return useMemo(() => {
+        const options = workflowsToSearchableSelectorOptions(workflows);
+        if (options.length > 0) {
+            options[0].description = 'latest';
+        }
+        return options;
+    }, [workflows]);
 }
 
 function useLaunchPlanSelectorOptions(launchPlans: LaunchPlan[]) {
@@ -251,41 +245,32 @@ export function useLaunchWorkflowFormState({
     const onSubmit = submissionState.fetch;
     const onCancel = onClose;
 
-    useEffect(
-        () => {
-            const parsedInputs =
-                launchPlanData && workflow.hasLoaded
-                    ? getInputs(workflow.value, launchPlanData)
-                    : [];
-            setParsedInputs(parsedInputs);
-        },
-        [workflow.hasLoaded, workflow.value, launchPlanData]
-    );
+    useEffect(() => {
+        const parsedInputs =
+            launchPlanData && workflow.hasLoaded
+                ? getInputs(workflow.value, launchPlanData)
+                : [];
+        setParsedInputs(parsedInputs);
+    }, [workflow.hasLoaded, workflow.value, launchPlanData]);
 
     // Once workflows have loaded, attempt to select the first option
-    useEffect(
-        () => {
-            if (workflowSelectorOptions.length > 0 && !selectedWorkflow) {
-                setWorkflow(workflowSelectorOptions[0]);
-            }
-        },
-        [workflows.value]
-    );
+    useEffect(() => {
+        if (workflowSelectorOptions.length > 0 && !selectedWorkflow) {
+            setWorkflow(workflowSelectorOptions[0]);
+        }
+    }, [workflows.value]);
 
     // Once launch plans have been loaded, attempt to select the default
     // launch plan
-    useEffect(
-        () => {
-            if (!launchPlanSelectorOptions.length) {
-                return;
-            }
-            const defaultLaunchPlan = launchPlanSelectorOptions.find(
-                ({ id }) => id === workflowId.name
-            );
-            setLaunchPlan(defaultLaunchPlan);
-        },
-        [launchPlanSelectorOptions]
-    );
+    useEffect(() => {
+        if (!launchPlanSelectorOptions.length) {
+            return;
+        }
+        const defaultLaunchPlan = launchPlanSelectorOptions.find(
+            ({ id }) => id === workflowId.name
+        );
+        setLaunchPlan(defaultLaunchPlan);
+    }, [launchPlanSelectorOptions]);
 
     return {
         inputLoadingState,

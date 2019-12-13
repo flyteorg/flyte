@@ -13,9 +13,10 @@ import { Link } from 'react-router-dom';
 import { Routes } from 'routes';
 
 /** Renders a searchable list of Workflow names, with associated descriptions */
-export const SearchableWorkflowNameList: React.FC<
-    Omit<SearchableNamedEntityListProps, 'renderItem'>
-> = props => {
+export const SearchableWorkflowNameList: React.FC<Omit<
+    SearchableNamedEntityListProps,
+    'renderItem'
+>> = props => {
     const commonStyles = useCommonStyles();
     const listStyles = useNamedEntityListStyles();
 

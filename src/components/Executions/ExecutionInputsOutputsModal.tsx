@@ -125,9 +125,10 @@ interface ExecutionInputsOutputsModalProps {
 /** Renders a Modal that will load/display the inputs/outputs for a given
  * Execution in a tabbed/scrollable container
  */
-export const ExecutionInputsOutputsModal: React.FC<
-    ExecutionInputsOutputsModalProps
-> = ({ execution, onClose }) => {
+export const ExecutionInputsOutputsModal: React.FC<ExecutionInputsOutputsModalProps> = ({
+    execution,
+    onClose
+}) => {
     const styles = useStyles();
     return (
         <Dialog

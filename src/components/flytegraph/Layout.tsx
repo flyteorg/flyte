@@ -14,10 +14,10 @@ function layoutArgsAreEqual(
     const [newData, newConfig] = newArgs;
     const [oldData, oldConfig] = oldArgs;
     /* Nodes can be very deep structures, so we don't want to do a deep compare.
-    * For the purposes of layout, we just want to check that the array of
-    * references to nodes hasn't changed. Changing any value in the config will
-    * result in re-computing a layout, so we do a deep comparison there.
-    */
+     * For the purposes of layout, we just want to check that the array of
+     * references to nodes hasn't changed. Changing any value in the config will
+     * result in re-computing a layout, so we do a deep comparison there.
+     */
     return shallowEqual(newData, oldData) && isEqual(newConfig, oldConfig);
 }
 

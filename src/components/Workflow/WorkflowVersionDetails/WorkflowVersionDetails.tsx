@@ -14,9 +14,12 @@ export interface WorkflowVersionDetailsRouteParams {
 export type WorkflowVersionDetailsProps = WorkflowVersionDetailsRouteParams;
 
 /** The view component for Workflow version details page */
-export const WorkflowVersionDetailsContainer: React.FC<
-    WorkflowVersionDetailsRouteParams
-> = ({ domainId, projectId, workflowName, version }) => {
+export const WorkflowVersionDetailsContainer: React.FC<WorkflowVersionDetailsRouteParams> = ({
+    domainId,
+    projectId,
+    workflowName,
+    version
+}) => {
     const workflow = useWorkflow({
         version,
         project: projectId,

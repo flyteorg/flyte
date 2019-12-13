@@ -156,12 +156,9 @@ export const NodeExecutionDetails: React.FC<NodeExecutionDetailsProps> = ({
     const showTaskDetails = !!execution.taskTemplate;
 
     // Reset to default tab when we change executions
-    React.useEffect(
-        () => {
-            tabState.onChange({}, defaultTab);
-        },
-        [execution.cacheKey]
-    );
+    React.useEffect(() => {
+        tabState.onChange({}, defaultTab);
+    }, [execution.cacheKey]);
 
     const statusContent = (
         <ExecutionStatusBadge phase={execution.closure.phase} type="node" />

@@ -59,25 +59,19 @@ export function useSingleFilterState<FilterKey extends string>({
         button.setOpen(false);
     };
 
-    useEffect(
-        () => {
-            const { value } = selectedOption;
-            const queryValue = value === defaultValue.value ? undefined : value;
-            setQueryStateValue(queryStateKey, queryValue);
-        },
-        [selectedOption, queryStateKey]
-    );
+    useEffect(() => {
+        const { value } = selectedOption;
+        const queryValue = value === defaultValue.value ? undefined : value;
+        setQueryStateValue(queryStateKey, queryValue);
+    }, [selectedOption, queryStateKey]);
 
-    useEffect(
-        () => {
-            if (queryStateValue) {
-                setSelectedOption(
-                    valueOrDefault(options, queryStateValue, defaultValue)
-                );
-            }
-        },
-        [queryStateValue]
-    );
+    useEffect(() => {
+        if (queryStateValue) {
+            setSelectedOption(
+                valueOrDefault(options, queryStateValue, defaultValue)
+            );
+        }
+    }, [queryStateValue]);
 
     const getFilter = () => selectedOption.data;
 

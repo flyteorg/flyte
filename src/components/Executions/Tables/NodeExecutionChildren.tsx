@@ -37,13 +37,10 @@ const TaskNodeExecutionChildren: React.FC<NodeExecutionChildrenProps> = ({
 
     const columnStyles = useColumnStyles();
     // Memoizing columns so they won't be re-generated unless the styles change
-    const { columns, Skeleton } = React.useMemo(
-        () => {
-            const columns = generateTaskExecutionColumns(columnStyles);
-            return { columns, Skeleton: generateRowSkeleton(columns) };
-        },
-        [columnStyles]
-    );
+    const { columns, Skeleton } = React.useMemo(() => {
+        const columns = generateTaskExecutionColumns(columnStyles);
+        return { columns, Skeleton: generateRowSkeleton(columns) };
+    }, [columnStyles]);
     return (
         <WaitForData
             spinnerVariant="medium"
@@ -81,22 +78,19 @@ const executionRefreshConfig: RefreshConfig<Execution> = {
     valueIsFinal: executionIsTerminal
 };
 
-const WorkflowNodeExecutionChildren: React.FC<
-    WorkflowNodeExecutionChildrenProps
-> = ({ execution }) => {
+const WorkflowNodeExecutionChildren: React.FC<WorkflowNodeExecutionChildrenProps> = ({
+    execution
+}) => {
     const { executionId } = execution.closure.workflowNodeMetadata;
     const workflowExecution = useWorkflowExecution(executionId).fetchable;
     useDataRefresher(executionId, workflowExecution, executionRefreshConfig);
 
     const columnStyles = useColumnStyles();
     // Memoizing columns so they won't be re-generated unless the styles change
-    const { columns, Skeleton } = React.useMemo(
-        () => {
-            const columns = generateWorkflowExecutionColumns(columnStyles);
-            return { columns, Skeleton: generateRowSkeleton(columns) };
-        },
-        [columnStyles]
-    );
+    const { columns, Skeleton } = React.useMemo(() => {
+        const columns = generateWorkflowExecutionColumns(columnStyles);
+        return { columns, Skeleton: generateRowSkeleton(columns) };
+    }, [columnStyles]);
     return (
         <WaitForData
             spinnerVariant="medium"
@@ -116,9 +110,7 @@ const WorkflowNodeExecutionChildren: React.FC<
 };
 
 /** Renders a nested list of row items for children of a NodeExecution */
-export const NodeExecutionChildren: React.FC<
-    NodeExecutionChildrenProps
-> = props => {
+export const NodeExecutionChildren: React.FC<NodeExecutionChildrenProps> = props => {
     const { workflowNodeMetadata } = props.execution.closure;
     const { execution: topExecution } = React.useContext(ExecutionContext);
 

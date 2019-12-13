@@ -27,5 +27,7 @@ export const createMockProjects: () => Project[] = () =>
 
 export const createMockProjectsMap: () => Map<string, Project> = () => {
     const projects = createMockProjects();
-    return new Map(projects.map<[string, Project]>(p => [p.id, p]));
+    return new Map(
+        projects.map<[string, Project]>(p => [p.id, p])
+    );
 };

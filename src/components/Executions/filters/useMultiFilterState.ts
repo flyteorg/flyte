@@ -76,28 +76,22 @@ export function useMultiFilterState<
     };
 
     // Sync changes to selected value with the query state
-    useEffect(
-        () => {
-            const queryValue = active
-                ? serializeForQueryState(selectedKeys)
-                : undefined;
-            setQueryStateValue(queryStateKey, queryValue);
-        },
-        [selectedKeys.join(), queryStateKey]
-    );
+    useEffect(() => {
+        const queryValue = active
+            ? serializeForQueryState(selectedKeys)
+            : undefined;
+        setQueryStateValue(queryStateKey, queryValue);
+    }, [selectedKeys.join(), queryStateKey]);
 
     // Watch for external changes to query string and sync our value if
     // it's different
-    useEffect(
-        () => {
-            if (queryStateValue) {
-                if (!isEqual(selected, queryStateSelected)) {
-                    setSelected(queryStateSelected);
-                }
+    useEffect(() => {
+        if (queryStateValue) {
+            if (!isEqual(selected, queryStateSelected)) {
+                setSelected(queryStateSelected);
             }
-        },
-        [queryStateValue]
-    );
+        }
+    }, [queryStateValue]);
 
     const getFilter = () => {
         // Collect the `data` property from all options for which we have

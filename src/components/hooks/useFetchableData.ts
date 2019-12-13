@@ -138,24 +138,24 @@ export function useFetchableData<T extends object, DataType>(
         return newFetchPromise;
     };
 
-    useEffect(() => {
-        setFetchState(null);
-        setValue(defaultValue);
-        setHasLoaded(false);
-    }, cacheKey === undefined ? [] : [cacheKey]);
+    useEffect(
+        () => {
+            setFetchState(null);
+            setValue(defaultValue);
+            setHasLoaded(false);
+        },
+        cacheKey === undefined ? [] : [cacheKey]
+    );
 
     // We initiate auto-fetch separately because we want it to run *after*
     // the reset occurs in the above effect. Otherwise doFetch will use a stale
     // `value` when invoking the passed fetch function.
-    useEffect(
-        () => {
-            if (!hasLoaded && autoFetch) {
-                fetch();
-            }
-            return cancel;
-        },
-        [autoFetch, hasLoaded, cacheKey]
-    );
+    useEffect(() => {
+        if (!hasLoaded && autoFetch) {
+            fetch();
+        }
+        return cancel;
+    }, [autoFetch, hasLoaded, cacheKey]);
 
     return { debugName, fetch, lastError, loading, hasLoaded, value };
 }

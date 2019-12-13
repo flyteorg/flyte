@@ -12,9 +12,9 @@ interface TerminateExecutionButtonProps {
 /** A button which manages the state and popover interaction used by a
  * `TerminateExecutionForm`
  */
-export const TerminateExecutionButton: React.FC<
-    TerminateExecutionButtonProps
-> = ({ className }) => {
+export const TerminateExecutionButton: React.FC<TerminateExecutionButtonProps> = ({
+    className
+}) => {
     const renderContent = (onClose: FormCloseHandler) => (
         <TerminateExecutionForm onClose={onClose} />
     );
