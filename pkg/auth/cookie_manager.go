@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"net/http"
+	"time"
 
 	"github.com/lyft/flytestdlib/errors"
 	"github.com/lyft/flytestdlib/logger"
@@ -92,4 +93,29 @@ func (c CookieManager) SetTokenCookies(ctx context.Context, writer http.Response
 		http.SetCookie(writer, &refreshCookie)
 	}
 	return nil
+}
+
+func getLogoutAccessCookie() *http.Cookie {
+	return &http.Cookie{
+		Name:     accessTokenCookieName,
+		Value:    "",
+		MaxAge:   0,
+		HttpOnly: true,
+		Expires:  time.Now().Add(-1 * time.Hour),
+	}
+}
+
+func getLogoutRefreshCookie() *http.Cookie {
+	return &http.Cookie{
+		Name:     refreshTokenCookieName,
+		Value:    "",
+		MaxAge:   0,
+		HttpOnly: true,
+		Expires:  time.Now().Add(-1 * time.Hour),
+	}
+}
+
+func (c CookieManager) DeleteCookies(ctx context.Context, writer http.ResponseWriter) {
+	http.SetCookie(writer, getLogoutAccessCookie())
+	http.SetCookie(writer, getLogoutRefreshCookie())
 }

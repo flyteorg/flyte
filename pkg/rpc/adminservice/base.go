@@ -57,7 +57,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	defer func() {
 		if err := recover(); err != nil {
 			adminScope.MustNewCounter("initialization_panic",
-				"panics encountered initializating the admin service").Inc()
+				"panics encountered initializing the admin service").Inc()
 			logger.Fatalf(context.Background(), fmt.Sprintf("caught panic: %v [%+v]", err, string(debug.Stack())))
 		}
 	}()
@@ -74,14 +74,14 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	db := repositories.GetRepository(
 		repositories.POSTGRES, dbConfig, adminScope.NewSubScope("database"))
 	storeConfig := storage.GetConfig()
-	executionCluster := executionCluster.GetExecutionCluster(
+	execCluster := executionCluster.GetExecutionCluster(
 		adminScope.NewSubScope("executor").NewSubScope("cluster"),
 		kubeConfig,
 		master,
 		configuration)
 	workflowExecutor := workflowengine.NewFlytePropeller(
 		applicationConfiguration.RoleNameKey,
-		executionCluster,
+		execCluster,
 		adminScope.NewSubScope("executor").NewSubScope("flytepropeller"),
 		configuration.NamespaceMappingConfiguration())
 	logger.Info(context.Background(), "Successfully created a workflow executor engine")
