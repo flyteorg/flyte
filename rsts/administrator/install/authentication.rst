@@ -12,8 +12,14 @@ Flow
 
 Flyte Admin authentication is implemented using the authorization code flow.
 
-.. TODO: Swimlane diagram
 
+Flyte UI Flow
+https://swimlanes.io/d/OmV4ybCkx
+https://static.swimlanes.io/fd751baba1152f38f40744fc06a67b1f.png
+
+Flyte CLI Flow
+https://swimlanes.io/d/q64OxuoxT
+https://static.swimlanes.io/3f0fa54e2cc52d4a07666be1cda3ccd3.png
 
 *************
 Configuration
