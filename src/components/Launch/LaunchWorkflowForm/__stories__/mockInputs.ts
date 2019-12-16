@@ -15,7 +15,7 @@ function simpleType(primitiveType: SimpleType, description?: string): Variable {
     };
 }
 
-export const mockVariables: Record<string, Variable> = {
+export const mockSimpleVariables: Record<string, Variable> = {
     simpleString: simpleType(SimpleType.STRING, 'a simple string value'),
     stringNoLabel: simpleType(SimpleType.STRING),
     simpleInteger: simpleType(SimpleType.INTEGER, 'a simple integer value'),
@@ -32,12 +32,20 @@ export const mockVariables: Record<string, Variable> = {
     // blob: {}
 };
 
-export const mockWorkflowInputsInterface: TypedInterface = {
-    inputs: {
-        variables: { ...mockVariables }
-    }
-};
+export const mockCollectionVariables: Record<string, Variable> = mapValues(
+    mockSimpleVariables,
+    v => ({
+        description: `A collection of: ${v.description}`,
+        type: { collectionType: v.type }
+    })
+);
 
-export const mockParameterMap: ParameterMap = {
-    parameters: mapValues(mockVariables, v => ({ var: v }))
-};
+export function createMockWorkflowInputsInterface(
+    variables: Record<string, Variable>
+): TypedInterface {
+    return {
+        inputs: {
+            variables: { ...variables }
+        }
+    };
+}
