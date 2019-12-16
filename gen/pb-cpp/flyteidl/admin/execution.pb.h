@@ -1622,19 +1622,19 @@ class ExecutionMetadata final :
 
   // accessors -------------------------------------------------------
 
-  // string principal = 2 [deprecated = true];
-  PROTOBUF_DEPRECATED void clear_principal();
-  PROTOBUF_DEPRECATED static const int kPrincipalFieldNumber = 2;
-  PROTOBUF_DEPRECATED const ::std::string& principal() const;
-  PROTOBUF_DEPRECATED void set_principal(const ::std::string& value);
+  // string principal = 2;
+  void clear_principal();
+  static const int kPrincipalFieldNumber = 2;
+  const ::std::string& principal() const;
+  void set_principal(const ::std::string& value);
   #if LANG_CXX11
-  PROTOBUF_DEPRECATED void set_principal(::std::string&& value);
+  void set_principal(::std::string&& value);
   #endif
-  PROTOBUF_DEPRECATED void set_principal(const char* value);
-  PROTOBUF_DEPRECATED void set_principal(const char* value, size_t size);
-  PROTOBUF_DEPRECATED ::std::string* mutable_principal();
-  PROTOBUF_DEPRECATED ::std::string* release_principal();
-  PROTOBUF_DEPRECATED void set_allocated_principal(::std::string* principal);
+  void set_principal(const char* value);
+  void set_principal(const char* value, size_t size);
+  ::std::string* mutable_principal();
+  ::std::string* release_principal();
+  void set_allocated_principal(::std::string* principal);
 
   // .google.protobuf.Timestamp scheduled_at = 4;
   bool has_scheduled_at() const;
@@ -3984,7 +3984,7 @@ inline void ExecutionMetadata::set_mode(::flyteidl::admin::ExecutionMetadata_Exe
   // @@protoc_insertion_point(field_set:flyteidl.admin.ExecutionMetadata.mode)
 }
 
-// string principal = 2 [deprecated = true];
+// string principal = 2;
 inline void ExecutionMetadata::clear_principal() {
   principal_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
