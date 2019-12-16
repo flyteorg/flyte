@@ -1,7 +1,9 @@
+import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
 import { resolveAfter } from 'common/promiseUtils';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
+import { Admin } from 'flyteidl';
 import { mapValues } from 'lodash';
 import { Variable, Workflow } from 'models';
 import { createMockLaunchPlan } from 'models/__mocks__/launchPlanData';
@@ -10,6 +12,7 @@ import {
     createMockWorkflowClosure,
     createMockWorkflowVersions
 } from 'models/__mocks__/workflowData';
+import { mockExecution } from 'models/Execution/__mocks__/mockWorkflowExecutionsData';
 import * as React from 'react';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 import {
@@ -17,6 +20,8 @@ import {
     mockCollectionVariables,
     mockSimpleVariables
 } from './mockInputs';
+
+const submitAction = action('createWorkflowExecution');
 
 const renderForm = (variables: Record<string, Variable>) => {
     const mockWorkflow = createMockWorkflow('MyWorkflow');
@@ -37,6 +42,10 @@ const renderForm = (variables: Record<string, Variable>) => {
     mockLaunchPlan.closure!.expectedInputs = parameterMap;
 
     const mockApi = mockAPIContextValue({
+        createWorkflowExecution: input => {
+            submitAction(input);
+            return Promise.reject('Not implemented');
+        },
         getLaunchPlan: () => resolveAfter(500, mockLaunchPlan),
         getWorkflow: id => {
             const workflow: Workflow = {

@@ -1,4 +1,5 @@
 import { timestampToDate } from 'common/utils';
+import { ParameterError, ValidationError } from 'errors';
 import {
     LaunchPlan,
     Literal,
@@ -10,7 +11,7 @@ import {
 } from 'models';
 import * as moment from 'moment';
 import { simpleTypeToInputType, typeLabels } from './constants';
-import { inputTypeConverters } from './inputConverters';
+import { inputToLiteral, inputTypeConverters } from './inputConverters';
 import { SearchableSelectorOption } from './SearchableSelector';
 import { InputProps, InputType, InputTypeDefinition } from './types';
 
@@ -88,30 +89,26 @@ export function launchPlansToSearchableSelectorOptions(
     }));
 }
 
-function inputToLiteral(input: InputProps) {
-    if (!input.value) {
-        return undefined;
-    }
-    const converter = inputTypeConverters[input.typeDefinition.type];
-    const value = input.value.toString();
-    return converter(value);
+interface ConversionResult {
+    literals: Record<string, Literal>;
+    errors: Record<string, string>;
 }
-
 /** Converts a list of Launch form inputs to values that can be submitted with
  * a CreateExecutionRequest.
  */
-export function convertFormInputsToLiteralMap(
+export function convertFormInputsToLiterals(
     inputs: InputProps[]
-): LiteralMap {
-    const literals = inputs.reduce<Record<string, Literal>>((out, input) => {
-        const converted = inputToLiteral(input);
-        return converted
-            ? Object.assign(out, { [input.name]: converted })
-            : out;
-    }, {});
-    return {
-        literals
-    };
+): ConversionResult {
+    const result: ConversionResult = { literals: {}, errors: {} };
+    return inputs.reduce((out, input) => {
+        try {
+            const converted = inputToLiteral(input);
+            Object.assign(out.literals, { [input.name]: converted });
+        } catch (error) {
+            Object.assign(out.errors, { [input.name]: `${error}` });
+        }
+        return result;
+    }, result);
 }
 
 /** Converts a `LiteralType` to an `InputTypeDefintion` to assist with rendering

@@ -6,6 +6,7 @@ import {
     useWorkflows,
     waitForAllFetchables
 } from 'components/hooks';
+import { ParameterError, ValidationError } from 'errors';
 import {
     FilterOperationName,
     LaunchPlan,
@@ -29,7 +30,7 @@ import {
     LaunchWorkflowFormState
 } from './types';
 import {
-    convertFormInputsToLiteralMap,
+    convertFormInputsToLiterals,
     formatLabelWithType,
     getInputDefintionForLiteralType,
     getWorkflowInputs,
@@ -221,11 +222,20 @@ export function useLaunchWorkflowFormState({
         }
         const launchPlanId = launchPlanData.id;
         const { domain, project } = workflowId;
+
+        const { errors, literals } = convertFormInputsToLiterals(inputs);
+        if (Object.keys(errors).length) {
+            throw new ValidationError(
+                Object.keys(errors).map(
+                    name => new ParameterError(name, errors[name])
+                )
+            );
+        }
         const response = await createWorkflowExecution({
             domain,
             launchPlanId,
             project,
-            inputs: convertFormInputsToLiteralMap(inputs)
+            inputs: { literals }
         });
         const newExecutionId = response.id as WorkflowExecutionIdentifier;
         if (!newExecutionId) {
