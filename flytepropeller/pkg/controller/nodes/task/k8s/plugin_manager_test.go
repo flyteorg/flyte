@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
@@ -453,4 +456,8 @@ func TestAddObjectMetadata(t *testing.T) {
 		"aKey": "aVal",
 	}, o.GetAnnotations())
 	assert.Equal(t, l, o.GetLabels())
+}
+
+func init() {
+	labeled.SetMetricKeys(contextutils.NamespaceKey)
 }

@@ -396,16 +396,19 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 		np = v1alpha1.NodePhaseFailed
 		finalStatus = executors.NodeStatusFailed(fmt.Errorf(ToError(p.GetErr(), p.GetReason())))
 	}
+
 	if np == v1alpha1.NodePhaseTimingOut && !h.FinalizeRequired() {
 		logger.Infof(ctx, "Finalize not required, moving node to TimedOut")
 		np = v1alpha1.NodePhaseTimedOut
 		finalStatus = executors.NodeStatusTimedOut
 	}
+
 	if np == v1alpha1.NodePhaseSucceeding && !h.FinalizeRequired() {
 		logger.Infof(ctx, "Finalize not required, moving node to Succeeded")
 		np = v1alpha1.NodePhaseSucceeded
 		finalStatus = executors.NodeStatusSuccess
 	}
+
 	// If it is retryable failure, we do no want to send any events, as the node is essentially still running
 	if np != nodeStatus.GetPhase() && np != v1alpha1.NodePhaseRetryableFailure {
 		// assert np == skipped, succeeding or failing
@@ -427,6 +430,7 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 			}
 		}
 	}
+
 	UpdateNodeStatus(np, p, nCtx.nsm, nodeStatus)
 	return finalStatus, nil
 }
@@ -702,4 +706,9 @@ func NewExecutor(ctx context.Context, defaultDeadlines config.DefaultDeadlines, 
 	nodeHandlerFactory, err := NewHandlerFactory(ctx, exec, workflowLauncher, kubeClient, catalogClient, nodeScope)
 	exec.nodeHandlerFactory = nodeHandlerFactory
 	return exec, err
+}
+
+func init() {
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
+		contextutils.TaskIDKey)
 }

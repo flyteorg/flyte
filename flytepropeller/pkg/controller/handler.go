@@ -105,6 +105,7 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	wfDeepCopy := w.DeepCopy()
 	t.Stop()
 	ctx = contextutils.WithWorkflowID(ctx, wfDeepCopy.GetID())
+	ctx = context.WithValue(ctx, ResourceVersion, wfDeepCopy.GetResourceVersion())
 
 	maxRetries := uint32(p.cfg.MaxWorkflowRetries)
 	if IsDeleted(wfDeepCopy) || (wfDeepCopy.Status.FailedAttempts > maxRetries) {

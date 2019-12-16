@@ -376,7 +376,3 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		kubeClient:      iCtx.KubeClient(),
 	}, nil
 }
-
-func init() {
-	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
-}
