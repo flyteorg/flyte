@@ -7,6 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
 	"github.com/lyft/flyteidl/clients/go/events"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
@@ -1297,4 +1300,9 @@ func TestNew(t *testing.T) {
 	assert.NotNil(t, got.plugins)
 	assert.NotNil(t, got.metrics)
 	assert.Equal(t, got.pluginRegistry, pluginmachinery.PluginRegistry())
+}
+
+func init() {
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
+		contextutils.TaskIDKey)
 }

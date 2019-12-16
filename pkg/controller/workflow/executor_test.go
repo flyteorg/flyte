@@ -9,6 +9,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
@@ -86,6 +89,11 @@ func (f fakeRemoteWritePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskE
 		assert.NoError(f.t, tCtx.OutputWriter().Put(ctx, ioutils.NewRemoteFileOutputReader(ctx, tCtx.DataStore(), tCtx.OutputWriter(), tCtx.MaxDatasetSizeBytes())))
 	}
 	return trns, err
+}
+
+func init() {
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
+		contextutils.TaskIDKey)
 }
 
 func createInmemoryDataStore(t testing.TB, scope promutils.Scope) *storage.DataStore {
