@@ -101,7 +101,7 @@ class AdminExecutionMetadata(object):
     def principal(self):
         """Gets the principal of this AdminExecutionMetadata.  # noqa: E501
 
-        Identifier of the entity that triggered this execution.  # noqa: E501
+        Identifier of the entity that triggered this execution. For systems using back-end authentication any value set here will be discarded in favor of the authenticated user context.  # noqa: E501
 
         :return: The principal of this AdminExecutionMetadata.  # noqa: E501
         :rtype: str
@@ -112,7 +112,7 @@ class AdminExecutionMetadata(object):
     def principal(self, principal):
         """Sets the principal of this AdminExecutionMetadata.
 
-        Identifier of the entity that triggered this execution.  # noqa: E501
+        Identifier of the entity that triggered this execution. For systems using back-end authentication any value set here will be discarded in favor of the authenticated user context.  # noqa: E501
 
         :param principal: The principal of this AdminExecutionMetadata.  # noqa: E501
         :type: str

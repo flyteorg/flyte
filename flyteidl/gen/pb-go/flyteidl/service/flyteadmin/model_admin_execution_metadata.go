@@ -16,7 +16,7 @@ import (
 // Represents attributes about an execution which are not required to launch the execution but are useful to record. These attributes are assigned at launch time and do not change.
 type AdminExecutionMetadata struct {
 	Mode *ExecutionMetadataExecutionMode `json:"mode,omitempty"`
-	// Identifier of the entity that triggered this execution.
+	// Identifier of the entity that triggered this execution. For systems using back-end authentication any value set here will be discarded in favor of the authenticated user context.
 	Principal string `json:"principal,omitempty"`
 	// Indicates the \"nestedness\" of this execution. If a user launches a workflow execution, the default nesting is 0. If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 => 1 Generally, if workflow at nesting level k launches a workflow then the child workflow will have nesting = k + 1.
 	Nesting int64 `json:"nesting,omitempty"`

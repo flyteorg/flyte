@@ -2684,7 +2684,7 @@
         },
         "principal": {
           "type": "string",
-          "description": "Identifier of the entity that triggered this execution."
+          "description": "Identifier of the entity that triggered this execution.\nFor systems using back-end authentication any value set here will be discarded in favor of the\nauthenticated user context."
         },
         "nesting": {
           "type": "integer",
