@@ -47,6 +47,7 @@ export const inputTypeConverters: Record<InputType, ConverterFn> = {
     [InputType.Binary]: unsupportedInput,
     [InputType.Blob]: unsupportedInput,
     [InputType.Boolean]: booleanToLiteral,
+    // TODO
     [InputType.Collection]: unsupportedInput,
     [InputType.Datetime]: dateToLiteral,
     [InputType.Duration]: durationToLiteral,

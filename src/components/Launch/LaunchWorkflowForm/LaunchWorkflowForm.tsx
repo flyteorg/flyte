@@ -18,6 +18,7 @@ import {
     workflowSortFields
 } from 'models';
 import * as React from 'react';
+import { CollectionInput } from './CollectionInput';
 import { SearchableSelector } from './SearchableSelector';
 import { SimpleInput } from './SimpleInput';
 import { InputProps, InputType, LaunchWorkflowFormProps } from './types';
@@ -54,6 +55,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 function getComponentForInput(input: InputProps) {
     switch (input.typeDefinition.type) {
         case InputType.Collection:
+            return <CollectionInput {...input} />;
         case InputType.Map:
         case InputType.Schema:
         case InputType.Unknown:
