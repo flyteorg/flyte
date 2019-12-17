@@ -45,7 +45,9 @@ func (h *dataSetRepo) Get(ctx context.Context, in models.DatasetKey) (models.Dat
 	defer timer.Stop()
 
 	var ds models.Dataset
-	result := h.db.Preload("PartitionKeys").First(&ds, &models.Dataset{DatasetKey: in})
+	result := h.db.Preload("PartitionKeys", func(db *gorm.DB) *gorm.DB {
+		return db.Order("partition_keys.created_at ASC") // preserve the order in which the partitions were created
+	}).First(&ds, &models.Dataset{DatasetKey: in})
 
 	if result.Error != nil {
 		logger.Debugf(ctx, "Unable to find Dataset: [%+v], err: %v", in, result.Error)
