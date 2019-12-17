@@ -34,6 +34,8 @@ type K8sPluginConfig struct {
 	DefaultLabels map[string]string `json:"default-labels" pflag:"-,Defines a set of default labels to add to the produced pods."`
 	// Provide additional environment variable pairs that plugin authors will provide to containers
 	DefaultEnvVars map[string]string `json:"default-env-vars" pflag:"-,Additional environment variable that should be injected into every resource"`
+	// Provide additional environment variable pairs whose values resolve from the plugin's execution environment.
+	DefaultEnvVarsFromEnv map[string]string `json:"default-env-vars" pflag:",Additional environment variable that should be injected into every resource"`
 	// Tolerations in the cluster that should be applied for a specific resource
 	// Currently we support simple resource based tolerations only
 	ResourceTolerations map[v1.ResourceName][]v1.Toleration `json:"resource-tolerations"  pflag:"-,Default tolerations to be applied for resource of type 'key'"`

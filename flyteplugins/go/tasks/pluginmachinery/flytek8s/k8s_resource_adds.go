@@ -2,6 +2,7 @@ package flytek8s
 
 import (
 	"context"
+	"os"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 
@@ -114,6 +115,10 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, id pluginsCore.Ta
 
 	for k, v := range config.GetK8sPluginConfig().DefaultEnvVars {
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: v})
+	}
+	for k, envVarName := range config.GetK8sPluginConfig().DefaultEnvVarsFromEnv {
+		value := os.Getenv(envVarName)
+		envVars = append(envVars, v1.EnvVar{Name: k, Value: value})
 	}
 
 	return envVars
