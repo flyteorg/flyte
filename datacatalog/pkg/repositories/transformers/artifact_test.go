@@ -133,10 +133,19 @@ func TestFromArtifactModel(t *testing.T) {
 }
 
 func TestToArtifactKey(t *testing.T) {
-	artifactKey := ToArtifactKey(datasetID, "artifactID-1")
+	artifactKey := ToArtifactKey(&datasetID, "artifactID-1")
 	assert.Equal(t, datasetID.Project, artifactKey.DatasetProject)
 	assert.Equal(t, datasetID.Domain, artifactKey.DatasetDomain)
 	assert.Equal(t, datasetID.Name, artifactKey.DatasetName)
 	assert.Equal(t, datasetID.Version, artifactKey.DatasetVersion)
+	assert.Equal(t, artifactKey.ArtifactID, "artifactID-1")
+}
+
+func TestToArtifactKeyNoDataset(t *testing.T) {
+	artifactKey := ToArtifactKey(nil, "artifactID-1")
+	assert.Equal(t, artifactKey.DatasetProject, "")
+	assert.Equal(t, artifactKey.DatasetDomain, "")
+	assert.Equal(t, artifactKey.DatasetName, "")
+	assert.Equal(t, artifactKey.DatasetVersion, "")
 	assert.Equal(t, artifactKey.ArtifactID, "artifactID-1")
 }

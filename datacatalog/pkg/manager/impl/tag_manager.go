@@ -46,10 +46,10 @@ func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagReque
 	}
 
 	// verify the artifact and dataset exists before adding a tag to it
-	datasetID := *request.Tag.Dataset
+	datasetID := request.Tag.Dataset
 	ctx = contextutils.WithProjectDomain(ctx, datasetID.Project, datasetID.Domain)
 
-	datasetKey := transformers.FromDatasetID(datasetID)
+	datasetKey := transformers.FromDatasetID(*datasetID)
 	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
 	if err != nil {
 		m.systemMetrics.addTagFailureCounter.Inc(ctx)
@@ -63,7 +63,7 @@ func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagReque
 		return nil, err
 	}
 
-	tagKey := transformers.ToTagKey(datasetID, request.Tag.Name)
+	tagKey := transformers.ToTagKey(*datasetID, request.Tag.Name)
 	err = m.repo.TagRepo().Create(ctx, models.Tag{
 		TagKey:      tagKey,
 		ArtifactID:  request.Tag.ArtifactId,
