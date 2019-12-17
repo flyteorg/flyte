@@ -18,6 +18,7 @@ import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 import {
     createMockWorkflowInputsInterface,
     mockCollectionVariables,
+    mockNestedCollectionVariables,
     mockSimpleVariables
 } from './mockInputs';
 
@@ -43,7 +44,8 @@ const renderForm = (variables: Record<string, Variable>) => {
 
     const mockApi = mockAPIContextValue({
         createWorkflowExecution: input => {
-            submitAction(input);
+            console.log(input);
+            submitAction('See console for data');
             return Promise.reject('Not implemented');
         },
         getLaunchPlan: () => resolveAfter(500, mockLaunchPlan),
@@ -81,3 +83,6 @@ const stories = storiesOf('Launch/LaunchWorkflowForm', module);
 
 stories.add('Simple', () => renderForm(mockSimpleVariables));
 stories.add('Collections', () => renderForm(mockCollectionVariables));
+stories.add('Nested Collections', () =>
+    renderForm(mockNestedCollectionVariables)
+);

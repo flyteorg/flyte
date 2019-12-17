@@ -40,6 +40,14 @@ export const mockCollectionVariables: Record<string, Variable> = mapValues(
     })
 );
 
+export const mockNestedCollectionVariables: Record<
+    string,
+    Variable
+> = mapValues(mockCollectionVariables, v => ({
+    description: `${v.description} (nested)`,
+    type: { collectionType: v.type }
+}));
+
 export function createMockWorkflowInputsInterface(
     variables: Record<string, Variable>
 ): TypedInterface {

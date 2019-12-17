@@ -1,11 +1,23 @@
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Core } from 'flyteidl';
 import * as Long from 'long';
+import * as LossLessJSON from 'lossless-json';
 import { utc as moment } from 'moment';
 import { InputProps, InputType, InputTypeDefinition } from './types';
 
-interface ConverterInput {
-    value: string;
+function lossLessToLongReviver(key: string, value: any) {
+    if (value && value.isLosslessNumber) {
+        return Long.fromString(value.toString());
+    }
+    return value;
+}
+
+function parseJSON(value: string) {
+    return LossLessJSON.parse(value, lossLessToLongReviver);
+}
+
+interface ConverterInput<T = never> {
+    value: string | T;
     typeDefinition: InputTypeDefinition;
 }
 
@@ -13,23 +25,27 @@ function literalNone(): Core.ILiteral {
     return { scalar: { noneType: {} } };
 }
 
-function booleanToLiteral({ value }: ConverterInput): Core.ILiteral {
+function booleanToLiteral({ value }: ConverterInput<boolean>): Core.ILiteral {
     return { scalar: { primitive: { boolean: Boolean(value) } } };
 }
 
-function stringToLiteral({ value }: ConverterInput): Core.ILiteral {
-    return { scalar: { primitive: { stringValue: value } } };
+function stringToLiteral({
+    value: stringValue
+}: ConverterInput): Core.ILiteral {
+    return { scalar: { primitive: { stringValue } } };
 }
 
-function integerToLiteral({ value }: ConverterInput): Core.ILiteral {
+function integerToLiteral({ value }: ConverterInput<Long>): Core.ILiteral {
+    const integer = value instanceof Long ? value : Long.fromString(value);
     return {
-        scalar: { primitive: { integer: Long.fromString(value) } }
+        scalar: { primitive: { integer } }
     };
 }
 
-function floatToLiteral({ value }: ConverterInput): Core.ILiteral {
+function floatToLiteral({ value }: ConverterInput<number>): Core.ILiteral {
+    const floatValue = typeof value === 'number' ? value : parseFloat(value);
     return {
-        scalar: { primitive: { floatValue: parseFloat(value) } }
+        scalar: { primitive: { floatValue } }
     };
 }
 
@@ -41,29 +57,22 @@ function dateToLiteral({ value }: ConverterInput): Core.ILiteral {
 }
 
 function durationToLiteral({ value }: ConverterInput): Core.ILiteral {
-    const duration = millisecondsToDuration(parseInt(value, 10));
+    const parsed = typeof value === 'number' ? value : parseInt(value, 10);
+    const duration = millisecondsToDuration(parsed);
     return {
         scalar: { primitive: { duration } }
     };
 }
 
 function parseCollection(list: string, type: InputType) {
-    let parsed;
-    // We can't rely on the built-in parser, because it will try to read integers as
-    // normal numbers and overflow for large values. So we'll split the list manually
-    if (type === InputType.Integer) {
-        if (list[0] !== '[' || list[list.length - 1] !== ']') {
-            throw new Error('Value is not in array format ([])');
-        }
-        parsed = list
-            .substr(1, list.length - 2) // remove the []
-            .split(',')
-            .map(s => s.trim());
-    } else {
-        parsed = JSON.parse(list);
-        if (!Array.isArray(parsed)) {
-            throw new Error('Value did not parse to an array');
-        }
+    // If we're processing a nested collection, it may already have been parsed
+    if (Array.isArray(list)) {
+        return list;
+    }
+
+    const parsed = parseJSON(list);
+    if (!Array.isArray(parsed)) {
+        throw new Error('Value did not parse to an array');
     }
     return parsed;
 }

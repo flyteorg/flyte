@@ -2930,6 +2930,11 @@
   resolved "https://registry.yarnpkg.com/@types/long/-/long-4.0.0.tgz#719551d2352d301ac8b81db732acb6bdc28dbdef"
   integrity sha512-1w52Nyx4Gq47uuu0EVcsHBxZFJgurQ+rTKS3qMHxR1GY2T8c2AJYd6vZoZ9q1rupaDjU0yT+Jc2XTyXkjeMA+Q==
 
+"@types/lossless-json@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/lossless-json/-/lossless-json-1.0.0.tgz#6493f813b9421f45bfef9b30e99242652cbd025e"
+  integrity sha512-knKgXT5I1x87nKLuwCKWi7nfwwYrmyi51ss7O8kAnbj8c116wBm86Laj9yguoN+Ju1S8jkjasam/OdearnQKRw==
+
 "@types/memoize-one@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@types/memoize-one/-/memoize-one-4.1.0.tgz#62119f26055b3193ae43ca1882c5b29b88b71ece"
@@ -9709,6 +9714,11 @@ loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.2.0, loose-envify@^1.3
   integrity sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
+
+lossless-json@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/lossless-json/-/lossless-json-1.0.3.tgz#f9ce7daeb79e4a0f38a3c0340177654b434bc2a2"
+  integrity sha512-r4w0WrhIHV1lOTVGbTg4Toqwso5x6C8pM7Q/Nto2vy4c7yUSdTYVYlj16uHVX3MT1StpSELDv8yrqGx41MBsDA==
 
 lower-case@^1.1.1:
   version "1.1.4"
