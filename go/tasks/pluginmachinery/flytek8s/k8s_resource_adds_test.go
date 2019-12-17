@@ -2,6 +2,8 @@ package flytek8s
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"reflect"
 	"testing"
 
@@ -221,6 +223,16 @@ func TestDecorateEnvVars(t *testing.T) {
 		"k": "v",
 	}
 	var emptyEnvVar map[string]string
+	envVarsFromEnv := map[string]string{
+		"k": "value",
+	}
+
+	originalEnvVal := os.Getenv("value")
+	err := os.Setenv("value", "v")
+	if err != nil {
+		t.Fatal(fmt.Sprintf("failed to set env var 'value'; %v", err))
+	}
+	defer os.Setenv("value", originalEnvVal)
 
 	expected := append(defaultEnv, GetContextEnvVars(ctx)...)
 	expected = append(expected, GetExecutionEnvVars(mockTaskExecutionIdentifier{})...)
@@ -231,17 +243,22 @@ func TestDecorateEnvVars(t *testing.T) {
 		id      pluginsCore.TaskExecutionID
 	}
 	tests := []struct {
-		name           string
-		args           args
-		additionEnvVar map[string]string
-		want           []v12.EnvVar
+		name                  string
+		args                  args
+		additionEnvVar        map[string]string
+		additionEnvVarFromEnv map[string]string
+		want                  []v12.EnvVar
 	}{
-		{"no-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, expected},
-		{"with-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, additionalEnv, aggregated},
+		{"no-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, expected},
+		{"with-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, additionalEnv, emptyEnvVar, aggregated},
+		{"from-env", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, envVarsFromEnv, aggregated},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{DefaultEnvVars: tt.additionEnvVar}))
+			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+				DefaultEnvVars:        tt.additionEnvVar,
+				DefaultEnvVarsFromEnv: tt.additionEnvVarFromEnv,
+			}))
 			if got := DecorateEnvVars(ctx, tt.args.envVars, tt.args.id); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DecorateEnvVars() = %v, want %v", got, tt.want)
 			}
