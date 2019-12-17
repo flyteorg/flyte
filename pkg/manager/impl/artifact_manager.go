@@ -128,7 +128,6 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.G
 	timer := m.systemMetrics.getResponseTime.Start(ctx)
 	defer timer.Stop()
 
-	datasetID := request.Dataset
 	err := validators.ValidateGetArtifactRequest(request)
 	if err != nil {
 		logger.Warningf(ctx, "Invalid get artifact request %v, err: %v", request, err)
@@ -136,12 +135,13 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.G
 		return nil, err
 	}
 
-	ctx = contextutils.WithProjectDomain(ctx, datasetID.Project, datasetID.Domain)
+	datasetID := request.Dataset
+
 	var artifactModel models.Artifact
 	switch request.QueryHandle.(type) {
 	case *datacatalog.GetArtifactRequest_ArtifactId:
 		logger.Debugf(ctx, "Get artifact by id %v", request.GetArtifactId())
-		artifactKey := transformers.ToArtifactKey(*datasetID, request.GetArtifactId())
+		artifactKey := transformers.ToArtifactKey(datasetID, request.GetArtifactId())
 		artifactModel, err = m.repo.ArtifactRepo().Get(ctx, artifactKey)
 
 		if err != nil {

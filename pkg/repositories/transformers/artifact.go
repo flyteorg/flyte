@@ -86,12 +86,17 @@ func FromArtifactModels(artifacts []models.Artifact) ([]*datacatalog.Artifact, e
 	return retArtifacts, nil
 }
 
-func ToArtifactKey(datasetID datacatalog.DatasetID, artifactID string) models.ArtifactKey {
-	return models.ArtifactKey{
-		DatasetProject: datasetID.Project,
-		DatasetDomain:  datasetID.Domain,
-		DatasetName:    datasetID.Name,
-		DatasetVersion: datasetID.Version,
-		ArtifactID:     artifactID,
+// Transforms datasetID and artifact combination into an ArtifactKey
+// The DatasetID is optional since artifactIDs are unique per Artifact
+func ToArtifactKey(datasetID *datacatalog.DatasetID, artifactID string) models.ArtifactKey {
+	artifactKey := models.ArtifactKey{
+		ArtifactID: artifactID,
 	}
+	if datasetID != nil {
+		artifactKey.DatasetProject = datasetID.Project
+		artifactKey.DatasetDomain = datasetID.Domain
+		artifactKey.DatasetName = datasetID.Name
+		artifactKey.DatasetVersion = datasetID.Version
+	}
+	return artifactKey
 }

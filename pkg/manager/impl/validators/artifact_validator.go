@@ -14,20 +14,27 @@ const (
 )
 
 func ValidateGetArtifactRequest(request datacatalog.GetArtifactRequest) error {
-	if err := ValidateDatasetID(request.Dataset); err != nil {
-		return err
-	}
-
 	if request.QueryHandle == nil {
 		return NewMissingArgumentError(fmt.Sprintf("one of %s/%s", artifactID, tagName))
 	}
 
 	switch request.QueryHandle.(type) {
 	case *datacatalog.GetArtifactRequest_ArtifactId:
+		if request.Dataset != nil {
+			err := ValidateDatasetID(request.Dataset)
+			if err != nil {
+				return err
+			}
+		}
+
 		if err := ValidateEmptyStringField(request.GetArtifactId(), artifactID); err != nil {
 			return err
 		}
 	case *datacatalog.GetArtifactRequest_TagName:
+		if err := ValidateDatasetID(request.Dataset); err != nil {
+			return err
+		}
+
 		if err := ValidateEmptyStringField(request.GetTagName(), tagName); err != nil {
 			return err
 		}
