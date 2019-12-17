@@ -165,7 +165,7 @@ func TestGetDataset(t *testing.T) {
 	samplePartitionKey["dataset_uuid"] = getDatasetUUID()
 	expectedPartitionKeyResponse = append(expectedPartitionKeyResponse, samplePartitionKey, samplePartitionKey)
 
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys"  WHERE "partition_keys"."deleted_at" IS NULL AND (("dataset_uuid" IN (test-uuid))) ORDER BY "partition_keys"."dataset_uuid" ASC`).WithReply(expectedPartitionKeyResponse)
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys"  WHERE "partition_keys"."deleted_at" IS NULL AND (("dataset_uuid" IN (test-uuid))) ORDER BY partition_keys.created_at ASC,"partition_keys"."dataset_uuid" ASC`).WithReply(expectedPartitionKeyResponse)
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	actualDataset, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
 	assert.NoError(t, err)

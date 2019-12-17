@@ -42,8 +42,12 @@ func (h *tagRepo) Get(ctx context.Context, in models.TagKey) (models.Tag, error)
 	defer timer.Stop()
 
 	var tag models.Tag
-	result := h.db.Preload("Artifact").Preload("Artifact.ArtifactData").
-		Preload("Artifact.Partitions").Preload("Artifact.Tags").
+	result := h.db.Preload("Artifact").
+		Preload("Artifact.ArtifactData").
+		Preload("Artifact.Partitions", func(db *gorm.DB) *gorm.DB {
+			return db.Order("partitions.created_at ASC") // preserve the order in which the partitions were created
+		}).
+		Preload("Artifact.Tags").
 		Order("tags.created_at DESC").
 		First(&tag, &models.Tag{
 			TagKey: in,

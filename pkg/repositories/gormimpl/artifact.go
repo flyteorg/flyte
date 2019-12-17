@@ -53,7 +53,11 @@ func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.A
 	defer timer.Stop()
 
 	var artifact models.Artifact
-	result := h.db.Preload("ArtifactData").Preload("Partitions").Preload("Tags").
+	result := h.db.Preload("ArtifactData").
+		Preload("Partitions", func(db *gorm.DB) *gorm.DB {
+			return db.Order("partitions.created_at ASC") // preserve the order in which the partitions were created
+		}).
+		Preload("Tags").
 		Order("artifacts.created_at DESC").
 		First(
 			&artifact,
@@ -102,7 +106,11 @@ func (h *artifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, i
 		return []models.Artifact{}, h.errorTransformer.ToDataCatalogError(tx.Error)
 	}
 
-	tx = tx.Preload("ArtifactData").Preload("Partitions").Preload("Tags").Find(&artifacts)
+	tx = tx.Preload("ArtifactData").
+		Preload("Partitions", func(db *gorm.DB) *gorm.DB {
+			return db.Order("partitions.created_at ASC") // preserve the order in which the partitions were created
+		}).
+		Preload("Tags").Find(&artifacts)
 	if tx.Error != nil {
 		return []models.Artifact{}, h.errorTransformer.ToDataCatalogError(tx.Error)
 	}
