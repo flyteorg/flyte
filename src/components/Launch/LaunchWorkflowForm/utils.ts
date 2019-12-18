@@ -1,9 +1,7 @@
 import { timestampToDate } from 'common/utils';
-import { ParameterError, ValidationError } from 'errors';
 import {
     LaunchPlan,
     Literal,
-    LiteralMap,
     LiteralType,
     Variable,
     Workflow,
@@ -11,7 +9,7 @@ import {
 } from 'models';
 import * as moment from 'moment';
 import { simpleTypeToInputType, typeLabels } from './constants';
-import { inputToLiteral, inputTypeConverters } from './inputConverters';
+import { inputToLiteral } from './inputHelpers/inputHelpers';
 import { SearchableSelectorOption } from './SearchableSelector';
 import { InputProps, InputType, InputTypeDefinition } from './types';
 
