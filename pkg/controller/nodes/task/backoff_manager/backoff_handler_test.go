@@ -99,8 +99,11 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 			wantErrCode:          taskErrors.BackOffError,
 			wantExp:              1,
 			wantNextEligibleTime: tc.Now().Add(time.Second * 7),
-			wantCeilings:         v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("1Gi")},
-			wantCallCount:        1,
+			// The following resource quantity of CPU is correct, as the error message will show the actual resource constraint
+			// in this case, the error message indicates constraints on memory only, so while requestedResourceList has a CPU component,
+			// it shouldn't be used to lower the ceiling
+			wantCeilings:  v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("1Gi")},
+			wantCallCount: 1,
 		},
 
 		{name: "Request coming after the block expires, if rejected, should lead to further backoff and proper ceilings",
