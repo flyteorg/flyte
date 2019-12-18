@@ -37,7 +37,7 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 	}
 
 	// Create a single backOffManager for all the plugins
-	backOffManager := backoff_manager.NewBackOffManager(ctx, backOffCfg.BackOffBase, backOffCfg.MaxBackOffDuration)
+	backOffManager := backoff_manager.NewBackOffManager(ctx, backOffCfg.BackOffBaseSecond, backOffCfg.MaxBackOffDuration)
 
 	k8sPlugins := pr.GetK8sPlugins()
 	for i := range k8sPlugins {
