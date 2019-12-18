@@ -10,19 +10,20 @@ import (
 type Key string
 
 const (
-	AppNameKey      Key = "app_name"
-	NamespaceKey    Key = "ns"
-	TaskTypeKey     Key = "tasktype"
-	ProjectKey      Key = "project"
-	DomainKey       Key = "domain"
-	WorkflowIDKey   Key = "wf"
-	NodeIDKey       Key = "node"
-	TaskIDKey       Key = "task"
-	ExecIDKey       Key = "exec_id"
-	JobIDKey        Key = "job_id"
-	PhaseKey        Key = "phase"
-	RoutineLabelKey Key = "routine"
-	LaunchPlanIDKey Key = "lp"
+	AppNameKey         Key = "app_name"
+	NamespaceKey       Key = "ns"
+	TaskTypeKey        Key = "tasktype"
+	ProjectKey         Key = "project"
+	DomainKey          Key = "domain"
+	WorkflowIDKey      Key = "wf"
+	NodeIDKey          Key = "node"
+	TaskIDKey          Key = "task"
+	ExecIDKey          Key = "exec_id"
+	JobIDKey           Key = "job_id"
+	PhaseKey           Key = "phase"
+	RoutineLabelKey    Key = "routine"
+	LaunchPlanIDKey    Key = "lp"
+	ResourceVersionKey Key = "res_ver"
 )
 
 func (k Key) String() string {
@@ -40,6 +41,12 @@ var logKeys = []Key{
 	PhaseKey,
 	RoutineLabelKey,
 	LaunchPlanIDKey,
+	ResourceVersionKey,
+}
+
+// Gets a new context with the resource version set.
+func WithResourceVersion(ctx context.Context, resourceVersion string) context.Context {
+	return context.WithValue(ctx, ResourceVersionKey, resourceVersion)
 }
 
 // Gets a new context with namespace set.
