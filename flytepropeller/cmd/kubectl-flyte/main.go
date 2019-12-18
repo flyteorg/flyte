@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lyft/flytepropeller/pkg/controller"
-
 	"github.com/lyft/flytepropeller/cmd/kubectl-flyte/cmd"
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
@@ -14,7 +12,7 @@ import (
 
 func init() {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
-		contextutils.TaskIDKey, controller.ResourceVersion)
+		contextutils.TaskIDKey)
 }
 
 func main() {
