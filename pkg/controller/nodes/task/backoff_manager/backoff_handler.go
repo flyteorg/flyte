@@ -94,6 +94,7 @@ func (r *ComputeResourceCeilings) inf() resource.Quantity {
 type ComputeResourceAwareBackOffHandler struct {
 	*SimpleBackOffBlocker
 	*ComputeResourceCeilings
+	IsActive bool
 }
 
 // Act based on current backoff interval and set the next one accordingly
@@ -111,7 +112,9 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 	//      Else => we block the operation(), which is where the main improvement comes from
 
 	now := h.Clock.Now()
-	if !h.SimpleBackOffBlocker.isBlocking(now) || h.ComputeResourceCeilings.isEligible(requestedResourceList) {
+	if !h.IsActive {
+		return operation()
+	} else if !h.SimpleBackOffBlocker.isBlocking(now) || h.ComputeResourceCeilings.isEligible(requestedResourceList) {
 		err := operation()
 		if err != nil {
 			if IsResourceQuotaExceeded(err) {
