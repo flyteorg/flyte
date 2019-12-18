@@ -6,7 +6,7 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 
-	v1 "k8s.io/api/core/v1"
+	"k8s.io/api/core/v1"
 
 	"github.com/lyft/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"

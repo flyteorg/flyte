@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/golang/protobuf/ptypes/struct"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
 	config2 "github.com/lyft/flytestdlib/config"

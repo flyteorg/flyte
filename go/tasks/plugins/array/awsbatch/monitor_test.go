@@ -1,10 +1,9 @@
 package awsbatch
 
 import (
-	"testing"
-
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
+	"testing"
 
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/storage"

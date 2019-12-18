@@ -8,12 +8,11 @@ package tests
 
 import (
 	"context"
-	"testing"
-	"time"
-
 	"github.com/lyft/flyteplugins/go/tasks/resourcemanager"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
 )
 
 func TestRedisLookasideBuffer(t *testing.T) {
