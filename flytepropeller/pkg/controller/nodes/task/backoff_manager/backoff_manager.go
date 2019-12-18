@@ -3,10 +3,11 @@ package backoff_manager
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
-	"time"
 )
 
 var (

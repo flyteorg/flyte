@@ -3,16 +3,17 @@ package backoff_manager
 import (
 	"context"
 	"errors"
+	"reflect"
+	"testing"
+	"time"
+
 	taskErrors "github.com/lyft/flyteplugins/go/tasks/errors"
 	stdlibErrors "github.com/lyft/flytestdlib/errors"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/clock"
-	"reflect"
-	"testing"
-	"time"
 )
 
 func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
@@ -77,7 +78,6 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 			wantCeilings:         v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("64Gi")},
 			wantCallCount:        0,
 		},
-
 
 		{name: "Smaller request before the block expires that gets rejected does not lead to further any back off",
 			fields: fields{
@@ -163,8 +163,7 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 	}
 }
 
-func
-TestComputeResourceCeilings_inf(t *testing.T) {
+func TestComputeResourceCeilings_inf(t *testing.T) {
 	type fields struct {
 		computeResourceCeilings v1.ResourceList
 	}
@@ -187,8 +186,7 @@ TestComputeResourceCeilings_inf(t *testing.T) {
 	}
 }
 
-func
-TestComputeResourceCeilings_isEligible(t *testing.T) {
+func TestComputeResourceCeilings_isEligible(t *testing.T) {
 	type fields struct {
 		computeResourceCeilings v1.ResourceList
 	}
@@ -234,8 +232,7 @@ TestComputeResourceCeilings_isEligible(t *testing.T) {
 	}
 }
 
-func
-TestComputeResourceCeilings_update(t *testing.T) {
+func TestComputeResourceCeilings_update(t *testing.T) {
 	type fields struct {
 		computeResourceCeilings v1.ResourceList
 	}
@@ -292,8 +289,7 @@ TestComputeResourceCeilings_update(t *testing.T) {
 	}
 }
 
-func
-TestComputeResourceCeilings_updateAll(t *testing.T) {
+func TestComputeResourceCeilings_updateAll(t *testing.T) {
 	type fields struct {
 		computeResourceCeilings v1.ResourceList
 	}
@@ -342,8 +338,7 @@ TestComputeResourceCeilings_updateAll(t *testing.T) {
 	}
 }
 
-func
-TestGetComputeResourceAndQuantityRequested(t *testing.T) {
+func TestGetComputeResourceAndQuantityRequested(t *testing.T) {
 	type args struct {
 		err error
 	}
@@ -376,8 +371,7 @@ TestGetComputeResourceAndQuantityRequested(t *testing.T) {
 	}
 }
 
-func
-TestIsBackoffError(t *testing.T) {
+func TestIsBackoffError(t *testing.T) {
 	type args struct {
 		err error
 	}
@@ -399,8 +393,7 @@ TestIsBackoffError(t *testing.T) {
 	}
 }
 
-func
-TestIsResourceQuotaExceeded(t *testing.T) {
+func TestIsResourceQuotaExceeded(t *testing.T) {
 	type args struct {
 		err error
 	}
@@ -429,8 +422,7 @@ TestIsResourceQuotaExceeded(t *testing.T) {
 	}
 }
 
-func
-TestSimpleBackOffBlocker_backOff(t *testing.T) {
+func TestSimpleBackOffBlocker_backOff(t *testing.T) {
 	tc := clock.NewFakeClock(time.Now())
 	maxBackOffDuration := 10 * time.Minute
 	type fields struct {

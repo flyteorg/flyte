@@ -338,7 +338,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 
 		// Build a reference resource that is supposed to be identical to the resource built by pluginManager
 		referenceResource, err := mockResourceHandler.BuildResource(ctx, tctx)
-		// assert.NoError(t, err)
+		assert.NoError(t, err)
 		AddObjectMetadata(tctx.TaskExecutionMetadata(), referenceResource, config.GetK8sPluginConfig())
 		refKey := backoff_manager.ComposeResourceKey(referenceResource)
 		podBackOffHandler, found := backOffManager.GetBackOffHandler(refKey)
