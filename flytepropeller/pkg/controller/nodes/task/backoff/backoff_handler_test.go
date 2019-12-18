@@ -1,4 +1,4 @@
-package backoff_manager
+package backoff
 
 import (
 	"context"
@@ -20,7 +20,7 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 	var callCount = 0
 
 	operWithErr := func() error {
-		callCount += 1
+		callCount++
 		return k8serrors.NewForbidden(
 			schema.GroupResource{}, "", errors.New("is forbidden: "+
 				"exceeded quota: project-quota, requested: limits.memory=1Gi, "+
@@ -28,7 +28,7 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 	}
 
 	operWithNoErr := func() error {
-		callCount += 1
+		callCount++
 		return nil
 	}
 

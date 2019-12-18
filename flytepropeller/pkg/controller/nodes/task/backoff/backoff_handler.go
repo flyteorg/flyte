@@ -1,4 +1,4 @@
-package backoff_manager
+package backoff
 
 import (
 	"context"
@@ -39,7 +39,6 @@ func (b *SimpleBackOffBlocker) reset() {
 }
 
 func (b *SimpleBackOffBlocker) backOff() time.Time {
-	// b.backOffExponent += 1
 	durationString := fmt.Sprintf("%vs", math.Pow(float64(b.BackOffBaseSecond), float64(b.BackOffExponent)))
 	backOffDuration, _ := time.ParseDuration(durationString)
 
@@ -48,7 +47,7 @@ func (b *SimpleBackOffBlocker) backOff() time.Time {
 	}
 
 	b.NextEligibleTime = b.Clock.Now().Add(backOffDuration)
-	b.BackOffExponent += 1
+	b.BackOffExponent++
 	return b.NextEligibleTime
 }
 
