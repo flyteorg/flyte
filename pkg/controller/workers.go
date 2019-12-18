@@ -14,10 +14,6 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-const (
-	ResourceVersion contextutils.Key = "rv_ver"
-)
-
 type Handler interface {
 	// Initialize the Handler
 	Initialize(ctx context.Context) error

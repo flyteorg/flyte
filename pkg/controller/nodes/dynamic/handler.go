@@ -169,6 +169,7 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.Node
 	case v1alpha1.DynamicNodePhaseFailing:
 		fallthrough
 	case v1alpha1.DynamicNodePhaseExecuting:
+		logger.Infof(ctx, "Aborting dynamic workflow.")
 		dynamicWF, isDynamic, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		if err != nil {
 			return err
@@ -180,6 +181,7 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.Node
 
 		return d.nodeExecutor.AbortHandler(ctx, dynamicWF, dynamicWF.StartNode(), reason)
 	default:
+		logger.Infof(ctx, "Aborting regular node.")
 		// The parent node has not yet completed, so we will abort the parent node
 		return d.TaskNodeHandler.Abort(ctx, nCtx, reason)
 	}
@@ -192,6 +194,7 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.N
 	case v1alpha1.DynamicNodePhaseFailing:
 		fallthrough
 	case v1alpha1.DynamicNodePhaseExecuting:
+		logger.Infof(ctx, "Finalizing dynamic workflow")
 		dynamicWF, isDynamic, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		if err != nil {
 			return err
@@ -203,6 +206,7 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.N
 
 		return d.nodeExecutor.FinalizeHandler(ctx, dynamicWF, dynamicWF.StartNode())
 	default:
+		logger.Infof(ctx, "Finalizing regular node")
 		return d.TaskNodeHandler.Finalize(ctx, nCtx)
 	}
 }
