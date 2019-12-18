@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	backOffBase        time.Duration // b in b^n
+	backOffBaseSecond  int // b in b^n
 	maxBackOffDuration time.Duration
 )
 
@@ -47,8 +47,8 @@ func ComposeResourceKey(o k8s.Resource) string {
 	return fmt.Sprintf("%v,%v", o.GroupVersionKind().String(), o.GetNamespace())
 }
 
-func NewBackOffManager(ctx context.Context, base, maxDuration time.Duration) *BackOffManager {
-	backOffBase = base
+func NewBackOffManager(ctx context.Context, baseSecond int, maxDuration time.Duration) *BackOffManager {
+	backOffBaseSecond = baseSecond
 	maxBackOffDuration = maxDuration
 
 	return &BackOffManager{
