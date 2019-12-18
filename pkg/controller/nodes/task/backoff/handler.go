@@ -97,7 +97,7 @@ type ComputeResourceAwareBackOffHandler struct {
 }
 
 func (h *ComputeResourceAwareBackOffHandler) IsActive() bool {
-	return h.BackOffBaseSecond == 0
+	return h.BackOffBaseSecond != 0
 }
 
 // Act based on current backoff interval and set the next one accordingly
@@ -149,11 +149,10 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 				return err
 			}
 			return errors.Wrapf(errors.BackOffError, err, "Failed to execute the operation")
-		} else {
-			h.SimpleBackOffBlocker.reset()
-			h.ComputeResourceCeilings.resetAll()
-			return nil
 		}
+		h.SimpleBackOffBlocker.reset()
+		h.ComputeResourceCeilings.resetAll()
+		return nil
 	} else { // The backoff is active and the resource request exceeds the ceiling
 		logger.Errorf(ctx, "Failed to execute the operation due to backoff")
 		return errors.Errorf(errors.BackOffError, "Failed to execute the operation due to backoff is "+
