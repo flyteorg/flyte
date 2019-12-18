@@ -56,13 +56,3 @@ func NewBackOffManager(ctx context.Context, base, maxDuration time.Duration) *Ba
 		backOffHandlerMap: BackOffHandlerMap{},
 	}
 }
-
-func NewFakeBackOffManager(ctx context.Context, base, maxDuration time.Duration, tc *clock.FakeClock) *BackOffManager {
-	backOffBase = base
-	maxBackOffDuration = maxDuration
-
-	return &BackOffManager{
-		Clock:             tc,
-		backOffHandlerMap: BackOffHandlerMap{},
-	}
-}
