@@ -1,8 +1,9 @@
-package backoff_manager
+package backoff
 
 import (
 	"context"
 	"fmt"
+	"github.com/lyft/flytestdlib/logger"
 	"time"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
@@ -10,22 +11,16 @@ import (
 	"k8s.io/apimachinery/pkg/util/clock"
 )
 
-var (
-	backOffBaseSecond  int // b in b^n
-	maxBackOffDuration time.Duration
-)
-
-type BackOffManager struct {
+type Controller struct {
 	Clock             clock.Clock
-	backOffHandlerMap BackOffHandlerMap
-	defaultIsActive   bool
+	backOffHandlerMap HandlerMap
 }
 
-func (m *BackOffManager) GetBackOffHandler(key string) (*ComputeResourceAwareBackOffHandler, bool) {
+func (m *Controller) GetBackOffHandler(key string) (*ComputeResourceAwareBackOffHandler, bool) {
 	return m.backOffHandlerMap.Get(key)
 }
 
-func (m *BackOffManager) CreateBackOffHandler(key string, backOffBaseSecond int, maxBackOffDuration time.Duration) *ComputeResourceAwareBackOffHandler {
+func (m *Controller) CreateBackOffHandler(ctx context.Context, key string, backOffBaseSecond int, maxBackOffDuration time.Duration) *ComputeResourceAwareBackOffHandler {
 	m.backOffHandlerMap.Set(key, &ComputeResourceAwareBackOffHandler{
 		SimpleBackOffBlocker: &SimpleBackOffBlocker{
 			Clock:              m.Clock,
@@ -42,6 +37,7 @@ func (m *BackOffManager) CreateBackOffHandler(key string, backOffBaseSecond int,
 	h, _ := m.backOffHandlerMap.Get(key)
 	h.ComputeResourceCeilings.resetAll()
 	h.SimpleBackOffBlocker.reset()
+	logger.Infof(ctx, "The back-off handler for [%v] has been created.\n", key)
 	return h
 }
 
@@ -49,12 +45,10 @@ func ComposeResourceKey(o k8s.Resource) string {
 	return fmt.Sprintf("%v,%v", o.GroupVersionKind().String(), o.GetNamespace())
 }
 
-func NewBackOffManager(ctx context.Context, baseSecond int, maxDuration time.Duration) *BackOffManager {
-	backOffBaseSecond = baseSecond
-	maxBackOffDuration = maxDuration
-
-	return &BackOffManager{
+func NewController(ctx context.Context) *Controller {
+	logger.Infof(ctx, "Initializing the back-off controller.\n")
+	return &Controller{
 		Clock:             clock.RealClock{},
-		backOffHandlerMap: BackOffHandlerMap{},
+		backOffHandlerMap: HandlerMap{},
 	}
 }
