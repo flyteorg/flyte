@@ -87,7 +87,7 @@ func ExampleNewPluginManager() {
 			RegisteredTaskTypes: []pluginsCore.TaskType{"container"},
 			ResourceToWatch:     &v1.Pod{},
 			Plugin:              k8sSampleHandler{},
-		}, backoff_manager.NewBackOffManager(ctx, time.Second * 2, time.Minute * 1))
+		}, backoff_manager.NewBackOffManager(ctx, 2, time.Minute*1))
 	if err == nil {
 		fmt.Printf("Created executor: %v\n", exec.GetID())
 	} else {
@@ -181,7 +181,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		}, backoff_manager.NewBackOffManager(ctx, time.Second * 2, time.Minute * 1))
+		}, backoff_manager.NewBackOffManager(ctx, 2, time.Minute*1))
 		assert.NoError(t, err)
 
 		transition, err := pluginManager.Handle(ctx, tctx)
@@ -209,7 +209,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		}, backoff_manager.NewBackOffManager(ctx, time.Second * 2, time.Minute * 1))
+		}, backoff_manager.NewBackOffManager(ctx, 2, time.Minute*1))
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
@@ -243,7 +243,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		}, backoff_manager.NewBackOffManager(ctx, time.Second * 2, time.Minute * 1))
+		}, backoff_manager.NewBackOffManager(ctx, 2, time.Minute*1))
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
@@ -276,7 +276,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		}, backoff_manager.NewBackOffManager(ctx, time.Second * 2, time.Minute * 1))
+		}, backoff_manager.NewBackOffManager(ctx, 2, time.Minute*1))
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
@@ -323,113 +323,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi")),
 		}
 
-		backOffManager := backoff_manager.NewBackOffManager(ctx, time.Second * 2, time.Minute * 1)
-		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
-			ID:              "x",
-			ResourceToWatch: &v1.Pod{},
-			Plugin:          mockResourceHandler,
-		}, backOffManager)
-
-		assert.NoError(t, err)
-		transition, err := pluginManager.Handle(ctx, tctx)
-		assert.NoError(t, err)
-		assert.NotNil(t, transition)
-		assert.Equal(t, transition.Info().Phase(), pluginsCore.PhaseWaitingForResources)
-
-		// Build a reference resource that is supposed to be identical to the resource built by pluginManager
-		referenceResource, err := mockResourceHandler.BuildResource(ctx, tctx)
-		// assert.NoError(t, err)
-		AddObjectMetadata(tctx.TaskExecutionMetadata(), referenceResource, config.GetK8sPluginConfig())
-		refKey := backoff_manager.ComposeResourceKey(referenceResource)
-		podBackOffHandler, found := backOffManager.GetBackOffHandler(refKey)
-		assert.True(t, found)
-		assert.Equal(t, 1, podBackOffHandler.BackOffExponent)
-	})
-
-	t.Run("Insufficient resource blocking pod creation for the first time", func(t *testing.T) {
-		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
-		// Creating a mock k8s plugin
-		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       flytek8s.PodKind,
-				APIVersion: v1.SchemeGroupVersion.String(),
-			},
-			Spec: v1.PodSpec{
-				Containers: []v1.Container{
-					{Resources: v1.ResourceRequirements{
-						Limits: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")},
-					}},
-					{Resources: v1.ResourceRequirements{
-						Limits: v1.ResourceList{v1.ResourceCPU: resource.MustParse("2"), v1.ResourceMemory: resource.MustParse("2Gi")},
-					}},
-					{Resources: v1.ResourceRequirements{
-						Limits: v1.ResourceList{v1.ResourceCPU: resource.MustParse("3"), v1.ResourceMemory: resource.MustParse("3Gi")},
-					}},
-				},
-			},
-		}, nil)
-		fakeClient := extendedFakeClient{
-			Client: fake.NewFakeClient(),
-			CreateError: k8serrors.NewForbidden(schema.GroupResource{}, "", errors.New("is forbidden: "+
-				"exceeded quota: project-quota, requested: limits.memory=6Gi, "+
-				"used: limits.memory=7996Gi, limited: limits.memory=8000Gi")),
-		}
-
-		backOffManager := backoff_manager.NewBackOffManager(ctx, time.Second * 2, time.Minute * 1)
-		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
-			ID:              "x",
-			ResourceToWatch: &v1.Pod{},
-			Plugin:          mockResourceHandler,
-		}, backOffManager)
-
-		assert.NoError(t, err)
-		transition, err := pluginManager.Handle(ctx, tctx)
-		assert.NoError(t, err)
-		assert.NotNil(t, transition)
-		assert.Equal(t, transition.Info().Phase(), pluginsCore.PhaseWaitingForResources)
-
-		// Build a reference resource that is supposed to be identical to the resource built by pluginManager
-		referenceResource, err := mockResourceHandler.BuildResource(ctx, tctx)
-		// assert.NoError(t, err)
-		AddObjectMetadata(tctx.TaskExecutionMetadata(), referenceResource, config.GetK8sPluginConfig())
-		refKey := backoff_manager.ComposeResourceKey(referenceResource)
-		podBackOffHandler, found := backOffManager.GetBackOffHandler(refKey)
-		assert.True(t, found)
-		assert.Equal(t, 1, podBackOffHandler.BackOffExponent)
-	})
-
-	t.Run("Insufficient resource blocking pod creation for the first time", func(t *testing.T) {
-		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
-		// Creating a mock k8s plugin
-		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       flytek8s.PodKind,
-				APIVersion: v1.SchemeGroupVersion.String(),
-			},
-			Spec: v1.PodSpec{
-				Containers: []v1.Container{
-					{Resources: v1.ResourceRequirements{
-						Limits: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")},
-					}},
-					{Resources: v1.ResourceRequirements{
-						Limits: v1.ResourceList{v1.ResourceCPU: resource.MustParse("2"), v1.ResourceMemory: resource.MustParse("2Gi")},
-					}},
-					{Resources: v1.ResourceRequirements{
-						Limits: v1.ResourceList{v1.ResourceCPU: resource.MustParse("3"), v1.ResourceMemory: resource.MustParse("3Gi")},
-					}},
-				},
-			},
-		}, nil)
-		fakeClient := extendedFakeClient{
-			Client: fake.NewFakeClient(),
-			CreateError: k8serrors.NewForbidden(schema.GroupResource{}, "", errors.New("is forbidden: "+
-				"exceeded quota: project-quota, requested: limits.memory=3Gi, "+
-				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi")),
-		}
-
-		backOffManager := backoff_manager.NewBackOffManager(ctx, time.Second * 2, time.Minute * 1)
+		backOffManager := backoff_manager.NewBackOffManager(ctx, 2, time.Minute*1)
 		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
@@ -565,7 +459,7 @@ func TestPluginManager_Handle_CheckResourceStatus(t *testing.T) {
 				ID:              "x",
 				ResourceToWatch: &v1.Pod{},
 				Plugin:          mockResourceHandler,
-			}, backoff_manager.NewBackOffManager(ctx, time.Second * 2, time.Minute * 1))
+			}, backoff_manager.NewBackOffManager(ctx, 2, time.Minute*1))
 			assert.NotNil(t, res)
 			assert.NoError(t, err)
 
