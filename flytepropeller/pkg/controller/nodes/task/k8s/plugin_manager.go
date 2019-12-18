@@ -124,30 +124,30 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 	key := backoff.ComposeResourceKey(o)
 
 	pod, casted := o.(*v1.Pod)
-	if !casted || pod.Spec.Containers == nil {
-		// return a proper error here
-	}
+	if casted {
+		podRequestedResources := make(v1.ResourceList)
 
-	podRequestedResources := make(v1.ResourceList)
-
-	// Collect the resource requests from all the containers in the pod whose creation is to be attempted
-	// to decide whether we should try the pod creation during the back off period
-	for _, container := range pod.Spec.Containers {
-		for k, v := range container.Resources.Limits {
-			quantity := podRequestedResources[k]
-			quantity.Add(v)
-			podRequestedResources[k] = quantity
+		// Collect the resource requests from all the containers in the pod whose creation is to be attempted
+		// to decide whether we should try the pod creation during the back off period
+		for _, container := range pod.Spec.Containers {
+			for k, v := range container.Resources.Limits {
+				quantity := podRequestedResources[k]
+				quantity.Add(v)
+				podRequestedResources[k] = quantity
+			}
 		}
-	}
 
-	backOffHandler, found := e.backOffManager.GetBackOffHandler(key)
-	if !found {
-		cfg := nodeTaskConfig.GetConfig()
-		backOffHandler = e.backOffManager.CreateBackOffHandler(ctx, key, cfg.BackOffConfig.BackOffBaseSecond, cfg.BackOffConfig.MaxBackOffDuration)
+		backOffHandler, found := e.backOffManager.GetBackOffHandler(key)
+		if !found {
+			cfg := nodeTaskConfig.GetConfig()
+			backOffHandler = e.backOffManager.CreateBackOffHandler(ctx, key, cfg.BackOffConfig.BackOffBaseSecond, cfg.BackOffConfig.MaxBackOffDuration)
+		}
+		err = backOffHandler.Handle(ctx, func() error {
+			return e.kubeClient.GetClient().Create(ctx, o)
+		}, podRequestedResources)
+	} else {
+		err = e.kubeClient.GetClient().Create(ctx, o)
 	}
-	err = backOffHandler.Handle(ctx, func() error {
-		return e.kubeClient.GetClient().Create(ctx, o)
-	}, podRequestedResources)
 
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		if backoff.IsBackoffError(err) {

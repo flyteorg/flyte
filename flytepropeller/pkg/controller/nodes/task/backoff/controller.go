@@ -3,8 +3,9 @@ package backoff
 import (
 	"context"
 	"fmt"
-	"github.com/lyft/flytestdlib/logger"
 	"time"
+
+	"github.com/lyft/flytestdlib/logger"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
 	v1 "k8s.io/api/core/v1"
