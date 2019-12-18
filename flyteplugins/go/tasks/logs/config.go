@@ -30,3 +30,4 @@ func GetLogConfig() *LogConfig {
 func SetLogConfig(logConfig *LogConfig) error {
 	return logConfigSection.SetConfig(logConfig)
 }
+

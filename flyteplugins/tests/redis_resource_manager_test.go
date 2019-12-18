@@ -9,12 +9,11 @@ package tests
 import (
 	"context"
 	"fmt"
-	"testing"
-
 	"github.com/lyft/flyteplugins/go/tasks/resourcemanager"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestRedisResourceManager(t *testing.T) {

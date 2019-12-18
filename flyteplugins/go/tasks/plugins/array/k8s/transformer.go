@@ -2,7 +2,6 @@ package k8s
 
 import (
 	"context"
-
 	core2 "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
 
 	"github.com/lyft/flytestdlib/storage"

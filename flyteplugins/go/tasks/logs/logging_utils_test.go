@@ -73,7 +73,8 @@ func TestGetLogsForContainerInPod_MissingStatus(t *testing.T) {
 				},
 			},
 		},
-		Status: v1.PodStatus{},
+		Status: v1.PodStatus{
+		},
 	}
 	pod.Name = podName
 
