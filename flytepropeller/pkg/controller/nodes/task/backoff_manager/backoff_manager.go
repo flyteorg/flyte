@@ -17,6 +17,7 @@ var (
 type BackOffManager struct {
 	Clock             clock.Clock
 	backOffHandlerMap BackOffHandlerMap
+	defaultIsActive   bool
 }
 
 func (m *BackOffManager) GetBackOffHandler(key string) (*ComputeResourceAwareBackOffHandler, bool) {
@@ -36,6 +37,7 @@ func (m *BackOffManager) CreateBackOffHandler(key string, backOffBaseSecond int,
 		ComputeResourceCeilings: &ComputeResourceCeilings{
 			computeResourceCeilings: v1.ResourceList{},
 		},
+		IsActive: m.defaultIsActive,
 	})
 	h, _ := m.backOffHandlerMap.Get(key)
 	h.ComputeResourceCeilings.resetAll()
@@ -47,12 +49,13 @@ func ComposeResourceKey(o k8s.Resource) string {
 	return fmt.Sprintf("%v,%v", o.GroupVersionKind().String(), o.GetNamespace())
 }
 
-func NewBackOffManager(ctx context.Context, baseSecond int, maxDuration time.Duration) *BackOffManager {
+func NewBackOffManager(ctx context.Context, baseSecond int, maxDuration time.Duration, active bool) *BackOffManager {
 	backOffBaseSecond = baseSecond
 	maxBackOffDuration = maxDuration
 
 	return &BackOffManager{
 		Clock:             clock.RealClock{},
 		backOffHandlerMap: BackOffHandlerMap{},
+		defaultIsActive:   active,
 	}
 }
