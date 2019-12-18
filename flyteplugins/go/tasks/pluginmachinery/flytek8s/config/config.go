@@ -1,7 +1,7 @@
 package config
 
 import (
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 
 	"github.com/lyft/flyteplugins/go/tasks/config"
 )

@@ -2,9 +2,10 @@ package hive
 
 import (
 	"context"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
 	"net/url"
 	"testing"
+
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	mocks2 "github.com/lyft/flytestdlib/cache/mocks"
 
