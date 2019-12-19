@@ -59,7 +59,7 @@ func TestWranglePluginsAndGenerateFinalList(t *testing.T) {
 				core: tt.args.corePlugins,
 				k8s:  tt.args.k8sPlugins,
 			}
-			got, err := WranglePluginsAndGenerateFinalList(context.TODO(), tt.args.cfg, tt.args.backOffCfg, pr)
+			got, err := WranglePluginsAndGenerateFinalList(context.TODO(), tt.args.cfg, pr)
 			if (err != nil) != tt.want.err {
 				t.Errorf("WranglePluginsAndGenerateFinalList() error = %v, wantErr %v", err, tt.want.err)
 				return

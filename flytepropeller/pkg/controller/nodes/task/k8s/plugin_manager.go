@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/backoff"
@@ -100,7 +101,7 @@ type PluginManager struct {
 	kubeClient      pluginsCore.KubeClient
 	metrics         PluginMetrics
 	// Per namespace-resource
-	backOffManager *backoff.Controller // sync.Map[string]*ComputeResourceAwareBackoffHandler
+	backOffController *backoff.Controller // sync.Map[string]*ComputeResourceAwareBackoffHandler
 }
 
 func (e *PluginManager) GetProperties() pluginsCore.PluginProperties {
@@ -124,7 +125,7 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 	key := backoff.ComposeResourceKey(o)
 
 	pod, casted := o.(*v1.Pod)
-	if casted {
+	if e.backOffController != nil && casted {
 		podRequestedResources := make(v1.ResourceList)
 
 		// Collect the resource requests from all the containers in the pod whose creation is to be attempted
@@ -137,10 +138,10 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 			}
 		}
 
-		backOffHandler, found := e.backOffManager.GetBackOffHandler(key)
+		backOffHandler, found := e.backOffController.GetBackOffHandler(key)
 		if !found {
 			cfg := nodeTaskConfig.GetConfig()
-			backOffHandler = e.backOffManager.CreateBackOffHandler(ctx, key, cfg.BackOffConfig.BackOffBaseSecond, cfg.BackOffConfig.MaxBackOffDuration)
+			backOffHandler = e.backOffController.CreateBackOffHandler(ctx, key, cfg.BackOffConfig.BackOffBaseSecond, cfg.BackOffConfig.MaxBackOffDuration)
 		}
 		err = backOffHandler.Handle(ctx, func() error {
 			return e.kubeClient.GetClient().Create(ctx, o)
@@ -155,6 +156,10 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 			logger.Warnf(ctx, "Failed to launch job, resource quota exceeded. err: %v", err)
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(time.Now(), pluginsCore.DefaultPhaseVersion, "failed to launch job, resource quota exceeded.")), nil
 		} else if k8serrors.IsForbidden(err) {
+			if e.backOffController == nil && strings.Contains(err.Error(), "exceeded quota") {
+				logger.Warnf(ctx, "Failed to launch job, resource quota exceeded and the operation is not guarded by back-off. err: %v", err)
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(time.Now(), pluginsCore.DefaultPhaseVersion, "failed to launch job, resource quota exceeded.")), nil
+			}
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
 		} else if k8serrors.IsBadRequest(err) || k8serrors.IsInvalid(err) {
 			logger.Errorf(ctx, "Badly formatted resource for plugin [%s], err %s", e.id, err)
@@ -308,8 +313,16 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 	return nil
 }
 
+func NewPluginManagerWithBackOff(ctx context.Context, iCtx pluginsCore.SetupContext, entry k8s.PluginEntry, backOffController *backoff.Controller) (*PluginManager, error) {
+	mgr, err := NewPluginManager(ctx, iCtx, entry)
+	if err == nil {
+		mgr.backOffController = backOffController
+	}
+	return mgr, err
+}
+
 // Creates a K8s generic task executor. This provides an easier way to build task executors that create K8s resources.
-func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry k8s.PluginEntry, backOffManager *backoff.Controller) (*PluginManager, error) {
+func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry k8s.PluginEntry) (*PluginManager, error) {
 	if iCtx.EnqueueOwner() == nil {
 		return nil, errors.Errorf(errors.PluginInitializationFailed, "Failed to initialize plugin, enqueue Owner cannot be nil or empty.")
 	}
@@ -405,7 +418,6 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		resourceToWatch: entry.ResourceToWatch,
 		metrics:         newPluginMetrics(metricsScope),
 		kubeClient:      iCtx.KubeClient(),
-		backOffManager:  backOffManager,
 	}, nil
 }
 

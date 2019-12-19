@@ -79,15 +79,12 @@ func ExampleNewPluginManager() {
 	sCtx.On("EnqueueOwner").Return(pluginsCore.EnqueueOwner(func(name k8stypes.NamespacedName) error { return nil }))
 	sCtx.On("MetricsScope").Return(promutils.NewTestScope())
 	ctx := context.TODO()
-	exec, err := NewPluginManager(
-		ctx,
-		sCtx,
-		k8s.PluginEntry{
-			ID:                  "SampleHandler",
-			RegisteredTaskTypes: []pluginsCore.TaskType{"container"},
-			ResourceToWatch:     &v1.Pod{},
-			Plugin:              k8sSampleHandler{},
-		}, backoff.NewController(ctx))
+	exec, err := NewPluginManager(ctx, sCtx, k8s.PluginEntry{
+		ID:                  "SampleHandler",
+		RegisteredTaskTypes: []pluginsCore.TaskType{"container"},
+		ResourceToWatch:     &v1.Pod{},
+		Plugin:              k8sSampleHandler{},
+	})
 	if err == nil {
 		fmt.Printf("Created executor: %v\n", exec.GetID())
 	} else {
@@ -181,7 +178,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		}, backoff.NewController(ctx))
+		})
 		assert.NoError(t, err)
 
 		transition, err := pluginManager.Handle(ctx, tctx)
@@ -209,7 +206,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		}, backoff.NewController(ctx))
+		})
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
@@ -243,7 +240,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		}, backoff.NewController(ctx))
+		})
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
@@ -276,7 +273,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		}, backoff.NewController(ctx))
+		})
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
@@ -323,12 +320,12 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi")),
 		}
 
-		backOffManager := backoff.NewController(ctx)
-		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
+		backOffController := backoff.NewController(ctx)
+		pluginManager, err := NewPluginManagerWithBackOff(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		}, backOffManager)
+		}, backOffController)
 
 		assert.NoError(t, err)
 		transition, err := pluginManager.Handle(ctx, tctx)
@@ -341,7 +338,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		assert.NoError(t, err)
 		AddObjectMetadata(tctx.TaskExecutionMetadata(), referenceResource, config.GetK8sPluginConfig())
 		refKey := backoff.ComposeResourceKey(referenceResource)
-		podBackOffHandler, found := backOffManager.GetBackOffHandler(refKey)
+		podBackOffHandler, found := backOffController.GetBackOffHandler(refKey)
 		assert.True(t, found)
 		assert.Equal(t, 1, podBackOffHandler.BackOffExponent)
 	})
@@ -459,7 +456,7 @@ func TestPluginManager_Handle_CheckResourceStatus(t *testing.T) {
 				ID:              "x",
 				ResourceToWatch: &v1.Pod{},
 				Plugin:          mockResourceHandler,
-			}, backoff.NewController(ctx))
+			})
 			assert.NotNil(t, res)
 			assert.NoError(t, err)
 
