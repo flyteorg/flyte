@@ -14,7 +14,7 @@ import (
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/k8s"
 )
 
-func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, backOffCfg *config.BackOffConfig, pr PluginRegistryIface) ([]core.PluginEntry, error) {
+func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface) ([]core.PluginEntry, error) {
 	allPluginsEnabled := false
 	enabledPlugins := sets.NewString()
 	if cfg != nil {
@@ -38,7 +38,7 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 	}
 
 	// Create a single backOffManager for all the plugins
-	backOffManager := backoff.NewController(ctx)
+	backOffController := backoff.NewController(ctx)
 
 	k8sPlugins := pr.GetK8sPlugins()
 	for i := range k8sPlugins {
@@ -52,7 +52,7 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 				ID:                  id,
 				RegisteredTaskTypes: kpe.RegisteredTaskTypes,
 				LoadPlugin: func(ctx context.Context, iCtx core.SetupContext) (plugin core.Plugin, e error) {
-					return k8s.NewPluginManager(ctx, iCtx, kpe, backOffManager)
+					return k8s.NewPluginManagerWithBackOff(ctx, iCtx, kpe, backOffController)
 				},
 				IsDefault: kpe.IsDefault,
 			})
