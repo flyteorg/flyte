@@ -7,10 +7,10 @@ import {
     waitForAllFetchables
 } from 'components/hooks';
 import { ParameterError, ValidationError } from 'errors';
+import { Core } from 'flyteidl';
 import {
     FilterOperationName,
     LaunchPlan,
-    LiteralType,
     SortDirection,
     Workflow,
     WorkflowExecutionIdentifier,
@@ -19,12 +19,9 @@ import {
 } from 'models';
 import { useEffect, useMemo, useState } from 'react';
 import { history, Routes } from 'routes';
-import { simpleTypeToInputType } from './constants';
 import { SearchableSelectorOption } from './SearchableSelector';
 import {
     InputProps,
-    InputType,
-    InputTypeDefinition,
     InputValue,
     LaunchWorkflowFormProps,
     LaunchWorkflowFormState
@@ -35,6 +32,7 @@ import {
     getInputDefintionForLiteralType,
     getWorkflowInputs,
     launchPlansToSearchableSelectorOptions,
+    validateFormInputs,
     workflowsToSearchableSelectorOptions
 } from './utils';
 
@@ -83,22 +81,42 @@ function getInputs(workflow: Workflow, launchPlan: LaunchPlan): ParsedInput[] {
 
 interface FormInputsState {
     inputs: InputProps[];
+    getValues(): Record<string, Core.ILiteral>;
 }
 
 // TODO: This could be made generic and composed with ParsedInput
 function useFormInputsState(parsedInputs: ParsedInput[]): FormInputsState {
     const [values, setValues] = useState<Record<string, InputValue>>({});
-    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [errors, setErrors] = useState<Record<string, Error>>({});
 
     const inputs = parsedInputs.map<InputProps>(parsed => ({
         ...parsed,
+        error: errors[parsed.name]
+            ? `${errors[parsed.name].message}`
+            : undefined,
         value: values[parsed.name],
-        helperText: errors[parsed.name]
-            ? errors[parsed.name]
-            : parsed.description,
+        helperText: parsed.description,
         onChange: (value: InputValue) =>
             setValues({ ...values, [parsed.name]: value })
     }));
+
+    const validate = () => {
+        const validationErrors = validateFormInputs(inputs);
+        if (Object.keys(validationErrors).length) {
+            setErrors(validationErrors);
+            throw new ValidationError(
+                Object.keys(errors).map(
+                    name => new ParameterError(name, errors[name].message)
+                )
+            );
+        }
+        setErrors({});
+    };
+
+    const getValues = () => {
+        validate();
+        return convertFormInputsToLiterals(inputs);
+    };
 
     useEffect(() => {
         // TODO: Use default values from inputs
@@ -106,7 +124,8 @@ function useFormInputsState(parsedInputs: ParsedInput[]): FormInputsState {
     }, [parsedInputs]);
 
     return {
-        inputs
+        inputs,
+        getValues
     };
 }
 
@@ -206,7 +225,7 @@ export function useLaunchWorkflowFormState({
     const inputLoadingState = waitForAllFetchables([workflow, launchPlans]);
 
     const [parsedInputs, setParsedInputs] = useState<ParsedInput[]>([]);
-    const { inputs } = useFormInputsState(parsedInputs);
+    const { inputs, getValues } = useFormInputsState(parsedInputs);
     const workflowName = workflowId.name;
 
     const onSelectWorkflow = (
@@ -223,14 +242,7 @@ export function useLaunchWorkflowFormState({
         const launchPlanId = launchPlanData.id;
         const { domain, project } = workflowId;
 
-        const { errors, literals } = convertFormInputsToLiterals(inputs);
-        if (Object.keys(errors).length) {
-            throw new ValidationError(
-                Object.keys(errors).map(
-                    name => new ParameterError(name, errors[name])
-                )
-            );
-        }
+        const literals = getValues();
         const response = await createWorkflowExecution({
             domain,
             launchPlanId,

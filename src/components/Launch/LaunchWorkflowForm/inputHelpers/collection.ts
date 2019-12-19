@@ -1,3 +1,4 @@
+import { ValueError } from 'errors';
 import { Core } from 'flyteidl';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
@@ -47,8 +48,20 @@ export function toLiteral({
     };
 }
 
-// TODO
-function validate({ value }: ConverterInput) {}
+function validate({ value }: ConverterInput) {
+    if (typeof value !== 'string') {
+        throw new Error('Value must be a string');
+    }
+
+    try {
+        const parsed = parseCollection(value);
+        if (!Array.isArray(parsed)) {
+            throw new Error(`Value parsed to type: ${typeof parsed}`);
+        }
+    } catch (e) {
+        throw new Error(`Failed to parse array: ${e}`);
+    }
+}
 
 export const collectionHelper: InputHelper = {
     toLiteral,

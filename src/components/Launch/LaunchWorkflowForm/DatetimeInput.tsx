@@ -12,7 +12,9 @@ import { InputProps } from './types';
  * keyboard.
  */
 export const DatetimeInput: React.FC<InputProps> = props => {
-    const { label, helperText, onChange, value: propValue } = props;
+    const { error, label, onChange, value: propValue } = props;
+    const hasError = !!error;
+    const helperText = hasError ? error : props.helperText;
     const value =
         typeof propValue === 'string' && propValue.length > 0
             ? propValue
@@ -33,6 +35,7 @@ export const DatetimeInput: React.FC<InputProps> = props => {
     return (
         <MuiPickersUtilsProvider libInstance={moment} utils={momentDateUtils}>
             <KeyboardDateTimePicker
+                error={hasError}
                 clearable={true}
                 fullWidth={true}
                 ampm={false}

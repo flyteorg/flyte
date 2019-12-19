@@ -1,7 +1,7 @@
 import { timestampToDate } from 'common/utils';
+import { Core } from 'flyteidl';
 import {
     LaunchPlan,
-    Literal,
     LiteralType,
     Variable,
     Workflow,
@@ -9,7 +9,7 @@ import {
 } from 'models';
 import * as moment from 'moment';
 import { simpleTypeToInputType, typeLabels } from './constants';
-import { inputToLiteral } from './inputHelpers/inputHelpers';
+import { inputToLiteral, validateInput } from './inputHelpers/inputHelpers';
 import { SearchableSelectorOption } from './SearchableSelector';
 import { InputProps, InputType, InputTypeDefinition } from './types';
 
@@ -87,26 +87,34 @@ export function launchPlansToSearchableSelectorOptions(
     }));
 }
 
-interface ConversionResult {
-    literals: Record<string, Literal>;
-    errors: Record<string, string>;
+/** Validates a list of Launch form inputs and returns a dictionary of any
+ * resulting errors.
+ */
+export function validateFormInputs(inputs: InputProps[]) {
+    const errors: Record<string, Error> = {};
+    return inputs.reduce((out, input) => {
+        try {
+            validateInput(input);
+            return out;
+        } catch (error) {
+            return { ...out, [input.name]: error };
+        }
+    }, errors);
 }
 /** Converts a list of Launch form inputs to values that can be submitted with
  * a CreateExecutionRequest.
  */
 export function convertFormInputsToLiterals(
     inputs: InputProps[]
-): ConversionResult {
-    const result: ConversionResult = { literals: {}, errors: {} };
-    return inputs.reduce((out, input) => {
-        try {
-            const converted = inputToLiteral(input);
-            Object.assign(out.literals, { [input.name]: converted });
-        } catch (error) {
-            Object.assign(out.errors, { [input.name]: `${error}` });
-        }
-        return result;
-    }, result);
+): Record<string, Core.ILiteral> {
+    const literals: Record<string, Core.ILiteral> = {};
+    return inputs.reduce(
+        (out, input) => ({
+            ...out,
+            [input.name]: inputToLiteral(input)
+        }),
+        literals
+    );
 }
 
 /** Converts a `LiteralType` to an `InputTypeDefintion` to assist with rendering

@@ -25,13 +25,15 @@ function stringChangeHandler(onChange: InputChangeHandler) {
 /** Handles rendering of the input component for any primitive-type input */
 export const SimpleInput: React.FC<InputProps> = props => {
     const {
+        error,
         label,
-        helperText,
         name,
         onChange,
         typeDefinition: { type },
         value = ''
     } = props;
+    const hasError = !!error;
+    const helperText = hasError ? error : props.helperText;
     switch (type) {
         case InputType.Boolean:
             return (
@@ -57,6 +59,7 @@ export const SimpleInput: React.FC<InputProps> = props => {
         case InputType.Duration:
             return (
                 <TextField
+                    error={hasError}
                     helperText={helperText}
                     fullWidth={true}
                     label={label}
