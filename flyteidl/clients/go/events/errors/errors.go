@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flytestdlib/logger"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type ErrorCode string

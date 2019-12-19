@@ -12,7 +12,7 @@ import (
 // assuming that the logName is the name of the pod in kubernetes
 type stackdriverLogPlugin struct {
 	// the name of the project in GCP that the logs are being published under
-	gcpProject  string
+	gcpProject string
 	// The Log resource name for which the logs are published under
 	logResource string
 }
