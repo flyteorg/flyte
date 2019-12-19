@@ -82,6 +82,7 @@ function getInputs(workflow: Workflow, launchPlan: LaunchPlan): ParsedInput[] {
 interface FormInputsState {
     inputs: InputProps[];
     getValues(): Record<string, Core.ILiteral>;
+    validate(): boolean;
 }
 
 // TODO: This could be made generic and composed with ParsedInput
@@ -104,19 +105,13 @@ function useFormInputsState(parsedInputs: ParsedInput[]): FormInputsState {
         const validationErrors = validateFormInputs(inputs);
         if (Object.keys(validationErrors).length) {
             setErrors(validationErrors);
-            throw new ValidationError(
-                Object.keys(errors).map(
-                    name => new ParameterError(name, errors[name].message)
-                )
-            );
+            return false;
         }
         setErrors({});
+        return true;
     };
 
-    const getValues = () => {
-        validate();
-        return convertFormInputsToLiterals(inputs);
-    };
+    const getValues = () => convertFormInputsToLiterals(inputs);
 
     useEffect(() => {
         // TODO: Use default values from inputs
@@ -125,7 +120,8 @@ function useFormInputsState(parsedInputs: ParsedInput[]): FormInputsState {
 
     return {
         inputs,
-        getValues
+        getValues,
+        validate
     };
 }
 
@@ -225,7 +221,7 @@ export function useLaunchWorkflowFormState({
     const inputLoadingState = waitForAllFetchables([workflow, launchPlans]);
 
     const [parsedInputs, setParsedInputs] = useState<ParsedInput[]>([]);
-    const { inputs, getValues } = useFormInputsState(parsedInputs);
+    const { inputs, getValues, validate } = useFormInputsState(parsedInputs);
     const workflowName = workflowId.name;
 
     const onSelectWorkflow = (
@@ -242,12 +238,11 @@ export function useLaunchWorkflowFormState({
         const launchPlanId = launchPlanData.id;
         const { domain, project } = workflowId;
 
-        const literals = getValues();
         const response = await createWorkflowExecution({
             domain,
             launchPlanId,
             project,
-            inputs: { literals }
+            inputs: { literals: getValues() }
         });
         const newExecutionId = response.id as WorkflowExecutionIdentifier;
         if (!newExecutionId) {
@@ -264,7 +259,14 @@ export function useLaunchWorkflowFormState({
         doFetch: launchWorkflow
     });
 
-    const onSubmit = submissionState.fetch;
+    const onSubmit = () => {
+        // We validate separately so that a request isn't triggered unless
+        // the inputs are valid.
+        if (!validate()) {
+            return;
+        }
+        submissionState.fetch();
+    };
     const onCancel = onClose;
 
     useEffect(() => {
