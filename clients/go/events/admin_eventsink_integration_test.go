@@ -6,21 +6,22 @@ package events
 import (
 	"context"
 	"fmt"
+	netUrl "net/url"
+	"testing"
+	"time"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/influxdata/influxdb/pkg/testing/assert"
 	"github.com/lyft/flyteidl/clients/go/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/lyft/flytestdlib/config"
-	netUrl "net/url"
-	"testing"
-	"time"
 )
 
 var (
 	u, _               = netUrl.Parse("localhost:8089")
 	adminServiceConfig = admin.Config{
-		Endpoint:              config.URL{URL: *u,},
+		Endpoint:              config.URL{URL: *u},
 		UseInsecureConnection: true,
 		PerRetryTimeout:       config.Duration{1 * time.Second},
 		MaxRetries:            1,

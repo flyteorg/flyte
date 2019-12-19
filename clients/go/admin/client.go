@@ -2,16 +2,21 @@ package admin
 
 import (
 	"context"
-	"crypto/x509"
+	"errors"
 	"fmt"
-	"github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/grpc-ecosystem/go-grpc-middleware/retry"
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/coreos/go-oidc"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/lyft/flyteidl/clients/go/admin/mocks"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/lyft/flytestdlib/logger"
+	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"io/ioutil"
+	"net/http"
+	"strings"
 	"sync"
 )
 
@@ -48,19 +53,77 @@ func GetAdditionalAdminClientConfigOptions(cfg Config) []grpc.DialOption {
 	return opts
 }
 
-func NewAdminConnection(_ context.Context, cfg Config) (*grpc.ClientConn, error) {
+// This function assumes that the authorization server supports the OAuth metadata standard, and uses the oidc
+// library to retrieve the token endpoint.
+func getTokenEndpointFromAuthServer(ctx context.Context, authorizationServer string) (string, error) {
+	if authorizationServer == "" {
+		logger.Errorf(ctx, "Attempting to construct provider with empty authorizationServer")
+		return "", errors.New("cannot get token URL from empty authorizationServer")
+	}
+
+	oidcCtx := oidc.ClientContext(ctx, &http.Client{})
+	provider, err := oidc.NewProvider(oidcCtx, authorizationServer)
+	if err != nil {
+		logger.Errorf(ctx, "Error when constructing new OIDC Provider")
+		return "", err
+	}
+	logger.Infof(ctx, "Constructing Admin client with token endpoint %s", provider.Endpoint().TokenURL)
+
+	return provider.Endpoint().TokenURL, nil
+}
+
+// This retrieves a DialOption that contains a source for generating JWTs for authentication with Flyte Admin.
+// It will first attempt to retrieve the token endpoint by making a metadata call. If that fails, but the token endpoint
+// is set in the config, that will be used instead.
+func getAuthenticationDialOption(ctx context.Context, cfg Config) (grpc.DialOption, error) {
+	var tokenURL string
+	tokenURL, err := getTokenEndpointFromAuthServer(ctx, cfg.AuthorizationServerURL)
+	if err != nil || tokenURL == "" {
+		logger.Infof(ctx, "No token URL found from configuration Issuer, looking for token endpoint directly")
+		if err != nil {
+			logger.Errorf(ctx, "Err is %s", err)
+		}
+		tokenURL = cfg.TokenURL
+		if tokenURL == "" {
+			return nil, errors.New("no token endpoint could be found")
+		}
+	}
+
+	secretBytes, err := ioutil.ReadFile(cfg.ClientSecretLocation)
+	if err != nil {
+		logger.Errorf(ctx, "Error reading secret from location %s", cfg.ClientSecretLocation)
+		return nil, err
+	}
+	secret := strings.TrimSpace(string(secretBytes))
+
+	ccConfig := clientcredentials.Config{
+		ClientID:     cfg.ClientId,
+		ClientSecret: secret,
+		TokenURL:     tokenURL,
+		Scopes:       cfg.Scopes,
+	}
+	tSource := ccConfig.TokenSource(ctx)
+	oauthTokenSource := NewCustomHeaderTokenSource(tSource, cfg.AuthorizationHeader)
+	return grpc.WithPerRPCCredentials(oauthTokenSource), nil
+}
+
+func NewAdminConnection(ctx context.Context, cfg Config) (*grpc.ClientConn, error) {
 	var opts []grpc.DialOption
+
 	if cfg.UseInsecureConnection {
 		opts = append(opts, grpc.WithInsecure())
 	} else {
 		// TODO: as of Go 1.11.4, this is not supported on Windows. https://github.com/golang/go/issues/16736
-		pool, err := x509.SystemCertPool()
-		if err != nil {
-			return nil, err
-		}
-
-		creds := credentials.NewClientTLSFromCert(pool, "")
+		creds := credentials.NewClientTLSFromCert(nil, "")
 		opts = append(opts, grpc.WithTransportCredentials(creds))
+		if cfg.UseAuth {
+			logger.Infof(ctx, "Instantiating a token source to authenticate against Admin, ID: %s", cfg.ClientId)
+			jwtDialOption, err := getAuthenticationDialOption(ctx, cfg)
+			if err != nil {
+				return nil, err
+			}
+			opts = append(opts, jwtDialOption)
+		}
 	}
 
 	opts = append(opts, GetAdditionalAdminClientConfigOptions(cfg)...)

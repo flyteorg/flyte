@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 type testErrorWithReason struct {
-	status  *status.Status
+	status *status.Status
 }
 
-func(e *testErrorWithReason) GRPCStatus() *status.Status {
+func (e *testErrorWithReason) GRPCStatus() *status.Status {
 	return e.status
 }
 
@@ -54,7 +54,7 @@ func TestWrapErrors(t *testing.T) {
 		{"resourceExhausted", status.Error(codes.ResourceExhausted, "Limit Exceeded"), IsResourceExhausted},
 		{"uncaughtError", status.Error(codes.Unknown, "Unknown Err"), isEventError},
 		{"uncaughtError", fmt.Errorf("Random err"), isUnknownError},
-		{"errorWithReason", createTestErrorWithReason(),IsEventAlreadyInTerminalStateError},
+		{"errorWithReason", createTestErrorWithReason(), IsEventAlreadyInTerminalStateError},
 	}
 
 	for _, test := range tests {

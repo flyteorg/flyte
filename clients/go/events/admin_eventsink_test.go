@@ -2,6 +2,8 @@ package events
 
 import (
 	"context"
+	"testing"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flyteidl/clients/go/admin/mocks"
 	"github.com/lyft/flyteidl/clients/go/events/errors"
@@ -12,7 +14,6 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"testing"
 )
 
 // This test suite uses Mockery to mock the AdminServiceClient. Run the following command in CLI or in the IntelliJ
@@ -34,7 +35,7 @@ func TestAdminWorkflowEvent(t *testing.T) {
 		OccurredAt:   ptypes.TimestampNow(),
 		ExecutionId:  nil,
 		ProducerId:   "",
-		OutputResult: &event.WorkflowExecutionEvent_OutputUri{""},
+		OutputResult: &event.WorkflowExecutionEvent_OutputUri{OutputUri: ""},
 	}
 
 	adminClient.On(
