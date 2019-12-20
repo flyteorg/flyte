@@ -119,37 +119,43 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 		return operation()
 	} else if !h.SimpleBackOffBlocker.isBlocking(now) || h.ComputeResourceCeilings.isEligible(requestedResourceList) {
 		err := operation()
-		if err != nil {
-			if IsResourceQuotaExceeded(err) {
-				// It is necessary to parse the error message to get the actual constraints
-				// in this case, if the error message indicates constraints on memory only, then we shouldn't be used to lower the CPU ceiling
-				// even if CPU appears in requestedResourceList
-				newCeiling := GetComputeResourceAndQuantityRequested(err)
-				h.ComputeResourceCeilings.updateAll(&newCeiling)
-
-				if !h.SimpleBackOffBlocker.isBlocking(now) {
-					// if the backOffBlocker is not blocking and we are still encountering insufficient resource issue,
-					// we should increase the exponent in the backoff and update the NextEligibleTime
-
-					backOffDuration := h.SimpleBackOffBlocker.backOff()
-					logger.Infof(ctx, "The operation was attempted because the back-off handler is not blocking, but failed due to "+
-						"insufficient resource (backing off for duration [%v], further to timestamp [%v])\n", backOffDuration, h.SimpleBackOffBlocker.NextEligibleTime)
-				} else {
-					// When lowering the ceiling, we only want to lower the ceiling that actually needs to be lowered.
-					// For example, if the creation of a pod requiring X cpus and Y memory got rejected because of
-					// 	insufficient memory, we should only lower the ceiling of memory to Y, without touching the cpu ceiling
-
-					logger.Infof(ctx, "The operation was attempted because the resource requested is lower than the ceilings, "+
-						"but failed due to insufficient resource (the next eligible time remains unchanged [%v])\n", h.SimpleBackOffBlocker.NextEligibleTime)
-				}
-				return errors.Wrapf(errors.BackOffError, err, "The operation was attempted but failed")
-			}
-			logger.Infof(ctx, "The operation was attempted but failed due to reason(s) other than insufficient resource: [%v]\n", err)
-			return err
+		if err == nil {
+			logger.Infof(ctx, "The operation was attempted and finished without an error\n")
+			h.SimpleBackOffBlocker.reset()
+			h.ComputeResourceCeilings.resetAll()
+			return nil
 		}
-		h.SimpleBackOffBlocker.reset()
-		h.ComputeResourceCeilings.resetAll()
-		return nil
+
+		if IsResourceQuotaExceeded(err) {
+			// It is necessary to parse the error message to get the actual constraints
+			// in this case, if the error message indicates constraints on memory only, then we shouldn't be used to lower the CPU ceiling
+			// even if CPU appears in requestedResourceList
+			newCeiling := GetComputeResourceAndQuantityRequested(err)
+			h.ComputeResourceCeilings.updateAll(&newCeiling)
+
+			if !h.SimpleBackOffBlocker.isBlocking(now) {
+				// if the backOffBlocker is not blocking and we are still encountering insufficient resource issue,
+				// we should increase the exponent in the backoff and update the NextEligibleTime
+
+				backOffDuration := h.SimpleBackOffBlocker.backOff()
+				logger.Infof(ctx, "The operation was attempted because the back-off handler is not blocking, but failed due to "+
+					"insufficient resource (backing off for a duration of [%v] to timestamp [%v])\n", backOffDuration, h.SimpleBackOffBlocker.NextEligibleTime)
+			} else if h.ComputeResourceCeilings.isEligible(requestedResourceList) {
+				// When lowering the ceiling, we only want to lower the ceiling that actually needs to be lowered.
+				// For example, if the creation of a pod requiring X cpus and Y memory got rejected because of
+				// 	insufficient memory, we should only lower the ceiling of memory to Y, without touching the cpu ceiling
+
+				logger.Infof(ctx, "The operation was attempted because the resource requested is lower than the ceilings, "+
+					"but failed due to insufficient resource (the next eligible time remains unchanged [%v]). The requests are "+
+					"[%v]. The ceilings are [%v]\n", h.SimpleBackOffBlocker.NextEligibleTime, requestedResourceList, h.computeResourceCeilings)
+			} else {
+				logger.Infof(ctx, "The operation was attempted because of unknown reasons, and "+
+					"it failed due to insufficient resource (the next eligible time is [%v])\n", h.SimpleBackOffBlocker.NextEligibleTime)
+			}
+			return errors.Wrapf(errors.BackOffError, err, "The operation was attempted but failed")
+		}
+		logger.Infof(ctx, "The operation was attempted but failed due to reason(s) other than insufficient resource: [%v]\n", err)
+		return err
 	} else { // The backoff is active and the resource request exceeds the ceiling
 		logger.Infof(ctx, "The operation was blocked due to back-off")
 		return errors.Errorf(errors.BackOffError, "The operation attempt was blocked by back-off "+
