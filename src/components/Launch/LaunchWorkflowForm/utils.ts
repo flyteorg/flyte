@@ -1,9 +1,7 @@
 import { timestampToDate } from 'common/utils';
-import { ParameterError, ValidationError } from 'errors';
+import { Core } from 'flyteidl';
 import {
     LaunchPlan,
-    Literal,
-    LiteralMap,
     LiteralType,
     Variable,
     Workflow,
@@ -11,7 +9,7 @@ import {
 } from 'models';
 import * as moment from 'moment';
 import { simpleTypeToInputType, typeLabels } from './constants';
-import { inputToLiteral, inputTypeConverters } from './inputConverters';
+import { inputToLiteral } from './inputHelpers/inputHelpers';
 import { SearchableSelectorOption } from './SearchableSelector';
 import { InputProps, InputType, InputTypeDefinition } from './types';
 
@@ -89,26 +87,20 @@ export function launchPlansToSearchableSelectorOptions(
     }));
 }
 
-interface ConversionResult {
-    literals: Record<string, Literal>;
-    errors: Record<string, string>;
-}
 /** Converts a list of Launch form inputs to values that can be submitted with
  * a CreateExecutionRequest.
  */
 export function convertFormInputsToLiterals(
     inputs: InputProps[]
-): ConversionResult {
-    const result: ConversionResult = { literals: {}, errors: {} };
-    return inputs.reduce((out, input) => {
-        try {
-            const converted = inputToLiteral(input);
-            Object.assign(out.literals, { [input.name]: converted });
-        } catch (error) {
-            Object.assign(out.errors, { [input.name]: `${error}` });
-        }
-        return result;
-    }, result);
+): Record<string, Core.ILiteral> {
+    const literals: Record<string, Core.ILiteral> = {};
+    return inputs.reduce(
+        (out, input) => ({
+            ...out,
+            [input.name]: inputToLiteral(input)
+        }),
+        literals
+    );
 }
 
 /** Converts a `LiteralType` to an `InputTypeDefintion` to assist with rendering

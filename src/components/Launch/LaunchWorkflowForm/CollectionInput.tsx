@@ -12,8 +12,8 @@ function stringChangeHandler(onChange: InputChangeHandler) {
 /** Handles rendering of the input component for a Collection of SimpleType values*/
 export const CollectionInput: React.FC<InputProps> = props => {
     const {
+        error,
         label,
-        helperText,
         onChange,
         typeDefinition: { subtype },
         value = ''
@@ -25,6 +25,8 @@ export const CollectionInput: React.FC<InputProps> = props => {
         );
         return <UnsupportedInput {...props} />;
     }
+    const hasError = !!error;
+    const helperText = hasError ? error : props.helperText;
     switch (subtype.type) {
         case InputType.Blob:
         case InputType.Boolean:
@@ -39,6 +41,7 @@ export const CollectionInput: React.FC<InputProps> = props => {
         case InputType.Struct:
             return (
                 <TextField
+                    error={hasError}
                     helperText={helperText}
                     fullWidth={true}
                     label={label}

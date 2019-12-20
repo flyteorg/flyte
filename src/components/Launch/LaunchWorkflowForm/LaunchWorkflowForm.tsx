@@ -6,11 +6,9 @@ import {
     FormHelperText,
     Typography
 } from '@material-ui/core';
-import { makeStyles, Theme } from '@material-ui/core/styles';
 import { WaitForData } from 'components/common';
 import { ButtonCircularProgress } from 'components/common/ButtonCircularProgress';
 import { APIContextValue, useAPIContext } from 'components/data/apiContext';
-import { smallFontSize } from 'components/Theme';
 import {
     FilterOperationName,
     NamedEntityIdentifier,
@@ -18,53 +16,12 @@ import {
     workflowSortFields
 } from 'models';
 import * as React from 'react';
-import { CollectionInput } from './CollectionInput';
+import { LaunchWorkflowFormInputs } from './LaunchWorkflowFormInputs';
 import { SearchableSelector } from './SearchableSelector';
-import { SimpleInput } from './SimpleInput';
-import { InputProps, InputType, LaunchWorkflowFormProps } from './types';
-import { UnsupportedInput } from './UnsupportedInput';
+import { useStyles } from './styles';
+import { LaunchWorkflowFormProps } from './types';
 import { useLaunchWorkflowFormState } from './useLaunchWorkflowFormState';
 import { workflowsToSearchableSelectorOptions } from './utils';
-
-const useStyles = makeStyles((theme: Theme) => ({
-    footer: {
-        padding: theme.spacing(2)
-    },
-    formControl: {
-        padding: `${theme.spacing(1.5)}px 0`
-    },
-    header: {
-        padding: theme.spacing(2),
-        width: '100%'
-    },
-    inputsSection: {
-        minHeight: theme.spacing(59),
-        padding: theme.spacing(2)
-    },
-    inputLabel: {
-        color: theme.palette.text.hint,
-        fontSize: smallFontSize
-    },
-    root: {
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%'
-    }
-}));
-
-function getComponentForInput(input: InputProps) {
-    switch (input.typeDefinition.type) {
-        case InputType.Collection:
-            return <CollectionInput {...input} />;
-        case InputType.Map:
-        case InputType.Schema:
-        case InputType.Unknown:
-        case InputType.None:
-            return <UnsupportedInput {...input} />;
-        default:
-            return <SimpleInput {...input} />;
-    }
-}
 
 function generateFetchSearchResults(
     { listWorkflows }: APIContextValue,
@@ -142,14 +99,12 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                             spinnerVariant="medium"
                             {...state.inputLoadingState}
                         >
-                            {state.inputs.map(input => (
-                                <div
-                                    key={input.label}
-                                    className={styles.formControl}
-                                >
-                                    {getComponentForInput(input)}
-                                </div>
-                            ))}
+                            <LaunchWorkflowFormInputs
+                                key={state.formKey}
+                                inputs={state.inputs}
+                                ref={state.formInputsRef}
+                                showErrors={state.showErrors}
+                            />
                         </WaitForData>
                     ) : null}
                 </WaitForData>
