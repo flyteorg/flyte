@@ -13,6 +13,12 @@ export const schedulesTableColumnsWidths = {
     name: 250
 };
 
+export const formStrings = {
+    title: 'Launch Workflow',
+    workflowVersion: 'Workflow Version',
+    launchPlan: 'Launch Plan'
+};
+
 /** Maps any valid InputType enum to a display string */
 export const typeLabels: { [k in InputType]: string } = {
     [InputType.Binary]: 'binary',

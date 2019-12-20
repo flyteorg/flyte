@@ -16,6 +16,7 @@ import {
     workflowSortFields
 } from 'models';
 import * as React from 'react';
+import { formStrings } from './constants';
 import { LaunchWorkflowFormInputs } from './LaunchWorkflowFormInputs';
 import { SearchableSelector } from './SearchableSelector';
 import { useStyles } from './styles';
@@ -64,7 +65,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
     return (
         <>
             <DialogTitle disableTypography={true} className={styles.header}>
-                <div className={styles.inputLabel}>Launch Workflow</div>
+                <div className={styles.inputLabel}>{formStrings.title}</div>
                 <Typography variant="h6">{state.workflowName}</Typography>
             </DialogTitle>
             <DialogContent dividers={true} className={styles.inputsSection}>
@@ -74,7 +75,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                 >
                     <div className={styles.formControl}>
                         <SearchableSelector
-                            label="Workflow Version"
+                            label={formStrings.workflowVersion}
                             onSelectionChanged={state.onSelectWorkflow}
                             options={state.workflowSelectorOptions}
                             fetchSearchResults={fetchSearchResults}
@@ -87,7 +88,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     >
                         <div className={styles.formControl}>
                             <SearchableSelector
-                                label="Launch Plan"
+                                label={formStrings.launchPlan}
                                 onSelectionChanged={state.onSelectLaunchPlan}
                                 options={state.launchPlanSelectorOptions}
                                 selectedItem={state.selectedLaunchPlan}

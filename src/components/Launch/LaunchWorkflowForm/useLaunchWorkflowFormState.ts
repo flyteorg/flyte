@@ -7,7 +7,6 @@ import {
     useWorkflows,
     waitForAllFetchables
 } from 'components/hooks';
-import { Core } from 'flyteidl';
 import {
     FilterOperationName,
     LaunchPlan,
