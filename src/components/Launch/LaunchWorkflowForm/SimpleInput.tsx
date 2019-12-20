@@ -41,6 +41,7 @@ export const SimpleInput: React.FC<InputProps> = props => {
                     <FormControlLabel
                         control={
                             <Switch
+                                id={name}
                                 checked={!!value}
                                 onChange={switchChangeHandler(onChange)}
                                 value={name}
@@ -60,6 +61,7 @@ export const SimpleInput: React.FC<InputProps> = props => {
             return (
                 <TextField
                     error={hasError}
+                    id={name}
                     helperText={helperText}
                     fullWidth={true}
                     label={label}

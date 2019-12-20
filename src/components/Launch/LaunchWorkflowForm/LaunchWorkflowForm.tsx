@@ -75,6 +75,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                 >
                     <div className={styles.formControl}>
                         <SearchableSelector
+                            id="launch-workflow-selector"
                             label={formStrings.workflowVersion}
                             onSelectionChanged={state.onSelectWorkflow}
                             options={state.workflowSelectorOptions}
@@ -88,6 +89,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     >
                         <div className={styles.formControl}>
                             <SearchableSelector
+                                id="launch-lp-selector"
                                 label={formStrings.launchPlan}
                                 onSelectionChanged={state.onSelectLaunchPlan}
                                 options={state.launchPlanSelectorOptions}

@@ -1,7 +1,7 @@
 import { ThemeProvider } from '@material-ui/styles';
 import { render, wait } from '@testing-library/react';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
-import { APIContext, APIContextValue } from 'components/data/apiContext';
+import { APIContext } from 'components/data/apiContext';
 import { muiTheme } from 'components/Theme';
 import { mapValues } from 'lodash';
 import {
@@ -32,10 +32,6 @@ import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 
 function createMockObjects(variables: Record<string, Variable>) {
     const mockWorkflow = createMockWorkflow('MyWorkflow');
-    const mockLaunchPlan = createMockLaunchPlan(
-        mockWorkflow.id.name,
-        mockWorkflow.id.version
-    );
 
     const mockWorkflowVersions = createMockWorkflowVersions(
         mockWorkflow.id.name,
@@ -46,13 +42,22 @@ function createMockObjects(variables: Record<string, Variable>) {
         parameters: mapValues(variables, v => ({ var: v }))
     };
 
-    mockLaunchPlan.closure!.expectedInputs = parameterMap;
-    return { mockWorkflow, mockLaunchPlan, mockWorkflowVersions };
+    const mockLaunchPlans = [mockWorkflow.id.name, 'OtherLaunchPlan'].map(
+        name => {
+            const launchPlan = createMockLaunchPlan(
+                name,
+                mockWorkflow.id.version
+            );
+            launchPlan.closure!.expectedInputs = parameterMap;
+            return launchPlan;
+        }
+    );
+    return { mockWorkflow, mockLaunchPlans, mockWorkflowVersions };
 }
 
 describe('LaunchWorkflowForm', () => {
     let onClose: jest.Mock;
-    let mockLaunchPlan: LaunchPlan;
+    let mockLaunchPlans: LaunchPlan[];
     let mockWorkflow: Workflow;
     let mockWorkflowVersions: Workflow[];
     let workflowId: NamedEntityIdentifier;
@@ -73,12 +78,12 @@ describe('LaunchWorkflowForm', () => {
     const createMocks = () => {
         const mockObjects = createMockObjects(variables);
         mockWorkflow = mockObjects.mockWorkflow;
-        mockLaunchPlan = mockObjects.mockLaunchPlan;
+        mockLaunchPlans = mockObjects.mockLaunchPlans;
         mockWorkflowVersions = mockObjects.mockWorkflowVersions;
 
         workflowId = mockWorkflow.id;
         mockCreateWorkflowExecution = jest.fn();
-        mockGetLaunchPlan = jest.fn().mockResolvedValue(mockLaunchPlan);
+        mockGetLaunchPlan = jest.fn().mockResolvedValue(mockLaunchPlans[0]);
         // Return our mock inputs for any version requested
         mockGetWorkflow = jest.fn().mockImplementation(id => {
             const workflow: Workflow = {
@@ -92,7 +97,7 @@ describe('LaunchWorkflowForm', () => {
         });
         mockListLaunchPlans = jest
             .fn()
-            .mockResolvedValue({ entities: [mockLaunchPlan] });
+            .mockResolvedValue({ entities: mockLaunchPlans });
         mockListWorkflows = jest
             .fn()
             .mockResolvedValue({ entities: mockWorkflowVersions });
@@ -136,13 +141,25 @@ describe('LaunchWorkflowForm', () => {
 
         it('should not show launch plan selector until list has loaded', async () => {
             mockListLaunchPlans.mockReturnValue(pendingPromise());
-            const { getByText, queryByText } = renderForm();
-            await wait(() => getByText(formStrings.workflowVersion));
+            const { getByLabelText, queryByText } = renderForm();
+            await wait(() => getByLabelText(formStrings.workflowVersion));
             expect(queryByText(formStrings.launchPlan)).not.toBeInTheDocument();
         });
 
-        it('should select the most recent workflow version by default', async () => {});
+        it('should select the most recent workflow version by default', async () => {
+            const { getByLabelText } = renderForm();
+            await wait();
+            expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
+                mockWorkflowVersions[0].id.version
+            );
+        });
 
-        it('should select the first launch plan by default', async () => {});
+        it('should select the launch plan matching the workflow name by default', async () => {
+            const { getByLabelText } = renderForm();
+            await wait();
+            expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
+                mockWorkflow.id.name
+            );
+        });
     });
 });

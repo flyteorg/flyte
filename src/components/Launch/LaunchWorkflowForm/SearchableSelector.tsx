@@ -55,6 +55,7 @@ export interface SearchableSelectorOption<DataType> {
 }
 
 export interface SearchableSelectorProps<DataType> {
+    id?: string;
     label: string;
     options: SearchableSelectorOption<DataType>[];
     selectedItem?: SearchableSelectorOption<DataType>;
@@ -263,6 +264,7 @@ export const SearchableSelector = <DataType extends {}>(
     return (
         <div className={styles.container}>
             <TextField
+                id={props.id}
                 inputRef={inputRef}
                 fullWidth={true}
                 InputProps={{
