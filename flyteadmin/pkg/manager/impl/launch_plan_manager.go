@@ -5,6 +5,8 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/lyft/flytestdlib/contextutils"
+
 	"github.com/lyft/flyteadmin/pkg/async/schedule/aws"
 
 	"github.com/lyft/flytestdlib/promutils"
@@ -44,6 +46,16 @@ type LaunchPlanManager struct {
 	metrics   launchPlanMetrics
 }
 
+func getLaunchPlanContext(ctx context.Context, identifier *core.Identifier) context.Context {
+	ctx = contextutils.WithProjectDomain(ctx, identifier.Project, identifier.Domain)
+	return contextutils.WithLaunchPlanID(ctx, identifier.Name)
+}
+
+func (m *LaunchPlanManager) getNamedEntityContext(ctx context.Context, identifier *admin.NamedEntityIdentifier) context.Context {
+	ctx = contextutils.WithProjectDomain(ctx, identifier.Project, identifier.Domain)
+	return contextutils.WithLaunchPlanID(ctx, identifier.Name)
+}
+
 func (m *LaunchPlanManager) CreateLaunchPlan(
 	ctx context.Context,
 	request admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
@@ -71,6 +83,7 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 		logger.Debugf(ctx, "could not create launch plan: %+v, request failed validation with err: %v", request.Id, err)
 		return nil, err
 	}
+	ctx = getLaunchPlanContext(ctx, request.Id)
 	launchPlan := transformers.CreateLaunchPlan(request, workflowInterface.Outputs)
 	launchPlanDigest, err := util.GetLaunchPlanDigest(ctx, &launchPlan)
 	if err != nil {
@@ -328,6 +341,7 @@ func (m *LaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request admin.
 	if err := validation.ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
 		logger.Debugf(ctx, "can't update launch plan [%+v] state, invalid identifier: %v", request.Id, err)
 	}
+	ctx = getLaunchPlanContext(ctx, request.Id)
 	switch request.State {
 	case admin.LaunchPlanState_INACTIVE:
 		return m.disableLaunchPlan(ctx, request)
@@ -346,6 +360,7 @@ func (m *LaunchPlanManager) GetLaunchPlan(ctx context.Context, request admin.Obj
 		logger.Debugf(ctx, "can't get launch plan [%+v] with invalid identifier: %v", request.Id, err)
 		return nil, err
 	}
+	ctx = getLaunchPlanContext(ctx, request.Id)
 	return util.GetLaunchPlan(ctx, m.db, *request.Id)
 }
 
@@ -355,6 +370,7 @@ func (m *LaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request adm
 		logger.Debugf(ctx, "can't get active launch plan [%+v] with invalid request: %v", request.Id, err)
 		return nil, err
 	}
+	ctx = m.getNamedEntityContext(ctx, request.Id)
 
 	filters, err := util.GetActiveLaunchPlanVersionFilters(request.Id.Project, request.Id.Domain, request.Id.Name)
 	if err != nil {
@@ -388,6 +404,7 @@ func (m *LaunchPlanManager) ListLaunchPlans(ctx context.Context, request admin.R
 		logger.Debugf(ctx, "")
 		return nil, err
 	}
+	ctx = m.getNamedEntityContext(ctx, request.Id)
 
 	filters, err := util.GetDbFilters(util.FilterSpec{
 		Project:        request.Id.Project,
@@ -447,6 +464,7 @@ func (m *LaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request a
 		logger.Debugf(ctx, "")
 		return nil, err
 	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 
 	filters, err := util.ListActiveLaunchPlanVersionsFilters(request.Project, request.Domain)
 	if err != nil {
@@ -496,7 +514,7 @@ func (m *LaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request a
 // At least project name and domain must be specified along with limit.
 func (m *LaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
-
+	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 	filters, err := util.GetDbFilters(util.FilterSpec{
 		Project: request.Project,
 		Domain:  request.Domain,

@@ -4,6 +4,8 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/lyft/flytestdlib/contextutils"
+
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -36,6 +38,7 @@ func (m *NamedEntityManager) UpdateNamedEntity(ctx context.Context, request admi
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 
 	// Ensure entity exists before trying to update it
 	_, err := util.GetNamedEntity(ctx, m.db, request.ResourceType, *request.Id)
@@ -58,6 +61,7 @@ func (m *NamedEntityManager) GetNamedEntity(ctx context.Context, request admin.N
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 	return util.GetNamedEntity(ctx, m.db, request.ResourceType, *request.Id)
 }
 
@@ -67,6 +71,7 @@ func (m *NamedEntityManager) ListNamedEntities(ctx context.Context, request admi
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 
 	filters, err := util.GetDbFilters(util.FilterSpec{
 		Project: request.Project,

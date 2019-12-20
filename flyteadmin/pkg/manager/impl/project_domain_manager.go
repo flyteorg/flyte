@@ -3,6 +3,8 @@ package impl
 import (
 	"context"
 
+	"github.com/lyft/flytestdlib/contextutils"
+
 	"github.com/lyft/flyteadmin/pkg/manager/impl/validation"
 	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
 
@@ -23,6 +25,7 @@ func (m *ProjectDomainManager) UpdateProjectDomain(
 	if err := validation.ValidateProjectDomainAttributesUpdateRequest(request); err != nil {
 		return nil, err
 	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Attributes.Project, request.Attributes.Domain)
 
 	model, err := transformers.ToProjectDomainModel(*request.Attributes)
 	if err != nil {

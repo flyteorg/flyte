@@ -6,6 +6,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/contextutils"
+
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/lyft/flytestdlib/promutils"
@@ -42,6 +45,11 @@ type TaskManager struct {
 	metrics  taskMetrics
 }
 
+func getTaskContext(ctx context.Context, identifier *core.Identifier) context.Context {
+	ctx = contextutils.WithProjectDomain(ctx, identifier.Project, identifier.Domain)
+	return contextutils.WithTaskID(ctx, identifier.Name)
+}
+
 func setDefaults(request admin.TaskCreateRequest) (admin.TaskCreateRequest, error) {
 	if request.Id == nil {
 		return request, errors.NewFlyteAdminError(codes.InvalidArgument,
@@ -60,6 +68,7 @@ func (t *TaskManager) CreateTask(
 		logger.Debugf(ctx, "Task [%+v] failed validation with err: %v", request.Id, err)
 		return nil, err
 	}
+	ctx = getTaskContext(ctx, request.Id)
 	finalizedRequest, err := setDefaults(request)
 	if err != nil {
 		return nil, err
@@ -119,6 +128,7 @@ func (t *TaskManager) GetTask(ctx context.Context, request admin.ObjectGetReques
 	if err := validation.ValidateIdentifier(request.Id, common.Task); err != nil {
 		logger.Debugf(ctx, "invalid identifier [%+v]: %v", request.Id, err)
 	}
+	ctx = getTaskContext(ctx, request.Id)
 	task, err := util.GetTask(ctx, t.db, *request.Id)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get task with id [%+v] with err %v", err, request.Id)
@@ -133,6 +143,8 @@ func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListR
 		logger.Debugf(ctx, "Invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
+	ctx = contextutils.WithTaskID(ctx, request.Id.Name)
 	spec := util.FilterSpec{
 		Project:        request.Id.Project,
 		Domain:         request.Id.Domain,
@@ -193,6 +205,7 @@ func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request adm
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 	filters, err := util.GetDbFilters(util.FilterSpec{
 		Project: request.Project,
 		Domain:  request.Domain,

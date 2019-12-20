@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/lyft/flytestdlib/contextutils"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteadmin/pkg/errors"
@@ -44,6 +46,11 @@ type WorkflowManager struct {
 	storageClient *storage.DataStore
 	storagePrefix []string
 	metrics       workflowMetrics
+}
+
+func getWorkflowContext(ctx context.Context, identifier *core.Identifier) context.Context {
+	ctx = contextutils.WithProjectDomain(ctx, identifier.Project, identifier.Domain)
+	return contextutils.WithWorkflowID(ctx, identifier.Name)
 }
 
 func (w *WorkflowManager) setDefaults(request admin.WorkflowCreateRequest) (admin.WorkflowCreateRequest, error) {
@@ -131,6 +138,7 @@ func (w *WorkflowManager) CreateWorkflow(
 	if err := validation.ValidateWorkflow(ctx, request, w.db, w.config.ApplicationConfiguration()); err != nil {
 		return nil, err
 	}
+	ctx = getWorkflowContext(ctx, request.Id)
 	finalizedRequest, err := w.setDefaults(request)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to set defaults for workflow with id [%+v] with err %v", request.Id, err)
@@ -210,6 +218,7 @@ func (w *WorkflowManager) GetWorkflow(ctx context.Context, request admin.ObjectG
 		logger.Debugf(ctx, "invalid identifier [%+v]: %v", request.Id, err)
 		return nil, err
 	}
+	ctx = getWorkflowContext(ctx, request.Id)
 	workflow, err := util.GetWorkflow(ctx, w.db, w.storageClient, *request.Id)
 	if err != nil {
 		logger.Infof(ctx, "Failed to get workflow with id [%+v] with err %v", request.Id, err)
@@ -225,6 +234,8 @@ func (w *WorkflowManager) ListWorkflows(
 	if err := validation.ValidateResourceListRequest(request); err != nil {
 		return nil, err
 	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
+	ctx = contextutils.WithWorkflowID(ctx, request.Id.Name)
 	filters, err := util.GetDbFilters(util.FilterSpec{
 		Project:        request.Id.Project,
 		Domain:         request.Id.Domain,
@@ -279,6 +290,7 @@ func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request a
 		logger.Debugf(ctx, "invalid request [%+v]: %v", request, err)
 		return nil, err
 	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 
 	filters, err := util.GetDbFilters(util.FilterSpec{
 		Project: request.Project,
