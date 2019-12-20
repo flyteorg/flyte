@@ -112,6 +112,44 @@ func (e *PluginManager) GetID() string {
 	return e.id
 }
 
+func (e *PluginManager) getPodResourceRequirement(ctx context.Context, pod *v1.Pod) v1.ResourceList {
+	podRequestedResources := make(v1.ResourceList)
+	initContainersRequestedResources := make(v1.ResourceList)
+	containersRequestedResources := make(v1.ResourceList)
+
+	// Collect the resource requests from all the containers in the pod whose creation is to be attempted
+	// to decide whether we should try the pod creation during the back off period
+
+	for _, container := range pod.Spec.InitContainers {
+		for k, v := range container.Resources.Limits {
+			quantity := initContainersRequestedResources[k]
+			quantity.Add(v)
+			initContainersRequestedResources[k] = quantity
+		}
+	}
+
+	for _, container := range pod.Spec.Containers {
+		for k, v := range container.Resources.Limits {
+			quantity := containersRequestedResources[k]
+			quantity.Add(v)
+			containersRequestedResources[k] = quantity
+		}
+	}
+
+	for k, v := range initContainersRequestedResources {
+		podRequestedResources[k] = v
+	}
+
+	for k, qC := range containersRequestedResources {
+		if qI, found := podRequestedResources[k]; !found || qC.Cmp(qI) == 1 {
+			podRequestedResources[k] = qC
+		}
+	}
+	logger.Infof(ctx, "The resource requirement for creating Pod [%v] is [%v]\n", pod, podRequestedResources)
+
+	return podRequestedResources
+}
+
 func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
 
 	o, err := e.plugin.BuildResource(ctx, tCtx)
@@ -126,18 +164,7 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 
 	pod, casted := o.(*v1.Pod)
 	if e.backOffController != nil && casted {
-		podRequestedResources := make(v1.ResourceList)
-
-		// Collect the resource requests from all the containers in the pod whose creation is to be attempted
-		// to decide whether we should try the pod creation during the back off period
-
-		for _, container := range pod.Spec.Containers {
-			for k, v := range container.Resources.Limits {
-				quantity := podRequestedResources[k]
-				quantity.Add(v)
-				podRequestedResources[k] = quantity
-			}
-		}
+		podRequestedResources := e.getPodResourceRequirement(ctx, pod)
 
 		cfg := nodeTaskConfig.GetConfig()
 		backOffHandler := e.backOffController.GetOrCreateHandler(ctx, key, cfg.BackOffConfig.BaseSecond, cfg.BackOffConfig.MaxDuration)
