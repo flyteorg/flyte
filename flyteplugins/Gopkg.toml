@@ -11,7 +11,7 @@ ignored = ["k8s.io/spark-on-k8s-operator",
 
 [[constraint]]
   name = "github.com/lyft/flyteidl"
-  version = "^0.14.x"
+  version = "^0.16.x"
 
 [[override]]
   name = "github.com/dgrijalva/jwt-go"
