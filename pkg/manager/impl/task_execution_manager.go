@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/lyft/flytestdlib/contextutils"
+
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -39,6 +41,11 @@ type TaskExecutionManager struct {
 	db      repositories.RepositoryInterface
 	metrics taskExecutionMetrics
 	urlData dataInterfaces.RemoteURLInterface
+}
+
+func getTaskExecutionContext(ctx context.Context, identifier *core.TaskExecutionIdentifier) context.Context {
+	ctx = getNodeExecutionContext(ctx, identifier.NodeExecutionId)
+	return contextutils.WithTaskID(ctx, fmt.Sprintf("%s-%v", identifier.TaskId.Name, identifier.RetryAttempt))
 }
 
 func (m *TaskExecutionManager) createTaskExecution(
@@ -94,6 +101,7 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		NodeExecutionId: nodeExecutionID,
 		RetryAttempt:    request.Event.RetryAttempt,
 	}
+	ctx = getTaskExecutionContext(ctx, &taskExecutionID)
 	logger.Debugf(ctx, "Received task execution event for [%+v] transitioning to phase [%v]",
 		taskExecutionID, request.Event.Phase)
 	nodeExecutionModel, err := util.GetNodeExecutionModel(ctx, m.db, nodeExecutionID)
@@ -166,6 +174,12 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 
 func (m *TaskExecutionManager) GetTaskExecution(
 	ctx context.Context, request admin.TaskExecutionGetRequest) (*admin.TaskExecution, error) {
+	err := validation.ValidateTaskExecutionIdentifier(request.Id)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to validate GetTaskExecution [%+v] with err: %v", request.Id, err)
+		return nil, err
+	}
+	ctx = getTaskExecutionContext(ctx, request.Id)
 	taskExecutionModel, err := util.GetTaskExecutionModel(ctx, m.db, request.Id)
 	if err != nil {
 		return nil, err
@@ -184,6 +198,7 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 		logger.Debugf(ctx, "ListTaskExecutions request [%+v] is invalid: %v", request, err)
 		return nil, err
 	}
+	ctx = getNodeExecutionContext(ctx, request.NodeExecutionId)
 
 	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, *request.NodeExecutionId)
 	if err != nil {
@@ -240,6 +255,7 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 	if err := validation.ValidateTaskExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "Invalid identifier [%+v]: %v", request.Id, err)
 	}
+	ctx = getTaskExecutionContext(ctx, request.Id)
 	taskExecution, err := m.GetTaskExecution(ctx, admin.TaskExecutionGetRequest{
 		Id: request.Id,
 	})

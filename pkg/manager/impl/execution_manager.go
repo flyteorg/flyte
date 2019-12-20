@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/lyft/flytestdlib/contextutils"
+
 	"github.com/lyft/flyteadmin/pkg/auth"
 
 	"github.com/golang/protobuf/ptypes"
@@ -81,6 +83,11 @@ type ExecutionManager struct {
 	userMetrics        executionUserMetrics
 	notificationClient notificationInterfaces.Publisher
 	urlData            dataInterfaces.RemoteURLInterface
+}
+
+func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
+	ctx = contextutils.WithExecutionID(ctx, id.Name)
+	return contextutils.WithProjectDomain(ctx, id.Project, id.Domain)
 }
 
 // Returns the unique string which identifies the authenticated end user (if any).
@@ -182,21 +189,22 @@ func (m *ExecutionManager) offloadInputs(ctx context.Context, literalMap *core.L
 }
 
 func (m *ExecutionManager) launchExecutionAndPrepareModel(
-	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (*models.Execution, error) {
+	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
+	context.Context, *models.Execution, error) {
 	err := validation.ValidateExecutionRequest(ctx, request, m.db, m.config.ApplicationConfiguration())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to validate ExecutionCreateRequest %+v with err %v", request, err)
-		return nil, err
+		return nil, nil, err
 	}
 	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *request.Spec.LaunchPlan)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get launch plan model for ExecutionCreateRequest %+v with err %v", request, err)
-		return nil, err
+		return nil, nil, err
 	}
 	launchPlan, err := transformers.FromLaunchPlanModel(launchPlanModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to transform launch plan model %+v with err %v", launchPlanModel, err)
-		return nil, err
+		return nil, nil, err
 	}
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
 		request.Inputs,
@@ -208,12 +216,12 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
 			"fixed inputs: %+v and expected inputs: %+v with err %v",
 			request.Inputs, launchPlan.Spec.FixedInputs, launchPlan.Closure.ExpectedInputs, err)
-		return nil, err
+		return nil, nil, err
 	}
 	workflow, err := util.GetWorkflow(ctx, m.db, m.storageClient, *launchPlan.Spec.WorkflowId)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
-		return nil, err
+		return nil, nil, err
 	}
 	name := util.GetExecutionName(request)
 	workflowExecutionID := core.WorkflowExecutionIdentifier{
@@ -221,6 +229,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		Domain:  request.Domain,
 		Name:    name,
 	}
+	ctx = getExecutionContext(ctx, &workflowExecutionID)
 
 	// Get the node execution (if any) that launched this execution
 	var parentNodeExecutionID uint
@@ -229,7 +238,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		if err != nil {
 			logger.Errorf(ctx, "Failed to get node execution [%+v] that launched this execution [%+v] with error %v",
 				request.Spec.Metadata.ParentNodeExecution, workflowExecutionID, err)
-			return nil, err
+			return nil, nil, err
 		}
 
 		parentNodeExecutionID = parentNodeExecutionModel.ID
@@ -245,11 +254,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	inputsURI, err := m.offloadInputs(ctx, executionInputs, &workflowExecutionID, shared.Inputs)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	userInputsURI, err := m.offloadInputs(ctx, request.Inputs, &workflowExecutionID, shared.UserInputs)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// TODO: Reduce CRD size and use offloaded input URI to blob store instead.
@@ -262,7 +271,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 	err = m.addLabelsAndAnnotations(request.Spec, &executeWorkflowInputs)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	execInfo, err := m.workflowExecutor.ExecuteWorkflow(ctx, executeWorkflowInputs)
@@ -270,7 +279,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		m.systemMetrics.PropellerFailures.Inc()
 		logger.Infof(ctx, "Failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
 			request, workflowExecutionID, executionInputs, err)
-		return nil, err
+		return nil, nil, err
 	}
 	executionCreatedAt := time.Now()
 	acceptanceDelay := executionCreatedAt.Sub(requestedAt)
@@ -308,9 +317,9 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
 			workflowExecutionID, err)
-		return nil, err
+		return nil, nil, err
 	}
-	return executionModel, nil
+	return ctx, executionModel, nil
 }
 
 // Inserts an execution model into the database store and emits platform metrics.
@@ -341,7 +350,9 @@ func (m *ExecutionManager) CreateExecution(
 	if request.Inputs == nil || len(request.Inputs.Literals) == 0 {
 		request.Inputs = request.GetSpec().GetInputs()
 	}
-	executionModel, err := m.launchExecutionAndPrepareModel(ctx, request, requestedAt)
+	var executionModel *models.Execution
+	var err error
+	ctx, executionModel, err = m.launchExecutionAndPrepareModel(ctx, request, requestedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -387,7 +398,8 @@ func (m *ExecutionManager) RelaunchExecution(
 		inputs = spec.Inputs
 	}
 	executionSpec.Metadata.Mode = admin.ExecutionMetadata_RELAUNCH
-	executionModel, err := m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
+	var executionModel *models.Execution
+	ctx, executionModel, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Name,
@@ -543,6 +555,7 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		logger.Debugf(ctx, "received invalid CreateWorkflowEventRequest [%s]: %v", request.RequestId, err)
 		return nil, err
 	}
+	ctx = getExecutionContext(ctx, request.Event.ExecutionId)
 	logger.Debugf(ctx, "Received workflow execution event for [%+v] transitioning to phase [%v]",
 		request.Event.ExecutionId, request.Event.Phase)
 
@@ -617,6 +630,7 @@ func (m *ExecutionManager) GetExecution(
 		logger.Debugf(ctx, "GetExecution request [%+v] failed validation with err: %v", request, err)
 		return nil, err
 	}
+	ctx = getExecutionContext(ctx, request.Id)
 	executionModel, err := util.GetExecutionModel(ctx, m.db, *request.Id)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err: %v", request, err)
@@ -667,6 +681,7 @@ func (m *ExecutionManager) GetExecution(
 
 func (m *ExecutionManager) GetExecutionData(
 	ctx context.Context, request admin.WorkflowExecutionGetDataRequest) (*admin.WorkflowExecutionGetDataResponse, error) {
+	ctx = getExecutionContext(ctx, request.Id)
 	executionModel, err := util.GetExecutionModel(ctx, m.db, *request.Id)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err: %v", request, err)
@@ -718,6 +733,7 @@ func (m *ExecutionManager) ListExecutions(
 		logger.Debugf(ctx, "ListExecutions request [%+v] failed validation with err: %v", request, err)
 		return nil, err
 	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 	filters, err := util.GetDbFilters(util.FilterSpec{
 		Project:        request.Id.Project,
 		Domain:         request.Id.Domain,
@@ -842,6 +858,7 @@ func (m *ExecutionManager) TerminateExecution(
 		logger.Debugf(ctx, "received terminate execution request: %v with invalid identifier: %v", request, err)
 		return nil, err
 	}
+	ctx = getExecutionContext(ctx, request.Id)
 	// Save the abort reason (best effort)
 	executionModel, err := m.db.ExecutionRepo().Get(ctx, repositoryInterfaces.GetResourceInput{
 		Project: request.Id.Project,

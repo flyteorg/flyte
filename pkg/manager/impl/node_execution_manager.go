@@ -4,6 +4,8 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/lyft/flytestdlib/contextutils"
+
 	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
@@ -57,6 +59,12 @@ const addIsParentFilter = true
 var isParent = common.NewMapFilter(map[string]interface{}{
 	shared.ParentTaskExecutionID: nil,
 })
+
+func getNodeExecutionContext(ctx context.Context, identifier *core.NodeExecutionIdentifier) context.Context {
+	ctx = contextutils.WithProjectDomain(ctx, identifier.ExecutionId.Project, identifier.ExecutionId.Domain)
+	ctx = contextutils.WithExecutionID(ctx, identifier.ExecutionId.Name)
+	return contextutils.WithNodeID(ctx, identifier.NodeId)
+}
 
 func (m *NodeExecutionManager) createNodeExecutionWithEvent(
 	ctx context.Context, request *admin.NodeExecutionEventRequest) error {
@@ -149,6 +157,10 @@ func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
 
 func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admin.NodeExecutionEventRequest) (
 	*admin.NodeExecutionEventResponse, error) {
+	if err := validation.ValidateNodeExecutionIdentifier(request.Event.Id); err != nil {
+		logger.Debugf(ctx, "CreateNodeEvent called with invalid identifier [%+v]: %v", request.Event.Id, err)
+	}
+	ctx = getNodeExecutionContext(ctx, request.Event.Id)
 	executionID := request.Event.Id.ExecutionId
 	logger.Debugf(ctx, "Received node execution event for Node Exec Id [%+v] transitioning to phase [%v], w/ Metadata [%v]",
 		request.Event.Id, request.Event.Phase, request.Event.ParentTaskMetadata)
@@ -208,6 +220,7 @@ func (m *NodeExecutionManager) GetNodeExecution(
 	if err := validation.ValidateNodeExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "get node execution called with invalid identifier [%+v]: %v", request.Id, err)
 	}
+	ctx = getNodeExecutionContext(ctx, request.Id)
 	nodeExecutionModel, err := util.GetNodeExecutionModel(ctx, m.db, request.Id)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get node execution with id [%+v] with err %v",
@@ -282,6 +295,7 @@ func (m *NodeExecutionManager) ListNodeExecutions(
 	if err := validation.ValidateNodeExecutionListRequest(request); err != nil {
 		return nil, err
 	}
+	ctx = getExecutionContext(ctx, request.WorkflowExecutionId)
 
 	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, *request.WorkflowExecutionId)
 	if err != nil {
@@ -299,6 +313,7 @@ func (m *NodeExecutionManager) ListNodeExecutionsForTask(
 	if err := validation.ValidateNodeExecutionForTaskListRequest(request); err != nil {
 		return nil, err
 	}
+	ctx = getTaskExecutionContext(ctx, request.TaskExecutionId)
 	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(
 		ctx, *request.TaskExecutionId.NodeExecutionId.ExecutionId)
 	if err != nil {
@@ -323,6 +338,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	if err := validation.ValidateNodeExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "can't get node execution data with invalid identifier [%+v]: %v", request.Id, err)
 	}
+	ctx = getNodeExecutionContext(ctx, request.Id)
 	nodeExecutionModel, err := util.GetNodeExecutionModel(ctx, m.db, request.Id)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get node execution with id [%+v] with err %v",
