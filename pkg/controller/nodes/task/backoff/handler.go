@@ -132,31 +132,28 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 					// we should increase the exponent in the backoff and update the NextEligibleTime
 
 					newEligibleTime := h.SimpleBackOffBlocker.backOff()
-					logger.Errorf(ctx, "BackOffBlocker is not blocking, but the request failed due to "+
-						"insufficient resource (backing off further to [%v]): [%v]\n", newEligibleTime, err)
+					logger.Infof(ctx, "The operation was attempted because the back-off handler is not blocking, but failed due to "+
+						"insufficient resource (backing off further to [%v])\n", newEligibleTime)
 				} else {
 					// When lowering the ceiling, we only want to lower the ceiling that actually needs to be lowered.
 					// For example, if the creation of a pod requiring X cpus and Y memory got rejected because of
 					// 	insufficient memory, we should only lower the ceiling of memory to Y, without touching the cpu ceiling
 
-					logger.Errorf(ctx, "BackOffBlocker is active but the requested amount of resource is lower "+
-						"than ceiling so is not blocked. "+
-						"Failed to run the operation due to insufficient resource "+
-						"(next eligible time remains unchanged [%v]): [%v]\n", h.SimpleBackOffBlocker.NextEligibleTime, err)
+					logger.Infof(ctx, "The operation was attempted because the resource requested is lower than the ceilings, "+
+						"but failed due to insufficient resource (the next eligible time remains unchanged [%v])\n", h.SimpleBackOffBlocker.NextEligibleTime)
 				}
-			} else {
-				logger.Errorf(ctx, "Failed to run the operation due to reasons other than insufficient resource: [%v]\n", err)
-				return err
+				return errors.Wrapf(errors.BackOffError, err, "The operation was attempted but failed")
 			}
-			return errors.Wrapf(errors.BackOffError, err, "Failed to execute the operation")
+			logger.Infof(ctx, "The operation was attempted but failed due to reason(s) other than insufficient resource: [%v]\n", err)
+			return err
 		}
 		h.SimpleBackOffBlocker.reset()
 		h.ComputeResourceCeilings.resetAll()
 		return nil
 	} else { // The backoff is active and the resource request exceeds the ceiling
-		logger.Errorf(ctx, "Failed to execute the operation due to backoff")
-		return errors.Errorf(errors.BackOffError, "Failed to execute the operation due to backoff is "+
-			"active [attempted at: %v][block expires at: %v] and the requested "+
+		logger.Infof(ctx, "The operation was blocked due to back-off")
+		return errors.Errorf(errors.BackOffError, "The operation attempt was blocked by back-off "+
+			"[attempted at: %v][the block expires at: %v] and the requested "+
 			"resource(s) exceeds resource ceiling(s)", now, h.SimpleBackOffBlocker.getBlockExpirationTime())
 	}
 
