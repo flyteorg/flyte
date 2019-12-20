@@ -115,9 +115,11 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 	//      Else => we block the operation(), which is where the main improvement comes from
 
 	now := h.Clock.Now()
+	isBlocking := h.SimpleBackOffBlocker.isBlocking(now)
+	isTryable := h.ComputeResourceCeilings.isEligible(requestedResourceList)
 	if !h.IsActive() {
 		return operation()
-	} else if !h.SimpleBackOffBlocker.isBlocking(now) || h.ComputeResourceCeilings.isEligible(requestedResourceList) {
+	} else if !isBlocking || isTryable {
 		err := operation()
 		if err == nil {
 			logger.Infof(ctx, "The operation was attempted and finished without an error\n")
@@ -127,20 +129,14 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 		}
 
 		if IsResourceQuotaExceeded(err) {
-			// It is necessary to parse the error message to get the actual constraints
-			// in this case, if the error message indicates constraints on memory only, then we shouldn't be used to lower the CPU ceiling
-			// even if CPU appears in requestedResourceList
-			newCeiling := GetComputeResourceAndQuantityRequested(err)
-			h.ComputeResourceCeilings.updateAll(&newCeiling)
-
-			if !h.SimpleBackOffBlocker.isBlocking(now) {
+			if !isBlocking {
 				// if the backOffBlocker is not blocking and we are still encountering insufficient resource issue,
 				// we should increase the exponent in the backoff and update the NextEligibleTime
 
 				backOffDuration := h.SimpleBackOffBlocker.backOff()
 				logger.Infof(ctx, "The operation was attempted because the back-off handler is not blocking, but failed due to "+
 					"insufficient resource (backing off for a duration of [%v] to timestamp [%v])\n", backOffDuration, h.SimpleBackOffBlocker.NextEligibleTime)
-			} else if h.ComputeResourceCeilings.isEligible(requestedResourceList) {
+			} else if isTryable {
 				// When lowering the ceiling, we only want to lower the ceiling that actually needs to be lowered.
 				// For example, if the creation of a pod requiring X cpus and Y memory got rejected because of
 				// 	insufficient memory, we should only lower the ceiling of memory to Y, without touching the cpu ceiling
@@ -152,6 +148,12 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 				logger.Infof(ctx, "The operation was attempted because of unknown reasons, and "+
 					"it failed due to insufficient resource (the next eligible time is [%v])\n", h.SimpleBackOffBlocker.NextEligibleTime)
 			}
+			// It is necessary to parse the error message to get the actual constraints
+			// in this case, if the error message indicates constraints on memory only, then we shouldn't be used to lower the CPU ceiling
+			// even if CPU appears in requestedResourceList
+			newCeiling := GetComputeResourceAndQuantityRequested(err)
+			h.ComputeResourceCeilings.updateAll(&newCeiling)
+
 			return errors.Wrapf(errors.BackOffError, err, "The operation was attempted but failed")
 		}
 		logger.Infof(ctx, "The operation was attempted but failed due to reason(s) other than insufficient resource: [%v]\n", err)
