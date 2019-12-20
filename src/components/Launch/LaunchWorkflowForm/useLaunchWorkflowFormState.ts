@@ -192,12 +192,14 @@ export function useLaunchWorkflowFormState({
         setWorkflow(newWorkflow);
     };
 
-    const launchWorkflow = async (
-        inputValues: Record<string, Core.ILiteral>
-    ) => {
+    const launchWorkflow = async () => {
         if (!launchPlanData) {
             throw new Error('Attempting to launch with no LaunchPlan');
         }
+        if (formInputsRef.current === null) {
+            throw new Error('Unexpected empty form inputs ref');
+        }
+        const literals = formInputsRef.current.getValues();
         const launchPlanId = launchPlanData.id;
         const { domain, project } = workflowId;
 
@@ -205,7 +207,7 @@ export function useLaunchWorkflowFormState({
             domain,
             launchPlanId,
             project,
-            inputs: { literals: inputValues }
+            inputs: { literals }
         });
         const newExecutionId = response.id as WorkflowExecutionIdentifier;
         if (!newExecutionId) {
@@ -223,12 +225,7 @@ export function useLaunchWorkflowFormState({
             autoFetch: false,
             debugName: 'LaunchWorkflowForm',
             defaultValue: {} as WorkflowExecutionIdentifier,
-            doFetch: () => {
-                if (formInputsRef.current === null) {
-                    throw new Error('Unexpected empty form inputs ref');
-                }
-                return launchWorkflow(formInputsRef.current.getValues());
-            }
+            doFetch: launchWorkflow
         },
         formKey
     );

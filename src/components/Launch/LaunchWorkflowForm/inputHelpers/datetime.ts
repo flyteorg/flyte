@@ -12,7 +12,6 @@ function toLiteral({ value }: ConverterInput): Core.ILiteral {
     };
 }
 
-// TODO
 function validate({ value }: ConverterInput) {}
 
 export const datetimeHelper: InputHelper = {

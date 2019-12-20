@@ -18,7 +18,6 @@ export function inputToLiteral(input: ToLiteralParams): Core.ILiteral {
 type ValidationParams = Pick<InputProps, 'name' | 'typeDefinition' | 'value'>;
 export function validateInput(input: ValidationParams) {
     if (input.value == null) {
-        // TODO: If input is required, check that here.
         return;
     }
 

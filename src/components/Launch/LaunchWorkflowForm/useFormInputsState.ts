@@ -5,7 +5,6 @@ import { validateInput } from './inputHelpers/inputHelpers';
 import { InputProps, InputValue, ParsedInput } from './types';
 import { convertFormInputsToLiterals } from './utils';
 
-// TODO: Maybe make this adjustable based on type
 const debounceDelay = 500;
 
 interface FormInputState extends InputProps {
@@ -18,9 +17,6 @@ interface FormInputsState {
     validate(): boolean;
 }
 
-// TODO: Mark values valid/invalid on initial setup so that manual
-// validation isn't required later. Required values
-// should default to being invalid.
 function useFormInputState(parsedInput: ParsedInput): FormInputState {
     const [value, setValue] = useState<InputValue>();
     const [error, setError] = useState<string>();
