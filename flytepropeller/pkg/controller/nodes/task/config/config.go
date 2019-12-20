@@ -22,8 +22,8 @@ var (
 			CacheTTL:  config.Duration{Duration: time.Minute * 30},
 		},
 		BackOffConfig: BackOffConfig{
-			BackOffBaseSecond:  2,
-			MaxBackOffDuration: time.Minute * 10,
+			BaseSecond:  2,
+			MaxDuration: time.Minute * 10,
 		},
 	}
 
@@ -48,8 +48,8 @@ type TaskPluginConfig struct {
 }
 
 type BackOffConfig struct {
-	BackOffBaseSecond  int           `json:"backoff-base-second" pflag:",The number of seconds representing the base duration of the exponential backoff"`
-	MaxBackOffDuration time.Duration `json:"max-backoff-duration" pflag:",The cap of the backoff duration"`
+	BaseSecond  int           `json:"base-second" pflag:",The number of seconds representing the base duration of the exponential backoff"`
+	MaxDuration time.Duration `json:"max-duration" pflag:",The cap of the backoff duration"`
 }
 
 func (p TaskPluginConfig) GetEnabledPluginsSet() sets.String {

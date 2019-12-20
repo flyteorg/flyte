@@ -101,7 +101,7 @@ type PluginManager struct {
 	kubeClient      pluginsCore.KubeClient
 	metrics         PluginMetrics
 	// Per namespace-resource
-	backOffController *backoff.Controller // sync.Map[string]*ComputeResourceAwareBackoffHandler
+	backOffController *backoff.Controller
 }
 
 func (e *PluginManager) GetProperties() pluginsCore.PluginProperties {
@@ -130,6 +130,7 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 
 		// Collect the resource requests from all the containers in the pod whose creation is to be attempted
 		// to decide whether we should try the pod creation during the back off period
+
 		for _, container := range pod.Spec.Containers {
 			for k, v := range container.Resources.Limits {
 				quantity := podRequestedResources[k]
@@ -138,11 +139,9 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 			}
 		}
 
-		backOffHandler, found := e.backOffController.GetBackOffHandler(key)
-		if !found {
-			cfg := nodeTaskConfig.GetConfig()
-			backOffHandler = e.backOffController.CreateBackOffHandler(ctx, key, cfg.BackOffConfig.BackOffBaseSecond, cfg.BackOffConfig.MaxBackOffDuration)
-		}
+		cfg := nodeTaskConfig.GetConfig()
+		backOffHandler := e.backOffController.GetOrCreateHandler(ctx, key, cfg.BackOffConfig.BaseSecond, cfg.BackOffConfig.MaxDuration)
+
 		err = backOffHandler.Handle(ctx, func() error {
 			return e.kubeClient.GetClient().Create(ctx, o)
 		}, podRequestedResources)
@@ -152,7 +151,6 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		if backoff.IsBackoffError(err) {
-			// TODO: Quota errors are retried forever, it would be good to have support for backoff strategy.
 			logger.Warnf(ctx, "Failed to launch job, resource quota exceeded. err: %v", err)
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(time.Now(), pluginsCore.DefaultPhaseVersion, "failed to launch job, resource quota exceeded.")), nil
 		} else if k8serrors.IsForbidden(err) {

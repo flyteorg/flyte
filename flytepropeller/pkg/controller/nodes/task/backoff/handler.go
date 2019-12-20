@@ -9,12 +9,16 @@ import (
 	"time"
 
 	"github.com/lyft/flyteplugins/go/tasks/errors"
-	errors3 "github.com/lyft/flytestdlib/errors"
+	stdErrors "github.com/lyft/flytestdlib/errors"
 	"github.com/lyft/flytestdlib/logger"
 	v1 "k8s.io/api/core/v1"
-	errors2 "k8s.io/apimachinery/pkg/api/errors"
+	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/clock"
+)
+
+var (
+	reqRegexp = regexp.MustCompile(`requested: (limits.[a-zA-Z]+=[a-zA-Z0-9]+[,]*)+`)
 )
 
 type SimpleBackOffBlocker struct {
@@ -136,7 +140,7 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 				backOffDuration := h.SimpleBackOffBlocker.backOff()
 				logger.Infof(ctx, "The operation was attempted because the back-off handler is not blocking, but failed due to "+
 					"insufficient resource (backing off for a duration of [%v] to timestamp [%v])\n", backOffDuration, h.SimpleBackOffBlocker.NextEligibleTime)
-			} else if isTryable {
+			} else {
 				// When lowering the ceiling, we only want to lower the ceiling that actually needs to be lowered.
 				// For example, if the creation of a pod requiring X cpus and Y memory got rejected because of
 				// 	insufficient memory, we should only lower the ceiling of memory to Y, without touching the cpu ceiling
@@ -144,9 +148,6 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 				logger.Infof(ctx, "The operation was attempted because the resource requested is lower than the ceilings, "+
 					"but failed due to insufficient resource (the next eligible time remains unchanged [%v]). The requests are "+
 					"[%v]. The ceilings are [%v]\n", h.SimpleBackOffBlocker.NextEligibleTime, requestedResourceList, h.computeResourceCeilings)
-			} else {
-				logger.Infof(ctx, "The operation was attempted because of unknown reasons, and "+
-					"it failed due to insufficient resource (the next eligible time is [%v])\n", h.SimpleBackOffBlocker.NextEligibleTime)
 			}
 			// It is necessary to parse the error message to get the actual constraints
 			// in this case, if the error message indicates constraints on memory only, then we shouldn't be used to lower the CPU ceiling
@@ -168,19 +169,16 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 }
 
 func IsResourceQuotaExceeded(err error) bool {
-	return errors2.IsForbidden(err) && strings.Contains(err.Error(), "exceeded quota")
+	return apiErrors.IsForbidden(err) && strings.Contains(err.Error(), "exceeded quota")
 }
 
 func GetComputeResourceAndQuantityRequested(err error) v1.ResourceList {
-	// re := regexp.MustCompile(`(?P<part>(?P<key>requested|used|limited): limits.(?P<resource_type>[a-zA-Z]+)=(?P<quantity_expr>[a-zA-Z0-9]+))`)
 	// Playground: https://play.golang.org/p/oOr6CMmW7IE
 	// limits.cpu=7,limits.memory=64Gi, used: limits.cpu=249,limits.memory=2012730Mi, limited: limits.cpu=250,limits.memory=2000Gi
-	// re := regexp.MustCompile(`(?P<key>requested): (limits.(?P<resource_type>[a-zA-Z]+)=(?P<quantity_expr>[a-zA-Z0-9]+)[,]*)+`)
-	// re := regexp.MustCompile(`(?P<key>requested): (limits.(?P<resource_type>[a-zA-Z]+)=(?P<quantity_expr>[a-zA-Z0-9]+)[,]*)+`)
+	// reqRegexp := regexp.MustCompile(`(?P<key>requested): (limits.(?P<resource_type>[a-zA-Z]+)=(?P<quantity_expr>[a-zA-Z0-9]+)[,]*)+`)
 
 	// Extracting "requested: limits.cpu=7,limits.memory=64Gi"
-	re := regexp.MustCompile(`requested: (limits.[a-zA-Z]+=[a-zA-Z0-9]+[,]*)+`)
-	matches := re.FindAllStringSubmatch(err.Error(), -1)
+	matches := reqRegexp.FindAllStringSubmatch(err.Error(), -1)
 	requestedComputeResources := v1.ResourceList{}
 
 	if len(matches) == 0 || len(matches[0]) == 0 {
@@ -208,12 +206,6 @@ func GetComputeResourceAndQuantityRequested(err error) v1.ResourceList {
 	return requestedComputeResources
 }
 
-// TODO ssingh: clean it and move to its right place
 func IsBackoffError(err error) bool {
-	code, found := errors3.GetErrorCode(err)
-	if found && code == errors.BackOffError {
-		return true
-	}
-
-	return false
+	return stdErrors.IsCausedBy(err, errors.BackOffError)
 }
