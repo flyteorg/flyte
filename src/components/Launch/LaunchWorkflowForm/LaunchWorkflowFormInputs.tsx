@@ -11,28 +11,30 @@ import {
 import { UnsupportedInput } from './UnsupportedInput';
 import { useFormInputsState } from './useFormInputsState';
 
-function getComponentForInput(input: InputProps) {
+function getComponentForInput(input: InputProps, showErrors: boolean) {
+    const props = { ...input, error: showErrors ? input.error : undefined };
     switch (input.typeDefinition.type) {
         case InputType.Collection:
-            return <CollectionInput {...input} />;
+            return <CollectionInput {...props} />;
         case InputType.Map:
         case InputType.Schema:
         case InputType.Unknown:
         case InputType.None:
-            return <UnsupportedInput {...input} />;
+            return <UnsupportedInput {...props} />;
         default:
-            return <SimpleInput {...input} />;
+            return <SimpleInput {...props} />;
     }
 }
 
 export interface LaunchWorkflowFormInputsProps {
     inputs: ParsedInput[];
+    showErrors?: boolean;
 }
 
 export const LaunchWorkflowFormInputsImpl: React.RefForwardingComponent<
     LaunchWorkflowFormInputsRef,
     LaunchWorkflowFormInputsProps
-> = ({ inputs: parsedInputs }, ref) => {
+> = ({ inputs: parsedInputs, showErrors = true }, ref) => {
     const { getValues, inputs, validate } = useFormInputsState(parsedInputs);
     const styles = useStyles();
     React.useImperativeHandle(ref, () => ({
@@ -44,7 +46,7 @@ export const LaunchWorkflowFormInputsImpl: React.RefForwardingComponent<
         <>
             {inputs.map(input => (
                 <div key={input.label} className={styles.formControl}>
-                    {getComponentForInput(input)}
+                    {getComponentForInput(input, showErrors)}
                 </div>
             ))}
         </>

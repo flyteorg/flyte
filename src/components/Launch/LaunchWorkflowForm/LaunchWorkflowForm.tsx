@@ -103,6 +103,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                                 key={state.formKey}
                                 inputs={state.inputs}
                                 ref={state.formInputsRef}
+                                showErrors={state.showErrors}
                             />
                         </WaitForData>
                     ) : null}

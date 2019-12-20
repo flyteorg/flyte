@@ -19,9 +19,7 @@ export interface LaunchWorkflowFormInputsRef {
 }
 
 export interface LaunchWorkflowFormState {
-    /** Used to key inputs component so it is re-mounted when we change
-     * workflows or launch plans.
-     */
+    /** Used to key inputs component so it is re-mounted the list of inputs */
     formKey?: string;
     formInputsRef: React.RefObject<LaunchWorkflowFormInputsRef>;
     inputLoadingState: MultiFetchableState;
@@ -29,8 +27,9 @@ export interface LaunchWorkflowFormState {
     launchPlanOptionsLoadingState: MultiFetchableState;
     launchPlanSelectorOptions: SearchableSelectorOption<LaunchPlan>[];
     selectedLaunchPlan?: SearchableSelectorOption<LaunchPlan>;
-    submissionState: FetchableData<WorkflowExecutionIdentifier>;
     selectedWorkflow?: SearchableSelectorOption<WorkflowId>;
+    showErrors: boolean;
+    submissionState: FetchableData<WorkflowExecutionIdentifier>;
     workflowName: string;
     workflowOptionsLoadingState: MultiFetchableState;
     workflowSelectorOptions: SearchableSelectorOption<WorkflowId>[];

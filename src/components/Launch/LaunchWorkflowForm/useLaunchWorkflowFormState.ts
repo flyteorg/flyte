@@ -135,6 +135,7 @@ export function useLaunchWorkflowFormState({
 }: LaunchWorkflowFormProps): LaunchWorkflowFormState {
     const { createWorkflowExecution } = useAPIContext();
     const formInputsRef = useRef<LaunchWorkflowFormInputsRef>(null);
+    const [showErrors, setShowErrors] = useState(false);
     const workflows = useWorkflows(workflowId, {
         limit: 10,
         sort: {
@@ -170,14 +171,17 @@ export function useLaunchWorkflowFormState({
 
     const [parsedInputs, setParsedInputs] = useState<ParsedInput[]>([]);
 
-    const formKey = useMemo<string | undefined>(() => {
+    // Any time the inputs change (even if it's just re-ordering), we must
+    // change the form key so that the inputs component will re-mount.
+    const formKey = useMemo<string>(() => {
         if (!selectedWorkflowId || !selectedLaunchPlan) {
-            return undefined;
+            return '';
         }
-        return `${getCacheKey(selectedWorkflowId)}-${getCacheKey(
-            selectedLaunchPlan.id
-        )}`;
-    }, [selectedWorkflowId, selectedLaunchPlan]);
+        return getCacheKey(parsedInputs);
+    }, [parsedInputs]);
+
+    // Only show errors after first submission for a set of inputs.
+    useEffect(() => setShowErrors(false), [formKey]);
 
     const workflowName = workflowId.name;
 
@@ -213,20 +217,20 @@ export function useLaunchWorkflowFormState({
 
     const submissionState = useFetchableData<
         WorkflowExecutionIdentifier,
-        LaunchWorkflowFormInputsRef | null
+        string
     >(
         {
             autoFetch: false,
             debugName: 'LaunchWorkflowForm',
             defaultValue: {} as WorkflowExecutionIdentifier,
-            doFetch: formInputs => {
-                if (formInputs === null) {
+            doFetch: () => {
+                if (formInputsRef.current === null) {
                     throw new Error('Unexpected empty form inputs ref');
                 }
-                return launchWorkflow(formInputs.getValues());
+                return launchWorkflow(formInputsRef.current.getValues());
             }
         },
-        formInputsRef.current
+        formKey
     );
 
     const onSubmit = () => {
@@ -234,6 +238,9 @@ export function useLaunchWorkflowFormState({
             console.error('Unexpected empty form inputs ref');
             return;
         }
+
+        // Show errors after the first submission
+        setShowErrors(true);
         // We validate separately so that a request isn't triggered unless
         // the inputs are valid.
         if (!formInputsRef.current.validate()) {
@@ -281,6 +288,7 @@ export function useLaunchWorkflowFormState({
         onSubmit,
         selectedLaunchPlan,
         selectedWorkflow,
+        showErrors,
         submissionState,
         workflowName,
         workflowOptionsLoadingState,

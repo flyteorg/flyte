@@ -43,13 +43,17 @@ function useFormInputState(parsedInput: ParsedInput): FormInputState {
         validate();
     }, [validationValue]);
 
+    const onChange = (value: InputValue) => {
+        setValue(value);
+    };
+
     return {
         ...parsedInput,
         error,
+        onChange,
         validate,
         value,
-        helperText: parsedInput.description,
-        onChange: setValue
+        helperText: parsedInput.description
     };
 }
 
@@ -57,6 +61,8 @@ function useFormInputState(parsedInput: ParsedInput): FormInputState {
  * NOTE: The input value for this hook is used to generate sub-hooks.
  * If the input value will change, the component using this hook should
  * be remounted (such as with the `key` prop) each time the value changes.
+ * Otherwise we will end up calling the hooks for a component in a different order.
+ * See https://reactjs.org/docs/hooks-rules.html#explanation
  */
 export function useFormInputsState(
     parsedInputs: ParsedInput[]
