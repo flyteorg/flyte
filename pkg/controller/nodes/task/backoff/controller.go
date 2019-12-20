@@ -17,6 +17,30 @@ type Controller struct {
 	backOffHandlerMap HandlerMap
 }
 
+func (m *Controller) GetOrCreateHandler(ctx context.Context, key string, backOffBaseSecond int, maxBackOffDuration time.Duration) *ComputeResourceAwareBackOffHandler {
+	h, loaded := m.backOffHandlerMap.LoadOrStore(key, &ComputeResourceAwareBackOffHandler{
+		SimpleBackOffBlocker: &SimpleBackOffBlocker{
+			Clock:              m.Clock,
+			BackOffBaseSecond:  backOffBaseSecond,
+			BackOffExponent:    0,
+			NextEligibleTime:   m.Clock.Now(),
+			MaxBackOffDuration: maxBackOffDuration,
+		}, ComputeResourceCeilings: &ComputeResourceCeilings{
+			computeResourceCeilings: v1.ResourceList{},
+		},
+	})
+
+	if loaded {
+		logger.Infof(ctx, "The back-off handler for [%v] has been loaded.\n", key)
+	} else {
+		logger.Infof(ctx, "The back-off handler for [%v] has been created.\n", key)
+	}
+	if ret, casted := h.(*ComputeResourceAwareBackOffHandler); casted {
+		return ret
+	}
+	return nil
+}
+
 func (m *Controller) GetBackOffHandler(key string) (*ComputeResourceAwareBackOffHandler, bool) {
 	return m.backOffHandlerMap.Get(key)
 }
@@ -30,7 +54,6 @@ func (m *Controller) CreateBackOffHandler(ctx context.Context, key string, backO
 			NextEligibleTime:   m.Clock.Now(),
 			MaxBackOffDuration: maxBackOffDuration,
 		},
-		// TODO changhong: initialize this field with proper value
 		ComputeResourceCeilings: &ComputeResourceCeilings{
 			computeResourceCeilings: v1.ResourceList{},
 		},
