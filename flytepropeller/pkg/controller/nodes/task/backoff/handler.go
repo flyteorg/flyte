@@ -38,7 +38,7 @@ func (b *SimpleBackOffBlocker) reset() {
 	b.NextEligibleTime = b.Clock.Now()
 }
 
-func (b *SimpleBackOffBlocker) backOff() time.Time {
+func (b *SimpleBackOffBlocker) backOff() time.Duration {
 	durationString := fmt.Sprintf("%vs", math.Pow(float64(b.BackOffBaseSecond), float64(b.BackOffExponent)))
 	backOffDuration, _ := time.ParseDuration(durationString)
 
@@ -48,7 +48,7 @@ func (b *SimpleBackOffBlocker) backOff() time.Time {
 
 	b.NextEligibleTime = b.Clock.Now().Add(backOffDuration)
 	b.BackOffExponent++
-	return b.NextEligibleTime
+	return backOffDuration
 }
 
 type ComputeResourceCeilings struct {
@@ -131,9 +131,9 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 					// if the backOffBlocker is not blocking and we are still encountering insufficient resource issue,
 					// we should increase the exponent in the backoff and update the NextEligibleTime
 
-					newEligibleTime := h.SimpleBackOffBlocker.backOff()
+					backOffDuration := h.SimpleBackOffBlocker.backOff()
 					logger.Infof(ctx, "The operation was attempted because the back-off handler is not blocking, but failed due to "+
-						"insufficient resource (backing off further to [%v])\n", newEligibleTime)
+						"insufficient resource (backing off for duration [%v], further to timestamp [%v])\n", backOffDuration, h.SimpleBackOffBlocker.NextEligibleTime)
 				} else {
 					// When lowering the ceiling, we only want to lower the ceiling that actually needs to be lowered.
 					// For example, if the creation of a pod requiring X cpus and Y memory got rejected because of
