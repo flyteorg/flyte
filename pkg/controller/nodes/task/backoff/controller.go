@@ -12,7 +12,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/clock"
 )
 
+// Controller is a name-spaced collection of back-off handlers
 type Controller struct {
+	// Controller.Clock allows the use of fake clock when testing
 	Clock             clock.Clock
 	backOffHandlerMap HandlerMap
 }

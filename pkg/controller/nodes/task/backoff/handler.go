@@ -21,6 +21,7 @@ var (
 	reqRegexp = regexp.MustCompile(`requested: (limits.[a-zA-Z]+=[a-zA-Z0-9]+[,]*)+`)
 )
 
+// SimpleBackOffBlocker is a simple exponential back-off timer that keeps track of the back-off period
 type SimpleBackOffBlocker struct {
 	Clock              clock.Clock
 	BackOffBaseSecond  int
@@ -95,6 +96,8 @@ func (r *ComputeResourceCeilings) inf() resource.Quantity {
 	return resource.MustParse("1Ei")
 }
 
+// ComputeResourceAwareBackOffHandler is an exponential back-off handler that also keeps track of the resource ceilings
+// of the operations that are blocked or failed due to resource insufficiency
 type ComputeResourceAwareBackOffHandler struct {
 	*SimpleBackOffBlocker
 	*ComputeResourceCeilings
