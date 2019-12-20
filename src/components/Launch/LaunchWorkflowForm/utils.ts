@@ -9,7 +9,7 @@ import {
 } from 'models';
 import * as moment from 'moment';
 import { simpleTypeToInputType, typeLabels } from './constants';
-import { inputToLiteral, validateInput } from './inputHelpers/inputHelpers';
+import { inputToLiteral } from './inputHelpers/inputHelpers';
 import { SearchableSelectorOption } from './SearchableSelector';
 import { InputProps, InputType, InputTypeDefinition } from './types';
 
@@ -87,20 +87,6 @@ export function launchPlansToSearchableSelectorOptions(
     }));
 }
 
-/** Validates a list of Launch form inputs and returns a dictionary of any
- * resulting errors.
- */
-export function validateFormInputs(inputs: InputProps[]) {
-    const errors: Record<string, Error> = {};
-    return inputs.reduce((out, input) => {
-        try {
-            validateInput(input);
-            return out;
-        } catch (error) {
-            return { ...out, [input.name]: error };
-        }
-    }, errors);
-}
 /** Converts a list of Launch form inputs to values that can be submitted with
  * a CreateExecutionRequest.
  */

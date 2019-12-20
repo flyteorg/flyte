@@ -1,4 +1,5 @@
 import { FetchableData, MultiFetchableState } from 'components/hooks';
+import { Core } from 'flyteidl';
 import {
     LaunchPlan,
     NamedEntityIdentifier,
@@ -12,9 +13,19 @@ export interface LaunchWorkflowFormProps {
     onClose(): void;
 }
 
+export interface LaunchWorkflowFormInputsRef {
+    getValues(): Record<string, Core.ILiteral>;
+    validate(): boolean;
+}
+
 export interface LaunchWorkflowFormState {
+    /** Used to key inputs component so it is re-mounted when we change
+     * workflows or launch plans.
+     */
+    formKey?: string;
+    formInputsRef: React.RefObject<LaunchWorkflowFormInputsRef>;
     inputLoadingState: MultiFetchableState;
-    inputs: InputProps[];
+    inputs: ParsedInput[];
     launchPlanOptionsLoadingState: MultiFetchableState;
     launchPlanSelectorOptions: SearchableSelectorOption<LaunchPlan>[];
     selectedLaunchPlan?: SearchableSelectorOption<LaunchPlan>;
@@ -66,3 +77,8 @@ export interface InputProps {
     value?: InputValue;
     onChange: InputChangeHandler;
 }
+
+export type ParsedInput = Pick<
+    InputProps,
+    'description' | 'label' | 'name' | 'required' | 'typeDefinition'
+>;

@@ -4,7 +4,8 @@ import { InputProps } from '../types';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
 
-export function inputToLiteral(input: InputProps): Core.ILiteral {
+type ToLiteralParams = Pick<InputProps, 'typeDefinition' | 'value'>;
+export function inputToLiteral(input: ToLiteralParams): Core.ILiteral {
     if (input.value == null) {
         return literalNone();
     }
@@ -14,7 +15,8 @@ export function inputToLiteral(input: InputProps): Core.ILiteral {
     return toLiteral({ value, typeDefinition });
 }
 
-export function validateInput(input: InputProps) {
+type ValidationParams = Pick<InputProps, 'name' | 'typeDefinition' | 'value'>;
+export function validateInput(input: ValidationParams) {
     if (input.value == null) {
         // TODO: If input is required, check that here.
         return;
