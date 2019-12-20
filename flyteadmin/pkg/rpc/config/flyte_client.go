@@ -18,8 +18,8 @@ const (
 func HandleFlyteCliConfigFunc(ctx context.Context, cfg *config.ServerConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		configValues := map[string]string{
-			clientID:        cfg.Security.Oauth.ClientID,
-			redirectURI:     cfg.Security.Oauth.CallbackURL,
+			clientID:        cfg.ThirdPartyConfig.FlyteClientConfig.ClientID,
+			redirectURI:     cfg.ThirdPartyConfig.FlyteClientConfig.RedirectURI,
 			authMetadataKey: cfg.Security.Oauth.GrpcAuthorizationHeader,
 		}
 		configJSON, err := json.Marshal(configValues)
