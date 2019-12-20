@@ -150,8 +150,8 @@ func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
 func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admin.NodeExecutionEventRequest) (
 	*admin.NodeExecutionEventResponse, error) {
 	executionID := request.Event.Id.ExecutionId
-	logger.Debugf(ctx, "Received node execution event for [%+v] transitioning to phase [%v]",
-		executionID, request.Event.Phase)
+	logger.Debugf(ctx, "Received node execution event for Node Exec Id [%+v] transitioning to phase [%v], w/ Metadata [%v]",
+		request.Event.Id, request.Event.Phase, request.Event.ParentTaskMetadata)
 
 	_, err := util.GetExecutionModel(ctx, m.db, *executionID)
 	if err != nil {
@@ -167,7 +167,6 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 	nodeExecutionModel, err := m.db.NodeExecutionRepo().Get(ctx, repoInterfaces.GetNodeExecutionInput{
 		NodeExecutionIdentifier: *request.Event.Id,
 	})
-	phase := core.NodeExecution_Phase(core.NodeExecution_Phase_value[nodeExecutionModel.Phase])
 	if err != nil {
 		if err.(errors.FlyteAdminError).Code() != codes.NotFound {
 			logger.Debugf(ctx, "Failed to retrieve existing node execution with id [%+v] with err: %v",
@@ -180,6 +179,7 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 		}
 		m.metrics.NodeExecutionsCreated.Inc()
 	} else {
+		phase := core.NodeExecution_Phase(core.NodeExecution_Phase_value[nodeExecutionModel.Phase])
 		updateStatus, err := m.updateNodeExecutionWithEvent(ctx, &request, &nodeExecutionModel)
 		if err != nil {
 			return nil, err
