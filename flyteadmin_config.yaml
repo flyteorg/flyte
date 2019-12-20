@@ -25,6 +25,10 @@ server:
         iss: "https://idp.com"
         aud: "api://default"
       idpUserInfoEndpoint: "/v1/userinfo"
+  thirdPartyConfig:
+    flyteClient:
+      clientId: yourPublicAppClientId
+      redirectUri: yourRegisteredLoginRedirectUri
 flyteadmin:
   runScheduler: false
   roleNameKey: "iam.amazonaws.com/role"

@@ -20,9 +20,13 @@ func TestHandleFlyteCliConfigFunc(t *testing.T) {
 	handleFlyteCliConfigFunc := HandleFlyteCliConfigFunc(context.Background(), &config.ServerConfig{
 		Security: config.ServerSecurityOptions{
 			Oauth: authConfig.OAuthOptions{
-				ClientID:                testClientID,
-				CallbackURL:             testRedirectURI,
 				GrpcAuthorizationHeader: testAuthMetadataKey,
+			},
+		},
+		ThirdPartyConfig: config.ThirdPartyConfigOptions{
+			FlyteClientConfig: config.FlyteClientConfig{
+				ClientID:    testClientID,
+				RedirectURI: testRedirectURI,
 			},
 		},
 	})
