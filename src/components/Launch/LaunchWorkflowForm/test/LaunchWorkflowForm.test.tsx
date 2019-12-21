@@ -161,5 +161,24 @@ describe('LaunchWorkflowForm', () => {
                 mockWorkflow.id.name
             );
         });
+
+        // TODO
+        it('should not render inputs until workflow and launch plan are selected', async () => {});
+
+        it('should disable submit button until inputs have loaded', async () => {});
+
+        it('should not show validation errors until first submit', async () => {});
+
+        it('should update validation errors while typing', async () => {});
+
+        it('should update launch plan when selecting a new workflow version', async () => {});
+
+        it('should update inputs when selecting a new launch plan', () => {});
+
+        it('should reset form error when selecting a new launch plan', async () => {});
+
+        describe('Input Values', () => {
+            it('Should send false for untouched toggles', async () => {});
+        });
     });
 });

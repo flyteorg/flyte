@@ -8,6 +8,7 @@ type PrimitiveTestParams = [InputType, any, Core.IPrimitive];
 
 const validDateString = '2019-01-10T00:00:00.000Z'; // Dec 1, 2019
 
+// TODO: Fill in the invalid cases here
 export const validityTestCases = {
     boolean: {
         invalid: ['randomString', {}, new Date()],
