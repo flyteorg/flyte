@@ -1,0 +1,475 @@
+package backoff
+
+import (
+	"context"
+	"errors"
+	"reflect"
+	"testing"
+	"time"
+
+	taskErrors "github.com/lyft/flyteplugins/go/tasks/errors"
+	stdlibErrors "github.com/lyft/flytestdlib/errors"
+	v1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/clock"
+)
+
+func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
+	var callCount = 0
+
+	operWithErr := func() error {
+		callCount++
+		return k8serrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: limits.memory=1Gi, "+
+				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi"))
+	}
+
+	operWithNoErr := func() error {
+		callCount++
+		return nil
+	}
+
+	ctx := context.TODO()
+	tc := clock.NewFakeClock(time.Now())
+	type fields struct {
+		SimpleBackOffBlocker    *SimpleBackOffBlocker
+		ComputeResourceCeilings *ComputeResourceCeilings
+	}
+	type args struct {
+		operation             func() error
+		requestedResourceList v1.ResourceList
+	}
+	tests := []struct {
+		name                 string
+		fields               fields
+		args                 args
+		wantErr              bool
+		wantErrCode          stdlibErrors.ErrorCode
+		wantExp              int
+		wantNextEligibleTime time.Time
+		wantCeilings         v1.ResourceList
+		wantCallCount        int
+	}{
+
+		{name: "Request gte the ceilings coming in before the block expires does not call operation()",
+			fields: fields{
+				SimpleBackOffBlocker: &SimpleBackOffBlocker{
+					Clock:              tc,
+					BackOffBaseSecond:  2,
+					BackOffExponent:    1,
+					NextEligibleTime:   tc.Now().Add(time.Second * 7),
+					MaxBackOffDuration: 10 * time.Second,
+				},
+				ComputeResourceCeilings: &ComputeResourceCeilings{
+					computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("64Gi")},
+				},
+			},
+			args: args{
+				operation:             operWithNoErr,
+				requestedResourceList: v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("64Gi")},
+			},
+			wantErr:              true,
+			wantErrCode:          taskErrors.BackOffError,
+			wantExp:              1,
+			wantNextEligibleTime: tc.Now().Add(time.Second * 7),
+			wantCeilings:         v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("64Gi")},
+			wantCallCount:        0,
+		},
+
+		{name: "Smaller request before the block expires that gets rejected does not lead to further any back off",
+			fields: fields{
+				SimpleBackOffBlocker: &SimpleBackOffBlocker{
+					Clock:              tc,
+					BackOffBaseSecond:  2,
+					BackOffExponent:    1,
+					NextEligibleTime:   tc.Now().Add(time.Second * 7),
+					MaxBackOffDuration: 10 * time.Second,
+				},
+				ComputeResourceCeilings: &ComputeResourceCeilings{
+					computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("64Gi")},
+				},
+			},
+			args: args{
+				operation:             operWithErr,
+				requestedResourceList: v1.ResourceList{v1.ResourceCPU: resource.MustParse("9"), v1.ResourceMemory: resource.MustParse("1Gi")}},
+			wantErr:              true,
+			wantErrCode:          taskErrors.BackOffError,
+			wantExp:              1,
+			wantNextEligibleTime: tc.Now().Add(time.Second * 7),
+			// The following resource quantity of CPU is correct, as the error message will show the actual resource constraint
+			// in this case, the error message indicates constraints on memory only, so while requestedResourceList has a CPU component,
+			// it shouldn't be used to lower the ceiling
+			wantCeilings:  v1.ResourceList{v1.ResourceCPU: resource.MustParse("10"), v1.ResourceMemory: resource.MustParse("1Gi")},
+			wantCallCount: 1,
+		},
+
+		{name: "Request coming after the block expires, if rejected, should lead to further backoff and proper ceilings",
+			fields: fields{
+				SimpleBackOffBlocker: &SimpleBackOffBlocker{
+					Clock:              tc,
+					BackOffBaseSecond:  2,
+					BackOffExponent:    1,
+					NextEligibleTime:   tc.Now().Add(time.Second * -2),
+					MaxBackOffDuration: 10 * time.Second,
+				},
+				ComputeResourceCeilings: &ComputeResourceCeilings{
+					computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1Ei"), v1.ResourceMemory: resource.MustParse("1Ei")},
+				},
+			},
+			args: args{
+				operation:             operWithErr,
+				requestedResourceList: v1.ResourceList{v1.ResourceMemory: resource.MustParse("1Gi")}},
+			wantErr:              true,
+			wantErrCode:          taskErrors.BackOffError,
+			wantExp:              2,
+			wantNextEligibleTime: tc.Now().Add(time.Second * 2),
+			wantCeilings:         v1.ResourceList{v1.ResourceCPU: resource.MustParse("1Ei"), v1.ResourceMemory: resource.MustParse("1Gi")},
+			wantCallCount:        1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			callCount = 0
+			h := &ComputeResourceAwareBackOffHandler{
+				SimpleBackOffBlocker:    tt.fields.SimpleBackOffBlocker,
+				ComputeResourceCeilings: tt.fields.ComputeResourceCeilings,
+			}
+			err := h.Handle(ctx, tt.args.operation, tt.args.requestedResourceList)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Handle() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if err != nil {
+				if ec, found := stdlibErrors.GetErrorCode(err); found && ec != tt.wantErrCode {
+					t.Errorf("Handle() errorCode = %v, wantErrCode %v", ec, tt.wantErrCode)
+				}
+			}
+			if tt.wantExp != h.BackOffExponent {
+				t.Errorf("post-Handle() BackOffExponent = %v, wantBackOffExponent %v", h.BackOffExponent, tt.wantExp)
+			}
+			if tt.wantNextEligibleTime != h.NextEligibleTime {
+				t.Errorf("post-Handle() NextEligibleTime = %v, wantNextEligibleTime %v", h.NextEligibleTime, tt.wantNextEligibleTime)
+			}
+			if !reflect.DeepEqual(h.computeResourceCeilings, tt.wantCeilings) {
+				t.Errorf("ResourceCeilings = %v, want %v", h.computeResourceCeilings, tt.wantCeilings)
+			}
+			if tt.wantCallCount != callCount {
+				t.Errorf("Operation call count = %v, want %v", callCount, tt.wantCallCount)
+			}
+		})
+	}
+}
+
+func TestComputeResourceCeilings_inf(t *testing.T) {
+	type fields struct {
+		computeResourceCeilings v1.ResourceList
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   resource.Quantity
+	}{
+		{name: "inf is set properly", fields: fields{computeResourceCeilings: v1.ResourceList{}}, want: resource.MustParse("1Ei")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &ComputeResourceCeilings{
+				computeResourceCeilings: tt.fields.computeResourceCeilings,
+			}
+			if got := r.inf(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("inf() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComputeResourceCeilings_isEligible(t *testing.T) {
+	type fields struct {
+		computeResourceCeilings v1.ResourceList
+	}
+	type args struct {
+		requestedResourceList v1.ResourceList
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   bool
+	}{
+		{name: "Smaller request should be accepted",
+			fields: fields{computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("0.7m")}},
+			args:   args{requestedResourceList: v1.ResourceList{v1.ResourceCPU: resource.MustParse("0.5m")}},
+			want:   true},
+		{name: "Larger request should be rejected",
+			fields: fields{computeResourceCeilings: v1.ResourceList{v1.ResourceMemory: resource.MustParse("32Gi")}},
+			args:   args{requestedResourceList: v1.ResourceList{v1.ResourceMemory: resource.MustParse("33Gi")}},
+			want:   false},
+		{name: "If not all of the resource requests are smaller, it should be rejected",
+			fields: fields{computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("0.7m"), v1.ResourceMemory: resource.MustParse("32Gi")}},
+			args:   args{requestedResourceList: v1.ResourceList{v1.ResourceCPU: resource.MustParse("0.69m"), v1.ResourceMemory: resource.MustParse("33Gi")}},
+			want:   false},
+		{name: "All the resources should be strictly smaller (<); otherwise it is rejected",
+			fields: fields{computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("0.7m"), v1.ResourceMemory: resource.MustParse("32Gi")}},
+			args:   args{requestedResourceList: v1.ResourceList{v1.ResourceCPU: resource.MustParse("0.7m"), v1.ResourceMemory: resource.MustParse("32Gi")}},
+			want:   false},
+		{name: "If all the resource requests are smaller, it should be accepted",
+			fields: fields{computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("0.8m"), v1.ResourceMemory: resource.MustParse("34Gi")}},
+			args:   args{requestedResourceList: v1.ResourceList{v1.ResourceCPU: resource.MustParse("0.7m"), v1.ResourceMemory: resource.MustParse("32Gi")}},
+			want:   true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &ComputeResourceCeilings{
+				computeResourceCeilings: tt.fields.computeResourceCeilings,
+			}
+			if got := r.isEligible(tt.args.requestedResourceList); got != tt.want {
+				t.Errorf("isEligible() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestComputeResourceCeilings_update(t *testing.T) {
+	type fields struct {
+		computeResourceCeilings v1.ResourceList
+	}
+	type args struct {
+		reqResource v1.ResourceName
+		reqQuantity resource.Quantity
+	}
+	tests := []struct {
+		name           string
+		fields         fields
+		args           args
+		wants          []args
+		shouldNotExist []v1.ResourceName
+	}{
+		{name: "Update CPU ceiling on top of an existing ceiling",
+			fields:         fields{computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")}},
+			args:           args{reqResource: v1.ResourceCPU, reqQuantity: resource.MustParse("0")},
+			wants:          []args{{reqResource: v1.ResourceCPU, reqQuantity: resource.MustParse("0")}, {reqResource: v1.ResourceMemory, reqQuantity: resource.MustParse("1Gi")}},
+			shouldNotExist: []v1.ResourceName{}},
+		{name: "Update Memory ceiling on top of an existing ceiling",
+			fields:         fields{computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")}},
+			args:           args{reqResource: v1.ResourceMemory, reqQuantity: resource.MustParse("500Mi")},
+			wants:          []args{{reqResource: v1.ResourceCPU, reqQuantity: resource.MustParse("1")}, {reqResource: v1.ResourceMemory, reqQuantity: resource.MustParse("500Mi")}},
+			shouldNotExist: []v1.ResourceName{}},
+		{name: "Update CPU ceiling without an existing ceiling",
+			fields:         fields{computeResourceCeilings: v1.ResourceList{}},
+			args:           args{reqResource: v1.ResourceCPU, reqQuantity: resource.MustParse("1")},
+			wants:          []args{{reqResource: v1.ResourceCPU, reqQuantity: resource.MustParse("1")}},
+			shouldNotExist: []v1.ResourceName{v1.ResourceMemory}},
+		{name: "Update Memory ceiling without an existing ceiling",
+			fields:         fields{computeResourceCeilings: v1.ResourceList{}},
+			args:           args{reqResource: v1.ResourceMemory, reqQuantity: resource.MustParse("500Mi")},
+			wants:          []args{{reqResource: v1.ResourceMemory, reqQuantity: resource.MustParse("500Mi")}},
+			shouldNotExist: []v1.ResourceName{v1.ResourceCPU}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &ComputeResourceCeilings{
+				computeResourceCeilings: tt.fields.computeResourceCeilings,
+			}
+			r.update(tt.args.reqResource, tt.args.reqQuantity)
+			for _, rsrcTuple := range tt.wants {
+				if rsrcTuple.reqQuantity != r.computeResourceCeilings[rsrcTuple.reqResource] {
+					t.Errorf("Resource ceiling: (%v, %v), want (%v, %v)",
+						rsrcTuple.reqResource, r.computeResourceCeilings[rsrcTuple.reqResource], rsrcTuple.reqResource, rsrcTuple.reqQuantity)
+				}
+			}
+			for _, ne := range tt.shouldNotExist {
+				if _, ok := r.computeResourceCeilings[ne]; ok {
+					t.Errorf("Resource should not exist in ceiling: %v", ne)
+				}
+			}
+		})
+	}
+}
+
+func TestComputeResourceCeilings_updateAll(t *testing.T) {
+	type fields struct {
+		computeResourceCeilings v1.ResourceList
+	}
+	type args struct {
+		resources *v1.ResourceList
+	}
+	type wants struct {
+		resources map[v1.ResourceName]resource.Quantity
+	}
+	tests := []struct {
+		name           string
+		fields         fields
+		args           args
+		wants          wants
+		shouldNotExist []v1.ResourceName
+	}{
+		{name: "Update Memory ceiling without an existing ceiling",
+			fields:         fields{computeResourceCeilings: v1.ResourceList{}},
+			args:           args{&v1.ResourceList{v1.ResourceMemory: resource.MustParse("500Mi")}},
+			wants:          wants{map[v1.ResourceName]resource.Quantity{v1.ResourceMemory: resource.MustParse("500Mi")}},
+			shouldNotExist: []v1.ResourceName{v1.ResourceCPU}},
+		{name: "Update Memory ceiling without an existing ceiling",
+			fields:         fields{computeResourceCeilings: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")}},
+			args:           args{&v1.ResourceList{v1.ResourceMemory: resource.MustParse("500Mi")}},
+			wants:          wants{map[v1.ResourceName]resource.Quantity{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("500Mi")}},
+			shouldNotExist: []v1.ResourceName{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &ComputeResourceCeilings{
+				computeResourceCeilings: tt.fields.computeResourceCeilings,
+			}
+			r.updateAll(tt.args.resources)
+			for rs, qs := range tt.wants.resources {
+				if qs != r.computeResourceCeilings[rs] {
+					t.Errorf("Resource ceiling: (%v, %v), want (%v, %v)",
+						rs, r.computeResourceCeilings[rs], rs, qs)
+				}
+			}
+			for _, ne := range tt.shouldNotExist {
+				if _, ok := r.computeResourceCeilings[ne]; ok {
+					t.Errorf("Resource should not exist in ceiling: %v", ne)
+				}
+			}
+		})
+	}
+}
+
+func TestGetComputeResourceAndQuantityRequested(t *testing.T) {
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name string
+		args args
+		want v1.ResourceList
+	}{
+		{name: "Memory request", args: args{err: k8serrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: limits.memory=3Gi, "+
+				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi"))},
+			want: v1.ResourceList{v1.ResourceMemory: resource.MustParse("3Gi")}},
+		{name: "CPU request", args: args{err: k8serrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: limits.cpu=3640m, "+
+				"used: limits.cpu=6000m, limited: limits.cpu=8000m"))},
+			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("3640m")}},
+		{name: "Multiple resources ", args: args{err: k8serrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: limits.cpu=7,limits.memory=64Gi, used: limits.cpu=249,limits.memory=2012730Mi, limited: limits.cpu=250,limits.memory=2000Gi"))},
+			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("7"), v1.ResourceMemory: resource.MustParse("64Gi")}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetComputeResourceAndQuantityRequested(tt.args.err); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetComputeResourceAndQuantityRequested() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsBackoffError(t *testing.T) {
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{name: "True BackOffError", args: args{err: taskErrors.Errorf(taskErrors.BackOffError, "")}, want: true},
+		{name: "BadTaskSpecification error", args: args{err: taskErrors.Errorf(taskErrors.BadTaskSpecification, "")}, want: false},
+		{name: "TaskFailedUnknownError", args: args{err: taskErrors.Errorf(taskErrors.TaskFailedUnknownError, "")}, want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsBackoffError(tt.args.err); got != tt.want {
+				t.Errorf("IsBackoffError() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsResourceQuotaExceeded(t *testing.T) {
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{name: "True ResourceQuotaExceeded error msg", args: args{err: k8serrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: limits.memory=3Gi, "+
+				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi"))},
+			want: true},
+		{name: "False ResourceQuotaExceeded error msg", args: args{err: k8serrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exxxceed quota: project-quota, requested: limits.memory=3Gi, "+
+				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi"))},
+			want: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsResourceQuotaExceeded(tt.args.err); got != tt.want {
+				t.Errorf("IsResourceQuotaExceeded() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSimpleBackOffBlocker_backOff(t *testing.T) {
+	tc := clock.NewFakeClock(time.Now())
+	maxBackOffDuration := 10 * time.Minute
+	type fields struct {
+		Clock              clock.Clock
+		BackOffBaseSecond  int
+		BackOffExponent    int
+		NextEligibleTime   time.Time
+		MaxBackOffDuration time.Duration
+	}
+	tests := []struct {
+		name         string
+		fields       fields
+		wantExponent int
+		wantDuration time.Duration
+	}{
+		{name: "backoff should increase exponent",
+			fields:       fields{Clock: tc, BackOffBaseSecond: 2, BackOffExponent: 0, NextEligibleTime: tc.Now(), MaxBackOffDuration: maxBackOffDuration},
+			wantExponent: 1,
+			wantDuration: time.Second * 1,
+		},
+		{name: "backoff should not saturate",
+			fields:       fields{Clock: tc, BackOffBaseSecond: 2, BackOffExponent: 9, NextEligibleTime: tc.Now(), MaxBackOffDuration: maxBackOffDuration},
+			wantExponent: 10,
+			wantDuration: time.Second * 512,
+		},
+		{name: "backoff should saturate",
+			fields:       fields{Clock: tc, BackOffBaseSecond: 2, BackOffExponent: 10, NextEligibleTime: tc.Now(), MaxBackOffDuration: maxBackOffDuration},
+			wantExponent: 11,
+			wantDuration: maxBackOffDuration,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &SimpleBackOffBlocker{
+				Clock:              tt.fields.Clock,
+				BackOffBaseSecond:  tt.fields.BackOffBaseSecond,
+				BackOffExponent:    tt.fields.BackOffExponent,
+				NextEligibleTime:   tt.fields.NextEligibleTime,
+				MaxBackOffDuration: tt.fields.MaxBackOffDuration,
+			}
+
+			if got := b.backOff(); !reflect.DeepEqual(got, tt.wantDuration) {
+				t.Errorf("backOff() = %v, want %v", got, tt.wantDuration)
+			}
+			if gotExp := b.BackOffExponent; !reflect.DeepEqual(gotExp, tt.wantExponent) {
+				t.Errorf("backOffExponent = %v, want %v", gotExp, tt.wantExponent)
+			}
+		})
+	}
+}
