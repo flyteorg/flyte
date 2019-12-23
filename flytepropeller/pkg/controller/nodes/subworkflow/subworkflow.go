@@ -32,10 +32,10 @@ func (s *subworkflowHandler) DoInlineSubWorkflow(ctx context.Context, nCtx handl
 	if state.HasFailed() {
 		if w.GetOnFailureNode() != nil {
 			// TODO ssignh: this is supposed to be failing
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), state.Err.Error(), nil)), err
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, state.Err.Error(), nil)), err
 		}
 
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), state.Err.Error(), nil)), err
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, state.Err.Error(), nil)), err
 	}
 
 	if state.IsComplete() {
@@ -45,14 +45,14 @@ func (s *subworkflowHandler) DoInlineSubWorkflow(ctx context.Context, nCtx handl
 			endNodeStatus := w.GetNodeExecutionStatus(v1alpha1.EndNodeID)
 			store := nCtx.DataStore()
 			if endNodeStatus == nil {
-				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), "No end node found in subworkflow.", nil)), err
+				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, "No end node found in subworkflow.", nil)), err
 			}
 
 			sourcePath := v1alpha1.GetOutputsFile(endNodeStatus.GetDataDir())
 			if metadata, err := store.Head(ctx, sourcePath); err == nil {
 				if !metadata.Exists() {
 					errMsg := fmt.Sprintf("Subworkflow is expected to produce outputs but no outputs file was written to %v.", sourcePath)
-					return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), errMsg, nil)), nil
+					return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, errMsg, nil)), nil
 				}
 			} else {
 				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), nil
@@ -62,7 +62,7 @@ func (s *subworkflowHandler) DoInlineSubWorkflow(ctx context.Context, nCtx handl
 			destinationPath := v1alpha1.GetOutputsFile(parentNodeStatus.GetDataDir())
 			if err := store.CopyRaw(ctx, sourcePath, destinationPath, storage.Options{}); err != nil {
 				errMsg := fmt.Sprintf("Failed to copy subworkflow outputs from [%v] to [%v]", sourcePath, destinationPath)
-				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), errMsg, nil)), nil
+				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, errMsg, nil)), nil
 			}
 			oInfo = &handler.OutputInfo{OutputURI: destinationPath}
 		}
@@ -88,7 +88,7 @@ func (s *subworkflowHandler) DoInFailureHandling(ctx context.Context, nCtx handl
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
 		}
 		if state.HasFailed() {
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), state.Err.Error(), nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, state.Err.Error(), nil)), nil
 		}
 
 		if state.IsComplete() {
@@ -97,7 +97,7 @@ func (s *subworkflowHandler) DoInFailureHandling(ctx context.Context, nCtx handl
 			}
 		}
 
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), "failure node handling completed", nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, "failure node handling completed", nil)), nil
 	}
 
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailureErr(nil, nil)), nil
@@ -109,7 +109,7 @@ func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.
 	subWorkflow := nCtx.Workflow().FindSubWorkflow(subID)
 	if subWorkflow == nil {
 		errMsg := fmt.Sprintf("No subWorkflow [%s], workflow.", subID)
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, errMsg, nil)), nil
 	}
 
 	w := nCtx.Workflow()
@@ -118,7 +118,7 @@ func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.
 	startNode := contextualSubWorkflow.StartNode()
 	if startNode == nil {
 		errMsg := "No start node found in subworkflow."
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, errMsg, nil)), nil
 	}
 
 	// Before starting the subworkflow, lets set the inputs for the Workflow. The inputs for a SubWorkflow are essentially
@@ -136,7 +136,7 @@ func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.
 		nodeInputs, err := nCtx.InputReader().Get(ctx)
 		if err != nil {
 			errMsg := fmt.Sprintf("Failed to read input. Error [%s]", err)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.RuntimeExecutionError), errMsg, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, errMsg, nil)), nil
 		}
 
 		startStatus, err := s.nodeExecutor.SetInputsForStartNode(ctx, contextualSubWorkflow, nodeInputs)
@@ -147,7 +147,7 @@ func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.
 
 		if startStatus.HasFailed() {
 			errorCode, _ := errors.GetErrorCode(startStatus.Err)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errorCode), startStatus.Err.Error(), nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errorCode, startStatus.Err.Error(), nil)), nil
 		}
 	}
 
@@ -161,14 +161,14 @@ func (s *subworkflowHandler) CheckSubWorkflowStatus(ctx context.Context, nCtx ha
 	subWorkflow := w.FindSubWorkflow(subID)
 	if subWorkflow == nil {
 		errMsg := fmt.Sprintf("No subWorkflow [%s], workflow.", subID)
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, errMsg, nil)), nil
 	}
 
 	contextualSubWorkflow := executors.NewSubContextualWorkflow(w, subWorkflow, status)
 	startNode := w.StartNode()
 	if startNode == nil {
 		errMsg := "No start node found in subworkflow"
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, errMsg, nil)), nil
 	}
 
 	parentNodeStatus := w.GetNodeExecutionStatus(nCtx.NodeID())
@@ -181,7 +181,7 @@ func (s *subworkflowHandler) HandleSubWorkflowFailingNode(ctx context.Context, n
 	subWorkflow := w.FindSubWorkflow(subID)
 	if subWorkflow == nil {
 		errMsg := fmt.Sprintf("No subWorkflow [%s], workflow.", subID)
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.SubWorkflowExecutionFailed), errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, errMsg, nil)), nil
 	}
 	contextualSubWorkflow := executors.NewSubContextualWorkflow(w, subWorkflow, status)
 	return s.DoInFailureHandling(ctx, nCtx, contextualSubWorkflow)

@@ -7,6 +7,9 @@ import (
 	"testing"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/backoff"
@@ -508,4 +511,8 @@ func TestAddObjectMetadata(t *testing.T) {
 		"aKey": "aVal",
 	}, o.GetAnnotations())
 	assert.Equal(t, l, o.GetLabels())
+}
+
+func init() {
+	labeled.SetMetricKeys(contextutils.NamespaceKey)
 }

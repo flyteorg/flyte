@@ -3,6 +3,8 @@ package v1alpha1
 import (
 	"context"
 
+	"time"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -54,6 +56,8 @@ const (
 	NodePhaseFailed
 	NodePhaseSkipped
 	NodePhaseRetryableFailure
+	NodePhaseTimingOut
+	NodePhaseTimedOut
 )
 
 func (p NodePhase) String() string {
@@ -64,17 +68,24 @@ func (p NodePhase) String() string {
 		return "Queued"
 	case NodePhaseRunning:
 		return "Running"
+	case NodePhaseTimingOut:
+		return "NodePhaseTimingOut"
+	case NodePhaseTimedOut:
+		return "NodePhaseTimedOut"
 	case NodePhaseSucceeding:
 		return "Succeeding"
 	case NodePhaseSucceeded:
 		return "Succeeded"
 	case NodePhaseFailed:
 		return "Failed"
+	case NodePhaseFailing:
+		return "Failing"
 	case NodePhaseSkipped:
 		return "Skipped"
 	case NodePhaseRetryableFailure:
 		return "RetryableFailure"
 	}
+
 	return "Unknown"
 }
 
@@ -163,12 +174,14 @@ type MutableBranchNodeStatus interface {
 // Interface for dynamic node status.
 type ExecutableDynamicNodeStatus interface {
 	GetDynamicNodePhase() DynamicNodePhase
+	GetDynamicNodeReason() string
 }
 
 type MutableDynamicNodeStatus interface {
 	ExecutableDynamicNodeStatus
 
 	SetDynamicNodePhase(phase DynamicNodePhase)
+	SetDynamicNodeReason(reason string)
 }
 
 // Interface for Branch node. All the methods are purely read only except for the GetExecutionStatus.
@@ -211,6 +224,7 @@ type MutableNodeStatus interface {
 	GetOrCreateDynamicNodeStatus() MutableDynamicNodeStatus
 	GetDynamicNodeStatus() MutableDynamicNodeStatus
 	ClearDynamicNodeStatus()
+	ClearLastAttemptStartedAt()
 }
 
 // Interface for a Node p. This provides a mutable API.
@@ -223,6 +237,7 @@ type ExecutableNodeStatus interface {
 	GetStoppedAt() *metav1.Time
 	GetStartedAt() *metav1.Time
 	GetLastUpdatedAt() *metav1.Time
+	GetLastAttemptStartedAt() *metav1.Time
 	GetParentNodeID() *NodeID
 	GetParentTaskID() *core.TaskExecutionIdentifier
 	GetDataDir() DataReference
@@ -285,6 +300,8 @@ type ExecutableNode interface {
 	GetResources() *v1.ResourceRequirements
 	GetConfig() *v1.ConfigMap
 	GetRetryStrategy() *RetryStrategy
+	GetExecutionDeadline() *time.Duration
+	GetActiveDeadline() *time.Duration
 }
 
 // Interface for the Workflow p. This is the mutable portion for a Workflow

@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"regexp"
+	"strings"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -9,12 +12,15 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/validation"
 )
 
 var NotTheOwnerError = errors.Errorf("FlytePropeller is not the owner")
 
 // ResourceNvidiaGPU is the name of the Nvidia GPU resource.
 const ResourceNvidiaGPU = "nvidia.com/gpu"
+
+var invalidDNS1123Characters = regexp.MustCompile("[^-a-z0-9]+")
 
 func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
 	envVars := make([]v1.EnvVar, 0, len(env))
@@ -94,6 +100,7 @@ func GetWorkflowIDFromOwner(reference *metav1.OwnerReference, namespace string) 
 	}
 	return "", NotTheOwnerError
 }
+
 func GetProtoTime(t *metav1.Time) *timestamp.Timestamp {
 	if t != nil {
 		pTime, err := ptypes.TimestampProto(t.Time)
@@ -102,4 +109,14 @@ func GetProtoTime(t *metav1.Time) *timestamp.Timestamp {
 		}
 	}
 	return ptypes.TimestampNow()
+}
+
+// SanitizeLabelValue ensures that the label value is a valid DNS-1123 string
+func SanitizeLabelValue(name string) string {
+	name = strings.ToLower(name)
+	name = invalidDNS1123Characters.ReplaceAllString(name, "-")
+	if len(name) > validation.DNS1123LabelMaxLength {
+		name = name[0:validation.DNS1123LabelMaxLength]
+	}
+	return strings.Trim(name, "-")
 }

@@ -106,6 +106,7 @@ func TestBuildFlyteWorkflow(t *testing.T) {
 			},
 		},
 		nil, nil, "")
+	assert.Equal(t, "wf-1", wf.Labels[WorkflowNameLabel])
 	assert.NoError(t, err)
 	assert.NotNil(t, wf)
 	errors.SetConfig(errors.Config{})

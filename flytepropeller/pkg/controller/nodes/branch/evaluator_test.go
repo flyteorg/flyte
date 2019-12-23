@@ -376,7 +376,7 @@ func TestDecideBranch(t *testing.T) {
 		b, err := DecideBranch(ctx, w, "n1", branchNode, inputs)
 		assert.Error(t, err)
 		assert.Nil(t, b)
-		assert.Equal(t, errors.NoBranchTakenError, err.(*errors.NodeError).Code)
+		assert.Equal(t, errors.NoBranchTakenError, err.(*errors.NodeError).ErrCode)
 	})
 
 	t.Run("WithThenNode", func(t *testing.T) {
@@ -605,7 +605,7 @@ func TestDecideBranch(t *testing.T) {
 		b, err := DecideBranch(ctx, w, "n", branchNode, inputs)
 		assert.Error(t, err)
 		assert.Nil(t, b)
-		assert.Equal(t, errors.DownstreamNodeNotFoundError, err.(*errors.NodeError).Code)
+		assert.Equal(t, errors.DownstreamNodeNotFoundError, err.(*errors.NodeError).ErrCode)
 	})
 
 	t.Run("ElseFailCase", func(t *testing.T) {
@@ -659,7 +659,7 @@ func TestDecideBranch(t *testing.T) {
 		b, err := DecideBranch(ctx, w, "n", branchNode, inputs)
 		assert.Error(t, err)
 		assert.Nil(t, b)
-		assert.Equal(t, errors.UserProvidedError, err.(*errors.NodeError).Code)
+		assert.Equal(t, errors.UserProvidedError, err.(*errors.NodeError).ErrCode)
 		assert.Equal(t, userError, err.(*errors.NodeError).Message)
 		assert.Equal(t, v1alpha1.NodePhaseSkipped, w.Status.NodeStatus[n1].GetPhase())
 		assert.Equal(t, v1alpha1.NodePhaseSkipped, w.Status.NodeStatus[n2].GetPhase())

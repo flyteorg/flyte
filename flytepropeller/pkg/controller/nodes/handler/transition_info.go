@@ -18,6 +18,7 @@ const (
 	EPhaseFailed
 	EPhaseRetryableFailure
 	EPhaseSuccess
+	EPhaseTimedout
 )
 
 func (p EPhase) String() string {
@@ -36,12 +37,14 @@ func (p EPhase) String() string {
 		return "retryable-fail"
 	case EPhaseSuccess:
 		return "success"
+	case EPhaseTimedout:
+		return "timedout"
 	}
 	return "undefined"
 }
 
 func (p EPhase) IsTerminal() bool {
-	if p == EPhaseFailed || p == EPhaseSuccess || p == EPhaseSkip {
+	if p == EPhaseFailed || p == EPhaseSuccess || p == EPhaseSkip || p == EPhaseTimedout {
 		return true
 	}
 	return false
@@ -148,6 +151,10 @@ func PhaseInfoSuccess(info *ExecutionInfo) PhaseInfo {
 
 func PhaseInfoSkip(info *ExecutionInfo, reason string) PhaseInfo {
 	return phaseInfo(EPhaseSkip, nil, info, reason)
+}
+
+func PhaseInfoTimedOut(info *ExecutionInfo, reason string) PhaseInfo {
+	return phaseInfo(EPhaseTimedout, nil, info, reason)
 }
 
 func phaseInfoFailed(p EPhase, err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {

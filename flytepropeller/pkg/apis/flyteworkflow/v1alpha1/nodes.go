@@ -2,10 +2,12 @@ package v1alpha1
 
 import (
 	"bytes"
+	"time"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	typesv1 "k8s.io/api/core/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var marshaler = jsonpb.Marshaler{}
@@ -132,14 +134,32 @@ type NodeSpec struct {
 	// If specified, the pod's tolerations.
 	// +optional
 	Tolerations []typesv1.Toleration `json:"tolerations,omitempty" protobuf:"bytes,22,opt,name=tolerations"`
+	// Node execution timeout
+	ExecutionDeadline *v1.Duration `json:"executionDeadline,omitempty"`
 	// StartTime before the system will actively try to mark it failed and kill associated containers.
-	// Value must be a positive integer.
+	// Value must be a positive integer. This includes time spent waiting in the queue.
 	// +optional
+	ActiveDeadline *v1.Duration `json:"activeDeadline,omitempty"`
+	// TODO 12-10-2019: For backward compatibility, remove it in future release
 	ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty"`
 }
 
 func (in *NodeSpec) GetRetryStrategy() *RetryStrategy {
 	return in.RetryStrategy
+}
+
+func (in *NodeSpec) GetExecutionDeadline() *time.Duration {
+	if in.ExecutionDeadline != nil {
+		return &in.ExecutionDeadline.Duration
+	}
+	return nil
+}
+
+func (in *NodeSpec) GetActiveDeadline() *time.Duration {
+	if in.ActiveDeadline != nil {
+		return &in.ActiveDeadline.Duration
+	}
+	return nil
 }
 
 func (in *NodeSpec) GetConfig() *typesv1.ConfigMap {

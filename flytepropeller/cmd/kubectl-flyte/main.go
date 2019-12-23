@@ -5,8 +5,15 @@ import (
 	"os"
 
 	"github.com/lyft/flytepropeller/cmd/kubectl-flyte/cmd"
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
+
+func init() {
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
+		contextutils.TaskIDKey)
+}
 
 func main() {
 

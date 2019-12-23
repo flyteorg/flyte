@@ -123,6 +123,10 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 		logger.Infof(ctx, "Workflow has failed. Error [%s]", state.Err.Error())
 		return StatusFailing(state.Err), nil
 	}
+	if state.HasTimedOut() {
+		err := errors.Errorf(errors.RuntimeExecutionError, w.GetID(), "Workflow Node timed out")
+		return StatusFailing(err), nil
+	}
 	if state.IsComplete() {
 		return StatusSucceeding, nil
 	}
@@ -147,6 +151,10 @@ func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha
 		}
 		if state.HasFailed() {
 			return StatusFailed(state.Err), nil
+		}
+		if state.HasTimedOut() {
+			err := errors.Errorf(errors.RuntimeExecutionError, w.GetID(), "Workflow Node timed out")
+			return StatusFailed(err), nil
 		}
 		if state.PartiallyComplete() {
 			// Re-enqueue the workflow
