@@ -2,7 +2,6 @@ package backoff
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"regexp"
 	"strings"
@@ -44,8 +43,7 @@ func (b *SimpleBackOffBlocker) reset() {
 }
 
 func (b *SimpleBackOffBlocker) backOff() time.Duration {
-	durationString := fmt.Sprintf("%vs", math.Pow(float64(b.BackOffBaseSecond), float64(b.BackOffExponent)))
-	backOffDuration, _ := time.ParseDuration(durationString)
+	backOffDuration := time.Duration(time.Second.Nanoseconds() * int64(math.Pow(float64(b.BackOffBaseSecond), float64(b.BackOffExponent))))
 
 	if backOffDuration > b.MaxBackOffDuration {
 		backOffDuration = b.MaxBackOffDuration
