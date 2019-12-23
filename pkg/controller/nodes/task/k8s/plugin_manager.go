@@ -112,7 +112,7 @@ func (e *PluginManager) GetID() string {
 	return e.id
 }
 
-func (e *PluginManager) getPodResourceRequirement(ctx context.Context, pod *v1.Pod) v1.ResourceList {
+func (e *PluginManager) getPodEffectiveResourceLimits(ctx context.Context, pod *v1.Pod) v1.ResourceList {
 	podRequestedResources := make(v1.ResourceList)
 	initContainersRequestedResources := make(v1.ResourceList)
 	containersRequestedResources := make(v1.ResourceList)
@@ -120,11 +120,13 @@ func (e *PluginManager) getPodResourceRequirement(ctx context.Context, pod *v1.P
 	// Collect the resource requests from all the containers in the pod whose creation is to be attempted
 	// to decide whether we should try the pod creation during the back off period
 
-	for _, container := range pod.Spec.InitContainers {
-		for k, v := range container.Resources.Limits {
-			quantity := initContainersRequestedResources[k]
-			quantity.Add(v)
-			initContainersRequestedResources[k] = quantity
+	// Calculating the effective init limit based on the definition on K8s official document:
+	// "The highest of any particular resource request or limit defined on all init containers is the effective init request/limit"
+	for _, initContainer := range pod.Spec.InitContainers {
+		for r, q := range initContainer.Resources.Limits {
+			if currentQuantity, found := initContainersRequestedResources[r]; !found || q.Cmp(currentQuantity) > 0 {
+				initContainersRequestedResources[r] = q
+			}
 		}
 	}
 
@@ -140,8 +142,11 @@ func (e *PluginManager) getPodResourceRequirement(ctx context.Context, pod *v1.P
 		podRequestedResources[k] = v
 	}
 
+	// "The Pod’s effective request/limit for a resource is the higher of:
+	// the sum of all app containers request/limit for a resource
+	// the effective init request/limit for a resource"
 	for k, qC := range containersRequestedResources {
-		if qI, found := podRequestedResources[k]; !found || qC.Cmp(qI) == 1 {
+		if qI, found := podRequestedResources[k]; !found || qC.Cmp(qI) > 0 {
 			podRequestedResources[k] = qC
 		}
 	}
@@ -164,7 +169,7 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 
 	pod, casted := o.(*v1.Pod)
 	if e.backOffController != nil && casted {
-		podRequestedResources := e.getPodResourceRequirement(ctx, pod)
+		podRequestedResources := e.getPodEffectiveResourceLimits(ctx, pod)
 
 		cfg := nodeTaskConfig.GetConfig()
 		backOffHandler := e.backOffController.GetOrCreateHandler(ctx, key, cfg.BackOffConfig.BaseSecond, cfg.BackOffConfig.MaxDuration)
