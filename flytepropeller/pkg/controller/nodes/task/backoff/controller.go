@@ -61,8 +61,7 @@ func (m *Controller) CreateBackOffHandler(ctx context.Context, key string, backO
 		},
 	})
 	h, _ := m.backOffHandlerMap.Get(key)
-	h.ComputeResourceCeilings.resetAll()
-	h.SimpleBackOffBlocker.reset()
+	h.reset()
 	logger.Infof(ctx, "The back-off handler for [%v] has been created.\n", key)
 	return h
 }

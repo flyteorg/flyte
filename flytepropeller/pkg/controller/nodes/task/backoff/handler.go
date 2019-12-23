@@ -63,7 +63,7 @@ type ComputeResourceCeilings struct {
 func (r *ComputeResourceCeilings) isEligible(requestedResourceList v1.ResourceList) bool {
 	eligibility := true
 	for reqResource, reqQuantity := range requestedResourceList {
-		eligibility = eligibility && (reqQuantity.Cmp(r.computeResourceCeilings[reqResource]) == -1)
+		eligibility = eligibility && (reqQuantity.Cmp(r.computeResourceCeilings[reqResource]) < 0)
 	}
 	return eligibility
 }
@@ -107,6 +107,11 @@ func (h *ComputeResourceAwareBackOffHandler) IsActive() bool {
 	return h.BackOffBaseSecond != 0
 }
 
+func (h *ComputeResourceAwareBackOffHandler) reset() {
+	h.SimpleBackOffBlocker.reset()
+	h.ComputeResourceCeilings.resetAll()
+}
+
 // Act based on current backoff interval and set the next one accordingly
 func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operation func() error, requestedResourceList v1.ResourceList) error {
 
@@ -130,8 +135,7 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 		err := operation()
 		if err == nil {
 			logger.Infof(ctx, "The operation was attempted and finished without an error\n")
-			h.SimpleBackOffBlocker.reset()
-			h.ComputeResourceCeilings.resetAll()
+			h.reset()
 			return nil
 		}
 
@@ -177,8 +181,9 @@ func IsResourceQuotaExceeded(err error) bool {
 
 func GetComputeResourceAndQuantityRequested(err error) v1.ResourceList {
 	// Playground: https://play.golang.org/p/oOr6CMmW7IE
-	// limits.cpu=7,limits.memory=64Gi, used: limits.cpu=249,limits.memory=2012730Mi, limited: limits.cpu=250,limits.memory=2000Gi
-	// reqRegexp := regexp.MustCompile(`(?P<key>requested): (limits.(?P<resource_type>[a-zA-Z]+)=(?P<quantity_expr>[a-zA-Z0-9]+)[,]*)+`)
+
+	// Sample message:
+	// "requested: limits.cpu=7,limits.memory=64Gi, used: limits.cpu=249,limits.memory=2012730Mi, limited: limits.cpu=250,limits.memory=2000Gi"
 
 	// Extracting "requested: limits.cpu=7,limits.memory=64Gi"
 	matches := reqRegexp.FindAllStringSubmatch(err.Error(), -1)
