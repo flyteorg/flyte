@@ -12,7 +12,11 @@ import (
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/lyft/flytepropeller/pkg/utils"
 )
+
+const NodeIDLabel = "node-id"
+const TaskNameLabel = "task-name"
 
 type execMetadata struct {
 	v1alpha1.WorkflowMeta
@@ -38,6 +42,7 @@ type execContext struct {
 	nsm                 *nodeStateManager
 	enqueueOwner        func() error
 	w                   v1alpha1.ExecutableWorkflow
+	nodeLabels          map[string]string
 }
 
 func (e execContext) EnqueueOwnerFunc() func() error {
@@ -96,9 +101,25 @@ func (e execContext) MaxDatasetSizeBytes() int64 {
 	return e.maxDatasetSizeBytes
 }
 
+func (e execContext) GetLabels() map[string]string {
+	return e.nodeLabels
+}
+
 func newNodeExecContext(_ context.Context, store *storage.DataStore, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, maxDatasetSize int64, er events.TaskEventRecorder, tr handler.TaskReader, nsm *nodeStateManager, enqueueOwner func() error) *execContext {
+	md := execMetadata{WorkflowMeta: w}
+
+	// Copying the labels before updating it for this node
+	nodeLabels := make(map[string]string)
+	for k, v := range md.GetLabels() {
+		nodeLabels[k] = v
+	}
+	nodeLabels[NodeIDLabel] = utils.SanitizeLabelValue(node.GetID())
+	if tr != nil && tr.GetTaskID() != nil {
+		nodeLabels[TaskNameLabel] = utils.SanitizeLabelValue(tr.GetTaskID().Name)
+	}
+
 	return &execContext{
-		md:                  execMetadata{WorkflowMeta: w},
+		md:                  md,
 		store:               store,
 		node:                node,
 		nodeStatus:          nodeStatus,
@@ -109,6 +130,7 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, w v1alpha1.
 		nsm:                 nsm,
 		enqueueOwner:        enqueueOwner,
 		w:                   w,
+		nodeLabels:          nodeLabels,
 	}
 }
 

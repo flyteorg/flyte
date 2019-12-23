@@ -9,11 +9,12 @@ import (
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/lyft/flytepropeller/pkg/compiler/common"
 	"github.com/lyft/flytepropeller/pkg/compiler/errors"
+	"github.com/lyft/flytepropeller/pkg/utils"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const ExecutionIDLabel = "execution-id"
-const WorkflowIDLabel = "workflow-id"
+const WorkflowNameLabel = "workflow-name"
 
 func requiresInputs(w *core.WorkflowTemplate) bool {
 	if w == nil || w.GetInterface() == nil || w.GetInterface().GetInputs() == nil ||
@@ -25,6 +26,7 @@ func requiresInputs(w *core.WorkflowTemplate) bool {
 	return len(w.GetInterface().GetInputs().Variables) > 0
 }
 
+// Note: Update WorkflowNameFromID for any change made to WorkflowIDAsString
 func WorkflowIDAsString(id *core.Identifier) string {
 	b := strings.Builder{}
 	_, err := b.WriteString(id.Project)
@@ -53,6 +55,14 @@ func WorkflowIDAsString(id *core.Identifier) string {
 	}
 
 	return b.String()
+}
+
+func WorkflowNameFromID(id string) string {
+	tokens := strings.Split(id, ":")
+	if len(tokens) != 3 {
+		return ""
+	}
+	return tokens[2]
 }
 
 func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTask, errs errors.CompileErrors) (
@@ -171,6 +181,7 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 	if err != nil {
 		errs.Collect(errors.NewWorkflowBuildError(err))
 	}
+	obj.ObjectMeta.Labels[WorkflowNameLabel] = utils.SanitizeLabelValue(WorkflowNameFromID(primarySpec.ID))
 
 	if obj.Nodes == nil || obj.Connections.DownstreamEdges == nil {
 		// If we come here, we'd better have an error generated earlier. Otherwise, add one to make sure build fails.

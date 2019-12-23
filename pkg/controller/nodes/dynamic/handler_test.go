@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/lyft/flytestdlib/promutils"
@@ -373,10 +376,10 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		{"error", args{isErr: true, dj: createDynamicJobSpec()}, want{isErr: true}},
 		{"success", args{s: executors.NodeStatusSuccess, dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
 		{"complete", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: true}, want{p: handler.EPhaseSuccess, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"complete-no-outputs", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: false}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"complete-valid-error-retryable", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{IsRecoverable: true}, generateOutputs: true}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"complete-valid-error", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}, generateOutputs: true}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseExecuting}},
-		{"failed", args{s: executors.NodeStatusFailed(fmt.Errorf("error")), dj: createDynamicJobSpec()}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"complete-no-outputs", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: false}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
+		{"complete-valid-error-retryable", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{IsRecoverable: true}, generateOutputs: true}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
+		{"complete-valid-error", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}, generateOutputs: true}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseFailing}},
+		{"failed", args{s: executors.NodeStatusFailed(fmt.Errorf("error")), dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseFailing}},
 		{"running", args{s: executors.NodeStatusRunning, dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
 		{"running-valid-err", args{s: executors.NodeStatusRunning, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
 		{"queued", args{s: executors.NodeStatusQueued, dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
@@ -421,4 +424,9 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			}
 		})
 	}
+}
+
+func init() {
+	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
+		contextutils.TaskIDKey)
 }

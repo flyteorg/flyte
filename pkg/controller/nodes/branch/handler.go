@@ -35,20 +35,20 @@ func (b *branchHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionCo
 	logger.Debug(ctx, "Starting Branch Node")
 	branchNode := nCtx.Node().GetBranchNode()
 	if branchNode == nil {
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.IllegalStateError), "Invoked branch handler, for a non branch node.", nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.IllegalStateError, "Invoked branch handler, for a non branch node.", nil)), nil
 	}
 
 	if nCtx.NodeStateReader().GetBranchNode().FinalizedNodeID == nil {
 		nodeInputs, err := nCtx.InputReader().Get(ctx)
 		if err != nil {
 			errMsg := fmt.Sprintf("Failed to read input. Error [%s]", err)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.RuntimeExecutionError), errMsg, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, errMsg, nil)), nil
 		}
 		w := nCtx.Workflow()
 		finalNodeID, err := DecideBranch(ctx, w, nCtx.NodeID(), branchNode, nodeInputs)
 		if err != nil {
 			errMsg := fmt.Sprintf("Branch evaluation failed. Error [%s]", err)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.IllegalStateError), errMsg, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.IllegalStateError, errMsg, nil)), nil
 		}
 
 		branchNodeState := handler.BranchNodeState{FinalizedNodeID: finalNodeID, Phase: v1alpha1.BranchNodeSuccess}
@@ -63,7 +63,7 @@ func (b *branchHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionCo
 		if !ok {
 			errMsg := fmt.Sprintf("Branch downstream finalized node not found. FinalizedNode [%s]", *finalNodeID)
 			logger.Debugf(ctx, errMsg)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.DownstreamNodeNotFoundError), errMsg, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.DownstreamNodeNotFoundError, errMsg, nil)), nil
 		}
 		i := nCtx.NodeID()
 		childNodeStatus := w.GetNodeExecutionStatus(finalNode.GetID())
@@ -82,17 +82,17 @@ func (b *branchHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionCo
 		if userError != nil {
 			// We should never reach here, but for safety and completeness
 			errMsg := fmt.Sprintf("Branch node userError [%s]", userError)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.UserProvidedError), errMsg, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.UserProvidedError, errMsg, nil)), nil
 		}
 		errMsg := "no node finalized through previous branchNodestatus evaluation"
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.IllegalStateError), errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.IllegalStateError, errMsg, nil)), nil
 	}
 
 	w := nCtx.Workflow()
 	branchTakenNode, ok := w.GetNode(*finalNodeID)
 	if !ok {
 		errMsg := fmt.Sprintf("Downstream node [%v] not found", *finalNodeID)
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(errors.DownstreamNodeNotFoundError), errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.DownstreamNodeNotFoundError, errMsg, nil)), nil
 	}
 
 	// Recurse downstream
@@ -123,7 +123,7 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx handler.Node
 		if !nodeError {
 			code = errors.UnknownError
 		}
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(string(code), errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(code, errMsg, nil)), nil
 	}
 
 	phase := handler.PhaseInfoRunning(nil)

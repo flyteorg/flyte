@@ -49,7 +49,7 @@ required = [
 
 [[constraint]]
   name = "github.com/lyft/flyteidl"
-  version = "^0.14.x"
+  version = "^0.16.x"
 
 [[constraint]]
   name = "github.com/lyft/datacatalog"

@@ -56,14 +56,24 @@ type DynamicNodePhase int
 const (
 	DynamicNodePhaseNone DynamicNodePhase = iota
 	DynamicNodePhaseExecuting
+	DynamicNodePhaseFailing
 )
 
 type DynamicNodeStatus struct {
-	Phase DynamicNodePhase `json:"phase"`
+	Phase  DynamicNodePhase `json:"phase"`
+	Reason string           `json:"reason"`
 }
 
 func (s *DynamicNodeStatus) GetDynamicNodePhase() DynamicNodePhase {
 	return s.Phase
+}
+
+func (s *DynamicNodeStatus) GetDynamicNodeReason() string {
+	return s.Reason
+}
+
+func (s *DynamicNodeStatus) SetDynamicNodeReason(reason string) {
+	s.Reason = reason
 }
 
 func (s *DynamicNodeStatus) SetDynamicNodePhase(phase DynamicNodePhase) {
@@ -77,7 +87,7 @@ func (s *DynamicNodeStatus) Equals(o *DynamicNodeStatus) bool {
 	if s == nil || o == nil {
 		return false
 	}
-	return s.Phase == o.Phase
+	return s.Phase == o.Phase && s.Reason == o.Reason
 }
 
 type WorkflowNodePhase int
@@ -100,16 +110,18 @@ func (in *WorkflowNodeStatus) SetWorkflowNodePhase(phase WorkflowNodePhase) {
 }
 
 type NodeStatus struct {
-	Phase         NodePhase     `json:"phase"`
-	QueuedAt      *metav1.Time  `json:"queuedAt,omitempty"`
-	StartedAt     *metav1.Time  `json:"startedAt,omitempty"`
-	StoppedAt     *metav1.Time  `json:"stoppedAt,omitempty"`
-	LastUpdatedAt *metav1.Time  `json:"lastUpdatedAt,omitempty"`
-	Message       string        `json:"message,omitempty"`
-	DataDir       DataReference `json:"dataDir,omitempty"`
-	Attempts      uint32        `json:"attempts"`
-	Cached        bool          `json:"cached"`
-	dirty         bool
+	Phase                NodePhase     `json:"phase"`
+	QueuedAt             *metav1.Time  `json:"queuedAt,omitempty"`
+	StartedAt            *metav1.Time  `json:"startedAt,omitempty"`
+	StoppedAt            *metav1.Time  `json:"stoppedAt,omitempty"`
+	LastUpdatedAt        *metav1.Time  `json:"lastUpdatedAt,omitempty"`
+	LastAttemptStartedAt *metav1.Time  `json:"laStartedAt,omitempty"`
+	Message              string        `json:"message,omitempty"`
+	DataDir              DataReference `json:"dataDir,omitempty"`
+	Attempts             uint32        `json:"attempts"`
+	Cached               bool          `json:"cached"`
+
+	dirty bool
 	// This is useful only for branch nodes. If this is set, then it can be used to determine if execution can proceed
 	ParentNode    *NodeID                  `json:"parentNode,omitempty"`
 	ParentTask    *TaskExecutionIdentifier `json:"parentTask,omitempty"`
@@ -166,8 +178,16 @@ func (in *NodeStatus) ClearTaskStatus() {
 	in.TaskNodeStatus = nil
 }
 
+func (in *NodeStatus) ClearLastAttemptStartedAt() {
+	in.LastAttemptStartedAt = nil
+}
+
 func (in *NodeStatus) GetLastUpdatedAt() *metav1.Time {
 	return in.LastUpdatedAt
+}
+
+func (in *NodeStatus) GetLastAttemptStartedAt() *metav1.Time {
+	return in.LastAttemptStartedAt
 }
 
 func (in *NodeStatus) GetAttempts() uint32 {
@@ -241,7 +261,7 @@ func (in *NodeStatus) GetMessage() string {
 }
 
 func IsPhaseTerminal(phase NodePhase) bool {
-	return phase == NodePhaseSucceeded || phase == NodePhaseFailed || phase == NodePhaseSkipped
+	return phase == NodePhaseSucceeded || phase == NodePhaseFailed || phase == NodePhaseSkipped || phase == NodePhaseTimedOut
 }
 
 func (in *NodeStatus) GetOrCreateTaskStatus() MutableTaskNodeStatus {
@@ -272,8 +292,13 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 
 	if p == NodePhaseQueued && in.QueuedAt == nil {
 		in.QueuedAt = &n
-	} else if p == NodePhaseRunning && in.StartedAt == nil {
-		in.StartedAt = &n
+	} else if p == NodePhaseRunning {
+		if in.StartedAt == nil {
+			in.StartedAt = &n
+		}
+		if in.LastAttemptStartedAt == nil {
+			in.LastAttemptStartedAt = &n
+		}
 	} else if IsPhaseTerminal(p) && in.StoppedAt == nil {
 		if in.StartedAt == nil {
 			in.StartedAt = &n

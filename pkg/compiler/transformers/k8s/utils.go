@@ -3,6 +3,9 @@ package k8s
 import (
 	"math"
 
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
@@ -31,16 +34,18 @@ func computeRetryStrategy(n *core.Node, t *core.TaskTemplate) *v1alpha1.RetryStr
 	return nil
 }
 
-func computeActiveDeadlineSeconds(n *core.Node, t *core.TaskTemplate) *int64 {
-	if n.GetMetadata() != nil && n.GetMetadata().Timeout != nil {
-		return &n.GetMetadata().Timeout.Seconds
+func computeDeadline(n *core.Node) (*v1.Duration, error) {
+	var deadline *v1.Duration
+	if n.GetMetadata() != nil && n.GetMetadata().GetTimeout() != nil {
+		duration, err := ptypes.Duration(n.GetMetadata().GetTimeout())
+		if err != nil {
+			return nil, err
+		}
+		deadline = &v1.Duration{
+			Duration: duration,
+		}
 	}
-
-	if t != nil && t.GetMetadata() != nil && t.GetMetadata().Timeout != nil {
-		return &t.GetMetadata().Timeout.Seconds
-	}
-
-	return nil
+	return deadline, nil
 }
 
 func getResources(task *core.TaskTemplate) *core.Resources {
