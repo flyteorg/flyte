@@ -6,6 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/backoff"
+	v1 "k8s.io/api/core/v1"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/lyft/flytestdlib/contextutils"
@@ -31,6 +34,7 @@ import (
 
 	"github.com/lyft/flyteplugins/go/tasks/errors"
 
+	nodeTaskConfig "github.com/lyft/flytepropeller/pkg/controller/nodes/task/config"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 )
 
@@ -96,6 +100,8 @@ type PluginManager struct {
 	resourceToWatch runtime.Object
 	kubeClient      pluginsCore.KubeClient
 	metrics         PluginMetrics
+	// Per namespace-resource
+	backOffController *backoff.Controller
 }
 
 func (e *PluginManager) GetProperties() pluginsCore.PluginProperties {
@@ -104,6 +110,51 @@ func (e *PluginManager) GetProperties() pluginsCore.PluginProperties {
 
 func (e *PluginManager) GetID() string {
 	return e.id
+}
+
+func (e *PluginManager) getPodEffectiveResourceLimits(ctx context.Context, pod *v1.Pod) v1.ResourceList {
+	podRequestedResources := make(v1.ResourceList)
+	initContainersRequestedResources := make(v1.ResourceList)
+	containersRequestedResources := make(v1.ResourceList)
+
+	// Collect the resource requests from all the containers in the pod whose creation is to be attempted
+	// to decide whether we should try the pod creation during the back off period
+
+	// Calculating the effective init resource limits based on the official definition:
+	// https://kubernetes.io/docs/concepts/workloads/pods/init-containers/#resources
+	// "The highest of any particular resource request or limit defined on all init containers is the effective init request/limit"
+	for _, initContainer := range pod.Spec.InitContainers {
+		for r, q := range initContainer.Resources.Limits {
+			if currentQuantity, found := initContainersRequestedResources[r]; !found || q.Cmp(currentQuantity) > 0 {
+				initContainersRequestedResources[r] = q
+			}
+		}
+	}
+
+	for _, container := range pod.Spec.Containers {
+		for k, v := range container.Resources.Limits {
+			quantity := containersRequestedResources[k]
+			quantity.Add(v)
+			containersRequestedResources[k] = quantity
+		}
+	}
+
+	for k, v := range initContainersRequestedResources {
+		podRequestedResources[k] = v
+	}
+
+	// https://kubernetes.io/docs/concepts/workloads/pods/init-containers/#resources
+	// "The Pod’s effective request/limit for a resource is the higher of:
+	// - the sum of all app containers request/limit for a resource
+	// - the effective init request/limit for a resource"
+	for k, qC := range containersRequestedResources {
+		if qI, found := podRequestedResources[k]; !found || qC.Cmp(qI) > 0 {
+			podRequestedResources[k] = qC
+		}
+	}
+	logger.Infof(ctx, "The resource requirement for creating Pod [%v] is [%v]\n", pod, podRequestedResources)
+
+	return podRequestedResources
 }
 
 func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
@@ -116,12 +167,29 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 	AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GroupVersionKind(), o.GetNamespace(), o.GetName())
 
-	err = e.kubeClient.GetClient().Create(ctx, o)
+	key := backoff.ComposeResourceKey(o)
+
+	pod, casted := o.(*v1.Pod)
+	if e.backOffController != nil && casted {
+		podRequestedResources := e.getPodEffectiveResourceLimits(ctx, pod)
+
+		cfg := nodeTaskConfig.GetConfig()
+		backOffHandler := e.backOffController.GetOrCreateHandler(ctx, key, cfg.BackOffConfig.BaseSecond, cfg.BackOffConfig.MaxDuration)
+
+		err = backOffHandler.Handle(ctx, func() error {
+			return e.kubeClient.GetClient().Create(ctx, o)
+		}, podRequestedResources)
+	} else {
+		err = e.kubeClient.GetClient().Create(ctx, o)
+	}
+
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
-		if k8serrors.IsForbidden(err) {
-			if strings.Contains(err.Error(), "exceeded quota") {
-				// TODO: Quota errors are retried forever, it would be good to have support for backoff strategy.
-				logger.Warnf(ctx, "Failed to launch job, resource quota exceeded. err: %v", err)
+		if backoff.IsBackoffError(err) {
+			logger.Warnf(ctx, "Failed to launch job, resource quota exceeded. err: %v", err)
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(time.Now(), pluginsCore.DefaultPhaseVersion, "failed to launch job, resource quota exceeded.")), nil
+		} else if k8serrors.IsForbidden(err) {
+			if e.backOffController == nil && strings.Contains(err.Error(), "exceeded quota") {
+				logger.Warnf(ctx, "Failed to launch job, resource quota exceeded and the operation is not guarded by back-off. err: %v", err)
 				return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(time.Now(), pluginsCore.DefaultPhaseVersion, "failed to launch job, resource quota exceeded.")), nil
 			}
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
@@ -275,6 +343,14 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 		}
 	}
 	return nil
+}
+
+func NewPluginManagerWithBackOff(ctx context.Context, iCtx pluginsCore.SetupContext, entry k8s.PluginEntry, backOffController *backoff.Controller) (*PluginManager, error) {
+	mgr, err := NewPluginManager(ctx, iCtx, entry)
+	if err == nil {
+		mgr.backOffController = backOffController
+	}
+	return mgr, err
 }
 
 // Creates a K8s generic task executor. This provides an easier way to build task executors that create K8s resources.

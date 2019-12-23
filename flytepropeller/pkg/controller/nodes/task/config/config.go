@@ -21,6 +21,10 @@ var (
 			CacheSize: 10000,
 			CacheTTL:  config.Duration{Duration: time.Minute * 30},
 		},
+		BackOffConfig: BackOffConfig{
+			BaseSecond:  2,
+			MaxDuration: time.Minute * 10,
+		},
 	}
 
 	section = config.MustRegisterSection(SectionKey, defaultConfig)
@@ -30,6 +34,7 @@ type Config struct {
 	TaskPlugins            TaskPluginConfig `json:"task-plugins" pflag:",Task plugin configuration"`
 	MaxPluginPhaseVersions int32            `json:"max-plugin-phase-versions" pflag:",Maximum number of plugin phase versions allowed for one phase."`
 	BarrierConfig          BarrierConfig    `json:"barrier" pflag:",Config for Barrier implementation"`
+	BackOffConfig          BackOffConfig    `json:"backoff" pflag:",Config for Exponential BackOff implementation"`
 }
 
 type BarrierConfig struct {
@@ -40,6 +45,11 @@ type BarrierConfig struct {
 
 type TaskPluginConfig struct {
 	EnabledPlugins []string `json:"enabled-plugins" pflag:",Plugins enabled currently"`
+}
+
+type BackOffConfig struct {
+	BaseSecond  int           `json:"base-second" pflag:",The number of seconds representing the base duration of the exponential backoff"`
+	MaxDuration time.Duration `json:"max-duration" pflag:",The cap of the backoff duration"`
 }
 
 func (p TaskPluginConfig) GetEnabledPluginsSet() sets.String {
