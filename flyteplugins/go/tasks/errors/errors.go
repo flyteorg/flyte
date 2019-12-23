@@ -17,6 +17,7 @@ const (
 	RuntimeFailure             errors.ErrorCode = "RuntimeFailure"
 	CorruptedPluginState       errors.ErrorCode = "CorruptedPluginState"
 	ResourceManagerFailure     errors.ErrorCode = "ResourceManagerFailure"
+	BackOffError               errors.ErrorCode = "BackOffError"
 )
 
 func Errorf(errorCode errors.ErrorCode, msgFmt string, args ...interface{}) error {
