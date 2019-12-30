@@ -144,7 +144,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.Node
 			taskExecID:            taskExecutionID{execName: uniqueID, id: id},
 			o:                     nCtx.Node(),
 		},
-		rm:  resourcemanager.GetTaskResourceManager(
+		rm: resourcemanager.GetTaskResourceManager(
 			t.resourceManager, resourceNamespacePrefix, resourcemanager.ComposeTokenNamespace(id)),
 		psm: psm,
 		tr:  nCtx.TaskReader(),

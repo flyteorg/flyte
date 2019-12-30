@@ -3,8 +3,9 @@ package resourcemanager
 import (
 	"context"
 	"fmt"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"sync"
+
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flytestdlib/promutils"
