@@ -108,7 +108,9 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**terminate_execution**](docs/AdminServiceApi.md#terminate_execution) | **DELETE** /api/v1/executions/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**update_launch_plan**](docs/AdminServiceApi.md#update_launch_plan) | **PUT** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | 
 *AdminServiceApi* | [**update_named_entity**](docs/AdminServiceApi.md#update_named_entity) | **PUT** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | 
+*AdminServiceApi* | [**update_project_attributes**](docs/AdminServiceApi.md#update_project_attributes) | **PUT** /api/v1/project_attributes/{attributes.project} | 
 *AdminServiceApi* | [**update_project_domain_attributes**](docs/AdminServiceApi.md#update_project_domain_attributes) | **PUT** /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain} | 
+*AdminServiceApi* | [**update_workflow_attributes**](docs/AdminServiceApi.md#update_workflow_attributes) | **PUT** /api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow} | 
 
 
 ## Documentation For Models
@@ -116,6 +118,7 @@ Class | Method | HTTP request | Description
  - [AdminAbortMetadata](docs/AdminAbortMetadata.md)
  - [AdminAnnotations](docs/AdminAnnotations.md)
  - [AdminAuth](docs/AdminAuth.md)
+ - [AdminClusterResourceAttributes](docs/AdminClusterResourceAttributes.md)
  - [AdminDomain](docs/AdminDomain.md)
  - [AdminEmailNotification](docs/AdminEmailNotification.md)
  - [AdminExecution](docs/AdminExecution.md)
@@ -124,6 +127,7 @@ Class | Method | HTTP request | Description
  - [AdminExecutionCreateResponse](docs/AdminExecutionCreateResponse.md)
  - [AdminExecutionList](docs/AdminExecutionList.md)
  - [AdminExecutionMetadata](docs/AdminExecutionMetadata.md)
+ - [AdminExecutionQueueAttributes](docs/AdminExecutionQueueAttributes.md)
  - [AdminExecutionRelaunchRequest](docs/AdminExecutionRelaunchRequest.md)
  - [AdminExecutionSpec](docs/AdminExecutionSpec.md)
  - [AdminExecutionTerminateRequest](docs/AdminExecutionTerminateRequest.md)
@@ -142,6 +146,7 @@ Class | Method | HTTP request | Description
  - [AdminLaunchPlanUpdateRequest](docs/AdminLaunchPlanUpdateRequest.md)
  - [AdminLaunchPlanUpdateResponse](docs/AdminLaunchPlanUpdateResponse.md)
  - [AdminLiteralMapBlob](docs/AdminLiteralMapBlob.md)
+ - [AdminMatchingAttributes](docs/AdminMatchingAttributes.md)
  - [AdminNamedEntity](docs/AdminNamedEntity.md)
  - [AdminNamedEntityIdentifier](docs/AdminNamedEntityIdentifier.md)
  - [AdminNamedEntityIdentifierList](docs/AdminNamedEntityIdentifierList.md)
@@ -158,6 +163,9 @@ Class | Method | HTTP request | Description
  - [AdminNotificationList](docs/AdminNotificationList.md)
  - [AdminPagerDutyNotification](docs/AdminPagerDutyNotification.md)
  - [AdminProject](docs/AdminProject.md)
+ - [AdminProjectAttributes](docs/AdminProjectAttributes.md)
+ - [AdminProjectAttributesUpdateRequest](docs/AdminProjectAttributesUpdateRequest.md)
+ - [AdminProjectAttributesUpdateResponse](docs/AdminProjectAttributesUpdateResponse.md)
  - [AdminProjectDomainAttributes](docs/AdminProjectDomainAttributes.md)
  - [AdminProjectDomainAttributesUpdateRequest](docs/AdminProjectDomainAttributesUpdateRequest.md)
  - [AdminProjectDomainAttributesUpdateResponse](docs/AdminProjectDomainAttributesUpdateResponse.md)
@@ -177,9 +185,14 @@ Class | Method | HTTP request | Description
  - [AdminTaskExecutionGetDataResponse](docs/AdminTaskExecutionGetDataResponse.md)
  - [AdminTaskExecutionList](docs/AdminTaskExecutionList.md)
  - [AdminTaskList](docs/AdminTaskList.md)
+ - [AdminTaskResourceAttributes](docs/AdminTaskResourceAttributes.md)
+ - [AdminTaskResourceSpec](docs/AdminTaskResourceSpec.md)
  - [AdminTaskSpec](docs/AdminTaskSpec.md)
  - [AdminUrlBlob](docs/AdminUrlBlob.md)
  - [AdminWorkflow](docs/AdminWorkflow.md)
+ - [AdminWorkflowAttributes](docs/AdminWorkflowAttributes.md)
+ - [AdminWorkflowAttributesUpdateRequest](docs/AdminWorkflowAttributesUpdateRequest.md)
+ - [AdminWorkflowAttributesUpdateResponse](docs/AdminWorkflowAttributesUpdateResponse.md)
  - [AdminWorkflowClosure](docs/AdminWorkflowClosure.md)
  - [AdminWorkflowCreateRequest](docs/AdminWorkflowCreateRequest.md)
  - [AdminWorkflowCreateResponse](docs/AdminWorkflowCreateResponse.md)

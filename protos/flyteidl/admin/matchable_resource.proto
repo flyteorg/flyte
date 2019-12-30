@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
+
+// Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
+// based on matching tags.
+enum MatchableResource {
+  // Applies to customizable task resource requests and limits.
+  TASK_RESOURCE = 0;
+
+  // Applies to configuring templated kubernetes cluster resources.
+  CLUSTER_RESOURCE = 1;
+
+  // Configures task and dynamic task execution queue assignment.
+  EXECUTION_QUEUE = 2;
+}
+
+message TaskResourceSpec {
+  string cpu = 1;
+
+  string gpu = 2;
+
+  string memory = 3;
+
+  string storage = 4;  
+}
+
+message TaskResourceAttributes {
+  TaskResourceSpec defaults = 1;
+
+  TaskResourceSpec limits = 2;
+}
+
+message ClusterResourceAttributes {
+  // Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
+  // Map keys are the *case-sensitive* names of variables in templatized resource files.
+  // Map values should be the custom values which get substituted during resource creation.
+  map<string, string> attributes = 1;
+}
+
+message ExecutionQueueAttributes {
+  // Tags used for assigning execution queues for tasks defined within this project.
+  repeated string tags           = 1; 
+}
+
+// Generic container for encapsulating all types of the above attributes messages.
+message MatchingAttributes {
+  oneof target {
+    TaskResourceAttributes task_resource_attributes = 1; 
+
+    ClusterResourceAttributes cluster_resource_attributes = 2; 
+
+    ExecutionQueueAttributes execution_queue_attributes = 3;
+  }
+}

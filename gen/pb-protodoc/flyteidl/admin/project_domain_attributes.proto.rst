@@ -8,7 +8,7 @@ project_domain_attributes.proto
 flyteidl.admin.ProjectDomainAttributes
 --------------------------------------
 
-`[flyteidl.admin.ProjectDomainAttributes proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_domain_attributes.proto#L5>`_
+`[flyteidl.admin.ProjectDomainAttributes proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_domain_attributes.proto#L7>`_
 
 
 .. code-block:: json
@@ -16,7 +16,7 @@ flyteidl.admin.ProjectDomainAttributes
   {
     "project": "...",
     "domain": "...",
-    "attributes": "{...}"
+    "matching_attributes": "{...}"
   }
 
 .. _api_field_flyteidl.admin.ProjectDomainAttributes.project:
@@ -31,13 +31,10 @@ domain
   (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Unique domain id for which this set of attributes will be applied.
   
   
-.. _api_field_flyteidl.admin.ProjectDomainAttributes.attributes:
+.. _api_field_flyteidl.admin.ProjectDomainAttributes.matching_attributes:
 
-attributes
-  (map<`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_, `string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_>) Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-  Map keys are the *case-sensitive* names of variables in templatized resource files.
-  Map values should be the custom values which get substituted during resource creation.
-  
+matching_attributes
+  (:ref:`flyteidl.admin.MatchingAttributes <api_msg_flyteidl.admin.MatchingAttributes>`) 
   
 
 
@@ -46,7 +43,7 @@ attributes
 flyteidl.admin.ProjectDomainAttributesUpdateRequest
 ---------------------------------------------------
 
-`[flyteidl.admin.ProjectDomainAttributesUpdateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_domain_attributes.proto#L19>`_
+`[flyteidl.admin.ProjectDomainAttributesUpdateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_domain_attributes.proto#L18>`_
 
 Sets custom attributes for a project-domain combination.
 
@@ -68,7 +65,7 @@ attributes
 flyteidl.admin.ProjectDomainAttributesUpdateResponse
 ----------------------------------------------------
 
-`[flyteidl.admin.ProjectDomainAttributesUpdateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_domain_attributes.proto#L24>`_
+`[flyteidl.admin.ProjectDomainAttributesUpdateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_domain_attributes.proto#L23>`_
 
 Purposefully empty, may be populated in the future.
 

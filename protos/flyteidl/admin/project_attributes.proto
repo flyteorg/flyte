@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+
+option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/admin/matchable_resource.proto";
+
+message ProjectAttributes {
+    // Unique project id for which this set of attributes will be applied.
+    string project                 = 1;
+
+    MatchingAttributes matching_attributes = 2;
+}
+
+// Sets custom attributes for a project combination.
+message ProjectAttributesUpdateRequest {
+    ProjectAttributes attributes = 1;
+}
+
+// Purposefully empty, may be populated in the future.
+message ProjectAttributesUpdateResponse {
+}

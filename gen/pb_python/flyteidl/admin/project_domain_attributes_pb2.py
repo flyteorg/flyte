@@ -13,6 +13,7 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+from flyteidl.admin import matchable_resource_pb2 as flyteidl_dot_admin_dot_matchable__resource__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -20,48 +21,12 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n.flyteidl/admin/project_domain_attributes.proto\x12\x0e\x66lyteidl.admin\"\xba\x01\n\x17ProjectDomainAttributes\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12K\n\nattributes\x18\x03 \x03(\x0b\x32\x37.flyteidl.admin.ProjectDomainAttributes.AttributesEntry\x1a\x31\n\x0f\x41ttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"c\n$ProjectDomainAttributesUpdateRequest\x12;\n\nattributes\x18\x01 \x01(\x0b\x32\'.flyteidl.admin.ProjectDomainAttributes\"\'\n%ProjectDomainAttributesUpdateResponseB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
-)
+  serialized_pb=_b('\n.flyteidl/admin/project_domain_attributes.proto\x12\x0e\x66lyteidl.admin\x1a\'flyteidl/admin/matchable_resource.proto\"{\n\x17ProjectDomainAttributes\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12?\n\x13matching_attributes\x18\x03 \x01(\x0b\x32\".flyteidl.admin.MatchingAttributes\"c\n$ProjectDomainAttributesUpdateRequest\x12;\n\nattributes\x18\x01 \x01(\x0b\x32\'.flyteidl.admin.ProjectDomainAttributes\"\'\n%ProjectDomainAttributesUpdateResponseB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  ,
+  dependencies=[flyteidl_dot_admin_dot_matchable__resource__pb2.DESCRIPTOR,])
 
 
 
-
-_PROJECTDOMAINATTRIBUTES_ATTRIBUTESENTRY = _descriptor.Descriptor(
-  name='AttributesEntry',
-  full_name='flyteidl.admin.ProjectDomainAttributes.AttributesEntry',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='key', full_name='flyteidl.admin.ProjectDomainAttributes.AttributesEntry.key', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='value', full_name='flyteidl.admin.ProjectDomainAttributes.AttributesEntry.value', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=_b('8\001'),
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=204,
-  serialized_end=253,
-)
 
 _PROJECTDOMAINATTRIBUTES = _descriptor.Descriptor(
   name='ProjectDomainAttributes',
@@ -85,16 +50,16 @@ _PROJECTDOMAINATTRIBUTES = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='attributes', full_name='flyteidl.admin.ProjectDomainAttributes.attributes', index=2,
-      number=3, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
+      name='matching_attributes', full_name='flyteidl.admin.ProjectDomainAttributes.matching_attributes', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
-  nested_types=[_PROJECTDOMAINATTRIBUTES_ATTRIBUTESENTRY, ],
+  nested_types=[],
   enum_types=[
   ],
   serialized_options=None,
@@ -103,8 +68,8 @@ _PROJECTDOMAINATTRIBUTES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=67,
-  serialized_end=253,
+  serialized_start=107,
+  serialized_end=230,
 )
 
 
@@ -134,8 +99,8 @@ _PROJECTDOMAINATTRIBUTESUPDATEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=255,
-  serialized_end=354,
+  serialized_start=232,
+  serialized_end=331,
 )
 
 
@@ -158,12 +123,11 @@ _PROJECTDOMAINATTRIBUTESUPDATERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=356,
-  serialized_end=395,
+  serialized_start=333,
+  serialized_end=372,
 )
 
-_PROJECTDOMAINATTRIBUTES_ATTRIBUTESENTRY.containing_type = _PROJECTDOMAINATTRIBUTES
-_PROJECTDOMAINATTRIBUTES.fields_by_name['attributes'].message_type = _PROJECTDOMAINATTRIBUTES_ATTRIBUTESENTRY
+_PROJECTDOMAINATTRIBUTES.fields_by_name['matching_attributes'].message_type = flyteidl_dot_admin_dot_matchable__resource__pb2._MATCHINGATTRIBUTES
 _PROJECTDOMAINATTRIBUTESUPDATEREQUEST.fields_by_name['attributes'].message_type = _PROJECTDOMAINATTRIBUTES
 DESCRIPTOR.message_types_by_name['ProjectDomainAttributes'] = _PROJECTDOMAINATTRIBUTES
 DESCRIPTOR.message_types_by_name['ProjectDomainAttributesUpdateRequest'] = _PROJECTDOMAINATTRIBUTESUPDATEREQUEST
@@ -171,19 +135,11 @@ DESCRIPTOR.message_types_by_name['ProjectDomainAttributesUpdateResponse'] = _PRO
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 ProjectDomainAttributes = _reflection.GeneratedProtocolMessageType('ProjectDomainAttributes', (_message.Message,), dict(
-
-  AttributesEntry = _reflection.GeneratedProtocolMessageType('AttributesEntry', (_message.Message,), dict(
-    DESCRIPTOR = _PROJECTDOMAINATTRIBUTES_ATTRIBUTESENTRY,
-    __module__ = 'flyteidl.admin.project_domain_attributes_pb2'
-    # @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectDomainAttributes.AttributesEntry)
-    ))
-  ,
   DESCRIPTOR = _PROJECTDOMAINATTRIBUTES,
   __module__ = 'flyteidl.admin.project_domain_attributes_pb2'
   # @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectDomainAttributes)
   ))
 _sym_db.RegisterMessage(ProjectDomainAttributes)
-_sym_db.RegisterMessage(ProjectDomainAttributes.AttributesEntry)
 
 ProjectDomainAttributesUpdateRequest = _reflection.GeneratedProtocolMessageType('ProjectDomainAttributesUpdateRequest', (_message.Message,), dict(
   DESCRIPTOR = _PROJECTDOMAINATTRIBUTESUPDATEREQUEST,
@@ -201,5 +157,4 @@ _sym_db.RegisterMessage(ProjectDomainAttributesUpdateResponse)
 
 
 DESCRIPTOR._options = None
-_PROJECTDOMAINATTRIBUTES_ATTRIBUTESENTRY._options = None
 # @@protoc_insertion_point(module_scope)

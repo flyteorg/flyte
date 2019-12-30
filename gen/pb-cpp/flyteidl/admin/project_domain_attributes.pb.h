@@ -30,10 +30,8 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/map.h>  // IWYU pragma: export
-#include <google/protobuf/map_entry.h>
-#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "flyteidl/admin/matchable_resource.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fproject_5fdomain_5fattributes_2eproto
@@ -44,7 +42,7 @@ struct TableStruct_flyteidl_2fadmin_2fproject_5fdomain_5fattributes_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[4]
+  static const ::google::protobuf::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -62,9 +60,6 @@ extern ProjectDomainAttributesUpdateRequestDefaultTypeInternal _ProjectDomainAtt
 class ProjectDomainAttributesUpdateResponse;
 class ProjectDomainAttributesUpdateResponseDefaultTypeInternal;
 extern ProjectDomainAttributesUpdateResponseDefaultTypeInternal _ProjectDomainAttributesUpdateResponse_default_instance_;
-class ProjectDomainAttributes_AttributesEntry_DoNotUse;
-class ProjectDomainAttributes_AttributesEntry_DoNotUseDefaultTypeInternal;
-extern ProjectDomainAttributes_AttributesEntry_DoNotUseDefaultTypeInternal _ProjectDomainAttributes_AttributesEntry_DoNotUse_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
 namespace google {
@@ -72,37 +67,12 @@ namespace protobuf {
 template<> ::flyteidl::admin::ProjectDomainAttributes* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributes>(Arena*);
 template<> ::flyteidl::admin::ProjectDomainAttributesUpdateRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributesUpdateRequest>(Arena*);
 template<> ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributesUpdateResponse>(Arena*);
-template<> ::flyteidl::admin::ProjectDomainAttributes_AttributesEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributes_AttributesEntry_DoNotUse>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
 namespace admin {
 
 // ===================================================================
-
-class ProjectDomainAttributes_AttributesEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<ProjectDomainAttributes_AttributesEntry_DoNotUse, 
-    ::std::string, ::std::string,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    0 > {
-public:
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  typedef ::google::protobuf::internal::MapEntry<ProjectDomainAttributes_AttributesEntry_DoNotUse, 
-    ::std::string, ::std::string,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    0 > SuperType;
-  ProjectDomainAttributes_AttributesEntry_DoNotUse();
-  ProjectDomainAttributes_AttributesEntry_DoNotUse(::google::protobuf::Arena* arena);
-  void MergeFrom(const ProjectDomainAttributes_AttributesEntry_DoNotUse& other);
-  static const ProjectDomainAttributes_AttributesEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const ProjectDomainAttributes_AttributesEntry_DoNotUse*>(&_ProjectDomainAttributes_AttributesEntry_DoNotUse_default_instance_); }
-  void MergeFrom(const ::google::protobuf::Message& other) final;
-  ::google::protobuf::Metadata GetMetadata() const;
-};
-
-// -------------------------------------------------------------------
 
 class ProjectDomainAttributes final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ProjectDomainAttributes) */ {
@@ -142,7 +112,7 @@ class ProjectDomainAttributes final :
                &_ProjectDomainAttributes_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    0;
 
   void Swap(ProjectDomainAttributes* other);
   friend void swap(ProjectDomainAttributes& a, ProjectDomainAttributes& b) {
@@ -197,17 +167,7 @@ class ProjectDomainAttributes final :
 
   // nested types ----------------------------------------------------
 
-
   // accessors -------------------------------------------------------
-
-  // map<string, string> attributes = 3;
-  int attributes_size() const;
-  void clear_attributes();
-  static const int kAttributesFieldNumber = 3;
-  const ::google::protobuf::Map< ::std::string, ::std::string >&
-      attributes() const;
-  ::google::protobuf::Map< ::std::string, ::std::string >*
-      mutable_attributes();
 
   // string project = 1;
   void clear_project();
@@ -237,19 +197,23 @@ class ProjectDomainAttributes final :
   ::std::string* release_domain();
   void set_allocated_domain(::std::string* domain);
 
+  // .flyteidl.admin.MatchingAttributes matching_attributes = 3;
+  bool has_matching_attributes() const;
+  void clear_matching_attributes();
+  static const int kMatchingAttributesFieldNumber = 3;
+  const ::flyteidl::admin::MatchingAttributes& matching_attributes() const;
+  ::flyteidl::admin::MatchingAttributes* release_matching_attributes();
+  ::flyteidl::admin::MatchingAttributes* mutable_matching_attributes();
+  void set_allocated_matching_attributes(::flyteidl::admin::MatchingAttributes* matching_attributes);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectDomainAttributes)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::MapField<
-      ProjectDomainAttributes_AttributesEntry_DoNotUse,
-      ::std::string, ::std::string,
-      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-      0 > attributes_;
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
+  ::flyteidl::admin::MatchingAttributes* matching_attributes_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_5fdomain_5fattributes_2eproto;
 };
@@ -293,7 +257,7 @@ class ProjectDomainAttributesUpdateRequest final :
                &_ProjectDomainAttributesUpdateRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    1;
 
   void Swap(ProjectDomainAttributesUpdateRequest* other);
   friend void swap(ProjectDomainAttributesUpdateRequest& a, ProjectDomainAttributesUpdateRequest& b) {
@@ -408,7 +372,7 @@ class ProjectDomainAttributesUpdateResponse final :
                &_ProjectDomainAttributesUpdateResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    2;
 
   void Swap(ProjectDomainAttributesUpdateResponse* other);
   friend void swap(ProjectDomainAttributesUpdateResponse& a, ProjectDomainAttributesUpdateResponse& b) {
@@ -482,8 +446,6 @@ class ProjectDomainAttributesUpdateResponse final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // ProjectDomainAttributes
 
 // string project = 1;
@@ -592,22 +554,49 @@ inline void ProjectDomainAttributes::set_allocated_domain(::std::string* domain)
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectDomainAttributes.domain)
 }
 
-// map<string, string> attributes = 3;
-inline int ProjectDomainAttributes::attributes_size() const {
-  return attributes_.size();
+// .flyteidl.admin.MatchingAttributes matching_attributes = 3;
+inline bool ProjectDomainAttributes::has_matching_attributes() const {
+  return this != internal_default_instance() && matching_attributes_ != nullptr;
 }
-inline void ProjectDomainAttributes::clear_attributes() {
-  attributes_.Clear();
+inline const ::flyteidl::admin::MatchingAttributes& ProjectDomainAttributes::matching_attributes() const {
+  const ::flyteidl::admin::MatchingAttributes* p = matching_attributes_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectDomainAttributes.matching_attributes)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::MatchingAttributes*>(
+      &::flyteidl::admin::_MatchingAttributes_default_instance_);
 }
-inline const ::google::protobuf::Map< ::std::string, ::std::string >&
-ProjectDomainAttributes::attributes() const {
-  // @@protoc_insertion_point(field_map:flyteidl.admin.ProjectDomainAttributes.attributes)
-  return attributes_.GetMap();
+inline ::flyteidl::admin::MatchingAttributes* ProjectDomainAttributes::release_matching_attributes() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectDomainAttributes.matching_attributes)
+  
+  ::flyteidl::admin::MatchingAttributes* temp = matching_attributes_;
+  matching_attributes_ = nullptr;
+  return temp;
 }
-inline ::google::protobuf::Map< ::std::string, ::std::string >*
-ProjectDomainAttributes::mutable_attributes() {
-  // @@protoc_insertion_point(field_mutable_map:flyteidl.admin.ProjectDomainAttributes.attributes)
-  return attributes_.MutableMap();
+inline ::flyteidl::admin::MatchingAttributes* ProjectDomainAttributes::mutable_matching_attributes() {
+  
+  if (matching_attributes_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::MatchingAttributes>(GetArenaNoVirtual());
+    matching_attributes_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectDomainAttributes.matching_attributes)
+  return matching_attributes_;
+}
+inline void ProjectDomainAttributes::set_allocated_matching_attributes(::flyteidl::admin::MatchingAttributes* matching_attributes) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(matching_attributes_);
+  }
+  if (matching_attributes) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      matching_attributes = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, matching_attributes, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  matching_attributes_ = matching_attributes;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectDomainAttributes.matching_attributes)
 }
 
 // -------------------------------------------------------------------
@@ -672,8 +661,6 @@ inline void ProjectDomainAttributesUpdateRequest::set_allocated_attributes(::fly
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
