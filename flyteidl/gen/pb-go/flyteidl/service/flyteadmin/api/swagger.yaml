@@ -1230,6 +1230,30 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminNodeExecutionList"
+  /api/v1/project_attributes/{attributes.project}:
+    put:
+      tags:
+      - "AdminService"
+      description: "Update the customized resource attributes associated with a project"
+      operationId: "UpdateProjectAttributes"
+      parameters:
+      - name: "attributes.project"
+        in: "path"
+        description: "Unique project id for which this set of attributes will be applied."
+        required: true
+        type: "string"
+        x-exportParamName: "AttributesProject"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminProjectAttributesUpdateRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminProjectAttributesUpdateResponse"
   /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}:
     put:
       tags:
@@ -1742,6 +1766,43 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminTask"
+  /api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}:
+    put:
+      tags:
+      - "AdminService"
+      description: "Update the customized resource attributes associated with a project,\
+        \ domain and workflow combination"
+      operationId: "UpdateWorkflowAttributes"
+      parameters:
+      - name: "attributes.project"
+        in: "path"
+        description: "Unique project id for which this set of attributes will be applied."
+        required: true
+        type: "string"
+        x-exportParamName: "AttributesProject"
+      - name: "attributes.domain"
+        in: "path"
+        description: "Unique domain id for which this set of attributes will be applied."
+        required: true
+        type: "string"
+        x-exportParamName: "AttributesDomain"
+      - name: "attributes.workflow"
+        in: "path"
+        description: "Workflow name for which this set of attributes will be applied."
+        required: true
+        type: "string"
+        x-exportParamName: "AttributesWorkflow"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminWorkflowAttributesUpdateRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminWorkflowAttributesUpdateResponse"
   /api/v1/workflow_ids/{project}/{domain}:
     get:
       tags:
@@ -2192,6 +2253,17 @@ definitions:
     example:
       kubernetes_service_account: "kubernetes_service_account"
       assumable_iam_role: "assumable_iam_role"
+  adminClusterResourceAttributes:
+    type: "object"
+    properties:
+      attributes:
+        type: "object"
+        description: "Custom resource attributes which will be applied in cluster\
+          \ resource creation (e.g. quotas).\nMap keys are the *case-sensitive* names\
+          \ of variables in templatized resource files.\nMap values should be the\
+          \ custom values which get substituted during resource creation."
+        additionalProperties:
+          type: "string"
   adminDomain:
     type: "object"
     properties:
@@ -2815,6 +2887,15 @@ definitions:
         project: "project"
       scheduled_at: "2000-01-23T04:56:07.000+00:00"
       nesting: 0
+  adminExecutionQueueAttributes:
+    type: "object"
+    properties:
+      tags:
+        type: "array"
+        description: "Tags used for assigning execution queues for tasks defined within\
+          \ this project."
+        items:
+          type: "string"
   adminExecutionRelaunchRequest:
     type: "object"
     properties:
@@ -4131,6 +4212,17 @@ definitions:
       values:
         literals: {}
       uri: "uri"
+  adminMatchingAttributes:
+    type: "object"
+    properties:
+      task_resource_attributes:
+        $ref: "#/definitions/adminTaskResourceAttributes"
+      cluster_resource_attributes:
+        $ref: "#/definitions/adminClusterResourceAttributes"
+      execution_queue_attributes:
+        $ref: "#/definitions/adminExecutionQueueAttributes"
+    description: "Generic container for encapsulating all types of the above attributes\
+      \ messages."
   adminNamedEntity:
     type: "object"
     properties:
@@ -4499,6 +4591,23 @@ definitions:
         id: "id"
       description: "description"
       id: "id"
+  adminProjectAttributes:
+    type: "object"
+    properties:
+      project:
+        type: "string"
+        description: "Unique project id for which this set of attributes will be applied."
+      matching_attributes:
+        $ref: "#/definitions/adminMatchingAttributes"
+  adminProjectAttributesUpdateRequest:
+    type: "object"
+    properties:
+      attributes:
+        $ref: "#/definitions/adminProjectAttributes"
+    description: "Sets custom attributes for a project combination."
+  adminProjectAttributesUpdateResponse:
+    type: "object"
+    description: "Purposefully empty, may be populated in the future."
   adminProjectDomainAttributes:
     type: "object"
     properties:
@@ -4508,14 +4617,8 @@ definitions:
       domain:
         type: "string"
         description: "Unique domain id for which this set of attributes will be applied."
-      attributes:
-        type: "object"
-        description: "Custom resource attributes which will be applied in cluster\
-          \ resource creation (e.g. quotas).\nMap keys are the *case-sensitive* names\
-          \ of variables in templatized resource files.\nMap values should be the\
-          \ custom values which get substituted during resource creation."
-        additionalProperties:
-          type: "string"
+      matching_attributes:
+        $ref: "#/definitions/adminMatchingAttributes"
   adminProjectDomainAttributesUpdateRequest:
     type: "object"
     properties:
@@ -5358,6 +5461,24 @@ definitions:
                           format: "format"
                         simple: {}
       token: "token"
+  adminTaskResourceAttributes:
+    type: "object"
+    properties:
+      defaults:
+        $ref: "#/definitions/adminTaskResourceSpec"
+      limits:
+        $ref: "#/definitions/adminTaskResourceSpec"
+  adminTaskResourceSpec:
+    type: "object"
+    properties:
+      cpu:
+        type: "string"
+      gpu:
+        type: "string"
+      memory:
+        type: "string"
+      storage:
+        type: "string"
   adminTaskSpec:
     type: "object"
     properties:
@@ -8086,6 +8207,29 @@ definitions:
                   - "ids"
                   - "ids"
         created_at: "2000-01-23T04:56:07.000+00:00"
+  adminWorkflowAttributes:
+    type: "object"
+    properties:
+      project:
+        type: "string"
+        description: "Unique project id for which this set of attributes will be applied."
+      domain:
+        type: "string"
+        description: "Unique domain id for which this set of attributes will be applied."
+      workflow:
+        type: "string"
+        description: "Workflow name for which this set of attributes will be applied."
+      matching_attributes:
+        $ref: "#/definitions/adminMatchingAttributes"
+  adminWorkflowAttributesUpdateRequest:
+    type: "object"
+    properties:
+      attributes:
+        $ref: "#/definitions/adminWorkflowAttributes"
+    description: "Sets custom attributes for a project, domain and workflow combination."
+  adminWorkflowAttributesUpdateResponse:
+    type: "object"
+    description: "Purposefully empty, may be populated in the future."
   adminWorkflowClosure:
     type: "object"
     properties:

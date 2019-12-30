@@ -3,6 +3,8 @@ syntax = "proto3";
 package flyteidl.admin;
 option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
 
+import "flyteidl/admin/matchable_resource.proto";
+
 message ProjectDomainAttributes {
     // Unique project id for which this set of attributes will be applied.
     string project                 = 1;
@@ -10,10 +12,7 @@ message ProjectDomainAttributes {
     // Unique domain id for which this set of attributes will be applied.
     string domain                  = 2;
 
-    // Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-    // Map keys are the *case-sensitive* names of variables in templatized resource files.
-    // Map values should be the custom values which get substituted during resource creation.
-    map<string, string> attributes = 3;
+    MatchingAttributes matching_attributes = 3; 
 }
 
 // Sets custom attributes for a project-domain combination.

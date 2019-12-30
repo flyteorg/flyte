@@ -55,68 +55,17 @@ public final class ProjectDomainAttributesOuterClass {
         getDomainBytes();
 
     /**
-     * <pre>
-     * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-     * Map keys are the *case-sensitive* names of variables in templatized resource files.
-     * Map values should be the custom values which get substituted during resource creation.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; attributes = 3;</code>
+     * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
      */
-    int getAttributesCount();
+    boolean hasMatchingAttributes();
     /**
-     * <pre>
-     * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-     * Map keys are the *case-sensitive* names of variables in templatized resource files.
-     * Map values should be the custom values which get substituted during resource creation.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; attributes = 3;</code>
+     * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
      */
-    boolean containsAttributes(
-        java.lang.String key);
+    flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes getMatchingAttributes();
     /**
-     * Use {@link #getAttributesMap()} instead.
+     * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
      */
-    @java.lang.Deprecated
-    java.util.Map<java.lang.String, java.lang.String>
-    getAttributes();
-    /**
-     * <pre>
-     * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-     * Map keys are the *case-sensitive* names of variables in templatized resource files.
-     * Map values should be the custom values which get substituted during resource creation.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; attributes = 3;</code>
-     */
-    java.util.Map<java.lang.String, java.lang.String>
-    getAttributesMap();
-    /**
-     * <pre>
-     * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-     * Map keys are the *case-sensitive* names of variables in templatized resource files.
-     * Map values should be the custom values which get substituted during resource creation.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; attributes = 3;</code>
-     */
-
-    java.lang.String getAttributesOrDefault(
-        java.lang.String key,
-        java.lang.String defaultValue);
-    /**
-     * <pre>
-     * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-     * Map keys are the *case-sensitive* names of variables in templatized resource files.
-     * Map values should be the custom values which get substituted during resource creation.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; attributes = 3;</code>
-     */
-
-    java.lang.String getAttributesOrThrow(
-        java.lang.String key);
+    flyteidl.admin.MatchableResourceOuterClass.MatchingAttributesOrBuilder getMatchingAttributesOrBuilder();
   }
   /**
    * Protobuf type {@code flyteidl.admin.ProjectDomainAttributes}
@@ -172,16 +121,16 @@ public final class ProjectDomainAttributesOuterClass {
               break;
             }
             case 26: {
-              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
-                attributes_ = com.google.protobuf.MapField.newMapField(
-                    AttributesDefaultEntryHolder.defaultEntry);
-                mutable_bitField0_ |= 0x00000004;
+              flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.Builder subBuilder = null;
+              if (matchingAttributes_ != null) {
+                subBuilder = matchingAttributes_.toBuilder();
               }
-              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-              attributes__ = input.readMessage(
-                  AttributesDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-              attributes_.getMutableMap().put(
-                  attributes__.getKey(), attributes__.getValue());
+              matchingAttributes_ = input.readMessage(flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(matchingAttributes_);
+                matchingAttributes_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -208,18 +157,6 @@ public final class ProjectDomainAttributesOuterClass {
       return flyteidl.admin.ProjectDomainAttributesOuterClass.internal_static_flyteidl_admin_ProjectDomainAttributes_descriptor;
     }
 
-    @SuppressWarnings({"rawtypes"})
-    @java.lang.Override
-    protected com.google.protobuf.MapField internalGetMapField(
-        int number) {
-      switch (number) {
-        case 3:
-          return internalGetAttributes();
-        default:
-          throw new RuntimeException(
-              "Invalid map field number: " + number);
-      }
-    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -228,7 +165,6 @@ public final class ProjectDomainAttributesOuterClass {
               flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes.class, flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes.Builder.class);
     }
 
-    private int bitField0_;
     public static final int PROJECT_FIELD_NUMBER = 1;
     private volatile java.lang.Object project_;
     /**
@@ -313,104 +249,25 @@ public final class ProjectDomainAttributesOuterClass {
       }
     }
 
-    public static final int ATTRIBUTES_FIELD_NUMBER = 3;
-    private static final class AttributesDefaultEntryHolder {
-      static final com.google.protobuf.MapEntry<
-          java.lang.String, java.lang.String> defaultEntry =
-              com.google.protobuf.MapEntry
-              .<java.lang.String, java.lang.String>newDefaultInstance(
-                  flyteidl.admin.ProjectDomainAttributesOuterClass.internal_static_flyteidl_admin_ProjectDomainAttributes_AttributesEntry_descriptor, 
-                  com.google.protobuf.WireFormat.FieldType.STRING,
-                  "",
-                  com.google.protobuf.WireFormat.FieldType.STRING,
-                  "");
-    }
-    private com.google.protobuf.MapField<
-        java.lang.String, java.lang.String> attributes_;
-    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-    internalGetAttributes() {
-      if (attributes_ == null) {
-        return com.google.protobuf.MapField.emptyMapField(
-            AttributesDefaultEntryHolder.defaultEntry);
-      }
-      return attributes_;
-    }
-
-    public int getAttributesCount() {
-      return internalGetAttributes().getMap().size();
+    public static final int MATCHING_ATTRIBUTES_FIELD_NUMBER = 3;
+    private flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes matchingAttributes_;
+    /**
+     * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
+     */
+    public boolean hasMatchingAttributes() {
+      return matchingAttributes_ != null;
     }
     /**
-     * <pre>
-     * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-     * Map keys are the *case-sensitive* names of variables in templatized resource files.
-     * Map values should be the custom values which get substituted during resource creation.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; attributes = 3;</code>
+     * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
      */
-
-    public boolean containsAttributes(
-        java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      return internalGetAttributes().getMap().containsKey(key);
+    public flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes getMatchingAttributes() {
+      return matchingAttributes_ == null ? flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.getDefaultInstance() : matchingAttributes_;
     }
     /**
-     * Use {@link #getAttributesMap()} instead.
+     * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
      */
-    @java.lang.Deprecated
-    public java.util.Map<java.lang.String, java.lang.String> getAttributes() {
-      return getAttributesMap();
-    }
-    /**
-     * <pre>
-     * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-     * Map keys are the *case-sensitive* names of variables in templatized resource files.
-     * Map values should be the custom values which get substituted during resource creation.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; attributes = 3;</code>
-     */
-
-    public java.util.Map<java.lang.String, java.lang.String> getAttributesMap() {
-      return internalGetAttributes().getMap();
-    }
-    /**
-     * <pre>
-     * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-     * Map keys are the *case-sensitive* names of variables in templatized resource files.
-     * Map values should be the custom values which get substituted during resource creation.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; attributes = 3;</code>
-     */
-
-    public java.lang.String getAttributesOrDefault(
-        java.lang.String key,
-        java.lang.String defaultValue) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      java.util.Map<java.lang.String, java.lang.String> map =
-          internalGetAttributes().getMap();
-      return map.containsKey(key) ? map.get(key) : defaultValue;
-    }
-    /**
-     * <pre>
-     * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-     * Map keys are the *case-sensitive* names of variables in templatized resource files.
-     * Map values should be the custom values which get substituted during resource creation.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; attributes = 3;</code>
-     */
-
-    public java.lang.String getAttributesOrThrow(
-        java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      java.util.Map<java.lang.String, java.lang.String> map =
-          internalGetAttributes().getMap();
-      if (!map.containsKey(key)) {
-        throw new java.lang.IllegalArgumentException();
-      }
-      return map.get(key);
+    public flyteidl.admin.MatchableResourceOuterClass.MatchingAttributesOrBuilder getMatchingAttributesOrBuilder() {
+      return getMatchingAttributes();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -433,12 +290,9 @@ public final class ProjectDomainAttributesOuterClass {
       if (!getDomainBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, domain_);
       }
-      com.google.protobuf.GeneratedMessageV3
-        .serializeStringMapTo(
-          output,
-          internalGetAttributes(),
-          AttributesDefaultEntryHolder.defaultEntry,
-          3);
+      if (matchingAttributes_ != null) {
+        output.writeMessage(3, getMatchingAttributes());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -454,15 +308,9 @@ public final class ProjectDomainAttributesOuterClass {
       if (!getDomainBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, domain_);
       }
-      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
-           : internalGetAttributes().getMap().entrySet()) {
-        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-        attributes__ = AttributesDefaultEntryHolder.defaultEntry.newBuilderForType()
-            .setKey(entry.getKey())
-            .setValue(entry.getValue())
-            .build();
+      if (matchingAttributes_ != null) {
         size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(3, attributes__);
+          .computeMessageSize(3, getMatchingAttributes());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -483,8 +331,11 @@ public final class ProjectDomainAttributesOuterClass {
           .equals(other.getProject())) return false;
       if (!getDomain()
           .equals(other.getDomain())) return false;
-      if (!internalGetAttributes().equals(
-          other.internalGetAttributes())) return false;
+      if (hasMatchingAttributes() != other.hasMatchingAttributes()) return false;
+      if (hasMatchingAttributes()) {
+        if (!getMatchingAttributes()
+            .equals(other.getMatchingAttributes())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -500,9 +351,9 @@ public final class ProjectDomainAttributesOuterClass {
       hash = (53 * hash) + getProject().hashCode();
       hash = (37 * hash) + DOMAIN_FIELD_NUMBER;
       hash = (53 * hash) + getDomain().hashCode();
-      if (!internalGetAttributes().getMap().isEmpty()) {
-        hash = (37 * hash) + ATTRIBUTES_FIELD_NUMBER;
-        hash = (53 * hash) + internalGetAttributes().hashCode();
+      if (hasMatchingAttributes()) {
+        hash = (37 * hash) + MATCHING_ATTRIBUTES_FIELD_NUMBER;
+        hash = (53 * hash) + getMatchingAttributes().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -611,28 +462,6 @@ public final class ProjectDomainAttributesOuterClass {
         return flyteidl.admin.ProjectDomainAttributesOuterClass.internal_static_flyteidl_admin_ProjectDomainAttributes_descriptor;
       }
 
-      @SuppressWarnings({"rawtypes"})
-      protected com.google.protobuf.MapField internalGetMapField(
-          int number) {
-        switch (number) {
-          case 3:
-            return internalGetAttributes();
-          default:
-            throw new RuntimeException(
-                "Invalid map field number: " + number);
-        }
-      }
-      @SuppressWarnings({"rawtypes"})
-      protected com.google.protobuf.MapField internalGetMutableMapField(
-          int number) {
-        switch (number) {
-          case 3:
-            return internalGetMutableAttributes();
-          default:
-            throw new RuntimeException(
-                "Invalid map field number: " + number);
-        }
-      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -663,7 +492,12 @@ public final class ProjectDomainAttributesOuterClass {
 
         domain_ = "";
 
-        internalGetMutableAttributes().clear();
+        if (matchingAttributesBuilder_ == null) {
+          matchingAttributes_ = null;
+        } else {
+          matchingAttributes_ = null;
+          matchingAttributesBuilder_ = null;
+        }
         return this;
       }
 
@@ -690,13 +524,13 @@ public final class ProjectDomainAttributesOuterClass {
       @java.lang.Override
       public flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes buildPartial() {
         flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes result = new flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
         result.project_ = project_;
         result.domain_ = domain_;
-        result.attributes_ = internalGetAttributes();
-        result.attributes_.makeImmutable();
-        result.bitField0_ = to_bitField0_;
+        if (matchingAttributesBuilder_ == null) {
+          result.matchingAttributes_ = matchingAttributes_;
+        } else {
+          result.matchingAttributes_ = matchingAttributesBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -753,8 +587,9 @@ public final class ProjectDomainAttributesOuterClass {
           domain_ = other.domain_;
           onChanged();
         }
-        internalGetMutableAttributes().mergeFrom(
-            other.internalGetAttributes());
+        if (other.hasMatchingAttributes()) {
+          mergeMatchingAttributes(other.getMatchingAttributes());
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -783,7 +618,6 @@ public final class ProjectDomainAttributesOuterClass {
         }
         return this;
       }
-      private int bitField0_;
 
       private java.lang.Object project_ = "";
       /**
@@ -963,169 +797,121 @@ public final class ProjectDomainAttributesOuterClass {
         return this;
       }
 
-      private com.google.protobuf.MapField<
-          java.lang.String, java.lang.String> attributes_;
-      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-      internalGetAttributes() {
-        if (attributes_ == null) {
-          return com.google.protobuf.MapField.emptyMapField(
-              AttributesDefaultEntryHolder.defaultEntry);
+      private flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes matchingAttributes_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes, flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.Builder, flyteidl.admin.MatchableResourceOuterClass.MatchingAttributesOrBuilder> matchingAttributesBuilder_;
+      /**
+       * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
+       */
+      public boolean hasMatchingAttributes() {
+        return matchingAttributesBuilder_ != null || matchingAttributes_ != null;
+      }
+      /**
+       * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes getMatchingAttributes() {
+        if (matchingAttributesBuilder_ == null) {
+          return matchingAttributes_ == null ? flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.getDefaultInstance() : matchingAttributes_;
+        } else {
+          return matchingAttributesBuilder_.getMessage();
         }
-        return attributes_;
       }
-      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-      internalGetMutableAttributes() {
-        onChanged();;
-        if (attributes_ == null) {
-          attributes_ = com.google.protobuf.MapField.newMapField(
-              AttributesDefaultEntryHolder.defaultEntry);
+      /**
+       * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
+       */
+      public Builder setMatchingAttributes(flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes value) {
+        if (matchingAttributesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          matchingAttributes_ = value;
+          onChanged();
+        } else {
+          matchingAttributesBuilder_.setMessage(value);
         }
-        if (!attributes_.isMutable()) {
-          attributes_ = attributes_.copy();
-        }
-        return attributes_;
-      }
 
-      public int getAttributesCount() {
-        return internalGetAttributes().getMap().size();
-      }
-      /**
-       * <pre>
-       * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-       * Map keys are the *case-sensitive* names of variables in templatized resource files.
-       * Map values should be the custom values which get substituted during resource creation.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; attributes = 3;</code>
-       */
-
-      public boolean containsAttributes(
-          java.lang.String key) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        return internalGetAttributes().getMap().containsKey(key);
-      }
-      /**
-       * Use {@link #getAttributesMap()} instead.
-       */
-      @java.lang.Deprecated
-      public java.util.Map<java.lang.String, java.lang.String> getAttributes() {
-        return getAttributesMap();
-      }
-      /**
-       * <pre>
-       * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-       * Map keys are the *case-sensitive* names of variables in templatized resource files.
-       * Map values should be the custom values which get substituted during resource creation.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; attributes = 3;</code>
-       */
-
-      public java.util.Map<java.lang.String, java.lang.String> getAttributesMap() {
-        return internalGetAttributes().getMap();
-      }
-      /**
-       * <pre>
-       * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-       * Map keys are the *case-sensitive* names of variables in templatized resource files.
-       * Map values should be the custom values which get substituted during resource creation.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; attributes = 3;</code>
-       */
-
-      public java.lang.String getAttributesOrDefault(
-          java.lang.String key,
-          java.lang.String defaultValue) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        java.util.Map<java.lang.String, java.lang.String> map =
-            internalGetAttributes().getMap();
-        return map.containsKey(key) ? map.get(key) : defaultValue;
-      }
-      /**
-       * <pre>
-       * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-       * Map keys are the *case-sensitive* names of variables in templatized resource files.
-       * Map values should be the custom values which get substituted during resource creation.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; attributes = 3;</code>
-       */
-
-      public java.lang.String getAttributesOrThrow(
-          java.lang.String key) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        java.util.Map<java.lang.String, java.lang.String> map =
-            internalGetAttributes().getMap();
-        if (!map.containsKey(key)) {
-          throw new java.lang.IllegalArgumentException();
-        }
-        return map.get(key);
-      }
-
-      public Builder clearAttributes() {
-        internalGetMutableAttributes().getMutableMap()
-            .clear();
         return this;
       }
       /**
-       * <pre>
-       * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-       * Map keys are the *case-sensitive* names of variables in templatized resource files.
-       * Map values should be the custom values which get substituted during resource creation.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; attributes = 3;</code>
+       * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
        */
+      public Builder setMatchingAttributes(
+          flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.Builder builderForValue) {
+        if (matchingAttributesBuilder_ == null) {
+          matchingAttributes_ = builderForValue.build();
+          onChanged();
+        } else {
+          matchingAttributesBuilder_.setMessage(builderForValue.build());
+        }
 
-      public Builder removeAttributes(
-          java.lang.String key) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        internalGetMutableAttributes().getMutableMap()
-            .remove(key);
         return this;
       }
       /**
-       * Use alternate mutation accessors instead.
+       * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
        */
-      @java.lang.Deprecated
-      public java.util.Map<java.lang.String, java.lang.String>
-      getMutableAttributes() {
-        return internalGetMutableAttributes().getMutableMap();
-      }
-      /**
-       * <pre>
-       * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-       * Map keys are the *case-sensitive* names of variables in templatized resource files.
-       * Map values should be the custom values which get substituted during resource creation.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; attributes = 3;</code>
-       */
-      public Builder putAttributes(
-          java.lang.String key,
-          java.lang.String value) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        if (value == null) { throw new java.lang.NullPointerException(); }
-        internalGetMutableAttributes().getMutableMap()
-            .put(key, value);
-        return this;
-      }
-      /**
-       * <pre>
-       * Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
-       * Map keys are the *case-sensitive* names of variables in templatized resource files.
-       * Map values should be the custom values which get substituted during resource creation.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; attributes = 3;</code>
-       */
+      public Builder mergeMatchingAttributes(flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes value) {
+        if (matchingAttributesBuilder_ == null) {
+          if (matchingAttributes_ != null) {
+            matchingAttributes_ =
+              flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.newBuilder(matchingAttributes_).mergeFrom(value).buildPartial();
+          } else {
+            matchingAttributes_ = value;
+          }
+          onChanged();
+        } else {
+          matchingAttributesBuilder_.mergeFrom(value);
+        }
 
-      public Builder putAllAttributes(
-          java.util.Map<java.lang.String, java.lang.String> values) {
-        internalGetMutableAttributes().getMutableMap()
-            .putAll(values);
         return this;
+      }
+      /**
+       * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
+       */
+      public Builder clearMatchingAttributes() {
+        if (matchingAttributesBuilder_ == null) {
+          matchingAttributes_ = null;
+          onChanged();
+        } else {
+          matchingAttributes_ = null;
+          matchingAttributesBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.Builder getMatchingAttributesBuilder() {
+        
+        onChanged();
+        return getMatchingAttributesFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.MatchingAttributesOrBuilder getMatchingAttributesOrBuilder() {
+        if (matchingAttributesBuilder_ != null) {
+          return matchingAttributesBuilder_.getMessageOrBuilder();
+        } else {
+          return matchingAttributes_ == null ?
+              flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.getDefaultInstance() : matchingAttributes_;
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes, flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.Builder, flyteidl.admin.MatchableResourceOuterClass.MatchingAttributesOrBuilder> 
+          getMatchingAttributesFieldBuilder() {
+        if (matchingAttributesBuilder_ == null) {
+          matchingAttributesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes, flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.Builder, flyteidl.admin.MatchableResourceOuterClass.MatchingAttributesOrBuilder>(
+                  getMatchingAttributes(),
+                  getParentForChildren(),
+                  isClean());
+          matchingAttributes_ = null;
+        }
+        return matchingAttributesBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -2219,11 +2005,6 @@ public final class ProjectDomainAttributesOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_ProjectDomainAttributes_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_flyteidl_admin_ProjectDomainAttributes_AttributesEntry_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_flyteidl_admin_ProjectDomainAttributes_AttributesEntry_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_ProjectDomainAttributesUpdateRequest_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -2243,17 +2024,16 @@ public final class ProjectDomainAttributesOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n.flyteidl/admin/project_domain_attribut" +
-      "es.proto\022\016flyteidl.admin\"\272\001\n\027ProjectDoma" +
+      "es.proto\022\016flyteidl.admin\032\'flyteidl/admin" +
+      "/matchable_resource.proto\"{\n\027ProjectDoma" +
       "inAttributes\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030" +
-      "\002 \001(\t\022K\n\nattributes\030\003 \003(\01327.flyteidl.adm" +
-      "in.ProjectDomainAttributes.AttributesEnt" +
-      "ry\0321\n\017AttributesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va" +
-      "lue\030\002 \001(\t:\0028\001\"c\n$ProjectDomainAttributes" +
-      "UpdateRequest\022;\n\nattributes\030\001 \001(\0132\'.flyt" +
-      "eidl.admin.ProjectDomainAttributes\"\'\n%Pr" +
-      "ojectDomainAttributesUpdateResponseB3Z1g" +
-      "ithub.com/lyft/flyteidl/gen/pb-go/flytei" +
-      "dl/adminb\006proto3"
+      "\002 \001(\t\022?\n\023matching_attributes\030\003 \001(\0132\".fly" +
+      "teidl.admin.MatchingAttributes\"c\n$Projec" +
+      "tDomainAttributesUpdateRequest\022;\n\nattrib" +
+      "utes\030\001 \001(\0132\'.flyteidl.admin.ProjectDomai" +
+      "nAttributes\"\'\n%ProjectDomainAttributesUp" +
+      "dateResponseB3Z1github.com/lyft/flyteidl" +
+      "/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2266,19 +2046,14 @@ public final class ProjectDomainAttributesOuterClass {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          flyteidl.admin.MatchableResourceOuterClass.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_admin_ProjectDomainAttributes_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_flyteidl_admin_ProjectDomainAttributes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectDomainAttributes_descriptor,
-        new java.lang.String[] { "Project", "Domain", "Attributes", });
-    internal_static_flyteidl_admin_ProjectDomainAttributes_AttributesEntry_descriptor =
-      internal_static_flyteidl_admin_ProjectDomainAttributes_descriptor.getNestedTypes().get(0);
-    internal_static_flyteidl_admin_ProjectDomainAttributes_AttributesEntry_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_flyteidl_admin_ProjectDomainAttributes_AttributesEntry_descriptor,
-        new java.lang.String[] { "Key", "Value", });
+        new java.lang.String[] { "Project", "Domain", "MatchingAttributes", });
     internal_static_flyteidl_admin_ProjectDomainAttributesUpdateRequest_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_admin_ProjectDomainAttributesUpdateRequest_fieldAccessorTable = new
@@ -2291,6 +2066,7 @@ public final class ProjectDomainAttributesOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectDomainAttributesUpdateResponse_descriptor,
         new java.lang.String[] { });
+    flyteidl.admin.MatchableResourceOuterClass.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -1933,6 +1933,41 @@ func request_AdminService_GetTaskExecutionData_0(ctx context.Context, marshaler 
 
 }
 
+func request_AdminService_UpdateProjectAttributes_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq admin.ProjectAttributesUpdateRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["attributes.project"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "attributes.project")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "attributes.project", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "attributes.project", err)
+	}
+
+	msg, err := client.UpdateProjectAttributes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
 func request_AdminService_UpdateProjectDomainAttributes_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq admin.ProjectDomainAttributesUpdateRequest
 	var metadata runtime.ServerMetadata
@@ -1975,6 +2010,63 @@ func request_AdminService_UpdateProjectDomainAttributes_0(ctx context.Context, m
 	}
 
 	msg, err := client.UpdateProjectDomainAttributes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func request_AdminService_UpdateWorkflowAttributes_0(ctx context.Context, marshaler runtime.Marshaler, client AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq admin.WorkflowAttributesUpdateRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["attributes.project"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "attributes.project")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "attributes.project", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "attributes.project", err)
+	}
+
+	val, ok = pathParams["attributes.domain"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "attributes.domain")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "attributes.domain", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "attributes.domain", err)
+	}
+
+	val, ok = pathParams["attributes.workflow"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "attributes.workflow")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "attributes.workflow", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "attributes.workflow", err)
+	}
+
+	msg, err := client.UpdateWorkflowAttributes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -2945,6 +3037,26 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 
 	})
 
+	mux.Handle("PUT", pattern_AdminService_UpdateProjectAttributes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_AdminService_UpdateProjectAttributes_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AdminService_UpdateProjectAttributes_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("PUT", pattern_AdminService_UpdateProjectDomainAttributes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -2962,6 +3074,26 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		}
 
 		forward_AdminService_UpdateProjectDomainAttributes_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("PUT", pattern_AdminService_UpdateWorkflowAttributes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_AdminService_UpdateWorkflowAttributes_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_AdminService_UpdateWorkflowAttributes_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -3101,7 +3233,11 @@ var (
 
 	pattern_AdminService_GetTaskExecutionData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12}, []string{"api", "v1", "data", "task_executions", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
 
+	pattern_AdminService_UpdateProjectAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "project_attributes", "attributes.project"}, ""))
+
 	pattern_AdminService_UpdateProjectDomainAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "attributes.project", "attributes.domain"}, ""))
+
+	pattern_AdminService_UpdateWorkflowAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "workflow_attributes", "attributes.project", "attributes.domain", "attributes.workflow"}, ""))
 
 	pattern_AdminService_ListNamedEntities_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "named_entities", "resource_type", "project", "domain"}, ""))
 
@@ -3183,7 +3319,11 @@ var (
 
 	forward_AdminService_GetTaskExecutionData_0 = runtime.ForwardResponseMessage
 
+	forward_AdminService_UpdateProjectAttributes_0 = runtime.ForwardResponseMessage
+
 	forward_AdminService_UpdateProjectDomainAttributes_0 = runtime.ForwardResponseMessage
+
+	forward_AdminService_UpdateWorkflowAttributes_0 = runtime.ForwardResponseMessage
 
 	forward_AdminService_ListNamedEntities_0 = runtime.ForwardResponseMessage
 

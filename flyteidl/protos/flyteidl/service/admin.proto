@@ -5,9 +5,11 @@ option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
 import "flyteidl/admin/project.proto";
+import "flyteidl/admin/project_attributes.proto";
 import "flyteidl/admin/project_domain_attributes.proto";
 import "flyteidl/admin/task.proto";
 import "flyteidl/admin/workflow.proto";
+import "flyteidl/admin/workflow_attributes.proto";
 import "flyteidl/admin/launch_plan.proto";
 import "flyteidl/admin/event.proto";
 import "flyteidl/admin/execution.proto";
@@ -378,6 +380,16 @@ service AdminService {
     };
   }
 
+  rpc UpdateProjectAttributes (flyteidl.admin.ProjectAttributesUpdateRequest) returns (flyteidl.admin.ProjectAttributesUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/project_attributes/{attributes.project}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Update the customized resource attributes associated with a project"
+    };
+  }
+
   rpc UpdateProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesUpdateRequest) returns (flyteidl.admin.ProjectDomainAttributesUpdateResponse) {
     option (google.api.http) = {
       put: "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}"
@@ -385,6 +397,16 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       description: "Update the customized resource attributes associated with a project-domain combination"
+    };
+  }
+
+  rpc UpdateWorkflowAttributes (flyteidl.admin.WorkflowAttributesUpdateRequest) returns (flyteidl.admin.WorkflowAttributesUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Update the customized resource attributes associated with a project, domain and workflow combination"
     };
   }
 

@@ -1436,6 +1436,40 @@
         ]
       }
     },
+    "/api/v1/project_attributes/{attributes.project}": {
+      "put": {
+        "description": "Update the customized resource attributes associated with a project",
+        "operationId": "UpdateProjectAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attributes.project",
+            "description": "Unique project id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}": {
       "put": {
         "description": "Update the customized resource attributes associated with a project-domain combination",
@@ -2026,6 +2060,54 @@
         ]
       }
     },
+    "/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}": {
+      "put": {
+        "description": "Update the customized resource attributes associated with a project, domain and workflow combination",
+        "operationId": "UpdateWorkflowAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowAttributesUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attributes.project",
+            "description": "Unique project id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.domain",
+            "description": "Unique domain id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.workflow",
+            "description": "Workflow name for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowAttributesUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/workflow_ids/{project}/{domain}": {
       "get": {
         "description": "Fetch an existing workflow definition identifiers matching input filters.",
@@ -2522,6 +2604,18 @@
       },
       "description": "Defines permissions associated with executions created by this launch plan spec."
     },
+    "adminClusterResourceAttributes": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).\nMap keys are the *case-sensitive* names of variables in templatized resource files.\nMap values should be the custom values which get substituted during resource creation."
+        }
+      }
+    },
     "adminDomain": {
       "type": "object",
       "properties": {
@@ -2706,6 +2800,18 @@
         }
       },
       "description": "Represents attributes about an execution which are not required to launch the execution but are useful to record.\nThese attributes are assigned at launch time and do not change."
+    },
+    "adminExecutionQueueAttributes": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags used for assigning execution queues for tasks defined within this project."
+        }
+      }
     },
     "adminExecutionRelaunchRequest": {
       "type": "object",
@@ -2981,6 +3087,21 @@
       },
       "title": "Input/output data can represented by actual values or a link to where values are stored"
     },
+    "adminMatchingAttributes": {
+      "type": "object",
+      "properties": {
+        "task_resource_attributes": {
+          "$ref": "#/definitions/adminTaskResourceAttributes"
+        },
+        "cluster_resource_attributes": {
+          "$ref": "#/definitions/adminClusterResourceAttributes"
+        },
+        "execution_queue_attributes": {
+          "$ref": "#/definitions/adminExecutionQueueAttributes"
+        }
+      },
+      "description": "Generic container for encapsulating all types of the above attributes messages."
+    },
     "adminNamedEntity": {
       "type": "object",
       "properties": {
@@ -3233,6 +3354,31 @@
       },
       "description": "Top-level namespace used to classify different entities like workflows and executions."
     },
+    "adminProjectAttributes": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Unique project id for which this set of attributes will be applied."
+        },
+        "matching_attributes": {
+          "$ref": "#/definitions/adminMatchingAttributes"
+        }
+      }
+    },
+    "adminProjectAttributesUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminProjectAttributes"
+        }
+      },
+      "description": "Sets custom attributes for a project combination."
+    },
+    "adminProjectAttributesUpdateResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
+    },
     "adminProjectDomainAttributes": {
       "type": "object",
       "properties": {
@@ -3244,12 +3390,8 @@
           "type": "string",
           "description": "Unique domain id for which this set of attributes will be applied."
         },
-        "attributes": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).\nMap keys are the *case-sensitive* names of variables in templatized resource files.\nMap values should be the custom values which get substituted during resource creation."
+        "matching_attributes": {
+          "$ref": "#/definitions/adminMatchingAttributes"
         }
       }
     },
@@ -3490,6 +3632,34 @@
       },
       "description": "Represents a list of tasks returned from the admin."
     },
+    "adminTaskResourceAttributes": {
+      "type": "object",
+      "properties": {
+        "defaults": {
+          "$ref": "#/definitions/adminTaskResourceSpec"
+        },
+        "limits": {
+          "$ref": "#/definitions/adminTaskResourceSpec"
+        }
+      }
+    },
+    "adminTaskResourceSpec": {
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "type": "string"
+        },
+        "gpu": {
+          "type": "string"
+        },
+        "memory": {
+          "type": "string"
+        },
+        "storage": {
+          "type": "string"
+        }
+      }
+    },
     "adminTaskSpec": {
       "type": "object",
       "properties": {
@@ -3528,6 +3698,39 @@
         }
       },
       "description": "Represents the workflow structure stored in the Admin\nA workflow is created by ordering tasks and associating outputs to inputs\nin order to produce a directed-acyclic execution graph."
+    },
+    "adminWorkflowAttributes": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Unique project id for which this set of attributes will be applied."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Unique domain id for which this set of attributes will be applied."
+        },
+        "workflow": {
+          "type": "string",
+          "description": "Workflow name for which this set of attributes will be applied."
+        },
+        "matching_attributes": {
+          "$ref": "#/definitions/adminMatchingAttributes"
+        }
+      }
+    },
+    "adminWorkflowAttributesUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminWorkflowAttributes"
+        }
+      },
+      "description": "Sets custom attributes for a project, domain and workflow combination."
+    },
+    "adminWorkflowAttributesUpdateResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
     },
     "adminWorkflowClosure": {
       "type": "object",

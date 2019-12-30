@@ -8220,6 +8220,312 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** MatchableResource enum. */
+        enum MatchableResource {
+            TASK_RESOURCE = 0,
+            CLUSTER_RESOURCE = 1,
+            EXECUTION_QUEUE = 2
+        }
+
+        /** Properties of a TaskResourceSpec. */
+        interface ITaskResourceSpec {
+
+            /** TaskResourceSpec cpu */
+            cpu?: (string|null);
+
+            /** TaskResourceSpec gpu */
+            gpu?: (string|null);
+
+            /** TaskResourceSpec memory */
+            memory?: (string|null);
+
+            /** TaskResourceSpec storage */
+            storage?: (string|null);
+        }
+
+        /** Represents a TaskResourceSpec. */
+        class TaskResourceSpec implements ITaskResourceSpec {
+
+            /**
+             * Constructs a new TaskResourceSpec.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ITaskResourceSpec);
+
+            /** TaskResourceSpec cpu. */
+            public cpu: string;
+
+            /** TaskResourceSpec gpu. */
+            public gpu: string;
+
+            /** TaskResourceSpec memory. */
+            public memory: string;
+
+            /** TaskResourceSpec storage. */
+            public storage: string;
+
+            /**
+             * Creates a new TaskResourceSpec instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskResourceSpec instance
+             */
+            public static create(properties?: flyteidl.admin.ITaskResourceSpec): flyteidl.admin.TaskResourceSpec;
+
+            /**
+             * Encodes the specified TaskResourceSpec message. Does not implicitly {@link flyteidl.admin.TaskResourceSpec.verify|verify} messages.
+             * @param message TaskResourceSpec message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ITaskResourceSpec, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskResourceSpec message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskResourceSpec
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.TaskResourceSpec;
+
+            /**
+             * Verifies a TaskResourceSpec message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskResourceAttributes. */
+        interface ITaskResourceAttributes {
+
+            /** TaskResourceAttributes defaults */
+            defaults?: (flyteidl.admin.ITaskResourceSpec|null);
+
+            /** TaskResourceAttributes limits */
+            limits?: (flyteidl.admin.ITaskResourceSpec|null);
+        }
+
+        /** Represents a TaskResourceAttributes. */
+        class TaskResourceAttributes implements ITaskResourceAttributes {
+
+            /**
+             * Constructs a new TaskResourceAttributes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ITaskResourceAttributes);
+
+            /** TaskResourceAttributes defaults. */
+            public defaults?: (flyteidl.admin.ITaskResourceSpec|null);
+
+            /** TaskResourceAttributes limits. */
+            public limits?: (flyteidl.admin.ITaskResourceSpec|null);
+
+            /**
+             * Creates a new TaskResourceAttributes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskResourceAttributes instance
+             */
+            public static create(properties?: flyteidl.admin.ITaskResourceAttributes): flyteidl.admin.TaskResourceAttributes;
+
+            /**
+             * Encodes the specified TaskResourceAttributes message. Does not implicitly {@link flyteidl.admin.TaskResourceAttributes.verify|verify} messages.
+             * @param message TaskResourceAttributes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ITaskResourceAttributes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskResourceAttributes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskResourceAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.TaskResourceAttributes;
+
+            /**
+             * Verifies a TaskResourceAttributes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ClusterResourceAttributes. */
+        interface IClusterResourceAttributes {
+
+            /** ClusterResourceAttributes attributes */
+            attributes?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a ClusterResourceAttributes. */
+        class ClusterResourceAttributes implements IClusterResourceAttributes {
+
+            /**
+             * Constructs a new ClusterResourceAttributes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IClusterResourceAttributes);
+
+            /** ClusterResourceAttributes attributes. */
+            public attributes: { [k: string]: string };
+
+            /**
+             * Creates a new ClusterResourceAttributes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ClusterResourceAttributes instance
+             */
+            public static create(properties?: flyteidl.admin.IClusterResourceAttributes): flyteidl.admin.ClusterResourceAttributes;
+
+            /**
+             * Encodes the specified ClusterResourceAttributes message. Does not implicitly {@link flyteidl.admin.ClusterResourceAttributes.verify|verify} messages.
+             * @param message ClusterResourceAttributes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IClusterResourceAttributes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ClusterResourceAttributes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ClusterResourceAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ClusterResourceAttributes;
+
+            /**
+             * Verifies a ClusterResourceAttributes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExecutionQueueAttributes. */
+        interface IExecutionQueueAttributes {
+
+            /** ExecutionQueueAttributes tags */
+            tags?: (string[]|null);
+        }
+
+        /** Represents an ExecutionQueueAttributes. */
+        class ExecutionQueueAttributes implements IExecutionQueueAttributes {
+
+            /**
+             * Constructs a new ExecutionQueueAttributes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IExecutionQueueAttributes);
+
+            /** ExecutionQueueAttributes tags. */
+            public tags: string[];
+
+            /**
+             * Creates a new ExecutionQueueAttributes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionQueueAttributes instance
+             */
+            public static create(properties?: flyteidl.admin.IExecutionQueueAttributes): flyteidl.admin.ExecutionQueueAttributes;
+
+            /**
+             * Encodes the specified ExecutionQueueAttributes message. Does not implicitly {@link flyteidl.admin.ExecutionQueueAttributes.verify|verify} messages.
+             * @param message ExecutionQueueAttributes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IExecutionQueueAttributes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionQueueAttributes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionQueueAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ExecutionQueueAttributes;
+
+            /**
+             * Verifies an ExecutionQueueAttributes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a MatchingAttributes. */
+        interface IMatchingAttributes {
+
+            /** MatchingAttributes taskResourceAttributes */
+            taskResourceAttributes?: (flyteidl.admin.ITaskResourceAttributes|null);
+
+            /** MatchingAttributes clusterResourceAttributes */
+            clusterResourceAttributes?: (flyteidl.admin.IClusterResourceAttributes|null);
+
+            /** MatchingAttributes executionQueueAttributes */
+            executionQueueAttributes?: (flyteidl.admin.IExecutionQueueAttributes|null);
+        }
+
+        /** Represents a MatchingAttributes. */
+        class MatchingAttributes implements IMatchingAttributes {
+
+            /**
+             * Constructs a new MatchingAttributes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IMatchingAttributes);
+
+            /** MatchingAttributes taskResourceAttributes. */
+            public taskResourceAttributes?: (flyteidl.admin.ITaskResourceAttributes|null);
+
+            /** MatchingAttributes clusterResourceAttributes. */
+            public clusterResourceAttributes?: (flyteidl.admin.IClusterResourceAttributes|null);
+
+            /** MatchingAttributes executionQueueAttributes. */
+            public executionQueueAttributes?: (flyteidl.admin.IExecutionQueueAttributes|null);
+
+            /** MatchingAttributes target. */
+            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes");
+
+            /**
+             * Creates a new MatchingAttributes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns MatchingAttributes instance
+             */
+            public static create(properties?: flyteidl.admin.IMatchingAttributes): flyteidl.admin.MatchingAttributes;
+
+            /**
+             * Encodes the specified MatchingAttributes message. Does not implicitly {@link flyteidl.admin.MatchingAttributes.verify|verify} messages.
+             * @param message MatchingAttributes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IMatchingAttributes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a MatchingAttributes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns MatchingAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.MatchingAttributes;
+
+            /**
+             * Verifies a MatchingAttributes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a NodeExecutionGetRequest. */
         interface INodeExecutionGetRequest {
 
@@ -9202,6 +9508,162 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a ProjectAttributes. */
+        interface IProjectAttributes {
+
+            /** ProjectAttributes project */
+            project?: (string|null);
+
+            /** ProjectAttributes matchingAttributes */
+            matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+        }
+
+        /** Represents a ProjectAttributes. */
+        class ProjectAttributes implements IProjectAttributes {
+
+            /**
+             * Constructs a new ProjectAttributes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectAttributes);
+
+            /** ProjectAttributes project. */
+            public project: string;
+
+            /** ProjectAttributes matchingAttributes. */
+            public matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /**
+             * Creates a new ProjectAttributes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectAttributes instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectAttributes): flyteidl.admin.ProjectAttributes;
+
+            /**
+             * Encodes the specified ProjectAttributes message. Does not implicitly {@link flyteidl.admin.ProjectAttributes.verify|verify} messages.
+             * @param message ProjectAttributes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectAttributes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectAttributes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectAttributes;
+
+            /**
+             * Verifies a ProjectAttributes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectAttributesUpdateRequest. */
+        interface IProjectAttributesUpdateRequest {
+
+            /** ProjectAttributesUpdateRequest attributes */
+            attributes?: (flyteidl.admin.IProjectAttributes|null);
+        }
+
+        /** Represents a ProjectAttributesUpdateRequest. */
+        class ProjectAttributesUpdateRequest implements IProjectAttributesUpdateRequest {
+
+            /**
+             * Constructs a new ProjectAttributesUpdateRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectAttributesUpdateRequest);
+
+            /** ProjectAttributesUpdateRequest attributes. */
+            public attributes?: (flyteidl.admin.IProjectAttributes|null);
+
+            /**
+             * Creates a new ProjectAttributesUpdateRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectAttributesUpdateRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectAttributesUpdateRequest): flyteidl.admin.ProjectAttributesUpdateRequest;
+
+            /**
+             * Encodes the specified ProjectAttributesUpdateRequest message. Does not implicitly {@link flyteidl.admin.ProjectAttributesUpdateRequest.verify|verify} messages.
+             * @param message ProjectAttributesUpdateRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectAttributesUpdateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectAttributesUpdateRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectAttributesUpdateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectAttributesUpdateRequest;
+
+            /**
+             * Verifies a ProjectAttributesUpdateRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectAttributesUpdateResponse. */
+        interface IProjectAttributesUpdateResponse {
+        }
+
+        /** Represents a ProjectAttributesUpdateResponse. */
+        class ProjectAttributesUpdateResponse implements IProjectAttributesUpdateResponse {
+
+            /**
+             * Constructs a new ProjectAttributesUpdateResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectAttributesUpdateResponse);
+
+            /**
+             * Creates a new ProjectAttributesUpdateResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectAttributesUpdateResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectAttributesUpdateResponse): flyteidl.admin.ProjectAttributesUpdateResponse;
+
+            /**
+             * Encodes the specified ProjectAttributesUpdateResponse message. Does not implicitly {@link flyteidl.admin.ProjectAttributesUpdateResponse.verify|verify} messages.
+             * @param message ProjectAttributesUpdateResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectAttributesUpdateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectAttributesUpdateResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectAttributesUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectAttributesUpdateResponse;
+
+            /**
+             * Verifies a ProjectAttributesUpdateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a ProjectDomainAttributes. */
         interface IProjectDomainAttributes {
 
@@ -9211,8 +9673,8 @@ export namespace flyteidl {
             /** ProjectDomainAttributes domain */
             domain?: (string|null);
 
-            /** ProjectDomainAttributes attributes */
-            attributes?: ({ [k: string]: string }|null);
+            /** ProjectDomainAttributes matchingAttributes */
+            matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
         }
 
         /** Represents a ProjectDomainAttributes. */
@@ -9230,8 +9692,8 @@ export namespace flyteidl {
             /** ProjectDomainAttributes domain. */
             public domain: string;
 
-            /** ProjectDomainAttributes attributes. */
-            public attributes: { [k: string]: string };
+            /** ProjectDomainAttributes matchingAttributes. */
+            public matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
 
             /**
              * Creates a new ProjectDomainAttributes instance using the specified properties.
@@ -10492,6 +10954,174 @@ export namespace flyteidl {
              */
             public static verify(message: { [k: string]: any }): (string|null);
         }
+
+        /** Properties of a WorkflowAttributes. */
+        interface IWorkflowAttributes {
+
+            /** WorkflowAttributes project */
+            project?: (string|null);
+
+            /** WorkflowAttributes domain */
+            domain?: (string|null);
+
+            /** WorkflowAttributes workflow */
+            workflow?: (string|null);
+
+            /** WorkflowAttributes matchingAttributes */
+            matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+        }
+
+        /** Represents a WorkflowAttributes. */
+        class WorkflowAttributes implements IWorkflowAttributes {
+
+            /**
+             * Constructs a new WorkflowAttributes.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowAttributes);
+
+            /** WorkflowAttributes project. */
+            public project: string;
+
+            /** WorkflowAttributes domain. */
+            public domain: string;
+
+            /** WorkflowAttributes workflow. */
+            public workflow: string;
+
+            /** WorkflowAttributes matchingAttributes. */
+            public matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /**
+             * Creates a new WorkflowAttributes instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowAttributes instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowAttributes): flyteidl.admin.WorkflowAttributes;
+
+            /**
+             * Encodes the specified WorkflowAttributes message. Does not implicitly {@link flyteidl.admin.WorkflowAttributes.verify|verify} messages.
+             * @param message WorkflowAttributes message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowAttributes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowAttributes message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowAttributes
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowAttributes;
+
+            /**
+             * Verifies a WorkflowAttributes message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowAttributesUpdateRequest. */
+        interface IWorkflowAttributesUpdateRequest {
+
+            /** WorkflowAttributesUpdateRequest attributes */
+            attributes?: (flyteidl.admin.IWorkflowAttributes|null);
+        }
+
+        /** Represents a WorkflowAttributesUpdateRequest. */
+        class WorkflowAttributesUpdateRequest implements IWorkflowAttributesUpdateRequest {
+
+            /**
+             * Constructs a new WorkflowAttributesUpdateRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowAttributesUpdateRequest);
+
+            /** WorkflowAttributesUpdateRequest attributes. */
+            public attributes?: (flyteidl.admin.IWorkflowAttributes|null);
+
+            /**
+             * Creates a new WorkflowAttributesUpdateRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowAttributesUpdateRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowAttributesUpdateRequest): flyteidl.admin.WorkflowAttributesUpdateRequest;
+
+            /**
+             * Encodes the specified WorkflowAttributesUpdateRequest message. Does not implicitly {@link flyteidl.admin.WorkflowAttributesUpdateRequest.verify|verify} messages.
+             * @param message WorkflowAttributesUpdateRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowAttributesUpdateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowAttributesUpdateRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowAttributesUpdateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowAttributesUpdateRequest;
+
+            /**
+             * Verifies a WorkflowAttributesUpdateRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowAttributesUpdateResponse. */
+        interface IWorkflowAttributesUpdateResponse {
+        }
+
+        /** Represents a WorkflowAttributesUpdateResponse. */
+        class WorkflowAttributesUpdateResponse implements IWorkflowAttributesUpdateResponse {
+
+            /**
+             * Constructs a new WorkflowAttributesUpdateResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowAttributesUpdateResponse);
+
+            /**
+             * Creates a new WorkflowAttributesUpdateResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowAttributesUpdateResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowAttributesUpdateResponse): flyteidl.admin.WorkflowAttributesUpdateResponse;
+
+            /**
+             * Encodes the specified WorkflowAttributesUpdateResponse message. Does not implicitly {@link flyteidl.admin.WorkflowAttributesUpdateResponse.verify|verify} messages.
+             * @param message WorkflowAttributesUpdateResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowAttributesUpdateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowAttributesUpdateResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowAttributesUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowAttributesUpdateResponse;
+
+            /**
+             * Verifies a WorkflowAttributesUpdateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
     }
 
     /** Namespace service. */
@@ -10980,6 +11610,20 @@ export namespace flyteidl {
             public getTaskExecutionData(request: flyteidl.admin.ITaskExecutionGetDataRequest): Promise<flyteidl.admin.TaskExecutionGetDataResponse>;
 
             /**
+             * Calls UpdateProjectAttributes.
+             * @param request ProjectAttributesUpdateRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ProjectAttributesUpdateResponse
+             */
+            public updateProjectAttributes(request: flyteidl.admin.IProjectAttributesUpdateRequest, callback: flyteidl.service.AdminService.UpdateProjectAttributesCallback): void;
+
+            /**
+             * Calls UpdateProjectAttributes.
+             * @param request ProjectAttributesUpdateRequest message or plain object
+             * @returns Promise
+             */
+            public updateProjectAttributes(request: flyteidl.admin.IProjectAttributesUpdateRequest): Promise<flyteidl.admin.ProjectAttributesUpdateResponse>;
+
+            /**
              * Calls UpdateProjectDomainAttributes.
              * @param request ProjectDomainAttributesUpdateRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and ProjectDomainAttributesUpdateResponse
@@ -10992,6 +11636,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public updateProjectDomainAttributes(request: flyteidl.admin.IProjectDomainAttributesUpdateRequest): Promise<flyteidl.admin.ProjectDomainAttributesUpdateResponse>;
+
+            /**
+             * Calls UpdateWorkflowAttributes.
+             * @param request WorkflowAttributesUpdateRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and WorkflowAttributesUpdateResponse
+             */
+            public updateWorkflowAttributes(request: flyteidl.admin.IWorkflowAttributesUpdateRequest, callback: flyteidl.service.AdminService.UpdateWorkflowAttributesCallback): void;
+
+            /**
+             * Calls UpdateWorkflowAttributes.
+             * @param request WorkflowAttributesUpdateRequest message or plain object
+             * @returns Promise
+             */
+            public updateWorkflowAttributes(request: flyteidl.admin.IWorkflowAttributesUpdateRequest): Promise<flyteidl.admin.WorkflowAttributesUpdateResponse>;
 
             /**
              * Calls ListNamedEntities.
@@ -11270,11 +11928,25 @@ export namespace flyteidl {
             type GetTaskExecutionDataCallback = (error: (Error|null), response?: flyteidl.admin.TaskExecutionGetDataResponse) => void;
 
             /**
+             * Callback as used by {@link flyteidl.service.AdminService#updateProjectAttributes}.
+             * @param error Error, if any
+             * @param [response] ProjectAttributesUpdateResponse
+             */
+            type UpdateProjectAttributesCallback = (error: (Error|null), response?: flyteidl.admin.ProjectAttributesUpdateResponse) => void;
+
+            /**
              * Callback as used by {@link flyteidl.service.AdminService#updateProjectDomainAttributes}.
              * @param error Error, if any
              * @param [response] ProjectDomainAttributesUpdateResponse
              */
             type UpdateProjectDomainAttributesCallback = (error: (Error|null), response?: flyteidl.admin.ProjectDomainAttributesUpdateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#updateWorkflowAttributes}.
+             * @param error Error, if any
+             * @param [response] WorkflowAttributesUpdateResponse
+             */
+            type UpdateWorkflowAttributesCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowAttributesUpdateResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listNamedEntities}.
