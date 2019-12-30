@@ -108,8 +108,11 @@ func QuboleHiveExecutorLoader(ctx context.Context, iCtx core.SetupContext) (core
 		return nil, err
 	}
 
-	if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, quboleResourceNamespace, cfg.Limit); err != nil {
-		return nil, err
+	for _, cluster := range cfg.Clusters {
+		clusteredResourceNamespacePrefix := quboleResourceNamespace.CreateSubNamespace(core.ResourceNamespace(cluster))
+		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, clusteredResourceNamespacePrefix, cfg.Limit); err != nil {
+			return nil, err
+		}
 	}
 
 	return q, nil

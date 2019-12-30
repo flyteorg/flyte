@@ -34,6 +34,7 @@ var (
 		Limit:           200,
 		LruCacheSize:    2000,
 		Workers:         15,
+		Clusters:        []string{"default-cluster"},
 	}
 
 	quboleConfigSection = pluginsConfig.MustRegisterSubSection(quboleConfigSectionKey, &defaultConfig)
@@ -48,6 +49,7 @@ type Config struct {
 	Limit           int        `json:"quboleLimit" pflag:",Global limit for concurrent Qubole queries"`
 	LruCacheSize    int        `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
 	Workers         int        `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
+	Clusters        []string   `json:"clusters" pflag:", List of service clusters"`
 }
 
 // Retrieves the current config value or default.
