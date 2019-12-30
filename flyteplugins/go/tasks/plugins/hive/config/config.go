@@ -49,7 +49,7 @@ type Config struct {
 	Limit           int        `json:"quboleLimit" pflag:",Global limit for concurrent Qubole queries"`
 	LruCacheSize    int        `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
 	Workers         int        `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
-	ClusterLabels   []string   `json:"clusterLabels" pflag:", List of labels of service clusters"`
+	ClusterLabels   []string   `json:"clusterLabels" pflag:",List of labels of service clusters"`
 }
 
 // Retrieves the current config value or default.
