@@ -13,13 +13,13 @@ import (
 
 //go:generate mockery -name ResourceManager -case=underscore
 
-type TokenNamespace string
+type TokenPrefix string
 
 const execUrnPrefix = "ex"
 const execUrnSeparator = ":"
 const tokenNamespaceSeparator = "-"
 
-func (t TokenNamespace) append(s string) string {
+func (t TokenPrefix) append(s string) string {
 	return fmt.Sprintf("%s%s%s", t, tokenNamespaceSeparator, s)
 }
 
@@ -28,9 +28,9 @@ func composeExecutionUrn(id *core.TaskExecutionIdentifier) string {
 		execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetDomain() + execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetName()
 }
 
-func ComposeTokenNamespace(id *core.TaskExecutionIdentifier) TokenNamespace {
+func ComposeTokenPrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
 	execUrn := composeExecutionUrn(id) // This is for the ease of debugging. Doesn't necessarily need to have this
-	return TokenNamespace(execUrn)
+	return TokenPrefix(execUrn)
 }
 
 // This struct is designed to serve as the identifier of an user of resource manager
@@ -53,7 +53,7 @@ type Builder interface {
 type Proxy struct {
 	pluginCore.ResourceManager
 	ResourceNamespacePrefix pluginCore.ResourceNamespace
-	TokenNamespacePrefix    TokenNamespace
+	TokenPrefix             TokenPrefix
 }
 
 func (p Proxy) getPrefixedNamespace(namespace pluginCore.ResourceNamespace) pluginCore.ResourceNamespace {
@@ -63,7 +63,7 @@ func (p Proxy) getPrefixedNamespace(namespace pluginCore.ResourceNamespace) plug
 func (p Proxy) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace,
 	allocationToken string) (pluginCore.AllocationStatus, error) {
 
-	namespacedAllocationToken := p.TokenNamespacePrefix.append(allocationToken)
+	namespacedAllocationToken := p.TokenPrefix.append(allocationToken)
 	status, err := p.ResourceManager.AllocateResource(ctx, p.getPrefixedNamespace(namespace), namespacedAllocationToken)
 	return status, err
 }
@@ -77,7 +77,7 @@ func (p Proxy) ReleaseResource(ctx context.Context, namespace pluginCore.Resourc
 type ResourceRegistrarProxy struct {
 	pluginCore.ResourceRegistrar
 	ResourceNamespacePrefix pluginCore.ResourceNamespace
-	TokenNamespacePrefix    TokenNamespace
+	TokenPrefix             TokenPrefix
 }
 
 func (p ResourceRegistrarProxy) getPrefixedNamespace(namespace pluginCore.ResourceNamespace) pluginCore.ResourceNamespace {

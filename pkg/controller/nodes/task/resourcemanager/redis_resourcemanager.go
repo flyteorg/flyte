@@ -73,7 +73,8 @@ func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) 
 
 	// building the resources and insert them into the resource manager
 	for namespace, quota := range r.namespacedResourcesQuotaMap {
-		// `namespace` contains plugin name and cluster (e.g., "qubole:default-cluster")
+		// `namespace` is always prefixed with the plugin ID. Each plugin can then affix additional sub-namespaces to it to create different resource pools.
+		// For example, hive qubole plugin's namespaces contain plugin ID and qubole cluster (e.g., "qubole:default-cluster").
 		prefixedNamespace := r.getNamespacedRedisSetKey(namespace)
 		metrics := NewRedisResourceManagerMetrics(r.MetricsScope.NewSubScope(prefixedNamespace))
 
@@ -110,11 +111,11 @@ type RedisResourceManager struct {
 	namespacedResourcesMap map[pluginCore.ResourceNamespace]*Resource
 }
 
-func GetTaskResourceManager(r pluginCore.ResourceManager, namespacePrefix pluginCore.ResourceNamespace, allocationTokenNamespace TokenNamespace) pluginCore.ResourceManager {
+func GetTaskResourceManager(r pluginCore.ResourceManager, resourceNamespacePrefix pluginCore.ResourceNamespace, allocationTokenPrefix TokenPrefix) pluginCore.ResourceManager {
 	return Proxy{
 		ResourceManager:         r,
-		ResourceNamespacePrefix: namespacePrefix,
-		TokenNamespacePrefix:    allocationTokenNamespace,
+		ResourceNamespacePrefix: resourceNamespacePrefix,
+		TokenPrefix:             allocationTokenPrefix,
 	}
 }
 
