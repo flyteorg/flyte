@@ -29,8 +29,8 @@ type RedisResourceManagerBuilder struct {
 
 func (r *RedisResourceManagerBuilder) ResourceRegistrar(namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceRegistrar {
 	return ResourceRegistrarProxy{
-		ResourceRegistrar: r,
-		NamespacePrefix:   namespacePrefix,
+		ResourceRegistrar:       r,
+		ResourceNamespacePrefix: namespacePrefix,
 	}
 }
 
@@ -73,8 +73,10 @@ func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) 
 
 	// building the resources and insert them into the resource manager
 	for namespace, quota := range r.namespacedResourcesQuotaMap {
+		// `namespace` contains plugin name and cluster (e.g., "qubole:default-cluster")
 		prefixedNamespace := r.getNamespacedRedisSetKey(namespace)
 		metrics := NewRedisResourceManagerMetrics(r.MetricsScope.NewSubScope(prefixedNamespace))
+
 		rm.namespacedResourcesMap[namespace] = &Resource{
 			quota:          quota,
 			metrics:        metrics,
@@ -108,10 +110,11 @@ type RedisResourceManager struct {
 	namespacedResourcesMap map[pluginCore.ResourceNamespace]*Resource
 }
 
-func GetTaskResourceManager(r pluginCore.ResourceManager, namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceManager {
+func GetTaskResourceManager(r pluginCore.ResourceManager, namespacePrefix pluginCore.ResourceNamespace, allocationTokenNamespace TokenNamespace) pluginCore.ResourceManager {
 	return Proxy{
-		ResourceManager: r,
-		NamespacePrefix: namespacePrefix,
+		ResourceManager:         r,
+		ResourceNamespacePrefix: namespacePrefix,
+		TokenNamespacePrefix: allocationTokenNamespace,
 	}
 }
 
