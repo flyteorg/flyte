@@ -196,8 +196,12 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 
 	query = hiveJob.Query.GetQuery()
 	cluster = hiveJob.ClusterLabel
-	tags = hiveJob.Tags
 	timeoutSec = hiveJob.Query.TimeoutSec
+	tags = hiveJob.Tags
+	tags = append(tags, fmt.Sprintf("ns:%s", tCtx.TaskExecutionMetadata().GetNamespace()))
+	for k, v := range tCtx.TaskExecutionMetadata().GetLabels() {
+		tags = append(tags, fmt.Sprintf("%s:%s", k, v))
+	}
 
 	return
 }
