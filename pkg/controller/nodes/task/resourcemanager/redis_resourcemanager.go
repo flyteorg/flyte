@@ -114,7 +114,7 @@ func GetTaskResourceManager(r pluginCore.ResourceManager, namespacePrefix plugin
 	return Proxy{
 		ResourceManager:         r,
 		ResourceNamespacePrefix: namespacePrefix,
-		TokenNamespacePrefix: allocationTokenNamespace,
+		TokenNamespacePrefix:    allocationTokenNamespace,
 	}
 }
 
