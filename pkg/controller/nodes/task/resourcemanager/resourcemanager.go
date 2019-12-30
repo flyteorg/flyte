@@ -2,6 +2,8 @@ package resourcemanager
 
 import (
 	"context"
+	"fmt"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"sync"
 
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
@@ -9,6 +11,18 @@ import (
 )
 
 //go:generate mockery -name ResourceManager -case=underscore
+
+type TokenNamespace string
+
+const tokenNamespaceSeparator = "-"
+
+func (t TokenNamespace) append(s string) string {
+	return fmt.Sprintf("%s%s%s", t, tokenNamespaceSeparator, s)
+}
+
+func ComposeTokenNamespace(id *core.TaskExecutionIdentifier) TokenNamespace {
+	return TokenNamespace(id.GetTaskId().GetProject() + tokenNamespaceSeparator + id.GetTaskId().GetDomain())
+}
 
 // This struct is designed to serve as the identifier of an user of resource manager
 type Resource struct {
@@ -26,18 +40,22 @@ type Builder interface {
 	BuildResourceManager(ctx context.Context) (pluginCore.ResourceManager, error)
 }
 
+// A proxy will be created for each TaskExecutionContext
 type Proxy struct {
 	pluginCore.ResourceManager
-	NamespacePrefix pluginCore.ResourceNamespace
+	ResourceNamespacePrefix pluginCore.ResourceNamespace
+	TokenNamespacePrefix    TokenNamespace
 }
 
 func (p Proxy) getPrefixedNamespace(namespace pluginCore.ResourceNamespace) pluginCore.ResourceNamespace {
-	return p.NamespacePrefix.CreateSubNamespace(namespace)
+	return p.ResourceNamespacePrefix.CreateSubNamespace(namespace)
 }
 
 func (p Proxy) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace,
 	allocationToken string) (pluginCore.AllocationStatus, error) {
-	status, err := p.ResourceManager.AllocateResource(ctx, p.getPrefixedNamespace(namespace), allocationToken)
+
+	namespacedAllocationToken := p.TokenNamespacePrefix.append(allocationToken)
+	status, err := p.ResourceManager.AllocateResource(ctx, p.getPrefixedNamespace(namespace), namespacedAllocationToken)
 	return status, err
 }
 
@@ -49,11 +67,12 @@ func (p Proxy) ReleaseResource(ctx context.Context, namespace pluginCore.Resourc
 
 type ResourceRegistrarProxy struct {
 	pluginCore.ResourceRegistrar
-	NamespacePrefix pluginCore.ResourceNamespace
+	ResourceNamespacePrefix pluginCore.ResourceNamespace
+	TokenNamespacePrefix    TokenNamespace
 }
 
 func (p ResourceRegistrarProxy) getPrefixedNamespace(namespace pluginCore.ResourceNamespace) pluginCore.ResourceNamespace {
-	return p.NamespacePrefix.CreateSubNamespace(namespace)
+	return p.ResourceNamespacePrefix.CreateSubNamespace(namespace)
 }
 
 func (p ResourceRegistrarProxy) RegisterResourceQuota(ctx context.Context, namespace pluginCore.ResourceNamespace, quota int) error {
