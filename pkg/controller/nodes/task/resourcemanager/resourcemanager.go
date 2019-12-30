@@ -14,14 +14,22 @@ import (
 
 type TokenNamespace string
 
+const execUrnPrefix = "ex"
+const execUrnSeparator = ":"
 const tokenNamespaceSeparator = "-"
 
 func (t TokenNamespace) append(s string) string {
 	return fmt.Sprintf("%s%s%s", t, tokenNamespaceSeparator, s)
 }
 
+func composeExecutionUrn(id *core.TaskExecutionIdentifier) string {
+	return execUrnPrefix + execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetProject() +
+		execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetDomain() + execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetName()
+}
+
 func ComposeTokenNamespace(id *core.TaskExecutionIdentifier) TokenNamespace {
-	return TokenNamespace(id.GetTaskId().GetProject() + tokenNamespaceSeparator + id.GetTaskId().GetDomain())
+	execUrn := composeExecutionUrn(id) // This is for the ease of debugging. Doesn't necessarily need to have this
+	return TokenNamespace(execUrn)
 }
 
 // This struct is designed to serve as the identifier of an user of resource manager
