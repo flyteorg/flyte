@@ -1221,3 +1221,51 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 		})
 	}
 }
+
+func Test_nodeExecutor_abort(t *testing.T) {
+	ctx := context.Background()
+	exec := nodeExecutor{}
+	nCtx := &execContext{}
+
+	t.Run("abort error calls finalize", func(t *testing.T) {
+		h := &nodeHandlerMocks.Node{}
+		h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("test error"))
+		h.OnFinalizeRequired().Return(true)
+		var called bool
+		h.OnFinalizeMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+			called = true
+		}).Return(nil)
+
+		err := exec.abort(ctx, h, nCtx, "testing")
+		assert.Equal(t, "test error", err.Error())
+		assert.True(t, called)
+	})
+
+	t.Run("abort error calls finalize with error", func(t *testing.T) {
+		h := &nodeHandlerMocks.Node{}
+		h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("test error"))
+		h.OnFinalizeRequired().Return(true)
+		var called bool
+		h.OnFinalizeMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+			called = true
+		}).Return(errors.New("finalize error"))
+
+		err := exec.abort(ctx, h, nCtx, "testing")
+		assert.Equal(t, "0: test error\r\n1: finalize error\r\n", err.Error())
+		assert.True(t, called)
+	})
+
+	t.Run("abort calls finalize when no errors", func(t *testing.T) {
+		h := &nodeHandlerMocks.Node{}
+		h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		h.OnFinalizeRequired().Return(true)
+		var called bool
+		h.OnFinalizeMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+			called = true
+		}).Return(nil)
+
+		err := exec.abort(ctx, h, nCtx, "testing")
+		assert.NoError(t, err)
+		assert.True(t, called)
+	})
+}
