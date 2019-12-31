@@ -575,7 +575,7 @@ func (t Handler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext
 }
 
 func New(ctx context.Context, kubeClient executors.Client, client catalog.Client, scope promutils.Scope) (*Handler, error) {
-	// TODO NewShould take apointer
+	// TODO New should take a pointer
 	async, err := catalog.NewAsyncClient(client, *catalog.GetConfig(), scope.NewSubScope("async_catalog"))
 	if err != nil {
 		return nil, err
