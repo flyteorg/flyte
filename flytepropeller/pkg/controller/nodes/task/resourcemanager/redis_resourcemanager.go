@@ -29,8 +29,8 @@ type RedisResourceManagerBuilder struct {
 
 func (r *RedisResourceManagerBuilder) ResourceRegistrar(namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceRegistrar {
 	return ResourceRegistrarProxy{
-		ResourceRegistrar: r,
-		NamespacePrefix:   namespacePrefix,
+		ResourceRegistrar:       r,
+		ResourceNamespacePrefix: namespacePrefix,
 	}
 }
 
@@ -73,8 +73,11 @@ func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) 
 
 	// building the resources and insert them into the resource manager
 	for namespace, quota := range r.namespacedResourcesQuotaMap {
+		// `namespace` is always prefixed with the plugin ID. Each plugin can then affix additional sub-namespaces to it to create different resource pools.
+		// For example, hive qubole plugin's namespaces contain plugin ID and qubole cluster (e.g., "qubole:default-cluster").
 		prefixedNamespace := r.getNamespacedRedisSetKey(namespace)
 		metrics := NewRedisResourceManagerMetrics(r.MetricsScope.NewSubScope(prefixedNamespace))
+
 		rm.namespacedResourcesMap[namespace] = &Resource{
 			quota:          quota,
 			metrics:        metrics,
@@ -108,10 +111,11 @@ type RedisResourceManager struct {
 	namespacedResourcesMap map[pluginCore.ResourceNamespace]*Resource
 }
 
-func GetTaskResourceManager(r pluginCore.ResourceManager, namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceManager {
+func GetTaskResourceManager(r pluginCore.ResourceManager, resourceNamespacePrefix pluginCore.ResourceNamespace, allocationTokenPrefix TokenPrefix) pluginCore.ResourceManager {
 	return Proxy{
-		ResourceManager: r,
-		NamespacePrefix: namespacePrefix,
+		ResourceManager:         r,
+		ResourceNamespacePrefix: resourceNamespacePrefix,
+		TokenPrefix:             allocationTokenPrefix,
 	}
 }
 
