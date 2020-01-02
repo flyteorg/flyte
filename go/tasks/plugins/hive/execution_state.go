@@ -141,10 +141,24 @@ func ConstructTaskInfo(e ExecutionState) *core.TaskInfo {
 	return nil
 }
 
+func composeResourceNamespaceWithClusterLabel(ctx context.Context, tCtx core.TaskExecutionContext, resourceNamespace core.ResourceNamespace) (core.ResourceNamespace, error) {
+	_, clusterLabel, _, _, err := GetQueryInfo(ctx, tCtx)
+	if err != nil {
+		return resourceNamespace, err
+	}
+	return resourceNamespace.CreateSubNamespace(core.ResourceNamespace(clusterLabel)), nil
+}
+
 func GetAllocationToken(ctx context.Context, resourceNamespace core.ResourceNamespace, tCtx core.TaskExecutionContext) (ExecutionState, error) {
 	newState := ExecutionState{}
 	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, resourceNamespace, uniqueId)
+
+	resourceNamespaceWithClusterLabel, err := composeResourceNamespaceWithClusterLabel(ctx, tCtx, resourceNamespace)
+	if err != nil {
+		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when requesting allocation token %s", uniqueId)
+	}
+
+	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, resourceNamespaceWithClusterLabel, uniqueId)
 	if err != nil {
 		logger.Errorf(ctx, "Resource manager failed for TaskExecId [%s] token [%s]. error %s",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueId, err)
@@ -299,7 +313,13 @@ func Abort(ctx context.Context, tCtx core.TaskExecutionContext, currentState Exe
 func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, resourceNamespace core.ResourceNamespace, _ ExecutionState) error {
 	// Release allocation token
 	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	err := tCtx.ResourceManager().ReleaseResource(ctx, resourceNamespace, uniqueId)
+	resourceNamespaceWithClusterLabel, err := composeResourceNamespaceWithClusterLabel(ctx, tCtx, resourceNamespace)
+	if err != nil {
+		return errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when releasing allocation token %s", uniqueId)
+	}
+
+	err = tCtx.ResourceManager().ReleaseResource(ctx, resourceNamespaceWithClusterLabel, uniqueId)
+
 	if err != nil {
 		logger.Errorf(ctx, "Error releasing allocation token [%s] in Finalize [%s]", uniqueId, err)
 		return err
