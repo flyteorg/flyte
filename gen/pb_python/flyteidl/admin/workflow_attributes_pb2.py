@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n(flyteidl/admin/workflow_attributes.proto\x12\x0e\x66lyteidl.admin\x1a\'flyteidl/admin/matchable_resource.proto\"\x88\x01\n\x12WorkflowAttributes\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x10\n\x08workflow\x18\x03 \x01(\t\x12?\n\x13matching_attributes\x18\x04 \x01(\x0b\x32\".flyteidl.admin.MatchingAttributes\"Y\n\x1fWorkflowAttributesUpdateRequest\x12\x36\n\nattributes\x18\x01 \x01(\x0b\x32\".flyteidl.admin.WorkflowAttributes\"\"\n WorkflowAttributesUpdateResponseB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n(flyteidl/admin/workflow_attributes.proto\x12\x0e\x66lyteidl.admin\x1a\'flyteidl/admin/matchable_resource.proto\"\x88\x01\n\x12WorkflowAttributes\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x10\n\x08workflow\x18\x03 \x01(\t\x12?\n\x13matching_attributes\x18\x04 \x01(\x0b\x32\".flyteidl.admin.MatchingAttributes\"Y\n\x1fWorkflowAttributesUpdateRequest\x12\x36\n\nattributes\x18\x01 \x01(\x0b\x32\".flyteidl.admin.WorkflowAttributes\"\"\n WorkflowAttributesUpdateResponse\"\x8b\x01\n\x1cWorkflowAttributesGetRequest\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x10\n\x08workflow\x18\x03 \x01(\t\x12\x38\n\rresource_type\x18\x04 \x01(\x0e\x32!.flyteidl.admin.MatchableResource\"W\n\x1dWorkflowAttributesGetResponse\x12\x36\n\nattributes\x18\x01 \x01(\x0b\x32\".flyteidl.admin.WorkflowAttributes\"\x8e\x01\n\x1fWorkflowAttributesDeleteRequest\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x10\n\x08workflow\x18\x03 \x01(\t\x12\x38\n\rresource_type\x18\x04 \x01(\x0e\x32!.flyteidl.admin.MatchableResource\"\"\n WorkflowAttributesDeleteResponseB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
   ,
   dependencies=[flyteidl_dot_admin_dot_matchable__resource__pb2.DESCRIPTOR,])
 
@@ -134,11 +134,177 @@ _WORKFLOWATTRIBUTESUPDATERESPONSE = _descriptor.Descriptor(
   serialized_end=365,
 )
 
+
+_WORKFLOWATTRIBUTESGETREQUEST = _descriptor.Descriptor(
+  name='WorkflowAttributesGetRequest',
+  full_name='flyteidl.admin.WorkflowAttributesGetRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='project', full_name='flyteidl.admin.WorkflowAttributesGetRequest.project', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='domain', full_name='flyteidl.admin.WorkflowAttributesGetRequest.domain', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='workflow', full_name='flyteidl.admin.WorkflowAttributesGetRequest.workflow', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='resource_type', full_name='flyteidl.admin.WorkflowAttributesGetRequest.resource_type', index=3,
+      number=4, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=368,
+  serialized_end=507,
+)
+
+
+_WORKFLOWATTRIBUTESGETRESPONSE = _descriptor.Descriptor(
+  name='WorkflowAttributesGetResponse',
+  full_name='flyteidl.admin.WorkflowAttributesGetResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='attributes', full_name='flyteidl.admin.WorkflowAttributesGetResponse.attributes', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=509,
+  serialized_end=596,
+)
+
+
+_WORKFLOWATTRIBUTESDELETEREQUEST = _descriptor.Descriptor(
+  name='WorkflowAttributesDeleteRequest',
+  full_name='flyteidl.admin.WorkflowAttributesDeleteRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='project', full_name='flyteidl.admin.WorkflowAttributesDeleteRequest.project', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='domain', full_name='flyteidl.admin.WorkflowAttributesDeleteRequest.domain', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='workflow', full_name='flyteidl.admin.WorkflowAttributesDeleteRequest.workflow', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='resource_type', full_name='flyteidl.admin.WorkflowAttributesDeleteRequest.resource_type', index=3,
+      number=4, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=599,
+  serialized_end=741,
+)
+
+
+_WORKFLOWATTRIBUTESDELETERESPONSE = _descriptor.Descriptor(
+  name='WorkflowAttributesDeleteResponse',
+  full_name='flyteidl.admin.WorkflowAttributesDeleteResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=743,
+  serialized_end=777,
+)
+
 _WORKFLOWATTRIBUTES.fields_by_name['matching_attributes'].message_type = flyteidl_dot_admin_dot_matchable__resource__pb2._MATCHINGATTRIBUTES
 _WORKFLOWATTRIBUTESUPDATEREQUEST.fields_by_name['attributes'].message_type = _WORKFLOWATTRIBUTES
+_WORKFLOWATTRIBUTESGETREQUEST.fields_by_name['resource_type'].enum_type = flyteidl_dot_admin_dot_matchable__resource__pb2._MATCHABLERESOURCE
+_WORKFLOWATTRIBUTESGETRESPONSE.fields_by_name['attributes'].message_type = _WORKFLOWATTRIBUTES
+_WORKFLOWATTRIBUTESDELETEREQUEST.fields_by_name['resource_type'].enum_type = flyteidl_dot_admin_dot_matchable__resource__pb2._MATCHABLERESOURCE
 DESCRIPTOR.message_types_by_name['WorkflowAttributes'] = _WORKFLOWATTRIBUTES
 DESCRIPTOR.message_types_by_name['WorkflowAttributesUpdateRequest'] = _WORKFLOWATTRIBUTESUPDATEREQUEST
 DESCRIPTOR.message_types_by_name['WorkflowAttributesUpdateResponse'] = _WORKFLOWATTRIBUTESUPDATERESPONSE
+DESCRIPTOR.message_types_by_name['WorkflowAttributesGetRequest'] = _WORKFLOWATTRIBUTESGETREQUEST
+DESCRIPTOR.message_types_by_name['WorkflowAttributesGetResponse'] = _WORKFLOWATTRIBUTESGETRESPONSE
+DESCRIPTOR.message_types_by_name['WorkflowAttributesDeleteRequest'] = _WORKFLOWATTRIBUTESDELETEREQUEST
+DESCRIPTOR.message_types_by_name['WorkflowAttributesDeleteResponse'] = _WORKFLOWATTRIBUTESDELETERESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 WorkflowAttributes = _reflection.GeneratedProtocolMessageType('WorkflowAttributes', (_message.Message,), dict(
@@ -161,6 +327,34 @@ WorkflowAttributesUpdateResponse = _reflection.GeneratedProtocolMessageType('Wor
   # @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowAttributesUpdateResponse)
   ))
 _sym_db.RegisterMessage(WorkflowAttributesUpdateResponse)
+
+WorkflowAttributesGetRequest = _reflection.GeneratedProtocolMessageType('WorkflowAttributesGetRequest', (_message.Message,), dict(
+  DESCRIPTOR = _WORKFLOWATTRIBUTESGETREQUEST,
+  __module__ = 'flyteidl.admin.workflow_attributes_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowAttributesGetRequest)
+  ))
+_sym_db.RegisterMessage(WorkflowAttributesGetRequest)
+
+WorkflowAttributesGetResponse = _reflection.GeneratedProtocolMessageType('WorkflowAttributesGetResponse', (_message.Message,), dict(
+  DESCRIPTOR = _WORKFLOWATTRIBUTESGETRESPONSE,
+  __module__ = 'flyteidl.admin.workflow_attributes_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowAttributesGetResponse)
+  ))
+_sym_db.RegisterMessage(WorkflowAttributesGetResponse)
+
+WorkflowAttributesDeleteRequest = _reflection.GeneratedProtocolMessageType('WorkflowAttributesDeleteRequest', (_message.Message,), dict(
+  DESCRIPTOR = _WORKFLOWATTRIBUTESDELETEREQUEST,
+  __module__ = 'flyteidl.admin.workflow_attributes_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  ))
+_sym_db.RegisterMessage(WorkflowAttributesDeleteRequest)
+
+WorkflowAttributesDeleteResponse = _reflection.GeneratedProtocolMessageType('WorkflowAttributesDeleteResponse', (_message.Message,), dict(
+  DESCRIPTOR = _WORKFLOWATTRIBUTESDELETERESPONSE,
+  __module__ = 'flyteidl.admin.workflow_attributes_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  ))
+_sym_db.RegisterMessage(WorkflowAttributesDeleteResponse)
 
 
 DESCRIPTOR._options = None

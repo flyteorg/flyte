@@ -68,3 +68,96 @@ Purposefully empty, may be populated in the future.
 
 
 
+
+.. _api_msg_flyteidl.admin.ProjectAttributesGetRequest:
+
+flyteidl.admin.ProjectAttributesGetRequest
+------------------------------------------
+
+`[flyteidl.admin.ProjectAttributesGetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_attributes.proto#L24>`_
+
+
+.. code-block:: json
+
+  {
+    "project": "...",
+    "resource_type": "..."
+  }
+
+.. _api_field_flyteidl.admin.ProjectAttributesGetRequest.project:
+
+project
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Unique project id which this set of attributes references.
+  
+  
+.. _api_field_flyteidl.admin.ProjectAttributesGetRequest.resource_type:
+
+resource_type
+  (:ref:`flyteidl.admin.MatchableResource <api_enum_flyteidl.admin.MatchableResource>`) 
+  
+
+
+.. _api_msg_flyteidl.admin.ProjectAttributesGetResponse:
+
+flyteidl.admin.ProjectAttributesGetResponse
+-------------------------------------------
+
+`[flyteidl.admin.ProjectAttributesGetResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_attributes.proto#L31>`_
+
+
+.. code-block:: json
+
+  {
+    "attributes": "{...}"
+  }
+
+.. _api_field_flyteidl.admin.ProjectAttributesGetResponse.attributes:
+
+attributes
+  (:ref:`flyteidl.admin.ProjectAttributes <api_msg_flyteidl.admin.ProjectAttributes>`) 
+  
+
+
+.. _api_msg_flyteidl.admin.ProjectAttributesDeleteRequest:
+
+flyteidl.admin.ProjectAttributesDeleteRequest
+---------------------------------------------
+
+`[flyteidl.admin.ProjectAttributesDeleteRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_attributes.proto#L36>`_
+
+
+.. code-block:: json
+
+  {
+    "project": "...",
+    "resource_type": "..."
+  }
+
+.. _api_field_flyteidl.admin.ProjectAttributesDeleteRequest.project:
+
+project
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Unique project id which this set of attributes references.
+  
+  
+.. _api_field_flyteidl.admin.ProjectAttributesDeleteRequest.resource_type:
+
+resource_type
+  (:ref:`flyteidl.admin.MatchableResource <api_enum_flyteidl.admin.MatchableResource>`) 
+  
+
+
+.. _api_msg_flyteidl.admin.ProjectAttributesDeleteResponse:
+
+flyteidl.admin.ProjectAttributesDeleteResponse
+----------------------------------------------
+
+`[flyteidl.admin.ProjectAttributesDeleteResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project_attributes.proto#L44>`_
+
+Purposefully empty, may be populated in the future.
+
+.. code-block:: json
+
+  {}
+
+
+

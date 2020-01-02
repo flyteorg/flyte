@@ -390,6 +390,25 @@ service AdminService {
     };
   }
 
+  rpc GetProjectAttributes (flyteidl.admin.ProjectAttributesGetRequest) returns (flyteidl.admin.ProjectAttributesGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/project_attributes/{project}"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Retrieve the customized resource attributes associated with a project"
+    };
+  }
+
+  rpc DeleteProjectAttributes (flyteidl.admin.ProjectAttributesDeleteRequest) returns (flyteidl.admin.ProjectAttributesDeleteResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/project_attributes/{project}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Delete the customized resource attributes associated with a project"
+    };
+  }
+
   rpc UpdateProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesUpdateRequest) returns (flyteidl.admin.ProjectDomainAttributesUpdateResponse) {
     option (google.api.http) = {
       put: "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}"
@@ -400,6 +419,25 @@ service AdminService {
     };
   }
 
+  rpc GetProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesGetRequest) returns (flyteidl.admin.ProjectDomainAttributesGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/project_domain_attributes/{project}/{domain}"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Retrieve the customized resource attributes associated with a project-domain combination"
+    };
+  }
+
+  rpc DeleteProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesDeleteRequest) returns (flyteidl.admin.ProjectDomainAttributesDeleteResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/project_domain_attributes/{project}/{domain}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Delete the customized resource attributes associated with a project-domain combination"
+    };
+  }
+
   rpc UpdateWorkflowAttributes (flyteidl.admin.WorkflowAttributesUpdateRequest) returns (flyteidl.admin.WorkflowAttributesUpdateResponse) {
     option (google.api.http) = {
       put: "/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}"
@@ -407,6 +445,25 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       description: "Update the customized resource attributes associated with a project, domain and workflow combination"
+    };
+  }
+
+  rpc GetWorkflowAttributes (flyteidl.admin.WorkflowAttributesGetRequest) returns (flyteidl.admin.WorkflowAttributesGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/workflow_attributes/{project}/{domain}/{workflow}"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Retrieve the customized resource attributes associated with a project, domain and workflow combination"
+    };
+  }
+
+  rpc DeleteWorkflowAttributes (flyteidl.admin.WorkflowAttributesDeleteRequest) returns (flyteidl.admin.WorkflowAttributesDeleteResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/workflow_attributes/{project}/{domain}/{workflow}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Delete the customized resource attributes associated with a project, domain and workflow combination"
     };
   }
 

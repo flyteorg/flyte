@@ -9664,6 +9664,220 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a ProjectAttributesGetRequest. */
+        interface IProjectAttributesGetRequest {
+
+            /** ProjectAttributesGetRequest project */
+            project?: (string|null);
+
+            /** ProjectAttributesGetRequest resourceType */
+            resourceType?: (flyteidl.admin.MatchableResource|null);
+        }
+
+        /** Represents a ProjectAttributesGetRequest. */
+        class ProjectAttributesGetRequest implements IProjectAttributesGetRequest {
+
+            /**
+             * Constructs a new ProjectAttributesGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectAttributesGetRequest);
+
+            /** ProjectAttributesGetRequest project. */
+            public project: string;
+
+            /** ProjectAttributesGetRequest resourceType. */
+            public resourceType: flyteidl.admin.MatchableResource;
+
+            /**
+             * Creates a new ProjectAttributesGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectAttributesGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectAttributesGetRequest): flyteidl.admin.ProjectAttributesGetRequest;
+
+            /**
+             * Encodes the specified ProjectAttributesGetRequest message. Does not implicitly {@link flyteidl.admin.ProjectAttributesGetRequest.verify|verify} messages.
+             * @param message ProjectAttributesGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectAttributesGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectAttributesGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectAttributesGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectAttributesGetRequest;
+
+            /**
+             * Verifies a ProjectAttributesGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectAttributesGetResponse. */
+        interface IProjectAttributesGetResponse {
+
+            /** ProjectAttributesGetResponse attributes */
+            attributes?: (flyteidl.admin.IProjectAttributes|null);
+        }
+
+        /** Represents a ProjectAttributesGetResponse. */
+        class ProjectAttributesGetResponse implements IProjectAttributesGetResponse {
+
+            /**
+             * Constructs a new ProjectAttributesGetResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectAttributesGetResponse);
+
+            /** ProjectAttributesGetResponse attributes. */
+            public attributes?: (flyteidl.admin.IProjectAttributes|null);
+
+            /**
+             * Creates a new ProjectAttributesGetResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectAttributesGetResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectAttributesGetResponse): flyteidl.admin.ProjectAttributesGetResponse;
+
+            /**
+             * Encodes the specified ProjectAttributesGetResponse message. Does not implicitly {@link flyteidl.admin.ProjectAttributesGetResponse.verify|verify} messages.
+             * @param message ProjectAttributesGetResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectAttributesGetResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectAttributesGetResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectAttributesGetResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectAttributesGetResponse;
+
+            /**
+             * Verifies a ProjectAttributesGetResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectAttributesDeleteRequest. */
+        interface IProjectAttributesDeleteRequest {
+
+            /** ProjectAttributesDeleteRequest project */
+            project?: (string|null);
+
+            /** ProjectAttributesDeleteRequest resourceType */
+            resourceType?: (flyteidl.admin.MatchableResource|null);
+        }
+
+        /** Represents a ProjectAttributesDeleteRequest. */
+        class ProjectAttributesDeleteRequest implements IProjectAttributesDeleteRequest {
+
+            /**
+             * Constructs a new ProjectAttributesDeleteRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectAttributesDeleteRequest);
+
+            /** ProjectAttributesDeleteRequest project. */
+            public project: string;
+
+            /** ProjectAttributesDeleteRequest resourceType. */
+            public resourceType: flyteidl.admin.MatchableResource;
+
+            /**
+             * Creates a new ProjectAttributesDeleteRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectAttributesDeleteRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectAttributesDeleteRequest): flyteidl.admin.ProjectAttributesDeleteRequest;
+
+            /**
+             * Encodes the specified ProjectAttributesDeleteRequest message. Does not implicitly {@link flyteidl.admin.ProjectAttributesDeleteRequest.verify|verify} messages.
+             * @param message ProjectAttributesDeleteRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectAttributesDeleteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectAttributesDeleteRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectAttributesDeleteRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectAttributesDeleteRequest;
+
+            /**
+             * Verifies a ProjectAttributesDeleteRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectAttributesDeleteResponse. */
+        interface IProjectAttributesDeleteResponse {
+        }
+
+        /** Represents a ProjectAttributesDeleteResponse. */
+        class ProjectAttributesDeleteResponse implements IProjectAttributesDeleteResponse {
+
+            /**
+             * Constructs a new ProjectAttributesDeleteResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectAttributesDeleteResponse);
+
+            /**
+             * Creates a new ProjectAttributesDeleteResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectAttributesDeleteResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectAttributesDeleteResponse): flyteidl.admin.ProjectAttributesDeleteResponse;
+
+            /**
+             * Encodes the specified ProjectAttributesDeleteResponse message. Does not implicitly {@link flyteidl.admin.ProjectAttributesDeleteResponse.verify|verify} messages.
+             * @param message ProjectAttributesDeleteResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectAttributesDeleteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectAttributesDeleteResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectAttributesDeleteResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectAttributesDeleteResponse;
+
+            /**
+             * Verifies a ProjectAttributesDeleteResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a ProjectDomainAttributes. */
         interface IProjectDomainAttributes {
 
@@ -9820,6 +10034,232 @@ export namespace flyteidl {
 
             /**
              * Verifies a ProjectDomainAttributesUpdateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectDomainAttributesGetRequest. */
+        interface IProjectDomainAttributesGetRequest {
+
+            /** ProjectDomainAttributesGetRequest project */
+            project?: (string|null);
+
+            /** ProjectDomainAttributesGetRequest domain */
+            domain?: (string|null);
+
+            /** ProjectDomainAttributesGetRequest resourceType */
+            resourceType?: (flyteidl.admin.MatchableResource|null);
+        }
+
+        /** Represents a ProjectDomainAttributesGetRequest. */
+        class ProjectDomainAttributesGetRequest implements IProjectDomainAttributesGetRequest {
+
+            /**
+             * Constructs a new ProjectDomainAttributesGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectDomainAttributesGetRequest);
+
+            /** ProjectDomainAttributesGetRequest project. */
+            public project: string;
+
+            /** ProjectDomainAttributesGetRequest domain. */
+            public domain: string;
+
+            /** ProjectDomainAttributesGetRequest resourceType. */
+            public resourceType: flyteidl.admin.MatchableResource;
+
+            /**
+             * Creates a new ProjectDomainAttributesGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectDomainAttributesGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectDomainAttributesGetRequest): flyteidl.admin.ProjectDomainAttributesGetRequest;
+
+            /**
+             * Encodes the specified ProjectDomainAttributesGetRequest message. Does not implicitly {@link flyteidl.admin.ProjectDomainAttributesGetRequest.verify|verify} messages.
+             * @param message ProjectDomainAttributesGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectDomainAttributesGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectDomainAttributesGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectDomainAttributesGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectDomainAttributesGetRequest;
+
+            /**
+             * Verifies a ProjectDomainAttributesGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectDomainAttributesGetResponse. */
+        interface IProjectDomainAttributesGetResponse {
+
+            /** ProjectDomainAttributesGetResponse attributes */
+            attributes?: (flyteidl.admin.IProjectDomainAttributes|null);
+        }
+
+        /** Represents a ProjectDomainAttributesGetResponse. */
+        class ProjectDomainAttributesGetResponse implements IProjectDomainAttributesGetResponse {
+
+            /**
+             * Constructs a new ProjectDomainAttributesGetResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectDomainAttributesGetResponse);
+
+            /** ProjectDomainAttributesGetResponse attributes. */
+            public attributes?: (flyteidl.admin.IProjectDomainAttributes|null);
+
+            /**
+             * Creates a new ProjectDomainAttributesGetResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectDomainAttributesGetResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectDomainAttributesGetResponse): flyteidl.admin.ProjectDomainAttributesGetResponse;
+
+            /**
+             * Encodes the specified ProjectDomainAttributesGetResponse message. Does not implicitly {@link flyteidl.admin.ProjectDomainAttributesGetResponse.verify|verify} messages.
+             * @param message ProjectDomainAttributesGetResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectDomainAttributesGetResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectDomainAttributesGetResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectDomainAttributesGetResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectDomainAttributesGetResponse;
+
+            /**
+             * Verifies a ProjectDomainAttributesGetResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectDomainAttributesDeleteRequest. */
+        interface IProjectDomainAttributesDeleteRequest {
+
+            /** ProjectDomainAttributesDeleteRequest project */
+            project?: (string|null);
+
+            /** ProjectDomainAttributesDeleteRequest domain */
+            domain?: (string|null);
+
+            /** ProjectDomainAttributesDeleteRequest resourceType */
+            resourceType?: (flyteidl.admin.MatchableResource|null);
+        }
+
+        /** Represents a ProjectDomainAttributesDeleteRequest. */
+        class ProjectDomainAttributesDeleteRequest implements IProjectDomainAttributesDeleteRequest {
+
+            /**
+             * Constructs a new ProjectDomainAttributesDeleteRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectDomainAttributesDeleteRequest);
+
+            /** ProjectDomainAttributesDeleteRequest project. */
+            public project: string;
+
+            /** ProjectDomainAttributesDeleteRequest domain. */
+            public domain: string;
+
+            /** ProjectDomainAttributesDeleteRequest resourceType. */
+            public resourceType: flyteidl.admin.MatchableResource;
+
+            /**
+             * Creates a new ProjectDomainAttributesDeleteRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectDomainAttributesDeleteRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectDomainAttributesDeleteRequest): flyteidl.admin.ProjectDomainAttributesDeleteRequest;
+
+            /**
+             * Encodes the specified ProjectDomainAttributesDeleteRequest message. Does not implicitly {@link flyteidl.admin.ProjectDomainAttributesDeleteRequest.verify|verify} messages.
+             * @param message ProjectDomainAttributesDeleteRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectDomainAttributesDeleteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectDomainAttributesDeleteRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectDomainAttributesDeleteRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectDomainAttributesDeleteRequest;
+
+            /**
+             * Verifies a ProjectDomainAttributesDeleteRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ProjectDomainAttributesDeleteResponse. */
+        interface IProjectDomainAttributesDeleteResponse {
+        }
+
+        /** Represents a ProjectDomainAttributesDeleteResponse. */
+        class ProjectDomainAttributesDeleteResponse implements IProjectDomainAttributesDeleteResponse {
+
+            /**
+             * Constructs a new ProjectDomainAttributesDeleteResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectDomainAttributesDeleteResponse);
+
+            /**
+             * Creates a new ProjectDomainAttributesDeleteResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectDomainAttributesDeleteResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectDomainAttributesDeleteResponse): flyteidl.admin.ProjectDomainAttributesDeleteResponse;
+
+            /**
+             * Encodes the specified ProjectDomainAttributesDeleteResponse message. Does not implicitly {@link flyteidl.admin.ProjectDomainAttributesDeleteResponse.verify|verify} messages.
+             * @param message ProjectDomainAttributesDeleteResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectDomainAttributesDeleteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectDomainAttributesDeleteResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectDomainAttributesDeleteResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectDomainAttributesDeleteResponse;
+
+            /**
+             * Verifies a ProjectDomainAttributesDeleteResponse message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -11122,6 +11562,244 @@ export namespace flyteidl {
              */
             public static verify(message: { [k: string]: any }): (string|null);
         }
+
+        /** Properties of a WorkflowAttributesGetRequest. */
+        interface IWorkflowAttributesGetRequest {
+
+            /** WorkflowAttributesGetRequest project */
+            project?: (string|null);
+
+            /** WorkflowAttributesGetRequest domain */
+            domain?: (string|null);
+
+            /** WorkflowAttributesGetRequest workflow */
+            workflow?: (string|null);
+
+            /** WorkflowAttributesGetRequest resourceType */
+            resourceType?: (flyteidl.admin.MatchableResource|null);
+        }
+
+        /** Represents a WorkflowAttributesGetRequest. */
+        class WorkflowAttributesGetRequest implements IWorkflowAttributesGetRequest {
+
+            /**
+             * Constructs a new WorkflowAttributesGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowAttributesGetRequest);
+
+            /** WorkflowAttributesGetRequest project. */
+            public project: string;
+
+            /** WorkflowAttributesGetRequest domain. */
+            public domain: string;
+
+            /** WorkflowAttributesGetRequest workflow. */
+            public workflow: string;
+
+            /** WorkflowAttributesGetRequest resourceType. */
+            public resourceType: flyteidl.admin.MatchableResource;
+
+            /**
+             * Creates a new WorkflowAttributesGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowAttributesGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowAttributesGetRequest): flyteidl.admin.WorkflowAttributesGetRequest;
+
+            /**
+             * Encodes the specified WorkflowAttributesGetRequest message. Does not implicitly {@link flyteidl.admin.WorkflowAttributesGetRequest.verify|verify} messages.
+             * @param message WorkflowAttributesGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowAttributesGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowAttributesGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowAttributesGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowAttributesGetRequest;
+
+            /**
+             * Verifies a WorkflowAttributesGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowAttributesGetResponse. */
+        interface IWorkflowAttributesGetResponse {
+
+            /** WorkflowAttributesGetResponse attributes */
+            attributes?: (flyteidl.admin.IWorkflowAttributes|null);
+        }
+
+        /** Represents a WorkflowAttributesGetResponse. */
+        class WorkflowAttributesGetResponse implements IWorkflowAttributesGetResponse {
+
+            /**
+             * Constructs a new WorkflowAttributesGetResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowAttributesGetResponse);
+
+            /** WorkflowAttributesGetResponse attributes. */
+            public attributes?: (flyteidl.admin.IWorkflowAttributes|null);
+
+            /**
+             * Creates a new WorkflowAttributesGetResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowAttributesGetResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowAttributesGetResponse): flyteidl.admin.WorkflowAttributesGetResponse;
+
+            /**
+             * Encodes the specified WorkflowAttributesGetResponse message. Does not implicitly {@link flyteidl.admin.WorkflowAttributesGetResponse.verify|verify} messages.
+             * @param message WorkflowAttributesGetResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowAttributesGetResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowAttributesGetResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowAttributesGetResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowAttributesGetResponse;
+
+            /**
+             * Verifies a WorkflowAttributesGetResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowAttributesDeleteRequest. */
+        interface IWorkflowAttributesDeleteRequest {
+
+            /** WorkflowAttributesDeleteRequest project */
+            project?: (string|null);
+
+            /** WorkflowAttributesDeleteRequest domain */
+            domain?: (string|null);
+
+            /** WorkflowAttributesDeleteRequest workflow */
+            workflow?: (string|null);
+
+            /** WorkflowAttributesDeleteRequest resourceType */
+            resourceType?: (flyteidl.admin.MatchableResource|null);
+        }
+
+        /** Represents a WorkflowAttributesDeleteRequest. */
+        class WorkflowAttributesDeleteRequest implements IWorkflowAttributesDeleteRequest {
+
+            /**
+             * Constructs a new WorkflowAttributesDeleteRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowAttributesDeleteRequest);
+
+            /** WorkflowAttributesDeleteRequest project. */
+            public project: string;
+
+            /** WorkflowAttributesDeleteRequest domain. */
+            public domain: string;
+
+            /** WorkflowAttributesDeleteRequest workflow. */
+            public workflow: string;
+
+            /** WorkflowAttributesDeleteRequest resourceType. */
+            public resourceType: flyteidl.admin.MatchableResource;
+
+            /**
+             * Creates a new WorkflowAttributesDeleteRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowAttributesDeleteRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowAttributesDeleteRequest): flyteidl.admin.WorkflowAttributesDeleteRequest;
+
+            /**
+             * Encodes the specified WorkflowAttributesDeleteRequest message. Does not implicitly {@link flyteidl.admin.WorkflowAttributesDeleteRequest.verify|verify} messages.
+             * @param message WorkflowAttributesDeleteRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowAttributesDeleteRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowAttributesDeleteRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowAttributesDeleteRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowAttributesDeleteRequest;
+
+            /**
+             * Verifies a WorkflowAttributesDeleteRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowAttributesDeleteResponse. */
+        interface IWorkflowAttributesDeleteResponse {
+        }
+
+        /** Represents a WorkflowAttributesDeleteResponse. */
+        class WorkflowAttributesDeleteResponse implements IWorkflowAttributesDeleteResponse {
+
+            /**
+             * Constructs a new WorkflowAttributesDeleteResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowAttributesDeleteResponse);
+
+            /**
+             * Creates a new WorkflowAttributesDeleteResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowAttributesDeleteResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowAttributesDeleteResponse): flyteidl.admin.WorkflowAttributesDeleteResponse;
+
+            /**
+             * Encodes the specified WorkflowAttributesDeleteResponse message. Does not implicitly {@link flyteidl.admin.WorkflowAttributesDeleteResponse.verify|verify} messages.
+             * @param message WorkflowAttributesDeleteResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowAttributesDeleteResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowAttributesDeleteResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowAttributesDeleteResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowAttributesDeleteResponse;
+
+            /**
+             * Verifies a WorkflowAttributesDeleteResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
     }
 
     /** Namespace service. */
@@ -11624,6 +12302,34 @@ export namespace flyteidl {
             public updateProjectAttributes(request: flyteidl.admin.IProjectAttributesUpdateRequest): Promise<flyteidl.admin.ProjectAttributesUpdateResponse>;
 
             /**
+             * Calls GetProjectAttributes.
+             * @param request ProjectAttributesGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ProjectAttributesGetResponse
+             */
+            public getProjectAttributes(request: flyteidl.admin.IProjectAttributesGetRequest, callback: flyteidl.service.AdminService.GetProjectAttributesCallback): void;
+
+            /**
+             * Calls GetProjectAttributes.
+             * @param request ProjectAttributesGetRequest message or plain object
+             * @returns Promise
+             */
+            public getProjectAttributes(request: flyteidl.admin.IProjectAttributesGetRequest): Promise<flyteidl.admin.ProjectAttributesGetResponse>;
+
+            /**
+             * Calls DeleteProjectAttributes.
+             * @param request ProjectAttributesDeleteRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ProjectAttributesDeleteResponse
+             */
+            public deleteProjectAttributes(request: flyteidl.admin.IProjectAttributesDeleteRequest, callback: flyteidl.service.AdminService.DeleteProjectAttributesCallback): void;
+
+            /**
+             * Calls DeleteProjectAttributes.
+             * @param request ProjectAttributesDeleteRequest message or plain object
+             * @returns Promise
+             */
+            public deleteProjectAttributes(request: flyteidl.admin.IProjectAttributesDeleteRequest): Promise<flyteidl.admin.ProjectAttributesDeleteResponse>;
+
+            /**
              * Calls UpdateProjectDomainAttributes.
              * @param request ProjectDomainAttributesUpdateRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and ProjectDomainAttributesUpdateResponse
@@ -11638,6 +12344,34 @@ export namespace flyteidl {
             public updateProjectDomainAttributes(request: flyteidl.admin.IProjectDomainAttributesUpdateRequest): Promise<flyteidl.admin.ProjectDomainAttributesUpdateResponse>;
 
             /**
+             * Calls GetProjectDomainAttributes.
+             * @param request ProjectDomainAttributesGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ProjectDomainAttributesGetResponse
+             */
+            public getProjectDomainAttributes(request: flyteidl.admin.IProjectDomainAttributesGetRequest, callback: flyteidl.service.AdminService.GetProjectDomainAttributesCallback): void;
+
+            /**
+             * Calls GetProjectDomainAttributes.
+             * @param request ProjectDomainAttributesGetRequest message or plain object
+             * @returns Promise
+             */
+            public getProjectDomainAttributes(request: flyteidl.admin.IProjectDomainAttributesGetRequest): Promise<flyteidl.admin.ProjectDomainAttributesGetResponse>;
+
+            /**
+             * Calls DeleteProjectDomainAttributes.
+             * @param request ProjectDomainAttributesDeleteRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ProjectDomainAttributesDeleteResponse
+             */
+            public deleteProjectDomainAttributes(request: flyteidl.admin.IProjectDomainAttributesDeleteRequest, callback: flyteidl.service.AdminService.DeleteProjectDomainAttributesCallback): void;
+
+            /**
+             * Calls DeleteProjectDomainAttributes.
+             * @param request ProjectDomainAttributesDeleteRequest message or plain object
+             * @returns Promise
+             */
+            public deleteProjectDomainAttributes(request: flyteidl.admin.IProjectDomainAttributesDeleteRequest): Promise<flyteidl.admin.ProjectDomainAttributesDeleteResponse>;
+
+            /**
              * Calls UpdateWorkflowAttributes.
              * @param request WorkflowAttributesUpdateRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and WorkflowAttributesUpdateResponse
@@ -11650,6 +12384,34 @@ export namespace flyteidl {
              * @returns Promise
              */
             public updateWorkflowAttributes(request: flyteidl.admin.IWorkflowAttributesUpdateRequest): Promise<flyteidl.admin.WorkflowAttributesUpdateResponse>;
+
+            /**
+             * Calls GetWorkflowAttributes.
+             * @param request WorkflowAttributesGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and WorkflowAttributesGetResponse
+             */
+            public getWorkflowAttributes(request: flyteidl.admin.IWorkflowAttributesGetRequest, callback: flyteidl.service.AdminService.GetWorkflowAttributesCallback): void;
+
+            /**
+             * Calls GetWorkflowAttributes.
+             * @param request WorkflowAttributesGetRequest message or plain object
+             * @returns Promise
+             */
+            public getWorkflowAttributes(request: flyteidl.admin.IWorkflowAttributesGetRequest): Promise<flyteidl.admin.WorkflowAttributesGetResponse>;
+
+            /**
+             * Calls DeleteWorkflowAttributes.
+             * @param request WorkflowAttributesDeleteRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and WorkflowAttributesDeleteResponse
+             */
+            public deleteWorkflowAttributes(request: flyteidl.admin.IWorkflowAttributesDeleteRequest, callback: flyteidl.service.AdminService.DeleteWorkflowAttributesCallback): void;
+
+            /**
+             * Calls DeleteWorkflowAttributes.
+             * @param request WorkflowAttributesDeleteRequest message or plain object
+             * @returns Promise
+             */
+            public deleteWorkflowAttributes(request: flyteidl.admin.IWorkflowAttributesDeleteRequest): Promise<flyteidl.admin.WorkflowAttributesDeleteResponse>;
 
             /**
              * Calls ListNamedEntities.
@@ -11935,6 +12697,20 @@ export namespace flyteidl {
             type UpdateProjectAttributesCallback = (error: (Error|null), response?: flyteidl.admin.ProjectAttributesUpdateResponse) => void;
 
             /**
+             * Callback as used by {@link flyteidl.service.AdminService#getProjectAttributes}.
+             * @param error Error, if any
+             * @param [response] ProjectAttributesGetResponse
+             */
+            type GetProjectAttributesCallback = (error: (Error|null), response?: flyteidl.admin.ProjectAttributesGetResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#deleteProjectAttributes}.
+             * @param error Error, if any
+             * @param [response] ProjectAttributesDeleteResponse
+             */
+            type DeleteProjectAttributesCallback = (error: (Error|null), response?: flyteidl.admin.ProjectAttributesDeleteResponse) => void;
+
+            /**
              * Callback as used by {@link flyteidl.service.AdminService#updateProjectDomainAttributes}.
              * @param error Error, if any
              * @param [response] ProjectDomainAttributesUpdateResponse
@@ -11942,11 +12718,39 @@ export namespace flyteidl {
             type UpdateProjectDomainAttributesCallback = (error: (Error|null), response?: flyteidl.admin.ProjectDomainAttributesUpdateResponse) => void;
 
             /**
+             * Callback as used by {@link flyteidl.service.AdminService#getProjectDomainAttributes}.
+             * @param error Error, if any
+             * @param [response] ProjectDomainAttributesGetResponse
+             */
+            type GetProjectDomainAttributesCallback = (error: (Error|null), response?: flyteidl.admin.ProjectDomainAttributesGetResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#deleteProjectDomainAttributes}.
+             * @param error Error, if any
+             * @param [response] ProjectDomainAttributesDeleteResponse
+             */
+            type DeleteProjectDomainAttributesCallback = (error: (Error|null), response?: flyteidl.admin.ProjectDomainAttributesDeleteResponse) => void;
+
+            /**
              * Callback as used by {@link flyteidl.service.AdminService#updateWorkflowAttributes}.
              * @param error Error, if any
              * @param [response] WorkflowAttributesUpdateResponse
              */
             type UpdateWorkflowAttributesCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowAttributesUpdateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getWorkflowAttributes}.
+             * @param error Error, if any
+             * @param [response] WorkflowAttributesGetResponse
+             */
+            type GetWorkflowAttributesCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowAttributesGetResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#deleteWorkflowAttributes}.
+             * @param error Error, if any
+             * @param [response] WorkflowAttributesDeleteResponse
+             */
+            type DeleteWorkflowAttributesCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowAttributesDeleteResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listNamedEntities}.

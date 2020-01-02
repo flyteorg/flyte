@@ -32,6 +32,22 @@ class WorkflowAttributesUpdateResponseDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<WorkflowAttributesUpdateResponse> _instance;
 } _WorkflowAttributesUpdateResponse_default_instance_;
+class WorkflowAttributesGetRequestDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<WorkflowAttributesGetRequest> _instance;
+} _WorkflowAttributesGetRequest_default_instance_;
+class WorkflowAttributesGetResponseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<WorkflowAttributesGetResponse> _instance;
+} _WorkflowAttributesGetResponse_default_instance_;
+class WorkflowAttributesDeleteRequestDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<WorkflowAttributesDeleteRequest> _instance;
+} _WorkflowAttributesDeleteRequest_default_instance_;
+class WorkflowAttributesDeleteResponseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<WorkflowAttributesDeleteResponse> _instance;
+} _WorkflowAttributesDeleteResponse_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
 static void InitDefaultsWorkflowAttributes_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto() {
@@ -78,13 +94,74 @@ static void InitDefaultsWorkflowAttributesUpdateResponse_flyteidl_2fadmin_2fwork
 ::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowAttributesUpdateResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsWorkflowAttributesUpdateResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto}, {}};
 
+static void InitDefaultsWorkflowAttributesGetRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::admin::_WorkflowAttributesGetRequest_default_instance_;
+    new (ptr) ::flyteidl::admin::WorkflowAttributesGetRequest();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::admin::WorkflowAttributesGetRequest::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowAttributesGetRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsWorkflowAttributesGetRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto}, {}};
+
+static void InitDefaultsWorkflowAttributesGetResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::admin::_WorkflowAttributesGetResponse_default_instance_;
+    new (ptr) ::flyteidl::admin::WorkflowAttributesGetResponse();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::admin::WorkflowAttributesGetResponse::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<1> scc_info_WorkflowAttributesGetResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsWorkflowAttributesGetResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto}, {
+      &scc_info_WorkflowAttributes_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base,}};
+
+static void InitDefaultsWorkflowAttributesDeleteRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::admin::_WorkflowAttributesDeleteRequest_default_instance_;
+    new (ptr) ::flyteidl::admin::WorkflowAttributesDeleteRequest();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::admin::WorkflowAttributesDeleteRequest::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowAttributesDeleteRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsWorkflowAttributesDeleteRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto}, {}};
+
+static void InitDefaultsWorkflowAttributesDeleteResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::admin::_WorkflowAttributesDeleteResponse_default_instance_;
+    new (ptr) ::flyteidl::admin::WorkflowAttributesDeleteResponse();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::admin::WorkflowAttributesDeleteResponse::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowAttributesDeleteResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsWorkflowAttributesDeleteResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto}, {}};
+
 void InitDefaults_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_WorkflowAttributes_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_WorkflowAttributesUpdateRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_WorkflowAttributesUpdateResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_WorkflowAttributesGetRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_WorkflowAttributesGetResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_WorkflowAttributesDeleteRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_WorkflowAttributesDeleteResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto[3];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto[7];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto = nullptr;
 
@@ -109,23 +186,60 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fworkflow_5fattri
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesGetRequest, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesGetRequest, project_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesGetRequest, domain_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesGetRequest, workflow_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesGetRequest, resource_type_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesGetResponse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesGetResponse, attributes_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesDeleteRequest, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesDeleteRequest, project_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesDeleteRequest, domain_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesDeleteRequest, workflow_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesDeleteRequest, resource_type_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowAttributesDeleteResponse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::admin::WorkflowAttributes)},
   { 9, -1, sizeof(::flyteidl::admin::WorkflowAttributesUpdateRequest)},
   { 15, -1, sizeof(::flyteidl::admin::WorkflowAttributesUpdateResponse)},
+  { 20, -1, sizeof(::flyteidl::admin::WorkflowAttributesGetRequest)},
+  { 29, -1, sizeof(::flyteidl::admin::WorkflowAttributesGetResponse)},
+  { 35, -1, sizeof(::flyteidl::admin::WorkflowAttributesDeleteRequest)},
+  { 44, -1, sizeof(::flyteidl::admin::WorkflowAttributesDeleteResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_WorkflowAttributes_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_WorkflowAttributesUpdateRequest_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_WorkflowAttributesUpdateResponse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_WorkflowAttributesGetRequest_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_WorkflowAttributesGetResponse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_WorkflowAttributesDeleteRequest_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_WorkflowAttributesDeleteResponse_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto = {
   {}, AddDescriptors_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, "flyteidl/admin/workflow_attributes.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto::offsets,
-  file_level_metadata_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, 3, file_level_enum_descriptors_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto,
+  file_level_metadata_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, 7, file_level_enum_descriptors_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto[] =
@@ -138,13 +252,23 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fworkflow_5fattributes_2e
   "\n\037WorkflowAttributesUpdateRequest\0226\n\natt"
   "ributes\030\001 \001(\0132\".flyteidl.admin.WorkflowA"
   "ttributes\"\"\n WorkflowAttributesUpdateRes"
-  "ponseB3Z1github.com/lyft/flyteidl/gen/pb"
-  "-go/flyteidl/adminb\006proto3"
+  "ponse\"\213\001\n\034WorkflowAttributesGetRequest\022\017"
+  "\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\020\n\010workf"
+  "low\030\003 \001(\t\0228\n\rresource_type\030\004 \001(\0162!.flyte"
+  "idl.admin.MatchableResource\"W\n\035WorkflowA"
+  "ttributesGetResponse\0226\n\nattributes\030\001 \001(\013"
+  "2\".flyteidl.admin.WorkflowAttributes\"\216\001\n"
+  "\037WorkflowAttributesDeleteRequest\022\017\n\007proj"
+  "ect\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\020\n\010workflow\030\003 "
+  "\001(\t\0228\n\rresource_type\030\004 \001(\0162!.flyteidl.ad"
+  "min.MatchableResource\"\"\n WorkflowAttribu"
+  "tesDeleteResponseB3Z1github.com/lyft/fly"
+  "teidl/gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto,
-  "flyteidl/admin/workflow_attributes.proto", &assign_descriptors_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, 426,
+  "flyteidl/admin/workflow_attributes.proto", &assign_descriptors_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, 838,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto() {
@@ -1172,6 +1296,1484 @@ void WorkflowAttributesUpdateResponse::InternalSwap(WorkflowAttributesUpdateResp
 }
 
 
+// ===================================================================
+
+void WorkflowAttributesGetRequest::InitAsDefaultInstance() {
+}
+class WorkflowAttributesGetRequest::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int WorkflowAttributesGetRequest::kProjectFieldNumber;
+const int WorkflowAttributesGetRequest::kDomainFieldNumber;
+const int WorkflowAttributesGetRequest::kWorkflowFieldNumber;
+const int WorkflowAttributesGetRequest::kResourceTypeFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+WorkflowAttributesGetRequest::WorkflowAttributesGetRequest()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.admin.WorkflowAttributesGetRequest)
+}
+WorkflowAttributesGetRequest::WorkflowAttributesGetRequest(const WorkflowAttributesGetRequest& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  project_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.project().size() > 0) {
+    project_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.project_);
+  }
+  domain_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.domain().size() > 0) {
+    domain_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.domain_);
+  }
+  workflow_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.workflow().size() > 0) {
+    workflow_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.workflow_);
+  }
+  resource_type_ = from.resource_type_;
+  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.WorkflowAttributesGetRequest)
+}
+
+void WorkflowAttributesGetRequest::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_WorkflowAttributesGetRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  project_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  domain_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  workflow_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  resource_type_ = 0;
+}
+
+WorkflowAttributesGetRequest::~WorkflowAttributesGetRequest() {
+  // @@protoc_insertion_point(destructor:flyteidl.admin.WorkflowAttributesGetRequest)
+  SharedDtor();
+}
+
+void WorkflowAttributesGetRequest::SharedDtor() {
+  project_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  domain_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  workflow_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void WorkflowAttributesGetRequest::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const WorkflowAttributesGetRequest& WorkflowAttributesGetRequest::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_WorkflowAttributesGetRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void WorkflowAttributesGetRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.admin.WorkflowAttributesGetRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  project_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  domain_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  workflow_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  resource_type_ = 0;
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* WorkflowAttributesGetRequest::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<WorkflowAttributesGetRequest*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string project = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.WorkflowAttributesGetRequest.project");
+        object = msg->mutable_project();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string domain = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.WorkflowAttributesGetRequest.domain");
+        object = msg->mutable_domain();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string workflow = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.WorkflowAttributesGetRequest.workflow");
+        object = msg->mutable_workflow();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // .flyteidl.admin.MatchableResource resource_type = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_resource_type(static_cast<::flyteidl::admin::MatchableResource>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool WorkflowAttributesGetRequest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.admin.WorkflowAttributesGetRequest)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string project = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_project()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->project().data(), static_cast<int>(this->project().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.WorkflowAttributesGetRequest.project"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string domain = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_domain()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->domain().data(), static_cast<int>(this->domain().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.WorkflowAttributesGetRequest.domain"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string workflow = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_workflow()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->workflow().data(), static_cast<int>(this->workflow().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.WorkflowAttributesGetRequest.workflow"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.admin.MatchableResource resource_type = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
+          int value = 0;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_resource_type(static_cast< ::flyteidl::admin::MatchableResource >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.admin.WorkflowAttributesGetRequest)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.admin.WorkflowAttributesGetRequest)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void WorkflowAttributesGetRequest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.admin.WorkflowAttributesGetRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string project = 1;
+  if (this->project().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->project().data(), static_cast<int>(this->project().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesGetRequest.project");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->project(), output);
+  }
+
+  // string domain = 2;
+  if (this->domain().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->domain().data(), static_cast<int>(this->domain().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesGetRequest.domain");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->domain(), output);
+  }
+
+  // string workflow = 3;
+  if (this->workflow().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->workflow().data(), static_cast<int>(this->workflow().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesGetRequest.workflow");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->workflow(), output);
+  }
+
+  // .flyteidl.admin.MatchableResource resource_type = 4;
+  if (this->resource_type() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      4, this->resource_type(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.admin.WorkflowAttributesGetRequest)
+}
+
+::google::protobuf::uint8* WorkflowAttributesGetRequest::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.WorkflowAttributesGetRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string project = 1;
+  if (this->project().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->project().data(), static_cast<int>(this->project().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesGetRequest.project");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->project(), target);
+  }
+
+  // string domain = 2;
+  if (this->domain().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->domain().data(), static_cast<int>(this->domain().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesGetRequest.domain");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->domain(), target);
+  }
+
+  // string workflow = 3;
+  if (this->workflow().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->workflow().data(), static_cast<int>(this->workflow().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesGetRequest.workflow");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->workflow(), target);
+  }
+
+  // .flyteidl.admin.MatchableResource resource_type = 4;
+  if (this->resource_type() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      4, this->resource_type(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.WorkflowAttributesGetRequest)
+  return target;
+}
+
+size_t WorkflowAttributesGetRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.WorkflowAttributesGetRequest)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string project = 1;
+  if (this->project().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->project());
+  }
+
+  // string domain = 2;
+  if (this->domain().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->domain());
+  }
+
+  // string workflow = 3;
+  if (this->workflow().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->workflow());
+  }
+
+  // .flyteidl.admin.MatchableResource resource_type = 4;
+  if (this->resource_type() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->resource_type());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void WorkflowAttributesGetRequest::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.WorkflowAttributesGetRequest)
+  GOOGLE_DCHECK_NE(&from, this);
+  const WorkflowAttributesGetRequest* source =
+      ::google::protobuf::DynamicCastToGenerated<WorkflowAttributesGetRequest>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.WorkflowAttributesGetRequest)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.WorkflowAttributesGetRequest)
+    MergeFrom(*source);
+  }
+}
+
+void WorkflowAttributesGetRequest::MergeFrom(const WorkflowAttributesGetRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.WorkflowAttributesGetRequest)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.project().size() > 0) {
+
+    project_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.project_);
+  }
+  if (from.domain().size() > 0) {
+
+    domain_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.domain_);
+  }
+  if (from.workflow().size() > 0) {
+
+    workflow_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.workflow_);
+  }
+  if (from.resource_type() != 0) {
+    set_resource_type(from.resource_type());
+  }
+}
+
+void WorkflowAttributesGetRequest::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.WorkflowAttributesGetRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void WorkflowAttributesGetRequest::CopyFrom(const WorkflowAttributesGetRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.WorkflowAttributesGetRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool WorkflowAttributesGetRequest::IsInitialized() const {
+  return true;
+}
+
+void WorkflowAttributesGetRequest::Swap(WorkflowAttributesGetRequest* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void WorkflowAttributesGetRequest::InternalSwap(WorkflowAttributesGetRequest* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  project_.Swap(&other->project_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  domain_.Swap(&other->domain_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  workflow_.Swap(&other->workflow_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(resource_type_, other->resource_type_);
+}
+
+::google::protobuf::Metadata WorkflowAttributesGetRequest::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto);
+  return ::file_level_metadata_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void WorkflowAttributesGetResponse::InitAsDefaultInstance() {
+  ::flyteidl::admin::_WorkflowAttributesGetResponse_default_instance_._instance.get_mutable()->attributes_ = const_cast< ::flyteidl::admin::WorkflowAttributes*>(
+      ::flyteidl::admin::WorkflowAttributes::internal_default_instance());
+}
+class WorkflowAttributesGetResponse::HasBitSetters {
+ public:
+  static const ::flyteidl::admin::WorkflowAttributes& attributes(const WorkflowAttributesGetResponse* msg);
+};
+
+const ::flyteidl::admin::WorkflowAttributes&
+WorkflowAttributesGetResponse::HasBitSetters::attributes(const WorkflowAttributesGetResponse* msg) {
+  return *msg->attributes_;
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int WorkflowAttributesGetResponse::kAttributesFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+WorkflowAttributesGetResponse::WorkflowAttributesGetResponse()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.admin.WorkflowAttributesGetResponse)
+}
+WorkflowAttributesGetResponse::WorkflowAttributesGetResponse(const WorkflowAttributesGetResponse& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  if (from.has_attributes()) {
+    attributes_ = new ::flyteidl::admin::WorkflowAttributes(*from.attributes_);
+  } else {
+    attributes_ = nullptr;
+  }
+  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.WorkflowAttributesGetResponse)
+}
+
+void WorkflowAttributesGetResponse::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_WorkflowAttributesGetResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  attributes_ = nullptr;
+}
+
+WorkflowAttributesGetResponse::~WorkflowAttributesGetResponse() {
+  // @@protoc_insertion_point(destructor:flyteidl.admin.WorkflowAttributesGetResponse)
+  SharedDtor();
+}
+
+void WorkflowAttributesGetResponse::SharedDtor() {
+  if (this != internal_default_instance()) delete attributes_;
+}
+
+void WorkflowAttributesGetResponse::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const WorkflowAttributesGetResponse& WorkflowAttributesGetResponse::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_WorkflowAttributesGetResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void WorkflowAttributesGetResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.admin.WorkflowAttributesGetResponse)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (GetArenaNoVirtual() == nullptr && attributes_ != nullptr) {
+    delete attributes_;
+  }
+  attributes_ = nullptr;
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* WorkflowAttributesGetResponse::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<WorkflowAttributesGetResponse*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // .flyteidl.admin.WorkflowAttributes attributes = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::admin::WorkflowAttributes::_InternalParse;
+        object = msg->mutable_attributes();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool WorkflowAttributesGetResponse::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.admin.WorkflowAttributesGetResponse)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // .flyteidl.admin.WorkflowAttributes attributes = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_attributes()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.admin.WorkflowAttributesGetResponse)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.admin.WorkflowAttributesGetResponse)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void WorkflowAttributesGetResponse::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.admin.WorkflowAttributesGetResponse)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .flyteidl.admin.WorkflowAttributes attributes = 1;
+  if (this->has_attributes()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, HasBitSetters::attributes(this), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.admin.WorkflowAttributesGetResponse)
+}
+
+::google::protobuf::uint8* WorkflowAttributesGetResponse::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.WorkflowAttributesGetResponse)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .flyteidl.admin.WorkflowAttributes attributes = 1;
+  if (this->has_attributes()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        1, HasBitSetters::attributes(this), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.WorkflowAttributesGetResponse)
+  return target;
+}
+
+size_t WorkflowAttributesGetResponse::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.WorkflowAttributesGetResponse)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // .flyteidl.admin.WorkflowAttributes attributes = 1;
+  if (this->has_attributes()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *attributes_);
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void WorkflowAttributesGetResponse::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.WorkflowAttributesGetResponse)
+  GOOGLE_DCHECK_NE(&from, this);
+  const WorkflowAttributesGetResponse* source =
+      ::google::protobuf::DynamicCastToGenerated<WorkflowAttributesGetResponse>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.WorkflowAttributesGetResponse)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.WorkflowAttributesGetResponse)
+    MergeFrom(*source);
+  }
+}
+
+void WorkflowAttributesGetResponse::MergeFrom(const WorkflowAttributesGetResponse& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.WorkflowAttributesGetResponse)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.has_attributes()) {
+    mutable_attributes()->::flyteidl::admin::WorkflowAttributes::MergeFrom(from.attributes());
+  }
+}
+
+void WorkflowAttributesGetResponse::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.WorkflowAttributesGetResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void WorkflowAttributesGetResponse::CopyFrom(const WorkflowAttributesGetResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.WorkflowAttributesGetResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool WorkflowAttributesGetResponse::IsInitialized() const {
+  return true;
+}
+
+void WorkflowAttributesGetResponse::Swap(WorkflowAttributesGetResponse* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void WorkflowAttributesGetResponse::InternalSwap(WorkflowAttributesGetResponse* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(attributes_, other->attributes_);
+}
+
+::google::protobuf::Metadata WorkflowAttributesGetResponse::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto);
+  return ::file_level_metadata_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void WorkflowAttributesDeleteRequest::InitAsDefaultInstance() {
+}
+class WorkflowAttributesDeleteRequest::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int WorkflowAttributesDeleteRequest::kProjectFieldNumber;
+const int WorkflowAttributesDeleteRequest::kDomainFieldNumber;
+const int WorkflowAttributesDeleteRequest::kWorkflowFieldNumber;
+const int WorkflowAttributesDeleteRequest::kResourceTypeFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+WorkflowAttributesDeleteRequest::WorkflowAttributesDeleteRequest()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.admin.WorkflowAttributesDeleteRequest)
+}
+WorkflowAttributesDeleteRequest::WorkflowAttributesDeleteRequest(const WorkflowAttributesDeleteRequest& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  project_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.project().size() > 0) {
+    project_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.project_);
+  }
+  domain_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.domain().size() > 0) {
+    domain_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.domain_);
+  }
+  workflow_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.workflow().size() > 0) {
+    workflow_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.workflow_);
+  }
+  resource_type_ = from.resource_type_;
+  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.WorkflowAttributesDeleteRequest)
+}
+
+void WorkflowAttributesDeleteRequest::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_WorkflowAttributesDeleteRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  project_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  domain_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  workflow_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  resource_type_ = 0;
+}
+
+WorkflowAttributesDeleteRequest::~WorkflowAttributesDeleteRequest() {
+  // @@protoc_insertion_point(destructor:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  SharedDtor();
+}
+
+void WorkflowAttributesDeleteRequest::SharedDtor() {
+  project_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  domain_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  workflow_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void WorkflowAttributesDeleteRequest::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const WorkflowAttributesDeleteRequest& WorkflowAttributesDeleteRequest::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_WorkflowAttributesDeleteRequest_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void WorkflowAttributesDeleteRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  project_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  domain_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  workflow_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  resource_type_ = 0;
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* WorkflowAttributesDeleteRequest::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<WorkflowAttributesDeleteRequest*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string project = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.WorkflowAttributesDeleteRequest.project");
+        object = msg->mutable_project();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string domain = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.WorkflowAttributesDeleteRequest.domain");
+        object = msg->mutable_domain();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string workflow = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.WorkflowAttributesDeleteRequest.workflow");
+        object = msg->mutable_workflow();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // .flyteidl.admin.MatchableResource resource_type = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_resource_type(static_cast<::flyteidl::admin::MatchableResource>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool WorkflowAttributesDeleteRequest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string project = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_project()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->project().data(), static_cast<int>(this->project().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.WorkflowAttributesDeleteRequest.project"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string domain = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_domain()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->domain().data(), static_cast<int>(this->domain().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.WorkflowAttributesDeleteRequest.domain"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string workflow = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_workflow()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->workflow().data(), static_cast<int>(this->workflow().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.WorkflowAttributesDeleteRequest.workflow"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.admin.MatchableResource resource_type = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
+          int value = 0;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_resource_type(static_cast< ::flyteidl::admin::MatchableResource >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void WorkflowAttributesDeleteRequest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string project = 1;
+  if (this->project().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->project().data(), static_cast<int>(this->project().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesDeleteRequest.project");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->project(), output);
+  }
+
+  // string domain = 2;
+  if (this->domain().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->domain().data(), static_cast<int>(this->domain().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesDeleteRequest.domain");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->domain(), output);
+  }
+
+  // string workflow = 3;
+  if (this->workflow().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->workflow().data(), static_cast<int>(this->workflow().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesDeleteRequest.workflow");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->workflow(), output);
+  }
+
+  // .flyteidl.admin.MatchableResource resource_type = 4;
+  if (this->resource_type() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      4, this->resource_type(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.admin.WorkflowAttributesDeleteRequest)
+}
+
+::google::protobuf::uint8* WorkflowAttributesDeleteRequest::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string project = 1;
+  if (this->project().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->project().data(), static_cast<int>(this->project().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesDeleteRequest.project");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->project(), target);
+  }
+
+  // string domain = 2;
+  if (this->domain().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->domain().data(), static_cast<int>(this->domain().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesDeleteRequest.domain");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->domain(), target);
+  }
+
+  // string workflow = 3;
+  if (this->workflow().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->workflow().data(), static_cast<int>(this->workflow().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.WorkflowAttributesDeleteRequest.workflow");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->workflow(), target);
+  }
+
+  // .flyteidl.admin.MatchableResource resource_type = 4;
+  if (this->resource_type() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      4, this->resource_type(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  return target;
+}
+
+size_t WorkflowAttributesDeleteRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string project = 1;
+  if (this->project().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->project());
+  }
+
+  // string domain = 2;
+  if (this->domain().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->domain());
+  }
+
+  // string workflow = 3;
+  if (this->workflow().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->workflow());
+  }
+
+  // .flyteidl.admin.MatchableResource resource_type = 4;
+  if (this->resource_type() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->resource_type());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void WorkflowAttributesDeleteRequest::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  GOOGLE_DCHECK_NE(&from, this);
+  const WorkflowAttributesDeleteRequest* source =
+      ::google::protobuf::DynamicCastToGenerated<WorkflowAttributesDeleteRequest>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.WorkflowAttributesDeleteRequest)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.WorkflowAttributesDeleteRequest)
+    MergeFrom(*source);
+  }
+}
+
+void WorkflowAttributesDeleteRequest::MergeFrom(const WorkflowAttributesDeleteRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.project().size() > 0) {
+
+    project_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.project_);
+  }
+  if (from.domain().size() > 0) {
+
+    domain_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.domain_);
+  }
+  if (from.workflow().size() > 0) {
+
+    workflow_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.workflow_);
+  }
+  if (from.resource_type() != 0) {
+    set_resource_type(from.resource_type());
+  }
+}
+
+void WorkflowAttributesDeleteRequest::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void WorkflowAttributesDeleteRequest::CopyFrom(const WorkflowAttributesDeleteRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.WorkflowAttributesDeleteRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool WorkflowAttributesDeleteRequest::IsInitialized() const {
+  return true;
+}
+
+void WorkflowAttributesDeleteRequest::Swap(WorkflowAttributesDeleteRequest* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void WorkflowAttributesDeleteRequest::InternalSwap(WorkflowAttributesDeleteRequest* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  project_.Swap(&other->project_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  domain_.Swap(&other->domain_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  workflow_.Swap(&other->workflow_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(resource_type_, other->resource_type_);
+}
+
+::google::protobuf::Metadata WorkflowAttributesDeleteRequest::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto);
+  return ::file_level_metadata_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void WorkflowAttributesDeleteResponse::InitAsDefaultInstance() {
+}
+class WorkflowAttributesDeleteResponse::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+WorkflowAttributesDeleteResponse::WorkflowAttributesDeleteResponse()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.admin.WorkflowAttributesDeleteResponse)
+}
+WorkflowAttributesDeleteResponse::WorkflowAttributesDeleteResponse(const WorkflowAttributesDeleteResponse& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.WorkflowAttributesDeleteResponse)
+}
+
+void WorkflowAttributesDeleteResponse::SharedCtor() {
+}
+
+WorkflowAttributesDeleteResponse::~WorkflowAttributesDeleteResponse() {
+  // @@protoc_insertion_point(destructor:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  SharedDtor();
+}
+
+void WorkflowAttributesDeleteResponse::SharedDtor() {
+}
+
+void WorkflowAttributesDeleteResponse::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const WorkflowAttributesDeleteResponse& WorkflowAttributesDeleteResponse::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_WorkflowAttributesDeleteResponse_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void WorkflowAttributesDeleteResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* WorkflowAttributesDeleteResponse::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<WorkflowAttributesDeleteResponse*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      default: {
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool WorkflowAttributesDeleteResponse::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+  handle_unusual:
+    if (tag == 0) {
+      goto success;
+    }
+    DO_(::google::protobuf::internal::WireFormat::SkipField(
+          input, tag, _internal_metadata_.mutable_unknown_fields()));
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void WorkflowAttributesDeleteResponse::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.admin.WorkflowAttributesDeleteResponse)
+}
+
+::google::protobuf::uint8* WorkflowAttributesDeleteResponse::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  return target;
+}
+
+size_t WorkflowAttributesDeleteResponse::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void WorkflowAttributesDeleteResponse::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  GOOGLE_DCHECK_NE(&from, this);
+  const WorkflowAttributesDeleteResponse* source =
+      ::google::protobuf::DynamicCastToGenerated<WorkflowAttributesDeleteResponse>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.WorkflowAttributesDeleteResponse)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.WorkflowAttributesDeleteResponse)
+    MergeFrom(*source);
+  }
+}
+
+void WorkflowAttributesDeleteResponse::MergeFrom(const WorkflowAttributesDeleteResponse& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+}
+
+void WorkflowAttributesDeleteResponse::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void WorkflowAttributesDeleteResponse::CopyFrom(const WorkflowAttributesDeleteResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.WorkflowAttributesDeleteResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool WorkflowAttributesDeleteResponse::IsInitialized() const {
+  return true;
+}
+
+void WorkflowAttributesDeleteResponse::Swap(WorkflowAttributesDeleteResponse* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void WorkflowAttributesDeleteResponse::InternalSwap(WorkflowAttributesDeleteResponse* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata WorkflowAttributesDeleteResponse::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto);
+  return ::file_level_metadata_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto[kIndexInFileMessages];
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace admin
 }  // namespace flyteidl
@@ -1185,6 +2787,18 @@ template<> PROTOBUF_NOINLINE ::flyteidl::admin::WorkflowAttributesUpdateRequest*
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::admin::WorkflowAttributesUpdateResponse* Arena::CreateMaybeMessage< ::flyteidl::admin::WorkflowAttributesUpdateResponse >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::admin::WorkflowAttributesUpdateResponse >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::admin::WorkflowAttributesGetRequest* Arena::CreateMaybeMessage< ::flyteidl::admin::WorkflowAttributesGetRequest >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::admin::WorkflowAttributesGetRequest >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::admin::WorkflowAttributesGetResponse* Arena::CreateMaybeMessage< ::flyteidl::admin::WorkflowAttributesGetResponse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::admin::WorkflowAttributesGetResponse >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::admin::WorkflowAttributesDeleteRequest* Arena::CreateMaybeMessage< ::flyteidl::admin::WorkflowAttributesDeleteRequest >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::admin::WorkflowAttributesDeleteRequest >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::admin::WorkflowAttributesDeleteResponse* Arena::CreateMaybeMessage< ::flyteidl::admin::WorkflowAttributesDeleteResponse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::admin::WorkflowAttributesDeleteResponse >(arena);
 }
 }  // namespace protobuf
 }  // namespace google

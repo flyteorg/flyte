@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n\'flyteidl/admin/project_attributes.proto\x12\x0e\x66lyteidl.admin\x1a\'flyteidl/admin/matchable_resource.proto\"e\n\x11ProjectAttributes\x12\x0f\n\x07project\x18\x01 \x01(\t\x12?\n\x13matching_attributes\x18\x02 \x01(\x0b\x32\".flyteidl.admin.MatchingAttributes\"W\n\x1eProjectAttributesUpdateRequest\x12\x35\n\nattributes\x18\x01 \x01(\x0b\x32!.flyteidl.admin.ProjectAttributes\"!\n\x1fProjectAttributesUpdateResponseB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n\'flyteidl/admin/project_attributes.proto\x12\x0e\x66lyteidl.admin\x1a\'flyteidl/admin/matchable_resource.proto\"e\n\x11ProjectAttributes\x12\x0f\n\x07project\x18\x01 \x01(\t\x12?\n\x13matching_attributes\x18\x02 \x01(\x0b\x32\".flyteidl.admin.MatchingAttributes\"W\n\x1eProjectAttributesUpdateRequest\x12\x35\n\nattributes\x18\x01 \x01(\x0b\x32!.flyteidl.admin.ProjectAttributes\"!\n\x1fProjectAttributesUpdateResponse\"h\n\x1bProjectAttributesGetRequest\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x38\n\rresource_type\x18\x02 \x01(\x0e\x32!.flyteidl.admin.MatchableResource\"U\n\x1cProjectAttributesGetResponse\x12\x35\n\nattributes\x18\x01 \x01(\x0b\x32!.flyteidl.admin.ProjectAttributes\"k\n\x1eProjectAttributesDeleteRequest\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x38\n\rresource_type\x18\x02 \x01(\x0e\x32!.flyteidl.admin.MatchableResource\"!\n\x1fProjectAttributesDeleteResponseB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
   ,
   dependencies=[flyteidl_dot_admin_dot_matchable__resource__pb2.DESCRIPTOR,])
 
@@ -120,11 +120,149 @@ _PROJECTATTRIBUTESUPDATERESPONSE = _descriptor.Descriptor(
   serialized_end=325,
 )
 
+
+_PROJECTATTRIBUTESGETREQUEST = _descriptor.Descriptor(
+  name='ProjectAttributesGetRequest',
+  full_name='flyteidl.admin.ProjectAttributesGetRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='project', full_name='flyteidl.admin.ProjectAttributesGetRequest.project', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='resource_type', full_name='flyteidl.admin.ProjectAttributesGetRequest.resource_type', index=1,
+      number=2, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=327,
+  serialized_end=431,
+)
+
+
+_PROJECTATTRIBUTESGETRESPONSE = _descriptor.Descriptor(
+  name='ProjectAttributesGetResponse',
+  full_name='flyteidl.admin.ProjectAttributesGetResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='attributes', full_name='flyteidl.admin.ProjectAttributesGetResponse.attributes', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=433,
+  serialized_end=518,
+)
+
+
+_PROJECTATTRIBUTESDELETEREQUEST = _descriptor.Descriptor(
+  name='ProjectAttributesDeleteRequest',
+  full_name='flyteidl.admin.ProjectAttributesDeleteRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='project', full_name='flyteidl.admin.ProjectAttributesDeleteRequest.project', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='resource_type', full_name='flyteidl.admin.ProjectAttributesDeleteRequest.resource_type', index=1,
+      number=2, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=520,
+  serialized_end=627,
+)
+
+
+_PROJECTATTRIBUTESDELETERESPONSE = _descriptor.Descriptor(
+  name='ProjectAttributesDeleteResponse',
+  full_name='flyteidl.admin.ProjectAttributesDeleteResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=629,
+  serialized_end=662,
+)
+
 _PROJECTATTRIBUTES.fields_by_name['matching_attributes'].message_type = flyteidl_dot_admin_dot_matchable__resource__pb2._MATCHINGATTRIBUTES
 _PROJECTATTRIBUTESUPDATEREQUEST.fields_by_name['attributes'].message_type = _PROJECTATTRIBUTES
+_PROJECTATTRIBUTESGETREQUEST.fields_by_name['resource_type'].enum_type = flyteidl_dot_admin_dot_matchable__resource__pb2._MATCHABLERESOURCE
+_PROJECTATTRIBUTESGETRESPONSE.fields_by_name['attributes'].message_type = _PROJECTATTRIBUTES
+_PROJECTATTRIBUTESDELETEREQUEST.fields_by_name['resource_type'].enum_type = flyteidl_dot_admin_dot_matchable__resource__pb2._MATCHABLERESOURCE
 DESCRIPTOR.message_types_by_name['ProjectAttributes'] = _PROJECTATTRIBUTES
 DESCRIPTOR.message_types_by_name['ProjectAttributesUpdateRequest'] = _PROJECTATTRIBUTESUPDATEREQUEST
 DESCRIPTOR.message_types_by_name['ProjectAttributesUpdateResponse'] = _PROJECTATTRIBUTESUPDATERESPONSE
+DESCRIPTOR.message_types_by_name['ProjectAttributesGetRequest'] = _PROJECTATTRIBUTESGETREQUEST
+DESCRIPTOR.message_types_by_name['ProjectAttributesGetResponse'] = _PROJECTATTRIBUTESGETRESPONSE
+DESCRIPTOR.message_types_by_name['ProjectAttributesDeleteRequest'] = _PROJECTATTRIBUTESDELETEREQUEST
+DESCRIPTOR.message_types_by_name['ProjectAttributesDeleteResponse'] = _PROJECTATTRIBUTESDELETERESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 ProjectAttributes = _reflection.GeneratedProtocolMessageType('ProjectAttributes', (_message.Message,), dict(
@@ -147,6 +285,34 @@ ProjectAttributesUpdateResponse = _reflection.GeneratedProtocolMessageType('Proj
   # @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectAttributesUpdateResponse)
   ))
 _sym_db.RegisterMessage(ProjectAttributesUpdateResponse)
+
+ProjectAttributesGetRequest = _reflection.GeneratedProtocolMessageType('ProjectAttributesGetRequest', (_message.Message,), dict(
+  DESCRIPTOR = _PROJECTATTRIBUTESGETREQUEST,
+  __module__ = 'flyteidl.admin.project_attributes_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectAttributesGetRequest)
+  ))
+_sym_db.RegisterMessage(ProjectAttributesGetRequest)
+
+ProjectAttributesGetResponse = _reflection.GeneratedProtocolMessageType('ProjectAttributesGetResponse', (_message.Message,), dict(
+  DESCRIPTOR = _PROJECTATTRIBUTESGETRESPONSE,
+  __module__ = 'flyteidl.admin.project_attributes_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectAttributesGetResponse)
+  ))
+_sym_db.RegisterMessage(ProjectAttributesGetResponse)
+
+ProjectAttributesDeleteRequest = _reflection.GeneratedProtocolMessageType('ProjectAttributesDeleteRequest', (_message.Message,), dict(
+  DESCRIPTOR = _PROJECTATTRIBUTESDELETEREQUEST,
+  __module__ = 'flyteidl.admin.project_attributes_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectAttributesDeleteRequest)
+  ))
+_sym_db.RegisterMessage(ProjectAttributesDeleteRequest)
+
+ProjectAttributesDeleteResponse = _reflection.GeneratedProtocolMessageType('ProjectAttributesDeleteResponse', (_message.Message,), dict(
+  DESCRIPTOR = _PROJECTATTRIBUTESDELETERESPONSE,
+  __module__ = 'flyteidl.admin.project_attributes_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectAttributesDeleteResponse)
+  ))
+_sym_db.RegisterMessage(ProjectAttributesDeleteResponse)
 
 
 DESCRIPTOR._options = None

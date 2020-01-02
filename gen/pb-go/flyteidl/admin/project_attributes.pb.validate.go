@@ -260,3 +260,293 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ProjectAttributesUpdateResponseValidationError{}
+
+// Validate checks the field values on ProjectAttributesGetRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ProjectAttributesGetRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Project
+
+	// no validation rules for ResourceType
+
+	return nil
+}
+
+// ProjectAttributesGetRequestValidationError is the validation error returned
+// by ProjectAttributesGetRequest.Validate if the designated constraints
+// aren't met.
+type ProjectAttributesGetRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ProjectAttributesGetRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ProjectAttributesGetRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ProjectAttributesGetRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ProjectAttributesGetRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ProjectAttributesGetRequestValidationError) ErrorName() string {
+	return "ProjectAttributesGetRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ProjectAttributesGetRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sProjectAttributesGetRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ProjectAttributesGetRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ProjectAttributesGetRequestValidationError{}
+
+// Validate checks the field values on ProjectAttributesGetResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ProjectAttributesGetResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetAttributes()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ProjectAttributesGetResponseValidationError{
+				field:  "Attributes",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ProjectAttributesGetResponseValidationError is the validation error returned
+// by ProjectAttributesGetResponse.Validate if the designated constraints
+// aren't met.
+type ProjectAttributesGetResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ProjectAttributesGetResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ProjectAttributesGetResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ProjectAttributesGetResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ProjectAttributesGetResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ProjectAttributesGetResponseValidationError) ErrorName() string {
+	return "ProjectAttributesGetResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ProjectAttributesGetResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sProjectAttributesGetResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ProjectAttributesGetResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ProjectAttributesGetResponseValidationError{}
+
+// Validate checks the field values on ProjectAttributesDeleteRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ProjectAttributesDeleteRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Project
+
+	// no validation rules for ResourceType
+
+	return nil
+}
+
+// ProjectAttributesDeleteRequestValidationError is the validation error
+// returned by ProjectAttributesDeleteRequest.Validate if the designated
+// constraints aren't met.
+type ProjectAttributesDeleteRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ProjectAttributesDeleteRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ProjectAttributesDeleteRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ProjectAttributesDeleteRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ProjectAttributesDeleteRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ProjectAttributesDeleteRequestValidationError) ErrorName() string {
+	return "ProjectAttributesDeleteRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ProjectAttributesDeleteRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sProjectAttributesDeleteRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ProjectAttributesDeleteRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ProjectAttributesDeleteRequestValidationError{}
+
+// Validate checks the field values on ProjectAttributesDeleteResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ProjectAttributesDeleteResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ProjectAttributesDeleteResponseValidationError is the validation error
+// returned by ProjectAttributesDeleteResponse.Validate if the designated
+// constraints aren't met.
+type ProjectAttributesDeleteResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ProjectAttributesDeleteResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ProjectAttributesDeleteResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ProjectAttributesDeleteResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ProjectAttributesDeleteResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ProjectAttributesDeleteResponseValidationError) ErrorName() string {
+	return "ProjectAttributesDeleteResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ProjectAttributesDeleteResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sProjectAttributesDeleteResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ProjectAttributesDeleteResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ProjectAttributesDeleteResponseValidationError{}

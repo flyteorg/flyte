@@ -76,6 +76,9 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**create_task_event**](docs/AdminServiceApi.md#create_task_event) | **POST** /api/v1/events/tasks | 
 *AdminServiceApi* | [**create_workflow**](docs/AdminServiceApi.md#create_workflow) | **POST** /api/v1/workflows | 
 *AdminServiceApi* | [**create_workflow_event**](docs/AdminServiceApi.md#create_workflow_event) | **POST** /api/v1/events/workflows | 
+*AdminServiceApi* | [**delete_project_attributes**](docs/AdminServiceApi.md#delete_project_attributes) | **DELETE** /api/v1/project_attributes/{project} | 
+*AdminServiceApi* | [**delete_project_domain_attributes**](docs/AdminServiceApi.md#delete_project_domain_attributes) | **DELETE** /api/v1/project_domain_attributes/{project}/{domain} | 
+*AdminServiceApi* | [**delete_workflow_attributes**](docs/AdminServiceApi.md#delete_workflow_attributes) | **DELETE** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | 
 *AdminServiceApi* | [**get_active_launch_plan**](docs/AdminServiceApi.md#get_active_launch_plan) | **GET** /api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**get_execution**](docs/AdminServiceApi.md#get_execution) | **GET** /api/v1/executions/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**get_execution_data**](docs/AdminServiceApi.md#get_execution_data) | **GET** /api/v1/data/executions/{id.project}/{id.domain}/{id.name} | 
@@ -83,10 +86,13 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**get_named_entity**](docs/AdminServiceApi.md#get_named_entity) | **GET** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**get_node_execution**](docs/AdminServiceApi.md#get_node_execution) | **GET** /api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | 
 *AdminServiceApi* | [**get_node_execution_data**](docs/AdminServiceApi.md#get_node_execution_data) | **GET** /api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | 
+*AdminServiceApi* | [**get_project_attributes**](docs/AdminServiceApi.md#get_project_attributes) | **GET** /api/v1/project_attributes/{project} | 
+*AdminServiceApi* | [**get_project_domain_attributes**](docs/AdminServiceApi.md#get_project_domain_attributes) | **GET** /api/v1/project_domain_attributes/{project}/{domain} | 
 *AdminServiceApi* | [**get_task**](docs/AdminServiceApi.md#get_task) | **GET** /api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version} | 
 *AdminServiceApi* | [**get_task_execution**](docs/AdminServiceApi.md#get_task_execution) | **GET** /api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | 
 *AdminServiceApi* | [**get_task_execution_data**](docs/AdminServiceApi.md#get_task_execution_data) | **GET** /api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | 
 *AdminServiceApi* | [**get_workflow**](docs/AdminServiceApi.md#get_workflow) | **GET** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | 
+*AdminServiceApi* | [**get_workflow_attributes**](docs/AdminServiceApi.md#get_workflow_attributes) | **GET** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | 
 *AdminServiceApi* | [**list_active_launch_plans**](docs/AdminServiceApi.md#list_active_launch_plans) | **GET** /api/v1/active_launch_plans/{project}/{domain} | 
 *AdminServiceApi* | [**list_executions**](docs/AdminServiceApi.md#list_executions) | **GET** /api/v1/executions/{id.project}/{id.domain} | 
 *AdminServiceApi* | [**list_launch_plan_ids**](docs/AdminServiceApi.md#list_launch_plan_ids) | **GET** /api/v1/launch_plan_ids/{project}/{domain} | 
@@ -146,6 +152,7 @@ Class | Method | HTTP request | Description
  - [AdminLaunchPlanUpdateRequest](docs/AdminLaunchPlanUpdateRequest.md)
  - [AdminLaunchPlanUpdateResponse](docs/AdminLaunchPlanUpdateResponse.md)
  - [AdminLiteralMapBlob](docs/AdminLiteralMapBlob.md)
+ - [AdminMatchableResource](docs/AdminMatchableResource.md)
  - [AdminMatchingAttributes](docs/AdminMatchingAttributes.md)
  - [AdminNamedEntity](docs/AdminNamedEntity.md)
  - [AdminNamedEntityIdentifier](docs/AdminNamedEntityIdentifier.md)
@@ -164,9 +171,15 @@ Class | Method | HTTP request | Description
  - [AdminPagerDutyNotification](docs/AdminPagerDutyNotification.md)
  - [AdminProject](docs/AdminProject.md)
  - [AdminProjectAttributes](docs/AdminProjectAttributes.md)
+ - [AdminProjectAttributesDeleteRequest](docs/AdminProjectAttributesDeleteRequest.md)
+ - [AdminProjectAttributesDeleteResponse](docs/AdminProjectAttributesDeleteResponse.md)
+ - [AdminProjectAttributesGetResponse](docs/AdminProjectAttributesGetResponse.md)
  - [AdminProjectAttributesUpdateRequest](docs/AdminProjectAttributesUpdateRequest.md)
  - [AdminProjectAttributesUpdateResponse](docs/AdminProjectAttributesUpdateResponse.md)
  - [AdminProjectDomainAttributes](docs/AdminProjectDomainAttributes.md)
+ - [AdminProjectDomainAttributesDeleteRequest](docs/AdminProjectDomainAttributesDeleteRequest.md)
+ - [AdminProjectDomainAttributesDeleteResponse](docs/AdminProjectDomainAttributesDeleteResponse.md)
+ - [AdminProjectDomainAttributesGetResponse](docs/AdminProjectDomainAttributesGetResponse.md)
  - [AdminProjectDomainAttributesUpdateRequest](docs/AdminProjectDomainAttributesUpdateRequest.md)
  - [AdminProjectDomainAttributesUpdateResponse](docs/AdminProjectDomainAttributesUpdateResponse.md)
  - [AdminProjectRegisterRequest](docs/AdminProjectRegisterRequest.md)
@@ -191,6 +204,9 @@ Class | Method | HTTP request | Description
  - [AdminUrlBlob](docs/AdminUrlBlob.md)
  - [AdminWorkflow](docs/AdminWorkflow.md)
  - [AdminWorkflowAttributes](docs/AdminWorkflowAttributes.md)
+ - [AdminWorkflowAttributesDeleteRequest](docs/AdminWorkflowAttributesDeleteRequest.md)
+ - [AdminWorkflowAttributesDeleteResponse](docs/AdminWorkflowAttributesDeleteResponse.md)
+ - [AdminWorkflowAttributesGetResponse](docs/AdminWorkflowAttributesGetResponse.md)
  - [AdminWorkflowAttributesUpdateRequest](docs/AdminWorkflowAttributesUpdateRequest.md)
  - [AdminWorkflowAttributesUpdateResponse](docs/AdminWorkflowAttributesUpdateResponse.md)
  - [AdminWorkflowClosure](docs/AdminWorkflowClosure.md)
