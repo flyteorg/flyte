@@ -182,7 +182,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 			}
 			assert.Equal(t, test.expectedPhase, h.Info().GetPhase())
 			if test.nodeStatus != nil {
-				assert.Equal(t, w.GetNodeExecutionStatus(test.branchTakenNode.GetID()).GetDataDir(), test.nodeStatus.GetDataDir())
+				assert.Equal(t, w.GetNodeExecutionStatus(ctx, test.branchTakenNode.GetID()).GetDataDir(), test.nodeStatus.GetDataDir())
 			}
 		})
 	}

@@ -26,8 +26,8 @@ func (_m ExecutableWorkflowStatus_ConstructNodeDataDir) Return(_a0 storage.DataR
 	return &ExecutableWorkflowStatus_ConstructNodeDataDir{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ExecutableWorkflowStatus) OnConstructNodeDataDir(ctx context.Context, constructor storage.ReferenceConstructor, name string) *ExecutableWorkflowStatus_ConstructNodeDataDir {
-	c := _m.On("ConstructNodeDataDir", ctx, constructor, name)
+func (_m *ExecutableWorkflowStatus) OnConstructNodeDataDir(ctx context.Context, name string) *ExecutableWorkflowStatus_ConstructNodeDataDir {
+	c := _m.On("ConstructNodeDataDir", ctx, name)
 	return &ExecutableWorkflowStatus_ConstructNodeDataDir{Call: c}
 }
 
@@ -36,20 +36,20 @@ func (_m *ExecutableWorkflowStatus) OnConstructNodeDataDirMatch(matchers ...inte
 	return &ExecutableWorkflowStatus_ConstructNodeDataDir{Call: c}
 }
 
-// ConstructNodeDataDir provides a mock function with given fields: ctx, constructor, name
-func (_m *ExecutableWorkflowStatus) ConstructNodeDataDir(ctx context.Context, constructor storage.ReferenceConstructor, name string) (storage.DataReference, error) {
-	ret := _m.Called(ctx, constructor, name)
+// ConstructNodeDataDir provides a mock function with given fields: ctx, name
+func (_m *ExecutableWorkflowStatus) ConstructNodeDataDir(ctx context.Context, name string) (storage.DataReference, error) {
+	ret := _m.Called(ctx, name)
 
 	var r0 storage.DataReference
-	if rf, ok := ret.Get(0).(func(context.Context, storage.ReferenceConstructor, string) storage.DataReference); ok {
-		r0 = rf(ctx, constructor, name)
+	if rf, ok := ret.Get(0).(func(context.Context, string) storage.DataReference); ok {
+		r0 = rf(ctx, name)
 	} else {
 		r0 = ret.Get(0).(storage.DataReference)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, storage.ReferenceConstructor, string) error); ok {
-		r1 = rf(ctx, constructor, name)
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, name)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -163,8 +163,8 @@ func (_m ExecutableWorkflowStatus_GetNodeExecutionStatus) Return(_a0 v1alpha1.Ex
 	return &ExecutableWorkflowStatus_GetNodeExecutionStatus{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ExecutableWorkflowStatus) OnGetNodeExecutionStatus(id string) *ExecutableWorkflowStatus_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", id)
+func (_m *ExecutableWorkflowStatus) OnGetNodeExecutionStatus(ctx context.Context, id string) *ExecutableWorkflowStatus_GetNodeExecutionStatus {
+	c := _m.On("GetNodeExecutionStatus", ctx, id)
 	return &ExecutableWorkflowStatus_GetNodeExecutionStatus{Call: c}
 }
 
@@ -173,13 +173,13 @@ func (_m *ExecutableWorkflowStatus) OnGetNodeExecutionStatusMatch(matchers ...in
 	return &ExecutableWorkflowStatus_GetNodeExecutionStatus{Call: c}
 }
 
-// GetNodeExecutionStatus provides a mock function with given fields: id
-func (_m *ExecutableWorkflowStatus) GetNodeExecutionStatus(id string) v1alpha1.ExecutableNodeStatus {
-	ret := _m.Called(id)
+// GetNodeExecutionStatus provides a mock function with given fields: ctx, id
+func (_m *ExecutableWorkflowStatus) GetNodeExecutionStatus(ctx context.Context, id string) v1alpha1.ExecutableNodeStatus {
+	ret := _m.Called(ctx, id)
 
 	var r0 v1alpha1.ExecutableNodeStatus
-	if rf, ok := ret.Get(0).(func(string) v1alpha1.ExecutableNodeStatus); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, string) v1alpha1.ExecutableNodeStatus); ok {
+		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(v1alpha1.ExecutableNodeStatus)

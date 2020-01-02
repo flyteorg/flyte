@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"strings"
@@ -33,9 +34,11 @@ func NewGetCommand(opts *RootOptions) *cobra.Command {
 		Short: "Gets a single workflow or lists all workflows currently in execution",
 		Long:  `use labels to filter`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.Background()
+
 			if len(args) > 0 {
 				name := args[0]
-				return getOpts.getWorkflow(name)
+				return getOpts.getWorkflow(ctx, name)
 			}
 			return getOpts.listWorkflows()
 		},
@@ -49,7 +52,7 @@ func NewGetCommand(opts *RootOptions) *cobra.Command {
 	return getCmd
 }
 
-func (g *GetOpts) getWorkflow(name string) error {
+func (g *GetOpts) getWorkflow(ctx context.Context, name string) error {
 	parts := strings.Split(name, "/")
 	if len(parts) > 1 {
 		g.ConfigOverrides.Context.Namespace = parts[0]
@@ -61,7 +64,7 @@ func (g *GetOpts) getWorkflow(name string) error {
 	}
 	wp := printers.WorkflowPrinter{}
 	tree := gotree.New("Workflow")
-	if err := wp.Print(tree, w); err != nil {
+	if err := wp.Print(ctx, tree, w); err != nil {
 		return err
 	}
 	fmt.Print(tree.Print())

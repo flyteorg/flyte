@@ -9,7 +9,7 @@ import (
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 )
 
-func ResolveBindingData(ctx context.Context, outputResolver OutputResolver, w v1alpha1.ExecutableWorkflow, bindingData *core.BindingData) (*core.Literal, error) {
+func ResolveBindingData(ctx context.Context, outputResolver OutputResolver, w v1alpha1.BaseWorkflowWithStatus, bindingData *core.BindingData) (*core.Literal, error) {
 	literal := &core.Literal{}
 	if bindingData == nil {
 		return nil, nil
@@ -75,7 +75,7 @@ func ResolveBindingData(ctx context.Context, outputResolver OutputResolver, w v1
 	return literal, nil
 }
 
-func Resolve(ctx context.Context, outputResolver OutputResolver, w v1alpha1.ExecutableWorkflow, nodeID v1alpha1.NodeID, bindings []*v1alpha1.Binding) (*core.LiteralMap, error) {
+func Resolve(ctx context.Context, outputResolver OutputResolver, w v1alpha1.BaseWorkflowWithStatus, nodeID v1alpha1.NodeID, bindings []*v1alpha1.Binding) (*core.LiteralMap, error) {
 	literalMap := make(map[string]*core.Literal, len(bindings))
 	for _, binding := range bindings {
 		varName := binding.GetVar()

@@ -78,6 +78,38 @@ func (_m *MutableBranchNodeStatus) GetPhase() v1alpha1.BranchNodePhase {
 	return r0
 }
 
+type MutableBranchNodeStatus_IsDirty struct {
+	*mock.Call
+}
+
+func (_m MutableBranchNodeStatus_IsDirty) Return(_a0 bool) *MutableBranchNodeStatus_IsDirty {
+	return &MutableBranchNodeStatus_IsDirty{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableBranchNodeStatus) OnIsDirty() *MutableBranchNodeStatus_IsDirty {
+	c := _m.On("IsDirty")
+	return &MutableBranchNodeStatus_IsDirty{Call: c}
+}
+
+func (_m *MutableBranchNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableBranchNodeStatus_IsDirty {
+	c := _m.On("IsDirty", matchers...)
+	return &MutableBranchNodeStatus_IsDirty{Call: c}
+}
+
+// IsDirty provides a mock function with given fields:
+func (_m *MutableBranchNodeStatus) IsDirty() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 // SetBranchNodeError provides a mock function with given fields:
 func (_m *MutableBranchNodeStatus) SetBranchNodeError() {
 	_m.Called()

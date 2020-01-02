@@ -123,7 +123,7 @@ func DecideBranch(ctx context.Context, w v1alpha1.BaseWorkflowWithStatus, nodeID
 		if !ok {
 			return nil, errors.Errorf(errors.DownstreamNodeNotFoundError, nodeID, "Downstream node [%v] not found", skippedNodeID)
 		}
-		nStatus := w.GetNodeExecutionStatus(n.GetID())
+		nStatus := w.GetNodeExecutionStatus(ctx, n.GetID())
 		logger.Infof(ctx, "Branch Setting Node[%v] status to Skipped!", skippedNodeID)
 		nStatus.UpdatePhase(v1alpha1.NodePhaseSkipped, v1.Now(), "Branch evaluated to false")
 	}

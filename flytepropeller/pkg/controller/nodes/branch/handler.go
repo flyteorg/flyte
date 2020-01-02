@@ -66,11 +66,11 @@ func (b *branchHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionCo
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.DownstreamNodeNotFoundError, errMsg, nil)), nil
 		}
 		i := nCtx.NodeID()
-		childNodeStatus := w.GetNodeExecutionStatus(finalNode.GetID())
+		childNodeStatus := w.GetNodeExecutionStatus(ctx, finalNode.GetID())
 		childNodeStatus.SetParentNodeID(&i)
 
 		logger.Debugf(ctx, "Recursing down branchNodestatus node")
-		nodeStatus := w.GetNodeExecutionStatus(nCtx.NodeID())
+		nodeStatus := w.GetNodeExecutionStatus(ctx, nCtx.NodeID())
 		return b.recurseDownstream(ctx, nCtx, nodeStatus, finalNode)
 	}
 
@@ -96,7 +96,7 @@ func (b *branchHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionCo
 	}
 
 	// Recurse downstream
-	nodeStatus := w.GetNodeExecutionStatus(nCtx.NodeID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, nCtx.NodeID())
 	return b.recurseDownstream(ctx, nCtx, nodeStatus, branchTakenNode)
 }
 
@@ -109,7 +109,7 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx handler.Node
 
 	if downstreamStatus.IsComplete() {
 		// For branch node we set the output node to be the same as the child nodes output
-		childNodeStatus := w.GetNodeExecutionStatus(branchTakenNode.GetID())
+		childNodeStatus := w.GetNodeExecutionStatus(ctx, branchTakenNode.GetID())
 		nodeStatus.SetDataDir(childNodeStatus.GetDataDir())
 		phase := handler.PhaseInfoSuccess(&handler.ExecutionInfo{
 			OutputInfo: &handler.OutputInfo{OutputURI: v1alpha1.GetOutputsFile(childNodeStatus.GetDataDir())},

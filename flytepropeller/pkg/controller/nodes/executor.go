@@ -116,7 +116,6 @@ func (c *nodeExecutor) preExecute(ctx context.Context, w v1alpha1.ExecutableWork
 	}
 
 	if predicatePhase == PredicatePhaseReady {
-
 		// TODO: Performance problem, we maybe in a retry loop and do not need to resolve the inputs again.
 		// For now we will do this.
 		dataDir := nodeStatus.GetDataDir()
@@ -146,8 +145,10 @@ func (c *nodeExecutor) preExecute(ctx context.Context, w v1alpha1.ExecutableWork
 
 			logger.Debugf(ctx, "Node Data Directory [%s].", nodeStatus.GetDataDir())
 		}
+
 		return handler.PhaseInfoQueued("node queued"), nil
 	}
+
 	// Now that we have resolved the inputs, we can record as a transition latency. This is because we have completed
 	// all the overhead that we have to compute. Any failures after this will incur this penalty, but it could be due
 	// to various external reasons - like queuing, overuse of quota, plugin overhead etc.
@@ -155,6 +156,7 @@ func (c *nodeExecutor) preExecute(ctx context.Context, w v1alpha1.ExecutableWork
 	if predicatePhase == PredicatePhaseSkip {
 		return handler.PhaseInfoSkip(nil, "Node Skipped as parent node was skipped"), nil
 	}
+
 	return handler.PhaseInfoNotReady("predecessor node not yet complete"), nil
 }
 
@@ -248,22 +250,17 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 		NodeId:      node.GetID(),
 		ExecutionId: w.GetExecutionID().WorkflowExecutionIdentifier,
 	}
-	nodeStatus := w.GetNodeExecutionStatus(node.GetID())
+
+	nodeStatus := w.GetNodeExecutionStatus(ctx, node.GetID())
+
+	if nodeStatus.IsDirty() {
+		return executors.NodeStatusRunning, nil
+	}
 
 	// Now depending on the node type decide
 	h, err := c.nodeHandlerFactory.GetHandler(node.GetKind())
 	if err != nil {
 		return executors.NodeStatusUndefined, err
-	}
-
-	if len(nodeStatus.GetDataDir()) == 0 {
-		// Predicate ready, lets Resolve the data
-		dataDir, err := w.GetExecutionStatus().ConstructNodeDataDir(ctx, c.store, node.GetID())
-		if err != nil {
-			return executors.NodeStatusUndefined, err
-		}
-
-		nodeStatus.SetDataDir(dataDir)
 	}
 
 	nCtx, err := c.newNodeExecContextDefault(ctx, w, node, nodeStatus)
@@ -283,9 +280,11 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 			logger.Errorf(ctx, "failed preExecute for node. Error: %s", err.Error())
 			return executors.NodeStatusUndefined, err
 		}
+
 		if p.GetPhase() == handler.EPhaseUndefined {
 			return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, node.GetID(), "received undefined phase.")
 		}
+
 		if p.GetPhase() == handler.EPhaseNotReady {
 			return executors.NodeStatusPending, nil
 		}
@@ -294,6 +293,7 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 		if err != nil {
 			return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, node.GetID(), err, "failed to move from queued")
 		}
+
 		if np != nodeStatus.GetPhase() {
 			// assert np == Queued!
 			logger.Infof(ctx, "Change in node state detected from [%s] -> [%s]", nodeStatus.GetPhase().String(), np.String())
@@ -309,11 +309,13 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 			UpdateNodeStatus(np, p, nCtx.nsm, nodeStatus)
 			c.RecordTransitionLatency(ctx, w, node, nodeStatus)
 		}
+
 		if np == v1alpha1.NodePhaseQueued {
 			return executors.NodeStatusQueued, nil
 		} else if np == v1alpha1.NodePhaseSkipped {
 			return executors.NodeStatusSuccess, nil
 		}
+
 		return executors.NodeStatusPending, nil
 	}
 
@@ -335,6 +337,7 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 			return executors.NodeStatusUndefined, err
 		}
 
+		nodeStatus.ClearSubNodeStatus()
 		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, v1.Now(), nodeStatus.GetMessage())
 		c.metrics.TimedOutFailure.Inc(ctx)
 		return executors.NodeStatusTimedOut, nil
@@ -346,6 +349,7 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 			return executors.NodeStatusUndefined, err
 		}
 
+		nodeStatus.ClearSubNodeStatus()
 		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, v1.Now(), "completed successfully")
 		c.metrics.SuccessDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
 		return executors.NodeStatusSuccess, nil
@@ -359,9 +363,10 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 
 		nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, v1.Now(), "retrying")
 		// We are going to retry in the next round, so we should clear all current state
-		nodeStatus.ClearDynamicNodeStatus()
+		nodeStatus.ClearSubNodeStatus()
 		nodeStatus.ClearTaskStatus()
 		nodeStatus.ClearWorkflowStatus()
+		nodeStatus.ClearDynamicNodeStatus()
 		nodeStatus.ClearLastAttemptStartedAt()
 		return executors.NodeStatusPending, nil
 	}
@@ -369,11 +374,6 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 	if currentPhase == v1alpha1.NodePhaseFailed {
 		// This should never happen
 		return executors.NodeStatusFailed(fmt.Errorf(nodeStatus.GetMessage())), nil
-	}
-
-	if currentPhase == v1alpha1.NodePhaseFailed {
-		// This should never happen
-		return executors.NodeStatusSuccess, nil
 	}
 
 	// case v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseRetryableFailure:
@@ -495,33 +495,39 @@ func (c *nodeExecutor) handleDownstream(ctx context.Context, w v1alpha1.Executab
 	return executors.NodeStatusPending, nil
 }
 
-func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, w v1alpha1.BaseWorkflowWithStatus, inputs *core.LiteralMap) (executors.NodeStatus, error) {
+func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, w v1alpha1.ExecutableWorkflow, inputs *core.LiteralMap) (executors.NodeStatus, error) {
 	startNode := w.StartNode()
 	if startNode == nil {
 		return executors.NodeStatusFailed(errors.Errorf(errors.BadSpecificationError, v1alpha1.StartNodeID, "Start node not found")), nil
 	}
+
 	ctx = contextutils.WithNodeID(ctx, startNode.GetID())
 	if inputs == nil {
 		logger.Infof(ctx, "No inputs for the workflow. Skipping storing inputs")
 		return executors.NodeStatusComplete, nil
 	}
+
 	// StartNode is special. It does not have any processing step. It just takes the workflow (or subworkflow) inputs and converts to its own outputs
-	nodeStatus := w.GetNodeExecutionStatus(startNode.GetID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, startNode.GetID())
+
 	if nodeStatus.GetDataDir() == "" {
 		return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, startNode.GetID(), "no data-dir set, cannot store inputs")
 	}
+
 	outputFile := v1alpha1.GetOutputsFile(nodeStatus.GetDataDir())
 	so := storage.Options{}
 	if err := c.store.WriteProtobuf(ctx, outputFile, so, inputs); err != nil {
 		logger.Errorf(ctx, "Failed to write protobuf (metadata). Error [%v]", err)
 		return executors.NodeStatusUndefined, errors.Wrapf(errors.CausedByError, startNode.GetID(), err, "Failed to store workflow inputs (as start node)")
 	}
+
 	return executors.NodeStatusComplete, nil
 }
 
 func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
 	currentNodeCtx := contextutils.WithNodeID(ctx, currentNode.GetID())
-	nodeStatus := w.GetNodeExecutionStatus(currentNode.GetID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, currentNode.GetID())
+
 	switch nodeStatus.GetPhase() {
 	case v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseTimingOut, v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseSucceeding:
 		logger.Debugf(currentNodeCtx, "Handling node Status [%v]", nodeStatus.GetPhase().String())
@@ -546,11 +552,11 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, w v1alpha1.Exec
 }
 
 func (c *nodeExecutor) FinalizeHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) error {
-	nodeStatus := w.GetNodeExecutionStatus(currentNode.GetID())
+	nodeStatus := w.GetExecutionStatus().GetNodeExecutionStatus(ctx, currentNode.GetID())
+
 	switch nodeStatus.GetPhase() {
 	case v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseSucceeding, v1alpha1.NodePhaseRetryableFailure:
 		ctx = contextutils.WithNodeID(ctx, currentNode.GetID())
-		nodeStatus := w.GetNodeExecutionStatus(currentNode.GetID())
 
 		// Now depending on the node type decide
 		h, err := c.nodeHandlerFactory.GetHandler(currentNode.GetKind())
@@ -599,11 +605,11 @@ func (c *nodeExecutor) FinalizeHandler(ctx context.Context, w v1alpha1.Executabl
 }
 
 func (c *nodeExecutor) AbortHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode, reason string) error {
-	nodeStatus := w.GetNodeExecutionStatus(currentNode.GetID())
+	nodeStatus := w.GetExecutionStatus().GetNodeExecutionStatus(ctx, currentNode.GetID())
+
 	switch nodeStatus.GetPhase() {
 	case v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseSucceeding, v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseQueued:
 		ctx = contextutils.WithNodeID(ctx, currentNode.GetID())
-		nodeStatus := w.GetNodeExecutionStatus(currentNode.GetID())
 
 		// Now depending on the node type decide
 		h, err := c.nodeHandlerFactory.GetHandler(currentNode.GetKind())

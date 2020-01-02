@@ -38,7 +38,7 @@ func FixedLengthUniqueID(inputID string, maxLength int) (string, error) {
 func FixedLengthUniqueIDForParts(maxLength int, parts ...string) (string, error) {
 	b := strings.Builder{}
 	for i, p := range parts {
-		if i > 0 {
+		if i > 0 && b.Len() > 0 {
 			_, err := b.WriteRune('-')
 			if err != nil {
 				return "", err

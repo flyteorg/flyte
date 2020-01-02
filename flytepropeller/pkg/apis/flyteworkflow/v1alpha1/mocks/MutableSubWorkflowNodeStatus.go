@@ -44,6 +44,38 @@ func (_m *MutableSubWorkflowNodeStatus) GetPhase() v1alpha1.WorkflowPhase {
 	return r0
 }
 
+type MutableSubWorkflowNodeStatus_IsDirty struct {
+	*mock.Call
+}
+
+func (_m MutableSubWorkflowNodeStatus_IsDirty) Return(_a0 bool) *MutableSubWorkflowNodeStatus_IsDirty {
+	return &MutableSubWorkflowNodeStatus_IsDirty{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableSubWorkflowNodeStatus) OnIsDirty() *MutableSubWorkflowNodeStatus_IsDirty {
+	c := _m.On("IsDirty")
+	return &MutableSubWorkflowNodeStatus_IsDirty{Call: c}
+}
+
+func (_m *MutableSubWorkflowNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableSubWorkflowNodeStatus_IsDirty {
+	c := _m.On("IsDirty", matchers...)
+	return &MutableSubWorkflowNodeStatus_IsDirty{Call: c}
+}
+
+// IsDirty provides a mock function with given fields:
+func (_m *MutableSubWorkflowNodeStatus) IsDirty() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 // SetPhase provides a mock function with given fields: phase
 func (_m *MutableSubWorkflowNodeStatus) SetPhase(phase v1alpha1.WorkflowPhase) {
 	_m.Called(phase)

@@ -20,7 +20,7 @@ type VarName = string
 
 type OutputResolver interface {
 	// Extracts a subset of node outputs to literals.
-	ExtractOutput(ctx context.Context, w v1alpha1.ExecutableWorkflow, n v1alpha1.ExecutableNode,
+	ExtractOutput(ctx context.Context, w v1alpha1.BaseWorkflowWithStatus, n v1alpha1.ExecutableNode,
 		bindToVar VarName) (values *core.Literal, err error)
 }
 
@@ -37,9 +37,9 @@ type remoteFileOutputResolver struct {
 	store *storage.DataStore
 }
 
-func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, w v1alpha1.ExecutableWorkflow, n v1alpha1.ExecutableNode,
+func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, w v1alpha1.BaseWorkflowWithStatus, n v1alpha1.ExecutableNode,
 	bindToVar VarName) (values *core.Literal, err error) {
-	nodeStatus := w.GetNodeExecutionStatus(n.GetID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, n.GetID())
 	outputsFileRef := v1alpha1.GetOutputsFile(nodeStatus.GetDataDir())
 
 	index, actualVar, err := ParseVarName(bindToVar)

@@ -28,6 +28,11 @@ func (_m *MutableNodeStatus) ClearLastAttemptStartedAt() {
 	_m.Called()
 }
 
+// ClearSubNodeStatus provides a mock function with given fields:
+func (_m *MutableNodeStatus) ClearSubNodeStatus() {
+	_m.Called()
+}
+
 // ClearTaskStatus provides a mock function with given fields:
 func (_m *MutableNodeStatus) ClearTaskStatus() {
 	_m.Called()
@@ -337,6 +342,38 @@ func (_m *MutableNodeStatus) IncrementAttempts() uint32 {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
+type MutableNodeStatus_IsDirty struct {
+	*mock.Call
+}
+
+func (_m MutableNodeStatus_IsDirty) Return(_a0 bool) *MutableNodeStatus_IsDirty {
+	return &MutableNodeStatus_IsDirty{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableNodeStatus) OnIsDirty() *MutableNodeStatus_IsDirty {
+	c := _m.On("IsDirty")
+	return &MutableNodeStatus_IsDirty{Call: c}
+}
+
+func (_m *MutableNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableNodeStatus_IsDirty {
+	c := _m.On("IsDirty", matchers...)
+	return &MutableNodeStatus_IsDirty{Call: c}
+}
+
+// IsDirty provides a mock function with given fields:
+func (_m *MutableNodeStatus) IsDirty() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
 	}
 
 	return r0

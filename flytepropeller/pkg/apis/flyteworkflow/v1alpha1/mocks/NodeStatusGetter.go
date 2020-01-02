@@ -3,6 +3,8 @@
 package mocks
 
 import (
+	context "context"
+
 	v1alpha1 "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -20,8 +22,8 @@ func (_m NodeStatusGetter_GetNodeExecutionStatus) Return(_a0 v1alpha1.Executable
 	return &NodeStatusGetter_GetNodeExecutionStatus{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *NodeStatusGetter) OnGetNodeExecutionStatus(id string) *NodeStatusGetter_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", id)
+func (_m *NodeStatusGetter) OnGetNodeExecutionStatus(ctx context.Context, id string) *NodeStatusGetter_GetNodeExecutionStatus {
+	c := _m.On("GetNodeExecutionStatus", ctx, id)
 	return &NodeStatusGetter_GetNodeExecutionStatus{Call: c}
 }
 
@@ -30,13 +32,13 @@ func (_m *NodeStatusGetter) OnGetNodeExecutionStatusMatch(matchers ...interface{
 	return &NodeStatusGetter_GetNodeExecutionStatus{Call: c}
 }
 
-// GetNodeExecutionStatus provides a mock function with given fields: id
-func (_m *NodeStatusGetter) GetNodeExecutionStatus(id string) v1alpha1.ExecutableNodeStatus {
-	ret := _m.Called(id)
+// GetNodeExecutionStatus provides a mock function with given fields: ctx, id
+func (_m *NodeStatusGetter) GetNodeExecutionStatus(ctx context.Context, id string) v1alpha1.ExecutableNodeStatus {
+	ret := _m.Called(ctx, id)
 
 	var r0 v1alpha1.ExecutableNodeStatus
-	if rf, ok := ret.Get(0).(func(string) v1alpha1.ExecutableNodeStatus); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, string) v1alpha1.ExecutableNodeStatus); ok {
+		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(v1alpha1.ExecutableNodeStatus)

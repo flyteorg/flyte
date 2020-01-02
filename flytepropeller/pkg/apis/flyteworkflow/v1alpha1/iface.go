@@ -165,6 +165,7 @@ type ExecutableBranchNodeStatus interface {
 }
 
 type MutableBranchNodeStatus interface {
+	Mutable
 	ExecutableBranchNodeStatus
 
 	SetBranchNodeError()
@@ -178,6 +179,7 @@ type ExecutableDynamicNodeStatus interface {
 }
 
 type MutableDynamicNodeStatus interface {
+	Mutable
 	ExecutableDynamicNodeStatus
 
 	SetDynamicNodePhase(phase DynamicNodePhase)
@@ -198,11 +200,17 @@ type ExecutableWorkflowNodeStatus interface {
 }
 
 type MutableWorkflowNodeStatus interface {
+	Mutable
 	ExecutableWorkflowNodeStatus
 	SetWorkflowNodePhase(phase WorkflowNodePhase)
 }
 
+type Mutable interface {
+	IsDirty() bool
+}
+
 type MutableNodeStatus interface {
+	Mutable
 	// Mutation API's
 	SetDataDir(DataReference)
 	SetParentNodeID(n *NodeID)
@@ -225,6 +233,7 @@ type MutableNodeStatus interface {
 	GetDynamicNodeStatus() MutableDynamicNodeStatus
 	ClearDynamicNodeStatus()
 	ClearLastAttemptStartedAt()
+	ClearSubNodeStatus()
 }
 
 // Interface for a Node p. This provides a mutable API.
@@ -247,7 +256,6 @@ type ExecutableNodeStatus interface {
 	GetTaskNodeStatus() ExecutableTaskNodeStatus
 
 	IsCached() bool
-	IsDirty() bool
 }
 
 type ExecutableSubWorkflowNodeStatus interface {
@@ -255,6 +263,7 @@ type ExecutableSubWorkflowNodeStatus interface {
 }
 
 type MutableSubWorkflowNodeStatus interface {
+	Mutable
 	ExecutableSubWorkflowNodeStatus
 	SetPhase(phase WorkflowPhase)
 }
@@ -268,6 +277,7 @@ type ExecutableTaskNodeStatus interface {
 }
 
 type MutableTaskNodeStatus interface {
+	Mutable
 	ExecutableTaskNodeStatus
 	SetPhase(phase int)
 	SetPhaseVersion(version uint32)
@@ -320,7 +330,7 @@ type ExecutableWorkflowStatus interface {
 	SetOutputReference(reference DataReference)
 	IncFailedAttempts()
 	SetMessage(msg string)
-	ConstructNodeDataDir(ctx context.Context, constructor storage.ReferenceConstructor, name NodeID) (storage.DataReference, error)
+	ConstructNodeDataDir(ctx context.Context, name NodeID) (storage.DataReference, error)
 }
 
 type BaseWorkflow interface {
@@ -381,7 +391,7 @@ type ExecutableWorkflow interface {
 }
 
 type NodeStatusGetter interface {
-	GetNodeExecutionStatus(id NodeID) ExecutableNodeStatus
+	GetNodeExecutionStatus(ctx context.Context, id NodeID) ExecutableNodeStatus
 }
 
 type NodeStatusMap = map[NodeID]ExecutableNodeStatus

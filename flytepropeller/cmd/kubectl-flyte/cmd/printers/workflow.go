@@ -1,6 +1,7 @@
 package printers
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -37,7 +38,7 @@ func CalculateWorkflowRuntime(s v1alpha1.ExecutableWorkflowStatus) string {
 type WorkflowPrinter struct {
 }
 
-func (p WorkflowPrinter) Print(tree gotree.Tree, w v1alpha1.ExecutableWorkflow) error {
+func (p WorkflowPrinter) Print(ctx context.Context, tree gotree.Tree, w v1alpha1.ExecutableWorkflow) error {
 	sortedNodes, err := visualize.TopologicalSort(w)
 	if err != nil {
 		return err
@@ -49,7 +50,7 @@ func (p WorkflowPrinter) Print(tree gotree.Tree, w v1alpha1.ExecutableWorkflow) 
 		tree.AddTree(newTree)
 	}
 	np := NodePrinter{}
-	return np.PrintList(newTree, w, sortedNodes)
+	return np.PrintList(ctx, newTree, w, sortedNodes)
 }
 
 func (p WorkflowPrinter) PrintShort(tree gotree.Tree, w v1alpha1.ExecutableWorkflow) error {

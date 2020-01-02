@@ -42,7 +42,7 @@ func (s *subworkflowHandler) DoInlineSubWorkflow(ctx context.Context, nCtx handl
 		// If the WF interface has outputs, validate that the outputs file was written.
 		var oInfo *handler.OutputInfo
 		if outputBindings := w.GetOutputBindings(); len(outputBindings) > 0 {
-			endNodeStatus := w.GetNodeExecutionStatus(v1alpha1.EndNodeID)
+			endNodeStatus := w.GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID)
 			store := nCtx.DataStore()
 			if endNodeStatus == nil {
 				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, "No end node found in subworkflow.", nil)), err
@@ -113,7 +113,7 @@ func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.
 	}
 
 	w := nCtx.Workflow()
-	status := w.GetNodeExecutionStatus(node.GetID())
+	status := w.GetNodeExecutionStatus(ctx, node.GetID())
 	contextualSubWorkflow := executors.NewSubContextualWorkflow(w, subWorkflow, status)
 	startNode := contextualSubWorkflow.StartNode()
 	if startNode == nil {
@@ -123,10 +123,9 @@ func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.
 
 	// Before starting the subworkflow, lets set the inputs for the Workflow. The inputs for a SubWorkflow are essentially
 	// Copy of the inputs to the Node
-	nodeStatus := contextualSubWorkflow.GetNodeExecutionStatus(startNode.GetID())
+	nodeStatus := contextualSubWorkflow.GetNodeExecutionStatus(ctx, startNode.GetID())
 	if len(nodeStatus.GetDataDir()) == 0 {
-		store := nCtx.DataStore()
-		dataDir, err := contextualSubWorkflow.GetExecutionStatus().ConstructNodeDataDir(ctx, store, startNode.GetID())
+		dataDir, err := contextualSubWorkflow.GetExecutionStatus().ConstructNodeDataDir(ctx, startNode.GetID())
 		if err != nil {
 			err = errors2.Wrapf(err, "Failed to create metadata store key. Error [%v]", err)
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
@@ -171,12 +170,12 @@ func (s *subworkflowHandler) CheckSubWorkflowStatus(ctx context.Context, nCtx ha
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, errMsg, nil)), nil
 	}
 
-	parentNodeStatus := w.GetNodeExecutionStatus(nCtx.NodeID())
+	parentNodeStatus := w.GetNodeExecutionStatus(ctx, nCtx.NodeID())
 	return s.DoInlineSubWorkflow(ctx, nCtx, contextualSubWorkflow, parentNodeStatus, startNode)
 }
 
 func (s *subworkflowHandler) HandleSubWorkflowFailingNode(ctx context.Context, nCtx handler.NodeExecutionContext, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode) (handler.Transition, error) {
-	status := w.GetNodeExecutionStatus(node.GetID())
+	status := w.GetNodeExecutionStatus(ctx, node.GetID())
 	subID := *node.GetWorkflowNode().GetSubWorkflowRef()
 	subWorkflow := w.FindSubWorkflow(subID)
 	if subWorkflow == nil {
@@ -193,7 +192,7 @@ func (s *subworkflowHandler) HandleAbort(ctx context.Context, nCtx handler.NodeE
 		return fmt.Errorf("no sub workflow [%s] found in node [%s]", workflowID, nCtx.NodeID())
 	}
 
-	nodeStatus := w.GetNodeExecutionStatus(nCtx.NodeID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, nCtx.NodeID())
 	contextualSubWorkflow := executors.NewSubContextualWorkflow(w, subWorkflow, nodeStatus)
 
 	startNode := w.StartNode()

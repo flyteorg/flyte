@@ -26,7 +26,7 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 	}
 
 	w := nCtx.Workflow()
-	nodeStatus := w.GetNodeExecutionStatus(nCtx.NodeID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, nCtx.NodeID())
 	childID, err := GetChildWorkflowExecutionID(
 		w.GetExecutionID().WorkflowExecutionIdentifier,
 		nCtx.NodeID(),
@@ -69,7 +69,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 
 	// Handle launch plan
 	w := nCtx.Workflow()
-	nodeStatus := w.GetNodeExecutionStatus(nCtx.NodeID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, nCtx.NodeID())
 	childID, err := GetChildWorkflowExecutionID(
 		w.GetExecutionID().WorkflowExecutionIdentifier,
 		nCtx.NodeID(),
@@ -150,7 +150,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 }
 
 func (l *launchPlanHandler) HandleAbort(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode) error {
-	nodeStatus := w.GetNodeExecutionStatus(node.GetID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, node.GetID())
 	childID, err := GetChildWorkflowExecutionID(
 		w.GetExecutionID().WorkflowExecutionIdentifier,
 		node.GetID(),

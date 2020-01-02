@@ -3,6 +3,8 @@ package v1alpha1
 import (
 	"context"
 
+	"github.com/lyft/flytestdlib/logger"
+
 	"github.com/lyft/flytestdlib/storage"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -27,6 +29,9 @@ type WorkflowStatus struct {
 	// that spin in an error loop. The value should be set at the global level and will be enforced. At the end of
 	// the retries the workflow will fail
 	FailedAttempts uint32 `json:"failedAttempts,omitempty"`
+
+	// non-Serialized fields
+	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
 }
 
 func IsWorkflowPhaseTerminal(p WorkflowPhase) bool {
@@ -84,21 +89,46 @@ func (in *WorkflowStatus) GetMessage() string {
 	return in.Message
 }
 
-func (in *WorkflowStatus) GetNodeExecutionStatus(id NodeID) ExecutableNodeStatus {
+func (in *WorkflowStatus) GetNodeExecutionStatus(ctx context.Context, id NodeID) ExecutableNodeStatus {
 	n, ok := in.NodeStatus[id]
 	if ok {
+		n.DataReferenceConstructor = in.DataReferenceConstructor
+		if len(n.GetDataDir()) == 0 {
+			dataDir, err := in.ConstructNodeDataDir(ctx, id)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to construct data dir for node [%v]", id)
+				return n
+			}
+
+			n.SetDataDir(dataDir)
+		}
+
 		return n
 	}
+
 	if in.NodeStatus == nil {
 		in.NodeStatus = make(map[NodeID]*NodeStatus)
 	}
-	newNodeStatus := &NodeStatus{}
+
+	newNodeStatus := &NodeStatus{
+		MutableStruct: MutableStruct{},
+	}
+
+	dataDir, err := in.ConstructNodeDataDir(ctx, id)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to construct data dir for node [%v], exec id [%v]", id)
+		return n
+	}
+
+	newNodeStatus.SetDataDir(dataDir)
+	newNodeStatus.DataReferenceConstructor = in.DataReferenceConstructor
+
 	in.NodeStatus[id] = newNodeStatus
 	return newNodeStatus
 }
 
-func (in *WorkflowStatus) ConstructNodeDataDir(ctx context.Context, constructor storage.ReferenceConstructor, name NodeID) (storage.DataReference, error) {
-	return constructor.ConstructReference(ctx, in.GetDataDir(), name, "data")
+func (in *WorkflowStatus) ConstructNodeDataDir(ctx context.Context, name NodeID) (storage.DataReference, error) {
+	return in.DataReferenceConstructor.ConstructReference(ctx, in.GetDataDir(), name, "data")
 }
 
 func (in *WorkflowStatus) GetDataDir() DataReference {

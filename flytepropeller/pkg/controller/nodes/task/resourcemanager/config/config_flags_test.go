@@ -99,10 +99,10 @@ func TestConfig_SetFlags(t *testing.T) {
 	cmdFlags := actual.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 
-	t.Run("Test_resourceManagerType", func(t *testing.T) {
+	t.Run("Test_type", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("resourceManagerType"); err == nil {
+			if vString, err := cmdFlags.GetString("type"); err == nil {
 				assert.Equal(t, string(defaultConfig.Type), vString)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -112,8 +112,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("resourceManagerType", testValue)
-			if vString, err := cmdFlags.GetString("resourceManagerType"); err == nil {
+			cmdFlags.Set("type", testValue)
+			if vString, err := cmdFlags.GetString("type"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Type)
 
 			} else {
@@ -121,10 +121,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_resourceQuota", func(t *testing.T) {
+	t.Run("Test_resourceMaxQuota", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("resourceQuota"); err == nil {
+			if vInt, err := cmdFlags.GetInt("resourceMaxQuota"); err == nil {
 				assert.Equal(t, int(defaultConfig.ResourceMaxQuota), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -134,8 +134,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("resourceQuota", testValue)
-			if vInt, err := cmdFlags.GetInt("resourceQuota"); err == nil {
+			cmdFlags.Set("resourceMaxQuota", testValue)
+			if vInt, err := cmdFlags.GetInt("resourceMaxQuota"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.ResourceMaxQuota)
 
 			} else {
@@ -143,10 +143,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_redisConfig.hostPath", func(t *testing.T) {
+	t.Run("Test_redis.hostPath", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("redisConfig.hostPath"); err == nil {
+			if vString, err := cmdFlags.GetString("redis.hostPath"); err == nil {
 				assert.Equal(t, string(defaultConfig.RedisConfig.HostPath), vString)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -156,8 +156,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("redisConfig.hostPath", testValue)
-			if vString, err := cmdFlags.GetString("redisConfig.hostPath"); err == nil {
+			cmdFlags.Set("redis.hostPath", testValue)
+			if vString, err := cmdFlags.GetString("redis.hostPath"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RedisConfig.HostPath)
 
 			} else {
@@ -165,10 +165,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_redisConfig.hostKey", func(t *testing.T) {
+	t.Run("Test_redis.hostKey", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("redisConfig.hostKey"); err == nil {
+			if vString, err := cmdFlags.GetString("redis.hostKey"); err == nil {
 				assert.Equal(t, string(defaultConfig.RedisConfig.HostKey), vString)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -178,8 +178,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("redisConfig.hostKey", testValue)
-			if vString, err := cmdFlags.GetString("redisConfig.hostKey"); err == nil {
+			cmdFlags.Set("redis.hostKey", testValue)
+			if vString, err := cmdFlags.GetString("redis.hostKey"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RedisConfig.HostKey)
 
 			} else {
@@ -187,10 +187,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_redisConfig.maxRetries", func(t *testing.T) {
+	t.Run("Test_redis.maxRetries", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("redisConfig.maxRetries"); err == nil {
+			if vInt, err := cmdFlags.GetInt("redis.maxRetries"); err == nil {
 				assert.Equal(t, int(defaultConfig.RedisConfig.MaxRetries), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -200,8 +200,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("redisConfig.maxRetries", testValue)
-			if vInt, err := cmdFlags.GetInt("redisConfig.maxRetries"); err == nil {
+			cmdFlags.Set("redis.maxRetries", testValue)
+			if vInt, err := cmdFlags.GetInt("redis.maxRetries"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.RedisConfig.MaxRetries)
 
 			} else {

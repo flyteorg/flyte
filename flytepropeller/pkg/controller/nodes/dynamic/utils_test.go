@@ -15,15 +15,21 @@ import (
 
 func TestHierarchicalNodeID(t *testing.T) {
 	t.Run("empty parent", func(t *testing.T) {
-		actual, err := hierarchicalNodeID("", "abc")
+		actual, err := hierarchicalNodeID("", "0", "abc")
 		assert.NoError(t, err)
-		assert.Equal(t, "-abc", actual)
+		assert.Equal(t, "0-abc", actual)
 	})
 
 	t.Run("long result", func(t *testing.T) {
-		actual, err := hierarchicalNodeID("abcdefghijklmnopqrstuvwxyz", "abc")
+		actual, err := hierarchicalNodeID("abcdefghijklmnopqrstuvwxyz", "0", "abc")
 		assert.NoError(t, err)
-		assert.Equal(t, "fpa3kc3y", actual)
+		assert.Equal(t, "fkm1vhcq", actual)
+	})
+
+	t.Run("Real case", func(t *testing.T) {
+		actual, err := hierarchicalNodeID("ensure-tables-task", "0", "2499f2af-7c23-42fd-8e62-01bf93cea82d")
+		assert.NoError(t, err)
+		assert.Equal(t, "fyvhfkda", actual)
 	})
 }
 
