@@ -1470,6 +1470,77 @@
         ]
       }
     },
+    "/api/v1/project_attributes/{project}": {
+      "get": {
+        "description": "Retrieve the customized resource attributes associated with a project",
+        "operationId": "GetProjectAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesGetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE"
+            ],
+            "default": "TASK_RESOURCE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "delete": {
+        "description": "Delete the customized resource attributes associated with a project",
+        "operationId": "DeleteProjectAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesDeleteRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}": {
       "put": {
         "description": "Update the customized resource attributes associated with a project-domain combination",
@@ -1503,6 +1574,91 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/adminProjectDomainAttributesUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/project_domain_attributes/{project}/{domain}": {
+      "get": {
+        "description": "Retrieve the customized resource attributes associated with a project-domain combination",
+        "operationId": "GetProjectDomainAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesGetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Unique domain id which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE"
+            ],
+            "default": "TASK_RESOURCE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "delete": {
+        "description": "Delete the customized resource attributes associated with a project-domain combination",
+        "operationId": "DeleteProjectDomainAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Unique domain id which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesDeleteRequest"
             }
           }
         ],
@@ -2100,6 +2256,105 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/adminWorkflowAttributesUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/workflow_attributes/{project}/{domain}/{workflow}": {
+      "get": {
+        "description": "Retrieve the customized resource attributes associated with a project, domain and workflow combination",
+        "operationId": "GetWorkflowAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowAttributesGetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Unique domain id which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "workflow",
+            "description": "Workflow name which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE"
+            ],
+            "default": "TASK_RESOURCE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "delete": {
+        "description": "Delete the customized resource attributes associated with a project, domain and workflow combination",
+        "operationId": "DeleteWorkflowAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowAttributesDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Unique domain id which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "workflow",
+            "description": "Workflow name which this set of attributes references.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowAttributesDeleteRequest"
             }
           }
         ],
@@ -3087,6 +3342,16 @@
       },
       "title": "Input/output data can represented by actual values or a link to where values are stored"
     },
+    "adminMatchableResource": {
+      "type": "string",
+      "enum": [
+        "TASK_RESOURCE",
+        "CLUSTER_RESOURCE",
+        "EXECUTION_QUEUE"
+      ],
+      "default": "TASK_RESOURCE",
+      "description": "Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment."
+    },
     "adminMatchingAttributes": {
       "type": "object",
       "properties": {
@@ -3366,6 +3631,30 @@
         }
       }
     },
+    "adminProjectAttributesDeleteRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Unique project id which this set of attributes references."
+        },
+        "resource_type": {
+          "$ref": "#/definitions/adminMatchableResource"
+        }
+      }
+    },
+    "adminProjectAttributesDeleteResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
+    },
+    "adminProjectAttributesGetResponse": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminProjectAttributes"
+        }
+      }
+    },
     "adminProjectAttributesUpdateRequest": {
       "type": "object",
       "properties": {
@@ -3392,6 +3681,34 @@
         },
         "matching_attributes": {
           "$ref": "#/definitions/adminMatchingAttributes"
+        }
+      }
+    },
+    "adminProjectDomainAttributesDeleteRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Unique project id which this set of attributes references."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Unique domain id which this set of attributes references."
+        },
+        "resource_type": {
+          "$ref": "#/definitions/adminMatchableResource"
+        }
+      }
+    },
+    "adminProjectDomainAttributesDeleteResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
+    },
+    "adminProjectDomainAttributesGetResponse": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminProjectDomainAttributes"
         }
       }
     },
@@ -3716,6 +4033,38 @@
         },
         "matching_attributes": {
           "$ref": "#/definitions/adminMatchingAttributes"
+        }
+      }
+    },
+    "adminWorkflowAttributesDeleteRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Unique project id which this set of attributes references."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Unique domain id which this set of attributes references."
+        },
+        "workflow": {
+          "type": "string",
+          "description": "Workflow name which this set of attributes references."
+        },
+        "resource_type": {
+          "$ref": "#/definitions/adminMatchableResource"
+        }
+      }
+    },
+    "adminWorkflowAttributesDeleteResponse": {
+      "type": "object",
+      "description": "Purposefully empty, may be populated in the future."
+    },
+    "adminWorkflowAttributesGetResponse": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminWorkflowAttributes"
         }
       }
     },

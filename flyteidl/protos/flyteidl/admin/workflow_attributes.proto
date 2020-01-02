@@ -26,3 +26,38 @@ message WorkflowAttributesUpdateRequest {
 // Purposefully empty, may be populated in the future.
 message WorkflowAttributesUpdateResponse {
 }
+
+message WorkflowAttributesGetRequest {
+    // Unique project id which this set of attributes references.
+    string project                 = 1;
+
+    // Unique domain id which this set of attributes references.
+    string domain                  = 2;
+
+    // Workflow name which this set of attributes references.
+    string workflow                = 3;
+
+    MatchableResource resource_type = 4;
+}
+
+message WorkflowAttributesGetResponse {
+    WorkflowAttributes attributes = 1;
+}
+
+message WorkflowAttributesDeleteRequest {
+    // Unique project id which this set of attributes references.
+    string project                 = 1;
+
+    // Unique domain id which this set of attributes references.
+    string domain                  = 2;
+
+    // Workflow name which this set of attributes references.
+    string workflow                = 3;
+
+    MatchableResource resource_type = 4;
+}
+
+// Purposefully empty, may be populated in the future.
+message WorkflowAttributesDeleteResponse {
+}
+

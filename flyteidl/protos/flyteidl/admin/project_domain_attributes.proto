@@ -23,3 +23,33 @@ message ProjectDomainAttributesUpdateRequest {
 // Purposefully empty, may be populated in the future.
 message ProjectDomainAttributesUpdateResponse {
 }
+
+message ProjectDomainAttributesGetRequest {
+    // Unique project id which this set of attributes references.
+    string project                 = 1;
+
+    // Unique domain id which this set of attributes references.
+    string domain                  = 2;
+
+    MatchableResource resource_type = 3;
+}
+
+message ProjectDomainAttributesGetResponse {
+  ProjectDomainAttributes attributes = 1;
+}
+
+
+message ProjectDomainAttributesDeleteRequest {
+    // Unique project id which this set of attributes references.
+    string project                 = 1;
+
+    // Unique domain id which this set of attributes references.
+    string domain                  = 2;
+
+    MatchableResource resource_type = 3;
+}
+
+// Purposefully empty, may be populated in the future.
+message ProjectDomainAttributesDeleteResponse {
+}
+

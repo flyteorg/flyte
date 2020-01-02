@@ -264,3 +264,301 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WorkflowAttributesUpdateResponseValidationError{}
+
+// Validate checks the field values on WorkflowAttributesGetRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *WorkflowAttributesGetRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Project
+
+	// no validation rules for Domain
+
+	// no validation rules for Workflow
+
+	// no validation rules for ResourceType
+
+	return nil
+}
+
+// WorkflowAttributesGetRequestValidationError is the validation error returned
+// by WorkflowAttributesGetRequest.Validate if the designated constraints
+// aren't met.
+type WorkflowAttributesGetRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowAttributesGetRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowAttributesGetRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowAttributesGetRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowAttributesGetRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowAttributesGetRequestValidationError) ErrorName() string {
+	return "WorkflowAttributesGetRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowAttributesGetRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowAttributesGetRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowAttributesGetRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowAttributesGetRequestValidationError{}
+
+// Validate checks the field values on WorkflowAttributesGetResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *WorkflowAttributesGetResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetAttributes()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowAttributesGetResponseValidationError{
+				field:  "Attributes",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// WorkflowAttributesGetResponseValidationError is the validation error
+// returned by WorkflowAttributesGetResponse.Validate if the designated
+// constraints aren't met.
+type WorkflowAttributesGetResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowAttributesGetResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowAttributesGetResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowAttributesGetResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowAttributesGetResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowAttributesGetResponseValidationError) ErrorName() string {
+	return "WorkflowAttributesGetResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowAttributesGetResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowAttributesGetResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowAttributesGetResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowAttributesGetResponseValidationError{}
+
+// Validate checks the field values on WorkflowAttributesDeleteRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *WorkflowAttributesDeleteRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Project
+
+	// no validation rules for Domain
+
+	// no validation rules for Workflow
+
+	// no validation rules for ResourceType
+
+	return nil
+}
+
+// WorkflowAttributesDeleteRequestValidationError is the validation error
+// returned by WorkflowAttributesDeleteRequest.Validate if the designated
+// constraints aren't met.
+type WorkflowAttributesDeleteRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowAttributesDeleteRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowAttributesDeleteRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowAttributesDeleteRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowAttributesDeleteRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowAttributesDeleteRequestValidationError) ErrorName() string {
+	return "WorkflowAttributesDeleteRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowAttributesDeleteRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowAttributesDeleteRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowAttributesDeleteRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowAttributesDeleteRequestValidationError{}
+
+// Validate checks the field values on WorkflowAttributesDeleteResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *WorkflowAttributesDeleteResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// WorkflowAttributesDeleteResponseValidationError is the validation error
+// returned by WorkflowAttributesDeleteResponse.Validate if the designated
+// constraints aren't met.
+type WorkflowAttributesDeleteResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowAttributesDeleteResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowAttributesDeleteResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowAttributesDeleteResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowAttributesDeleteResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowAttributesDeleteResponseValidationError) ErrorName() string {
+	return "WorkflowAttributesDeleteResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowAttributesDeleteResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowAttributesDeleteResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowAttributesDeleteResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowAttributesDeleteResponseValidationError{}

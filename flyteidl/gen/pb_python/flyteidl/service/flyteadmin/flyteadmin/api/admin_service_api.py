@@ -726,6 +726,351 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def delete_project_attributes(self, project, body, **kwargs):  # noqa: E501
+        """delete_project_attributes  # noqa: E501
+
+        Delete the customized resource attributes associated with a project  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.delete_project_attributes(project, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param AdminProjectAttributesDeleteRequest body: (required)
+        :return: AdminProjectAttributesDeleteResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.delete_project_attributes_with_http_info(project, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.delete_project_attributes_with_http_info(project, body, **kwargs)  # noqa: E501
+            return data
+
+    def delete_project_attributes_with_http_info(self, project, body, **kwargs):  # noqa: E501
+        """delete_project_attributes  # noqa: E501
+
+        Delete the customized resource attributes associated with a project  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.delete_project_attributes_with_http_info(project, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param AdminProjectAttributesDeleteRequest body: (required)
+        :return: AdminProjectAttributesDeleteResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['project', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method delete_project_attributes" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'project' is set
+        if ('project' not in params or
+                params['project'] is None):
+            raise ValueError("Missing the required parameter `project` when calling `delete_project_attributes`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `delete_project_attributes`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'project' in params:
+            path_params['project'] = params['project']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/project_attributes/{project}', 'DELETE',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminProjectAttributesDeleteResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def delete_project_domain_attributes(self, project, domain, body, **kwargs):  # noqa: E501
+        """delete_project_domain_attributes  # noqa: E501
+
+        Delete the customized resource attributes associated with a project-domain combination  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.delete_project_domain_attributes(project, domain, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param str domain: Unique domain id which this set of attributes references. (required)
+        :param AdminProjectDomainAttributesDeleteRequest body: (required)
+        :return: AdminProjectDomainAttributesDeleteResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.delete_project_domain_attributes_with_http_info(project, domain, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.delete_project_domain_attributes_with_http_info(project, domain, body, **kwargs)  # noqa: E501
+            return data
+
+    def delete_project_domain_attributes_with_http_info(self, project, domain, body, **kwargs):  # noqa: E501
+        """delete_project_domain_attributes  # noqa: E501
+
+        Delete the customized resource attributes associated with a project-domain combination  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.delete_project_domain_attributes_with_http_info(project, domain, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param str domain: Unique domain id which this set of attributes references. (required)
+        :param AdminProjectDomainAttributesDeleteRequest body: (required)
+        :return: AdminProjectDomainAttributesDeleteResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['project', 'domain', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method delete_project_domain_attributes" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'project' is set
+        if ('project' not in params or
+                params['project'] is None):
+            raise ValueError("Missing the required parameter `project` when calling `delete_project_domain_attributes`")  # noqa: E501
+        # verify the required parameter 'domain' is set
+        if ('domain' not in params or
+                params['domain'] is None):
+            raise ValueError("Missing the required parameter `domain` when calling `delete_project_domain_attributes`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `delete_project_domain_attributes`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'project' in params:
+            path_params['project'] = params['project']  # noqa: E501
+        if 'domain' in params:
+            path_params['domain'] = params['domain']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/project_domain_attributes/{project}/{domain}', 'DELETE',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminProjectDomainAttributesDeleteResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def delete_workflow_attributes(self, project, domain, workflow, body, **kwargs):  # noqa: E501
+        """delete_workflow_attributes  # noqa: E501
+
+        Delete the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.delete_workflow_attributes(project, domain, workflow, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param str domain: Unique domain id which this set of attributes references. (required)
+        :param str workflow: Workflow name which this set of attributes references. (required)
+        :param AdminWorkflowAttributesDeleteRequest body: (required)
+        :return: AdminWorkflowAttributesDeleteResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.delete_workflow_attributes_with_http_info(project, domain, workflow, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.delete_workflow_attributes_with_http_info(project, domain, workflow, body, **kwargs)  # noqa: E501
+            return data
+
+    def delete_workflow_attributes_with_http_info(self, project, domain, workflow, body, **kwargs):  # noqa: E501
+        """delete_workflow_attributes  # noqa: E501
+
+        Delete the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.delete_workflow_attributes_with_http_info(project, domain, workflow, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param str domain: Unique domain id which this set of attributes references. (required)
+        :param str workflow: Workflow name which this set of attributes references. (required)
+        :param AdminWorkflowAttributesDeleteRequest body: (required)
+        :return: AdminWorkflowAttributesDeleteResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['project', 'domain', 'workflow', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method delete_workflow_attributes" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'project' is set
+        if ('project' not in params or
+                params['project'] is None):
+            raise ValueError("Missing the required parameter `project` when calling `delete_workflow_attributes`")  # noqa: E501
+        # verify the required parameter 'domain' is set
+        if ('domain' not in params or
+                params['domain'] is None):
+            raise ValueError("Missing the required parameter `domain` when calling `delete_workflow_attributes`")  # noqa: E501
+        # verify the required parameter 'workflow' is set
+        if ('workflow' not in params or
+                params['workflow'] is None):
+            raise ValueError("Missing the required parameter `workflow` when calling `delete_workflow_attributes`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `delete_workflow_attributes`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'project' in params:
+            path_params['project'] = params['project']  # noqa: E501
+        if 'domain' in params:
+            path_params['domain'] = params['domain']  # noqa: E501
+        if 'workflow' in params:
+            path_params['workflow'] = params['workflow']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/workflow_attributes/{project}/{domain}/{workflow}', 'DELETE',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminWorkflowAttributesDeleteResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def get_active_launch_plan(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """get_active_launch_plan  # noqa: E501
 
@@ -1567,6 +1912,220 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def get_project_attributes(self, project, **kwargs):  # noqa: E501
+        """get_project_attributes  # noqa: E501
+
+        Retrieve the customized resource attributes associated with a project  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_project_attributes(project, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+        :return: AdminProjectAttributesGetResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.get_project_attributes_with_http_info(project, **kwargs)  # noqa: E501
+        else:
+            (data) = self.get_project_attributes_with_http_info(project, **kwargs)  # noqa: E501
+            return data
+
+    def get_project_attributes_with_http_info(self, project, **kwargs):  # noqa: E501
+        """get_project_attributes  # noqa: E501
+
+        Retrieve the customized resource attributes associated with a project  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_project_attributes_with_http_info(project, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+        :return: AdminProjectAttributesGetResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['project', 'resource_type']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method get_project_attributes" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'project' is set
+        if ('project' not in params or
+                params['project'] is None):
+            raise ValueError("Missing the required parameter `project` when calling `get_project_attributes`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'project' in params:
+            path_params['project'] = params['project']  # noqa: E501
+
+        query_params = []
+        if 'resource_type' in params:
+            query_params.append(('resource_type', params['resource_type']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/project_attributes/{project}', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminProjectAttributesGetResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def get_project_domain_attributes(self, project, domain, **kwargs):  # noqa: E501
+        """get_project_domain_attributes  # noqa: E501
+
+        Retrieve the customized resource attributes associated with a project-domain combination  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_project_domain_attributes(project, domain, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param str domain: Unique domain id which this set of attributes references. (required)
+        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+        :return: AdminProjectDomainAttributesGetResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.get_project_domain_attributes_with_http_info(project, domain, **kwargs)  # noqa: E501
+        else:
+            (data) = self.get_project_domain_attributes_with_http_info(project, domain, **kwargs)  # noqa: E501
+            return data
+
+    def get_project_domain_attributes_with_http_info(self, project, domain, **kwargs):  # noqa: E501
+        """get_project_domain_attributes  # noqa: E501
+
+        Retrieve the customized resource attributes associated with a project-domain combination  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_project_domain_attributes_with_http_info(project, domain, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param str domain: Unique domain id which this set of attributes references. (required)
+        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+        :return: AdminProjectDomainAttributesGetResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['project', 'domain', 'resource_type']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method get_project_domain_attributes" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'project' is set
+        if ('project' not in params or
+                params['project'] is None):
+            raise ValueError("Missing the required parameter `project` when calling `get_project_domain_attributes`")  # noqa: E501
+        # verify the required parameter 'domain' is set
+        if ('domain' not in params or
+                params['domain'] is None):
+            raise ValueError("Missing the required parameter `domain` when calling `get_project_domain_attributes`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'project' in params:
+            path_params['project'] = params['project']  # noqa: E501
+        if 'domain' in params:
+            path_params['domain'] = params['domain']  # noqa: E501
+
+        query_params = []
+        if 'resource_type' in params:
+            query_params.append(('resource_type', params['resource_type']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/project_domain_attributes/{project}/{domain}', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminProjectDomainAttributesGetResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def get_task(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """get_task  # noqa: E501
 
@@ -2148,6 +2707,125 @@ class AdminServiceApi(object):
             post_params=form_params,
             files=local_var_files,
             response_type='AdminWorkflow',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def get_workflow_attributes(self, project, domain, workflow, **kwargs):  # noqa: E501
+        """get_workflow_attributes  # noqa: E501
+
+        Retrieve the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_workflow_attributes(project, domain, workflow, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param str domain: Unique domain id which this set of attributes references. (required)
+        :param str workflow: Workflow name which this set of attributes references. (required)
+        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+        :return: AdminWorkflowAttributesGetResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.get_workflow_attributes_with_http_info(project, domain, workflow, **kwargs)  # noqa: E501
+        else:
+            (data) = self.get_workflow_attributes_with_http_info(project, domain, workflow, **kwargs)  # noqa: E501
+            return data
+
+    def get_workflow_attributes_with_http_info(self, project, domain, workflow, **kwargs):  # noqa: E501
+        """get_workflow_attributes  # noqa: E501
+
+        Retrieve the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_workflow_attributes_with_http_info(project, domain, workflow, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project: Unique project id which this set of attributes references. (required)
+        :param str domain: Unique domain id which this set of attributes references. (required)
+        :param str workflow: Workflow name which this set of attributes references. (required)
+        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+        :return: AdminWorkflowAttributesGetResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['project', 'domain', 'workflow', 'resource_type']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method get_workflow_attributes" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'project' is set
+        if ('project' not in params or
+                params['project'] is None):
+            raise ValueError("Missing the required parameter `project` when calling `get_workflow_attributes`")  # noqa: E501
+        # verify the required parameter 'domain' is set
+        if ('domain' not in params or
+                params['domain'] is None):
+            raise ValueError("Missing the required parameter `domain` when calling `get_workflow_attributes`")  # noqa: E501
+        # verify the required parameter 'workflow' is set
+        if ('workflow' not in params or
+                params['workflow'] is None):
+            raise ValueError("Missing the required parameter `workflow` when calling `get_workflow_attributes`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'project' in params:
+            path_params['project'] = params['project']  # noqa: E501
+        if 'domain' in params:
+            path_params['domain'] = params['domain']  # noqa: E501
+        if 'workflow' in params:
+            path_params['workflow'] = params['workflow']  # noqa: E501
+
+        query_params = []
+        if 'resource_type' in params:
+            query_params.append(('resource_type', params['resource_type']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/workflow_attributes/{project}/{domain}/{workflow}', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminWorkflowAttributesGetResponse',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),

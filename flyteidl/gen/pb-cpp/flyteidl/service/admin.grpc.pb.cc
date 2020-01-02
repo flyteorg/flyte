@@ -54,8 +54,14 @@ static const char* AdminService_method_names[] = {
   "/flyteidl.service.AdminService/ListTaskExecutions",
   "/flyteidl.service.AdminService/GetTaskExecutionData",
   "/flyteidl.service.AdminService/UpdateProjectAttributes",
+  "/flyteidl.service.AdminService/GetProjectAttributes",
+  "/flyteidl.service.AdminService/DeleteProjectAttributes",
   "/flyteidl.service.AdminService/UpdateProjectDomainAttributes",
+  "/flyteidl.service.AdminService/GetProjectDomainAttributes",
+  "/flyteidl.service.AdminService/DeleteProjectDomainAttributes",
   "/flyteidl.service.AdminService/UpdateWorkflowAttributes",
+  "/flyteidl.service.AdminService/GetWorkflowAttributes",
+  "/flyteidl.service.AdminService/DeleteWorkflowAttributes",
   "/flyteidl.service.AdminService/ListNamedEntities",
   "/flyteidl.service.AdminService/GetNamedEntity",
   "/flyteidl.service.AdminService/UpdateNamedEntity",
@@ -102,11 +108,17 @@ AdminService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chann
   , rpcmethod_ListTaskExecutions_(AdminService_method_names[31], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetTaskExecutionData_(AdminService_method_names[32], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_UpdateProjectAttributes_(AdminService_method_names[33], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_UpdateProjectDomainAttributes_(AdminService_method_names[34], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_UpdateWorkflowAttributes_(AdminService_method_names[35], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListNamedEntities_(AdminService_method_names[36], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetNamedEntity_(AdminService_method_names[37], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_UpdateNamedEntity_(AdminService_method_names[38], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetProjectAttributes_(AdminService_method_names[34], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_DeleteProjectAttributes_(AdminService_method_names[35], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateProjectDomainAttributes_(AdminService_method_names[36], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetProjectDomainAttributes_(AdminService_method_names[37], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_DeleteProjectDomainAttributes_(AdminService_method_names[38], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateWorkflowAttributes_(AdminService_method_names[39], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetWorkflowAttributes_(AdminService_method_names[40], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_DeleteWorkflowAttributes_(AdminService_method_names[41], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListNamedEntities_(AdminService_method_names[42], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetNamedEntity_(AdminService_method_names[43], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateNamedEntity_(AdminService_method_names[44], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status AdminService::Stub::CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::flyteidl::admin::TaskCreateResponse* response) {
@@ -1061,6 +1073,62 @@ void AdminService::Stub::experimental_async::UpdateProjectAttributes(::grpc::Cli
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectAttributesUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateProjectAttributes_, context, request, false);
 }
 
+::grpc::Status AdminService::Stub::GetProjectAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectAttributesGetRequest& request, ::flyteidl::admin::ProjectAttributesGetResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetProjectAttributes_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::GetProjectAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectAttributesGetRequest* request, ::flyteidl::admin::ProjectAttributesGetResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetProjectAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetProjectAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectAttributesGetResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetProjectAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetProjectAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectAttributesGetRequest* request, ::flyteidl::admin::ProjectAttributesGetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetProjectAttributes_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::GetProjectAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectAttributesGetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetProjectAttributes_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectAttributesGetResponse>* AdminService::Stub::AsyncGetProjectAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectAttributesGetRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectAttributesGetResponse>::Create(channel_.get(), cq, rpcmethod_GetProjectAttributes_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectAttributesGetResponse>* AdminService::Stub::PrepareAsyncGetProjectAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectAttributesGetRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectAttributesGetResponse>::Create(channel_.get(), cq, rpcmethod_GetProjectAttributes_, context, request, false);
+}
+
+::grpc::Status AdminService::Stub::DeleteProjectAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectAttributesDeleteRequest& request, ::flyteidl::admin::ProjectAttributesDeleteResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_DeleteProjectAttributes_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::DeleteProjectAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectAttributesDeleteRequest* request, ::flyteidl::admin::ProjectAttributesDeleteResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_DeleteProjectAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::DeleteProjectAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectAttributesDeleteResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_DeleteProjectAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::DeleteProjectAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectAttributesDeleteRequest* request, ::flyteidl::admin::ProjectAttributesDeleteResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_DeleteProjectAttributes_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::DeleteProjectAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectAttributesDeleteResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_DeleteProjectAttributes_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectAttributesDeleteResponse>* AdminService::Stub::AsyncDeleteProjectAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectAttributesDeleteRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectAttributesDeleteResponse>::Create(channel_.get(), cq, rpcmethod_DeleteProjectAttributes_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectAttributesDeleteResponse>* AdminService::Stub::PrepareAsyncDeleteProjectAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectAttributesDeleteRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectAttributesDeleteResponse>::Create(channel_.get(), cq, rpcmethod_DeleteProjectAttributes_, context, request, false);
+}
+
 ::grpc::Status AdminService::Stub::UpdateProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest& request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_UpdateProjectDomainAttributes_, context, request, response);
 }
@@ -1089,6 +1157,62 @@ void AdminService::Stub::experimental_async::UpdateProjectDomainAttributes(::grp
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateProjectDomainAttributes_, context, request, false);
 }
 
+::grpc::Status AdminService::Stub::GetProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest& request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetProjectDomainAttributes_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::GetProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest* request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetProjectDomainAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetProjectDomainAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest* request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetProjectDomainAttributes_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::GetProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetProjectDomainAttributes_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectDomainAttributesGetResponse>* AdminService::Stub::AsyncGetProjectDomainAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectDomainAttributesGetResponse>::Create(channel_.get(), cq, rpcmethod_GetProjectDomainAttributes_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectDomainAttributesGetResponse>* AdminService::Stub::PrepareAsyncGetProjectDomainAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectDomainAttributesGetResponse>::Create(channel_.get(), cq, rpcmethod_GetProjectDomainAttributes_, context, request, false);
+}
+
+::grpc::Status AdminService::Stub::DeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest& request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_DeleteProjectDomainAttributes_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::DeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest* request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_DeleteProjectDomainAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::DeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_DeleteProjectDomainAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::DeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest* request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_DeleteProjectDomainAttributes_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::DeleteProjectDomainAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_DeleteProjectDomainAttributes_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectDomainAttributesDeleteResponse>* AdminService::Stub::AsyncDeleteProjectDomainAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectDomainAttributesDeleteResponse>::Create(channel_.get(), cq, rpcmethod_DeleteProjectDomainAttributes_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectDomainAttributesDeleteResponse>* AdminService::Stub::PrepareAsyncDeleteProjectDomainAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectDomainAttributesDeleteResponse>::Create(channel_.get(), cq, rpcmethod_DeleteProjectDomainAttributes_, context, request, false);
+}
+
 ::grpc::Status AdminService::Stub::UpdateWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesUpdateRequest& request, ::flyteidl::admin::WorkflowAttributesUpdateResponse* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_UpdateWorkflowAttributes_, context, request, response);
 }
@@ -1115,6 +1239,62 @@ void AdminService::Stub::experimental_async::UpdateWorkflowAttributes(::grpc::Cl
 
 ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::WorkflowAttributesUpdateResponse>* AdminService::Stub::PrepareAsyncUpdateWorkflowAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesUpdateRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::WorkflowAttributesUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateWorkflowAttributes_, context, request, false);
+}
+
+::grpc::Status AdminService::Stub::GetWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest& request, ::flyteidl::admin::WorkflowAttributesGetResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetWorkflowAttributes_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::GetWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest* request, ::flyteidl::admin::WorkflowAttributesGetResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetWorkflowAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetWorkflowAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowAttributesGetResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetWorkflowAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest* request, ::flyteidl::admin::WorkflowAttributesGetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetWorkflowAttributes_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::GetWorkflowAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowAttributesGetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetWorkflowAttributes_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::WorkflowAttributesGetResponse>* AdminService::Stub::AsyncGetWorkflowAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::WorkflowAttributesGetResponse>::Create(channel_.get(), cq, rpcmethod_GetWorkflowAttributes_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::WorkflowAttributesGetResponse>* AdminService::Stub::PrepareAsyncGetWorkflowAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::WorkflowAttributesGetResponse>::Create(channel_.get(), cq, rpcmethod_GetWorkflowAttributes_, context, request, false);
+}
+
+::grpc::Status AdminService::Stub::DeleteWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest& request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_DeleteWorkflowAttributes_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::DeleteWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest* request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_DeleteWorkflowAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::DeleteWorkflowAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_DeleteWorkflowAttributes_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::DeleteWorkflowAttributes(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest* request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_DeleteWorkflowAttributes_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::DeleteWorkflowAttributes(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_DeleteWorkflowAttributes_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::WorkflowAttributesDeleteResponse>* AdminService::Stub::AsyncDeleteWorkflowAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::WorkflowAttributesDeleteResponse>::Create(channel_.get(), cq, rpcmethod_DeleteWorkflowAttributes_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::WorkflowAttributesDeleteResponse>* AdminService::Stub::PrepareAsyncDeleteWorkflowAttributesRaw(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::WorkflowAttributesDeleteResponse>::Create(channel_.get(), cq, rpcmethod_DeleteWorkflowAttributes_, context, request, false);
 }
 
 ::grpc::Status AdminService::Stub::ListNamedEntities(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityListRequest& request, ::flyteidl::admin::NamedEntityList* response) {
@@ -1375,25 +1555,55 @@ AdminService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[34],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectAttributesGetRequest, ::flyteidl::admin::ProjectAttributesGetResponse>(
+          std::mem_fn(&AdminService::Service::GetProjectAttributes), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[35],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectAttributesDeleteRequest, ::flyteidl::admin::ProjectAttributesDeleteResponse>(
+          std::mem_fn(&AdminService::Service::DeleteProjectAttributes), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[36],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectDomainAttributesUpdateRequest, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>(
           std::mem_fn(&AdminService::Service::UpdateProjectDomainAttributes), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[35],
+      AdminService_method_names[37],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectDomainAttributesGetRequest, ::flyteidl::admin::ProjectDomainAttributesGetResponse>(
+          std::mem_fn(&AdminService::Service::GetProjectDomainAttributes), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[38],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectDomainAttributesDeleteRequest, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse>(
+          std::mem_fn(&AdminService::Service::DeleteProjectDomainAttributes), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[39],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::WorkflowAttributesUpdateRequest, ::flyteidl::admin::WorkflowAttributesUpdateResponse>(
           std::mem_fn(&AdminService::Service::UpdateWorkflowAttributes), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[36],
+      AdminService_method_names[40],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::WorkflowAttributesGetRequest, ::flyteidl::admin::WorkflowAttributesGetResponse>(
+          std::mem_fn(&AdminService::Service::GetWorkflowAttributes), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[41],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::WorkflowAttributesDeleteRequest, ::flyteidl::admin::WorkflowAttributesDeleteResponse>(
+          std::mem_fn(&AdminService::Service::DeleteWorkflowAttributes), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[42],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityListRequest, ::flyteidl::admin::NamedEntityList>(
           std::mem_fn(&AdminService::Service::ListNamedEntities), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[37],
+      AdminService_method_names[43],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityGetRequest, ::flyteidl::admin::NamedEntity>(
           std::mem_fn(&AdminService::Service::GetNamedEntity), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[38],
+      AdminService_method_names[44],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityUpdateRequest, ::flyteidl::admin::NamedEntityUpdateResponse>(
           std::mem_fn(&AdminService::Service::UpdateNamedEntity), this)));
@@ -1640,6 +1850,20 @@ AdminService::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
+::grpc::Status AdminService::Service::GetProjectAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectAttributesGetRequest* request, ::flyteidl::admin::ProjectAttributesGetResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::DeleteProjectAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectAttributesDeleteRequest* request, ::flyteidl::admin::ProjectAttributesDeleteResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
 ::grpc::Status AdminService::Service::UpdateProjectDomainAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectDomainAttributesUpdateRequest* request, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* response) {
   (void) context;
   (void) request;
@@ -1647,7 +1871,35 @@ AdminService::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
+::grpc::Status AdminService::Service::GetProjectDomainAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectDomainAttributesGetRequest* request, ::flyteidl::admin::ProjectDomainAttributesGetResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::DeleteProjectDomainAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectDomainAttributesDeleteRequest* request, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
 ::grpc::Status AdminService::Service::UpdateWorkflowAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowAttributesUpdateRequest* request, ::flyteidl::admin::WorkflowAttributesUpdateResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::GetWorkflowAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowAttributesGetRequest* request, ::flyteidl::admin::WorkflowAttributesGetResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::DeleteWorkflowAttributes(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowAttributesDeleteRequest* request, ::flyteidl::admin::WorkflowAttributesDeleteResponse* response) {
   (void) context;
   (void) request;
   (void) response;

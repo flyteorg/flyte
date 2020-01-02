@@ -42,7 +42,7 @@ struct TableStruct_flyteidl_2fadmin_2fproject_5fdomain_5fattributes_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[3]
+  static const ::google::protobuf::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -54,6 +54,18 @@ namespace admin {
 class ProjectDomainAttributes;
 class ProjectDomainAttributesDefaultTypeInternal;
 extern ProjectDomainAttributesDefaultTypeInternal _ProjectDomainAttributes_default_instance_;
+class ProjectDomainAttributesDeleteRequest;
+class ProjectDomainAttributesDeleteRequestDefaultTypeInternal;
+extern ProjectDomainAttributesDeleteRequestDefaultTypeInternal _ProjectDomainAttributesDeleteRequest_default_instance_;
+class ProjectDomainAttributesDeleteResponse;
+class ProjectDomainAttributesDeleteResponseDefaultTypeInternal;
+extern ProjectDomainAttributesDeleteResponseDefaultTypeInternal _ProjectDomainAttributesDeleteResponse_default_instance_;
+class ProjectDomainAttributesGetRequest;
+class ProjectDomainAttributesGetRequestDefaultTypeInternal;
+extern ProjectDomainAttributesGetRequestDefaultTypeInternal _ProjectDomainAttributesGetRequest_default_instance_;
+class ProjectDomainAttributesGetResponse;
+class ProjectDomainAttributesGetResponseDefaultTypeInternal;
+extern ProjectDomainAttributesGetResponseDefaultTypeInternal _ProjectDomainAttributesGetResponse_default_instance_;
 class ProjectDomainAttributesUpdateRequest;
 class ProjectDomainAttributesUpdateRequestDefaultTypeInternal;
 extern ProjectDomainAttributesUpdateRequestDefaultTypeInternal _ProjectDomainAttributesUpdateRequest_default_instance_;
@@ -65,6 +77,10 @@ extern ProjectDomainAttributesUpdateResponseDefaultTypeInternal _ProjectDomainAt
 namespace google {
 namespace protobuf {
 template<> ::flyteidl::admin::ProjectDomainAttributes* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributes>(Arena*);
+template<> ::flyteidl::admin::ProjectDomainAttributesDeleteRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributesDeleteRequest>(Arena*);
+template<> ::flyteidl::admin::ProjectDomainAttributesDeleteResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributesDeleteResponse>(Arena*);
+template<> ::flyteidl::admin::ProjectDomainAttributesGetRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributesGetRequest>(Arena*);
+template<> ::flyteidl::admin::ProjectDomainAttributesGetResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributesGetResponse>(Arena*);
 template<> ::flyteidl::admin::ProjectDomainAttributesUpdateRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributesUpdateRequest>(Arena*);
 template<> ::flyteidl::admin::ProjectDomainAttributesUpdateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributesUpdateResponse>(Arena*);
 }  // namespace protobuf
@@ -437,6 +453,510 @@ class ProjectDomainAttributesUpdateResponse final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_5fdomain_5fattributes_2eproto;
 };
+// -------------------------------------------------------------------
+
+class ProjectDomainAttributesGetRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ProjectDomainAttributesGetRequest) */ {
+ public:
+  ProjectDomainAttributesGetRequest();
+  virtual ~ProjectDomainAttributesGetRequest();
+
+  ProjectDomainAttributesGetRequest(const ProjectDomainAttributesGetRequest& from);
+
+  inline ProjectDomainAttributesGetRequest& operator=(const ProjectDomainAttributesGetRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ProjectDomainAttributesGetRequest(ProjectDomainAttributesGetRequest&& from) noexcept
+    : ProjectDomainAttributesGetRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline ProjectDomainAttributesGetRequest& operator=(ProjectDomainAttributesGetRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ProjectDomainAttributesGetRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ProjectDomainAttributesGetRequest* internal_default_instance() {
+    return reinterpret_cast<const ProjectDomainAttributesGetRequest*>(
+               &_ProjectDomainAttributesGetRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  void Swap(ProjectDomainAttributesGetRequest* other);
+  friend void swap(ProjectDomainAttributesGetRequest& a, ProjectDomainAttributesGetRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ProjectDomainAttributesGetRequest* New() const final {
+    return CreateMaybeMessage<ProjectDomainAttributesGetRequest>(nullptr);
+  }
+
+  ProjectDomainAttributesGetRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ProjectDomainAttributesGetRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ProjectDomainAttributesGetRequest& from);
+  void MergeFrom(const ProjectDomainAttributesGetRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ProjectDomainAttributesGetRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string project = 1;
+  void clear_project();
+  static const int kProjectFieldNumber = 1;
+  const ::std::string& project() const;
+  void set_project(const ::std::string& value);
+  #if LANG_CXX11
+  void set_project(::std::string&& value);
+  #endif
+  void set_project(const char* value);
+  void set_project(const char* value, size_t size);
+  ::std::string* mutable_project();
+  ::std::string* release_project();
+  void set_allocated_project(::std::string* project);
+
+  // string domain = 2;
+  void clear_domain();
+  static const int kDomainFieldNumber = 2;
+  const ::std::string& domain() const;
+  void set_domain(const ::std::string& value);
+  #if LANG_CXX11
+  void set_domain(::std::string&& value);
+  #endif
+  void set_domain(const char* value);
+  void set_domain(const char* value, size_t size);
+  ::std::string* mutable_domain();
+  ::std::string* release_domain();
+  void set_allocated_domain(::std::string* domain);
+
+  // .flyteidl.admin.MatchableResource resource_type = 3;
+  void clear_resource_type();
+  static const int kResourceTypeFieldNumber = 3;
+  ::flyteidl::admin::MatchableResource resource_type() const;
+  void set_resource_type(::flyteidl::admin::MatchableResource value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectDomainAttributesGetRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr project_;
+  ::google::protobuf::internal::ArenaStringPtr domain_;
+  int resource_type_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fproject_5fdomain_5fattributes_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ProjectDomainAttributesGetResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ProjectDomainAttributesGetResponse) */ {
+ public:
+  ProjectDomainAttributesGetResponse();
+  virtual ~ProjectDomainAttributesGetResponse();
+
+  ProjectDomainAttributesGetResponse(const ProjectDomainAttributesGetResponse& from);
+
+  inline ProjectDomainAttributesGetResponse& operator=(const ProjectDomainAttributesGetResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ProjectDomainAttributesGetResponse(ProjectDomainAttributesGetResponse&& from) noexcept
+    : ProjectDomainAttributesGetResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline ProjectDomainAttributesGetResponse& operator=(ProjectDomainAttributesGetResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ProjectDomainAttributesGetResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ProjectDomainAttributesGetResponse* internal_default_instance() {
+    return reinterpret_cast<const ProjectDomainAttributesGetResponse*>(
+               &_ProjectDomainAttributesGetResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  void Swap(ProjectDomainAttributesGetResponse* other);
+  friend void swap(ProjectDomainAttributesGetResponse& a, ProjectDomainAttributesGetResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ProjectDomainAttributesGetResponse* New() const final {
+    return CreateMaybeMessage<ProjectDomainAttributesGetResponse>(nullptr);
+  }
+
+  ProjectDomainAttributesGetResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ProjectDomainAttributesGetResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ProjectDomainAttributesGetResponse& from);
+  void MergeFrom(const ProjectDomainAttributesGetResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ProjectDomainAttributesGetResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.ProjectDomainAttributes attributes = 1;
+  bool has_attributes() const;
+  void clear_attributes();
+  static const int kAttributesFieldNumber = 1;
+  const ::flyteidl::admin::ProjectDomainAttributes& attributes() const;
+  ::flyteidl::admin::ProjectDomainAttributes* release_attributes();
+  ::flyteidl::admin::ProjectDomainAttributes* mutable_attributes();
+  void set_allocated_attributes(::flyteidl::admin::ProjectDomainAttributes* attributes);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectDomainAttributesGetResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::admin::ProjectDomainAttributes* attributes_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fproject_5fdomain_5fattributes_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ProjectDomainAttributesDeleteRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ProjectDomainAttributesDeleteRequest) */ {
+ public:
+  ProjectDomainAttributesDeleteRequest();
+  virtual ~ProjectDomainAttributesDeleteRequest();
+
+  ProjectDomainAttributesDeleteRequest(const ProjectDomainAttributesDeleteRequest& from);
+
+  inline ProjectDomainAttributesDeleteRequest& operator=(const ProjectDomainAttributesDeleteRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ProjectDomainAttributesDeleteRequest(ProjectDomainAttributesDeleteRequest&& from) noexcept
+    : ProjectDomainAttributesDeleteRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline ProjectDomainAttributesDeleteRequest& operator=(ProjectDomainAttributesDeleteRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ProjectDomainAttributesDeleteRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ProjectDomainAttributesDeleteRequest* internal_default_instance() {
+    return reinterpret_cast<const ProjectDomainAttributesDeleteRequest*>(
+               &_ProjectDomainAttributesDeleteRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  void Swap(ProjectDomainAttributesDeleteRequest* other);
+  friend void swap(ProjectDomainAttributesDeleteRequest& a, ProjectDomainAttributesDeleteRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ProjectDomainAttributesDeleteRequest* New() const final {
+    return CreateMaybeMessage<ProjectDomainAttributesDeleteRequest>(nullptr);
+  }
+
+  ProjectDomainAttributesDeleteRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ProjectDomainAttributesDeleteRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ProjectDomainAttributesDeleteRequest& from);
+  void MergeFrom(const ProjectDomainAttributesDeleteRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ProjectDomainAttributesDeleteRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string project = 1;
+  void clear_project();
+  static const int kProjectFieldNumber = 1;
+  const ::std::string& project() const;
+  void set_project(const ::std::string& value);
+  #if LANG_CXX11
+  void set_project(::std::string&& value);
+  #endif
+  void set_project(const char* value);
+  void set_project(const char* value, size_t size);
+  ::std::string* mutable_project();
+  ::std::string* release_project();
+  void set_allocated_project(::std::string* project);
+
+  // string domain = 2;
+  void clear_domain();
+  static const int kDomainFieldNumber = 2;
+  const ::std::string& domain() const;
+  void set_domain(const ::std::string& value);
+  #if LANG_CXX11
+  void set_domain(::std::string&& value);
+  #endif
+  void set_domain(const char* value);
+  void set_domain(const char* value, size_t size);
+  ::std::string* mutable_domain();
+  ::std::string* release_domain();
+  void set_allocated_domain(::std::string* domain);
+
+  // .flyteidl.admin.MatchableResource resource_type = 3;
+  void clear_resource_type();
+  static const int kResourceTypeFieldNumber = 3;
+  ::flyteidl::admin::MatchableResource resource_type() const;
+  void set_resource_type(::flyteidl::admin::MatchableResource value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectDomainAttributesDeleteRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr project_;
+  ::google::protobuf::internal::ArenaStringPtr domain_;
+  int resource_type_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fproject_5fdomain_5fattributes_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ProjectDomainAttributesDeleteResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ProjectDomainAttributesDeleteResponse) */ {
+ public:
+  ProjectDomainAttributesDeleteResponse();
+  virtual ~ProjectDomainAttributesDeleteResponse();
+
+  ProjectDomainAttributesDeleteResponse(const ProjectDomainAttributesDeleteResponse& from);
+
+  inline ProjectDomainAttributesDeleteResponse& operator=(const ProjectDomainAttributesDeleteResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ProjectDomainAttributesDeleteResponse(ProjectDomainAttributesDeleteResponse&& from) noexcept
+    : ProjectDomainAttributesDeleteResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline ProjectDomainAttributesDeleteResponse& operator=(ProjectDomainAttributesDeleteResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ProjectDomainAttributesDeleteResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ProjectDomainAttributesDeleteResponse* internal_default_instance() {
+    return reinterpret_cast<const ProjectDomainAttributesDeleteResponse*>(
+               &_ProjectDomainAttributesDeleteResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(ProjectDomainAttributesDeleteResponse* other);
+  friend void swap(ProjectDomainAttributesDeleteResponse& a, ProjectDomainAttributesDeleteResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ProjectDomainAttributesDeleteResponse* New() const final {
+    return CreateMaybeMessage<ProjectDomainAttributesDeleteResponse>(nullptr);
+  }
+
+  ProjectDomainAttributesDeleteResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ProjectDomainAttributesDeleteResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ProjectDomainAttributesDeleteResponse& from);
+  void MergeFrom(const ProjectDomainAttributesDeleteResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ProjectDomainAttributesDeleteResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectDomainAttributesDeleteResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fproject_5fdomain_5fattributes_2eproto;
+};
 // ===================================================================
 
 
@@ -658,9 +1178,324 @@ inline void ProjectDomainAttributesUpdateRequest::set_allocated_attributes(::fly
 
 // ProjectDomainAttributesUpdateResponse
 
+// -------------------------------------------------------------------
+
+// ProjectDomainAttributesGetRequest
+
+// string project = 1;
+inline void ProjectDomainAttributesGetRequest::clear_project() {
+  project_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProjectDomainAttributesGetRequest::project() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectDomainAttributesGetRequest.project)
+  return project_.GetNoArena();
+}
+inline void ProjectDomainAttributesGetRequest::set_project(const ::std::string& value) {
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectDomainAttributesGetRequest.project)
+}
+#if LANG_CXX11
+inline void ProjectDomainAttributesGetRequest::set_project(::std::string&& value) {
+  
+  project_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectDomainAttributesGetRequest.project)
+}
+#endif
+inline void ProjectDomainAttributesGetRequest::set_project(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectDomainAttributesGetRequest.project)
+}
+inline void ProjectDomainAttributesGetRequest::set_project(const char* value, size_t size) {
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectDomainAttributesGetRequest.project)
+}
+inline ::std::string* ProjectDomainAttributesGetRequest::mutable_project() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectDomainAttributesGetRequest.project)
+  return project_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProjectDomainAttributesGetRequest::release_project() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectDomainAttributesGetRequest.project)
+  
+  return project_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProjectDomainAttributesGetRequest::set_allocated_project(::std::string* project) {
+  if (project != nullptr) {
+    
+  } else {
+    
+  }
+  project_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), project);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectDomainAttributesGetRequest.project)
+}
+
+// string domain = 2;
+inline void ProjectDomainAttributesGetRequest::clear_domain() {
+  domain_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProjectDomainAttributesGetRequest::domain() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectDomainAttributesGetRequest.domain)
+  return domain_.GetNoArena();
+}
+inline void ProjectDomainAttributesGetRequest::set_domain(const ::std::string& value) {
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectDomainAttributesGetRequest.domain)
+}
+#if LANG_CXX11
+inline void ProjectDomainAttributesGetRequest::set_domain(::std::string&& value) {
+  
+  domain_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectDomainAttributesGetRequest.domain)
+}
+#endif
+inline void ProjectDomainAttributesGetRequest::set_domain(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectDomainAttributesGetRequest.domain)
+}
+inline void ProjectDomainAttributesGetRequest::set_domain(const char* value, size_t size) {
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectDomainAttributesGetRequest.domain)
+}
+inline ::std::string* ProjectDomainAttributesGetRequest::mutable_domain() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectDomainAttributesGetRequest.domain)
+  return domain_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProjectDomainAttributesGetRequest::release_domain() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectDomainAttributesGetRequest.domain)
+  
+  return domain_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProjectDomainAttributesGetRequest::set_allocated_domain(::std::string* domain) {
+  if (domain != nullptr) {
+    
+  } else {
+    
+  }
+  domain_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), domain);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectDomainAttributesGetRequest.domain)
+}
+
+// .flyteidl.admin.MatchableResource resource_type = 3;
+inline void ProjectDomainAttributesGetRequest::clear_resource_type() {
+  resource_type_ = 0;
+}
+inline ::flyteidl::admin::MatchableResource ProjectDomainAttributesGetRequest::resource_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectDomainAttributesGetRequest.resource_type)
+  return static_cast< ::flyteidl::admin::MatchableResource >(resource_type_);
+}
+inline void ProjectDomainAttributesGetRequest::set_resource_type(::flyteidl::admin::MatchableResource value) {
+  
+  resource_type_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectDomainAttributesGetRequest.resource_type)
+}
+
+// -------------------------------------------------------------------
+
+// ProjectDomainAttributesGetResponse
+
+// .flyteidl.admin.ProjectDomainAttributes attributes = 1;
+inline bool ProjectDomainAttributesGetResponse::has_attributes() const {
+  return this != internal_default_instance() && attributes_ != nullptr;
+}
+inline void ProjectDomainAttributesGetResponse::clear_attributes() {
+  if (GetArenaNoVirtual() == nullptr && attributes_ != nullptr) {
+    delete attributes_;
+  }
+  attributes_ = nullptr;
+}
+inline const ::flyteidl::admin::ProjectDomainAttributes& ProjectDomainAttributesGetResponse::attributes() const {
+  const ::flyteidl::admin::ProjectDomainAttributes* p = attributes_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectDomainAttributesGetResponse.attributes)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::ProjectDomainAttributes*>(
+      &::flyteidl::admin::_ProjectDomainAttributes_default_instance_);
+}
+inline ::flyteidl::admin::ProjectDomainAttributes* ProjectDomainAttributesGetResponse::release_attributes() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectDomainAttributesGetResponse.attributes)
+  
+  ::flyteidl::admin::ProjectDomainAttributes* temp = attributes_;
+  attributes_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::ProjectDomainAttributes* ProjectDomainAttributesGetResponse::mutable_attributes() {
+  
+  if (attributes_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::ProjectDomainAttributes>(GetArenaNoVirtual());
+    attributes_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectDomainAttributesGetResponse.attributes)
+  return attributes_;
+}
+inline void ProjectDomainAttributesGetResponse::set_allocated_attributes(::flyteidl::admin::ProjectDomainAttributes* attributes) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete attributes_;
+  }
+  if (attributes) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      attributes = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, attributes, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  attributes_ = attributes;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectDomainAttributesGetResponse.attributes)
+}
+
+// -------------------------------------------------------------------
+
+// ProjectDomainAttributesDeleteRequest
+
+// string project = 1;
+inline void ProjectDomainAttributesDeleteRequest::clear_project() {
+  project_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProjectDomainAttributesDeleteRequest::project() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectDomainAttributesDeleteRequest.project)
+  return project_.GetNoArena();
+}
+inline void ProjectDomainAttributesDeleteRequest::set_project(const ::std::string& value) {
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectDomainAttributesDeleteRequest.project)
+}
+#if LANG_CXX11
+inline void ProjectDomainAttributesDeleteRequest::set_project(::std::string&& value) {
+  
+  project_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectDomainAttributesDeleteRequest.project)
+}
+#endif
+inline void ProjectDomainAttributesDeleteRequest::set_project(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectDomainAttributesDeleteRequest.project)
+}
+inline void ProjectDomainAttributesDeleteRequest::set_project(const char* value, size_t size) {
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectDomainAttributesDeleteRequest.project)
+}
+inline ::std::string* ProjectDomainAttributesDeleteRequest::mutable_project() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectDomainAttributesDeleteRequest.project)
+  return project_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProjectDomainAttributesDeleteRequest::release_project() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectDomainAttributesDeleteRequest.project)
+  
+  return project_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProjectDomainAttributesDeleteRequest::set_allocated_project(::std::string* project) {
+  if (project != nullptr) {
+    
+  } else {
+    
+  }
+  project_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), project);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectDomainAttributesDeleteRequest.project)
+}
+
+// string domain = 2;
+inline void ProjectDomainAttributesDeleteRequest::clear_domain() {
+  domain_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProjectDomainAttributesDeleteRequest::domain() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectDomainAttributesDeleteRequest.domain)
+  return domain_.GetNoArena();
+}
+inline void ProjectDomainAttributesDeleteRequest::set_domain(const ::std::string& value) {
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectDomainAttributesDeleteRequest.domain)
+}
+#if LANG_CXX11
+inline void ProjectDomainAttributesDeleteRequest::set_domain(::std::string&& value) {
+  
+  domain_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectDomainAttributesDeleteRequest.domain)
+}
+#endif
+inline void ProjectDomainAttributesDeleteRequest::set_domain(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectDomainAttributesDeleteRequest.domain)
+}
+inline void ProjectDomainAttributesDeleteRequest::set_domain(const char* value, size_t size) {
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectDomainAttributesDeleteRequest.domain)
+}
+inline ::std::string* ProjectDomainAttributesDeleteRequest::mutable_domain() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectDomainAttributesDeleteRequest.domain)
+  return domain_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProjectDomainAttributesDeleteRequest::release_domain() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectDomainAttributesDeleteRequest.domain)
+  
+  return domain_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProjectDomainAttributesDeleteRequest::set_allocated_domain(::std::string* domain) {
+  if (domain != nullptr) {
+    
+  } else {
+    
+  }
+  domain_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), domain);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectDomainAttributesDeleteRequest.domain)
+}
+
+// .flyteidl.admin.MatchableResource resource_type = 3;
+inline void ProjectDomainAttributesDeleteRequest::clear_resource_type() {
+  resource_type_ = 0;
+}
+inline ::flyteidl::admin::MatchableResource ProjectDomainAttributesDeleteRequest::resource_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectDomainAttributesDeleteRequest.resource_type)
+  return static_cast< ::flyteidl::admin::MatchableResource >(resource_type_);
+}
+inline void ProjectDomainAttributesDeleteRequest::set_resource_type(::flyteidl::admin::MatchableResource value) {
+  
+  resource_type_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectDomainAttributesDeleteRequest.resource_type)
+}
+
+// -------------------------------------------------------------------
+
+// ProjectDomainAttributesDeleteResponse
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

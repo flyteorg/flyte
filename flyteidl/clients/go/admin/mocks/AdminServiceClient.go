@@ -353,6 +353,150 @@ func (_m *AdminServiceClient) CreateWorkflowEvent(ctx context.Context, in *admin
 	return r0, r1
 }
 
+type AdminServiceClient_DeleteProjectAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_DeleteProjectAttributes) Return(_a0 *admin.ProjectAttributesDeleteResponse, _a1 error) *AdminServiceClient_DeleteProjectAttributes {
+	return &AdminServiceClient_DeleteProjectAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnDeleteProjectAttributes(ctx context.Context, in *admin.ProjectAttributesDeleteRequest, opts ...grpc.CallOption) *AdminServiceClient_DeleteProjectAttributes {
+	c := _m.On("DeleteProjectAttributes", ctx, in, opts)
+	return &AdminServiceClient_DeleteProjectAttributes{Call: c}
+}
+
+func (_m *AdminServiceClient) OnDeleteProjectAttributesMatch(matchers ...interface{}) *AdminServiceClient_DeleteProjectAttributes {
+	c := _m.On("DeleteProjectAttributes", matchers...)
+	return &AdminServiceClient_DeleteProjectAttributes{Call: c}
+}
+
+// DeleteProjectAttributes provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) DeleteProjectAttributes(ctx context.Context, in *admin.ProjectAttributesDeleteRequest, opts ...grpc.CallOption) (*admin.ProjectAttributesDeleteResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ProjectAttributesDeleteResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectAttributesDeleteRequest, ...grpc.CallOption) *admin.ProjectAttributesDeleteResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ProjectAttributesDeleteResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectAttributesDeleteRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceClient_DeleteProjectDomainAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_DeleteProjectDomainAttributes) Return(_a0 *admin.ProjectDomainAttributesDeleteResponse, _a1 error) *AdminServiceClient_DeleteProjectDomainAttributes {
+	return &AdminServiceClient_DeleteProjectDomainAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnDeleteProjectDomainAttributes(ctx context.Context, in *admin.ProjectDomainAttributesDeleteRequest, opts ...grpc.CallOption) *AdminServiceClient_DeleteProjectDomainAttributes {
+	c := _m.On("DeleteProjectDomainAttributes", ctx, in, opts)
+	return &AdminServiceClient_DeleteProjectDomainAttributes{Call: c}
+}
+
+func (_m *AdminServiceClient) OnDeleteProjectDomainAttributesMatch(matchers ...interface{}) *AdminServiceClient_DeleteProjectDomainAttributes {
+	c := _m.On("DeleteProjectDomainAttributes", matchers...)
+	return &AdminServiceClient_DeleteProjectDomainAttributes{Call: c}
+}
+
+// DeleteProjectDomainAttributes provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) DeleteProjectDomainAttributes(ctx context.Context, in *admin.ProjectDomainAttributesDeleteRequest, opts ...grpc.CallOption) (*admin.ProjectDomainAttributesDeleteResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ProjectDomainAttributesDeleteResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectDomainAttributesDeleteRequest, ...grpc.CallOption) *admin.ProjectDomainAttributesDeleteResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ProjectDomainAttributesDeleteResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectDomainAttributesDeleteRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceClient_DeleteWorkflowAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_DeleteWorkflowAttributes) Return(_a0 *admin.WorkflowAttributesDeleteResponse, _a1 error) *AdminServiceClient_DeleteWorkflowAttributes {
+	return &AdminServiceClient_DeleteWorkflowAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnDeleteWorkflowAttributes(ctx context.Context, in *admin.WorkflowAttributesDeleteRequest, opts ...grpc.CallOption) *AdminServiceClient_DeleteWorkflowAttributes {
+	c := _m.On("DeleteWorkflowAttributes", ctx, in, opts)
+	return &AdminServiceClient_DeleteWorkflowAttributes{Call: c}
+}
+
+func (_m *AdminServiceClient) OnDeleteWorkflowAttributesMatch(matchers ...interface{}) *AdminServiceClient_DeleteWorkflowAttributes {
+	c := _m.On("DeleteWorkflowAttributes", matchers...)
+	return &AdminServiceClient_DeleteWorkflowAttributes{Call: c}
+}
+
+// DeleteWorkflowAttributes provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) DeleteWorkflowAttributes(ctx context.Context, in *admin.WorkflowAttributesDeleteRequest, opts ...grpc.CallOption) (*admin.WorkflowAttributesDeleteResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.WorkflowAttributesDeleteResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowAttributesDeleteRequest, ...grpc.CallOption) *admin.WorkflowAttributesDeleteResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.WorkflowAttributesDeleteResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowAttributesDeleteRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetActiveLaunchPlan struct {
 	*mock.Call
 }
@@ -689,6 +833,102 @@ func (_m *AdminServiceClient) GetNodeExecutionData(ctx context.Context, in *admi
 	return r0, r1
 }
 
+type AdminServiceClient_GetProjectAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetProjectAttributes) Return(_a0 *admin.ProjectAttributesGetResponse, _a1 error) *AdminServiceClient_GetProjectAttributes {
+	return &AdminServiceClient_GetProjectAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetProjectAttributes(ctx context.Context, in *admin.ProjectAttributesGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetProjectAttributes {
+	c := _m.On("GetProjectAttributes", ctx, in, opts)
+	return &AdminServiceClient_GetProjectAttributes{Call: c}
+}
+
+func (_m *AdminServiceClient) OnGetProjectAttributesMatch(matchers ...interface{}) *AdminServiceClient_GetProjectAttributes {
+	c := _m.On("GetProjectAttributes", matchers...)
+	return &AdminServiceClient_GetProjectAttributes{Call: c}
+}
+
+// GetProjectAttributes provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetProjectAttributes(ctx context.Context, in *admin.ProjectAttributesGetRequest, opts ...grpc.CallOption) (*admin.ProjectAttributesGetResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ProjectAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectAttributesGetRequest, ...grpc.CallOption) *admin.ProjectAttributesGetResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ProjectAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectAttributesGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceClient_GetProjectDomainAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetProjectDomainAttributes) Return(_a0 *admin.ProjectDomainAttributesGetResponse, _a1 error) *AdminServiceClient_GetProjectDomainAttributes {
+	return &AdminServiceClient_GetProjectDomainAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetProjectDomainAttributes(ctx context.Context, in *admin.ProjectDomainAttributesGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetProjectDomainAttributes {
+	c := _m.On("GetProjectDomainAttributes", ctx, in, opts)
+	return &AdminServiceClient_GetProjectDomainAttributes{Call: c}
+}
+
+func (_m *AdminServiceClient) OnGetProjectDomainAttributesMatch(matchers ...interface{}) *AdminServiceClient_GetProjectDomainAttributes {
+	c := _m.On("GetProjectDomainAttributes", matchers...)
+	return &AdminServiceClient_GetProjectDomainAttributes{Call: c}
+}
+
+// GetProjectDomainAttributes provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetProjectDomainAttributes(ctx context.Context, in *admin.ProjectDomainAttributesGetRequest, opts ...grpc.CallOption) (*admin.ProjectDomainAttributesGetResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ProjectDomainAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectDomainAttributesGetRequest, ...grpc.CallOption) *admin.ProjectDomainAttributesGetResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ProjectDomainAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectDomainAttributesGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetTask struct {
 	*mock.Call
 }
@@ -873,6 +1113,54 @@ func (_m *AdminServiceClient) GetWorkflow(ctx context.Context, in *admin.ObjectG
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.ObjectGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceClient_GetWorkflowAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetWorkflowAttributes) Return(_a0 *admin.WorkflowAttributesGetResponse, _a1 error) *AdminServiceClient_GetWorkflowAttributes {
+	return &AdminServiceClient_GetWorkflowAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetWorkflowAttributes(ctx context.Context, in *admin.WorkflowAttributesGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetWorkflowAttributes {
+	c := _m.On("GetWorkflowAttributes", ctx, in, opts)
+	return &AdminServiceClient_GetWorkflowAttributes{Call: c}
+}
+
+func (_m *AdminServiceClient) OnGetWorkflowAttributesMatch(matchers ...interface{}) *AdminServiceClient_GetWorkflowAttributes {
+	c := _m.On("GetWorkflowAttributes", matchers...)
+	return &AdminServiceClient_GetWorkflowAttributes{Call: c}
+}
+
+// GetWorkflowAttributes provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetWorkflowAttributes(ctx context.Context, in *admin.WorkflowAttributesGetRequest, opts ...grpc.CallOption) (*admin.WorkflowAttributesGetResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.WorkflowAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowAttributesGetRequest, ...grpc.CallOption) *admin.WorkflowAttributesGetResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.WorkflowAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowAttributesGetRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

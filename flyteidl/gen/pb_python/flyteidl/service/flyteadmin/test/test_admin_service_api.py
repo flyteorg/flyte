@@ -71,6 +71,24 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_delete_project_attributes(self):
+        """Test case for delete_project_attributes
+
+        """
+        pass
+
+    def test_delete_project_domain_attributes(self):
+        """Test case for delete_project_domain_attributes
+
+        """
+        pass
+
+    def test_delete_workflow_attributes(self):
+        """Test case for delete_workflow_attributes
+
+        """
+        pass
+
     def test_get_active_launch_plan(self):
         """Test case for get_active_launch_plan
 
@@ -113,6 +131,18 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_project_attributes(self):
+        """Test case for get_project_attributes
+
+        """
+        pass
+
+    def test_get_project_domain_attributes(self):
+        """Test case for get_project_domain_attributes
+
+        """
+        pass
+
     def test_get_task(self):
         """Test case for get_task
 
@@ -133,6 +163,12 @@ class TestAdminServiceApi(unittest.TestCase):
 
     def test_get_workflow(self):
         """Test case for get_workflow
+
+        """
+        pass
+
+    def test_get_workflow_attributes(self):
+        """Test case for get_workflow_attributes
 
         """
         pass

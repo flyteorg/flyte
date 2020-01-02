@@ -1254,6 +1254,63 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminProjectAttributesUpdateResponse"
+  /api/v1/project_attributes/{project}:
+    get:
+      tags:
+      - "AdminService"
+      description: "Retrieve the customized resource attributes associated with a\
+        \ project"
+      operationId: "GetProjectAttributes"
+      parameters:
+      - name: "project"
+        in: "path"
+        description: "Unique project id which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Project"
+      - name: "resource_type"
+        in: "query"
+        description: " - TASK_RESOURCE: Applies to customizable task resource requests\
+          \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
+          \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
+          \ execution queue assignment."
+        required: false
+        type: "string"
+        default: "TASK_RESOURCE"
+        enum:
+        - "TASK_RESOURCE"
+        - "CLUSTER_RESOURCE"
+        - "EXECUTION_QUEUE"
+        x-exportParamName: "ResourceType"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminProjectAttributesGetResponse"
+    delete:
+      tags:
+      - "AdminService"
+      description: "Delete the customized resource attributes associated with a project"
+      operationId: "DeleteProjectAttributes"
+      parameters:
+      - name: "project"
+        in: "path"
+        description: "Unique project id which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Project"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminProjectAttributesDeleteRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminProjectAttributesDeleteResponse"
   /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}:
     put:
       tags:
@@ -1285,6 +1342,76 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminProjectDomainAttributesUpdateResponse"
+  /api/v1/project_domain_attributes/{project}/{domain}:
+    get:
+      tags:
+      - "AdminService"
+      description: "Retrieve the customized resource attributes associated with a\
+        \ project-domain combination"
+      operationId: "GetProjectDomainAttributes"
+      parameters:
+      - name: "project"
+        in: "path"
+        description: "Unique project id which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Project"
+      - name: "domain"
+        in: "path"
+        description: "Unique domain id which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Domain"
+      - name: "resource_type"
+        in: "query"
+        description: " - TASK_RESOURCE: Applies to customizable task resource requests\
+          \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
+          \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
+          \ execution queue assignment."
+        required: false
+        type: "string"
+        default: "TASK_RESOURCE"
+        enum:
+        - "TASK_RESOURCE"
+        - "CLUSTER_RESOURCE"
+        - "EXECUTION_QUEUE"
+        x-exportParamName: "ResourceType"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminProjectDomainAttributesGetResponse"
+    delete:
+      tags:
+      - "AdminService"
+      description: "Delete the customized resource attributes associated with a project-domain\
+        \ combination"
+      operationId: "DeleteProjectDomainAttributes"
+      parameters:
+      - name: "project"
+        in: "path"
+        description: "Unique project id which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Project"
+      - name: "domain"
+        in: "path"
+        description: "Unique domain id which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Domain"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminProjectDomainAttributesDeleteRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminProjectDomainAttributesDeleteResponse"
   /api/v1/projects:
     get:
       tags:
@@ -1803,6 +1930,88 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminWorkflowAttributesUpdateResponse"
+  /api/v1/workflow_attributes/{project}/{domain}/{workflow}:
+    get:
+      tags:
+      - "AdminService"
+      description: "Retrieve the customized resource attributes associated with a\
+        \ project, domain and workflow combination"
+      operationId: "GetWorkflowAttributes"
+      parameters:
+      - name: "project"
+        in: "path"
+        description: "Unique project id which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Project"
+      - name: "domain"
+        in: "path"
+        description: "Unique domain id which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Domain"
+      - name: "workflow"
+        in: "path"
+        description: "Workflow name which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Workflow"
+      - name: "resource_type"
+        in: "query"
+        description: " - TASK_RESOURCE: Applies to customizable task resource requests\
+          \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
+          \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
+          \ execution queue assignment."
+        required: false
+        type: "string"
+        default: "TASK_RESOURCE"
+        enum:
+        - "TASK_RESOURCE"
+        - "CLUSTER_RESOURCE"
+        - "EXECUTION_QUEUE"
+        x-exportParamName: "ResourceType"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminWorkflowAttributesGetResponse"
+    delete:
+      tags:
+      - "AdminService"
+      description: "Delete the customized resource attributes associated with a project,\
+        \ domain and workflow combination"
+      operationId: "DeleteWorkflowAttributes"
+      parameters:
+      - name: "project"
+        in: "path"
+        description: "Unique project id which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Project"
+      - name: "domain"
+        in: "path"
+        description: "Unique domain id which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Domain"
+      - name: "workflow"
+        in: "path"
+        description: "Workflow name which this set of attributes references."
+        required: true
+        type: "string"
+        x-exportParamName: "Workflow"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminWorkflowAttributesDeleteRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminWorkflowAttributesDeleteResponse"
   /api/v1/workflow_ids/{project}/{domain}:
     get:
       tags:
@@ -2264,6 +2473,9 @@ definitions:
           \ custom values which get substituted during resource creation."
         additionalProperties:
           type: "string"
+    example:
+      attributes:
+        key: "attributes"
   adminDomain:
     type: "object"
     properties:
@@ -2896,6 +3108,10 @@ definitions:
           \ this project."
         items:
           type: "string"
+    example:
+      tags:
+      - "tags"
+      - "tags"
   adminExecutionRelaunchRequest:
     type: "object"
     properties:
@@ -4212,6 +4428,18 @@ definitions:
       values:
         literals: {}
       uri: "uri"
+  adminMatchableResource:
+    type: "string"
+    description: "Defines a resource that can be configured by customizable Project-,\
+      \ ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE:\
+      \ Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE:\
+      \ Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE:\
+      \ Configures task and dynamic task execution queue assignment."
+    enum:
+    - "TASK_RESOURCE"
+    - "CLUSTER_RESOURCE"
+    - "EXECUTION_QUEUE"
+    default: "TASK_RESOURCE"
   adminMatchingAttributes:
     type: "object"
     properties:
@@ -4223,6 +4451,25 @@ definitions:
         $ref: "#/definitions/adminExecutionQueueAttributes"
     description: "Generic container for encapsulating all types of the above attributes\
       \ messages."
+    example:
+      cluster_resource_attributes:
+        attributes:
+          key: "attributes"
+      execution_queue_attributes:
+        tags:
+        - "tags"
+        - "tags"
+      task_resource_attributes:
+        defaults:
+          memory: "memory"
+          cpu: "cpu"
+          storage: "storage"
+          gpu: "gpu"
+        limits:
+          memory: "memory"
+          cpu: "cpu"
+          storage: "storage"
+          gpu: "gpu"
   adminNamedEntity:
     type: "object"
     properties:
@@ -4599,6 +4846,65 @@ definitions:
         description: "Unique project id for which this set of attributes will be applied."
       matching_attributes:
         $ref: "#/definitions/adminMatchingAttributes"
+    example:
+      project: "project"
+      matching_attributes:
+        cluster_resource_attributes:
+          attributes:
+            key: "attributes"
+        execution_queue_attributes:
+          tags:
+          - "tags"
+          - "tags"
+        task_resource_attributes:
+          defaults:
+            memory: "memory"
+            cpu: "cpu"
+            storage: "storage"
+            gpu: "gpu"
+          limits:
+            memory: "memory"
+            cpu: "cpu"
+            storage: "storage"
+            gpu: "gpu"
+  adminProjectAttributesDeleteRequest:
+    type: "object"
+    properties:
+      project:
+        type: "string"
+        description: "Unique project id which this set of attributes references."
+      resource_type:
+        $ref: "#/definitions/adminMatchableResource"
+  adminProjectAttributesDeleteResponse:
+    type: "object"
+    description: "Purposefully empty, may be populated in the future."
+  adminProjectAttributesGetResponse:
+    type: "object"
+    properties:
+      attributes:
+        $ref: "#/definitions/adminProjectAttributes"
+    example:
+      attributes:
+        project: "project"
+        matching_attributes:
+          cluster_resource_attributes:
+            attributes:
+              key: "attributes"
+          execution_queue_attributes:
+            tags:
+            - "tags"
+            - "tags"
+          task_resource_attributes:
+            defaults:
+              memory: "memory"
+              cpu: "cpu"
+              storage: "storage"
+              gpu: "gpu"
+            limits:
+              memory: "memory"
+              cpu: "cpu"
+              storage: "storage"
+              gpu: "gpu"
   adminProjectAttributesUpdateRequest:
     type: "object"
     properties:
@@ -4619,6 +4925,70 @@ definitions:
         description: "Unique domain id for which this set of attributes will be applied."
       matching_attributes:
         $ref: "#/definitions/adminMatchingAttributes"
+    example:
+      domain: "domain"
+      project: "project"
+      matching_attributes:
+        cluster_resource_attributes:
+          attributes:
+            key: "attributes"
+        execution_queue_attributes:
+          tags:
+          - "tags"
+          - "tags"
+        task_resource_attributes:
+          defaults:
+            memory: "memory"
+            cpu: "cpu"
+            storage: "storage"
+            gpu: "gpu"
+          limits:
+            memory: "memory"
+            cpu: "cpu"
+            storage: "storage"
+            gpu: "gpu"
+  adminProjectDomainAttributesDeleteRequest:
+    type: "object"
+    properties:
+      project:
+        type: "string"
+        description: "Unique project id which this set of attributes references."
+      domain:
+        type: "string"
+        description: "Unique domain id which this set of attributes references."
+      resource_type:
+        $ref: "#/definitions/adminMatchableResource"
+  adminProjectDomainAttributesDeleteResponse:
+    type: "object"
+    description: "Purposefully empty, may be populated in the future."
+  adminProjectDomainAttributesGetResponse:
+    type: "object"
+    properties:
+      attributes:
+        $ref: "#/definitions/adminProjectDomainAttributes"
+    example:
+      attributes:
+        domain: "domain"
+        project: "project"
+        matching_attributes:
+          cluster_resource_attributes:
+            attributes:
+              key: "attributes"
+          execution_queue_attributes:
+            tags:
+            - "tags"
+            - "tags"
+          task_resource_attributes:
+            defaults:
+              memory: "memory"
+              cpu: "cpu"
+              storage: "storage"
+              gpu: "gpu"
+            limits:
+              memory: "memory"
+              cpu: "cpu"
+              storage: "storage"
+              gpu: "gpu"
   adminProjectDomainAttributesUpdateRequest:
     type: "object"
     properties:
@@ -5468,6 +5838,17 @@ definitions:
         $ref: "#/definitions/adminTaskResourceSpec"
       limits:
         $ref: "#/definitions/adminTaskResourceSpec"
+    example:
+      defaults:
+        memory: "memory"
+        cpu: "cpu"
+        storage: "storage"
+        gpu: "gpu"
+      limits:
+        memory: "memory"
+        cpu: "cpu"
+        storage: "storage"
+        gpu: "gpu"
   adminTaskResourceSpec:
     type: "object"
     properties:
@@ -5479,6 +5860,11 @@ definitions:
         type: "string"
       storage:
         type: "string"
+    example:
+      memory: "memory"
+      cpu: "cpu"
+      storage: "storage"
+      gpu: "gpu"
   adminTaskSpec:
     type: "object"
     properties:
@@ -8221,6 +8607,75 @@ definitions:
         description: "Workflow name for which this set of attributes will be applied."
       matching_attributes:
         $ref: "#/definitions/adminMatchingAttributes"
+    example:
+      workflow: "workflow"
+      domain: "domain"
+      project: "project"
+      matching_attributes:
+        cluster_resource_attributes:
+          attributes:
+            key: "attributes"
+        execution_queue_attributes:
+          tags:
+          - "tags"
+          - "tags"
+        task_resource_attributes:
+          defaults:
+            memory: "memory"
+            cpu: "cpu"
+            storage: "storage"
+            gpu: "gpu"
+          limits:
+            memory: "memory"
+            cpu: "cpu"
+            storage: "storage"
+            gpu: "gpu"
+  adminWorkflowAttributesDeleteRequest:
+    type: "object"
+    properties:
+      project:
+        type: "string"
+        description: "Unique project id which this set of attributes references."
+      domain:
+        type: "string"
+        description: "Unique domain id which this set of attributes references."
+      workflow:
+        type: "string"
+        description: "Workflow name which this set of attributes references."
+      resource_type:
+        $ref: "#/definitions/adminMatchableResource"
+  adminWorkflowAttributesDeleteResponse:
+    type: "object"
+    description: "Purposefully empty, may be populated in the future."
+  adminWorkflowAttributesGetResponse:
+    type: "object"
+    properties:
+      attributes:
+        $ref: "#/definitions/adminWorkflowAttributes"
+    example:
+      attributes:
+        workflow: "workflow"
+        domain: "domain"
+        project: "project"
+        matching_attributes:
+          cluster_resource_attributes:
+            attributes:
+              key: "attributes"
+          execution_queue_attributes:
+            tags:
+            - "tags"
+            - "tags"
+          task_resource_attributes:
+            defaults:
+              memory: "memory"
+              cpu: "cpu"
+              storage: "storage"
+              gpu: "gpu"
+            limits:
+              memory: "memory"
+              cpu: "cpu"
+              storage: "storage"
+              gpu: "gpu"
   adminWorkflowAttributesUpdateRequest:
     type: "object"
     properties:
