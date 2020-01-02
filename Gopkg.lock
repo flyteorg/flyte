@@ -170,12 +170,12 @@
   version = "v4.6.0"
 
 [[projects]]
-  digest = "1:e988ed0ca0d81f4d28772760c02ee95084961311291bdfefc1b04617c178b722"
+  digest = "1:afb117f8c84e70a479a3c4c2d9250b29634b65d392d2339ee833626905a28ecd"
   name = "github.com/fatih/color"
   packages = ["."]
   pruneopts = ""
-  revision = "5b77d2a35fb0ede96d138fc9a99f5c9b6aef11b4"
-  version = "v1.7.0"
+  revision = "2e5e248695e7e4a0f9ff6d548b83b99199326f49"
+  version = "v1.8.0"
 
 [[projects]]
   digest = "1:eb53021a8aa3f599d29c7102e65026242bdedce998a54837dc67f14b6a97c5fd"
@@ -238,11 +238,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:156e8134a4ab3efcbcbc6e3dd5069bfb70ed8cbb1cdd7db557bd9035c363f335"
+  digest = "1:bd738ea0dd7d1ce14f6410e1a966c946bcb1855db767a16836d5c56ca3f2f2a0"
   name = "github.com/golang/groupcache"
   packages = ["lru"]
   pruneopts = ""
-  revision = "611e8accdfc92c4187d399e95ce826046d4c8d73"
+  revision = "215e87163ea771ffa998a96c611387313bb5a403"
 
 [[projects]]
   digest = "1:b852d2b62be24e445fcdbad9ce3015b44c207815d631230dfce3f14e7803f5bf"
@@ -440,7 +440,7 @@
   version = "v0.1.1"
 
 [[projects]]
-  digest = "1:24508da9d4741637264e1f5deeceb58150415974ce08efe1f0764ffa881d833d"
+  digest = "1:97e53a804787364765470d65d80930d614aff2f53b901cb97748df725aaf963f"
   name = "github.com/lyft/flyteidl"
   packages = [
     "clients/go/admin",
@@ -456,11 +456,11 @@
     "gen/pb-go/flyteidl/service",
   ]
   pruneopts = ""
-  revision = "7f8cdc2cb0f613bb62b8b44167828326b733f8a5"
-  version = "v0.16.3"
+  revision = "6deb3c002d84b2012f02cdecc32902f475deda83"
+  version = "v0.16.4"
 
 [[projects]]
-  digest = "1:125c50aaaa2820eb9b9abb92dddb922287712eb5bdc17d41a4ffd6b3da059669"
+  digest = "1:e69bc03d9fd2227c96a74dd36a039e408e78b0d1514ab16ce2366168bceaa35c"
   name = "github.com/lyft/flyteplugins"
   packages = [
     "go/tasks/aws",
@@ -498,8 +498,8 @@
     "tests",
   ]
   pruneopts = ""
-  revision = "7895fbb06113776218b0dfce557a74a082e67ff5"
-  version = "v0.2.5"
+  revision = "91586fc9078d968905b0bb21ea564213b430d67a"
+  version = "v0.2.6"
 
 [[projects]]
   digest = "1:6c8d5d4b7189d903f7a2bcca20d5e2d721493f51406a16dcf27caf09315f522c"
@@ -540,12 +540,12 @@
   version = "v1.8.1"
 
 [[projects]]
-  digest = "1:9ea83adf8e96d6304f394d40436f2eb44c1dc3250d223b74088cc253a6cd0a1c"
+  digest = "1:9b58ad18b38cf0d44b1d006fce319e45f200eafa406fe7f65fe0d0194b9f7a9f"
   name = "github.com/mattn/go-colorable"
   packages = ["."]
   pruneopts = ""
-  revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
-  version = "v0.0.9"
+  revision = "98ec13f34aabf44cc914c65a1cfb7b9bc815aef1"
+  version = "v0.1.4"
 
 [[projects]]
   digest = "1:f438921468fbc770ac4c97628f188913a099d4f004226e4aeb6e0f62f5b14fd1"
@@ -795,7 +795,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:51249205ab90861c8f2843e2ae875f92a7adc363efc8799c71c8ddbb4165ca00"
+  digest = "1:623570fddb99ef064b125c7bf3161f14aba21fdb787896b6c5070d34187c86f8"
   name = "golang.org/x/crypto"
   packages = [
     "ed25519",
@@ -804,7 +804,7 @@
     "ssh/terminal",
   ]
   pruneopts = ""
-  revision = "becbf705a91575484002d598f87d74f0002801e7"
+  revision = "53104e6ec876ad4e22ad27cce588b01392043c1b"
 
 [[projects]]
   branch = "master"
@@ -840,14 +840,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8672bd77695bb11e432fe8bbb9856eb5551a5151961a78f2a9be26fd00cb78c5"
+  digest = "1:2a7cec082e70191280349fd7a78903f342bc06aaa315d8fe9c59567d02ecc9e5"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = ""
-  revision = "0732a990476f7f2f5f7200b39ba4ab730c0f09f8"
+  revision = "c96a22e43c9c1088b5e506727c975511357d9f68"
 
 [[projects]]
   digest = "1:740b51a55815493a8d0f2b1e0d0ae48fe48953bf7eaf3fcc4198823bf67768c0"
@@ -884,15 +884,10 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e727267886769b6b0325f529c2f5c92e7d6c98f8f12de1e7c796fcf76e4f4e6d"
+  digest = "1:ad81d61e978db8aec8410fdc3af5c446e0da19893c9378b1460983a026dc3e24"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
-    "go/gcexportdata",
-    "go/internal/gcimporter",
-    "go/internal/packagesdriver",
-    "go/packages",
-    "go/types/typeutil",
     "imports",
     "internal/fastwalk",
     "internal/gopathwalk",
@@ -901,7 +896,7 @@
     "internal/semver",
   ]
   pruneopts = ""
-  revision = "a7b3459f042864abcfe7f4b6c02e1e18c8958fc8"
+  revision = "81ef4df1d3665dab592e0354cae5c140e0321841"
 
 [[projects]]
   branch = "master"
@@ -924,7 +919,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:48781668d4340e3a38dbc35af32770cfa0a4c6845167182b32037c2fbf6e34b6"
+  digest = "1:3a4ddb21b80c45fde4ee6c2443f6397c7626226d527ebc082d0ab76e857a0779"
   name = "google.golang.org/api"
   packages = [
     "googleapi",
@@ -938,7 +933,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = ""
-  revision = "79caabb4e1b98b5d711a612a16e147fd3262fd04"
+  revision = "be7392cba7ef82ac6c60ea8cf980dd632163bafd"
 
 [[projects]]
   digest = "1:c4404231035fad619a12f82ae3f0f8f9edc1cc7f34e7edad7a28ccac5336cc96"
@@ -961,7 +956,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:fe23f3a26c75673c70082e83d30ea13bb78d15abcd994886d9bd9b50fa3beb4a"
+  digest = "1:ba64d3acd79ad4dee34b76de29a73959114a204f1f35791807171a152d41aa38"
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api/annotations",
@@ -970,7 +965,7 @@
     "protobuf/field_mask",
   ]
   pruneopts = ""
-  revision = "3caeed10a8bf5b67c6007d5b0a7016f367cedbad"
+  revision = "f3c370f40bfba3cb25c5c2f823a1a8031b5ad724"
 
 [[projects]]
   digest = "1:7af390490e636a6adc9c76b37a3c823195fbf375a02c4d9506b4dd49d5d2409a"
@@ -1035,12 +1030,12 @@
   version = "v0.9.1"
 
 [[projects]]
-  digest = "1:b97a9fe409926ddb2f6a7a1f2b65476ba885e737a220a086554e00ecd7b530d8"
+  digest = "1:d68a26e5d4ba1d9213041aad76d2d6b6d68dba853ceb585235311bd86748e473"
   name = "gopkg.in/ini.v1"
   packages = ["."]
   pruneopts = ""
-  revision = "87e589f4917038ae250cff2446db7573f47e97ca"
-  version = "v1.51.0"
+  revision = "94291fffe2b14f4632ec0e67c1bfecfc1287a168"
+  version = "v1.51.1"
 
 [[projects]]
   digest = "1:edd75ef05376347c02f40c36f2896d4aee3b8cbfe8247299c71aefd7ca28f443"
