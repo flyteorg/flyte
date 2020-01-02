@@ -11,8 +11,8 @@ type NoopResourceManagerBuilder struct {
 
 func (r *NoopResourceManagerBuilder) ResourceRegistrar(namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceRegistrar {
 	return ResourceRegistrarProxy{
-		ResourceRegistrar: r,
-		NamespacePrefix:   namespacePrefix,
+		ResourceRegistrar:       r,
+		ResourceNamespacePrefix: namespacePrefix,
 	}
 }
 
