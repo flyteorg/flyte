@@ -41,10 +41,10 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "resourceManagerType"), defaultConfig.Type, "Which resource manager to use")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "resourceQuota"), defaultConfig.ResourceMaxQuota, "Global limit for concurrent Qubole queries")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "redisConfig.hostPath"), defaultConfig.RedisConfig.HostPath, "Redis host location")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "redisConfig.hostKey"), defaultConfig.RedisConfig.HostKey, "Key for local Redis access")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "redisConfig.maxRetries"), defaultConfig.RedisConfig.MaxRetries, "See Redis client options for more info")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.Type, "Which resource manager to use")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "resourceMaxQuota"), defaultConfig.ResourceMaxQuota, "Global limit for concurrent Qubole queries")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "redis.hostPath"), defaultConfig.RedisConfig.HostPath, "Redis host location")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "redis.hostKey"), defaultConfig.RedisConfig.HostKey, "Key for local Redis access")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "redis.maxRetries"), defaultConfig.RedisConfig.MaxRetries, "See Redis client options for more info")
 	return cmdFlags
 }

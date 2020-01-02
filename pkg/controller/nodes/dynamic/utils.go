@@ -27,27 +27,27 @@ func underlyingInterface(ctx context.Context, taskReader handler.TaskReader) (*c
 	return iface, nil
 }
 
-func hierarchicalNodeID(parentNodeID, nodeID string) (string, error) {
-	return utils.FixedLengthUniqueIDForParts(20, parentNodeID, nodeID)
+func hierarchicalNodeID(parentNodeID, retryAttempt, nodeID string) (string, error) {
+	return utils.FixedLengthUniqueIDForParts(20, parentNodeID, retryAttempt, nodeID)
 }
 
-func updateBindingNodeIDsWithLineage(parentNodeID string, binding *core.BindingData) (err error) {
+func updateBindingNodeIDsWithLineage(parentNodeID, retryAttempt string, binding *core.BindingData) (err error) {
 	switch b := binding.Value.(type) {
 	case *core.BindingData_Promise:
-		b.Promise.NodeId, err = hierarchicalNodeID(parentNodeID, b.Promise.NodeId)
+		b.Promise.NodeId, err = hierarchicalNodeID(parentNodeID, retryAttempt, b.Promise.NodeId)
 		if err != nil {
 			return err
 		}
 	case *core.BindingData_Collection:
 		for _, item := range b.Collection.Bindings {
-			err = updateBindingNodeIDsWithLineage(parentNodeID, item)
+			err = updateBindingNodeIDsWithLineage(parentNodeID, retryAttempt, item)
 			if err != nil {
 				return err
 			}
 		}
 	case *core.BindingData_Map:
 		for _, item := range b.Map.Bindings {
-			err = updateBindingNodeIDsWithLineage(parentNodeID, item)
+			err = updateBindingNodeIDsWithLineage(parentNodeID, retryAttempt, item)
 			if err != nil {
 				return err
 			}

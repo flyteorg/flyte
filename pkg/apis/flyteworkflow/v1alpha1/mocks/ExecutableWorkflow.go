@@ -3,6 +3,8 @@
 package mocks
 
 import (
+	context "context"
+
 	mock "github.com/stretchr/testify/mock"
 	types "k8s.io/apimachinery/pkg/types"
 
@@ -468,8 +470,8 @@ func (_m ExecutableWorkflow_GetNodeExecutionStatus) Return(_a0 v1alpha1.Executab
 	return &ExecutableWorkflow_GetNodeExecutionStatus{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ExecutableWorkflow) OnGetNodeExecutionStatus(id string) *ExecutableWorkflow_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", id)
+func (_m *ExecutableWorkflow) OnGetNodeExecutionStatus(ctx context.Context, id string) *ExecutableWorkflow_GetNodeExecutionStatus {
+	c := _m.On("GetNodeExecutionStatus", ctx, id)
 	return &ExecutableWorkflow_GetNodeExecutionStatus{Call: c}
 }
 
@@ -478,13 +480,13 @@ func (_m *ExecutableWorkflow) OnGetNodeExecutionStatusMatch(matchers ...interfac
 	return &ExecutableWorkflow_GetNodeExecutionStatus{Call: c}
 }
 
-// GetNodeExecutionStatus provides a mock function with given fields: id
-func (_m *ExecutableWorkflow) GetNodeExecutionStatus(id string) v1alpha1.ExecutableNodeStatus {
-	ret := _m.Called(id)
+// GetNodeExecutionStatus provides a mock function with given fields: ctx, id
+func (_m *ExecutableWorkflow) GetNodeExecutionStatus(ctx context.Context, id string) v1alpha1.ExecutableNodeStatus {
+	ret := _m.Called(ctx, id)
 
 	var r0 v1alpha1.ExecutableNodeStatus
-	if rf, ok := ret.Get(0).(func(string) v1alpha1.ExecutableNodeStatus); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, string) v1alpha1.ExecutableNodeStatus); ok {
+		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(v1alpha1.ExecutableNodeStatus)

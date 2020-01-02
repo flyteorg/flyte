@@ -314,7 +314,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 		w := &v1alpha1.FlyteWorkflow{}
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we know how many rounds it needs
-			// Number of rounds = 14
+			// Number of rounds = 28
 			// + WF (x1)
 			// | start-node: Succeeded, successfully completed | (x1)
 			// | add-one-and-print-0: Succeeded, completed successfully || add-one-and-print-3: Succeeded, completed successfully || print-every-time-0: Succeeded, completed successfully | (x3)
@@ -323,7 +323,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 			// | add-one-and-print-2: Succeeded, completed successfully | (x3)
 			// + WF (x2)
 			// Also there is some overlap
-			for i := 0; i < 14; i++ {
+			for i := 0; i < 28; i++ {
 				err := executor.HandleFlyteWorkflow(ctx, w)
 				if err != nil {
 					t.Log(err)
@@ -544,8 +544,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 		w := &v1alpha1.FlyteWorkflow{}
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we know how many rounds it needs
-			// Number of rounds = 14 ?
-			for i := 0; i < 14; i++ {
+			// Number of rounds = 28 ?
+			for i := 0; i < 28; i++ {
 				err := executor.HandleFlyteWorkflow(ctx, w)
 				assert.NoError(t, err)
 				fmt.Printf("Round[%d] Workflow[%v]\n", i, w.Status.Phase.String())
@@ -642,5 +642,4 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 		assert.Error(t, err)
 		assert.True(t, wfErrors.Matches(err, wfErrors.EventRecordingError))
 	})
-
 }

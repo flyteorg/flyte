@@ -105,18 +105,22 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 		n := &flyteMocks.ExecutableNode{}
 		n.On("GetResources").Return(res)
 
+		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		assert.NoError(t, err)
+
 		ir := &ioMocks.InputReader{}
 		nCtx := &nodeMocks.NodeExecutionContext{}
 		nCtx.On("NodeExecutionMetadata").Return(nm)
 		nCtx.On("Node").Return(n)
 		nCtx.On("InputReader").Return(ir)
-		nCtx.On("DataStore").Return(storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope()))
+		nCtx.On("DataReferenceConstructor").Return(storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope()))
 		nCtx.On("CurrentAttempt").Return(uint32(1))
 		nCtx.On("TaskReader").Return(tr)
 		nCtx.On("MaxDatasetSizeBytes").Return(int64(1))
 		nCtx.On("NodeStatus").Return(ns)
 		nCtx.On("NodeID").Return("n1")
 		nCtx.On("EnqueueOwner").Return(nil)
+		nCtx.OnDataStore().Return(dataStore)
 
 		r := &nodeMocks.NodeStateReader{}
 		r.On("GetDynamicNodeState").Return(handler.DynamicNodeState{})
@@ -258,6 +262,8 @@ func createDynamicJobSpec() *core.DynamicJobSpec {
 
 func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 	createNodeContext := func(ttype string, finalOutput storage.DataReference) *nodeMocks.NodeExecutionContext {
+		ctx := context.TODO()
+
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -308,17 +314,21 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		tID := "task-1"
 		n.On("GetTaskID").Return(&tID)
 
+		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		assert.NoError(t, err)
+
 		ir := &ioMocks.InputReader{}
 		nCtx := &nodeMocks.NodeExecutionContext{}
 		nCtx.On("NodeExecutionMetadata").Return(nm)
 		nCtx.On("Node").Return(n)
 		nCtx.On("InputReader").Return(ir)
-		nCtx.On("DataStore").Return(storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope()))
+		nCtx.On("DataReferenceConstructor").Return(storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope()))
 		nCtx.On("CurrentAttempt").Return(uint32(1))
 		nCtx.On("TaskReader").Return(tr)
 		nCtx.On("MaxDatasetSizeBytes").Return(int64(1))
 		nCtx.On("NodeID").Return("n1")
 		nCtx.On("EnqueueOwnerFunc").Return(func() error { return nil })
+		nCtx.OnDataStore().Return(dataStore)
 
 		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
 		endNodeStatus.On("GetDataDir").Return(storage.DataReference("end-node"))
@@ -332,19 +342,19 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		dynamicNS := &flyteMocks.ExecutableNodeStatus{}
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
-		dynamicNS.On("GetNodeExecutionStatus", "n1-Node_1").Return(subNs)
-		dynamicNS.On("GetNodeExecutionStatus", "n1-Node_2").Return(subNs)
-		dynamicNS.On("GetNodeExecutionStatus", "n1-Node_3").Return(subNs)
-		dynamicNS.On("GetNodeExecutionStatus", v1alpha1.EndNodeID).Return(endNodeStatus)
+		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
+		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_2").Return(subNs)
+		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_3").Return(subNs)
+		dynamicNS.OnGetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
-		ns.On("GetNodeExecutionStatus", dynamicNodeID).Return(dynamicNS)
+		ns.OnGetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
 		nCtx.On("NodeStatus").Return(ns)
 
 		w := &flyteMocks.ExecutableWorkflow{}
 		ws := &flyteMocks.ExecutableWorkflowStatus{}
-		ws.On("GetNodeExecutionStatus", "n1").Return(ns)
+		ws.OnGetNodeExecutionStatus(ctx, "n1").Return(ns)
 		w.On("GetExecutionStatus").Return(ws)
 		nCtx.On("Workflow").Return(w)
 

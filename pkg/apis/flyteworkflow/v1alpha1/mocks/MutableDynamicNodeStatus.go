@@ -76,6 +76,38 @@ func (_m *MutableDynamicNodeStatus) GetDynamicNodeReason() string {
 	return r0
 }
 
+type MutableDynamicNodeStatus_IsDirty struct {
+	*mock.Call
+}
+
+func (_m MutableDynamicNodeStatus_IsDirty) Return(_a0 bool) *MutableDynamicNodeStatus_IsDirty {
+	return &MutableDynamicNodeStatus_IsDirty{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableDynamicNodeStatus) OnIsDirty() *MutableDynamicNodeStatus_IsDirty {
+	c := _m.On("IsDirty")
+	return &MutableDynamicNodeStatus_IsDirty{Call: c}
+}
+
+func (_m *MutableDynamicNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableDynamicNodeStatus_IsDirty {
+	c := _m.On("IsDirty", matchers...)
+	return &MutableDynamicNodeStatus_IsDirty{Call: c}
+}
+
+// IsDirty provides a mock function with given fields:
+func (_m *MutableDynamicNodeStatus) IsDirty() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 // SetDynamicNodePhase provides a mock function with given fields: phase
 func (_m *MutableDynamicNodeStatus) SetDynamicNodePhase(phase v1alpha1.DynamicNodePhase) {
 	_m.Called(phase)

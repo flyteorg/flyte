@@ -38,7 +38,7 @@ func TestCanExecute(t *testing.T) {
 		mockNode := &mocks.BaseNode{}
 		mockNode.On("GetID").Return(nodeN2)
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockNodeStatus)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockNodeStatus)
 		mockWf.On("GetConnections").Return(&v1alpha1.Connections{})
 		mockWf.On("GetID").Return("w1")
 
@@ -65,9 +65,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetID").Return("w1")
 
@@ -95,9 +95,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetID").Return("w1")
 
@@ -125,9 +125,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetID").Return("w1")
 
@@ -155,9 +155,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(true)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetID").Return("w1")
 
@@ -185,9 +185,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetID").Return("w1")
 
@@ -215,9 +215,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetID").Return("w1")
 
@@ -245,9 +245,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetID").Return("w1")
 
@@ -276,9 +276,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetID").Return("w1")
 
@@ -309,9 +309,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetNode", nodeN0).Return(nil, false)
 		mockWf.On("GetID").Return("w1")
@@ -343,9 +343,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetNode", nodeN0).Return(mockN0Node, true)
 		mockWf.On("GetID").Return("w1")
@@ -381,9 +381,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetNode", nodeN0).Return(mockN0Node, true)
 		mockWf.On("GetID").Return("w1")
@@ -419,9 +419,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetNode", nodeN0).Return(mockN0Node, true)
 		mockWf.On("GetID").Return("w1")
@@ -458,9 +458,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetNode", nodeN0).Return(mockN0Node, true)
 		mockWf.On("GetID").Return("w1")
@@ -497,9 +497,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetNode", nodeN0).Return(mockN0Node, true)
 		mockWf.On("GetID").Return("w1")
@@ -536,9 +536,9 @@ func TestCanExecute(t *testing.T) {
 		mockN1Status.On("IsDirty").Return(false)
 
 		mockWf := &mocks.ExecutableWorkflow{}
-		mockWf.On("GetNodeExecutionStatus", nodeN0).Return(mockN0Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN1).Return(mockN1Status)
-		mockWf.On("GetNodeExecutionStatus", nodeN2).Return(mockN2Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN0).Return(mockN0Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN1).Return(mockN1Status)
+		mockWf.OnGetNodeExecutionStatus(ctx, nodeN2).Return(mockN2Status)
 		mockWf.On("GetConnections").Return(connections)
 		mockWf.On("GetNode", nodeN0).Return(mockN0Node, true)
 		mockWf.On("GetID").Return("w1")

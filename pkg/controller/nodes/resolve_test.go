@@ -25,6 +25,7 @@ type dummyBaseWorkflow struct {
 	FromNodeCb     func(name v1alpha1.NodeID) ([]v1alpha1.NodeID, error)
 	GetNodeCb      func(nodeId v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool)
 	Status         map[v1alpha1.NodeID]*v1alpha1.NodeStatus
+	DataStore      *storage.DataStore
 }
 
 func (d *dummyBaseWorkflow) GetOutputBindings() []*v1alpha1.Binding {
@@ -101,13 +102,17 @@ func (d *dummyBaseWorkflow) GetExecutionStatus() v1alpha1.ExecutableWorkflowStat
 	return nil
 }
 
-func (d *dummyBaseWorkflow) GetNodeExecutionStatus(id v1alpha1.NodeID) v1alpha1.ExecutableNodeStatus {
+func (d *dummyBaseWorkflow) GetNodeExecutionStatus(_ context.Context, id v1alpha1.NodeID) v1alpha1.ExecutableNodeStatus {
 	n, ok := d.Status[id]
 	if ok {
+		n.DataReferenceConstructor = d.DataStore
 		return n
 	}
-	n = &v1alpha1.NodeStatus{}
+	n = &v1alpha1.NodeStatus{
+		MutableStruct: v1alpha1.MutableStruct{},
+	}
 	d.Status[id] = n
+	n.DataReferenceConstructor = d.DataStore
 	return n
 }
 
@@ -127,12 +132,13 @@ func (d *dummyBaseWorkflow) GetNode(nodeID v1alpha1.NodeID) (v1alpha1.Executable
 	return d.GetNodeCb(nodeID)
 }
 
-func createDummyBaseWorkflow() *dummyBaseWorkflow {
+func createDummyBaseWorkflow(dataStore *storage.DataStore) *dummyBaseWorkflow {
 	return &dummyBaseWorkflow{
 		ID: "w1",
 		Status: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
 			v1alpha1.StartNodeID: {},
 		},
+		DataStore: dataStore,
 	}
 }
 

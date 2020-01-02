@@ -132,7 +132,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 		Project: "z",
 	}
 	mockWf := &mocks2.ExecutableWorkflow{}
-	mockWf.On("GetNodeExecutionStatus", nodeID).Return(mockNodeStatus)
+	mockWf.OnGetNodeExecutionStatus(ctx, nodeID).Return(mockNodeStatus)
 	mockWf.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
 		WorkflowExecutionIdentifier: parentID,
 	})
@@ -195,7 +195,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 		Project: "z",
 	}
 	mockWf := &mocks2.ExecutableWorkflow{}
-	mockWf.On("GetNodeExecutionStatus", nodeID).Return(mockNodeStatus)
+	mockWf.OnGetNodeExecutionStatus(ctx, nodeID).Return(mockNodeStatus)
 	mockWf.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
 		WorkflowExecutionIdentifier: parentID,
 	})
@@ -255,7 +255,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		Project: "z",
 	}
 	mockWf := &mocks2.ExecutableWorkflow{}
-	mockWf.On("GetNodeExecutionStatus", nodeID).Return(mockNodeStatus)
+	mockWf.OnGetNodeExecutionStatus(ctx, nodeID).Return(mockNodeStatus)
 	mockWf.On("GetName").Return("test")
 	mockWf.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
 		WorkflowExecutionIdentifier: parentID,

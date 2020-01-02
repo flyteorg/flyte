@@ -171,6 +171,38 @@ func (_m *MutableTaskNodeStatus) GetPluginStateVersion() uint32 {
 	return r0
 }
 
+type MutableTaskNodeStatus_IsDirty struct {
+	*mock.Call
+}
+
+func (_m MutableTaskNodeStatus_IsDirty) Return(_a0 bool) *MutableTaskNodeStatus_IsDirty {
+	return &MutableTaskNodeStatus_IsDirty{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableTaskNodeStatus) OnIsDirty() *MutableTaskNodeStatus_IsDirty {
+	c := _m.On("IsDirty")
+	return &MutableTaskNodeStatus_IsDirty{Call: c}
+}
+
+func (_m *MutableTaskNodeStatus) OnIsDirtyMatch(matchers ...interface{}) *MutableTaskNodeStatus_IsDirty {
+	c := _m.On("IsDirty", matchers...)
+	return &MutableTaskNodeStatus_IsDirty{Call: c}
+}
+
+// IsDirty provides a mock function with given fields:
+func (_m *MutableTaskNodeStatus) IsDirty() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 // SetBarrierClockTick provides a mock function with given fields: tick
 func (_m *MutableTaskNodeStatus) SetBarrierClockTick(tick uint32) {
 	_m.Called(tick)

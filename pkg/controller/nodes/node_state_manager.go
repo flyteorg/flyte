@@ -85,6 +85,8 @@ func (n nodeStateManager) clearNodeStatus() {
 	n.t = nil
 	n.b = nil
 	n.d = nil
+	n.w = nil
+	n.nodeStatus.ClearLastAttemptStartedAt()
 }
 
 func newNodeStateManager(_ context.Context, status v1alpha1.ExecutableNodeStatus) *nodeStateManager {

@@ -3,6 +3,8 @@
 package mocks
 
 import (
+	context "context"
+
 	core "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	mock "github.com/stretchr/testify/mock"
 
@@ -25,6 +27,11 @@ func (_m *ExecutableNodeStatus) ClearDynamicNodeStatus() {
 
 // ClearLastAttemptStartedAt provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) ClearLastAttemptStartedAt() {
+	_m.Called()
+}
+
+// ClearSubNodeStatus provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) ClearSubNodeStatus() {
 	_m.Called()
 }
 
@@ -278,8 +285,8 @@ func (_m ExecutableNodeStatus_GetNodeExecutionStatus) Return(_a0 v1alpha1.Execut
 	return &ExecutableNodeStatus_GetNodeExecutionStatus{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ExecutableNodeStatus) OnGetNodeExecutionStatus(id string) *ExecutableNodeStatus_GetNodeExecutionStatus {
-	c := _m.On("GetNodeExecutionStatus", id)
+func (_m *ExecutableNodeStatus) OnGetNodeExecutionStatus(ctx context.Context, id string) *ExecutableNodeStatus_GetNodeExecutionStatus {
+	c := _m.On("GetNodeExecutionStatus", ctx, id)
 	return &ExecutableNodeStatus_GetNodeExecutionStatus{Call: c}
 }
 
@@ -288,13 +295,13 @@ func (_m *ExecutableNodeStatus) OnGetNodeExecutionStatusMatch(matchers ...interf
 	return &ExecutableNodeStatus_GetNodeExecutionStatus{Call: c}
 }
 
-// GetNodeExecutionStatus provides a mock function with given fields: id
-func (_m *ExecutableNodeStatus) GetNodeExecutionStatus(id string) v1alpha1.ExecutableNodeStatus {
-	ret := _m.Called(id)
+// GetNodeExecutionStatus provides a mock function with given fields: ctx, id
+func (_m *ExecutableNodeStatus) GetNodeExecutionStatus(ctx context.Context, id string) v1alpha1.ExecutableNodeStatus {
+	ret := _m.Called(ctx, id)
 
 	var r0 v1alpha1.ExecutableNodeStatus
-	if rf, ok := ret.Get(0).(func(string) v1alpha1.ExecutableNodeStatus); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, string) v1alpha1.ExecutableNodeStatus); ok {
+		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(v1alpha1.ExecutableNodeStatus)

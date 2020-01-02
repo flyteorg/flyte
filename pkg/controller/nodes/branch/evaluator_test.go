@@ -4,6 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/storage"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 
@@ -340,12 +343,16 @@ func TestEvaluateIfBlock(t *testing.T) {
 func TestDecideBranch(t *testing.T) {
 	ctx := context.Background()
 
+	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+
 	t.Run("EmptyIfBlock", func(t *testing.T) {
 		w := &v1alpha1.FlyteWorkflow{
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID:    "w1",
 				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{},
 			},
+			DataReferenceConstructor: dataStore,
 		}
 		branchNode := &v1alpha1.BranchNodeSpec{}
 		b, err := DecideBranch(ctx, w, "n1", branchNode, nil)
@@ -359,6 +366,7 @@ func TestDecideBranch(t *testing.T) {
 				ID:    "w1",
 				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{},
 			},
+			DataReferenceConstructor: dataStore,
 		}
 		exp, inputs := getComparisonExpression(1.0, core.ComparisonExpression_EQ, 1.0)
 		branchNode := &v1alpha1.BranchNodeSpec{
@@ -390,6 +398,7 @@ func TestDecideBranch(t *testing.T) {
 					},
 				},
 			},
+			DataReferenceConstructor: dataStore,
 		}
 		exp, inputs := getComparisonExpression(1.0, core.ComparisonExpression_EQ, 1.0)
 		branchNode := &v1alpha1.BranchNodeSpec{
@@ -413,6 +422,7 @@ func TestDecideBranch(t *testing.T) {
 	t.Run("RepeatedCondition", func(t *testing.T) {
 		n1 := "n1"
 		n2 := "n2"
+
 		w := &v1alpha1.FlyteWorkflow{
 			WorkflowSpec: &v1alpha1.WorkflowSpec{
 				ID: "w1",
@@ -425,7 +435,9 @@ func TestDecideBranch(t *testing.T) {
 					},
 				},
 			},
+			DataReferenceConstructor: dataStore,
 		}
+
 		exp, inputs := getComparisonExpression(1.0, core.ComparisonExpression_EQ, 1.0)
 		branchNode := &v1alpha1.BranchNodeSpec{
 			If: v1alpha1.IfBlock{
@@ -474,6 +486,7 @@ func TestDecideBranch(t *testing.T) {
 					},
 				},
 			},
+			DataReferenceConstructor: dataStore,
 		}
 		exp1, inputs := getComparisonExpression(1, core.ComparisonExpression_NEQ, 1)
 		exp2, _ := getComparisonExpression(1, core.ComparisonExpression_EQ, 1)
@@ -525,6 +538,7 @@ func TestDecideBranch(t *testing.T) {
 					},
 				},
 			},
+			DataReferenceConstructor: dataStore,
 		}
 		exp1, inputs := getComparisonExpression(1, core.ComparisonExpression_NEQ, 1)
 		exp2, _ := getComparisonExpression(1, core.ComparisonExpression_NEQ, 1)
@@ -574,6 +588,7 @@ func TestDecideBranch(t *testing.T) {
 					},
 				},
 			},
+			DataReferenceConstructor: dataStore,
 		}
 		exp1, inputs := getComparisonExpression(1, core.ComparisonExpression_NEQ, 1)
 		exp2, _ := getComparisonExpression(1, core.ComparisonExpression_NEQ, 1)
@@ -624,7 +639,9 @@ func TestDecideBranch(t *testing.T) {
 					},
 				},
 			},
+			DataReferenceConstructor: dataStore,
 		}
+
 		exp1, inputs := getComparisonExpression(1, core.ComparisonExpression_NEQ, 1)
 		exp2, _ := getComparisonExpression(1, core.ComparisonExpression_NEQ, 1)
 		branchNode := &v1alpha1.BranchNodeSpec{
@@ -656,6 +673,7 @@ func TestDecideBranch(t *testing.T) {
 				},
 			},
 		}
+
 		b, err := DecideBranch(ctx, w, "n", branchNode, inputs)
 		assert.Error(t, err)
 		assert.Nil(t, b)

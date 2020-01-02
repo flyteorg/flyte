@@ -43,15 +43,17 @@ func CanExecute(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha
 		logger.Debugf(ctx, "Start Node id is assumed to be ready.")
 		return PredicatePhaseReady, nil
 	}
-	nodeStatus := w.GetNodeExecutionStatus(nodeID)
+
+	nodeStatus := w.GetNodeExecutionStatus(ctx, nodeID)
 	parentNodeID := nodeStatus.GetParentNodeID()
 	upstreamNodes, ok := w.GetConnections().UpstreamEdges[nodeID]
 	if !ok {
 		return PredicatePhaseUndefined, errors.Errorf(errors.BadSpecificationError, nodeID, "Unable to find upstream nodes for Node")
 	}
+
 	skipped := false
 	for _, upstreamNodeID := range upstreamNodes {
-		upstreamNodeStatus := w.GetNodeExecutionStatus(upstreamNodeID)
+		upstreamNodeStatus := w.GetNodeExecutionStatus(ctx, upstreamNodeID)
 
 		if upstreamNodeStatus.IsDirty() {
 			return PredicatePhaseNotReady, nil
@@ -62,11 +64,13 @@ func CanExecute(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha
 			if !ok {
 				return PredicatePhaseUndefined, errors.Errorf(errors.BadSpecificationError, nodeID, "Upstream node [%v] of node [%v] not defined", upstreamNodeID, nodeID)
 			}
+
 			// This only happens if current node is the child node of a branch node
 			if upstreamNode.GetBranchNode() == nil || upstreamNodeStatus.GetOrCreateBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
 				logger.Debugf(ctx, "Branch sub node is expected to have parent branch node in succeeded state")
 				return PredicatePhaseUndefined, errors.Errorf(errors.IllegalStateError, nodeID, "Upstream node [%v] is set as parent, but is not a branch node of [%v] or in illegal state.", upstreamNodeID, nodeID)
 			}
+
 			continue
 		}
 
@@ -76,9 +80,11 @@ func CanExecute(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha
 			return PredicatePhaseNotReady, nil
 		}
 	}
+
 	if skipped {
 		return PredicatePhaseSkip, nil
 	}
+
 	return PredicatePhaseReady, nil
 }
 
@@ -90,7 +96,7 @@ func GetParentNodeMaxEndTime(ctx context.Context, w v1alpha1.ExecutableWorkflow,
 		return zeroTime, nil
 	}
 
-	nodeStatus := w.GetNodeExecutionStatus(node.GetID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, node.GetID())
 	parentNodeID := nodeStatus.GetParentNodeID()
 	upstreamNodes, ok := w.GetConnections().UpstreamEdges[nodeID]
 	if !ok {
@@ -99,7 +105,7 @@ func GetParentNodeMaxEndTime(ctx context.Context, w v1alpha1.ExecutableWorkflow,
 
 	var latest v1.Time
 	for _, upstreamNodeID := range upstreamNodes {
-		upstreamNodeStatus := w.GetNodeExecutionStatus(upstreamNodeID)
+		upstreamNodeStatus := w.GetNodeExecutionStatus(ctx, upstreamNodeID)
 		if parentNodeID != nil && *parentNodeID == upstreamNodeID {
 			upstreamNode, ok := w.GetNode(upstreamNodeID)
 			if !ok {

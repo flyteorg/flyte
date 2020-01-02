@@ -81,7 +81,7 @@ func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecu
 
 	if wfNode.GetSubWorkflowRef() != nil {
 		wf := nCtx.Workflow()
-		status := wf.GetNodeExecutionStatus(nCtx.NodeID())
+		status := wf.GetNodeExecutionStatus(ctx, nCtx.NodeID())
 		return w.subWfHandler.CheckSubWorkflowStatus(ctx, nCtx, wf, status)
 	} else if wfNode.GetLaunchPlanRefID() != nil {
 		return w.lpHandler.CheckLaunchPlanStatus(ctx, nCtx)

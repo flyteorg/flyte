@@ -64,7 +64,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 		Project: "z",
 	}
 	mockWf := &mocks2.ExecutableWorkflow{}
-	mockWf.On("GetNodeExecutionStatus", nodeID).Return(mockNodeStatus)
+	mockWf.OnGetNodeExecutionStatus(ctx, nodeID).Return(mockNodeStatus)
 	mockWf.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
 		WorkflowExecutionIdentifier: parentID,
 	})
@@ -211,7 +211,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		Project: "z",
 	}
 	mockWf := &mocks2.ExecutableWorkflow{}
-	mockWf.On("GetNodeExecutionStatus", nodeID).Return(mockNodeStatus)
+	mockWf.OnGetNodeExecutionStatus(ctx, nodeID).Return(mockNodeStatus)
 	mockWf.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
 		WorkflowExecutionIdentifier: parentID,
 	})
@@ -297,7 +297,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockWf, mockNode)
-		nCtx.On("DataStore").Return(mockStore)
+		nCtx.OnDataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseSuccess, s.Info().GetPhase())
@@ -338,7 +338,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockWf, mockNode)
-		nCtx.On("DataStore").Return(mockStore)
+		nCtx.OnDataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseSuccess)
@@ -497,7 +497,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockWf, mockNode)
-		nCtx.On("DataStore").Return(mockStore)
+		nCtx.OnDataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.Error(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseUndefined)
@@ -530,7 +530,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockWf, mockNode)
-		nCtx.On("DataStore").Return(mockStore)
+		nCtx.OnDataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, handler.EPhaseUndefined, s.Info().GetPhase())
@@ -563,7 +563,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockWf, mockNode)
-		nCtx.On("DataStore").Return(mockStore)
+		nCtx.OnDataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.Error(t, err)
 		assert.Equal(t, s.Info().GetPhase().String(), handler.EPhaseUndefined.String())
@@ -605,7 +605,7 @@ func TestLaunchPlanHandler_HandleAbort(t *testing.T) {
 	}
 	mockWf := &mocks2.ExecutableWorkflow{}
 	mockWf.On("GetName").Return("test")
-	mockWf.On("GetNodeExecutionStatus", nodeID).Return(mockNodeStatus)
+	mockWf.OnGetNodeExecutionStatus(ctx, nodeID).Return(mockNodeStatus)
 	mockWf.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
 		WorkflowExecutionIdentifier: parentID,
 	})

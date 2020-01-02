@@ -22,13 +22,14 @@ func newContextualWorkflow(baseWorkflow v1alpha1.ExecutableWorkflow,
 	subwf v1alpha1.ExecutableSubWorkflow,
 	status v1alpha1.ExecutableNodeStatus,
 	tasks map[v1alpha1.TaskID]*v1alpha1.TaskSpec,
-	workflows map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec) v1alpha1.ExecutableWorkflow {
+	workflows map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec,
+	refConstructor storage.ReferenceConstructor) v1alpha1.ExecutableWorkflow {
 
 	return &contextualWorkflow{
 		ExecutableWorkflow: executors.NewSubContextualWorkflow(baseWorkflow, subwf, status),
 		extraTasks:         tasks,
 		extraWorkflows:     workflows,
-		status:             newContextualWorkflowStatus(baseWorkflow.GetExecutionStatus(), status),
+		status:             newContextualWorkflowStatus(baseWorkflow.GetExecutionStatus(), status, refConstructor),
 	}
 }
 
@@ -55,7 +56,8 @@ func (w contextualWorkflow) FindSubWorkflow(id v1alpha1.WorkflowID) v1alpha1.Exe
 // A contextual workflow status to override some of the implementations.
 type ContextualWorkflowStatus struct {
 	v1alpha1.ExecutableWorkflowStatus
-	baseStatus v1alpha1.ExecutableNodeStatus
+	baseStatus           v1alpha1.ExecutableNodeStatus
+	referenceConstructor storage.ReferenceConstructor
 }
 
 func (w ContextualWorkflowStatus) GetDataDir() v1alpha1.DataReference {
@@ -74,16 +76,16 @@ func (w ContextualWorkflowStatus) GetDataDir() v1alpha1.DataReference {
 //                   |_ sub-node2/inputs.pb
 // TODO: This is just a stop-gap until we transition the DynamicJobSpec to be a full-fledged workflow spec.
 // TODO: this will allow us to have proper data bindings between nodes then we can stop making assumptions about data refs.
-func (w ContextualWorkflowStatus) ConstructNodeDataDir(ctx context.Context, constructor storage.ReferenceConstructor,
-	name v1alpha1.NodeID) (storage.DataReference, error) {
-	return constructor.ConstructReference(ctx, w.GetDataDir(), name)
+func (w ContextualWorkflowStatus) ConstructNodeDataDir(ctx context.Context, name v1alpha1.NodeID) (storage.DataReference, error) {
+	return w.referenceConstructor.ConstructReference(ctx, w.GetDataDir(), name)
 }
 
 func newContextualWorkflowStatus(baseWfStatus v1alpha1.ExecutableWorkflowStatus,
-	baseStatus v1alpha1.ExecutableNodeStatus) *ContextualWorkflowStatus {
+	baseStatus v1alpha1.ExecutableNodeStatus, constructor storage.ReferenceConstructor) *ContextualWorkflowStatus {
 
 	return &ContextualWorkflowStatus{
 		ExecutableWorkflowStatus: baseWfStatus,
 		baseStatus:               baseStatus,
+		referenceConstructor:     constructor,
 	}
 }
