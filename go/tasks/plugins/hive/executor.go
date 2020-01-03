@@ -103,19 +103,32 @@ func (q QuboleHiveExecutor) GetProperties() core.PluginProperties {
 
 func QuboleHiveExecutorLoader(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
 	cfg := config.GetQuboleConfig()
-	q, err := NewQuboleHiveExecutor(ctx, cfg, client.NewQuboleClient(cfg), quboleResourceNamespace, iCtx.SecretManager(), iCtx.MetricsScope())
+	return InitializeHiveExecutor(ctx, iCtx, BuildResourceConfig(cfg), client.NewQuboleClient(cfg))
+}
+
+func BuildResourceConfig() {
+	resourceConfig := make(map[string]int, len(cfg.ClusterLabels))
+
+	for _, cluster := range cfg.Presto {
+		resourceConfig[cluster] = cfg.Limit
+	}
+}
+
+func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, resourceConfig map[string]int,
+	quboleClient client.QuboleClient) (core.Plugin, error) {
+	q, err := NewQuboleHiveExecutor(ctx, cfg, quboleClient, quboleResourceNamespace, iCtx.SecretManager(), iCtx.MetricsScope())
 	if err != nil {
 		return nil, err
 	}
 
-	for _, cluster := range cfg.ClusterLabels {
-		clusteredResourceNamespacePrefix := quboleResourceNamespace.CreateSubNamespace(core.ResourceNamespace(cluster))
-		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, clusteredResourceNamespacePrefix, cfg.Limit); err != nil {
+	for clusterName, limit := range resourceConfig {
+		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, clusterName, limit); err != nil {
 			return nil, err
 		}
 	}
 
 	return q, nil
+
 }
 
 // type PluginLoader func(ctx context.Context, iCtx SetupContext) (Plugin, error)
