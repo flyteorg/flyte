@@ -42,14 +42,15 @@ var (
 
 // Qubole plugin configs
 type Config struct {
-	Endpoint        config.URL `json:"endpoint" pflag:",Endpoint for qubole to use"`
-	CommandAPIPath  config.URL `json:"commandApiPath" pflag:",API Path where commands can be launched on Qubole. Should be a valid url."`
-	AnalyzeLinkPath config.URL `json:"analyzeLinkPath" pflag:",URL path where queries can be visualized on qubole website. Should be a valid url."`
-	TokenKey        string     `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
-	Limit           int        `json:"quboleLimit" pflag:",Global limit for concurrent Qubole queries"`
-	LruCacheSize    int        `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
-	Workers         int        `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
-	ClusterLabels   []string   `json:"clusterLabels" pflag:",List of labels of service clusters"`
+	Endpoint        config.URL     `json:"endpoint" pflag:",Endpoint for qubole to use"`
+	CommandAPIPath  config.URL     `json:"commandApiPath" pflag:",API Path where commands can be launched on Qubole. Should be a valid url."`
+	AnalyzeLinkPath config.URL     `json:"analyzeLinkPath" pflag:",URL path where queries can be visualized on qubole website. Should be a valid url."`
+	TokenKey        string         `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
+	Limit           int            `json:"quboleLimit" pflag:",Global limit for concurrent Qubole queries"`
+	LruCacheSize    int            `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
+	Workers         int            `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
+	HiveConfig      map[string]int `json:"clusterLabels" pflag:",List of labels of service clusters"`
+	PrestoConfig    map[string]int
 }
 
 // Retrieves the current config value or default.
