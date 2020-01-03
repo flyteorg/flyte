@@ -246,7 +246,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	// Dynamically assign task resource defaults.
 	for _, task := range workflow.Closure.CompiledWorkflow.Tasks {
-		validation.SetDefaults(ctx, m.config.TaskResourceConfiguration(), task)
+		validation.SetDefaults(ctx, m.config.TaskResourceConfiguration(), task, m.db, name)
 	}
 
 	// Dynamically assign execution queues.
@@ -926,7 +926,7 @@ func NewExecutionManager(
 	userScope promutils.Scope,
 	publisher notificationInterfaces.Publisher,
 	urlData dataInterfaces.RemoteURLInterface) interfaces.ExecutionInterface {
-	queueAllocator := executions.NewQueueAllocator(config)
+	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
 
 	userMetrics := executionUserMetrics{

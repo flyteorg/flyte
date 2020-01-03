@@ -20,14 +20,14 @@ type NewMockAdminServerInput struct {
 func NewMockAdminServer(input NewMockAdminServerInput) *adminservice.AdminService {
 	var testScope = mockScope.NewTestScope()
 	return &adminservice.AdminService{
-		ExecutionManager:     input.executionManager,
-		LaunchPlanManager:    input.launchPlanManager,
-		NodeExecutionManager: input.nodeExecutionManager,
-		TaskManager:          input.taskManager,
-		ProjectManager:       input.projectManager,
-		ProjectDomainManager: input.projectDomainManager,
-		WorkflowManager:      input.workflowManager,
-		TaskExecutionManager: input.taskExecutionManager,
-		Metrics:              adminservice.InitMetrics(testScope),
+		ExecutionManager:               input.executionManager,
+		LaunchPlanManager:              input.launchPlanManager,
+		NodeExecutionManager:           input.nodeExecutionManager,
+		TaskManager:                    input.taskManager,
+		ProjectManager:                 input.projectManager,
+		ProjectDomainAttributesManager: input.projectDomainManager,
+		WorkflowManager:                input.workflowManager,
+		TaskExecutionManager:           input.taskExecutionManager,
+		Metrics:                        adminservice.InitMetrics(testScope),
 	}
 }

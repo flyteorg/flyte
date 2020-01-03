@@ -453,7 +453,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:adf75c64d9fd1b82df8924fec495eb015ab53e5b2db6db1c2b1b8b1c27145848"
+  digest = "1:b1ab65fa43650fb503aa710091eb9d13c6c5d7f0cf14684039827b457a1f2ac9"
   name = "github.com/lyft/flyteidl"
   packages = [
     "clients/go/admin",
@@ -466,9 +466,9 @@
     "gen/pb-go/flyteidl/service",
   ]
   pruneopts = "UT"
-  revision = "4e175db2a7338f787fc7e939417718e59af639a4"
+  revision = "6deb3c002d84b2012f02cdecc32902f475deda83"
   source = "https://github.com/lyft/flyteidl"
-  version = "v0.16.2"
+  version = "v0.16.4"
 
 [[projects]]
   digest = "1:938998e14bd5e42c54f3b640a41d869eb79029ad7c623fa47c604b8480c781fc"
@@ -814,10 +814,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:31e33f76456ccf54819ab4a646cf01271d1a99d7712ab84bf1a9e7b61cd2031b"
+  digest = "1:dbd0f5d2c3d68686f4b80fcc71c632d4f9b5cf622f17c64affecfc90f7650639"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
+    "clientcredentials",
     "google",
     "internal",
     "jws",
@@ -1183,6 +1184,7 @@
     "github.com/aws/aws-sdk-go/service/ses/sesiface",
     "github.com/benbjohnson/clock",
     "github.com/coreos/go-oidc",
+    "github.com/evanphx/json-patch",
     "github.com/gogo/protobuf/proto",
     "github.com/golang/glog",
     "github.com/golang/protobuf/jsonpb",
@@ -1197,6 +1199,7 @@
     "github.com/graymeta/stow/s3",
     "github.com/grpc-ecosystem/go-grpc-middleware",
     "github.com/grpc-ecosystem/go-grpc-middleware/auth",
+    "github.com/grpc-ecosystem/go-grpc-middleware/util/metautils",
     "github.com/grpc-ecosystem/go-grpc-prometheus",
     "github.com/grpc-ecosystem/grpc-gateway/runtime",
     "github.com/grpc/grpc-go/credentials/oauth",
@@ -1246,7 +1249,10 @@
     "k8s.io/apimachinery/pkg/api/errors",
     "k8s.io/apimachinery/pkg/api/resource",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
+    "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/runtime/schema",
+    "k8s.io/apimachinery/pkg/types",
+    "k8s.io/apimachinery/pkg/util/json",
     "k8s.io/apimachinery/pkg/util/validation",
     "k8s.io/apimachinery/pkg/util/wait",
     "k8s.io/client-go/kubernetes/scheme",

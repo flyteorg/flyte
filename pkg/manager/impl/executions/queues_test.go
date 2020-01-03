@@ -4,6 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/lyft/flyteadmin/pkg/errors"
+	"github.com/lyft/flyteadmin/pkg/repositories/mocks"
+	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"google.golang.org/grpc/codes"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 
 	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
@@ -11,25 +18,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetAnyMapKey(t *testing.T) {
-	fooConfig := singleQueueConfiguration{
-		PrimaryQueue: "foo primary",
-		DynamicQueue: "foo dynamic",
-	}
-	testMap := map[singleQueueConfiguration]bool{
-		fooConfig: true,
-	}
-	key := getAnyMapKey(testMap)
-	assert.Equal(t, fooConfig, key)
-
-	barConfig := singleQueueConfiguration{
-		PrimaryQueue: "bar primary",
-		DynamicQueue: "bar dynamic",
-	}
-	testMap[barConfig] = true
-	key = getAnyMapKey(testMap)
-	assert.Contains(t, []string{"foo primary", "bar primary"}, key.PrimaryQueue)
-}
+const testProject = "project"
+const testDomain = "domain"
+const testWorkflow = "name"
 
 func TestGetQueue(t *testing.T) {
 	executionQueues := []runtimeInterfaces.ExecutionQueue{
@@ -39,35 +30,43 @@ func TestGetQueue(t *testing.T) {
 			Attributes: []string{"attribute"},
 		},
 	}
-	workflowConfigs := []runtimeInterfaces.WorkflowConfig{
-		{
-			Project:      "project",
-			Domain:       "domain",
-			WorkflowName: "name",
-			Tags:         []string{"attribute"},
-		},
-		{
-			Project:      "project",
-			Domain:       "domain",
-			WorkflowName: "name2",
-			Tags:         []string{"another attribute"},
-		},
-		{
-			Project:      "project",
-			Domain:       "domain2",
-			WorkflowName: "name",
-			Tags:         []string{"another attribute"},
-		},
-		{
-			Project:      "project2",
-			Domain:       "domain",
-			WorkflowName: "name",
-			Tags:         []string{"another attribute"},
-		},
+	db := mocks.NewMockRepository()
+	db.WorkflowAttributesRepo().(*mocks.MockWorkflowAttributesRepo).GetFunction = func(
+		ctx context.Context, project, domain, workflow, resource string) (
+		models.WorkflowAttributes, error) {
+		response := models.WorkflowAttributes{
+			Project:  project,
+			Domain:   domain,
+			Workflow: workflow,
+			Resource: resource,
+		}
+		if project == testProject && domain == testDomain && workflow == testWorkflow {
+			matchingAttributes := &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+						Tags: []string{"attribute"},
+					},
+				},
+			}
+			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
+			response.Attributes = marshalledMatchingAttributes
+		} else {
+			matchingAttributes := &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+						Tags: []string{"another attribute"},
+					},
+				},
+			}
+			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
+			response.Attributes = marshalledMatchingAttributes
+		}
+		return response, nil
 	}
+
 	queueAllocator := NewQueueAllocator(runtimeMocks.NewMockConfigurationProvider(
-		nil, runtimeMocks.NewMockQueueConfigurationProvider(executionQueues, workflowConfigs),
-		nil, nil, nil, nil))
+		nil, runtimeMocks.NewMockQueueConfigurationProvider(executionQueues, nil),
+		nil, nil, nil, nil), db)
 	queueConfig := singleQueueConfiguration{
 		PrimaryQueue: "queue primary",
 		DynamicQueue: "queue dynamic",
@@ -121,25 +120,74 @@ func TestGetQueueDefaults(t *testing.T) {
 		{
 			Tags: []string{"default"},
 		},
-		{
-			Project: "project",
-			Tags:    []string{"attr1"},
-		},
-		{
-			Project: "project",
-			Domain:  "domain",
-			Tags:    []string{"attr2"},
-		},
-		{
-			Project:      "project",
-			Domain:       "domain",
-			WorkflowName: "workflow",
-			Tags:         []string{"attr3"},
-		},
 	}
+	db := mocks.NewMockRepository()
+	db.WorkflowAttributesRepo().(*mocks.MockWorkflowAttributesRepo).GetFunction = func(
+		ctx context.Context, project, domain, workflow, resource string) (
+		models.WorkflowAttributes, error) {
+		if project == testProject && domain == testDomain && workflow == "workflow" &&
+			resource == admin.MatchableResource_EXECUTION_QUEUE.String() {
+			matchingAttributes := &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+						Tags: []string{"attr3"},
+					},
+				},
+			}
+			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
+			return models.WorkflowAttributes{
+				Project:    project,
+				Domain:     domain,
+				Workflow:   workflow,
+				Resource:   resource,
+				Attributes: marshalledMatchingAttributes,
+			}, nil
+		}
+		return models.WorkflowAttributes{}, errors.NewFlyteAdminError(codes.NotFound, "foo")
+	}
+	db.ProjectDomainAttributesRepo().(*mocks.MockProjectDomainAttributesRepo).GetFunction = func(
+		ctx context.Context, project, domain, resource string) (models.ProjectDomainAttributes, error) {
+		if project == testProject && domain == testDomain && resource == admin.MatchableResource_EXECUTION_QUEUE.String() {
+			matchingAttributes := &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+						Tags: []string{"attr2"},
+					},
+				},
+			}
+			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
+			return models.ProjectDomainAttributes{
+				Project:    project,
+				Domain:     domain,
+				Resource:   resource,
+				Attributes: marshalledMatchingAttributes,
+			}, nil
+		}
+		return models.ProjectDomainAttributes{}, errors.NewFlyteAdminError(codes.NotFound, "foo")
+	}
+	db.ProjectAttributesRepo().(*mocks.MockProjectAttributesRepo).GetFunction = func(
+		ctx context.Context, project, resource string) (models.ProjectAttributes, error) {
+		if project == testProject && resource == admin.MatchableResource_EXECUTION_QUEUE.String() {
+			matchingAttributes := &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+						Tags: []string{"attr1"},
+					},
+				},
+			}
+			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
+			return models.ProjectAttributes{
+				Project:    project,
+				Resource:   resource,
+				Attributes: marshalledMatchingAttributes,
+			}, nil
+		}
+		return models.ProjectAttributes{}, errors.NewFlyteAdminError(codes.NotFound, "foo")
+	}
+
 	queueAllocator := NewQueueAllocator(runtimeMocks.NewMockConfigurationProvider(
 		nil, runtimeMocks.NewMockQueueConfigurationProvider(executionQueues, workflowConfigs), nil,
-		nil, nil, nil))
+		nil, nil, nil), db)
 	assert.Equal(t, singleQueueConfiguration{
 		PrimaryQueue: "default primary",
 		DynamicQueue: "default dynamic",

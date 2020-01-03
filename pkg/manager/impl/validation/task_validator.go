@@ -4,6 +4,8 @@ package validation
 import (
 	"context"
 
+	"github.com/lyft/flyteadmin/pkg/resourcematching"
+
 	"github.com/lyft/flyteadmin/pkg/repositories"
 
 	"github.com/lyft/flyteadmin/pkg/common"
@@ -222,7 +224,7 @@ func validateTaskResources(
 
 func assignResourcesIfUnset(ctx context.Context, identifier *core.Identifier,
 	platformValues runtimeInterfaces.TaskResourceSet,
-	resourceEntries []*core.Resources_ResourceEntry) []*core.Resources_ResourceEntry {
+	resourceEntries []*core.Resources_ResourceEntry, taskResourceSpec *admin.TaskResourceSpec) []*core.Resources_ResourceEntry {
 	var cpuIndex, memoryIndex = -1, -1
 	for idx, entry := range resourceEntries {
 		switch entry.Name {
@@ -232,22 +234,33 @@ func assignResourcesIfUnset(ctx context.Context, identifier *core.Identifier,
 			memoryIndex = idx
 		}
 	}
-	if cpuIndex > 0 && memoryIndex > 00 {
+	if cpuIndex > 0 && memoryIndex > 0 {
 		// nothing to do
 		return resourceEntries
 	}
+
 	if cpuIndex < 0 && platformValues.CPU != "" {
 		logger.Debugf(ctx, "Setting 'cpu' for [%+v] to %s", identifier, platformValues.CPU)
+		cpuValue := platformValues.CPU
+		if taskResourceSpec != nil && len(taskResourceSpec.Cpu) > 0 {
+			// Use the custom attributes from the database rather than the platform defaults from the application config
+			cpuValue = taskResourceSpec.Cpu
+		}
 		cpuResource := &core.Resources_ResourceEntry{
 			Name:  core.Resources_CPU,
-			Value: platformValues.CPU,
+			Value: cpuValue,
 		}
 		resourceEntries = append(resourceEntries, cpuResource)
 	}
 	if memoryIndex < 0 && platformValues.Memory != "" {
+		memoryValue := platformValues.Memory
+		if taskResourceSpec != nil && len(taskResourceSpec.Memory) > 0 {
+			// Use the custom attributes from the database rather than the platform defaults from the application config
+			memoryValue = taskResourceSpec.Memory
+		}
 		memoryResource := &core.Resources_ResourceEntry{
 			Name:  core.Resources_MEMORY,
-			Value: platformValues.Memory,
+			Value: memoryValue,
 		}
 		logger.Debugf(ctx, "Setting 'memory' for [%+v] to %s", identifier, platformValues.Memory)
 		resourceEntries = append(resourceEntries, memoryResource)
@@ -260,7 +273,8 @@ func assignResourcesIfUnset(ctx context.Context, identifier *core.Identifier,
 // Note: The system will assign a system-default value for request but for limit it will deduce it from the request
 // itself => Limit := Min([Some-Multiplier X Request], System-Max). For now we are using a multiplier of 1. In
 // general we recommend the users to set limits close to requests for more predictability in the system.
-func SetDefaults(ctx context.Context, taskConfig runtime.TaskResourceConfiguration, task *core.CompiledTask) {
+func SetDefaults(ctx context.Context, taskConfig runtime.TaskResourceConfiguration, task *core.CompiledTask,
+	db repositories.RepositoryInterface, workflowName string) {
 	if task == nil {
 		logger.Warningf(ctx, "Can't set default resources for nil task.")
 		return
@@ -270,12 +284,35 @@ func SetDefaults(ctx context.Context, taskConfig runtime.TaskResourceConfigurati
 		logger.Debugf(ctx, "Not setting default resources for task [%+v], no container resources found to check", task)
 		return
 	}
+
+	attributes, err := resourcematching.GetOverrideValuesToApply(ctx, resourcematching.GetOverrideValuesInput{
+		Db:       db,
+		Project:  task.Template.Id.Project,
+		Domain:   task.Template.Id.Domain,
+		Workflow: workflowName,
+		Resource: admin.MatchableResource_TASK_RESOURCE,
+	})
+	if err != nil {
+		logger.Warningf(ctx, "Failed to fetch override values when assigning task resource default values for [%+v]: %v",
+			task.Template, err)
+	}
+
 	logger.Debugf(ctx, "Assigning task requested resources for [%+v]", task.Template.Id)
+	var taskResourceSpec *admin.TaskResourceSpec
+	if attributes != nil && attributes.GetTaskResourceAttributes() != nil {
+		taskResourceSpec = attributes.GetTaskResourceAttributes().Defaults
+	}
 	task.Template.GetContainer().Resources.Requests = assignResourcesIfUnset(
-		ctx, task.Template.Id, taskConfig.GetDefaults(), task.Template.GetContainer().Resources.Requests)
+		ctx, task.Template.Id, taskConfig.GetDefaults(), task.Template.GetContainer().Resources.Requests,
+		taskResourceSpec)
+
 	logger.Debugf(ctx, "Assigning task resource limits for [%+v]", task.Template.Id)
+	if attributes != nil && attributes.GetTaskResourceAttributes() != nil {
+		taskResourceSpec = attributes.GetTaskResourceAttributes().Limits
+	}
 	task.Template.GetContainer().Resources.Limits = assignResourcesIfUnset(
-		ctx, task.Template.Id, createTaskDefaultLimits(ctx, task), task.Template.GetContainer().Resources.Limits)
+		ctx, task.Template.Id, createTaskDefaultLimits(ctx, task), task.Template.GetContainer().Resources.Limits,
+		taskResourceSpec)
 }
 
 func createTaskDefaultLimits(ctx context.Context, task *core.CompiledTask) runtimeInterfaces.TaskResourceSet {

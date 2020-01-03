@@ -13,18 +13,19 @@ import (
 	flyteAdminErrors "github.com/lyft/flyteadmin/pkg/errors"
 )
 
-type ProjectDomainRepo struct {
+type ProjectDomainAttributesRepo struct {
 	db               *gorm.DB
 	errorTransformer errors.ErrorTransformer
 	metrics          gormMetrics
 }
 
-func (r *ProjectDomainRepo) CreateOrUpdate(ctx context.Context, input models.ProjectDomain) error {
+func (r *ProjectDomainAttributesRepo) CreateOrUpdate(ctx context.Context, input models.ProjectDomainAttributes) error {
 	timer := r.metrics.GetDuration.Start()
-	var record models.ProjectDomain
-	tx := r.db.FirstOrCreate(&record, models.ProjectDomain{
-		Project: input.Project,
-		Domain:  input.Domain,
+	var record models.ProjectDomainAttributes
+	tx := r.db.FirstOrCreate(&record, models.ProjectDomainAttributes{
+		Project:  input.Project,
+		Domain:   input.Domain,
+		Resource: input.Resource,
 	})
 	timer.Stop()
 	if tx.Error != nil {
@@ -41,28 +42,30 @@ func (r *ProjectDomainRepo) CreateOrUpdate(ctx context.Context, input models.Pro
 	return nil
 }
 
-func (r *ProjectDomainRepo) Get(ctx context.Context, project, domain string) (models.ProjectDomain, error) {
-	var model models.ProjectDomain
+func (r *ProjectDomainAttributesRepo) Get(ctx context.Context, project, domain, resource string) (
+	models.ProjectDomainAttributes, error) {
+	var model models.ProjectDomainAttributes
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.ProjectDomain{
-		Project: project,
-		Domain:  domain,
+	tx := r.db.Where(&models.ProjectDomainAttributes{
+		Project:  project,
+		Domain:   domain,
+		Resource: resource,
 	}).First(&model)
 	timer.Stop()
 	if tx.Error != nil {
-		return models.ProjectDomain{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
+		return models.ProjectDomainAttributes{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	if tx.RecordNotFound() {
-		return models.ProjectDomain{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound,
+		return models.ProjectDomainAttributes{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound,
 			"project-domain [%s-%s] not found", project, domain)
 	}
 	return model, nil
 }
 
-func NewProjectDomainRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer,
-	scope promutils.Scope) interfaces.ProjectDomainRepoInterface {
+func NewProjectDomainAttributesRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer,
+	scope promutils.Scope) interfaces.ProjectDomainAttributesRepoInterface {
 	metrics := newMetrics(scope)
-	return &ProjectDomainRepo{
+	return &ProjectDomainAttributesRepo{
 		db:               db,
 		errorTransformer: errorTransformer,
 		metrics:          metrics,

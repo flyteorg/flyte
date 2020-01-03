@@ -23,16 +23,18 @@ import (
 )
 
 type AdminService struct {
-	TaskManager          interfaces.TaskInterface
-	WorkflowManager      interfaces.WorkflowInterface
-	LaunchPlanManager    interfaces.LaunchPlanInterface
-	ExecutionManager     interfaces.ExecutionInterface
-	NodeExecutionManager interfaces.NodeExecutionInterface
-	TaskExecutionManager interfaces.TaskExecutionInterface
-	ProjectManager       interfaces.ProjectInterface
-	ProjectDomainManager interfaces.ProjectDomainInterface
-	NamedEntityManager   interfaces.NamedEntityInterface
-	Metrics              AdminMetrics
+	TaskManager                    interfaces.TaskInterface
+	WorkflowManager                interfaces.WorkflowInterface
+	LaunchPlanManager              interfaces.LaunchPlanInterface
+	ExecutionManager               interfaces.ExecutionInterface
+	NodeExecutionManager           interfaces.NodeExecutionInterface
+	TaskExecutionManager           interfaces.TaskExecutionInterface
+	ProjectManager                 interfaces.ProjectInterface
+	ProjectAttributesManager       interfaces.ProjectAttributesInterface
+	ProjectDomainAttributesManager interfaces.ProjectDomainAttributesInterface
+	WorkflowAttributesManager      interfaces.WorkflowAttributesInterface
+	NamedEntityManager             interfaces.NamedEntityInterface
+	Metrics                        AdminMetrics
 }
 
 // Intercepts all admin requests to handle panics during execution.
@@ -159,8 +161,10 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 			db, adminScope.NewSubScope("node_execution_manager"), urlData),
 		TaskExecutionManager: manager.NewTaskExecutionManager(
 			db, adminScope.NewSubScope("task_execution_manager"), urlData),
-		ProjectManager:       manager.NewProjectManager(db, configuration),
-		ProjectDomainManager: manager.NewProjectDomainManager(db, configuration),
-		Metrics:              InitMetrics(adminScope),
+		ProjectManager:                 manager.NewProjectManager(db, configuration),
+		ProjectAttributesManager:       manager.NewProjectAttributesManager(db),
+		ProjectDomainAttributesManager: manager.NewProjectDomainAttributesManager(db),
+		WorkflowAttributesManager:      manager.NewWorkflowAttributesManager(db),
+		Metrics:                        InitMetrics(adminScope),
 	}
 }

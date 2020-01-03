@@ -337,10 +337,8 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 			},
 		}, []runtimeInterfaces.WorkflowConfig{
 			{
-				Project:      "project",
-				Domain:       "domain",
-				WorkflowName: "name",
-				Tags:         []string{"tag"},
+				Domain: "domain",
+				Tags:   []string{"tag"},
 			},
 		}),
 		nil, nil, nil, nil)
@@ -1551,7 +1549,7 @@ func TestListExecutions_TransformerError(t *testing.T) {
 
 func TestExecutionManager_PublishNotifications(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	queue := executions.NewQueueAllocator(getMockExecutionsConfigProvider())
+	queue := executions.NewQueueAllocator(getMockExecutionsConfigProvider(), repository)
 
 	mockApplicationConfig := runtimeMocks.MockApplicationProvider{}
 	mockApplicationConfig.SetNotificationsConfig(runtimeInterfaces.NotificationsConfig{
@@ -1647,7 +1645,7 @@ func TestExecutionManager_PublishNotifications(t *testing.T) {
 
 func TestExecutionManager_PublishNotificationsTransformError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	queue := executions.NewQueueAllocator(getMockExecutionsConfigProvider())
+	queue := executions.NewQueueAllocator(getMockExecutionsConfigProvider(), repository)
 	var execManager = &ExecutionManager{
 		db:                 repository,
 		config:             getMockExecutionsConfigProvider(),
@@ -1688,7 +1686,7 @@ func TestExecutionManager_PublishNotificationsTransformError(t *testing.T) {
 
 func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	queue := executions.NewQueueAllocator(getMockExecutionsConfigProvider())
+	queue := executions.NewQueueAllocator(getMockExecutionsConfigProvider(), repository)
 	publishFunc := func(ctx context.Context, key string, msg proto.Message) error {
 		return errors.New("error publishing message")
 	}
@@ -1759,7 +1757,7 @@ func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformErro
 
 func TestExecutionManager_PublishNotificationsNoPhaseMatch(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	queue := executions.NewQueueAllocator(getMockExecutionsConfigProvider())
+	queue := executions.NewQueueAllocator(getMockExecutionsConfigProvider(), repository)
 
 	var myExecManager = &ExecutionManager{
 		db:                 repository,
