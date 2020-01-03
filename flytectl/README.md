@@ -1,0 +1,2 @@
+# flytectl
+Flyte CLI
