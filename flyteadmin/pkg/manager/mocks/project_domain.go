@@ -17,7 +17,7 @@ func (m *MockProjectDomainManager) SetUpdateProjectDomainAttributes(updateProjec
 	m.updateProjectDomainFunc = updateProjectDomainFunc
 }
 
-func (m *MockProjectDomainManager) UpdateProjectDomain(
+func (m *MockProjectDomainManager) UpdateProjectDomainAttributes(
 	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (
 	*admin.ProjectDomainAttributesUpdateResponse, error) {
 	if m.updateProjectDomainFunc != nil {

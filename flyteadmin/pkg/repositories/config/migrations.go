@@ -139,16 +139,6 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS InputsURI, DROP COLUMN IF EXISTS UserInputsURI").Error
 		},
 	},
-	// Add ProjectDomains with custom resource attributes.
-	{
-		ID: "2019-10-28-project-domains",
-		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.ProjectDomain{}).Error
-		},
-		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("project_domains").Error
-		},
-	},
 	// Create named_entity_metadata table.
 	{
 		ID: "2019-11-05-named-entity-metadata",
@@ -157,6 +147,37 @@ var Migrations = []*gormigrate.Migration{
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.DropTable("named_entity_metadata").Error
+		},
+	},
+	// Add ProjectAttributes with custom resource attributes.
+	{
+		ID: "2019-12-30-project-attributes",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.ProjectAttributes{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.DropTable("project_attributes").Error
+		},
+	},
+
+	// Add ProjectDomainAttributes with custom resource attributes.
+	{
+		ID: "2019-12-30-project-domain-attributes",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.ProjectDomainAttributes{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.DropTable("project_domain_attributes").Error
+		},
+	},
+	// Add WorkflowAttributes with custom resource attributes.
+	{
+		ID: "2019-12-30-workflow-attributes",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.WorkflowAttributes{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.DropTable("workflow_attributes").Error
 		},
 	},
 }

@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lyft/flyteadmin/pkg/repositories/mocks"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+
 	"github.com/golang/protobuf/proto"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -414,6 +417,35 @@ func TestIsWholeNumber(t *testing.T) {
 	}
 }
 
+func TestAssignResourcesIfUnset(t *testing.T) {
+	platformValues := runtimeInterfaces.TaskResourceSet{
+		CPU:    "200m",
+		GPU:    "8",
+		Memory: "200Gi",
+	}
+	taskResourceSpec := &admin.TaskResourceSpec{
+		Cpu:    "400m",
+		Memory: "400Gi",
+	}
+	assignedResources := assignResourcesIfUnset(context.Background(), &core.Identifier{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "name",
+		Version: "version",
+	}, platformValues, []*core.Resources_ResourceEntry{}, taskResourceSpec)
+
+	assert.EqualValues(t, []*core.Resources_ResourceEntry{
+		{
+			Name:  core.Resources_CPU,
+			Value: taskResourceSpec.Cpu,
+		},
+		{
+			Name:  core.Resources_MEMORY,
+			Value: taskResourceSpec.Memory,
+		},
+	}, assignedResources)
+}
+
 func TestSetDefaults(t *testing.T) {
 	task := &core.CompiledTask{
 		Template: &core.TaskTemplate{
@@ -429,6 +461,12 @@ func TestSetDefaults(t *testing.T) {
 					},
 				},
 			},
+			Id: &core.Identifier{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "task_name",
+				Version: "version",
+			},
 		},
 	}
 
@@ -443,7 +481,7 @@ func TestSetDefaults(t *testing.T) {
 		GPU:    "8",
 		Memory: "500Gi",
 	}
-	SetDefaults(context.Background(), &taskConfig, task)
+	SetDefaults(context.Background(), &taskConfig, task, mocks.NewMockRepository(), "workflow")
 	assert.True(t, proto.Equal(
 		&core.Container{
 			Resources: &core.Resources{
@@ -487,6 +525,12 @@ func TestSetDefaults_MissingDefaults(t *testing.T) {
 					},
 				},
 			},
+			Id: &core.Identifier{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "task_name",
+				Version: "version",
+			},
 		},
 	}
 
@@ -500,7 +544,7 @@ func TestSetDefaults_MissingDefaults(t *testing.T) {
 		CPU: "300m",
 		GPU: "8",
 	}
-	SetDefaults(context.Background(), &taskConfig, task)
+	SetDefaults(context.Background(), &taskConfig, task, mocks.NewMockRepository(), "workflow")
 	assert.True(t, proto.Equal(
 		&core.Container{
 			Resources: &core.Resources{

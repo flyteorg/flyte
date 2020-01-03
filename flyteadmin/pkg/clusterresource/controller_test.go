@@ -7,9 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flyteadmin/pkg/errors"
-	"google.golang.org/grpc/codes"
-
 	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 
@@ -154,15 +151,20 @@ func TestGetCustomTemplateValues(t *testing.T) {
 	projectDomainAttributes := admin.ProjectDomainAttributes{
 		Project: "project-foo",
 		Domain:  "domain-bar",
-		Attributes: map[string]string{
-			"var1": "val1",
-			"var2": "val2",
+		MatchingAttributes: &admin.MatchingAttributes{
+			Target: &admin.MatchingAttributes_ClusterResourceAttributes{ClusterResourceAttributes: &admin.ClusterResourceAttributes{
+				Attributes: map[string]string{
+					"var1": "val1",
+					"var2": "val2",
+				},
+			},
+			},
 		},
 	}
-	projectDomainModel, err := transformers.ToProjectDomainModel(projectDomainAttributes)
+	projectDomainModel, err := transformers.ToProjectDomainAttributesModel(projectDomainAttributes, admin.MatchableResource_CLUSTER_RESOURCE)
 	assert.Nil(t, err)
-	mockRepository.ProjectDomainRepo().(*repositoryMocks.MockProjectDomainRepo).GetFunction = func(
-		ctx context.Context, project, domain string) (models.ProjectDomain, error) {
+	mockRepository.ProjectDomainAttributesRepo().(*repositoryMocks.MockProjectDomainAttributesRepo).GetFunction = func(
+		ctx context.Context, project, domain, resource string) (models.ProjectDomainAttributes, error) {
 		assert.Equal(t, "project-foo", project)
 		assert.Equal(t, "domain-bar", domain)
 		return projectDomainModel, nil
@@ -188,10 +190,6 @@ func TestGetCustomTemplateValues(t *testing.T) {
 
 func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
 	mockRepository := repositoryMocks.NewMockRepository()
-	mockRepository.ProjectDomainRepo().(*repositoryMocks.MockProjectDomainRepo).GetFunction = func(
-		ctx context.Context, project, domain string) (models.ProjectDomain, error) {
-		return models.ProjectDomain{}, errors.NewFlyteAdminError(codes.NotFound, "not found")
-	}
 	testController := controller{
 		db: mockRepository,
 	}
@@ -209,9 +207,9 @@ func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
 
 func TestGetCustomTemplateValues_InvalidDBModel(t *testing.T) {
 	mockRepository := repositoryMocks.NewMockRepository()
-	mockRepository.ProjectDomainRepo().(*repositoryMocks.MockProjectDomainRepo).GetFunction = func(
-		ctx context.Context, project, domain string) (models.ProjectDomain, error) {
-		return models.ProjectDomain{
+	mockRepository.ProjectDomainAttributesRepo().(*repositoryMocks.MockProjectDomainAttributesRepo).GetFunction = func(
+		ctx context.Context, project, domain, resource string) (models.ProjectDomainAttributes, error) {
+		return models.ProjectDomainAttributes{
 			Attributes: []byte("i'm invalid"),
 		}, nil
 	}

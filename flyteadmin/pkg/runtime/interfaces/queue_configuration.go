@@ -8,14 +8,16 @@ type ExecutionQueue struct {
 	Attributes []string
 }
 
+func (q ExecutionQueue) GetAttributes() []string {
+	return q.Attributes
+}
+
 type ExecutionQueues []ExecutionQueue
 
 // Defines the specific resource attributes (tags) a workflow requires to run.
 type WorkflowConfig struct {
-	Project      string   `json:"project"`
-	Domain       string   `json:"domain"`
-	WorkflowName string   `json:"workflowName"`
-	Tags         []string `json:"tags"`
+	Domain string   `json:"domain"`
+	Tags   []string `json:"tags"`
 }
 
 type WorkflowConfigs []WorkflowConfig

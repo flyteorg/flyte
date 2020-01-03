@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
+	"github.com/lyft/flyteadmin/pkg/resourcematching"
 
 	"github.com/lyft/flyteadmin/pkg/executioncluster/interfaces"
 
@@ -174,21 +174,18 @@ func (c *controller) getCustomTemplateValues(
 		customTemplateValues[key] = value
 	}
 	collectedErrs := make([]error, 0)
-	// All project-domain defaults saved in the database take precedence over the domain-specific defaults.
-	projectDomainModel, err := c.db.ProjectDomainRepo().Get(ctx, project, domain)
-	if err != nil {
-		if err.(errors.FlyteAdminError).Code() != codes.NotFound {
-			// Not found is fine because not every project-domain combination will have specific custom resource
-			// attributes.
-			collectedErrs = append(collectedErrs, err)
-		}
-	}
-	projectDomain, err := transformers.FromProjectDomainModel(projectDomainModel)
+	// All override values saved in the database take precedence over the domain-specific defaults.
+	attributes, err := resourcematching.GetOverrideValuesToApply(ctx, resourcematching.GetOverrideValuesInput{
+		Db:       c.db,
+		Project:  project,
+		Domain:   domain,
+		Resource: admin.MatchableResource_CLUSTER_RESOURCE,
+	})
 	if err != nil {
 		collectedErrs = append(collectedErrs, err)
 	}
-	if len(projectDomain.Attributes) > 0 {
-		for templateKey, templateValue := range projectDomain.Attributes {
+	if attributes != nil && attributes.GetClusterResourceAttributes() != nil {
+		for templateKey, templateValue := range attributes.GetClusterResourceAttributes().Attributes {
 			customTemplateValues[fmt.Sprintf(templateVariableFormat, templateKey)] = templateValue
 		}
 	}
