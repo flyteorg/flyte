@@ -168,7 +168,7 @@ func TestGetAllocationToken(t *testing.T) {
 		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusGranted, nil)
 
-		state, err := GetAllocationToken(ctx, quboleResourceNamespace, tCtx)
+		state, err := GetAllocationToken(ctx, quboleHiveExecutorId, tCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, PhaseQueued, state.Phase)
 	})
@@ -180,7 +180,7 @@ func TestGetAllocationToken(t *testing.T) {
 		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusExhausted, nil)
 
-		state, err := GetAllocationToken(ctx, quboleResourceNamespace, tCtx)
+		state, err := GetAllocationToken(ctx, quboleHiveExecutorId, tCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, PhaseNotStarted, state.Phase)
 	})
@@ -192,7 +192,7 @@ func TestGetAllocationToken(t *testing.T) {
 		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusNamespaceQuotaExceeded, nil)
 
-		state, err := GetAllocationToken(ctx, quboleResourceNamespace, tCtx)
+		state, err := GetAllocationToken(ctx, quboleHiveExecutorId, tCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, PhaseNotStarted, state.Phase)
 	})
@@ -243,7 +243,7 @@ func TestFinalize(t *testing.T) {
 		called = true
 	}).Return(nil)
 
-	err := Finalize(ctx, tCtx, quboleResourceNamespace, state)
+	err := Finalize(ctx, tCtx, quboleHiveExecutorId, state)
 	assert.NoError(t, err)
 	assert.True(t, called)
 }

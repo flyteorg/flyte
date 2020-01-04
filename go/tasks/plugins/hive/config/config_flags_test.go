@@ -187,28 +187,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_quboleLimit", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("quboleLimit"); err == nil {
-				assert.Equal(t, int(defaultConfig.Limit), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("quboleLimit", testValue)
-			if vInt, err := cmdFlags.GetInt("quboleLimit"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.Limit)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_lruCacheSize", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
