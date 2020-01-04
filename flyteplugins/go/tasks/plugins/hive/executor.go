@@ -22,19 +22,21 @@ const quboleHiveExecutorId = "qubole-hive-executor"
 const pluginStateVersion = 0
 
 const hiveTaskType = "hive" // This needs to match the type defined in Flytekit constants.py
-const quboleResourceNamespace core.ResourceNamespace = "qubole"
 
 type QuboleHiveExecutor struct {
-	id                string
-	metrics           QuboleHiveExecutorMetrics
-	quboleClient      client.QuboleClient
-	executionsCache   cache.AutoRefresh
-	cfg               *config.Config
-	resourceNamespace core.ResourceNamespace
+	id              string
+	metrics         QuboleHiveExecutorMetrics
+	quboleClient    client.QuboleClient
+	executionsCache cache.AutoRefresh
+	cfg             *config.Config
 }
 
 func (q QuboleHiveExecutor) GetID() string {
 	return q.id
+}
+
+func (q QuboleHiveExecutor) GetResourceNamespace() core.ResourceNamespace {
+	return core.ResourceNamespace(q.GetID())
 }
 
 func (q QuboleHiveExecutor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
@@ -52,7 +54,7 @@ func (q QuboleHiveExecutor) Handle(ctx context.Context, tCtx core.TaskExecutionC
 	// Do what needs to be done, and give this function everything it needs to do its job properly
 	// TODO: Play around with making this return a transition directly. How will that pattern affect the multi-Qubole plugin
 	outgoingState, transformError := HandleExecutionState(ctx, tCtx, incomingState, q.quboleClient, q.executionsCache,
-		q.resourceNamespace, q.cfg)
+		q.GetResourceNamespace(), q.cfg)
 
 	// Return if there was an error
 	if transformError != nil {
@@ -94,7 +96,7 @@ func (q QuboleHiveExecutor) Finalize(ctx context.Context, tCtx core.TaskExecutio
 		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to unmarshal custom state in Finalize")
 	}
 
-	return Finalize(ctx, tCtx, q.resourceNamespace, incomingState)
+	return Finalize(ctx, tCtx, q.GetResourceNamespace(), incomingState)
 }
 
 func (q QuboleHiveExecutor) GetProperties() core.PluginProperties {
@@ -103,37 +105,38 @@ func (q QuboleHiveExecutor) GetProperties() core.PluginProperties {
 
 func QuboleHiveExecutorLoader(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
 	cfg := config.GetQuboleConfig()
-	return InitializeHiveExecutor(ctx, iCtx, BuildResourceConfig(cfg), client.NewQuboleClient(cfg))
+	return InitializeHiveExecutor(ctx, iCtx, cfg, quboleHiveExecutorId, BuildResourceConfig(cfg), client.NewQuboleClient(cfg))
 }
 
-func BuildResourceConfig() {
-	resourceConfig := make(map[string]int, len(cfg.ClusterLabels))
+func BuildResourceConfig(cfg *config.Config) map[string]int {
+	resourceConfig := make(map[string]int, len(cfg.ClusterConfigs))
 
-	for _, cluster := range cfg.Presto {
-		resourceConfig[cluster] = cfg.Limit
+	for _, clusterCfg := range cfg.ClusterConfigs {
+		resourceConfig[clusterCfg.Label] = clusterCfg.Limit
 	}
+	return resourceConfig
 }
 
-func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, resourceConfig map[string]int,
+func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, cfg *config.Config, resourceNamespace core.ResourceNamespace, resourceConfig map[string]int,
 	quboleClient client.QuboleClient) (core.Plugin, error) {
-	q, err := NewQuboleHiveExecutor(ctx, cfg, quboleClient, quboleResourceNamespace, iCtx.SecretManager(), iCtx.MetricsScope())
+
+	q, err := NewQuboleHiveExecutor(ctx, cfg, quboleClient, iCtx.SecretManager(), iCtx.MetricsScope())
 	if err != nil {
 		return nil, err
 	}
 
-	for clusterName, limit := range resourceConfig {
-		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, clusterName, limit); err != nil {
+	for clusterLabel, clusterLimit := range resourceConfig {
+		namespaceWithClusterLabel := resourceNamespace.CreateSubNamespace(core.ResourceNamespace(clusterLabel))
+		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, namespaceWithClusterLabel, clusterLimit); err != nil {
 			return nil, err
 		}
 	}
 
 	return q, nil
-
 }
 
 // type PluginLoader func(ctx context.Context, iCtx SetupContext) (Plugin, error)
-func NewQuboleHiveExecutor(ctx context.Context, cfg *config.Config, quboleClient client.QuboleClient, resourceNamespace core.ResourceNamespace,
-	secretManager core.SecretManager, scope promutils.Scope) (QuboleHiveExecutor, error) {
+func NewQuboleHiveExecutor(ctx context.Context, cfg *config.Config, quboleClient client.QuboleClient, secretManager core.SecretManager, scope promutils.Scope) (QuboleHiveExecutor, error) {
 	executionsAutoRefreshCache, err := NewQuboleHiveExecutionsCache(ctx, quboleClient, secretManager, cfg, scope.NewSubScope(hiveTaskType))
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create AutoRefreshCache in QuboleHiveExecutor Setup. Error: %v", err)
@@ -146,12 +149,11 @@ func NewQuboleHiveExecutor(ctx context.Context, cfg *config.Config, quboleClient
 	}
 
 	return QuboleHiveExecutor{
-		id:                quboleHiveExecutorId,
-		cfg:               cfg,
-		resourceNamespace: resourceNamespace,
-		metrics:           getQuboleHiveExecutorMetrics(scope),
-		quboleClient:      quboleClient,
-		executionsCache:   executionsAutoRefreshCache,
+		id:              quboleHiveExecutorId,
+		cfg:             cfg,
+		metrics:         getQuboleHiveExecutorMetrics(scope),
+		quboleClient:    quboleClient,
+		executionsCache: executionsAutoRefreshCache,
 	}, nil
 }
 

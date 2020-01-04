@@ -25,16 +25,20 @@ func MustParse(s string) config.URL {
 	return config.URL{URL: *r}
 }
 
+type ClusterConfig struct {
+	Label string `json:"label" pflag:",Label of the service cluster"`
+	Limit int    `json:"limit" pflag:",Resource quota of the service cluster"`
+}
+
 var (
 	defaultConfig = Config{
 		Endpoint:        MustParse("https://wellness.qubole.com"),
 		CommandAPIPath:  MustParse("/api/v1.2/commands/"),
 		AnalyzeLinkPath: MustParse("/v2/analyze"),
 		TokenKey:        "FLYTE_QUBOLE_CLIENT_TOKEN",
-		Limit:           200,
 		LruCacheSize:    2000,
 		Workers:         15,
-		ClusterLabels:   []string{"default"},
+		ClusterConfigs:  []ClusterConfig{{Label: "default", Limit: 200}},
 	}
 
 	quboleConfigSection = pluginsConfig.MustRegisterSubSection(quboleConfigSectionKey, &defaultConfig)
@@ -42,15 +46,13 @@ var (
 
 // Qubole plugin configs
 type Config struct {
-	Endpoint        config.URL     `json:"endpoint" pflag:",Endpoint for qubole to use"`
-	CommandAPIPath  config.URL     `json:"commandApiPath" pflag:",API Path where commands can be launched on Qubole. Should be a valid url."`
-	AnalyzeLinkPath config.URL     `json:"analyzeLinkPath" pflag:",URL path where queries can be visualized on qubole website. Should be a valid url."`
-	TokenKey        string         `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
-	Limit           int            `json:"quboleLimit" pflag:",Global limit for concurrent Qubole queries"`
-	LruCacheSize    int            `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
-	Workers         int            `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
-	HiveConfig      map[string]int `json:"clusterLabels" pflag:",List of labels of service clusters"`
-	PrestoConfig    map[string]int
+	Endpoint        config.URL      `json:"endpoint" pflag:",Endpoint for qubole to use"`
+	CommandAPIPath  config.URL      `json:"commandApiPath" pflag:",API Path where commands can be launched on Qubole. Should be a valid url."`
+	AnalyzeLinkPath config.URL      `json:"analyzeLinkPath" pflag:",URL path where queries can be visualized on qubole website. Should be a valid url."`
+	TokenKey        string          `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
+	LruCacheSize    int             `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
+	Workers         int             `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
+	ClusterConfigs  []ClusterConfig `json:"clusterConfigs" pflag:"-,List of cluster configs. Each of the configs corresponds to a service cluster"`
 }
 
 // Retrieves the current config value or default.
