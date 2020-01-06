@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/lyft/flyteadmin/pkg/auth/config"
+	"github.com/lyft/flyteadmin/pkg/common"
 
 	"github.com/lyft/flyteadmin/pkg/auth/interfaces/mocks"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,7 @@ import (
 
 func TestWithUserEmail(t *testing.T) {
 	ctx := WithUserEmail(context.Background(), "abc")
-	assert.Equal(t, "abc", ctx.Value(PrincipalContextKey))
+	assert.Equal(t, "abc", ctx.Value(common.PrincipalContextKey))
 }
 
 func TestGetLoginHandler(t *testing.T) {

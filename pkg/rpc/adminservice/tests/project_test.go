@@ -24,7 +24,11 @@ func TestRegisterProject(t *testing.T) {
 		projectManager: &mockProjectManager,
 	})
 
-	resp, err := mockServer.RegisterProject(ctx, &admin.ProjectRegisterRequest{})
+	resp, err := mockServer.RegisterProject(ctx, &admin.ProjectRegisterRequest{
+		Project: &admin.Project{
+			Id: "project",
+		},
+	})
 	assert.NotNil(t, resp)
 	assert.NoError(t, err)
 }

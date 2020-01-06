@@ -3,6 +3,8 @@ package impl
 import (
 	"context"
 
+	"github.com/lyft/flytestdlib/logger"
+
 	"github.com/lyft/flytestdlib/contextutils"
 
 	"github.com/lyft/flyteadmin/pkg/manager/impl/validation"
@@ -68,6 +70,8 @@ func (m *ProjectDomainAttributesManager) DeleteProjectDomainAttributes(ctx conte
 		ctx, request.Project, request.Domain, request.ResourceType.String()); err != nil {
 		return nil, err
 	}
+	logger.Infof(ctx, "Deleted project-domain attributes for: %s-%s (%s)", request.Project,
+		request.Domain, request.ResourceType.String())
 	return &admin.ProjectDomainAttributesDeleteResponse{}, nil
 }
 

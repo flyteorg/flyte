@@ -25,7 +25,12 @@ func TestUpdateProjectDomain(t *testing.T) {
 		projectDomainAttributesManager: &mockProjectDomainManager,
 	})
 
-	resp, err := mockServer.UpdateProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesUpdateRequest{})
+	resp, err := mockServer.UpdateProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesUpdateRequest{
+		Attributes: &admin.ProjectDomainAttributes{
+			Project: "project",
+			Domain:  "domain",
+		},
+	})
 	assert.NotNil(t, resp)
 	assert.NoError(t, err)
 	assert.True(t, updateCalled)

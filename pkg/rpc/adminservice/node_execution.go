@@ -2,6 +2,9 @@ package adminservice
 
 import (
 	"context"
+	"time"
+
+	"github.com/lyft/flyteadmin/pkg/audit"
 
 	"github.com/lyft/flytestdlib/logger"
 
@@ -15,6 +18,7 @@ import (
 func (m *AdminService) CreateNodeEvent(
 	ctx context.Context, request *admin.NodeExecutionEventRequest) (*admin.NodeExecutionEventResponse, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -23,6 +27,12 @@ func (m *AdminService) CreateNodeEvent(
 	m.Metrics.nodeExecutionEndpointMetrics.createEvent.Time(func() {
 		response, err = m.NodeExecutionManager.CreateNodeEvent(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"CreateNodeEvent",
+		audit.ParametersFromNodeExecutionIdentifier(request.Event.Id),
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.createEvent)
 	}
@@ -33,6 +43,7 @@ func (m *AdminService) CreateNodeEvent(
 func (m *AdminService) GetNodeExecution(
 	ctx context.Context, request *admin.NodeExecutionGetRequest) (*admin.NodeExecution, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -41,6 +52,12 @@ func (m *AdminService) GetNodeExecution(
 	m.Metrics.nodeExecutionEndpointMetrics.get.Time(func() {
 		response, err = m.NodeExecutionManager.GetNodeExecution(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"GetNodeExecution",
+		audit.ParametersFromNodeExecutionIdentifier(request.Id),
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.get)
 	}
@@ -51,6 +68,7 @@ func (m *AdminService) GetNodeExecution(
 func (m *AdminService) ListNodeExecutions(
 	ctx context.Context, request *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -59,6 +77,12 @@ func (m *AdminService) ListNodeExecutions(
 	m.Metrics.nodeExecutionEndpointMetrics.list.Time(func() {
 		response, err = m.NodeExecutionManager.ListNodeExecutions(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"ListNodeExecutions",
+		audit.ParametersFromExecutionIdentifier(request.WorkflowExecutionId),
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.list)
 	}
@@ -69,6 +93,7 @@ func (m *AdminService) ListNodeExecutions(
 func (m *AdminService) ListNodeExecutionsForTask(
 	ctx context.Context, request *admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -84,6 +109,12 @@ func (m *AdminService) ListNodeExecutionsForTask(
 	m.Metrics.nodeExecutionEndpointMetrics.listChildren.Time(func() {
 		response, err = m.NodeExecutionManager.ListNodeExecutionsForTask(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"ListNodeExecutionsForTask",
+		audit.ParametersFromTaskExecutionIdentifier(request.TaskExecutionId),
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.listChildren)
 	}
@@ -94,6 +125,7 @@ func (m *AdminService) ListNodeExecutionsForTask(
 func (m *AdminService) GetNodeExecutionData(
 	ctx context.Context, request *admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -102,6 +134,12 @@ func (m *AdminService) GetNodeExecutionData(
 	m.Metrics.nodeExecutionEndpointMetrics.getData.Time(func() {
 		response, err = m.NodeExecutionManager.GetNodeExecutionData(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"GetNodeExecutionData",
+		audit.ParametersFromNodeExecutionIdentifier(request.Id),
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.getData)
 	}

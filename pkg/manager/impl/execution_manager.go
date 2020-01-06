@@ -6,13 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lyft/flytestdlib/contextutils"
-
-	"github.com/lyft/flyteadmin/pkg/auth"
-
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	dataInterfaces "github.com/lyft/flyteadmin/pkg/data/interfaces"
+	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -92,7 +89,7 @@ func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifi
 
 // Returns the unique string which identifies the authenticated end user (if any).
 func getUser(ctx context.Context) string {
-	principalContextUser := ctx.Value(auth.PrincipalContextKey)
+	principalContextUser := ctx.Value(common.PrincipalContextKey)
 	if principalContextUser != nil {
 		return fmt.Sprintf(principalContextKeyFormat, principalContextUser)
 	}
