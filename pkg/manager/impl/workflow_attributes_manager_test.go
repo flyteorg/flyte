@@ -39,3 +39,60 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, createOrUpdateCalled)
 }
+
+func TestGetWorkflowAttributes(t *testing.T) {
+	request := admin.WorkflowAttributesGetRequest{
+		Project:      "project",
+		Domain:       "domain",
+		Workflow:     "workflow",
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+	}
+	db := mocks.NewMockRepository()
+	db.WorkflowAttributesRepo().(*mocks.MockWorkflowAttributesRepo).GetFunction = func(
+		ctx context.Context, project, domain, workflow, resource string) (models.WorkflowAttributes, error) {
+		assert.Equal(t, "project", project)
+		assert.Equal(t, "domain", domain)
+		assert.Equal(t, "workflow", workflow)
+		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), resource)
+		expectedSerializedAttrs, _ := proto.Marshal(testutils.ExecutionQueueAttributes)
+		return models.WorkflowAttributes{
+			Project:    project,
+			Domain:     domain,
+			Workflow:   workflow,
+			Resource:   resource,
+			Attributes: expectedSerializedAttrs,
+		}, nil
+	}
+	manager := NewWorkflowAttributesManager(db)
+	response, err := manager.GetWorkflowAttributes(context.Background(), request)
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&admin.WorkflowAttributesGetResponse{
+		Attributes: &admin.WorkflowAttributes{
+			Project:            "project",
+			Domain:             "domain",
+			Workflow:           "workflow",
+			MatchingAttributes: testutils.ExecutionQueueAttributes,
+		},
+	}, response))
+}
+
+func TestDeleteWorkflowAttributes(t *testing.T) {
+	request := admin.WorkflowAttributesDeleteRequest{
+		Project:      "project",
+		Domain:       "domain",
+		Workflow:     "workflow",
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+	}
+	db := mocks.NewMockRepository()
+	db.WorkflowAttributesRepo().(*mocks.MockWorkflowAttributesRepo).DeleteFunction = func(
+		ctx context.Context, project, domain, workflow, resource string) error {
+		assert.Equal(t, "project", project)
+		assert.Equal(t, "domain", domain)
+		assert.Equal(t, "workflow", workflow)
+		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), resource)
+		return nil
+	}
+	manager := NewWorkflowAttributesManager(db)
+	_, err := manager.DeleteWorkflowAttributes(context.Background(), request)
+	assert.Nil(t, err)
+}

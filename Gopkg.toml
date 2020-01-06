@@ -60,7 +60,7 @@
 [[override]]
   name = "github.com/lyft/flyteidl"
   source = "https://github.com/lyft/flyteidl"
-  version = "^0.16.x"
+  version = "^0.16.5"
 
 [[constraint]]
   name = "github.com/lyft/flytepropeller"

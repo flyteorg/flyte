@@ -95,6 +95,24 @@ func TestValidateProjectAttributesUpdateRequest(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestValidateProjectAttributesGetRequest(t *testing.T) {
+	err := ValidateProjectAttributesGetRequest(admin.ProjectAttributesGetRequest{})
+	assert.Equal(t, "missing project", err.Error())
+
+	assert.Nil(t, ValidateProjectAttributesGetRequest(admin.ProjectAttributesGetRequest{
+		Project: "project",
+	}))
+}
+
+func TestValidateProjectAttributesDeleteRequest(t *testing.T) {
+	err := ValidateProjectAttributesDeleteRequest(admin.ProjectAttributesDeleteRequest{})
+	assert.Equal(t, "missing project", err.Error())
+
+	assert.Nil(t, ValidateProjectAttributesDeleteRequest(admin.ProjectAttributesDeleteRequest{
+		Project: "project",
+	}))
+}
+
 func TestValidateProjectDomainAttributesUpdateRequest(t *testing.T) {
 	_, err := ValidateProjectDomainAttributesUpdateRequest(admin.ProjectDomainAttributesUpdateRequest{})
 	assert.Equal(t, "missing attributes", err.Error())
@@ -125,6 +143,36 @@ func TestValidateProjectDomainAttributesUpdateRequest(t *testing.T) {
 		}})
 	assert.Equal(t, admin.MatchableResource_CLUSTER_RESOURCE, matchableResource)
 	assert.Nil(t, err)
+}
+
+func TestValidateProjectDomainAttributesGetRequest(t *testing.T) {
+	err := ValidateProjectDomainAttributesGetRequest(admin.ProjectDomainAttributesGetRequest{})
+	assert.Equal(t, "missing project", err.Error())
+
+	err = ValidateProjectDomainAttributesGetRequest(admin.ProjectDomainAttributesGetRequest{
+		Project: "project",
+	})
+	assert.Equal(t, "missing domain", err.Error())
+
+	assert.Nil(t, ValidateProjectDomainAttributesGetRequest(admin.ProjectDomainAttributesGetRequest{
+		Project: "project",
+		Domain:  "domain",
+	}))
+}
+
+func TestValidateProjectDomainAttributesDeleteRequest(t *testing.T) {
+	err := ValidateProjectDomainAttributesDeleteRequest(admin.ProjectDomainAttributesDeleteRequest{})
+	assert.Equal(t, "missing project", err.Error())
+
+	err = ValidateProjectDomainAttributesDeleteRequest(admin.ProjectDomainAttributesDeleteRequest{
+		Project: "project",
+	})
+	assert.Equal(t, "missing domain", err.Error())
+
+	assert.Nil(t, ValidateProjectDomainAttributesDeleteRequest(admin.ProjectDomainAttributesDeleteRequest{
+		Project: "project",
+		Domain:  "domain",
+	}))
 }
 
 func TestValidateWorkflowAttributesUpdateRequest(t *testing.T) {
@@ -163,4 +211,48 @@ func TestValidateWorkflowAttributesUpdateRequest(t *testing.T) {
 		}})
 	assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE, matchableResource)
 	assert.Nil(t, err)
+}
+
+func TestValidateWorkflowAttributesGetRequest(t *testing.T) {
+	err := ValidateWorkflowAttributesGetRequest(admin.WorkflowAttributesGetRequest{})
+	assert.Equal(t, "missing project", err.Error())
+
+	err = ValidateWorkflowAttributesGetRequest(admin.WorkflowAttributesGetRequest{
+		Project: "project",
+	})
+	assert.Equal(t, "missing domain", err.Error())
+
+	err = ValidateWorkflowAttributesGetRequest(admin.WorkflowAttributesGetRequest{
+		Project: "project",
+		Domain:  "domain",
+	})
+	assert.Equal(t, "missing name", err.Error())
+
+	assert.Nil(t, ValidateWorkflowAttributesGetRequest(admin.WorkflowAttributesGetRequest{
+		Project:  "project",
+		Domain:   "domain",
+		Workflow: "workflow",
+	}))
+}
+
+func TestValidateWorkflowAttributesDeleteRequest(t *testing.T) {
+	err := ValidateWorkflowAttributesDeleteRequest(admin.WorkflowAttributesDeleteRequest{})
+	assert.Equal(t, "missing project", err.Error())
+
+	err = ValidateWorkflowAttributesDeleteRequest(admin.WorkflowAttributesDeleteRequest{
+		Project: "project",
+	})
+	assert.Equal(t, "missing domain", err.Error())
+
+	err = ValidateWorkflowAttributesDeleteRequest(admin.WorkflowAttributesDeleteRequest{
+		Project: "project",
+		Domain:  "domain",
+	})
+	assert.Equal(t, "missing name", err.Error())
+
+	assert.Nil(t, ValidateWorkflowAttributesDeleteRequest(admin.WorkflowAttributesDeleteRequest{
+		Project:  "project",
+		Domain:   "domain",
+		Workflow: "workflow",
+	}))
 }

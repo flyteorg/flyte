@@ -11,4 +11,6 @@ type ProjectAttributesRepoInterface interface {
 	CreateOrUpdate(ctx context.Context, input models.ProjectAttributes) error
 	// Returns a matching ProjectAttributes model when it exists.
 	Get(ctx context.Context, project, resource string) (models.ProjectAttributes, error)
+	// Deletes a matching ProjectAttributes model when it exists.
+	Delete(ctx context.Context, project, resource string) error
 }

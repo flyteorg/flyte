@@ -62,6 +62,25 @@ func (r *ProjectDomainAttributesRepo) Get(ctx context.Context, project, domain, 
 	return model, nil
 }
 
+func (r *ProjectDomainAttributesRepo) Delete(ctx context.Context, project, domain, resource string) error {
+	var tx *gorm.DB
+	r.metrics.DeleteDuration.Time(func() {
+		tx = r.db.Where(&models.ProjectDomainAttributes{
+			Project:  project,
+			Domain:   domain,
+			Resource: resource,
+		}).Unscoped().Delete(models.ProjectDomainAttributes{})
+	})
+	if tx.Error != nil {
+		return r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	if tx.RecordNotFound() {
+		return flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound,
+			"project-domain [%s-%s] not found", project, domain)
+	}
+	return nil
+}
+
 func NewProjectDomainAttributesRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer,
 	scope promutils.Scope) interfaces.ProjectDomainAttributesRepoInterface {
 	metrics := newMetrics(scope)

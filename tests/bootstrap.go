@@ -5,6 +5,8 @@ package tests
 import (
 	"fmt"
 
+	"github.com/jinzhu/gorm"
+
 	database_config "github.com/lyft/flyteadmin/pkg/repositories/config"
 	"github.com/lyft/flytestdlib/promutils"
 )
@@ -32,6 +34,10 @@ func getLocalDbConfig() database_config.DbConfig {
 		DbName: "postgres",
 		User:   "postgres",
 	}
+}
+
+func truncateTableForTesting(db *gorm.DB, tableName string) {
+	db.Exec(fmt.Sprintf("TRUNCATE TABLE %s;", tableName))
 }
 
 func truncateAllTablesForTestingOnly() {

@@ -10,4 +10,8 @@ import (
 type ProjectDomainAttributesInterface interface {
 	UpdateProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (
 		*admin.ProjectDomainAttributesUpdateResponse, error)
+	GetProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesGetRequest) (
+		*admin.ProjectDomainAttributesGetResponse, error)
+	DeleteProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (
+		*admin.ProjectDomainAttributesDeleteResponse, error)
 }

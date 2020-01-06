@@ -36,6 +36,38 @@ func (m *WorkflowAttributesManager) UpdateWorkflowAttributes(
 	return &admin.WorkflowAttributesUpdateResponse{}, nil
 }
 
+func (m *WorkflowAttributesManager) GetWorkflowAttributes(
+	ctx context.Context, request admin.WorkflowAttributesGetRequest) (
+	*admin.WorkflowAttributesGetResponse, error) {
+	if err := validation.ValidateWorkflowAttributesGetRequest(request); err != nil {
+		return nil, err
+	}
+	projectAttributesModel, err := m.db.WorkflowAttributesRepo().Get(
+		ctx, request.Project, request.Domain, request.Workflow, request.ResourceType.String())
+	if err != nil {
+		return nil, err
+	}
+	projectAttributes, err := transformers.FromWorkflowAttributesModel(projectAttributesModel)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.WorkflowAttributesGetResponse{
+		Attributes: &projectAttributes,
+	}, nil
+}
+
+func (m *WorkflowAttributesManager) DeleteWorkflowAttributes(ctx context.Context,
+	request admin.WorkflowAttributesDeleteRequest) (*admin.WorkflowAttributesDeleteResponse, error) {
+	if err := validation.ValidateWorkflowAttributesDeleteRequest(request); err != nil {
+		return nil, err
+	}
+	if err := m.db.WorkflowAttributesRepo().Delete(
+		ctx, request.Project, request.Domain, request.Workflow, request.ResourceType.String()); err != nil {
+		return nil, err
+	}
+	return &admin.WorkflowAttributesDeleteResponse{}, nil
+}
+
 func NewWorkflowAttributesManager(db repositories.RepositoryInterface) interfaces.WorkflowAttributesInterface {
 	return &WorkflowAttributesManager{
 		db: db,

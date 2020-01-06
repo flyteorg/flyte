@@ -10,4 +10,8 @@ import (
 type ProjectAttributesInterface interface {
 	UpdateProjectAttributes(ctx context.Context, request admin.ProjectAttributesUpdateRequest) (
 		*admin.ProjectAttributesUpdateResponse, error)
+	GetProjectAttributes(ctx context.Context, request admin.ProjectAttributesGetRequest) (
+		*admin.ProjectAttributesGetResponse, error)
+	DeleteProjectAttributes(ctx context.Context, request admin.ProjectAttributesDeleteRequest) (
+		*admin.ProjectAttributesDeleteResponse, error)
 }
