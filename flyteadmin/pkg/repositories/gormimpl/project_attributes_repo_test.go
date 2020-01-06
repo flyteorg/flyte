@@ -55,3 +55,17 @@ func TestGetProjectAttributes(t *testing.T) {
 	assert.Equal(t, testResourceAttr, output.Resource)
 	assert.Equal(t, []byte("attrs"), output.Attributes)
 }
+
+func TestDeleteProjectAttributes(t *testing.T) {
+	projectRepo := NewProjectAttributesRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	GlobalMock := mocket.Catcher.Reset()
+
+	query := GlobalMock.NewMock()
+	fakeResponse := query.WithQuery(
+		`DELETE FROM "project_attributes"  WHERE ("project_attributes"."project" = ?) AND ` +
+			`("project_attributes"."resource" = ?)`)
+
+	err := projectRepo.Delete(context.Background(), "project", "resource")
+	assert.Nil(t, err)
+	assert.True(t, fakeResponse.Triggered)
+}

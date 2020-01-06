@@ -10,4 +10,8 @@ import (
 type WorkflowAttributesInterface interface {
 	UpdateWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesUpdateRequest) (
 		*admin.WorkflowAttributesUpdateResponse, error)
+	GetWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesGetRequest) (
+		*admin.WorkflowAttributesGetResponse, error)
+	DeleteWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesDeleteRequest) (
+		*admin.WorkflowAttributesDeleteResponse, error)
 }

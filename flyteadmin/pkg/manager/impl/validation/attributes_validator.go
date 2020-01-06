@@ -38,6 +38,22 @@ func ValidateProjectAttributesUpdateRequest(request admin.ProjectAttributesUpdat
 	return validateMatchingAttributes(request.Attributes.MatchingAttributes, request.Attributes.Project)
 }
 
+func ValidateProjectAttributesGetRequest(request admin.ProjectAttributesGetRequest) error {
+	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ValidateProjectAttributesDeleteRequest(request admin.ProjectAttributesDeleteRequest) error {
+	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func ValidateProjectDomainAttributesUpdateRequest(request admin.ProjectDomainAttributesUpdateRequest) (
 	admin.MatchableResource, error) {
 	if request.Attributes == nil {
@@ -52,6 +68,28 @@ func ValidateProjectDomainAttributesUpdateRequest(request admin.ProjectDomainAtt
 
 	return validateMatchingAttributes(request.Attributes.MatchingAttributes,
 		fmt.Sprintf("%s-%s", request.Attributes.Project, request.Attributes.Domain))
+}
+
+func ValidateProjectDomainAttributesGetRequest(request admin.ProjectDomainAttributesGetRequest) error {
+	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
+		return err
+	}
+	if err := ValidateEmptyStringField(request.Domain, shared.Domain); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ValidateProjectDomainAttributesDeleteRequest(request admin.ProjectDomainAttributesDeleteRequest) error {
+	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
+		return err
+	}
+	if err := ValidateEmptyStringField(request.Domain, shared.Domain); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func ValidateWorkflowAttributesUpdateRequest(request admin.WorkflowAttributesUpdateRequest) (
@@ -71,4 +109,32 @@ func ValidateWorkflowAttributesUpdateRequest(request admin.WorkflowAttributesUpd
 
 	return validateMatchingAttributes(request.Attributes.MatchingAttributes,
 		fmt.Sprintf("%s-%s-%s", request.Attributes.Project, request.Attributes.Domain, request.Attributes.Workflow))
+}
+
+func ValidateWorkflowAttributesGetRequest(request admin.WorkflowAttributesGetRequest) error {
+	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
+		return err
+	}
+	if err := ValidateEmptyStringField(request.Domain, shared.Domain); err != nil {
+		return err
+	}
+	if err := ValidateEmptyStringField(request.Workflow, shared.Name); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ValidateWorkflowAttributesDeleteRequest(request admin.WorkflowAttributesDeleteRequest) error {
+	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
+		return err
+	}
+	if err := ValidateEmptyStringField(request.Domain, shared.Domain); err != nil {
+		return err
+	}
+	if err := ValidateEmptyStringField(request.Workflow, shared.Name); err != nil {
+		return err
+	}
+
+	return nil
 }

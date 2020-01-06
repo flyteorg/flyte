@@ -37,3 +37,54 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, createOrUpdateCalled)
 }
+
+func TestGetProjectDomainAttributes(t *testing.T) {
+	request := admin.ProjectDomainAttributesGetRequest{
+		Project:      "project",
+		Domain:       "domain",
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+	}
+	db := mocks.NewMockRepository()
+	db.ProjectDomainAttributesRepo().(*mocks.MockProjectDomainAttributesRepo).GetFunction = func(
+		ctx context.Context, project, domain, resource string) (models.ProjectDomainAttributes, error) {
+		assert.Equal(t, "project", project)
+		assert.Equal(t, "domain", domain)
+		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), resource)
+		expectedSerializedAttrs, _ := proto.Marshal(testutils.ExecutionQueueAttributes)
+		return models.ProjectDomainAttributes{
+			Project:    project,
+			Domain:     domain,
+			Resource:   resource,
+			Attributes: expectedSerializedAttrs,
+		}, nil
+	}
+	manager := NewProjectDomainAttributesManager(db)
+	response, err := manager.GetProjectDomainAttributes(context.Background(), request)
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&admin.ProjectDomainAttributesGetResponse{
+		Attributes: &admin.ProjectDomainAttributes{
+			Project:            "project",
+			Domain:             "domain",
+			MatchingAttributes: testutils.ExecutionQueueAttributes,
+		},
+	}, response))
+}
+
+func TestDeleteProjectDomainAttributes(t *testing.T) {
+	request := admin.ProjectDomainAttributesDeleteRequest{
+		Project:      "project",
+		Domain:       "domain",
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+	}
+	db := mocks.NewMockRepository()
+	db.ProjectDomainAttributesRepo().(*mocks.MockProjectDomainAttributesRepo).DeleteFunction = func(
+		ctx context.Context, project, domain, resource string) error {
+		assert.Equal(t, "project", project)
+		assert.Equal(t, "domain", domain)
+		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), resource)
+		return nil
+	}
+	manager := NewProjectDomainAttributesManager(db)
+	_, err := manager.DeleteProjectDomainAttributes(context.Background(), request)
+	assert.Nil(t, err)
+}

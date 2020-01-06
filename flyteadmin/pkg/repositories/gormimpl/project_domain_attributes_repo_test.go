@@ -12,7 +12,7 @@ import (
 )
 
 func TestCreateProjectDomainAttributes(t *testing.T) {
-	projectRepo := NewProjectDomainAttributesRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	projectDomainRepo := NewProjectDomainAttributesRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
 
 	query := GlobalMock.NewMock()
@@ -20,7 +20,7 @@ func TestCreateProjectDomainAttributes(t *testing.T) {
 		`INSERT  INTO "project_domain_attributes" ` +
 			`("created_at","updated_at","deleted_at","project","domain","resource","attributes") VALUES (?,?,?,?,?,?,?)`)
 
-	err := projectRepo.CreateOrUpdate(context.Background(), models.ProjectDomainAttributes{
+	err := projectDomainRepo.CreateOrUpdate(context.Background(), models.ProjectDomainAttributes{
 		Project:    "project",
 		Domain:     "domain",
 		Resource:   "resource",
@@ -31,7 +31,7 @@ func TestCreateProjectDomainAttributes(t *testing.T) {
 }
 
 func TestGetProjectDomainAttributes(t *testing.T) {
-	projectRepo := NewProjectDomainAttributesRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	projectDomainRepo := NewProjectDomainAttributesRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
 
 	response := make(map[string]interface{})
@@ -49,10 +49,24 @@ func TestGetProjectDomainAttributes(t *testing.T) {
 			response,
 		})
 
-	output, err := projectRepo.Get(context.Background(), "project", "domain", "resource")
+	output, err := projectDomainRepo.Get(context.Background(), "project", "domain", "resource")
 	assert.Nil(t, err)
 	assert.Equal(t, "project", output.Project)
 	assert.Equal(t, "domain", output.Domain)
 	assert.Equal(t, "resource", output.Resource)
 	assert.Equal(t, []byte("attrs"), output.Attributes)
+}
+
+func TestDeleteProjectDomainAttributes(t *testing.T) {
+	projectDomainRepo := NewProjectDomainAttributesRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	GlobalMock := mocket.Catcher.Reset()
+
+	query := GlobalMock.NewMock()
+	fakeResponse := query.WithQuery(
+		`DELETE FROM "project_domain_attributes"  WHERE ("project_domain_attributes"."project" = ?) AND ` +
+			`("project_domain_attributes"."domain" = ?) AND ("project_domain_attributes"."resource" = ?)`)
+
+	err := projectDomainRepo.Delete(context.Background(), "project", "domain", "resource")
+	assert.Nil(t, err)
+	assert.True(t, fakeResponse.Triggered)
 }

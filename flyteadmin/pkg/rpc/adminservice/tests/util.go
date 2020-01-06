@@ -7,14 +7,14 @@ import (
 )
 
 type NewMockAdminServerInput struct {
-	executionManager     *mocks.MockExecutionManager
-	launchPlanManager    *mocks.MockLaunchPlanManager
-	nodeExecutionManager *mocks.MockNodeExecutionManager
-	projectManager       *mocks.MockProjectManager
-	projectDomainManager *mocks.MockProjectDomainManager
-	taskManager          *mocks.MockTaskManager
-	workflowManager      *mocks.MockWorkflowManager
-	taskExecutionManager *mocks.MockTaskExecutionManager
+	executionManager               *mocks.MockExecutionManager
+	launchPlanManager              *mocks.MockLaunchPlanManager
+	nodeExecutionManager           *mocks.MockNodeExecutionManager
+	projectManager                 *mocks.MockProjectManager
+	projectDomainAttributesManager *mocks.MockProjectDomainAttributesManager
+	taskManager                    *mocks.MockTaskManager
+	workflowManager                *mocks.MockWorkflowManager
+	taskExecutionManager           *mocks.MockTaskExecutionManager
 }
 
 func NewMockAdminServer(input NewMockAdminServerInput) *adminservice.AdminService {
@@ -25,7 +25,7 @@ func NewMockAdminServer(input NewMockAdminServerInput) *adminservice.AdminServic
 		NodeExecutionManager:           input.nodeExecutionManager,
 		TaskManager:                    input.taskManager,
 		ProjectManager:                 input.projectManager,
-		ProjectDomainAttributesManager: input.projectDomainManager,
+		ProjectDomainAttributesManager: input.projectDomainAttributesManager,
 		WorkflowManager:                input.workflowManager,
 		TaskExecutionManager:           input.taskExecutionManager,
 		Metrics:                        adminservice.InitMetrics(testScope),

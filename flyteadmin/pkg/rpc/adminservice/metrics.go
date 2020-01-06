@@ -60,6 +60,8 @@ type attributeEndpointMetrics struct {
 	scope promutils.Scope
 
 	update util.RequestMetrics
+	get    util.RequestMetrics
+	delete util.RequestMetrics
 }
 
 type taskEndpointMetrics struct {
@@ -154,14 +156,20 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 		projectAttributesEndpointMetrics: attributeEndpointMetrics{
 			scope:  adminScope,
 			update: util.NewRequestMetrics(adminScope, "update_project_attrs"),
+			get:    util.NewRequestMetrics(adminScope, "get_project_attrs"),
+			delete: util.NewRequestMetrics(adminScope, "delete_project_attrs"),
 		},
 		projectDomainAttributesEndpointMetrics: attributeEndpointMetrics{
 			scope:  adminScope,
 			update: util.NewRequestMetrics(adminScope, "update_project_domain_attrs"),
+			get:    util.NewRequestMetrics(adminScope, "get_project_domain_attrs"),
+			delete: util.NewRequestMetrics(adminScope, "delete_project_domain_attrs"),
 		},
 		workflowAttributesEndpointMetrics: attributeEndpointMetrics{
 			scope:  adminScope,
 			update: util.NewRequestMetrics(adminScope, "update_workflow_attrs"),
+			get:    util.NewRequestMetrics(adminScope, "get_workflow_attrs"),
+			delete: util.NewRequestMetrics(adminScope, "delete_workflow_attrs"),
 		},
 		taskEndpointMetrics: taskEndpointMetrics{
 			scope:   adminScope,

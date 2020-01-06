@@ -59,9 +59,29 @@ func (r *WorkflowAttributesRepo) Get(ctx context.Context, project, domain, workf
 	}
 	if tx.RecordNotFound() {
 		return models.WorkflowAttributes{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound,
-			"project-domain [%s-%s] not found", project, domain)
+			"project-domain-workflow [%s-%s-%s] not found", project, domain, workflow)
 	}
 	return model, nil
+}
+
+func (r *WorkflowAttributesRepo) Delete(ctx context.Context, project, domain, workflow, resource string) error {
+	var tx *gorm.DB
+	r.metrics.DeleteDuration.Time(func() {
+		tx = r.db.Where(&models.WorkflowAttributes{
+			Project:  project,
+			Domain:   domain,
+			Workflow: workflow,
+			Resource: resource,
+		}).Unscoped().Delete(models.WorkflowAttributes{})
+	})
+	if tx.Error != nil {
+		return r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	if tx.RecordNotFound() {
+		return flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound,
+			"project-domain-workflow [%s-%s-%s] not found", project, domain, workflow)
+	}
+	return nil
 }
 
 func NewWorkflowAttributesRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer,

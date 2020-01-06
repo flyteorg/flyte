@@ -35,3 +35,48 @@ func TestUpdateProjectAttributes(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, createOrUpdateCalled)
 }
+
+func TestGetProjectAttributes(t *testing.T) {
+	request := admin.ProjectAttributesGetRequest{
+		Project:      "project",
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+	}
+	db := mocks.NewMockRepository()
+	db.ProjectAttributesRepo().(*mocks.MockProjectAttributesRepo).GetFunction = func(
+		ctx context.Context, project, resource string) (models.ProjectAttributes, error) {
+		assert.Equal(t, "project", project)
+		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), resource)
+		expectedSerializedAttrs, _ := proto.Marshal(testutils.ExecutionQueueAttributes)
+		return models.ProjectAttributes{
+			Project:    project,
+			Resource:   resource,
+			Attributes: expectedSerializedAttrs,
+		}, nil
+	}
+	manager := NewProjectAttributesManager(db)
+	response, err := manager.GetProjectAttributes(context.Background(), request)
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&admin.ProjectAttributesGetResponse{
+		Attributes: &admin.ProjectAttributes{
+			Project:            "project",
+			MatchingAttributes: testutils.ExecutionQueueAttributes,
+		},
+	}, response))
+}
+
+func TestDeleteProjectAttributes(t *testing.T) {
+	request := admin.ProjectAttributesDeleteRequest{
+		Project:      "project",
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+	}
+	db := mocks.NewMockRepository()
+	db.ProjectAttributesRepo().(*mocks.MockProjectAttributesRepo).DeleteFunction = func(
+		ctx context.Context, project, resource string) error {
+		assert.Equal(t, "project", project)
+		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), resource)
+		return nil
+	}
+	manager := NewProjectAttributesManager(db)
+	_, err := manager.DeleteProjectAttributes(context.Background(), request)
+	assert.Nil(t, err)
+}

@@ -60,3 +60,18 @@ func TestGetWorkflowAttributes(t *testing.T) {
 	assert.Equal(t, "resource", output.Resource)
 	assert.Equal(t, []byte("attrs"), output.Attributes)
 }
+
+func TestDeleteWorkflowAttributes(t *testing.T) {
+	workflowRepo := NewWorkflowAttributesRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	GlobalMock := mocket.Catcher.Reset()
+
+	query := GlobalMock.NewMock()
+	fakeResponse := query.WithQuery(
+		`DELETE FROM "workflow_attributes"  WHERE ("workflow_attributes"."project" = ?) AND ` +
+			`("workflow_attributes"."domain" = ?) AND ("workflow_attributes"."workflow" = ?) AND ` +
+			`("workflow_attributes"."resource" = ?)`)
+
+	err := workflowRepo.Delete(context.Background(), "project", "domain", "workflow", "resource")
+	assert.Nil(t, err)
+	assert.True(t, fakeResponse.Triggered)
+}
