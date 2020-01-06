@@ -2,6 +2,9 @@ package adminservice
 
 import (
 	"context"
+	"time"
+
+	"github.com/lyft/flyteadmin/pkg/audit"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/logger"
@@ -15,6 +18,7 @@ import (
 func (m *AdminService) CreateLaunchPlan(
 	ctx context.Context, request *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -23,6 +27,12 @@ func (m *AdminService) CreateLaunchPlan(
 	m.Metrics.launchPlanEndpointMetrics.create.Time(func() {
 		response, err = m.LaunchPlanManager.CreateLaunchPlan(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"CreateLaunchPlan",
+		audit.ParametersFromIdentifier(request.Id),
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.launchPlanEndpointMetrics.create)
 	}
@@ -32,6 +42,7 @@ func (m *AdminService) CreateLaunchPlan(
 
 func (m *AdminService) GetLaunchPlan(ctx context.Context, request *admin.ObjectGetRequest) (*admin.LaunchPlan, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -46,6 +57,12 @@ func (m *AdminService) GetLaunchPlan(ctx context.Context, request *admin.ObjectG
 	m.Metrics.launchPlanEndpointMetrics.get.Time(func() {
 		response, err = m.LaunchPlanManager.GetLaunchPlan(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"GetLaunchPlan",
+		audit.ParametersFromIdentifier(request.Id),
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.launchPlanEndpointMetrics.get)
 	}
@@ -56,6 +73,7 @@ func (m *AdminService) GetLaunchPlan(ctx context.Context, request *admin.ObjectG
 
 func (m *AdminService) GetActiveLaunchPlan(ctx context.Context, request *admin.ActiveLaunchPlanRequest) (*admin.LaunchPlan, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -64,6 +82,12 @@ func (m *AdminService) GetActiveLaunchPlan(ctx context.Context, request *admin.A
 	m.Metrics.launchPlanEndpointMetrics.getActive.Time(func() {
 		response, err = m.LaunchPlanManager.GetActiveLaunchPlan(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"GetActiveLaunchPlan",
+		audit.ParametersFromNamedEntityIdentifier(request.Id),
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.launchPlanEndpointMetrics.getActive)
 	}
@@ -74,6 +98,7 @@ func (m *AdminService) GetActiveLaunchPlan(ctx context.Context, request *admin.A
 func (m *AdminService) UpdateLaunchPlan(ctx context.Context, request *admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -88,6 +113,12 @@ func (m *AdminService) UpdateLaunchPlan(ctx context.Context, request *admin.Laun
 	m.Metrics.launchPlanEndpointMetrics.update.Time(func() {
 		response, err = m.LaunchPlanManager.UpdateLaunchPlan(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"UpdateLaunchPlan",
+		audit.ParametersFromIdentifier(request.Id),
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.launchPlanEndpointMetrics.update)
 	}
@@ -98,6 +129,7 @@ func (m *AdminService) UpdateLaunchPlan(ctx context.Context, request *admin.Laun
 func (m *AdminService) ListLaunchPlans(ctx context.Context, request *admin.ResourceListRequest) (
 	*admin.LaunchPlanList, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Empty request.  Please rephrase.")
 	}
@@ -106,6 +138,12 @@ func (m *AdminService) ListLaunchPlans(ctx context.Context, request *admin.Resou
 	m.Metrics.launchPlanEndpointMetrics.list.Time(func() {
 		response, err = m.LaunchPlanManager.ListLaunchPlans(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"ListLaunchPlans",
+		audit.ParametersFromNamedEntityIdentifier(request.Id),
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.launchPlanEndpointMetrics.list)
 	}
@@ -117,6 +155,7 @@ func (m *AdminService) ListLaunchPlans(ctx context.Context, request *admin.Resou
 func (m *AdminService) ListActiveLaunchPlans(ctx context.Context, request *admin.ActiveLaunchPlanListRequest) (
 	*admin.LaunchPlanList, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Empty request.  Please rephrase.")
 	}
@@ -125,6 +164,15 @@ func (m *AdminService) ListActiveLaunchPlans(ctx context.Context, request *admin
 	m.Metrics.launchPlanEndpointMetrics.listActive.Time(func() {
 		response, err = m.LaunchPlanManager.ListActiveLaunchPlans(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"ListActiveLaunchPlans",
+		map[string]string{
+			audit.Project: request.Project,
+			audit.Domain:  request.Domain,
+		},
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.launchPlanEndpointMetrics.listActive)
 	}
@@ -136,6 +184,7 @@ func (m *AdminService) ListActiveLaunchPlans(ctx context.Context, request *admin
 func (m *AdminService) ListLaunchPlanIds(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Empty request.  Please rephrase.")
 	}
@@ -145,6 +194,15 @@ func (m *AdminService) ListLaunchPlanIds(ctx context.Context, request *admin.Nam
 	m.Metrics.launchPlanEndpointMetrics.listIds.Time(func() {
 		response, err = m.LaunchPlanManager.ListLaunchPlanIds(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"ListLaunchPlanIds",
+		map[string]string{
+			audit.Project: request.Project,
+			audit.Domain:  request.Domain,
+		},
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.launchPlanEndpointMetrics.listIds)
 	}

@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/lyft/flyteadmin/pkg/audit"
+
 	"github.com/lyft/flyteadmin/pkg/rpc/adminservice/util"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
@@ -22,6 +24,16 @@ func (m *AdminService) CreateExecution(
 	m.Metrics.executionEndpointMetrics.create.Time(func() {
 		response, err = m.ExecutionManager.CreateExecution(ctx, *request, requestedAt)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"ExecutionCreateRequest",
+		map[string]string{
+			audit.Project: request.Project,
+			audit.Domain:  request.Domain,
+			audit.Name:    request.Name,
+		},
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.create)
 	}
@@ -41,6 +53,12 @@ func (m *AdminService) RelaunchExecution(
 	m.Metrics.executionEndpointMetrics.relaunch.Time(func() {
 		response, err = m.ExecutionManager.RelaunchExecution(ctx, *request, requestedAt)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"ExecutionCreateRequest",
+		audit.ParametersFromExecutionIdentifier(request.Id),
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.relaunch)
 	}
@@ -51,6 +69,7 @@ func (m *AdminService) RelaunchExecution(
 func (m *AdminService) CreateWorkflowEvent(
 	ctx context.Context, request *admin.WorkflowExecutionEventRequest) (*admin.WorkflowExecutionEventResponse, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -59,16 +78,24 @@ func (m *AdminService) CreateWorkflowEvent(
 	m.Metrics.executionEndpointMetrics.createEvent.Time(func() {
 		response, err = m.ExecutionManager.CreateWorkflowEvent(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"CreateWorkflowEvent",
+		audit.ParametersFromExecutionIdentifier(request.Event.ExecutionId),
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.createEvent)
 	}
 	m.Metrics.executionEndpointMetrics.createEvent.Success()
+
 	return response, nil
 }
 
 func (m *AdminService) GetExecution(
 	ctx context.Context, request *admin.WorkflowExecutionGetRequest) (*admin.Execution, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -77,6 +104,12 @@ func (m *AdminService) GetExecution(
 	m.Metrics.executionEndpointMetrics.get.Time(func() {
 		response, err = m.ExecutionManager.GetExecution(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"GetExecution",
+		audit.ParametersFromExecutionIdentifier(request.Id),
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.get)
 	}
@@ -87,6 +120,7 @@ func (m *AdminService) GetExecution(
 func (m *AdminService) GetExecutionData(
 	ctx context.Context, request *admin.WorkflowExecutionGetDataRequest) (*admin.WorkflowExecutionGetDataResponse, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -95,6 +129,12 @@ func (m *AdminService) GetExecutionData(
 	m.Metrics.executionEndpointMetrics.get.Time(func() {
 		response, err = m.ExecutionManager.GetExecutionData(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"GetExecutionData",
+		audit.ParametersFromExecutionIdentifier(request.Id),
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.getData)
 	}
@@ -105,6 +145,7 @@ func (m *AdminService) GetExecutionData(
 func (m *AdminService) ListExecutions(
 	ctx context.Context, request *admin.ResourceListRequest) (*admin.ExecutionList, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -113,6 +154,12 @@ func (m *AdminService) ListExecutions(
 	m.Metrics.executionEndpointMetrics.list.Time(func() {
 		response, err = m.ExecutionManager.ListExecutions(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"ListExecutions",
+		audit.ParametersFromNamedEntityIdentifier(request.Id),
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.list)
 	}
@@ -123,6 +170,7 @@ func (m *AdminService) ListExecutions(
 func (m *AdminService) TerminateExecution(
 	ctx context.Context, request *admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error) {
 	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
 	}
@@ -131,6 +179,12 @@ func (m *AdminService) TerminateExecution(
 	m.Metrics.executionEndpointMetrics.terminate.Time(func() {
 		response, err = m.ExecutionManager.TerminateExecution(ctx, *request)
 	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"TerminateExecution",
+		audit.ParametersFromExecutionIdentifier(request.Id),
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
 	if err != nil {
 		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.terminate)
 	}

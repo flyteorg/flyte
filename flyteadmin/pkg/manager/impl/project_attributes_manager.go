@@ -3,6 +3,8 @@ package impl
 import (
 	"context"
 
+	"github.com/lyft/flytestdlib/logger"
+
 	"github.com/lyft/flyteadmin/pkg/manager/impl/validation"
 	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
 
@@ -62,6 +64,7 @@ func (m *ProjectAttributesManager) DeleteProjectAttributes(ctx context.Context,
 	if err := m.db.ProjectAttributesRepo().Delete(ctx, request.Project, request.ResourceType.String()); err != nil {
 		return nil, err
 	}
+	logger.Infof(ctx, "Deleted project attributes for: %s (%s)", request.Project, request.ResourceType.String())
 	return &admin.ProjectAttributesDeleteResponse{}, nil
 }
 
