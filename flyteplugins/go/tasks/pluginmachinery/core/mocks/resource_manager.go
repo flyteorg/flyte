@@ -50,6 +50,38 @@ func (_m *ResourceManager) AllocateResource(ctx context.Context, namespace core.
 	return r0, r1
 }
 
+type ResourceManager_GetID struct {
+	*mock.Call
+}
+
+func (_m ResourceManager_GetID) Return(_a0 string) *ResourceManager_GetID {
+	return &ResourceManager_GetID{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ResourceManager) OnGetID() *ResourceManager_GetID {
+	c := _m.On("GetID")
+	return &ResourceManager_GetID{Call: c}
+}
+
+func (_m *ResourceManager) OnGetIDMatch(matchers ...interface{}) *ResourceManager_GetID {
+	c := _m.On("GetID", matchers...)
+	return &ResourceManager_GetID{Call: c}
+}
+
+// GetID provides a mock function with given fields:
+func (_m *ResourceManager) GetID() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type ResourceManager_ReleaseResource struct {
 	*mock.Call
 }
