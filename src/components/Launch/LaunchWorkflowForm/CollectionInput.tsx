@@ -2,6 +2,7 @@ import { TextField } from '@material-ui/core';
 import * as React from 'react';
 import { InputChangeHandler, InputProps, InputType } from './types';
 import { UnsupportedInput } from './UnsupportedInput';
+import { getLaunchInputId } from './utils';
 
 function stringChangeHandler(onChange: InputChangeHandler) {
     return ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
@@ -14,6 +15,7 @@ export const CollectionInput: React.FC<InputProps> = props => {
     const {
         error,
         label,
+        name,
         onChange,
         typeDefinition: { subtype },
         value = ''
@@ -41,6 +43,7 @@ export const CollectionInput: React.FC<InputProps> = props => {
         case InputType.Struct:
             return (
                 <TextField
+                    id={getLaunchInputId(name)}
                     error={hasError}
                     helperText={helperText}
                     fullWidth={true}

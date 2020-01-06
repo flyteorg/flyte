@@ -1,5 +1,11 @@
 import { ThemeProvider } from '@material-ui/styles';
-import { render, wait } from '@testing-library/react';
+import {
+    fireEvent,
+    getByRole,
+    getByText,
+    render,
+    wait
+} from '@testing-library/react';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
 import { muiTheme } from 'components/Theme';
@@ -8,6 +14,7 @@ import {
     createWorkflowExecution,
     getLaunchPlan,
     getWorkflow,
+    Identifier,
     LaunchPlan,
     listLaunchPlans,
     listWorkflows,
@@ -22,7 +29,7 @@ import {
     createMockWorkflowVersions
 } from 'models/__mocks__/workflowData';
 import * as React from 'react';
-import { pendingPromise } from 'test/utils';
+import { delayedPromise, pendingPromise } from 'test/utils';
 import {
     createMockWorkflowInputsInterface,
     mockSimpleVariables
@@ -75,6 +82,17 @@ describe('LaunchWorkflowForm', () => {
         onClose = jest.fn();
     });
 
+    const createMockWorkflowWithInputs = (id: Identifier) => {
+        const workflow: Workflow = {
+            id
+        };
+        workflow.closure = createMockWorkflowClosure();
+        workflow.closure!.compiledWorkflow!.primary.template.interface = createMockWorkflowInputsInterface(
+            variables
+        );
+        return workflow;
+    };
+
     const createMocks = () => {
         const mockObjects = createMockObjects(variables);
         mockWorkflow = mockObjects.mockWorkflow;
@@ -85,16 +103,11 @@ describe('LaunchWorkflowForm', () => {
         mockCreateWorkflowExecution = jest.fn();
         mockGetLaunchPlan = jest.fn().mockResolvedValue(mockLaunchPlans[0]);
         // Return our mock inputs for any version requested
-        mockGetWorkflow = jest.fn().mockImplementation(id => {
-            const workflow: Workflow = {
-                id
-            };
-            workflow.closure = createMockWorkflowClosure();
-            workflow.closure!.compiledWorkflow!.primary.template.interface = createMockWorkflowInputsInterface(
-                variables
+        mockGetWorkflow = jest
+            .fn()
+            .mockImplementation(id =>
+                Promise.resolve(createMockWorkflowWithInputs(id))
             );
-            return Promise.resolve(workflow);
-        });
         mockListLaunchPlans = jest
             .fn()
             .mockResolvedValue({ entities: mockLaunchPlans });
@@ -162,10 +175,62 @@ describe('LaunchWorkflowForm', () => {
             );
         });
 
-        // TODO
-        it('should not render inputs until workflow and launch plan are selected', async () => {});
+        it('should not render inputs until workflow and launch plan are selected', async () => {
+            // Remove default launch plan so it is not auto-selected
+            const launchPlans = mockLaunchPlans.filter(
+                lp => lp.id.name !== workflowId.name
+            );
+            mockListLaunchPlans.mockResolvedValue({
+                entities: launchPlans
+            });
+            const { getByLabelText, getByTitle, container } = renderForm();
+            await wait();
 
-        it('should disable submit button until inputs have loaded', async () => {});
+            // Find the launch plan selector, verify it has no value selected
+            const launchPlanInput = getByLabelText(formStrings.launchPlan);
+            expect(launchPlanInput).toBeInTheDocument();
+            expect(launchPlanInput).toHaveValue('');
+
+            // Click the expander for the launch plan, select the first/only item
+            const launchPlanDiv = getByTitle(formStrings.launchPlan);
+            const expander = getByRole(launchPlanDiv, 'button');
+            fireEvent.click(expander);
+            await wait(() => getByRole(launchPlanDiv, 'menuitem'));
+            fireEvent.click(getByRole(launchPlanDiv, 'menuitem'));
+
+            await wait();
+            const simpleInputName = Object.keys(variables)[0];
+            expect(
+                getByLabelText(simpleInputName, {
+                    // Don't use exact match because the label will be decorated with type info
+                    exact: false
+                })
+            ).toBeInTheDocument();
+        });
+
+        it('should disable submit button until inputs have loaded', async () => {
+            let identifier: Identifier = {} as Identifier;
+            const { promise, resolve } = delayedPromise<Workflow>();
+            mockGetWorkflow.mockImplementation(id => {
+                identifier = id;
+                return promise;
+            });
+            const { queryAllByRole } = renderForm();
+
+            await wait();
+
+            const buttons = queryAllByRole('button').filter(
+                el => el.getAttribute('type') === 'submit'
+            );
+            expect(buttons.length).toBe(1);
+            const submitButton = buttons[0];
+
+            expect(submitButton).toBeDisabled();
+            resolve(createMockWorkflowWithInputs(identifier));
+
+            await wait();
+            expect(submitButton).not.toBeDisabled();
+        });
 
         it('should not show validation errors until first submit', async () => {});
 

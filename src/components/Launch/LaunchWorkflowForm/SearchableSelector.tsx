@@ -275,6 +275,11 @@ export const SearchableSelector = <DataType extends {}>(
                         <InputAdornment position="end">
                             <IconButton
                                 edge="end"
+                                id={
+                                    props.id
+                                        ? `${props.id}-expander`
+                                        : undefined
+                                }
                                 onClick={handleClickShowOptions}
                                 onMouseDown={preventBubble}
                                 size="small"

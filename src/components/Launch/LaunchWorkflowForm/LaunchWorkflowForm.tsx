@@ -73,7 +73,10 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     spinnerVariant="medium"
                     {...state.workflowOptionsLoadingState}
                 >
-                    <div className={styles.formControl}>
+                    <div
+                        title={formStrings.workflowVersion}
+                        className={styles.formControl}
+                    >
                         <SearchableSelector
                             id="launch-workflow-selector"
                             label={formStrings.workflowVersion}
@@ -87,7 +90,10 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                         {...state.launchPlanOptionsLoadingState}
                         spinnerVariant="medium"
                     >
-                        <div className={styles.formControl}>
+                        <div
+                            title={formStrings.launchPlan}
+                            className={styles.formControl}
+                        >
                             <SearchableSelector
                                 id="launch-lp-selector"
                                 label={formStrings.launchPlan}
@@ -126,7 +132,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                         onClick={state.onCancel}
                         variant="outlined"
                     >
-                        Cancel
+                        {formStrings.cancel}
                     </Button>
                     <Button
                         color="primary"
@@ -139,7 +145,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                         type="submit"
                         variant="contained"
                     >
-                        Launch
+                        {formStrings.submit}
                         {submissionState.loading && <ButtonCircularProgress />}
                     </Button>
                 </DialogActions>

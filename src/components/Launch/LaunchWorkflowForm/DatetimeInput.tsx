@@ -7,6 +7,7 @@ import {
 import { Moment, utc as moment } from 'moment';
 import * as React from 'react';
 import { InputProps } from './types';
+import { getLaunchInputId } from './utils';
 
 /* This module imports differently in tests and causes errors.
  * The long-term solution is to enable `esmModuleInterop` and change all of
@@ -48,7 +49,7 @@ export const DatetimeInput: React.FC<InputProps> = props => {
                 ampm={false}
                 format="MM/DD/YYYY HH:mm:ss"
                 helperText={helperText}
-                id={name}
+                id={getLaunchInputId(name)}
                 inputVariant="outlined"
                 label={label}
                 onChange={handleChange}
