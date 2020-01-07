@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	"testing"
 	"time"
+
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"

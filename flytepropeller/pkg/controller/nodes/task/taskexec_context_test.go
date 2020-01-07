@@ -3,8 +3,9 @@ package task
 import (
 	"bytes"
 	"context"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	"testing"
+
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
