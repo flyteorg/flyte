@@ -57,7 +57,8 @@ required = [
 
 [[constraint]]
   name = "github.com/lyft/flyteplugins"
-  version = "^0.2.5"
+  # version = "^0.2.5"
+  branch = "simpler-hive-plugin-init"
 
 [[override]]
   name = "github.com/lyft/flytestdlib"

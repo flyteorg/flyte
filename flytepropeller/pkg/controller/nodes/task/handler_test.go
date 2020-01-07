@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	"testing"
 	"time"
 
@@ -37,6 +38,7 @@ import (
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/codex"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/config"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/fakeplugins"
+	rmConfig "github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
 )
 
 func Test_task_setDefault(t *testing.T) {
@@ -384,6 +386,8 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		nCtx.On("NodeStateWriter").Return(s)
 		return nCtx
 	}
+	rmBuilder, _ := resourcemanager.GetResourceManagerBuilderByType(context.TODO(), rmConfig.TypeNoop, promutils.NewTestScope())
+	rm, _ := rmBuilder.BuildResourceManager(context.TODO())
 
 	type args struct {
 		startingPluginPhase        pluginCore.Phase
@@ -555,6 +559,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				barrierCache: newLRUBarrier(context.TODO(), config.BarrierConfig{
 					Enabled: false,
 				}),
+				resourceManager: rm,
 			}
 			got, err := tk.Handle(context.TODO(), nCtx)
 			if (err != nil) != tt.want.wantErr {
@@ -683,6 +688,9 @@ func Test_task_Handle_Catalog(t *testing.T) {
 		return nCtx
 	}
 
+	rmBuilder, _ := resourcemanager.GetResourceManagerBuilderByType(context.TODO(), rmConfig.TypeNoop, promutils.NewTestScope())
+	rm, _ := rmBuilder.BuildResourceManager(context.TODO())
+
 	type args struct {
 		catalogFetch      bool
 		catalogFetchError bool
@@ -766,6 +774,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 				"test": fakeplugins.NewPhaseBasedPlugin(),
 			}
 			tk.catalog = c
+			tk.resourceManager = rm
 			got, err := tk.Handle(context.TODO(), nCtx)
 			if (err != nil) != tt.want.wantErr {
 				t.Errorf("Handler.Handle() error = %v, wantErr %v", err, tt.want.wantErr)
@@ -881,6 +890,9 @@ func Test_task_Handle_Barrier(t *testing.T) {
 		nCtx.On("NodeStateWriter").Return(s)
 		return nCtx
 	}
+
+	rmBuilder, _ := resourcemanager.GetResourceManagerBuilderByType(context.TODO(), rmConfig.TypeNoop, promutils.NewTestScope())
+	rm, _ := rmBuilder.BuildResourceManager(context.TODO())
 
 	trns := pluginCore.DoTransitionType(pluginCore.TransitionTypeBarrier, pluginCore.PhaseInfoQueued(time.Now(), 1, "z"))
 	type args struct {
@@ -1024,6 +1036,7 @@ func Test_task_Handle_Barrier(t *testing.T) {
 
 			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), c, promutils.NewTestScope())
 			assert.NoError(t, err)
+			tk.resourceManager = rm
 
 			tctx, err := tk.newTaskExecutionContext(context.TODO(), nCtx, "plugin1")
 			assert.NoError(t, err)
@@ -1039,6 +1052,7 @@ func Test_task_Handle_Barrier(t *testing.T) {
 				"test": fakeplugins.NewReplayer("test", pluginCore.PluginProperties{},
 					tt.args.res, nil, nil),
 			}
+
 			got, err := tk.Handle(context.TODO(), nCtx)
 			if (err != nil) != tt.want.wantErr {
 				t.Errorf("Handler.Handle() error = %v, wantErr %v", err, tt.want.wantErr)
@@ -1129,6 +1143,9 @@ func Test_task_Abort(t *testing.T) {
 		return nCtx
 	}
 
+	rmBuilder, _ := resourcemanager.GetResourceManagerBuilderByType(context.TODO(), rmConfig.TypeNoop, promutils.NewTestScope())
+	rm, _ := rmBuilder.BuildResourceManager(context.TODO())
+
 	type fields struct {
 		defaultPluginCallback func() pluginCore.Plugin
 	}
@@ -1163,7 +1180,8 @@ func Test_task_Abort(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			m := tt.fields.defaultPluginCallback()
 			tk := Handler{
-				defaultPlugin: m,
+				defaultPlugin:   m,
+				resourceManager: rm,
 			}
 			nCtx := createNodeCtx(tt.args.ev)
 			if err := tk.Abort(context.TODO(), nCtx, "reason"); (err != nil) != tt.wantErr {
@@ -1231,6 +1249,9 @@ func Test_task_Finalize(t *testing.T) {
 	nCtx.On("EventsRecorder").Return(nil)
 	nCtx.On("EnqueueOwner").Return(nil)
 
+	rmBuilder, _ := resourcemanager.GetResourceManagerBuilderByType(context.TODO(), rmConfig.TypeNoop, promutils.NewTestScope())
+	rm, _ := rmBuilder.BuildResourceManager(context.TODO())
+
 	st := bytes.NewBuffer([]byte{})
 	a := 45
 	type test struct {
@@ -1277,7 +1298,8 @@ func Test_task_Finalize(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			m := tt.fields.defaultPluginCallback()
 			tk := Handler{
-				defaultPlugin: m,
+				defaultPlugin:   m,
+				resourceManager: rm,
 			}
 			if err := tk.Finalize(context.TODO(), tt.args.nCtx); (err != nil) != tt.wantErr {
 				t.Errorf("Handler.Finalize() error = %v, wantErr %v", err, tt.wantErr)
