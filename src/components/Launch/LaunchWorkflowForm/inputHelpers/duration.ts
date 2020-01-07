@@ -1,5 +1,6 @@
 import { millisecondsToDuration } from 'common/utils';
 import { Core } from 'flyteidl';
+import { isValidFloat } from './float';
 import { ConverterInput, InputHelper } from './types';
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {
@@ -11,7 +12,11 @@ function toLiteral({ value }: ConverterInput): Core.ILiteral {
     };
 }
 
-function validate({ value }: ConverterInput) {}
+function validate({ value }: ConverterInput) {
+    if (!isValidFloat(value)) {
+        throw new Error('Value is not a valid duration');
+    }
+}
 
 export const durationHelper: InputHelper = {
     toLiteral,

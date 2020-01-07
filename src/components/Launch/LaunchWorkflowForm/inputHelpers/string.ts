@@ -6,7 +6,11 @@ function toLiteral({ value }: ConverterInput): Core.ILiteral {
     return { scalar: { primitive: { stringValue } } };
 }
 
-function validate({ value }: ConverterInput) {}
+function validate({ value }: ConverterInput) {
+    if (typeof value !== 'string') {
+        throw new Error('Value is not a string');
+    }
+}
 
 export const stringHelper: InputHelper = {
     toLiteral,

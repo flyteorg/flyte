@@ -26,7 +26,7 @@ function useFormInputState(parsedInput: ParsedInput): FormInputState {
     const validate = () => {
         const { name, typeDefinition } = parsedInput;
         try {
-            validateInput({ name, typeDefinition, value: validationValue });
+            validateInput({ name, typeDefinition, value });
             setError(undefined);
             return true;
         } catch (validationError) {
