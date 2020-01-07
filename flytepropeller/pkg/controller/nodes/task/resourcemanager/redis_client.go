@@ -10,10 +10,15 @@ import (
 )
 
 type RedisClient interface {
+	// A pass-through method. Getting the cardinality of the Redis set
 	SCard(string) *redis.IntCmd
+	// A pass-through method. Checking if an entity is a member of the set specified by the key
 	SIsMember(string, interface{}) *redis.BoolCmd
+	// A pass-through method. Adding an entity to the set specified by the key
 	SAdd(string, interface{}) *redis.IntCmd
+	// A pass-through method. Removing an entity from the set specified by the key
 	SRem(string, interface{}) *redis.IntCmd
+	// A pass-through method. Pinging the Redis client
 	Ping() *redis.StatusCmd
 }
 

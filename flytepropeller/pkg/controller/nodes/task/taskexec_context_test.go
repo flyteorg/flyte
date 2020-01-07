@@ -5,8 +5,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager"
-
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
 	ioMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
@@ -22,7 +20,6 @@ import (
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	nodeMocks "github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/codex"
-	rmConfig "github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/secretmanager"
 )
 
@@ -85,14 +82,13 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	})
 	nCtx.On("NodeStateReader").Return(nr)
 
-	rmBuilder, _ := resourcemanager.GetResourceManagerBuilderByType(context.TODO(), rmConfig.TypeNoop, promutils.NewTestScope())
-	rm, _ := rmBuilder.BuildResourceManager(context.TODO())
+	noopRm := CreateNoopResourceManager(context.TODO(), promutils.NewTestScope())
 
 	c := &mocks.Client{}
 	tk := &Handler{
 		catalog:         c,
 		secretManager:   secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
-		resourceManager: rm,
+		resourceManager: noopRm,
 	}
 
 	got, err := tk.newTaskExecutionContext(context.TODO(), nCtx, "plugin1")
