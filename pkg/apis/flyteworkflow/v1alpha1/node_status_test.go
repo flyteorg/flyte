@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -153,4 +154,12 @@ func TestCustomState_DeepCopy(t *testing.T) {
 		assert.NotNil(t, out)
 		assert.Equal(t, 1, len(*out))
 	})
+}
+
+func TestWorkflowStatus_Deserialize(t *testing.T) {
+	raw := []byte(`{"phase":0,"dataDir":"/blah/bloh.pb","attempts":0,"cached":false}`)
+
+	parsed := &NodeStatus{}
+	err := json.Unmarshal(raw, parsed)
+	assert.NoError(t, err)
 }
