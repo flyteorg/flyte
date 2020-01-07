@@ -15,6 +15,7 @@ export const schedulesTableColumnsWidths = {
 
 export const formStrings = {
     cancel: 'Cancel',
+    inputs: 'Inputs',
     submit: 'Launch',
     title: 'Launch Workflow',
     workflowVersion: 'Workflow Version',

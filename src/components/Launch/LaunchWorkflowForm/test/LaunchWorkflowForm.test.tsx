@@ -1,17 +1,22 @@
 import { ThemeProvider } from '@material-ui/styles';
 import {
+    act,
     fireEvent,
+    getAllByRole,
     getByRole,
-    getByText,
+    queryAllByRole,
     render,
-    wait
+    wait,
+    waitForElement
 } from '@testing-library/react';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
 import { muiTheme } from 'components/Theme';
-import { mapValues } from 'lodash';
+import { Core } from 'flyteidl';
+import { get, mapValues } from 'lodash';
 import {
     createWorkflowExecution,
+    CreateWorkflowExecutionArguments,
     getLaunchPlan,
     getWorkflow,
     Identifier,
@@ -37,6 +42,11 @@ import {
 import { formStrings } from '../constants';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 
+const booleanInputName = 'simpleBoolean';
+const stringInputName = 'simpleString';
+const stringNoLabelName = 'stringNoLabel';
+const integerInputName = 'simpleInteger';
+
 function createMockObjects(variables: Record<string, Variable>) {
     const mockWorkflow = createMockWorkflow('MyWorkflow');
 
@@ -45,12 +55,11 @@ function createMockObjects(variables: Record<string, Variable>) {
         10
     );
 
-    const parameterMap = {
-        parameters: mapValues(variables, v => ({ var: v }))
-    };
-
     const mockLaunchPlans = [mockWorkflow.id.name, 'OtherLaunchPlan'].map(
         name => {
+            const parameterMap = {
+                parameters: mapValues(variables, v => ({ var: v }))
+            };
             const launchPlan = createMockLaunchPlan(
                 name,
                 mockWorkflow.id.version
@@ -97,6 +106,13 @@ describe('LaunchWorkflowForm', () => {
         const mockObjects = createMockObjects(variables);
         mockWorkflow = mockObjects.mockWorkflow;
         mockLaunchPlans = mockObjects.mockLaunchPlans;
+
+        // We want the second launch plan to have inputs which differ, so we'll
+        // remove one of the inputs
+        delete mockLaunchPlans[1].closure!.expectedInputs.parameters[
+            stringNoLabelName
+        ];
+
         mockWorkflowVersions = mockObjects.mockWorkflowVersions;
 
         workflowId = mockWorkflow.id;
@@ -137,6 +153,14 @@ describe('LaunchWorkflowForm', () => {
         );
     };
 
+    const getSubmitButton = (container: HTMLElement) => {
+        const buttons = queryAllByRole(container, 'button').filter(
+            el => el.getAttribute('type') === 'submit'
+        );
+        expect(buttons.length).toBe(1);
+        return buttons[0];
+    };
+
     describe('With Simple Inputs', () => {
         beforeEach(() => {
             variables = mockSimpleVariables;
@@ -155,7 +179,9 @@ describe('LaunchWorkflowForm', () => {
         it('should not show launch plan selector until list has loaded', async () => {
             mockListLaunchPlans.mockReturnValue(pendingPromise());
             const { getByLabelText, queryByText } = renderForm();
-            await wait(() => getByLabelText(formStrings.workflowVersion));
+            await waitForElement(() =>
+                getByLabelText(formStrings.workflowVersion)
+            );
             expect(queryByText(formStrings.launchPlan)).not.toBeInTheDocument();
         });
 
@@ -183,7 +209,7 @@ describe('LaunchWorkflowForm', () => {
             mockListLaunchPlans.mockResolvedValue({
                 entities: launchPlans
             });
-            const { getByLabelText, getByTitle, container } = renderForm();
+            const { getByLabelText, getByTitle } = renderForm();
             await wait();
 
             // Find the launch plan selector, verify it has no value selected
@@ -195,13 +221,14 @@ describe('LaunchWorkflowForm', () => {
             const launchPlanDiv = getByTitle(formStrings.launchPlan);
             const expander = getByRole(launchPlanDiv, 'button');
             fireEvent.click(expander);
-            await wait(() => getByRole(launchPlanDiv, 'menuitem'));
-            fireEvent.click(getByRole(launchPlanDiv, 'menuitem'));
+            const item = await waitForElement(() =>
+                getByRole(launchPlanDiv, 'menuitem')
+            );
+            fireEvent.click(item);
 
             await wait();
-            const simpleInputName = Object.keys(variables)[0];
             expect(
-                getByLabelText(simpleInputName, {
+                getByLabelText(stringInputName, {
                     // Don't use exact match because the label will be decorated with type info
                     exact: false
                 })
@@ -215,15 +242,11 @@ describe('LaunchWorkflowForm', () => {
                 identifier = id;
                 return promise;
             });
-            const { queryAllByRole } = renderForm();
+            const { container } = renderForm();
 
             await wait();
 
-            const buttons = queryAllByRole('button').filter(
-                el => el.getAttribute('type') === 'submit'
-            );
-            expect(buttons.length).toBe(1);
-            const submitButton = buttons[0];
+            const submitButton = getSubmitButton(container);
 
             expect(submitButton).toBeDisabled();
             resolve(createMockWorkflowWithInputs(identifier));
@@ -232,18 +255,154 @@ describe('LaunchWorkflowForm', () => {
             expect(submitButton).not.toBeDisabled();
         });
 
-        it('should not show validation errors until first submit', async () => {});
+        it('should not show validation errors until first submit', async () => {
+            jest.useFakeTimers();
+            const { container, getByLabelText } = renderForm();
+            await wait();
 
-        it('should update validation errors while typing', async () => {});
+            const integerInput = getByLabelText(integerInputName, {
+                exact: false
+            });
+            fireEvent.change(integerInput, { target: { value: 'abc' } });
 
-        it('should update launch plan when selecting a new workflow version', async () => {});
+            act(jest.runAllTimers);
+            await wait();
+            expect(integerInput).not.toBeInvalid();
 
-        it('should update inputs when selecting a new launch plan', () => {});
+            fireEvent.click(getSubmitButton(container));
+            await wait();
 
-        it('should reset form error when selecting a new launch plan', async () => {});
+            expect(integerInput).toBeInvalid();
+        });
+
+        it('should update validation errors while typing', async () => {
+            jest.useFakeTimers();
+            const { container, getByLabelText } = renderForm();
+            await wait();
+
+            const integerInput = getByLabelText(integerInputName, {
+                exact: false
+            });
+            fireEvent.change(integerInput, { target: { value: 'abc' } });
+            fireEvent.click(getSubmitButton(container));
+            await wait();
+            expect(integerInput).toBeInvalid();
+
+            fireEvent.change(integerInput, { target: { value: '123' } });
+            act(jest.runAllTimers);
+            await wait();
+            expect(integerInput).toBeValid();
+        });
+
+        it('should update launch plan when selecting a new workflow version', async () => {
+            const { getByTitle } = renderForm();
+            await wait();
+
+            mockListLaunchPlans.mockClear();
+
+            // Click the expander for the workflow, select the second item
+            const workflowDiv = getByTitle(formStrings.workflowVersion);
+            const expander = getByRole(workflowDiv, 'button');
+            fireEvent.click(expander);
+            const items = await waitForElement(() =>
+                getAllByRole(workflowDiv, 'menuitem')
+            );
+            fireEvent.click(items[1]);
+
+            await wait();
+            expect(mockListLaunchPlans).toHaveBeenCalled();
+        });
+
+        it('should update inputs when selecting a new launch plan', async () => {
+            const { queryByLabelText, getByTitle } = renderForm();
+            await wait();
+
+            // Delete the string input so that its corresponding input will
+            // disappear after the new launch plan is loaded.
+            delete mockLaunchPlans[1].closure!.expectedInputs.parameters[
+                stringInputName
+            ];
+            mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[1]);
+
+            // Click the expander for the launch plan, select the second item
+            const launchPlanDiv = getByTitle(formStrings.launchPlan);
+            const expander = getByRole(launchPlanDiv, 'button');
+            fireEvent.click(expander);
+            const items = await waitForElement(() =>
+                getAllByRole(launchPlanDiv, 'menuitem')
+            );
+            fireEvent.click(items[1]);
+
+            await wait();
+            expect(
+                queryByLabelText(stringInputName, {
+                    // Don't use exact match because the label will be decorated with type info
+                    exact: false
+                })
+            ).toBeNull();
+        });
+
+        it('should reset form error when inputs change', async () => {
+            const errorString = 'Something went wrong';
+            mockCreateWorkflowExecution.mockRejectedValue(
+                new Error(errorString)
+            );
+
+            const {
+                container,
+                getByText,
+                getByTitle,
+                queryByText
+            } = renderForm();
+            await wait();
+
+            fireEvent.click(getSubmitButton(container));
+            await wait();
+
+            expect(getByText(errorString)).toBeInTheDocument();
+
+            mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[1]);
+            // Click the expander for the launch plan, select the second item
+            const launchPlanDiv = getByTitle(formStrings.launchPlan);
+            const expander = getByRole(launchPlanDiv, 'button');
+            fireEvent.click(expander);
+            const items = await waitForElement(() =>
+                getAllByRole(launchPlanDiv, 'menuitem')
+            );
+            fireEvent.click(items[1]);
+            await wait();
+            expect(queryByText(errorString)).not.toBeInTheDocument();
+        });
 
         describe('Input Values', () => {
-            it('Should send false for untouched toggles', async () => {});
+            /* TODO: Un-skip this when https://github.com/lyft/flyte/issues/18
+             * is fixed.
+             */
+            it.skip('Should send false for untouched toggles', async () => {
+                let inputs: Core.ILiteralMap = {};
+                mockCreateWorkflowExecution.mockImplementation(
+                    ({
+                        inputs: passedInputs
+                    }: CreateWorkflowExecutionArguments) => {
+                        inputs = passedInputs;
+                        return pendingPromise();
+                    }
+                );
+
+                const { container } = renderForm();
+                await wait();
+
+                fireEvent.click(getSubmitButton(container));
+                await wait();
+
+                expect(mockCreateWorkflowExecution).toHaveBeenCalled();
+                expect(inputs.literals).toBeDefined();
+                const value = get(
+                    inputs.literals,
+                    `${booleanInputName}.scalar.primitive.boolean`
+                );
+                expect(value).toBe(false);
+            });
         });
     });
 });

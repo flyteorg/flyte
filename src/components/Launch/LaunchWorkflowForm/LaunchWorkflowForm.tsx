@@ -73,7 +73,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     spinnerVariant="medium"
                     {...state.workflowOptionsLoadingState}
                 >
-                    <div
+                    <section
                         title={formStrings.workflowVersion}
                         className={styles.formControl}
                     >
@@ -85,12 +85,12 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                             fetchSearchResults={fetchSearchResults}
                             selectedItem={state.selectedWorkflow}
                         />
-                    </div>
+                    </section>
                     <WaitForData
                         {...state.launchPlanOptionsLoadingState}
                         spinnerVariant="medium"
                     >
-                        <div
+                        <section
                             title={formStrings.launchPlan}
                             className={styles.formControl}
                         >
@@ -101,19 +101,21 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                                 options={state.launchPlanSelectorOptions}
                                 selectedItem={state.selectedLaunchPlan}
                             />
-                        </div>
+                        </section>
                     </WaitForData>
                     {launchPlanSelected ? (
                         <WaitForData
                             spinnerVariant="medium"
                             {...state.inputLoadingState}
                         >
-                            <LaunchWorkflowFormInputs
-                                key={state.formKey}
-                                inputs={state.inputs}
-                                ref={state.formInputsRef}
-                                showErrors={state.showErrors}
-                            />
+                            <section title={formStrings.inputs}>
+                                <LaunchWorkflowFormInputs
+                                    key={state.formKey}
+                                    inputs={state.inputs}
+                                    ref={state.formInputsRef}
+                                    showErrors={state.showErrors}
+                                />
+                            </section>
                         </WaitForData>
                     ) : null}
                 </WaitForData>

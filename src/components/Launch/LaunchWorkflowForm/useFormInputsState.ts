@@ -24,9 +24,9 @@ function useFormInputState(parsedInput: ParsedInput): FormInputState {
     const validationValue = useDebouncedValue(value, debounceDelay);
 
     const validate = () => {
-        const { typeDefinition } = parsedInput;
+        const { name, typeDefinition } = parsedInput;
         try {
-            validateInput({ name, typeDefinition, value });
+            validateInput({ name, typeDefinition, value: validationValue });
             setError(undefined);
             return true;
         } catch (validationError) {

@@ -84,7 +84,7 @@ export const getExecutionData = (
         config
     );
 
-interface CreateWorkflowExecutionArguments {
+export interface CreateWorkflowExecutionArguments {
     domain: string;
     inputs: Core.ILiteralMap;
     launchPlanId: Identifier;
