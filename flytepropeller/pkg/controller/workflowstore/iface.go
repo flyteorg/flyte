@@ -15,6 +15,8 @@ const (
 
 type FlyteWorkflow interface {
 	Get(ctx context.Context, namespace, name string) (*v1alpha1.FlyteWorkflow, error)
-	UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) error
-	Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) error
+	UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
+		newWF *v1alpha1.FlyteWorkflow, err error)
+	Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
+		newWF *v1alpha1.FlyteWorkflow, err error)
 }

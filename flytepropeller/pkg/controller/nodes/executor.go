@@ -510,7 +510,7 @@ func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, w v1alpha1.Exe
 	// StartNode is special. It does not have any processing step. It just takes the workflow (or subworkflow) inputs and converts to its own outputs
 	nodeStatus := w.GetNodeExecutionStatus(ctx, startNode.GetID())
 
-	if nodeStatus.GetDataDir() == "" {
+	if len(nodeStatus.GetDataDir()) == 0 {
 		return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, startNode.GetID(), "no data-dir set, cannot store inputs")
 	}
 
