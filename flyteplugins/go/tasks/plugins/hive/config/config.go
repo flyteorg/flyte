@@ -27,7 +27,7 @@ func MustParse(s string) config.URL {
 
 type ClusterConfig struct {
 	Label string `json:"label" pflag:",Label of the service cluster"`
-	Limit int    `json:"limit" pflag:",Resource quota of the service cluster"`
+	Limit int    `json:"limit" pflag:",Resource quota (in the number of outstanding requests) of the service cluster"`
 }
 
 var (
