@@ -179,7 +179,8 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	// update the GetExecutionStatus block of the FlyteWorkflow resource. UpdateStatus will not
 	// allow changes to the Spec of the resource, which is ideal for ensuring
 	// nothing other than resource status has been updated.
-	return p.wfStore.Update(ctx, wfDeepCopy, workflowstore.PriorityClassCritical)
+	_, err = p.wfStore.Update(ctx, wfDeepCopy, workflowstore.PriorityClassCritical)
+	return err
 }
 
 func NewPropellerHandler(_ context.Context, cfg *config.Config, wfStore workflowstore.FlyteWorkflow, executor executors.Workflow, scope promutils.Scope) *Propeller {
