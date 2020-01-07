@@ -176,11 +176,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 
 	for _, p := range enabledPlugins {
 		// create a new resource registrar proxy for each plugin, and pass it into the plugin's LoadPlugin() via a setup context
-		logger.Warningf(ctx, "plugin ID = %v\n", p.ID)
 		sCtxFinal := newNameSpacedSetupCtx(tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginCore.ResourceNamespace(p.ID)))
-		logger.Warningf(ctx, "plugin ID = %v\n", p.ID)
-		// sCtxFinal := newNSSetupCtx(tSCtx)
-		// tSCtx.resourceNegotiator = tSCtx.GetResourceRegistrar().GetResourceRegistrar(pluginCore.ResourceNamespace(p.ID))
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
 		// cp, err := p.LoadPlugin(ctx, tSCtx)
 		cp, err := p.LoadPlugin(ctx, sCtxFinal)
