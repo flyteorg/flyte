@@ -117,12 +117,18 @@ func (rrmm RedisResourceManagerMetrics) GetScope() promutils.Scope {
 	return rrmm.Scope
 }
 
-func (r *RedisResourceManager) getResource(namespace pluginCore.ResourceNamespace) *Resource {
-	return r.namespacedResourcesMap[namespace]
+func (r *RedisResourceManager) getResource(namespace pluginCore.ResourceNamespace) (*Resource, error) {
+	if resource, ok := r.namespacedResourcesMap[namespace]; ok {
+		return resource, nil
+	}
+	return nil, errors.Errorf("Requested resource [%v] not found in namespacedResourceMap", namespace)
 }
 
 func (r *RedisResourceManager) pollRedis(ctx context.Context, namespace pluginCore.ResourceNamespace) {
-	resource := r.getResource(namespace)
+	resource, err := r.getResource(namespace)
+	if err != nil {
+		return
+	}
 	stopWatch := resource.metrics.(*RedisResourceManagerMetrics).RedisSizeCheckTime.Start()
 	defer stopWatch.Stop()
 	size, err := r.client.SCard(string(namespace)).Result()
@@ -170,7 +176,11 @@ func (r *RedisResourceManager) GetID() string {
 func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) (
 	pluginCore.AllocationStatus, error) {
 
-	namespacedResource := r.getResource(namespace)
+	namespacedResource, err := r.getResource(namespace)
+	if err != nil {
+		logger.Errorf(ctx, "Error finding resource [%v] during allocation", namespace)
+		return pluginCore.AllocationUndefined, err
+	}
 	// Check to see if the allocation token is already in the set
 	found, err := r.client.SIsMember(string(namespace), allocationToken).Result()
 	if err != nil {
@@ -213,7 +223,11 @@ func (r *RedisResourceManager) ReleaseResource(ctx context.Context, namespace pl
 		return err
 	}
 
-	namespacedResource := r.getResource(namespace)
+	namespacedResource, err := r.getResource(namespace)
+	if err != nil {
+		logger.Errorf(ctx, "Error finding resource [%v] during releasing", namespace)
+		return err
+	}
 	namespacedResource.rejectedTokens.Delete(allocationToken)
 	logger.Infof(ctx, "Removed %d token: %s", countRemoved, allocationToken)
 
