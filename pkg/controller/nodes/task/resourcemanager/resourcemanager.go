@@ -45,45 +45,44 @@ type Metrics interface {
 }
 
 type Builder interface {
-	ResourceRegistrar(namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceRegistrar
+	GetResourceRegistrar(namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceRegistrar
 	BuildResourceManager(ctx context.Context) (pluginCore.ResourceManager, error)
 }
 
-// A proxy will be created for each TaskExecutionContext
+// A proxy will be created for each TaskExecutionContext.
+// The Proxy of an execution contains the resource namespace prefix (e.g., "qubole-hive-executor" for a hive task)
+// and the token prefix (e.g., ex:<project>:<domain>:<exec_id>) of that execution.
+// The plugins will only have access to a Proxy but not directly the underlying resource manager.
+// The Proxy will prepend proper prefixes for the resource namespace and the allocation token.
 type Proxy struct {
 	pluginCore.ResourceManager
 	ResourceNamespacePrefix pluginCore.ResourceNamespace
 	TokenPrefix             TokenPrefix
 }
 
-func (p Proxy) getPrefixedNamespace(namespace pluginCore.ResourceNamespace) pluginCore.ResourceNamespace {
-	return p.ResourceNamespacePrefix.CreateSubNamespace(namespace)
-}
-
 func (p Proxy) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace,
 	allocationToken string) (pluginCore.AllocationStatus, error) {
-
-	namespacedAllocationToken := p.TokenPrefix.append(allocationToken)
-	status, err := p.ResourceManager.AllocateResource(ctx, p.getPrefixedNamespace(namespace), namespacedAllocationToken)
+	status, err := p.ResourceManager.AllocateResource(ctx,
+		p.ResourceNamespacePrefix.CreateSubNamespace(namespace),
+		p.TokenPrefix.append(allocationToken))
 	return status, err
 }
 
 func (p Proxy) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace,
 	allocationToken string) error {
-	err := p.ResourceManager.ReleaseResource(ctx, p.getPrefixedNamespace(namespace), allocationToken)
+	err := p.ResourceManager.ReleaseResource(ctx,
+		p.ResourceNamespacePrefix.CreateSubNamespace(namespace),
+		p.TokenPrefix.append(allocationToken))
 	return err
 }
 
+// The Proxy will prepend a proper prefix for the resource namespace.
 type ResourceRegistrarProxy struct {
 	pluginCore.ResourceRegistrar
 	ResourceNamespacePrefix pluginCore.ResourceNamespace
-	TokenPrefix             TokenPrefix
-}
-
-func (p ResourceRegistrarProxy) getPrefixedNamespace(namespace pluginCore.ResourceNamespace) pluginCore.ResourceNamespace {
-	return p.ResourceNamespacePrefix.CreateSubNamespace(namespace)
 }
 
 func (p ResourceRegistrarProxy) RegisterResourceQuota(ctx context.Context, namespace pluginCore.ResourceNamespace, quota int) error {
-	return p.ResourceRegistrar.RegisterResourceQuota(ctx, p.getPrefixedNamespace(namespace), quota)
+	return p.ResourceRegistrar.RegisterResourceQuota(ctx,
+		p.ResourceNamespacePrefix.CreateSubNamespace(namespace), quota)
 }

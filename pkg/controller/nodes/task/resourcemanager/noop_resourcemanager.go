@@ -6,10 +6,12 @@ import (
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
+const NoopResourceManagerID = "noopresourcemanager"
+
 type NoopResourceManagerBuilder struct {
 }
 
-func (r *NoopResourceManagerBuilder) ResourceRegistrar(namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceRegistrar {
+func (r *NoopResourceManagerBuilder) GetResourceRegistrar(namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceRegistrar {
 	return ResourceRegistrarProxy{
 		ResourceRegistrar:       r,
 		ResourceNamespacePrefix: namespacePrefix,
@@ -25,6 +27,10 @@ func (r *NoopResourceManagerBuilder) BuildResourceManager(ctx context.Context) (
 }
 
 type NoopResourceManager struct {
+}
+
+func (*NoopResourceManager) GetID() string {
+	return NoopResourceManagerID
 }
 
 func (*NoopResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) (
