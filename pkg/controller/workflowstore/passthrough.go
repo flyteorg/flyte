@@ -41,50 +41,53 @@ func (p *passthroughWorkflowStore) Get(ctx context.Context, namespace, name stri
 	return w, nil
 }
 
-func (p *passthroughWorkflowStore) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) error {
+func (p *passthroughWorkflowStore) UpdateStatus(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
+	newWF *v1alpha1.FlyteWorkflow, err error) {
 	p.metrics.workflowUpdateCount.Inc()
 	// Something has changed. Lets save
 	logger.Debugf(ctx, "Observed FlyteWorkflow State change. [%v] -> [%v]", workflow.Status.Phase.String(), workflow.Status.Phase.String())
 	t := p.metrics.workflowUpdateLatency.Start()
-	_, err := p.wfClientSet.FlyteWorkflows(workflow.Namespace).Update(workflow)
+	newWF, err = p.wfClientSet.FlyteWorkflows(workflow.Namespace).Update(workflow)
 	if err != nil {
 		if kubeerrors.IsNotFound(err) {
-			return nil
+			return nil, nil
 		}
+
 		if kubeerrors.IsConflict(err) {
 			p.metrics.workflowUpdateConflictCount.Inc()
 		}
 		p.metrics.workflowUpdateFailedCount.Inc()
 		logger.Errorf(ctx, "Failed to update workflow status. Error [%v]", err)
-		return err
+		return nil, err
 	}
 	t.Stop()
 	p.metrics.workflowUpdateSuccessCount.Inc()
 	logger.Debugf(ctx, "Updated workflow status.")
-	return nil
+	return newWF, nil
 }
 
-func (p *passthroughWorkflowStore) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) error {
+func (p *passthroughWorkflowStore) Update(ctx context.Context, workflow *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
+	newWF *v1alpha1.FlyteWorkflow, err error) {
 	p.metrics.workflowUpdateCount.Inc()
 	// Something has changed. Lets save
 	logger.Debugf(ctx, "Observed FlyteWorkflow Update (maybe finalizer)")
 	t := p.metrics.workflowUpdateLatency.Start()
-	_, err := p.wfClientSet.FlyteWorkflows(workflow.Namespace).Update(workflow)
+	newWF, err = p.wfClientSet.FlyteWorkflows(workflow.Namespace).Update(workflow)
 	if err != nil {
 		if kubeerrors.IsNotFound(err) {
-			return nil
+			return nil, nil
 		}
 		if kubeerrors.IsConflict(err) {
 			p.metrics.workflowUpdateConflictCount.Inc()
 		}
 		p.metrics.workflowUpdateFailedCount.Inc()
 		logger.Errorf(ctx, "Failed to update workflow. Error [%v]", err)
-		return err
+		return nil, err
 	}
 	t.Stop()
 	p.metrics.workflowUpdateSuccessCount.Inc()
 	logger.Debugf(ctx, "Updated workflow.")
-	return nil
+	return newWF, nil
 }
 
 func NewPassthroughWorkflowStore(_ context.Context, scope promutils.Scope, wfClient v1alpha12.FlyteworkflowV1alpha1Interface,

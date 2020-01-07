@@ -22,6 +22,8 @@ propeller:
       capacity: 1000
   kube-config: "$HOME/.kube/config"
   publish-k8s-events: true
+  workflowStore:
+    policy: "ResourceVersionCache"
 tasks:
   task-plugins:
     enabled-plugins:

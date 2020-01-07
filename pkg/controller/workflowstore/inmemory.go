@@ -44,22 +44,26 @@ func (i *InmemoryWorkflowStore) Get(ctx context.Context, namespace, name string)
 	return nil, errWorkflowNotFound
 }
 
-func (i *InmemoryWorkflowStore) UpdateStatus(ctx context.Context, w *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) error {
+func (i *InmemoryWorkflowStore) UpdateStatus(ctx context.Context, w *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
+	newWF *v1alpha1.FlyteWorkflow, err error) {
 	if w != nil {
 		if w.Name != "" && w.Namespace != "" {
 			if m, ok := i.store[w.Namespace]; ok {
 				if _, ok := m[w.Name]; ok {
 					m[w.Name] = w
-					return nil
+					return w, nil
 				}
 			}
-			return nil
+
+			return nil, kubeerrors.NewNotFound(v1alpha1.Resource(v1alpha1.FlyteWorkflowKind), w.Name)
 		}
 	}
-	return kubeerrors.NewBadRequest("Workflow object with Namespace & Name is required")
+
+	return nil, kubeerrors.NewBadRequest("Workflow object with Namespace & Name is required")
 }
 
-func (i *InmemoryWorkflowStore) Update(ctx context.Context, w *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) error {
+func (i *InmemoryWorkflowStore) Update(ctx context.Context, w *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (
+	newWF *v1alpha1.FlyteWorkflow, err error) {
 	return i.UpdateStatus(ctx, w, priorityClass)
 }
 
