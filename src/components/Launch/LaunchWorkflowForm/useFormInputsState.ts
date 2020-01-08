@@ -1,4 +1,5 @@
 import { useDebouncedValue } from 'components/hooks/useDebouncedValue';
+import { ValidationError, ValueError } from 'errors';
 import { Core } from 'flyteidl';
 import { useEffect, useState } from 'react';
 import { validateInput } from './inputHelpers/inputHelpers';
@@ -24,13 +25,13 @@ function useFormInputState(parsedInput: ParsedInput): FormInputState {
     const validationValue = useDebouncedValue(value, debounceDelay);
 
     const validate = () => {
-        const { typeDefinition } = parsedInput;
+        const { name, typeDefinition } = parsedInput;
         try {
             validateInput({ name, typeDefinition, value });
             setError(undefined);
             return true;
-        } catch (validationError) {
-            setError(`${validationError}`);
+        } catch (e) {
+            setError((e as Error).message);
             return false;
         }
     };

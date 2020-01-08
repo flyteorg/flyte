@@ -9,6 +9,7 @@ import * as React from 'react';
 import { DatetimeInput } from './DatetimeInput';
 import { InputChangeHandler, InputProps, InputType } from './types';
 import { UnsupportedInput } from './UnsupportedInput';
+import { getLaunchInputId } from './utils';
 
 function switchChangeHandler(onChange: InputChangeHandler) {
     return ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,6 +42,7 @@ export const SimpleInput: React.FC<InputProps> = props => {
                     <FormControlLabel
                         control={
                             <Switch
+                                id={getLaunchInputId(name)}
                                 checked={!!value}
                                 onChange={switchChangeHandler(onChange)}
                                 value={name}
@@ -60,6 +62,7 @@ export const SimpleInput: React.FC<InputProps> = props => {
             return (
                 <TextField
                     error={hasError}
+                    id={getLaunchInputId(name)}
                     helperText={helperText}
                     fullWidth={true}
                     label={label}

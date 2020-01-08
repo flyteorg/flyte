@@ -14,24 +14,31 @@ export const validityTestCases = {
         valid: [true, 'true', 't', '1', 1, false, 'false', 'f', '0', 0]
     },
     datetime: {
-        invalid: [],
+        invalid: ['abc', true],
         valid: [new Date(validDateString), validDateString]
     },
-    duration: { invalid: [], valid: [0, 10000] },
+    duration: {
+        // Same cases used for float
+        invalid: ['abc', {}, true, new Date()],
+        valid: [0, '0', -1.5, '-1.5', 1.5, '1.5', 1.25e10, '1.25e10']
+    },
     float: {
-        invalid: [],
+        invalid: ['abc', {}, true, new Date()],
         valid: [0, '0', -1.5, '-1.5', 1.5, '1.5', 1.25e10, '1.25e10']
     },
     integer: {
-        invalid: [],
+        invalid: ['a', {}, true, new Date(), 1.1, 0 / 0, '1.1', '1a'],
         valid: [
             0,
+            0.0,
             Long.fromNumber(0),
             '0',
             1,
+            1.0,
             Long.fromNumber(1),
             '1',
             -1,
+            -1.0,
             Long.fromNumber(-1),
             '-1',
             Long.MAX_VALUE.toString(),
@@ -40,7 +47,7 @@ export const validityTestCases = {
             Long.MIN_VALUE
         ]
     },
-    string: { invalid: [], valid: ['', 'abcdefg'] }
+    string: { invalid: [123, true, new Date(), {}], valid: ['', 'abcdefg'] }
 };
 
 export const literalTestCases: PrimitiveTestParams[] = [

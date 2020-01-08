@@ -137,3 +137,7 @@ export function getInputDefintionForLiteralType(
 
     return { type: InputType.Unknown };
 }
+
+export function getLaunchInputId(name: string): string {
+    return `launch-input-${name}`;
+}

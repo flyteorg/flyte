@@ -16,6 +16,7 @@ import {
     workflowSortFields
 } from 'models';
 import * as React from 'react';
+import { formStrings } from './constants';
 import { LaunchWorkflowFormInputs } from './LaunchWorkflowFormInputs';
 import { SearchableSelector } from './SearchableSelector';
 import { useStyles } from './styles';
@@ -64,7 +65,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
     return (
         <>
             <DialogTitle disableTypography={true} className={styles.header}>
-                <div className={styles.inputLabel}>Launch Workflow</div>
+                <div className={styles.inputLabel}>{formStrings.title}</div>
                 <Typography variant="h6">{state.workflowName}</Typography>
             </DialogTitle>
             <DialogContent dividers={true} className={styles.inputsSection}>
@@ -72,39 +73,49 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     spinnerVariant="medium"
                     {...state.workflowOptionsLoadingState}
                 >
-                    <div className={styles.formControl}>
+                    <section
+                        title={formStrings.workflowVersion}
+                        className={styles.formControl}
+                    >
                         <SearchableSelector
-                            label="Workflow Version"
+                            id="launch-workflow-selector"
+                            label={formStrings.workflowVersion}
                             onSelectionChanged={state.onSelectWorkflow}
                             options={state.workflowSelectorOptions}
                             fetchSearchResults={fetchSearchResults}
                             selectedItem={state.selectedWorkflow}
                         />
-                    </div>
+                    </section>
                     <WaitForData
                         {...state.launchPlanOptionsLoadingState}
                         spinnerVariant="medium"
                     >
-                        <div className={styles.formControl}>
+                        <section
+                            title={formStrings.launchPlan}
+                            className={styles.formControl}
+                        >
                             <SearchableSelector
-                                label="Launch Plan"
+                                id="launch-lp-selector"
+                                label={formStrings.launchPlan}
                                 onSelectionChanged={state.onSelectLaunchPlan}
                                 options={state.launchPlanSelectorOptions}
                                 selectedItem={state.selectedLaunchPlan}
                             />
-                        </div>
+                        </section>
                     </WaitForData>
                     {launchPlanSelected ? (
                         <WaitForData
                             spinnerVariant="medium"
                             {...state.inputLoadingState}
                         >
-                            <LaunchWorkflowFormInputs
-                                key={state.formKey}
-                                inputs={state.inputs}
-                                ref={state.formInputsRef}
-                                showErrors={state.showErrors}
-                            />
+                            <section title={formStrings.inputs}>
+                                <LaunchWorkflowFormInputs
+                                    key={state.formKey}
+                                    inputs={state.inputs}
+                                    ref={state.formInputsRef}
+                                    showErrors={state.showErrors}
+                                />
+                            </section>
                         </WaitForData>
                     ) : null}
                 </WaitForData>
@@ -123,7 +134,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                         onClick={state.onCancel}
                         variant="outlined"
                     >
-                        Cancel
+                        {formStrings.cancel}
                     </Button>
                     <Button
                         color="primary"
@@ -136,7 +147,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                         type="submit"
                         variant="contained"
                     >
-                        Launch
+                        {formStrings.submit}
                         {submissionState.loading && <ButtonCircularProgress />}
                     </Button>
                 </DialogActions>

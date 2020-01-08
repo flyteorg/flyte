@@ -3,7 +3,6 @@ import { storiesOf } from '@storybook/react';
 import { resolveAfter } from 'common/promiseUtils';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
-import { Admin } from 'flyteidl';
 import { mapValues } from 'lodash';
 import { Variable, Workflow } from 'models';
 import { createMockLaunchPlan } from 'models/__mocks__/launchPlanData';
@@ -12,15 +11,14 @@ import {
     createMockWorkflowClosure,
     createMockWorkflowVersions
 } from 'models/__mocks__/workflowData';
-import { mockExecution } from 'models/Execution/__mocks__/mockWorkflowExecutionsData';
 import * as React from 'react';
-import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 import {
     createMockWorkflowInputsInterface,
     mockCollectionVariables,
     mockNestedCollectionVariables,
     mockSimpleVariables
-} from './mockInputs';
+} from '../__mocks__/mockInputs';
+import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 
 const submitAction = action('createWorkflowExecution');
 
