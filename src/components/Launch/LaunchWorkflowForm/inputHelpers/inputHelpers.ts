@@ -35,7 +35,7 @@ export function literalToInputValue(
     } catch (e) {
         // If something goes wrong (most likely malformed default value input),
         // we'll return the system default value.
-        console.error((e as Error).message);
+        console.debug((e as Error).message);
         return defaultValue;
     }
 }

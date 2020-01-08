@@ -1,4 +1,5 @@
 import { InputProps, InputType } from '../../types';
+import { getHelperForInput } from '../getHelperForInput';
 import {
     inputToLiteral,
     literalToInputValue,
@@ -54,8 +55,16 @@ describe('literalToInputValue', () => {
         );
     });
 
-    // TODO
-    it('should return system default if parsing literal fails', () => {});
+    it('should return system default if parsing literal fails', () => {
+        const { defaultValue } = getHelperForInput(InputType.Boolean);
+        expect(
+            literalToInputValue(
+                { type: InputType.Boolean },
+                // Invalid boolean input value because it uses the string field
+                { scalar: { primitive: { stringValue: 'whoops' } } }
+            )
+        ).toEqual(defaultValue);
+    });
 });
 
 describe('inputToLiteral', () => {
