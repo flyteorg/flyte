@@ -43,7 +43,7 @@ function makeNestedCollectionInput(type: InputType, value: string): InputProps {
 }
 
 describe('literalToInputValue', () => {
-    describe.only('Primitives', () => {
+    describe('Primitives', () => {
         literalToInputTestCases.map(([type, input, output]) =>
             it(`Should correctly convert ${type}: ${JSON.stringify(
                 input.scalar!.primitive

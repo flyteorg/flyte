@@ -14,6 +14,7 @@ import { APIContext } from 'components/data/apiContext';
 import { muiTheme } from 'components/Theme';
 import { Core } from 'flyteidl';
 import { get, mapValues } from 'lodash';
+import * as Long from 'long';
 import {
     createWorkflowExecution,
     CreateWorkflowExecutionArguments,
@@ -23,6 +24,7 @@ import {
     LaunchPlan,
     listLaunchPlans,
     listWorkflows,
+    Literal,
     NamedEntityIdentifier,
     Variable,
     Workflow
@@ -401,7 +403,29 @@ describe('LaunchWorkflowForm', () => {
                 expect(value).toBe(false);
             });
 
-            it('should use default values when provided', async () => {});
+            it('should use default values when provided', async () => {
+                // Add defaults for the string/integer inputs and check that they are
+                // correctly populated
+                const parameters = mockLaunchPlans[0].closure!.expectedInputs
+                    .parameters;
+                parameters[stringInputName].default = {
+                    scalar: { primitive: { stringValue: 'abc' } }
+                } as Literal;
+                parameters[integerInputName].default = {
+                    scalar: { primitive: { integer: Long.fromNumber(10000) } }
+                } as Literal;
+                mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[0]);
+
+                const { getByLabelText } = renderForm();
+                await wait();
+
+                expect(
+                    getByLabelText(stringInputName, { exact: false })
+                ).toHaveValue('abc');
+                expect(
+                    getByLabelText(integerInputName, { exact: false })
+                ).toHaveValue('10000');
+            });
         });
     });
 });
