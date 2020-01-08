@@ -1,6 +1,7 @@
 import { ValueError } from 'errors';
 import { Core } from 'flyteidl';
-import { InputProps } from '../types';
+import { Literal } from 'models';
+import { InputProps, InputTypeDefinition, InputValue } from '../types';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
 
@@ -13,6 +14,30 @@ export function inputToLiteral(input: ToLiteralParams): Core.ILiteral {
 
     const { toLiteral } = getHelperForInput(typeDefinition.type);
     return toLiteral({ value, typeDefinition });
+}
+
+export function defaultValueForInputType(
+    typeDefinition: InputTypeDefinition
+): InputValue | undefined {
+    return getHelperForInput(typeDefinition.type).defaultValue;
+}
+
+export function literalToInputValue(
+    typeDefinition: InputTypeDefinition,
+    literal: Literal
+): InputValue | undefined {
+    const { defaultValue, fromLiteral } = getHelperForInput(
+        typeDefinition.type
+    );
+
+    try {
+        return fromLiteral(literal);
+    } catch (e) {
+        // If something goes wrong (most likely malformed default value input),
+        // we'll return the system default value.
+        console.error((e as Error).message);
+        return defaultValue;
+    }
 }
 
 type ValidationParams = Pick<InputProps, 'name' | 'typeDefinition' | 'value'>;

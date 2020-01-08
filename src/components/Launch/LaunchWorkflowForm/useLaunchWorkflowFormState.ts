@@ -18,6 +18,10 @@ import {
 } from 'models';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { history, Routes } from 'routes';
+import {
+    defaultValueForInputType,
+    literalToInputValue
+} from './inputHelpers/inputHelpers';
 import { SearchableSelectorOption } from './SearchableSelector';
 import {
     LaunchWorkflowFormInputsRef,
@@ -59,9 +63,13 @@ function getInputs(workflow: Workflow, launchPlan: LaunchPlan): ParsedInput[] {
         );
         const label = formatLabelWithType(name, typeDefinition);
 
-        // TODO:
-        // Extract default value for more specific type (maybe just for simple)
+        const defaultValue =
+            parameter.default !== undefined
+                ? literalToInputValue(typeDefinition, parameter.default)
+                : defaultValueForInputType(typeDefinition);
+
         return {
+            defaultValue,
             description,
             label,
             name,

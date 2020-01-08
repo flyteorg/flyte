@@ -1,9 +1,15 @@
 import { Core } from 'flyteidl';
 import * as Long from 'long';
+import { Literal } from 'models';
 import { InputValue } from '../types';
 import { ConverterInput, InputHelper } from './types';
 
 const integerRegexPattern = /^-?[0-9]+$/;
+
+function fromLiteral(literal: Literal): InputValue {
+    // TODO
+    return '';
+}
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {
     const integer =
@@ -33,6 +39,7 @@ function validate({ value }: ConverterInput) {
 }
 
 export const integerHelper: InputHelper = {
+    fromLiteral,
     toLiteral,
     validate
 };

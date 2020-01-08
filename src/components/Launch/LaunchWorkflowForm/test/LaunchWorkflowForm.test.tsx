@@ -375,10 +375,7 @@ describe('LaunchWorkflowForm', () => {
         });
 
         describe('Input Values', () => {
-            /* TODO: Un-skip this when https://github.com/lyft/flyte/issues/18
-             * is fixed.
-             */
-            it.skip('Should send false for untouched toggles', async () => {
+            it('Should send false for untouched toggles', async () => {
                 let inputs: Core.ILiteralMap = {};
                 mockCreateWorkflowExecution.mockImplementation(
                     ({

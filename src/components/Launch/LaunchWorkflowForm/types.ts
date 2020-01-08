@@ -77,7 +77,10 @@ export interface InputProps {
     onChange: InputChangeHandler;
 }
 
-export type ParsedInput = Pick<
-    InputProps,
-    'description' | 'label' | 'name' | 'required' | 'typeDefinition'
->;
+export interface ParsedInput
+    extends Pick<
+        InputProps,
+        'description' | 'label' | 'name' | 'required' | 'typeDefinition'
+    > {
+    defaultValue?: InputValue;
+}

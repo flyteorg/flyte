@@ -6,3 +6,14 @@ export function literalNone(): Core.ILiteral {
 }
 
 export const allowedDateFormats = [ISO_8601, RFC_2822];
+
+const primitivePath = 'scalar.primitive';
+
+export const literalValuePaths = {
+    scalarBoolean: `${primitivePath}.boolean`,
+    scalarDatetime: `${primitivePath}.datetime`,
+    scalarDuration: `${primitivePath}.duration`,
+    scalarFloat: `${primitivePath}.floatValue`,
+    scalarInteger: `${primitivePath}.integer`,
+    scalarString: `${primitivePath}.stringValue`
+};

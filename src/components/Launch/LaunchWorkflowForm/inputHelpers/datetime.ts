@@ -1,5 +1,6 @@
 import { dateToTimestamp } from 'common/utils';
 import { Core } from 'flyteidl';
+import { Literal } from 'models';
 import { utc as moment } from 'moment';
 import { InputValue } from '../types';
 import { allowedDateFormats } from './constants';
@@ -9,6 +10,11 @@ function parseDate(value: InputValue) {
     return value instanceof Date
         ? value
         : moment(value.toString(), allowedDateFormats).toDate();
+}
+
+function fromLiteral(literal: Literal): InputValue {
+    // TODO
+    return '';
 }
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {
@@ -26,6 +32,7 @@ function validate({ value }: ConverterInput) {
 }
 
 export const datetimeHelper: InputHelper = {
+    fromLiteral,
     toLiteral,
     validate
 };

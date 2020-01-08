@@ -34,6 +34,13 @@ function makeNestedCollectionInput(type: InputType, value: string): InputProps {
     };
 }
 
+describe('literalToInputValue', () => {
+    // TODO: test cases for all of the input types
+
+    // TODO
+    it('should return system default if parsing literal fails', () => {});
+});
+
 describe('inputToLiteral', () => {
     describe('Primitives', () => {
         literalTestCases.map(([type, input, output]) =>

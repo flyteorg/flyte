@@ -1,4 +1,6 @@
 import { Core } from 'flyteidl';
+import { Literal } from 'models';
+import { InputValue } from '../types';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
 import { parseJSON } from './parseJson';
@@ -12,7 +14,12 @@ function parseCollection(list: string) {
     return parsed;
 }
 
-export function toLiteral({
+function fromLiteral(literal: Literal): InputValue {
+    // TODO
+    return '';
+}
+
+function toLiteral({
     value,
     typeDefinition: { subtype }
 }: ConverterInput): Core.ILiteral {
@@ -63,6 +70,7 @@ function validate({ value }: ConverterInput) {
 }
 
 export const collectionHelper: InputHelper = {
+    fromLiteral,
     toLiteral,
     validate
 };
