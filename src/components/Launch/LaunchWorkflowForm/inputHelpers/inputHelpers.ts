@@ -24,7 +24,7 @@ export function defaultValueForInputType(
 
 export function literalToInputValue(
     typeDefinition: InputTypeDefinition,
-    literal: Literal
+    literal: Core.ILiteral
 ): InputValue | undefined {
     const { defaultValue, fromLiteral } = getHelperForInput(
         typeDefinition.type

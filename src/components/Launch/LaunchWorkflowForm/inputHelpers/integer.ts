@@ -1,14 +1,17 @@
 import { Core } from 'flyteidl';
 import * as Long from 'long';
-import { Literal } from 'models';
 import { InputValue } from '../types';
+import { literalValuePaths } from './constants';
 import { ConverterInput, InputHelper } from './types';
+import { extractLiteralWithCheck } from './utils';
 
 const integerRegexPattern = /^-?[0-9]+$/;
 
-function fromLiteral(literal: Literal): InputValue {
-    // TODO
-    return '';
+function fromLiteral(literal: Core.ILiteral): InputValue {
+    return extractLiteralWithCheck<Long>(
+        literal,
+        literalValuePaths.scalarInteger
+    ).toString();
 }
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {

@@ -1,5 +1,4 @@
 import { Core } from 'flyteidl';
-import { Literal } from 'models';
 import { InputValue } from '../types';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
@@ -14,7 +13,7 @@ function parseCollection(list: string) {
     return parsed;
 }
 
-function fromLiteral(literal: Literal): InputValue {
+function fromLiteral(literal: Core.ILiteral): InputValue {
     // TODO
     return '';
 }

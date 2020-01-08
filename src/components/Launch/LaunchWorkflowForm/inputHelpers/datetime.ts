@@ -1,10 +1,10 @@
-import { dateToTimestamp } from 'common/utils';
-import { Core } from 'flyteidl';
-import { Literal } from 'models';
+import { dateToTimestamp, timestampToDate } from 'common/utils';
+import { Core, Protobuf } from 'flyteidl';
 import { utc as moment } from 'moment';
 import { InputValue } from '../types';
-import { allowedDateFormats } from './constants';
+import { allowedDateFormats, literalValuePaths } from './constants';
 import { ConverterInput, InputHelper } from './types';
+import { extractLiteralWithCheck } from './utils';
 
 function parseDate(value: InputValue) {
     return value instanceof Date
@@ -12,9 +12,12 @@ function parseDate(value: InputValue) {
         : moment(value.toString(), allowedDateFormats).toDate();
 }
 
-function fromLiteral(literal: Literal): InputValue {
-    // TODO
-    return '';
+function fromLiteral(literal: Core.ILiteral): InputValue {
+    const value = extractLiteralWithCheck<Protobuf.ITimestamp>(
+        literal,
+        literalValuePaths.scalarDatetime
+    );
+    return timestampToDate(value);
 }
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {

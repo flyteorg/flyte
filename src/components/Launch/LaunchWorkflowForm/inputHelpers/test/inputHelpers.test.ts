@@ -1,6 +1,14 @@
 import { InputProps, InputType } from '../../types';
-import { inputToLiteral, validateInput } from '../inputHelpers';
-import { literalTestCases, validityTestCases } from './testCases';
+import {
+    inputToLiteral,
+    literalToInputValue,
+    validateInput
+} from '../inputHelpers';
+import {
+    literalTestCases,
+    literalToInputTestCases,
+    validityTestCases
+} from './testCases';
 
 const baseInputProps: InputProps = {
     description: 'test',
@@ -35,7 +43,16 @@ function makeNestedCollectionInput(type: InputType, value: string): InputProps {
 }
 
 describe('literalToInputValue', () => {
-    // TODO: test cases for all of the input types
+    describe.only('Primitives', () => {
+        literalToInputTestCases.map(([type, input, output]) =>
+            it(`Should correctly convert ${type}: ${JSON.stringify(
+                input.scalar!.primitive
+            )}`, () => {
+                const result = literalToInputValue({ type }, input);
+                expect(result).toEqual(output);
+            })
+        );
+    });
 
     // TODO
     it('should return system default if parsing literal fails', () => {});

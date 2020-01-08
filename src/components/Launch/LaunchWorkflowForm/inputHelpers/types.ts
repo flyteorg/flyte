@@ -1,5 +1,4 @@
 import { Core } from 'flyteidl';
-import { Literal } from 'models';
 import { InputTypeDefinition, InputValue } from '../types';
 
 export interface ConverterInput {
@@ -10,7 +9,9 @@ export interface ConverterInput {
 export type InputToLiteralConverterFn = (
     input: ConverterInput
 ) => Core.ILiteral;
-export type LiteralToInputConterterFn = (literal: Literal) => InputValue;
+export type LiteralToInputConterterFn = (
+    literal: Core.ILiteral
+) => InputValue | undefined;
 export interface InputHelper {
     defaultValue?: InputValue;
     toLiteral: InputToLiteralConverterFn;

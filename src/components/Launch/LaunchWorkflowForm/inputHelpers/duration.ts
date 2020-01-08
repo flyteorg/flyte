@@ -1,13 +1,17 @@
-import { millisecondsToDuration } from 'common/utils';
-import { Core } from 'flyteidl';
-import { Literal } from 'models';
+import { durationToMilliseconds, millisecondsToDuration } from 'common/utils';
+import { Core, Protobuf } from 'flyteidl';
 import { InputValue } from '../types';
+import { literalValuePaths } from './constants';
 import { isValidFloat } from './float';
 import { ConverterInput, InputHelper } from './types';
+import { extractLiteralWithCheck } from './utils';
 
-function fromLiteral(literal: Literal): InputValue {
-    // TODO
-    return '';
+function fromLiteral(literal: Core.ILiteral): InputValue {
+    const value = extractLiteralWithCheck<Protobuf.IDuration>(
+        literal,
+        literalValuePaths.scalarDuration
+    );
+    return durationToMilliseconds(value);
 }
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {
