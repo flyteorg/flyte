@@ -38,7 +38,7 @@ var (
 		TokenKey:        "FLYTE_QUBOLE_CLIENT_TOKEN",
 		LruCacheSize:    2000,
 		Workers:         15,
-		ClusterConfigs:  []ClusterConfig{{Label: "default", Limit: 200}},
+		ClusterConfigs:  []ClusterConfig{{Label: "default", Limit: 250}},
 	}
 
 	quboleConfigSection = pluginsConfig.MustRegisterSubSection(quboleConfigSectionKey, &defaultConfig)
