@@ -23,6 +23,8 @@ const pluginStateVersion = 0
 
 const hiveTaskType = "hive" // This needs to match the type defined in Flytekit constants.py
 
+const DefaultClusterPrimaryLabel = "default"
+
 type QuboleHiveExecutor struct {
 	id              string
 	metrics         QuboleHiveExecutorMetrics
@@ -112,7 +114,7 @@ func BuildResourceConfig(cfg *config.Config) map[string]int {
 	resourceConfig := make(map[string]int, len(cfg.ClusterConfigs))
 
 	for _, clusterCfg := range cfg.ClusterConfigs {
-		resourceConfig[clusterCfg.Label] = clusterCfg.Limit
+		resourceConfig[clusterCfg.PrimaryLabel] = clusterCfg.Limit
 	}
 	return resourceConfig
 }
@@ -125,9 +127,9 @@ func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, cfg *co
 		return nil, err
 	}
 
-	for clusterLabel, clusterLimit := range resourceConfig {
-		namespaceWithClusterLabel := resourceNamespace.CreateSubNamespace(core.ResourceNamespace(clusterLabel))
-		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, namespaceWithClusterLabel, clusterLimit); err != nil {
+	for clusterPrimaryLabel, clusterLimit := range resourceConfig {
+		namespaceWithClusterPrimaryLabel := resourceNamespace.CreateSubNamespace(core.ResourceNamespace(clusterPrimaryLabel))
+		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, namespaceWithClusterPrimaryLabel, clusterLimit); err != nil {
 			return nil, err
 		}
 	}

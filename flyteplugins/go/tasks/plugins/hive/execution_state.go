@@ -141,24 +141,25 @@ func ConstructTaskInfo(e ExecutionState) *core.TaskInfo {
 	return nil
 }
 
-func composeResourceNamespaceWithClusterLabel(ctx context.Context, tCtx core.TaskExecutionContext, resourceNamespace core.ResourceNamespace) (core.ResourceNamespace, error) {
-	_, clusterLabel, _, _, err := GetQueryInfo(ctx, tCtx)
+func composeResourceNamespaceWithClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext, resourceNamespace core.ResourceNamespace) (core.ResourceNamespace, error) {
+	_, clusterLabelOverride, _, _, err := GetQueryInfo(ctx, tCtx)
 	if err != nil {
 		return resourceNamespace, err
 	}
-	return resourceNamespace.CreateSubNamespace(core.ResourceNamespace(clusterLabel)), nil
+	clusterPrimaryLabel := getClusterPrimaryLabel(ctx, tCtx, clusterLabelOverride)
+	return resourceNamespace.CreateSubNamespace(core.ResourceNamespace(clusterPrimaryLabel)), nil
 }
 
 func GetAllocationToken(ctx context.Context, resourceNamespace core.ResourceNamespace, tCtx core.TaskExecutionContext) (ExecutionState, error) {
 	newState := ExecutionState{}
 	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 
-	resourceNamespaceWithClusterLabel, err := composeResourceNamespaceWithClusterLabel(ctx, tCtx, resourceNamespace)
+	resourceNamespaceWithClusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx, resourceNamespace)
 	if err != nil {
 		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when requesting allocation token %s", uniqueId)
 	}
 
-	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, resourceNamespaceWithClusterLabel, uniqueId)
+	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, resourceNamespaceWithClusterPrimaryLabel, uniqueId)
 	if err != nil {
 		logger.Errorf(ctx, "Resource manager failed for TaskExecId [%s] token [%s]. error %s",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueId, err)
@@ -216,8 +217,46 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 	for k, v := range tCtx.TaskExecutionMetadata().GetLabels() {
 		tags = append(tags, fmt.Sprintf("%s:%s", k, v))
 	}
-
+	logger.Debugf(ctx, "QueryInfo: query: [%v], cluster: [%v], timeoutSec: [%v], tags: [%v]", query, cluster, timeoutSec, tags)
 	return
+}
+
+func mapLabelToPrimaryLabel(quboleCfg *config.Config, label string) string {
+	if label == "" {
+		return DefaultClusterPrimaryLabel
+	}
+	// Using a linear search because N is small and because of ClusterConfig's struct definition
+	// which is determined specifically for the readability of the corresponding configmap yaml file
+	for _, clusterCfg := range quboleCfg.ClusterConfigs {
+		for _, l := range clusterCfg.Labels {
+			if l == label {
+				return clusterCfg.PrimaryLabel
+			}
+		}
+	}
+	return DefaultClusterPrimaryLabel
+}
+
+func getClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext, labelOverride string) string {
+	cfg := config.GetQuboleConfig()
+	label := ""
+	// If there's no override, we look up in our mapping to find the proper primary cluster label according to the project and the domain
+	if labelOverride == "" {
+		project := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().GetTaskId().GetProject()
+		domain := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().GetTaskId().GetDomain()
+		// Using a linear search because N is small
+		for _, m := range cfg.ProjectDestinationClusterConfigs {
+			if project == m.Project && domain == m.Domain {
+				label = m.ClusterLabel
+				break
+			}
+		}
+	} else {
+		label = labelOverride
+	}
+	primaryLabel := mapLabelToPrimaryLabel(cfg, label)
+	logger.Debugf(ctx, "Cluster label override = [%v]. Getting the primary label of label [%v] = [%v]", labelOverride, label, primaryLabel)
+	return primaryLabel
 }
 
 func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, quboleClient client.QuboleClient,
@@ -229,13 +268,15 @@ func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 		return currentState, errors.Wrapf(errors.RuntimeFailure, err, "Failed to read token from secrets manager")
 	}
 
-	query, cluster, tags, timeoutSec, err := GetQueryInfo(ctx, tCtx)
+	query, clusterLabelOverride, tags, timeoutSec, err := GetQueryInfo(ctx, tCtx)
 	if err != nil {
 		return currentState, err
 	}
 
+	clusterPrimaryLabel := getClusterPrimaryLabel(ctx, tCtx, clusterLabelOverride)
+
 	cmdDetails, err := quboleClient.ExecuteHiveCommand(ctx, query, timeoutSec,
-		cluster, apiKey, tags)
+		clusterPrimaryLabel, apiKey, tags)
 	if err != nil {
 		// If we failed, we'll keep the NotStarted state
 		currentState.CreationFailureCount = currentState.CreationFailureCount + 1
@@ -313,12 +354,12 @@ func Abort(ctx context.Context, tCtx core.TaskExecutionContext, currentState Exe
 func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, resourceNamespace core.ResourceNamespace, _ ExecutionState) error {
 	// Release allocation token
 	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	resourceNamespaceWithClusterLabel, err := composeResourceNamespaceWithClusterLabel(ctx, tCtx, resourceNamespace)
+	resourceNamespaceWithClusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx, resourceNamespace)
 	if err != nil {
 		return errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when releasing allocation token %s", uniqueId)
 	}
 
-	err = tCtx.ResourceManager().ReleaseResource(ctx, resourceNamespaceWithClusterLabel, uniqueId)
+	err = tCtx.ResourceManager().ReleaseResource(ctx, resourceNamespaceWithClusterPrimaryLabel, uniqueId)
 
 	if err != nil {
 		logger.Errorf(ctx, "Error releasing allocation token [%s] in Finalize [%s]", uniqueId, err)
