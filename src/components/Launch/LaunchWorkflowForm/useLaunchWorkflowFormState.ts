@@ -1,4 +1,5 @@
 import { sortedObjectEntries } from 'common/utils';
+import { getCacheKey } from 'components/Cache';
 import { useAPIContext } from 'components/data/apiContext';
 import {
     useFetchableData,
@@ -9,27 +10,22 @@ import {
 import {
     FilterOperationName,
     LaunchPlan,
-    LiteralType,
     SortDirection,
     Workflow,
     WorkflowExecutionIdentifier,
     WorkflowId,
     workflowSortFields
 } from 'models';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { history, Routes } from 'routes';
-import { simpleTypeToInputType } from './constants';
 import { SearchableSelectorOption } from './SearchableSelector';
 import {
-    InputProps,
-    InputType,
-    InputTypeDefinition,
-    InputValue,
+    LaunchWorkflowFormInputsRef,
     LaunchWorkflowFormProps,
-    LaunchWorkflowFormState
+    LaunchWorkflowFormState,
+    ParsedInput
 } from './types';
 import {
-    convertFormInputsToLiteralMap,
     formatLabelWithType,
     getInputDefintionForLiteralType,
     getWorkflowInputs,
@@ -40,11 +36,6 @@ import {
 // We use a non-empty string for the description to allow display components
 // to depend on the existence of a value
 const emptyDescription = ' ';
-
-type ParsedInput = Pick<
-    InputProps,
-    'description' | 'label' | 'name' | 'required' | 'typeDefinition'
->;
 
 function getInputs(workflow: Workflow, launchPlan: LaunchPlan): ParsedInput[] {
     if (!launchPlan.closure || !workflow) {
@@ -78,35 +69,6 @@ function getInputs(workflow: Workflow, launchPlan: LaunchPlan): ParsedInput[] {
             typeDefinition
         };
     });
-}
-
-interface FormInputsState {
-    inputs: InputProps[];
-}
-
-// TODO: This could be made generic and composed with ParsedInput
-function useFormInputsState(parsedInputs: ParsedInput[]): FormInputsState {
-    const [values, setValues] = useState<Record<string, InputValue>>({});
-    const [errors, setErrors] = useState<Record<string, string>>({});
-
-    const inputs = parsedInputs.map<InputProps>(parsed => ({
-        ...parsed,
-        value: values[parsed.name],
-        helperText: errors[parsed.name]
-            ? errors[parsed.name]
-            : parsed.description,
-        onChange: (value: InputValue) =>
-            setValues({ ...values, [parsed.name]: value })
-    }));
-
-    useEffect(() => {
-        // TODO: Use default values from inputs
-        setValues({});
-    }, [parsedInputs]);
-
-    return {
-        inputs
-    };
 }
 
 export function useWorkflowSelectorOptions(workflows: Workflow[]) {
@@ -171,6 +133,8 @@ export function useLaunchWorkflowFormState({
     workflowId
 }: LaunchWorkflowFormProps): LaunchWorkflowFormState {
     const { createWorkflowExecution } = useAPIContext();
+    const formInputsRef = useRef<LaunchWorkflowFormInputsRef>(null);
+    const [showErrors, setShowErrors] = useState(false);
     const workflows = useWorkflows(workflowId, {
         limit: 10,
         sort: {
@@ -205,7 +169,19 @@ export function useLaunchWorkflowFormState({
     const inputLoadingState = waitForAllFetchables([workflow, launchPlans]);
 
     const [parsedInputs, setParsedInputs] = useState<ParsedInput[]>([]);
-    const { inputs } = useFormInputsState(parsedInputs);
+
+    // Any time the inputs change (even if it's just re-ordering), we must
+    // change the form key so that the inputs component will re-mount.
+    const formKey = useMemo<string>(() => {
+        if (!selectedWorkflowId || !selectedLaunchPlan) {
+            return '';
+        }
+        return getCacheKey(parsedInputs);
+    }, [parsedInputs]);
+
+    // Only show errors after first submission for a set of inputs.
+    useEffect(() => setShowErrors(false), [formKey]);
+
     const workflowName = workflowId.name;
 
     const onSelectWorkflow = (
@@ -219,13 +195,18 @@ export function useLaunchWorkflowFormState({
         if (!launchPlanData) {
             throw new Error('Attempting to launch with no LaunchPlan');
         }
+        if (formInputsRef.current === null) {
+            throw new Error('Unexpected empty form inputs ref');
+        }
+        const literals = formInputsRef.current.getValues();
         const launchPlanId = launchPlanData.id;
         const { domain, project } = workflowId;
+
         const response = await createWorkflowExecution({
             domain,
             launchPlanId,
             project,
-            inputs: convertFormInputsToLiteralMap(inputs)
+            inputs: { literals }
         });
         const newExecutionId = response.id as WorkflowExecutionIdentifier;
         if (!newExecutionId) {
@@ -235,14 +216,34 @@ export function useLaunchWorkflowFormState({
         return newExecutionId;
     };
 
-    const submissionState = useFetchableData<WorkflowExecutionIdentifier>({
-        autoFetch: false,
-        debugName: 'LaunchWorkflowForm',
-        defaultValue: {} as WorkflowExecutionIdentifier,
-        doFetch: launchWorkflow
-    });
+    const submissionState = useFetchableData<
+        WorkflowExecutionIdentifier,
+        string
+    >(
+        {
+            autoFetch: false,
+            debugName: 'LaunchWorkflowForm',
+            defaultValue: {} as WorkflowExecutionIdentifier,
+            doFetch: launchWorkflow
+        },
+        formKey
+    );
 
-    const onSubmit = submissionState.fetch;
+    const onSubmit = () => {
+        if (formInputsRef.current === null) {
+            console.error('Unexpected empty form inputs ref');
+            return;
+        }
+
+        // Show errors after the first submission
+        setShowErrors(true);
+        // We validate separately so that a request isn't triggered unless
+        // the inputs are valid.
+        if (!formInputsRef.current.validate()) {
+            return;
+        }
+        submissionState.fetch();
+    };
     const onCancel = onClose;
 
     useEffect(() => {
@@ -273,8 +274,9 @@ export function useLaunchWorkflowFormState({
     }, [launchPlanSelectorOptions]);
 
     return {
+        formInputsRef,
+        formKey,
         inputLoadingState,
-        inputs,
         launchPlanOptionsLoadingState,
         launchPlanSelectorOptions,
         onCancel,
@@ -282,10 +284,12 @@ export function useLaunchWorkflowFormState({
         onSubmit,
         selectedLaunchPlan,
         selectedWorkflow,
+        showErrors,
         submissionState,
         workflowName,
         workflowOptionsLoadingState,
         workflowSelectorOptions,
+        inputs: parsedInputs,
         onSelectLaunchPlan: setLaunchPlan
     };
 }

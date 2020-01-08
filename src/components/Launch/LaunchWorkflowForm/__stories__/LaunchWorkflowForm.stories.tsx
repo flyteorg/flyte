@@ -1,8 +1,10 @@
+import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
 import { resolveAfter } from 'common/promiseUtils';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
-import { Workflow } from 'models';
+import { mapValues } from 'lodash';
+import { Variable, Workflow } from 'models';
 import { createMockLaunchPlan } from 'models/__mocks__/launchPlanData';
 import {
     createMockWorkflow,
@@ -10,46 +12,75 @@ import {
     createMockWorkflowVersions
 } from 'models/__mocks__/workflowData';
 import * as React from 'react';
+import {
+    createMockWorkflowInputsInterface,
+    mockCollectionVariables,
+    mockNestedCollectionVariables,
+    mockSimpleVariables
+} from '../__mocks__/mockInputs';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
-import { mockParameterMap, mockWorkflowInputsInterface } from './mockInputs';
 
-const mockWorkflow = createMockWorkflow('MyWorkflow');
-const mockLaunchPlan = createMockLaunchPlan(
-    mockWorkflow.id.name,
-    mockWorkflow.id.version
-);
+const submitAction = action('createWorkflowExecution');
 
-const mockWorkflowVersions = createMockWorkflowVersions(
-    mockWorkflow.id.name,
-    10
-);
+const renderForm = (variables: Record<string, Variable>) => {
+    const mockWorkflow = createMockWorkflow('MyWorkflow');
+    const mockLaunchPlan = createMockLaunchPlan(
+        mockWorkflow.id.name,
+        mockWorkflow.id.version
+    );
 
-mockLaunchPlan.closure!.expectedInputs = mockParameterMap;
+    const mockWorkflowVersions = createMockWorkflowVersions(
+        mockWorkflow.id.name,
+        10
+    );
 
-const mockApi = mockAPIContextValue({
-    getLaunchPlan: () => resolveAfter(500, mockLaunchPlan),
-    getWorkflow: id => {
-        const workflow: Workflow = {
-            id
-        };
-        workflow.closure = createMockWorkflowClosure();
-        workflow.closure!.compiledWorkflow!.primary.template.interface = mockWorkflowInputsInterface;
+    const parameterMap = {
+        parameters: mapValues(variables, v => ({ var: v }))
+    };
 
-        return resolveAfter(500, workflow);
-    },
-    listWorkflows: () => resolveAfter(500, { entities: mockWorkflowVersions }),
-    listLaunchPlans: () => resolveAfter(500, { entities: [mockLaunchPlan] })
-});
+    mockLaunchPlan.closure!.expectedInputs = parameterMap;
 
-const onClose = () => console.log('Close');
+    const mockApi = mockAPIContextValue({
+        createWorkflowExecution: input => {
+            console.log(input);
+            submitAction('See console for data');
+            return Promise.reject('Not implemented');
+        },
+        getLaunchPlan: () => resolveAfter(500, mockLaunchPlan),
+        getWorkflow: id => {
+            const workflow: Workflow = {
+                id
+            };
+            workflow.closure = createMockWorkflowClosure();
+            workflow.closure!.compiledWorkflow!.primary.template.interface = createMockWorkflowInputsInterface(
+                variables
+            );
+
+            return resolveAfter(500, workflow);
+        },
+        listWorkflows: () =>
+            resolveAfter(500, { entities: mockWorkflowVersions }),
+        listLaunchPlans: () => resolveAfter(500, { entities: [mockLaunchPlan] })
+    });
+
+    const onClose = () => console.log('Close');
+
+    return (
+        <APIContext.Provider value={mockApi}>
+            <div style={{ width: 600, height: '95vh' }}>
+                <LaunchWorkflowForm
+                    onClose={onClose}
+                    workflowId={mockWorkflow.id}
+                />
+            </div>
+        </APIContext.Provider>
+    );
+};
 
 const stories = storiesOf('Launch/LaunchWorkflowForm', module);
-stories.addDecorator(story => (
-    <APIContext.Provider value={mockApi}>
-        <div style={{ width: 600, height: '95vh' }}>{story()}</div>
-    </APIContext.Provider>
-));
 
-stories.add('Basic', () => (
-    <LaunchWorkflowForm onClose={onClose} workflowId={mockWorkflow.id} />
-));
+stories.add('Simple', () => renderForm(mockSimpleVariables));
+stories.add('Collections', () => renderForm(mockCollectionVariables));
+stories.add('Nested Collections', () =>
+    renderForm(mockNestedCollectionVariables)
+);

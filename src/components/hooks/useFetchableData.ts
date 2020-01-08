@@ -141,7 +141,9 @@ export function useFetchableData<T extends object, DataType>(
     useEffect(
         () => {
             setFetchState(null);
+            setLastError(null);
             setValue(defaultValue);
+            setLoading(false);
             setHasLoaded(false);
         },
         cacheKey === undefined ? [] : [cacheKey]
