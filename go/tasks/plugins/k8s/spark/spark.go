@@ -244,9 +244,18 @@ func getEventInfoForSpark(sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, 
 			Name:          "System Logs (via Cloudwatch)",
 			MessageFormat: core.TaskLog_JSON,
 		}
+		allUserLogs := core.TaskLog{
+			Uri: fmt.Sprintf(
+				"https://console.aws.amazon.com/cloudwatch/home?region=%s#logStream:group=%s;prefix=var.log.containers.%s;streamFilter=typeLogStreamPrefix",
+				logConfig.CloudwatchRegion,
+				logConfig.CloudwatchLogGroup,
+				sj.Name),
+			Name:          "Spark-Submit/All User Logs (via Cloudwatch)",
+			MessageFormat: core.TaskLog_JSON,
+		}
 		taskLogs = append(taskLogs, &cwUserLogs)
 		taskLogs = append(taskLogs, &cwSystemLogs)
-
+		taskLogs = append(taskLogs, &allUserLogs)
 	}
 
 	// Spark UI.
