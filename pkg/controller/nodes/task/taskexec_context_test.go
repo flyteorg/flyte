@@ -50,6 +50,7 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 
 	ns := &flyteMocks.ExecutableNodeStatus{}
 	ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+	ns.On("GetOutputDir").Return(storage.DataReference("output-dir"))
 
 	res := &v12.ResourceRequirements{}
 	n := &flyteMocks.ExecutableNode{}

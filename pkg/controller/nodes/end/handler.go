@@ -30,7 +30,7 @@ func (e endHandler) Handle(ctx context.Context, executionContext handler.NodeExe
 	if inputs != nil {
 		logger.Debugf(ctx, "Workflow has outputs. Storing them.")
 		// TODO we should use OutputWriter here
-		o := v1alpha1.GetOutputsFile(executionContext.NodeStatus().GetDataDir())
+		o := v1alpha1.GetOutputsFile(executionContext.NodeStatus().GetOutputDir())
 		so := storage.Options{}
 		if err := executionContext.DataStore().WriteProtobuf(ctx, o, so, inputs); err != nil {
 			logger.Errorf(ctx, "Failed to store workflow outputs. Error [%s]", err)

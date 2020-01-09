@@ -447,6 +447,38 @@ func (_m *ExecutableNodeStatus) GetOrCreateWorkflowStatus() v1alpha1.MutableWork
 	return r0
 }
 
+type ExecutableNodeStatus_GetOutputDir struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_GetOutputDir) Return(_a0 storage.DataReference) *ExecutableNodeStatus_GetOutputDir {
+	return &ExecutableNodeStatus_GetOutputDir{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnGetOutputDir() *ExecutableNodeStatus_GetOutputDir {
+	c := _m.On("GetOutputDir")
+	return &ExecutableNodeStatus_GetOutputDir{Call: c}
+}
+
+func (_m *ExecutableNodeStatus) OnGetOutputDirMatch(matchers ...interface{}) *ExecutableNodeStatus_GetOutputDir {
+	c := _m.On("GetOutputDir", matchers...)
+	return &ExecutableNodeStatus_GetOutputDir{Call: c}
+}
+
+// GetOutputDir provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetOutputDir() storage.DataReference {
+	ret := _m.Called()
+
+	var r0 storage.DataReference
+	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
+
 type ExecutableNodeStatus_GetParentNodeID struct {
 	*mock.Call
 }
@@ -894,6 +926,11 @@ func (_m *ExecutableNodeStatus) SetCached() {
 // SetDataDir provides a mock function with given fields: _a0
 func (_m *ExecutableNodeStatus) SetDataDir(_a0 storage.DataReference) {
 	_m.Called(_a0)
+}
+
+// SetOutputDir provides a mock function with given fields: d
+func (_m *ExecutableNodeStatus) SetOutputDir(d storage.DataReference) {
+	_m.Called(d)
 }
 
 // SetParentNodeID provides a mock function with given fields: n

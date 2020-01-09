@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/lyft/flytestdlib/logger"
 
@@ -103,6 +104,13 @@ func (in *WorkflowStatus) GetNodeExecutionStatus(ctx context.Context, id NodeID)
 			n.SetDataDir(dataDir)
 		}
 
+		outputDir, err := in.DataReferenceConstructor.ConstructReference(ctx, n.GetDataDir(), strconv.FormatUint(uint64(n.Attempts), 10))
+		if err != nil {
+			logger.Errorf(ctx, "Failed to construct output dir for node [%v]", id)
+			return n
+		}
+		n.SetOutputDir(outputDir)
+
 		return n
 	}
 
@@ -120,7 +128,14 @@ func (in *WorkflowStatus) GetNodeExecutionStatus(ctx context.Context, id NodeID)
 		return n
 	}
 
+	outputDir, err := in.DataReferenceConstructor.ConstructReference(ctx, dataDir, "0")
+	if err != nil {
+		logger.Errorf(ctx, "Failed to construct output dir for node [%v]", id)
+		return n
+	}
+
 	newNodeStatus.SetDataDir(dataDir)
+	newNodeStatus.SetOutputDir(outputDir)
 	newNodeStatus.DataReferenceConstructor = in.DataReferenceConstructor
 
 	in.NodeStatus[id] = newNodeStatus

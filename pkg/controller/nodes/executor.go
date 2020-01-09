@@ -513,8 +513,8 @@ func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, w v1alpha1.Exe
 	if len(nodeStatus.GetDataDir()) == 0 {
 		return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, startNode.GetID(), "no data-dir set, cannot store inputs")
 	}
+	outputFile := v1alpha1.GetOutputsFile(nodeStatus.GetOutputDir())
 
-	outputFile := v1alpha1.GetOutputsFile(nodeStatus.GetDataDir())
 	so := storage.Options{}
 	if err := c.store.WriteProtobuf(ctx, outputFile, so, inputs); err != nil {
 		logger.Errorf(ctx, "Failed to write protobuf (metadata). Error [%v]", err)

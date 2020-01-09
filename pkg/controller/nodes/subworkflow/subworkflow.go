@@ -131,7 +131,14 @@ func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
 		}
 
+		outputDir, err := nCtx.DataStore().ConstructReference(ctx, nodeStatus.GetDataDir(), "0")
+		if err != nil {
+			err = errors2.Wrapf(err, "Failed to create metadata store key. Error [%v]", err)
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
+		}
+
 		nodeStatus.SetDataDir(dataDir)
+		nodeStatus.SetOutputDir(outputDir)
 		nodeInputs, err := nCtx.InputReader().Get(ctx)
 		if err != nil {
 			errMsg := fmt.Sprintf("Failed to read input. Error [%s]", err)

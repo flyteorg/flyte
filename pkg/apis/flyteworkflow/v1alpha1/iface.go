@@ -213,6 +213,7 @@ type MutableNodeStatus interface {
 	Mutable
 	// Mutation API's
 	SetDataDir(DataReference)
+	SetOutputDir(d DataReference)
 	SetParentNodeID(n *NodeID)
 	SetParentTaskID(t *core.TaskExecutionIdentifier)
 	UpdatePhase(phase NodePhase, occurredAt metav1.Time, reason string)
@@ -250,6 +251,7 @@ type ExecutableNodeStatus interface {
 	GetParentNodeID() *NodeID
 	GetParentTaskID() *core.TaskExecutionIdentifier
 	GetDataDir() DataReference
+	GetOutputDir() DataReference
 	GetMessage() string
 	GetAttempts() uint32
 	GetWorkflowNodeStatus() ExecutableWorkflowNodeStatus
