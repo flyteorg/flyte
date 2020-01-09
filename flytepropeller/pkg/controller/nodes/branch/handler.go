@@ -111,6 +111,7 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx handler.Node
 		// For branch node we set the output node to be the same as the child nodes output
 		childNodeStatus := w.GetNodeExecutionStatus(ctx, branchTakenNode.GetID())
 		nodeStatus.SetDataDir(childNodeStatus.GetDataDir())
+		nodeStatus.SetOutputDir(childNodeStatus.GetOutputDir())
 		phase := handler.PhaseInfoSuccess(&handler.ExecutionInfo{
 			OutputInfo: &handler.OutputInfo{OutputURI: v1alpha1.GetOutputsFile(childNodeStatus.GetDataDir())},
 		})

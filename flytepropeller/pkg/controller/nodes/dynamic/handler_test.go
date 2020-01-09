@@ -100,6 +100,7 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+		ns.On("GetOutputDir").Return(storage.DataReference("data-dir"))
 
 		res := &v12.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
@@ -332,15 +333,18 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 
 		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
 		endNodeStatus.On("GetDataDir").Return(storage.DataReference("end-node"))
+		endNodeStatus.On("GetOutputDir").Return(storage.DataReference("end-node"))
 
 		subNs := &flyteMocks.ExecutableNodeStatus{}
 		subNs.On("SetDataDir", mock.Anything).Return()
+		subNs.On("SetOutputDir", mock.Anything).Return()
 		subNs.On("ResetDirty").Return()
-		subNs.On("GetDataDir").Return(finalOutput)
+		subNs.On("GetOutputDir").Return(finalOutput)
 		subNs.On("SetParentTaskID", mock.Anything).Return()
 
 		dynamicNS := &flyteMocks.ExecutableNodeStatus{}
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
+		dynamicNS.On("SetOutputDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_2").Return(subNs)
@@ -349,6 +353,8 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+		ns.On("GetOutputDir").Return(storage.DataReference("output-dir"))
+		ns.On("GetNodeExecutionStatus", dynamicNodeID).Return(dynamicNS)
 		ns.OnGetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
 		nCtx.On("NodeStatus").Return(ns)
 
@@ -400,7 +406,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			nCtx := createNodeContext("test", finalOutput)
 			s := &dynamicNodeStateHolder{}
 			nCtx.On("NodeStateWriter").Return(s)
-			f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
+			f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetOutputDir(), "futures.pb")
 			assert.NoError(t, err)
 			if tt.args.dj != nil {
 				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, tt.args.dj))

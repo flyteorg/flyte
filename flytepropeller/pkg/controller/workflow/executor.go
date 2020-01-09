@@ -95,9 +95,14 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	if err != nil {
 		return StatusFailing(errors.Wrapf(errors.CausedByError, w.GetID(), err, "failed to create metadata prefix for start node.")), nil
 	}
+	outputDir, err := c.store.ConstructReference(ctx, dataDir, "0")
+	if err != nil {
+		return StatusFailing(errors.Wrapf(errors.CausedByError, w.GetID(), err, "failed to create metadata prefix for start node.")), nil
+	}
 
 	logger.Infof(ctx, "Setting the MetadataDir for StartNode [%v]", dataDir)
 	nodeStatus.SetDataDir(dataDir)
+	nodeStatus.SetOutputDir(outputDir)
 	s, err := c.nodeExecutor.SetInputsForStartNode(ctx, w, inputs)
 	if err != nil {
 		return StatusReady, err

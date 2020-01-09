@@ -68,6 +68,7 @@ func TestSetInputsForStartNode(t *testing.T) {
 	t.Run("WithInputs", func(t *testing.T) {
 		w := createDummyBaseWorkflow(mockStorage)
 		w.GetNodeExecutionStatus(ctx, v1alpha1.StartNodeID).SetDataDir("s3://test-bucket/exec/start-node/data")
+		w.GetNodeExecutionStatus(ctx, v1alpha1.StartNodeID).SetOutputDir("s3://test-bucket/exec/start-node/data/0")
 		w.DummyStartNode = &v1alpha1.NodeSpec{
 			ID: v1alpha1.StartNodeID,
 		}
@@ -75,7 +76,7 @@ func TestSetInputsForStartNode(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, executors.NodeStatusComplete, s)
 		actual := &core.LiteralMap{}
-		if assert.NoError(t, mockStorage.ReadProtobuf(ctx, "s3://test-bucket/exec/start-node/data/outputs.pb", actual)) {
+		if assert.NoError(t, mockStorage.ReadProtobuf(ctx, "s3://test-bucket/exec/start-node/data/0/outputs.pb", actual)) {
 			flyteassert.EqualLiteralMap(t, inputs, actual)
 		}
 	})
@@ -320,6 +321,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 
 				if test.expectedNodePhase == v1alpha1.NodePhaseQueued {
 					assert.Equal(t, mockNodeStatus.GetDataDir(), storage.DataReference("/wf-data/end-node/data"))
+					assert.Equal(t, mockNodeStatus.GetOutputDir(), storage.DataReference("/wf-data/end-node/data/0"))
 				}
 			})
 		}
@@ -509,12 +511,16 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockN2Status.On("GetPhase").Return(n2Phase)
 			mockN2Status.On("SetDataDir", mock.AnythingOfType(reflect.TypeOf(storage.DataReference("x")).String()))
 			mockN2Status.On("GetDataDir").Return(storage.DataReference("blah"))
+			mockN2Status.On("SetOutputDir", mock.AnythingOfType(reflect.TypeOf(storage.DataReference("x")).String()))
+			mockN2Status.On("GetOutputDir").Return(storage.DataReference("blah"))
 			mockN2Status.On("GetWorkflowNodeStatus").Return(nil)
+
 			mockN2Status.On("GetStoppedAt").Return(nil)
 			mockN2Status.On("UpdatePhase", expectedN2Phase, mock.Anything, mock.AnythingOfType("string"))
 			mockN2Status.On("IsDirty").Return(false)
 			mockN2Status.On("GetTaskNodeStatus").Return(nil)
 			mockN2Status.On("ClearDynamicNodeStatus").Return(nil)
+			mockN2Status.On("GetAttempts").Return(uint32(0))
 
 			mockNode := &mocks.ExecutableNode{}
 			mockNode.On("GetID").Return(nodeN2)
@@ -534,6 +540,8 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockNodeN0.On("GetTaskID").Return(&taskID0)
 			mockN0Status := &mocks.ExecutableNodeStatus{}
 			mockN0Status.On("GetPhase").Return(n0Phase)
+			mockN0Status.On("GetAttempts").Return(uint32(0))
+
 			mockN0Status.On("IsDirty").Return(false)
 			mockN0Status.On("GetParentTaskID").Return(nil)
 			n := v1.Now()
@@ -557,6 +565,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockWf.On("GetTask", taskID).Return(tk, nil)
 			mockWf.On("GetLabels").Return(make(map[string]string))
 			mockWfStatus.On("GetDataDir").Return(storage.DataReference("x"))
+			mockWfStatus.On("ConstructNodeDataDir", mock.Anything, mock.Anything, mock.Anything).Return(storage.DataReference("x"), nil)
 			return mockWf, mockN2Status
 		}
 
@@ -831,7 +840,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 	})
 
 	// Remaining retries
-	t.Run("retries-exhausted", func(t *testing.T) {
+	t.Run("retries-remaining", func(t *testing.T) {
 		hf := &mocks2.HandlerFactory{}
 		store := createInmemoryDataStore(t, promutils.NewTestScope())
 		execIface, err := NewExecutor(ctx, config.GetConfig().DefaultDeadlines, store, enQWf, mockEventSink, launchplan.NewFailFastLaunchPlanExecutor(), 10, fakeKubeClient, catalogClient, promutils.NewTestScope())

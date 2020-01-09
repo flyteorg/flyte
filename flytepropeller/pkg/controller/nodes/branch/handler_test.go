@@ -128,6 +128,9 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 	branch := New(m, promutils.NewTestScope()).(*branchHandler)
 	childNodeID := "child"
 	childDatadir := v1alpha1.DataReference("test")
+
+	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
 	w := &v1alpha1.FlyteWorkflow{
 		Status: v1alpha1.WorkflowStatus{
 			NodeStatus: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
@@ -136,6 +139,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 				},
 			},
 		},
+		DataReferenceConstructor: dataStore,
 	}
 
 	res := &v12.ResourceRequirements{}

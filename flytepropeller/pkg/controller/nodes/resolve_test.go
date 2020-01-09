@@ -183,7 +183,8 @@ func TestResolveBindingData(t *testing.T) {
 	w := &dummyBaseWorkflow{
 		Status: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
 			"n2": {
-				DataDir: outputRef,
+				DataDir:   outputRef,
+				OutputDir: outputRef,
 			},
 		},
 		GetNodeCb: func(nodeId v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool) {
@@ -353,7 +354,8 @@ func TestResolve(t *testing.T) {
 	w := &dummyBaseWorkflow{
 		Status: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
 			"n1": {
-				DataDir: outputRef,
+				DataDir:   outputRef,
+				OutputDir: outputRef,
 			},
 		},
 		GetNodeCb: func(nodeId v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool) {

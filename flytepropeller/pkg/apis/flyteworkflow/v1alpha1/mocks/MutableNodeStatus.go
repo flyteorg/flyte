@@ -394,6 +394,11 @@ func (_m *MutableNodeStatus) SetDataDir(_a0 storage.DataReference) {
 	_m.Called(_a0)
 }
 
+// SetOutputDir provides a mock function with given fields: d
+func (_m *MutableNodeStatus) SetOutputDir(d storage.DataReference) {
+	_m.Called(d)
+}
+
 // SetParentNodeID provides a mock function with given fields: n
 func (_m *MutableNodeStatus) SetParentNodeID(n *string) {
 	_m.Called(n)

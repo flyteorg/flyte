@@ -351,6 +351,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+		ns.On("GetOutputDir").Return(storage.DataReference("data-dir"))
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
@@ -648,6 +649,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+		ns.On("GetOutputDir").Return(storage.DataReference("output-dir"))
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
@@ -784,7 +786,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 						assert.True(t, got.Info().GetInfo().TaskNodeInfo.CacheHit)
 					}
 					assert.NotNil(t, got.Info().GetInfo().OutputInfo)
-					s := storage.DataReference("/data-dir/outputs.pb")
+					s := storage.DataReference("/output-dir/outputs.pb")
 					assert.Equal(t, s, got.Info().GetInfo().OutputInfo.OutputURI)
 					r, err := nCtx.DataStore().Head(context.TODO(), s)
 					assert.NoError(t, err)
@@ -846,6 +848,7 @@ func Test_task_Handle_Barrier(t *testing.T) {
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+		ns.On("GetOutputDir").Return(storage.DataReference("output-dir"))
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
@@ -1095,6 +1098,7 @@ func Test_task_Abort(t *testing.T) {
 
 		ns := &flyteMocks.ExecutableNodeStatus{}
 		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+		ns.On("GetOutputDir").Return(storage.DataReference("output-dir"))
 
 		res := &v1.ResourceRequirements{}
 		n := &flyteMocks.ExecutableNode{}
@@ -1212,6 +1216,7 @@ func Test_task_Finalize(t *testing.T) {
 
 	ns := &flyteMocks.ExecutableNodeStatus{}
 	ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+	ns.On("GetOutputDir").Return(storage.DataReference("output-dir"))
 
 	res := &v1.ResourceRequirements{}
 	n := &flyteMocks.ExecutableNode{}

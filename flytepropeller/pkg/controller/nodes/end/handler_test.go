@@ -80,6 +80,7 @@ func TestEndHandler_Handle(t *testing.T) {
 		nCtx.On("DataStore").Return(store)
 		ns := &mocks3.ExecutableNodeStatus{}
 		ns.On("GetDataDir").Return(outputRef)
+		ns.On("GetOutputDir").Return(outputRef)
 		nCtx.On("NodeStatus").Return(ns)
 		nCtx.On("NodeID").Return("end-node")
 		return nCtx
