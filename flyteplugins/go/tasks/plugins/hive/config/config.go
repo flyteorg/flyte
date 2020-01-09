@@ -57,7 +57,7 @@ type Config struct {
 	Endpoint                         config.URL                        `json:"endpoint" pflag:",Endpoint for qubole to use"`
 	CommandAPIPath                   config.URL                        `json:"commandApiPath" pflag:",API Path where commands can be launched on Qubole. Should be a valid url."`
 	AnalyzeLinkPath                  config.URL                        `json:"analyzeLinkPath" pflag:",URL path where queries can be visualized on qubole website. Should be a valid url."`
-	TokenKey                         string                            `json:"quboleTokenKey" pflag:",PrimaryLabel of the key where to find Qubole token in the secret manager."`
+	TokenKey                         string                            `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
 	LruCacheSize                     int                               `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
 	Workers                          int                               `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
 	ClusterConfigs                   []ClusterConfig                   `json:"clusterConfigs" pflag:"-,A list of cluster configs. Each of the configs corresponds to a service cluster"`
