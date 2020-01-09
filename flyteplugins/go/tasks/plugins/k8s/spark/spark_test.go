@@ -70,7 +70,8 @@ func TestGetEventInfo(t *testing.T) {
 	assert.Equal(t, "k8s.com/#!/log/spark-namespace/spark-pod/pod?namespace=spark-namespace", info.Logs[0].Uri)
 	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-pod;streamFilter=typeLogStreamPrefix", info.Logs[1].Uri)
 	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=system_log.var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix", info.Logs[2].Uri)
-	assert.Equal(t, "https://spark-ui.flyte", info.Logs[3].Uri)
+	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix", info.Logs[3].Uri)
+	assert.Equal(t, "https://spark-ui.flyte", info.Logs[4].Uri)
 
 	assert.NoError(t, setSparkConfig(&Config{
 		SparkHistoryServerURL: "spark-history.flyte",
@@ -82,7 +83,8 @@ func TestGetEventInfo(t *testing.T) {
 	assert.Equal(t, "k8s.com/#!/log/spark-namespace/spark-pod/pod?namespace=spark-namespace", info.Logs[0].Uri)
 	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-pod;streamFilter=typeLogStreamPrefix", info.Logs[1].Uri)
 	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=system_log.var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix", info.Logs[2].Uri)
-	assert.Equal(t, "spark-history.flyte/history/app-id", info.Logs[3].Uri)
+	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix", info.Logs[3].Uri)
+	assert.Equal(t, "spark-history.flyte/history/app-id", info.Logs[4].Uri)
 }
 
 func TestGetTaskPhase(t *testing.T) {
