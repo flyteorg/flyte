@@ -11,6 +11,10 @@ const NoopResourceManagerID = "noopresourcemanager"
 type NoopResourceManagerBuilder struct {
 }
 
+func (r *NoopResourceManagerBuilder) GetID() string {
+	return NoopResourceManagerID
+}
+
 func (r *NoopResourceManagerBuilder) GetResourceRegistrar(namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceRegistrar {
 	return ResourceRegistrarProxy{
 		ResourceRegistrar:       r,

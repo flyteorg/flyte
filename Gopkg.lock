@@ -53,7 +53,7 @@
   version = "v0.1.3"
 
 [[projects]]
-  digest = "1:e08d1378855f8ac73a1d60f3ea4ac230fab251c50c753bf3eae22766ef480060"
+  digest = "1:2d06a35a9627cddd6ce2b221a7d46d6b479bc116dc516d5f76a2a60a995d130d"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -103,8 +103,8 @@
     "service/sts/stsiface",
   ]
   pruneopts = ""
-  revision = "e92e1b8eb5fa589199a2bbcdf84a0342fbc40dc6"
-  version = "v1.27.4"
+  revision = "0b1278033d8e0b68eb64faec9ca9512ccd8695e0"
+  version = "v1.28.0"
 
 [[projects]]
   branch = "master"
@@ -441,7 +441,7 @@
   version = "v0.1.1"
 
 [[projects]]
-  digest = "1:7e7dbc278fab0a772ac3eb0f97c75677e151887fc9b8f065639090e0af0747a0"
+  digest = "1:970dc58fa00dcc9564052ac331d3eaec6aa4aa8d15dd40ce09f1530cddd7d492"
   name = "github.com/lyft/flyteidl"
   packages = [
     "clients/go/admin",
@@ -457,12 +457,12 @@
     "gen/pb-go/flyteidl/service",
   ]
   pruneopts = ""
-  revision = "28c0dfb6608b70262aac9cb1ff83a750521ded8e"
-  version = "v0.16.5"
+  revision = "ed373f903580e70fa1a08820b61d124163cb52da"
+  version = "v0.16.6"
 
 [[projects]]
   branch = "simpler-hive-plugin-init"
-  digest = "1:56849a2c843657a95a6fb72f55dbe8a441c6b2420bc404d6591d4a6a4182b012"
+  digest = "1:2befe92dee37980575d816558a2a2e512cc2717db20ee35decd1c0574581378e"
   name = "github.com/lyft/flyteplugins"
   packages = [
     "go/tasks/aws",
@@ -500,7 +500,7 @@
     "tests",
   ]
   pruneopts = ""
-  revision = "08730bffc879ff38d69bcb350adf245dc62d6cbd"
+  revision = "6bf03e40c6401d2a3f6dfcb96fdba4e263bf969c"
 
 [[projects]]
   digest = "1:6c8d5d4b7189d903f7a2bcca20d5e2d721493f51406a16dcf27caf09315f522c"
@@ -885,7 +885,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:411cdc92bbef745674accf00d9813473a4171541322acf1625b0861a8ef962d1"
+  digest = "1:ef7ebfbf8970c2304dc6cf8ff25e2727176d461a4f29499d757488257eeb1f36"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -897,7 +897,7 @@
     "internal/semver",
   ]
   pruneopts = ""
-  revision = "563860d11da684b1d3cbcbe4c57ecf43d099572b"
+  revision = "a7a6caa82ab2c7a235db8f1e47d3a8f2e7a6c054"
 
 [[projects]]
   branch = "master"
