@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"time"
+
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -15,6 +17,7 @@ type TaskNodeState struct {
 	PluginState        []byte
 	PluginStateVersion uint32
 	BarrierClockTick   uint32
+	LastPhaseUpdatedAt time.Time
 }
 
 type BranchNodeState struct {

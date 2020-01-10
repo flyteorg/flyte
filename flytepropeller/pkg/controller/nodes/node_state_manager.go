@@ -46,6 +46,7 @@ func (n nodeStateManager) GetTaskNodeState() handler.TaskNodeState {
 			PluginStateVersion: tn.GetPluginStateVersion(),
 			PluginState:        tn.GetPluginState(),
 			BarrierClockTick:   tn.GetBarrierClockTick(),
+			LastPhaseUpdatedAt: tn.GetLastPhaseUpdatedAt(),
 		}
 	}
 	return handler.TaskNodeState{}

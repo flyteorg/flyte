@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"strconv"
+	"time"
 
 	"github.com/lyft/flytestdlib/storage"
 
@@ -633,11 +634,12 @@ func (in *CustomState) DeepCopy() *CustomState {
 
 type TaskNodeStatus struct {
 	MutableStruct
-	Phase              int    `json:"phase,omitempty"`
-	PhaseVersion       uint32 `json:"phaseVersion,omitempty"`
-	PluginState        []byte `json:"pState,omitempty"`
-	PluginStateVersion uint32 `json:"psv,omitempty"`
-	BarrierClockTick   uint32 `json:"tick,omitempty"`
+	Phase              int       `json:"phase,omitempty"`
+	PhaseVersion       uint32    `json:"phaseVersion,omitempty"`
+	PluginState        []byte    `json:"pState,omitempty"`
+	PluginStateVersion uint32    `json:"psv,omitempty"`
+	BarrierClockTick   uint32    `json:"tick,omitempty"`
+	LastPhaseUpdatedAt time.Time `json:"updAt,omitempty"`
 }
 
 func (in *TaskNodeStatus) GetBarrierClockTick() uint32 {
@@ -652,6 +654,10 @@ func (in *TaskNodeStatus) SetBarrierClockTick(tick uint32) {
 func (in *TaskNodeStatus) SetPluginState(s []byte) {
 	in.PluginState = s
 	in.SetDirty()
+}
+
+func (in TaskNodeStatus) SetLastPhaseUpdatedAt(updatedAt time.Time) {
+	in.LastPhaseUpdatedAt = updatedAt
 }
 
 func (in *TaskNodeStatus) SetPluginStateVersion(v uint32) {
@@ -679,6 +685,10 @@ func (in *TaskNodeStatus) SetPhaseVersion(version uint32) {
 
 func (in TaskNodeStatus) GetPhase() int {
 	return in.Phase
+}
+
+func (in TaskNodeStatus) GetLastPhaseUpdatedAt() time.Time {
+	return in.LastPhaseUpdatedAt
 }
 
 func (in TaskNodeStatus) GetPhaseVersion() uint32 {

@@ -44,6 +44,7 @@ type metrics struct {
 	catalogMissCount       labeled.Counter
 	catalogHitCount        labeled.Counter
 	pluginExecutionLatency labeled.StopWatch
+	pluginQueueLatency     labeled.StopWatch
 
 	// TODO We should have a metric to capture custom state size
 	scope promutils.Scope
@@ -269,6 +270,14 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 	}
 	pluginTrns.ObservedTransitionAndState(trns, v, b)
 
+	// Emit the queue latency if the task has just transitioned from Queued to Running.
+	if ts.PluginPhase == pluginCore.PhaseQueued &&
+		(pluginTrns.pInfo.Phase() == pluginCore.PhaseInitializing || pluginTrns.pInfo.Phase() == pluginCore.PhaseRunning) {
+		if !ts.LastPhaseUpdatedAt.IsZero() {
+			t.metrics.pluginQueueLatency.Observe(ctx, ts.LastPhaseUpdatedAt, time.Now())
+		}
+	}
+
 	if pluginTrns.pInfo.Phase() == ts.PluginPhase {
 		if pluginTrns.pInfo.Version() == ts.PluginPhaseVersion {
 			logger.Debugf(ctx, "p+Version previously seen .. no event will be sent")
@@ -478,6 +487,7 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 		PluginPhase:        pluginTrns.pInfo.Phase(),
 		PluginPhaseVersion: pluginTrns.pInfo.Version(),
 		BarrierClockTick:   barrierTick,
+		LastPhaseUpdatedAt: time.Now(),
 	})
 	if err != nil {
 		logger.Errorf(ctx, "Failed to store TaskNode state, err :%s", err.Error())
@@ -598,6 +608,7 @@ func New(ctx context.Context, kubeClient executors.Client, client catalog.Client
 			catalogPutFailureCount: labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", scope),
 			catalogGetFailureCount: labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", scope),
 			pluginExecutionLatency: labeled.NewStopWatch("plugin_exec_latecny", "Time taken to invoke plugin for one round", time.Microsecond, scope),
+			pluginQueueLatency:     labeled.NewStopWatch("plugin_queue_latecny", "Time spent by plugin in queued phase", time.Microsecond, scope),
 			scope:                  scope,
 		},
 		kubeClient:      kubeClient,
