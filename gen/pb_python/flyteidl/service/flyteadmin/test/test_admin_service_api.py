@@ -71,12 +71,6 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
-    def test_delete_project_attributes(self):
-        """Test case for delete_project_attributes
-
-        """
-        pass
-
     def test_delete_project_domain_attributes(self):
         """Test case for delete_project_domain_attributes
 
@@ -127,12 +121,6 @@ class TestAdminServiceApi(unittest.TestCase):
 
     def test_get_node_execution_data(self):
         """Test case for get_node_execution_data
-
-        """
-        pass
-
-    def test_get_project_attributes(self):
-        """Test case for get_project_attributes
 
         """
         pass
@@ -295,12 +283,6 @@ class TestAdminServiceApi(unittest.TestCase):
 
     def test_update_named_entity(self):
         """Test case for update_named_entity
-
-        """
-        pass
-
-    def test_update_project_attributes(self):
-        """Test case for update_project_attributes
 
         """
         pass

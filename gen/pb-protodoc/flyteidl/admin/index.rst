@@ -18,7 +18,6 @@ Flyte Admin service over gRPC or REST. The endpoint specification is defined in 
 	node_execution.proto
 	notification.proto
 	project.proto
-	project_attributes.proto
 	project_domain_attributes.proto
 	schedule.proto
 	task.proto

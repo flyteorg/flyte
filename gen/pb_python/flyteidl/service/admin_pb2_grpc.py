@@ -6,7 +6,6 @@ from flyteidl.admin import event_pb2 as flyteidl_dot_admin_dot_event__pb2
 from flyteidl.admin import execution_pb2 as flyteidl_dot_admin_dot_execution__pb2
 from flyteidl.admin import launch_plan_pb2 as flyteidl_dot_admin_dot_launch__plan__pb2
 from flyteidl.admin import node_execution_pb2 as flyteidl_dot_admin_dot_node__execution__pb2
-from flyteidl.admin import project_attributes_pb2 as flyteidl_dot_admin_dot_project__attributes__pb2
 from flyteidl.admin import project_domain_attributes_pb2 as flyteidl_dot_admin_dot_project__domain__attributes__pb2
 from flyteidl.admin import project_pb2 as flyteidl_dot_admin_dot_project__pb2
 from flyteidl.admin import task_execution_pb2 as flyteidl_dot_admin_dot_task__execution__pb2
@@ -190,21 +189,6 @@ class AdminServiceStub(object):
         '/flyteidl.service.AdminService/GetTaskExecutionData',
         request_serializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionGetDataRequest.SerializeToString,
         response_deserializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionGetDataResponse.FromString,
-        )
-    self.UpdateProjectAttributes = channel.unary_unary(
-        '/flyteidl.service.AdminService/UpdateProjectAttributes',
-        request_serializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesUpdateRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesUpdateResponse.FromString,
-        )
-    self.GetProjectAttributes = channel.unary_unary(
-        '/flyteidl.service.AdminService/GetProjectAttributes',
-        request_serializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesGetRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesGetResponse.FromString,
-        )
-    self.DeleteProjectAttributes = channel.unary_unary(
-        '/flyteidl.service.AdminService/DeleteProjectAttributes',
-        request_serializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesDeleteRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesDeleteResponse.FromString,
         )
     self.UpdateProjectDomainAttributes = channel.unary_unary(
         '/flyteidl.service.AdminService/UpdateProjectDomainAttributes',
@@ -489,27 +473,6 @@ class AdminServiceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def UpdateProjectAttributes(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def GetProjectAttributes(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def DeleteProjectAttributes(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
   def UpdateProjectDomainAttributes(self, request, context):
     # missing associated documentation comment in .proto file
     pass
@@ -740,21 +703,6 @@ def add_AdminServiceServicer_to_server(servicer, server):
           servicer.GetTaskExecutionData,
           request_deserializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionGetDataRequest.FromString,
           response_serializer=flyteidl_dot_admin_dot_task__execution__pb2.TaskExecutionGetDataResponse.SerializeToString,
-      ),
-      'UpdateProjectAttributes': grpc.unary_unary_rpc_method_handler(
-          servicer.UpdateProjectAttributes,
-          request_deserializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesUpdateRequest.FromString,
-          response_serializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesUpdateResponse.SerializeToString,
-      ),
-      'GetProjectAttributes': grpc.unary_unary_rpc_method_handler(
-          servicer.GetProjectAttributes,
-          request_deserializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesGetRequest.FromString,
-          response_serializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesGetResponse.SerializeToString,
-      ),
-      'DeleteProjectAttributes': grpc.unary_unary_rpc_method_handler(
-          servicer.DeleteProjectAttributes,
-          request_deserializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesDeleteRequest.FromString,
-          response_serializer=flyteidl_dot_admin_dot_project__attributes__pb2.ProjectAttributesDeleteResponse.SerializeToString,
       ),
       'UpdateProjectDomainAttributes': grpc.unary_unary_rpc_method_handler(
           servicer.UpdateProjectDomainAttributes,
