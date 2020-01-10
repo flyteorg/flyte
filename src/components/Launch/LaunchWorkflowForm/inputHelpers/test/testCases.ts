@@ -156,6 +156,5 @@ export const literalToInputTestCases: InputToLiteralTestParams[] = [
         Long.MIN_VALUE.toString()
     ],
     [InputType.String, primitiveLiteral({ stringValue: '' }), ''],
-    [InputType.String, primitiveLiteral({ stringValue: 'abcdefg' }), 'abcdefg'],
-    [InputType.None, literalNone(), undefined]
+    [InputType.String, primitiveLiteral({ stringValue: 'abcdefg' }), 'abcdefg']
 ];

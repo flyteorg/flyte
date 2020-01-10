@@ -1,4 +1,6 @@
+import { Core } from 'flyteidl';
 import { InputProps, InputType } from '../../types';
+import { literalNone } from '../constants';
 import { getHelperForInput } from '../getHelperForInput';
 import {
     inputToLiteral,
@@ -46,13 +48,76 @@ function makeNestedCollectionInput(type: InputType, value: string): InputProps {
 describe('literalToInputValue', () => {
     describe('Primitives', () => {
         literalToInputTestCases.map(([type, input, output]) =>
-            it(`Should correctly convert ${type}: ${JSON.stringify(
+            it(`should correctly convert ${type}: ${JSON.stringify(
                 input.scalar!.primitive
             )}`, () => {
                 const result = literalToInputValue({ type }, input);
                 expect(result).toEqual(output);
             })
         );
+
+        [
+            InputType.Collection,
+            InputType.Datetime,
+            InputType.Duration,
+            InputType.Float,
+            InputType.Integer,
+            InputType.String
+        ].map(type =>
+            it(`should convert None value for ${type} to undefined`, () => {
+                expect(
+                    literalToInputValue({ type }, literalNone())
+                ).toBeUndefined();
+            })
+        );
+
+        it('should correctly convert noneType to undefined', () => {
+            expect(
+                literalToInputValue({ type: InputType.None }, literalNone())
+            ).toEqual(undefined);
+        });
+    });
+
+    describe('Collections', () => {
+        literalToInputTestCases.map(([type, input, output]) =>
+            it(`should correctly convert collection of ${type}: ${JSON.stringify(
+                input.scalar!.primitive
+            )}`, () => {
+                const collection: Core.ILiteral = {
+                    collection: {
+                        // Duplicate it to test comma separation
+                        literals: [input, input]
+                    }
+                };
+                const stringifiedValue =
+                    output === undefined ? '' : output.toString();
+                const expectedString = `[${stringifiedValue},${stringifiedValue}]`;
+                const result = literalToInputValue(
+                    { type: InputType.Collection, subtype: { type } },
+                    collection
+                );
+                expect(result).toEqual(expectedString);
+            })
+        );
+
+        it('should return empty for noneType literals', () => {
+            const collection: Core.ILiteral = {
+                collection: {
+                    // Duplicate it to test comma separation
+                    literals: [literalNone(), literalNone()]
+                }
+            };
+
+            expect(
+                literalToInputValue(
+                    {
+                        type: InputType.Collection,
+                        subtype: { type: InputType.None }
+                    },
+                    collection
+                )
+            ).toEqual('[]');
+        });
     });
 
     it('should return system default if parsing literal fails', () => {
@@ -70,7 +135,7 @@ describe('literalToInputValue', () => {
 describe('inputToLiteral', () => {
     describe('Primitives', () => {
         literalTestCases.map(([type, input, output]) =>
-            it(`Should correctly convert ${type}: ${input} (${typeof input})`, () => {
+            it(`should correctly convert ${type}: ${input} (${typeof input})`, () => {
                 const result = inputToLiteral(makeSimpleInput(type, input));
                 expect(result.scalar!.primitive).toEqual(output);
             })
@@ -88,7 +153,7 @@ describe('inputToLiteral', () => {
                 value = `"${input}"`;
             }
 
-            it(`Should correctly convert collection of type ${type}: [${value}] (${typeof input})`, () => {
+            it(`should correctly convert collection of type ${type}: [${value}] (${typeof input})`, () => {
                 const result = inputToLiteral(
                     makeCollectionInput(type, `[${value}]`)
                 );
@@ -97,7 +162,7 @@ describe('inputToLiteral', () => {
                 ).toEqual(output);
             });
 
-            it(`Should correctly convert nested collection of type ${type}: [[${value}]] (${typeof input})`, () => {
+            it(`should correctly convert nested collection of type ${type}: [[${value}]] (${typeof input})`, () => {
                 const result = inputToLiteral(
                     makeNestedCollectionInput(type, `[[${value}]]`)
                 );
@@ -120,7 +185,7 @@ describe('inputToLiteral', () => {
             InputType.Struct,
             InputType.Unknown
         ].map(type =>
-            it(`Should return empty value for type: ${type}`, () => {
+            it(`should return empty value for type: ${type}`, () => {
                 expect(
                     inputToLiteral(makeSimpleInput(type, '')).scalar
                 ).toEqual({ noneType: {} });

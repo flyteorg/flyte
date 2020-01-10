@@ -10,7 +10,8 @@ export type InputToLiteralConverterFn = (
     input: ConverterInput
 ) => Core.ILiteral;
 export type LiteralToInputConterterFn = (
-    literal: Core.ILiteral
+    literal: Core.ILiteral,
+    typeDefinition: InputTypeDefinition
 ) => InputValue | undefined;
 export interface InputHelper {
     defaultValue?: InputValue;

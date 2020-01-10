@@ -1,9 +1,11 @@
 import { Core } from 'flyteidl';
-import { InputValue } from '../types';
+import { InputTypeDefinition, InputValue } from '../types';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
 import { parseJSON } from './parseJson';
 import { ConverterInput, InputHelper } from './types';
+
+const missingSubTypeError = 'Unexpected missing subtype for collection';
 
 function parseCollection(list: string) {
     const parsed = parseJSON(list);
@@ -13,9 +15,34 @@ function parseCollection(list: string) {
     return parsed;
 }
 
-function fromLiteral(literal: Core.ILiteral): InputValue {
-    // TODO
-    return '';
+function fromLiteral(
+    literal: Core.ILiteral,
+    { subtype }: InputTypeDefinition
+): InputValue {
+    if (!subtype) {
+        throw new Error(missingSubTypeError);
+    }
+    if (!literal.collection) {
+        throw new Error('Collection literal missing `collection` property');
+    }
+    if (!literal.collection.literals) {
+        throw new Error(
+            'Collection literal missing `colleciton.literals` property'
+        );
+    }
+
+    const subTypeHelper = getHelperForInput(subtype.type);
+    const values = literal.collection.literals.reduce<string[]>(
+        (out, literal) => {
+            const value = subTypeHelper.fromLiteral(literal, subtype);
+            if (value !== undefined) {
+                out.push(value.toString());
+            }
+            return out;
+        },
+        []
+    );
+    return `[${values.join(',')}]`;
 }
 
 function toLiteral({
@@ -23,7 +50,7 @@ function toLiteral({
     typeDefinition: { subtype }
 }: ConverterInput): Core.ILiteral {
     if (!subtype) {
-        throw new Error('Unexpected missing subtype for collection');
+        throw new Error(missingSubTypeError);
     }
     let parsed: any[];
     // If we're processing a nested collection, it may already have been parsed

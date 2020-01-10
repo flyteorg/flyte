@@ -30,8 +30,12 @@ export function literalToInputValue(
         typeDefinition.type
     );
 
+    if (literal.scalar && literal.scalar.noneType) {
+        return undefined;
+    }
+
     try {
-        return fromLiteral(literal);
+        return fromLiteral(literal, typeDefinition);
     } catch (e) {
         // If something goes wrong (most likely malformed default value input),
         // we'll return the system default value.
