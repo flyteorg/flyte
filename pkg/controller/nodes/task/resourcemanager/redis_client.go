@@ -9,6 +9,8 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 )
 
+//go:generate mockery -name RedisClient -case=underscore
+
 type RedisClient interface {
 	// A pass-through method. Getting the cardinality of the Redis set
 	SCard(string) *redis.IntCmd
