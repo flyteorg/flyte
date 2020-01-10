@@ -2,6 +2,7 @@ package resourcemanager
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"time"
 
@@ -55,6 +56,10 @@ func (r *RedisResourceManagerBuilder) RegisterResourceQuota(ctx context.Context,
 	return nil
 }
 
+func getValidMetricScopeName(name string) string {
+	return strings.Replace(name, "-", "_", -1)
+}
+
 func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) (pluginCore.ResourceManager, error) {
 	if r.client == nil || r.MetricsScope == nil || r.namespacedResourcesQuotaMap == nil {
 		return nil, errors.Errorf("Failed to build a redis resource manager. Missing key property(s)")
@@ -70,7 +75,7 @@ func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) 
 	for namespace, quota := range r.namespacedResourcesQuotaMap {
 		// `namespace` is always prefixed with the RedisSetKeyPrefix and the plugin ID. Each plugin can then affix additional sub-namespaces to it to create different resource pools.
 		// For example, hive qubole plugin's namespaces contain plugin ID and qubole cluster (e.g., "redisresourcemanager:qubole-hive-executor:default-cluster").
-		metrics := NewRedisResourceManagerMetrics(r.MetricsScope.NewSubScope(string(namespace)))
+		metrics := NewRedisResourceManagerMetrics(r.MetricsScope.NewSubScope(getValidMetricScopeName(string(namespace))))
 
 		rm.namespacedResourcesMap[namespace] = &Resource{
 			quota:          quota,
@@ -158,7 +163,7 @@ func (r *RedisResourceManager) startMetricsGathering(ctx context.Context) {
 func NewRedisResourceManagerMetrics(scope promutils.Scope) *RedisResourceManagerMetrics {
 	return &RedisResourceManagerMetrics{
 		Scope: scope,
-		RedisSizeCheckTime: scope.MustNewStopWatch("size_check_time_ms",
+		RedisSizeCheckTime: scope.MustNewStopWatch("size_check_time",
 			"The time it takes to measure the size of the Redis Set where all utilized resource are stored", time.Millisecond),
 
 		AllocatedTokensGauge: scope.MustNewGauge("size",
