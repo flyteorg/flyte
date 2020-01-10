@@ -276,12 +276,14 @@ type ExecutableTaskNodeStatus interface {
 	GetPluginState() []byte
 	GetPluginStateVersion() uint32
 	GetBarrierClockTick() uint32
+	GetLastPhaseUpdatedAt() time.Time
 }
 
 type MutableTaskNodeStatus interface {
 	Mutable
 	ExecutableTaskNodeStatus
 	SetPhase(phase int)
+	SetLastPhaseUpdatedAt(updatedAt time.Time)
 	SetPhaseVersion(version uint32)
 	SetPluginState([]byte)
 	SetPluginStateVersion(uint32)
