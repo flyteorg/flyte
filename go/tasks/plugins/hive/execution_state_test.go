@@ -366,7 +366,8 @@ func createMockTaskExecutionContextWithProjectDomain(project string, domain stri
 
 func Test_getClusterPrimaryLabel(t *testing.T) {
 	ctx := context.TODO()
-	config.SetQuboleConfig(createMockQuboleCfg())
+	err := config.SetQuboleConfig(createMockQuboleCfg())
+	assert.Nil(t, err)
 
 	type args struct {
 		ctx                  context.Context
