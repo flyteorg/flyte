@@ -111,7 +111,7 @@ If you have the flyte sandbox installed on your local machine, the image will be
 
 To upload to a remote registry, use ::
 
-  DOCKER_REGISRY_USERNAME={username} DOCKER_REGISTRY_PASSWORD={pass} REGISTRY=docker.io make docker_build
+  DOCKER_REGISTRY_USERNAME={username} DOCKER_REGISTRY_PASSWORD={pass} REGISTRY=docker.io make docker_build
 
 Replace the values above with your registry username, password, and registry endpoint.
 
