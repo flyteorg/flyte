@@ -307,7 +307,7 @@ func createMockQuboleCfg() *config.Config {
 			{PrimaryLabel: "primary B", Labels: []string{"B"}, Limit: 10},
 			{PrimaryLabel: "primary C", Labels: []string{"C-prod"}, Limit: 1},
 		},
-		ProjectDestinationClusterConfigs: []config.ProjectDestinationClusterConfig{
+		DestinationClusterConfigs: []config.DestinationClusterConfig{
 			{Project: "project A", Domain: "domain X", ClusterLabel: "A-prod"},
 			{Project: "project A", Domain: "domain Y", ClusterLabel: "A"},
 			{Project: "project A", Domain: "domain Z", ClusterLabel: "B"},

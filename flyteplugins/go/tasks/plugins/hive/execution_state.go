@@ -251,7 +251,7 @@ func getClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext,
 		domain := tExecId.NodeExecutionId.GetExecutionId().GetDomain()
 		logger.Debugf(ctx, "No clusterLabelOverride. Finding the pre-defined cluster label for (project: %v, domain: %v)", project, domain)
 		// Using a linear search because N is small
-		for _, m := range cfg.ProjectDestinationClusterConfigs {
+		for _, m := range cfg.DestinationClusterConfigs {
 			if project == m.Project && domain == m.Domain {
 				clusterLabel = m.ClusterLabel
 				logger.Debugf(ctx, "Found the pre-defined cluster label [%v] for (project: %v, domain: %v)", clusterLabel, project, domain)
