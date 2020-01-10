@@ -5,7 +5,6 @@ option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
 import "flyteidl/admin/project.proto";
-import "flyteidl/admin/project_attributes.proto";
 import "flyteidl/admin/project_domain_attributes.proto";
 import "flyteidl/admin/task.proto";
 import "flyteidl/admin/workflow.proto";
@@ -377,35 +376,6 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
       description: "Retrieve input and output data from an existing task execution."
-    };
-  }
-
-  rpc UpdateProjectAttributes (flyteidl.admin.ProjectAttributesUpdateRequest) returns (flyteidl.admin.ProjectAttributesUpdateResponse) {
-    option (google.api.http) = {
-      put: "/api/v1/project_attributes/{attributes.project}"
-      body: "*"
-    };
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-      description: "Update the customized resource attributes associated with a project"
-    };
-  }
-
-  rpc GetProjectAttributes (flyteidl.admin.ProjectAttributesGetRequest) returns (flyteidl.admin.ProjectAttributesGetResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/project_attributes/{project}"
-    };
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-      description: "Retrieve the customized resource attributes associated with a project"
-    };
-  }
-
-  rpc DeleteProjectAttributes (flyteidl.admin.ProjectAttributesDeleteRequest) returns (flyteidl.admin.ProjectAttributesDeleteResponse) {
-    option (google.api.http) = {
-      delete: "/api/v1/project_attributes/{project}"
-      body: "*"
-    };
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-      description: "Delete the customized resource attributes associated with a project"
     };
   }
 

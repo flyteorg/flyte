@@ -31,7 +31,6 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include "google/api/annotations.pb.h"
 #include "flyteidl/admin/project.pb.h"
-#include "flyteidl/admin/project_attributes.pb.h"
 #include "flyteidl/admin/project_domain_attributes.pb.h"
 #include "flyteidl/admin/task.pb.h"
 #include "flyteidl/admin/workflow.pb.h"
