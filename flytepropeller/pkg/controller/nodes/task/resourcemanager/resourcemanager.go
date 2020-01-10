@@ -45,6 +45,7 @@ type Metrics interface {
 }
 
 type Builder interface {
+	GetID() string
 	GetResourceRegistrar(namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceRegistrar
 	BuildResourceManager(ctx context.Context) (pluginCore.ResourceManager, error)
 }

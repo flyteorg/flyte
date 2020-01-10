@@ -25,6 +25,10 @@ type RedisResourceManagerBuilder struct {
 	namespacedResourcesQuotaMap map[pluginCore.ResourceNamespace]int
 }
 
+func (r *RedisResourceManagerBuilder) GetID() string {
+	return RedisSetKeyPrefix
+}
+
 func (r *RedisResourceManagerBuilder) GetResourceRegistrar(namespacePrefix pluginCore.ResourceNamespace) pluginCore.ResourceRegistrar {
 	return ResourceRegistrarProxy{
 		ResourceRegistrar:       r,
@@ -64,13 +68,14 @@ func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) 
 	if r.client == nil || r.MetricsScope == nil || r.namespacedResourcesQuotaMap == nil {
 		return nil, errors.Errorf("Failed to build a redis resource manager. Missing key property(s)")
 	}
-
+	logger.Infof(ctx, "Start building a resource manager")
 	rm := &RedisResourceManager{
 		client:                 r.client,
 		MetricsScope:           r.MetricsScope,
 		namespacedResourcesMap: map[pluginCore.ResourceNamespace]*Resource{},
 	}
 
+	logger.Infof(ctx, "Building a resource manager: creating metrics and namespacedResourcesMap")
 	// building the resources and insert them into the resource manager
 	for namespace, quota := range r.namespacedResourcesQuotaMap {
 		// `namespace` is always prefixed with the RedisSetKeyPrefix and the plugin ID. Each plugin can then affix additional sub-namespaces to it to create different resource pools.
@@ -82,6 +87,7 @@ func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) 
 			metrics:        metrics,
 			rejectedTokens: sync.Map{},
 		}
+		logger.Infof(ctx, "Creating namespacedResourcesMap: added namespace [%v] and resource [%v]", namespace, rm.namespacedResourcesMap[namespace])
 	}
 	rm.startMetricsGathering(ctx)
 	return rm, nil
