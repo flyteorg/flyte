@@ -65,14 +65,14 @@ type ExecutionState struct {
 
 // This is the main state iteration
 func HandleExecutionState(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, quboleClient client.QuboleClient,
-	executionsCache cache.AutoRefresh, resourceNamespace core.ResourceNamespace, cfg *config.Config) (ExecutionState, error) {
+	executionsCache cache.AutoRefresh, cfg *config.Config) (ExecutionState, error) {
 
 	var transformError error
 	var newState ExecutionState
 
 	switch currentState.Phase {
 	case PhaseNotStarted:
-		newState, transformError = GetAllocationToken(ctx, resourceNamespace, tCtx)
+		newState, transformError = GetAllocationToken(ctx, tCtx)
 
 	case PhaseQueued:
 		newState, transformError = KickOffQuery(ctx, tCtx, currentState, quboleClient, executionsCache, cfg)
@@ -141,25 +141,25 @@ func ConstructTaskInfo(e ExecutionState) *core.TaskInfo {
 	return nil
 }
 
-func composeResourceNamespaceWithClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext, resourceNamespace core.ResourceNamespace) (core.ResourceNamespace, error) {
+func composeResourceNamespaceWithClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext) (core.ResourceNamespace, error) {
 	_, clusterLabelOverride, _, _, err := GetQueryInfo(ctx, tCtx)
 	if err != nil {
-		return resourceNamespace, err
+		return "", err
 	}
 	clusterPrimaryLabel := getClusterPrimaryLabel(ctx, tCtx, clusterLabelOverride)
-	return resourceNamespace.CreateSubNamespace(core.ResourceNamespace(clusterPrimaryLabel)), nil
+	return core.ResourceNamespace(clusterPrimaryLabel), nil
 }
 
-func GetAllocationToken(ctx context.Context, resourceNamespace core.ResourceNamespace, tCtx core.TaskExecutionContext) (ExecutionState, error) {
+func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext) (ExecutionState, error) {
 	newState := ExecutionState{}
 	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 
-	resourceNamespaceWithClusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx, resourceNamespace)
+	clusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx)
 	if err != nil {
 		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when requesting allocation token %s", uniqueId)
 	}
 
-	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, resourceNamespaceWithClusterPrimaryLabel, uniqueId)
+	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, clusterPrimaryLabel, uniqueId)
 	if err != nil {
 		logger.Errorf(ctx, "Resource manager failed for TaskExecId [%s] token [%s]. error %s",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueId, err)
@@ -359,15 +359,15 @@ func Abort(ctx context.Context, tCtx core.TaskExecutionContext, currentState Exe
 	return nil
 }
 
-func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, resourceNamespace core.ResourceNamespace, _ ExecutionState) error {
+func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, _ ExecutionState) error {
 	// Release allocation token
 	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	resourceNamespaceWithClusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx, resourceNamespace)
+	clusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx)
 	if err != nil {
 		return errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when releasing allocation token %s", uniqueId)
 	}
 
-	err = tCtx.ResourceManager().ReleaseResource(ctx, resourceNamespaceWithClusterPrimaryLabel, uniqueId)
+	err = tCtx.ResourceManager().ReleaseResource(ctx, clusterPrimaryLabel, uniqueId)
 
 	if err != nil {
 		logger.Errorf(ctx, "Error releasing allocation token [%s] in Finalize [%s]", uniqueId, err)

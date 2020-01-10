@@ -37,10 +37,6 @@ func (q QuboleHiveExecutor) GetID() string {
 	return q.id
 }
 
-func (q QuboleHiveExecutor) GetResourceNamespace() core.ResourceNamespace {
-	return core.ResourceNamespace(q.GetID())
-}
-
 func (q QuboleHiveExecutor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	incomingState := ExecutionState{}
 
@@ -55,8 +51,7 @@ func (q QuboleHiveExecutor) Handle(ctx context.Context, tCtx core.TaskExecutionC
 
 	// Do what needs to be done, and give this function everything it needs to do its job properly
 	// TODO: Play around with making this return a transition directly. How will that pattern affect the multi-Qubole plugin
-	outgoingState, transformError := HandleExecutionState(ctx, tCtx, incomingState, q.quboleClient, q.executionsCache,
-		q.GetResourceNamespace(), q.cfg)
+	outgoingState, transformError := HandleExecutionState(ctx, tCtx, incomingState, q.quboleClient, q.executionsCache, q.cfg)
 
 	// Return if there was an error
 	if transformError != nil {
@@ -98,7 +93,7 @@ func (q QuboleHiveExecutor) Finalize(ctx context.Context, tCtx core.TaskExecutio
 		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to unmarshal custom state in Finalize")
 	}
 
-	return Finalize(ctx, tCtx, q.GetResourceNamespace(), incomingState)
+	return Finalize(ctx, tCtx, incomingState)
 }
 
 func (q QuboleHiveExecutor) GetProperties() core.PluginProperties {
@@ -107,7 +102,7 @@ func (q QuboleHiveExecutor) GetProperties() core.PluginProperties {
 
 func QuboleHiveExecutorLoader(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
 	cfg := config.GetQuboleConfig()
-	return InitializeHiveExecutor(ctx, iCtx, cfg, quboleHiveExecutorId, BuildResourceConfig(cfg), client.NewQuboleClient(cfg))
+	return InitializeHiveExecutor(ctx, iCtx, cfg, BuildResourceConfig(cfg), client.NewQuboleClient(cfg))
 }
 
 func BuildResourceConfig(cfg *config.Config) map[string]int {
@@ -119,18 +114,18 @@ func BuildResourceConfig(cfg *config.Config) map[string]int {
 	return resourceConfig
 }
 
-func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, cfg *config.Config, resourceNamespace core.ResourceNamespace, resourceConfig map[string]int,
+func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, cfg *config.Config, resourceConfig map[string]int,
 	quboleClient client.QuboleClient) (core.Plugin, error) {
-
+	logger.Infof(ctx, "Initializing a Hive executor with a resource config [%v]", resourceConfig)
 	q, err := NewQuboleHiveExecutor(ctx, cfg, quboleClient, iCtx.SecretManager(), iCtx.MetricsScope())
 	if err != nil {
+		logger.Errorf(ctx, "Failed to create a new QuboleHiveExecutor due to error: [%v]", err)
 		return nil, err
 	}
 
 	for clusterPrimaryLabel, clusterLimit := range resourceConfig {
-		namespaceWithClusterPrimaryLabel := resourceNamespace.CreateSubNamespace(core.ResourceNamespace(clusterPrimaryLabel))
-		logger.Infof(ctx, "Registering resource quota [%v]", clusterPrimaryLabel)
-		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, namespaceWithClusterPrimaryLabel, clusterLimit); err != nil {
+		logger.Infof(ctx, "Registering resource quota for cluster [%v]", clusterPrimaryLabel)
+		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, core.ResourceNamespace(clusterPrimaryLabel), clusterLimit); err != nil {
 			logger.Errorf(ctx, "Resource quota registration for [%v] failed due to error [%v]", clusterPrimaryLabel, err)
 			return nil, err
 		}
