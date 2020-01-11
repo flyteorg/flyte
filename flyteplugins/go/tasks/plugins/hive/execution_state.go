@@ -221,50 +221,90 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 	return
 }
 
-func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label string) string {
+func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label string) (string, bool) {
+	primaryLabel := DefaultClusterPrimaryLabel
+	found := false
+
 	if label == "" {
 		logger.Debugf(ctx, "Input cluster label is an empty string; falling back to using the default primary label [%v]", label, DefaultClusterPrimaryLabel)
-		return DefaultClusterPrimaryLabel
+		return primaryLabel, found
 	}
+
 	// Using a linear search because N is small and because of ClusterConfig's struct definition
 	// which is determined specifically for the readability of the corresponding configmap yaml file
 	for _, clusterCfg := range quboleCfg.ClusterConfigs {
 		for _, l := range clusterCfg.Labels {
-			if l == label {
+			if label != "" && l == label {
 				logger.Debugf(ctx, "Found the primary label [%v] for label [%v]", clusterCfg.PrimaryLabel, label)
-				return clusterCfg.PrimaryLabel
+				primaryLabel, found = clusterCfg.PrimaryLabel, true
+				break
 			}
 		}
 	}
+
 	logger.Debugf(ctx, "Cannot find the primary cluster label for label [%v] in configmap; "+
 		"falling back to using the default primary label [%v]", label, DefaultClusterPrimaryLabel)
-	return DefaultClusterPrimaryLabel
+	return primaryLabel, found
+}
+
+func mapProjectDomainToDestinationClusterLabel(ctx context.Context, tCtx core.TaskExecutionContext, quboleCfg *config.Config) (string, bool) {
+	tExecId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	project := tExecId.NodeExecutionId.GetExecutionId().GetProject()
+	domain := tExecId.NodeExecutionId.GetExecutionId().GetDomain()
+	logger.Debugf(ctx, "No clusterLabelOverride. Finding the pre-defined cluster label for (project: %v, domain: %v)", project, domain)
+	// Using a linear search because N is small
+	for _, m := range quboleCfg.DestinationClusterConfigs {
+		if project == m.Project && domain == m.Domain {
+			logger.Debugf(ctx, "Found the pre-defined cluster label [%v] for (project: %v, domain: %v)", m.ClusterLabel, project, domain)
+			return m.ClusterLabel, true
+		}
+	}
+
+	// This function finds the label, not primary label, so in the case where no mapping is found, this function should return an empty string
+	return "", false
 }
 
 func getClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext, clusterLabelOverride string) string {
 	cfg := config.GetQuboleConfig()
-	clusterLabel := ""
-	// If there's no override, we look up in our mapping to find the proper primary cluster clusterLabel according to the project and the domain
-	if clusterLabelOverride == "" {
-		tExecId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-		project := tExecId.NodeExecutionId.GetExecutionId().GetProject()
-		domain := tExecId.NodeExecutionId.GetExecutionId().GetDomain()
-		logger.Debugf(ctx, "No clusterLabelOverride. Finding the pre-defined cluster label for (project: %v, domain: %v)", project, domain)
-		// Using a linear search because N is small
-		for _, m := range cfg.DestinationClusterConfigs {
-			if project == m.Project && domain == m.Domain {
-				clusterLabel = m.ClusterLabel
-				logger.Debugf(ctx, "Found the pre-defined cluster label [%v] for (project: %v, domain: %v)", clusterLabel, project, domain)
-				break
-			}
+
+	// If override is not empty and if it has a mapping, we return the mapped primary label
+	if clusterLabelOverride != "" {
+		if primaryLabel, found := mapLabelToPrimaryLabel(ctx, cfg, clusterLabelOverride); found {
+			return primaryLabel
 		}
-	} else {
-		clusterLabel = clusterLabelOverride
-		logger.Debugf(ctx, "clusterLabelOverride exists = [%v]. Using it as clusterLabel = [%v]", clusterLabelOverride, clusterLabel)
 	}
-	primaryLabel := mapLabelToPrimaryLabel(ctx, cfg, clusterLabel)
-	logger.Debugf(ctx, "Cluster clusterLabel override = [%v]. Getting the primary clusterLabel of clusterLabel [%v] = [%v]", clusterLabelOverride, clusterLabel, primaryLabel)
-	return primaryLabel
+
+	// If override is empty or if the override does not have a mapping, we return the primary label mapped using (project, domain)
+	if clusterLabel, found := mapProjectDomainToDestinationClusterLabel(ctx, tCtx, cfg); found {
+		primaryLabel, _ := mapLabelToPrimaryLabel(ctx, cfg, clusterLabel)
+		return primaryLabel
+	}
+
+	// Else we return the default primary label
+	return DefaultClusterPrimaryLabel
+	/*
+		// If there's no override, we look up in our mapping to find the proper primary cluster clusterLabel according to the project and the domain
+		if clusterLabelOverride == "" {
+			tExecId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+			project := tExecId.NodeExecutionId.GetExecutionId().GetProject()
+			domain := tExecId.NodeExecutionId.GetExecutionId().GetDomain()
+			logger.Debugf(ctx, "No clusterLabelOverride. Finding the pre-defined cluster label for (project: %v, domain: %v)", project, domain)
+			// Using a linear search because N is small
+			for _, m := range cfg.DestinationClusterConfigs {
+				if project == m.Project && domain == m.Domain {
+					clusterLabel = m.ClusterLabel
+					logger.Debugf(ctx, "Found the pre-defined cluster label [%v] for (project: %v, domain: %v)", clusterLabel, project, domain)
+					break
+				}
+			}
+		} else {
+			clusterLabel = clusterLabelOverride
+			logger.Debugf(ctx, "clusterLabelOverride exists = [%v]. Using it as clusterLabel = [%v]", clusterLabelOverride, clusterLabel)
+		}
+		primaryLabel := mapLabelToPrimaryLabel(ctx, cfg, clusterLabel)
+		logger.Debugf(ctx, "Cluster clusterLabel override = [%v]. Getting the primary clusterLabel of clusterLabel [%v] = [%v]", clusterLabelOverride, clusterLabel, primaryLabel)
+		return primaryLabel
+	*/
 }
 
 func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, quboleClient client.QuboleClient,
