@@ -1,6 +1,9 @@
 import { Core } from 'flyteidl';
 import { get } from 'lodash';
 
+/** Performs a deep get of `path` on the given `Core.ILiteral`. Will throw
+ * if the given property doesn't exist.
+ */
 export function extractLiteralWithCheck<T>(
     literal: Core.ILiteral,
     path: string

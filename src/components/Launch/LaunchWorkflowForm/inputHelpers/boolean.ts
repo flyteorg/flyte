@@ -1,6 +1,6 @@
 import { Core } from 'flyteidl';
 import { InputValue } from '../types';
-import { literalValuePaths } from './constants';
+import { primitiveLiteralPaths } from './constants';
 import { ConverterInput, InputHelper } from './types';
 import { extractLiteralWithCheck } from './utils';
 
@@ -43,7 +43,7 @@ function toLiteral({ value }: ConverterInput): Core.ILiteral {
 function fromLiteral(literal: Core.ILiteral): InputValue {
     return extractLiteralWithCheck<boolean>(
         literal,
-        literalValuePaths.scalarBoolean
+        primitiveLiteralPaths.scalarBoolean
     );
 }
 

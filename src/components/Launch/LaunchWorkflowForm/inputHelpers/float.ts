@@ -1,13 +1,13 @@
 import { Core } from 'flyteidl';
 import { InputValue } from '../types';
-import { literalValuePaths } from './constants';
+import { primitiveLiteralPaths } from './constants';
 import { ConverterInput, InputHelper } from './types';
 import { extractLiteralWithCheck } from './utils';
 
 function fromLiteral(literal: Core.ILiteral): InputValue {
     return extractLiteralWithCheck<number>(
         literal,
-        literalValuePaths.scalarFloat
+        primitiveLiteralPaths.scalarFloat
     );
 }
 

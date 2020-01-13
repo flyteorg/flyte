@@ -2,7 +2,7 @@ import { dateToTimestamp, timestampToDate } from 'common/utils';
 import { Core, Protobuf } from 'flyteidl';
 import { utc as moment } from 'moment';
 import { InputValue } from '../types';
-import { allowedDateFormats, literalValuePaths } from './constants';
+import { allowedDateFormats, primitiveLiteralPaths } from './constants';
 import { ConverterInput, InputHelper } from './types';
 import { extractLiteralWithCheck } from './utils';
 
@@ -15,7 +15,7 @@ function parseDate(value: InputValue) {
 function fromLiteral(literal: Core.ILiteral): InputValue {
     const value = extractLiteralWithCheck<Protobuf.ITimestamp>(
         literal,
-        literalValuePaths.scalarDatetime
+        primitiveLiteralPaths.scalarDatetime
     );
     return timestampToDate(value);
 }

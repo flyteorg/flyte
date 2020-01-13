@@ -1,7 +1,7 @@
 import { Core } from 'flyteidl';
 import * as Long from 'long';
 import { InputValue } from '../types';
-import { literalValuePaths } from './constants';
+import { primitiveLiteralPaths } from './constants';
 import { ConverterInput, InputHelper } from './types';
 import { extractLiteralWithCheck } from './utils';
 
@@ -10,7 +10,7 @@ const integerRegexPattern = /^-?[0-9]+$/;
 function fromLiteral(literal: Core.ILiteral): InputValue {
     return extractLiteralWithCheck<Long>(
         literal,
-        literalValuePaths.scalarInteger
+        primitiveLiteralPaths.scalarInteger
     ).toString();
 }
 

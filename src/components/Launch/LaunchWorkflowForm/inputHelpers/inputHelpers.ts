@@ -6,6 +6,9 @@ import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
 
 type ToLiteralParams = Pick<InputProps, 'typeDefinition' | 'value'>;
+/** Converts a type/InputValue combination to a `Core.ILiteral` which can be
+ * submitted to Admin for creating an execution.
+ */
 export function inputToLiteral(input: ToLiteralParams): Core.ILiteral {
     if (input.value == null) {
         return literalNone();
@@ -16,12 +19,16 @@ export function inputToLiteral(input: ToLiteralParams): Core.ILiteral {
     return toLiteral({ value, typeDefinition });
 }
 
+/** Generates the default value (if any) for a given type. */
 export function defaultValueForInputType(
     typeDefinition: InputTypeDefinition
 ): InputValue | undefined {
     return getHelperForInput(typeDefinition.type).defaultValue;
 }
 
+/** Converts a Core.ILiteral to an InputValue which can be used to populate
+ * a form control.
+ */
 export function literalToInputValue(
     typeDefinition: InputTypeDefinition,
     literal: Core.ILiteral
@@ -45,6 +52,9 @@ export function literalToInputValue(
 }
 
 type ValidationParams = Pick<InputProps, 'name' | 'typeDefinition' | 'value'>;
+/** Validates a given InputValue based on rules for the provided type. Returns
+ * void if no errors, throws an error otherwise.
+ */
 export function validateInput(input: ValidationParams) {
     if (input.value == null) {
         return;

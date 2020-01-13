@@ -1,7 +1,7 @@
 import { durationToMilliseconds, millisecondsToDuration } from 'common/utils';
 import { Core, Protobuf } from 'flyteidl';
 import { InputValue } from '../types';
-import { literalValuePaths } from './constants';
+import { primitiveLiteralPaths } from './constants';
 import { isValidFloat } from './float';
 import { ConverterInput, InputHelper } from './types';
 import { extractLiteralWithCheck } from './utils';
@@ -9,7 +9,7 @@ import { extractLiteralWithCheck } from './utils';
 function fromLiteral(literal: Core.ILiteral): InputValue {
     const value = extractLiteralWithCheck<Protobuf.IDuration>(
         literal,
-        literalValuePaths.scalarDuration
+        primitiveLiteralPaths.scalarDuration
     );
     return durationToMilliseconds(value);
 }
