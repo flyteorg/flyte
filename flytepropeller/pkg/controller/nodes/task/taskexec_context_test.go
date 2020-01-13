@@ -83,10 +83,13 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	})
 	nCtx.On("NodeStateReader").Return(nr)
 
+	noopRm := CreateNoopResourceManager(context.TODO(), promutils.NewTestScope())
+
 	c := &mocks.Client{}
 	tk := &Handler{
-		catalog:       c,
-		secretManager: secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
+		catalog:         c,
+		secretManager:   secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
+		resourceManager: noopRm,
 	}
 
 	got, err := tk.newTaskExecutionContext(context.TODO(), nCtx, "plugin1")

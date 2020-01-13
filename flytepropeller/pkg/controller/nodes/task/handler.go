@@ -162,8 +162,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 
 	// Create a new base resource negotiator
 	resourceManagerConfig := rmConfig.GetConfig()
-	newResourceManagerBuilder, err := resourcemanager.GetResourceManagerBuilderByType(ctx, resourceManagerConfig.Type,
-		t.metrics.scope.NewSubScope("resourcemanager"))
+	newResourceManagerBuilder, err := resourcemanager.GetResourceManagerBuilderByType(ctx, resourceManagerConfig.Type, t.metrics.scope)
 	if err != nil {
 		return err
 	}
@@ -177,10 +176,10 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 	}
 
 	for _, p := range enabledPlugins {
-		// rn = create a new resource negotiator proxy for each plugin
-		sCtxFinal := newNameSpacedSetupCtx(tSCtx, newResourceManagerBuilder.ResourceRegistrar(pluginCore.ResourceNamespace(p.ID)))
-		// sCtxFinal := newNSSetupCtx(tSCtx)
-		// tSCtx.resourceNegotiator = tSCtx.ResourceRegistrar().ResourceRegistrar(pluginCore.ResourceNamespace(p.ID))
+		// create a new resource registrar proxy for each plugin, and pass it into the plugin's LoadPlugin() via a setup context
+		pluginResourceNamespacePrefix := pluginCore.ResourceNamespace(newResourceManagerBuilder.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(p.ID))
+		sCtxFinal := newNameSpacedSetupCtx(
+			tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix))
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
 		// cp, err := p.LoadPlugin(ctx, tSCtx)
 		cp, err := p.LoadPlugin(ctx, sCtxFinal)

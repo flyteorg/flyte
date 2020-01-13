@@ -134,7 +134,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.Node
 		return nil, errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "unable to initialize plugin state manager")
 	}
 
-	resourceNamespacePrefix := pluginCore.ResourceNamespace(pluginID)
+	resourceNamespacePrefix := pluginCore.ResourceNamespace(t.resourceManager.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(pluginID))
 
 	return &taskExecutionContext{
 		NodeExecutionContext: nCtx,
