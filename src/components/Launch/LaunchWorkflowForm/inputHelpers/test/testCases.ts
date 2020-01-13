@@ -1,8 +1,8 @@
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Core } from 'flyteidl';
 import * as Long from 'long';
+import { primitiveLiteral } from '../../__mocks__/utils';
 import { InputType, InputValue } from '../../types';
-import { literalNone } from '../constants';
 
 // Defines type of value, input, and expected value of innermost `IScalar`
 type PrimitiveTestParams = [InputType, any, Core.IPrimitive];
@@ -99,10 +99,6 @@ export const literalTestCases: PrimitiveTestParams[] = [
     [InputType.String, 'abcdefg', { stringValue: 'abcdefg' }]
 ];
 
-function primitiveLiteral(primitive: Core.IPrimitive): Core.ILiteral {
-    return { scalar: { primitive } };
-}
-
 type InputToLiteralTestParams = [
     InputType,
     Core.ILiteral,
@@ -116,7 +112,7 @@ export const literalToInputTestCases: InputToLiteralTestParams[] = [
         primitiveLiteral({
             datetime: dateToTimestamp(new Date(validDateString))
         }),
-        new Date(validDateString)
+        validDateString
     ],
     [
         InputType.Duration,

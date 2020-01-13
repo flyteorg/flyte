@@ -4,7 +4,7 @@ import { resolveAfter } from 'common/promiseUtils';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
 import { mapValues } from 'lodash';
-import { Variable, Workflow } from 'models';
+import { Literal, Variable, Workflow } from 'models';
 import { createMockLaunchPlan } from 'models/__mocks__/launchPlanData';
 import {
     createMockWorkflow,
@@ -16,7 +16,9 @@ import {
     createMockWorkflowInputsInterface,
     mockCollectionVariables,
     mockNestedCollectionVariables,
-    mockSimpleVariables
+    mockSimpleVariables,
+    simpleVariableDefaults,
+    SimpleVariableKey
 } from '../__mocks__/mockInputs';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 
@@ -94,6 +96,16 @@ stories.add('Required Inputs', () => {
     const parameters = mocks.mockLaunchPlan.closure!.expectedInputs.parameters;
     parameters[stringInputName].required = true;
     parameters[integerInputName].required = true;
+    return renderForm(mocks);
+});
+stories.add('Default Values', () => {
+    const mocks = generateMocks(mockSimpleVariables);
+    const parameters = mocks.mockLaunchPlan.closure!.expectedInputs.parameters;
+    Object.keys(parameters).forEach(paramName => {
+        const defaultValue =
+            simpleVariableDefaults[paramName as SimpleVariableKey];
+        parameters[paramName].default = defaultValue as Literal;
+    });
     return renderForm(mocks);
 });
 stories.add('Collections', () =>

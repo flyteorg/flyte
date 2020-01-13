@@ -17,7 +17,7 @@ function fromLiteral(literal: Core.ILiteral): InputValue {
         literal,
         primitiveLiteralPaths.scalarDatetime
     );
-    return timestampToDate(value);
+    return timestampToDate(value).toISOString();
 }
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {
