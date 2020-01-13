@@ -51,7 +51,7 @@ function getInputs(workflow: Workflow, launchPlan: LaunchPlan): ParsedInput[] {
     const launchPlanInputs = launchPlan.closure.expectedInputs.parameters;
     return sortedObjectEntries(launchPlanInputs).map(value => {
         const [name, parameter] = value;
-        const required = !!(parameter.default || parameter.required);
+        const required = !!parameter.required;
         const workflowInput = workflowInputs[name];
         const description =
             workflowInput && workflowInput.description

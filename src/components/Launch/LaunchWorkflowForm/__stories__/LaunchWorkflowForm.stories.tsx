@@ -22,6 +22,7 @@ import {
 } from '../__mocks__/mockInputs';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 
+const booleanInputName = 'simpleBoolean';
 const stringInputName = 'simpleString';
 const integerInputName = 'simpleInteger';
 const submitAction = action('createWorkflowExecution');
@@ -96,6 +97,7 @@ stories.add('Required Inputs', () => {
     const parameters = mocks.mockLaunchPlan.closure!.expectedInputs.parameters;
     parameters[stringInputName].required = true;
     parameters[integerInputName].required = true;
+    parameters[booleanInputName].required = true;
     return renderForm(mocks);
 });
 stories.add('Default Values', () => {
