@@ -51,12 +51,18 @@ export function literalToInputValue(
     }
 }
 
-type ValidationParams = Pick<InputProps, 'name' | 'typeDefinition' | 'value'>;
+type ValidationParams = Pick<
+    InputProps,
+    'name' | 'required' | 'typeDefinition' | 'value'
+>;
 /** Validates a given InputValue based on rules for the provided type. Returns
  * void if no errors, throws an error otherwise.
  */
 export function validateInput(input: ValidationParams) {
     if (input.value == null) {
+        if (input.required) {
+            throw new ValueError(input.name, 'Value is required');
+        }
         return;
     }
 

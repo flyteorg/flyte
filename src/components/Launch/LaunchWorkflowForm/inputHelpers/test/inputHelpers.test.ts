@@ -235,4 +235,12 @@ describe('validateInput', () => {
     describe('string', () => {
         generateValidityTests(InputType.String, validityTestCases.string);
     });
+
+    it('should throw errors for missing required values', () => {
+        const [type, input] = literalTestCases[0];
+        const simpleInput = makeSimpleInput(type, input);
+        simpleInput.required = true;
+        delete simpleInput.value;
+        expect(() => validateInput(simpleInput)).toThrowError();
+    });
 });
