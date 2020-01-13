@@ -1,10 +1,5 @@
 import { mapValues } from 'lodash';
-import {
-    ParameterMap,
-    SimpleType,
-    TypedInterface,
-    Variable
-} from 'models/Common';
+import { SimpleType, TypedInterface, Variable } from 'models/Common';
 
 function simpleType(primitiveType: SimpleType, description?: string): Variable {
     return {

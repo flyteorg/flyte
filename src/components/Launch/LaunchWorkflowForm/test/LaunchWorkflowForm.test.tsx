@@ -426,6 +426,21 @@ describe('LaunchWorkflowForm', () => {
                     getByLabelText(integerInputName, { exact: false })
                 ).toHaveValue('10000');
             });
+
+            it('should decorate labels for required inputs', async () => {
+                // Add defaults for the string/integer inputs and check that they are
+                // correctly populated
+                const parameters = mockLaunchPlans[0].closure!.expectedInputs
+                    .parameters;
+                parameters[stringInputName].required = true;
+                mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[0]);
+
+                const { getByText } = renderForm();
+                await wait();
+                expect(
+                    getByText(stringInputName, { exact: false }).textContent
+                ).toContain('*');
+            });
         });
     });
 });

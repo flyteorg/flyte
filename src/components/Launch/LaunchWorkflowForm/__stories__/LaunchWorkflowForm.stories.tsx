@@ -20,9 +20,11 @@ import {
 } from '../__mocks__/mockInputs';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 
+const stringInputName = 'simpleString';
+const integerInputName = 'simpleInteger';
 const submitAction = action('createWorkflowExecution');
 
-const renderForm = (variables: Record<string, Variable>) => {
+const generateMocks = (variables: Record<string, Variable>) => {
     const mockWorkflow = createMockWorkflow('MyWorkflow');
     const mockLaunchPlan = createMockLaunchPlan(
         mockWorkflow.id.name,
@@ -63,6 +65,13 @@ const renderForm = (variables: Record<string, Variable>) => {
         listLaunchPlans: () => resolveAfter(500, { entities: [mockLaunchPlan] })
     });
 
+    return { mockWorkflow, mockLaunchPlan, mockWorkflowVersions, mockApi };
+};
+
+const renderForm = ({
+    mockApi,
+    mockWorkflow
+}: ReturnType<typeof generateMocks>) => {
     const onClose = () => console.log('Close');
 
     return (
@@ -79,8 +88,17 @@ const renderForm = (variables: Record<string, Variable>) => {
 
 const stories = storiesOf('Launch/LaunchWorkflowForm', module);
 
-stories.add('Simple', () => renderForm(mockSimpleVariables));
-stories.add('Collections', () => renderForm(mockCollectionVariables));
+stories.add('Simple', () => renderForm(generateMocks(mockSimpleVariables)));
+stories.add('Required Inputs', () => {
+    const mocks = generateMocks(mockSimpleVariables);
+    const parameters = mocks.mockLaunchPlan.closure!.expectedInputs.parameters;
+    parameters[stringInputName].required = true;
+    parameters[integerInputName].required = true;
+    return renderForm(mocks);
+});
+stories.add('Collections', () =>
+    renderForm(generateMocks(mockCollectionVariables))
+);
 stories.add('Nested Collections', () =>
-    renderForm(mockNestedCollectionVariables)
+    renderForm(generateMocks(mockNestedCollectionVariables))
 );

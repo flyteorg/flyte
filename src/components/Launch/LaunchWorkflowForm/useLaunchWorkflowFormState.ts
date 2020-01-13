@@ -61,7 +61,8 @@ function getInputs(workflow: Workflow, launchPlan: LaunchPlan): ParsedInput[] {
         const typeDefinition = getInputDefintionForLiteralType(
             parameter.var.type
         );
-        const label = formatLabelWithType(name, typeDefinition);
+        const typeLabel = formatLabelWithType(name, typeDefinition);
+        const label = required ? `${typeLabel}*` : typeLabel;
 
         const defaultValue =
             parameter.default !== undefined
