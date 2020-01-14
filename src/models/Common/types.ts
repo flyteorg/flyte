@@ -139,7 +139,7 @@ export interface VariableMap extends Core.IVariableMap {
 
 export interface Parameter extends Core.IParameter {
     var: Variable;
-    default?: Literal;
+    default?: Literal | null;
     required?: boolean;
 }
 

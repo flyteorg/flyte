@@ -13,7 +13,7 @@ import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
 import { muiTheme } from 'components/Theme';
 import { Core } from 'flyteidl';
-import { get, mapValues } from 'lodash';
+import { get } from 'lodash';
 import * as Long from 'long';
 import {
     createWorkflowExecution,
@@ -29,12 +29,7 @@ import {
     Variable,
     Workflow
 } from 'models';
-import { createMockLaunchPlan } from 'models/__mocks__/launchPlanData';
-import {
-    createMockWorkflow,
-    createMockWorkflowClosure,
-    createMockWorkflowVersions
-} from 'models/__mocks__/workflowData';
+import { createMockWorkflowClosure } from 'models/__mocks__/workflowData';
 import * as React from 'react';
 import { delayedPromise, pendingPromise } from 'test/utils';
 import {
@@ -43,35 +38,13 @@ import {
 } from '../__mocks__/mockInputs';
 import { formStrings } from '../constants';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
-
-const booleanInputName = 'simpleBoolean';
-const stringInputName = 'simpleString';
-const stringNoLabelName = 'stringNoLabel';
-const integerInputName = 'simpleInteger';
-
-function createMockObjects(variables: Record<string, Variable>) {
-    const mockWorkflow = createMockWorkflow('MyWorkflow');
-
-    const mockWorkflowVersions = createMockWorkflowVersions(
-        mockWorkflow.id.name,
-        10
-    );
-
-    const mockLaunchPlans = [mockWorkflow.id.name, 'OtherLaunchPlan'].map(
-        name => {
-            const parameterMap = {
-                parameters: mapValues(variables, v => ({ var: v }))
-            };
-            const launchPlan = createMockLaunchPlan(
-                name,
-                mockWorkflow.id.version
-            );
-            launchPlan.closure!.expectedInputs = parameterMap;
-            return launchPlan;
-        }
-    );
-    return { mockWorkflow, mockLaunchPlans, mockWorkflowVersions };
-}
+import {
+    booleanInputName,
+    integerInputName,
+    stringInputName,
+    stringNoLabelName
+} from './constants';
+import { createMockObjects } from './utils';
 
 describe('LaunchWorkflowForm', () => {
     let onClose: jest.Mock;
