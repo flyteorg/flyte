@@ -123,7 +123,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 		// nCtx.Node().GetOutputAlias()
 		var oInfo *handler.OutputInfo
 		if wfStatusClosure.GetOutputs() != nil {
-			outputFile := v1alpha1.GetOutputsFile(nodeStatus.GetDataDir())
+			outputFile := v1alpha1.GetOutputsFile(nodeStatus.GetOutputDir())
 			if wfStatusClosure.GetOutputs().GetUri() != "" {
 				uri := wfStatusClosure.GetOutputs().GetUri()
 				store := nCtx.DataStore()

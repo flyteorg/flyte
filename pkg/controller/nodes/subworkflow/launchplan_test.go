@@ -204,6 +204,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
 	mockNodeStatus.On("GetAttempts").Return(attempts)
 	mockNodeStatus.On("GetDataDir").Return(dataDir)
+	mockNodeStatus.On("GetOutputDir").Return(dataDir)
 
 	parentID := &core.WorkflowExecutionIdentifier{
 		Name:    "x",
@@ -299,6 +300,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockWf, mockNode)
 		nCtx.OnDataStore().Return(mockStore)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
+		mockNodeStatus.AssertCalled(t, "GetOutputDir")
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseSuccess, s.Info().GetPhase())
 		final := &core.LiteralMap{}
