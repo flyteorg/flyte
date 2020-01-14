@@ -1,6 +1,15 @@
 import { Core } from 'flyteidl';
 import { InputValue } from '../types';
+import { primitiveLiteralPaths } from './constants';
 import { ConverterInput, InputHelper } from './types';
+import { extractLiteralWithCheck } from './utils';
+
+function fromLiteral(literal: Core.ILiteral): InputValue {
+    return extractLiteralWithCheck<number>(
+        literal,
+        primitiveLiteralPaths.scalarFloat
+    );
+}
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {
     const floatValue =
@@ -27,6 +36,7 @@ function validate({ value }: ConverterInput) {
 }
 
 export const floatHelper: InputHelper = {
+    fromLiteral,
     toLiteral,
     validate
 };

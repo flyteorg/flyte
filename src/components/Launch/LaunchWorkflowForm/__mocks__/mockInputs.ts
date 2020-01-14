@@ -1,10 +1,10 @@
+import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
+import { Core } from 'flyteidl';
 import { mapValues } from 'lodash';
-import {
-    ParameterMap,
-    SimpleType,
-    TypedInterface,
-    Variable
-} from 'models/Common';
+import * as Long from 'long';
+import { SimpleType, TypedInterface, Variable } from 'models/Common';
+import { literalNone } from '../inputHelpers/constants';
+import { primitiveLiteral } from './utils';
 
 function simpleType(primitiveType: SimpleType, description?: string): Variable {
     return {
@@ -15,7 +15,21 @@ function simpleType(primitiveType: SimpleType, description?: string): Variable {
     };
 }
 
-export const mockSimpleVariables: Record<string, Variable> = {
+const validDateString = '2019-01-10T00:00:00.000Z'; // Dec 1, 2019
+
+export type SimpleVariableKey =
+    | 'simpleString'
+    | 'stringNoLabel'
+    | 'simpleInteger'
+    | 'simpleFloat'
+    | 'simpleBoolean'
+    | 'simpleDuration'
+    | 'simpleDatetime'
+    | 'simpleBinary'
+    | 'simpleError'
+    | 'simpleStruct';
+
+export const mockSimpleVariables: Record<SimpleVariableKey, Variable> = {
     simpleString: simpleType(SimpleType.STRING, 'a simple string value'),
     stringNoLabel: simpleType(SimpleType.STRING),
     simpleInteger: simpleType(SimpleType.INTEGER, 'a simple integer value'),
@@ -30,6 +44,26 @@ export const mockSimpleVariables: Record<string, Variable> = {
     // collection: {},
     // mapValue: {},
     // blob: {}
+};
+
+export const simpleVariableDefaults: Record<
+    SimpleVariableKey,
+    Core.ILiteral
+> = {
+    simpleString: primitiveLiteral({ stringValue: 'abcdefg' }),
+    stringNoLabel: primitiveLiteral({ stringValue: 'abcdefg' }),
+    simpleBinary: literalNone(),
+    simpleBoolean: primitiveLiteral({ boolean: false }),
+    simpleDatetime: primitiveLiteral({
+        datetime: dateToTimestamp(new Date(validDateString))
+    }),
+    simpleDuration: primitiveLiteral({
+        duration: millisecondsToDuration(10000)
+    }),
+    simpleError: literalNone(),
+    simpleFloat: primitiveLiteral({ floatValue: 1.5 }),
+    simpleInteger: primitiveLiteral({ integer: Long.fromNumber(12345) }),
+    simpleStruct: literalNone()
 };
 
 export const mockCollectionVariables: Record<string, Variable> = mapValues(

@@ -1,6 +1,8 @@
 import { Core } from 'flyteidl';
 import { InputValue } from '../types';
+import { primitiveLiteralPaths } from './constants';
 import { ConverterInput, InputHelper } from './types';
+import { extractLiteralWithCheck } from './utils';
 
 /** Checks that a value is an acceptable boolean value. These can be
  * an actual Boolean instance, any variant of ('T', 'F', 'TRUE', 'FALSE') or
@@ -38,6 +40,13 @@ function toLiteral({ value }: ConverterInput): Core.ILiteral {
     return { scalar: { primitive: { boolean: parseBoolean(value) } } };
 }
 
+function fromLiteral(literal: Core.ILiteral): InputValue {
+    return extractLiteralWithCheck<boolean>(
+        literal,
+        primitiveLiteralPaths.scalarBoolean
+    );
+}
+
 function validate({ value }: ConverterInput) {
     if (!isValidBoolean(value)) {
         throw new Error('Value is not a valid boolean');
@@ -45,6 +54,8 @@ function validate({ value }: ConverterInput) {
 }
 
 export const booleanHelper: InputHelper = {
+    fromLiteral,
     toLiteral,
-    validate
+    validate,
+    defaultValue: false
 };

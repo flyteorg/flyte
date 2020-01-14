@@ -1,7 +1,18 @@
-import { millisecondsToDuration } from 'common/utils';
-import { Core } from 'flyteidl';
+import { durationToMilliseconds, millisecondsToDuration } from 'common/utils';
+import { Core, Protobuf } from 'flyteidl';
+import { InputValue } from '../types';
+import { primitiveLiteralPaths } from './constants';
 import { isValidFloat } from './float';
 import { ConverterInput, InputHelper } from './types';
+import { extractLiteralWithCheck } from './utils';
+
+function fromLiteral(literal: Core.ILiteral): InputValue {
+    const value = extractLiteralWithCheck<Protobuf.IDuration>(
+        literal,
+        primitiveLiteralPaths.scalarDuration
+    );
+    return durationToMilliseconds(value);
+}
 
 function toLiteral({ value }: ConverterInput): Core.ILiteral {
     const parsed =
@@ -19,6 +30,7 @@ function validate({ value }: ConverterInput) {
 }
 
 export const durationHelper: InputHelper = {
+    fromLiteral,
     toLiteral,
     validate
 };

@@ -18,6 +18,10 @@ import {
 } from 'models';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { history, Routes } from 'routes';
+import {
+    defaultValueForInputType,
+    literalToInputValue
+} from './inputHelpers/inputHelpers';
 import { SearchableSelectorOption } from './SearchableSelector';
 import {
     LaunchWorkflowFormInputsRef,
@@ -47,7 +51,7 @@ function getInputs(workflow: Workflow, launchPlan: LaunchPlan): ParsedInput[] {
     const launchPlanInputs = launchPlan.closure.expectedInputs.parameters;
     return sortedObjectEntries(launchPlanInputs).map(value => {
         const [name, parameter] = value;
-        const required = !!(parameter.default || parameter.required);
+        const required = !!parameter.required;
         const workflowInput = workflowInputs[name];
         const description =
             workflowInput && workflowInput.description
@@ -57,11 +61,16 @@ function getInputs(workflow: Workflow, launchPlan: LaunchPlan): ParsedInput[] {
         const typeDefinition = getInputDefintionForLiteralType(
             parameter.var.type
         );
-        const label = formatLabelWithType(name, typeDefinition);
+        const typeLabel = formatLabelWithType(name, typeDefinition);
+        const label = required ? `${typeLabel}*` : typeLabel;
 
-        // TODO:
-        // Extract default value for more specific type (maybe just for simple)
+        const defaultValue =
+            parameter.default !== undefined
+                ? literalToInputValue(typeDefinition, parameter.default)
+                : defaultValueForInputType(typeDefinition);
+
         return {
+            defaultValue,
             description,
             label,
             name,

@@ -1,7 +1,8 @@
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Core } from 'flyteidl';
 import * as Long from 'long';
-import { InputType } from '../../types';
+import { primitiveLiteral } from '../../__mocks__/utils';
+import { InputType, InputValue } from '../../types';
 
 // Defines type of value, input, and expected value of innermost `IScalar`
 type PrimitiveTestParams = [InputType, any, Core.IPrimitive];
@@ -96,4 +97,60 @@ export const literalTestCases: PrimitiveTestParams[] = [
     [InputType.Integer, Long.MIN_VALUE, { integer: Long.MIN_VALUE }],
     [InputType.String, '', { stringValue: '' }],
     [InputType.String, 'abcdefg', { stringValue: 'abcdefg' }]
+];
+
+type InputToLiteralTestParams = [
+    InputType,
+    Core.ILiteral,
+    InputValue | undefined
+];
+export const literalToInputTestCases: InputToLiteralTestParams[] = [
+    [InputType.Boolean, primitiveLiteral({ boolean: true }), true],
+    [InputType.Boolean, primitiveLiteral({ boolean: false }), false],
+    [
+        InputType.Datetime,
+        primitiveLiteral({
+            datetime: dateToTimestamp(new Date(validDateString))
+        }),
+        validDateString
+    ],
+    [
+        InputType.Duration,
+        primitiveLiteral({ duration: millisecondsToDuration(0) }),
+        0
+    ],
+    [
+        InputType.Duration,
+        primitiveLiteral({ duration: millisecondsToDuration(10000) }),
+        10000
+    ],
+    [
+        InputType.Duration,
+        primitiveLiteral({ duration: millisecondsToDuration(1.5) }),
+        1.5
+    ],
+    [InputType.Float, primitiveLiteral({ floatValue: 0 }), 0],
+    [InputType.Float, primitiveLiteral({ floatValue: -1.5 }), -1.5],
+    [InputType.Float, primitiveLiteral({ floatValue: 1.5 }), 1.5],
+    [InputType.Float, primitiveLiteral({ floatValue: 1.25e10 }), 1.25e10],
+    // Integers will be returned as strings because they may overflow numbers
+    [InputType.Integer, primitiveLiteral({ integer: Long.fromNumber(0) }), '0'],
+    [InputType.Integer, primitiveLiteral({ integer: Long.fromNumber(1) }), '1'],
+    [
+        InputType.Integer,
+        primitiveLiteral({ integer: Long.fromNumber(-1) }),
+        '-1'
+    ],
+    [
+        InputType.Integer,
+        primitiveLiteral({ integer: Long.MAX_VALUE }),
+        Long.MAX_VALUE.toString()
+    ],
+    [
+        InputType.Integer,
+        primitiveLiteral({ integer: Long.MIN_VALUE }),
+        Long.MIN_VALUE.toString()
+    ],
+    [InputType.String, primitiveLiteral({ stringValue: '' }), ''],
+    [InputType.String, primitiveLiteral({ stringValue: 'abcdefg' }), 'abcdefg']
 ];

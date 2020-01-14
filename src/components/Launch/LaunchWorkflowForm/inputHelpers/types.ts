@@ -6,9 +6,17 @@ export interface ConverterInput {
     typeDefinition: InputTypeDefinition;
 }
 
-export type LiteralConverterFn = (input: ConverterInput) => Core.ILiteral;
+export type InputToLiteralConverterFn = (
+    input: ConverterInput
+) => Core.ILiteral;
+export type LiteralToInputConterterFn = (
+    literal: Core.ILiteral,
+    typeDefinition: InputTypeDefinition
+) => InputValue | undefined;
 export interface InputHelper {
-    toLiteral: LiteralConverterFn;
+    defaultValue?: InputValue;
+    toLiteral: InputToLiteralConverterFn;
+    fromLiteral: LiteralToInputConterterFn;
     /** Will throw in the case of a failed validation */
     validate: (input: ConverterInput) => void;
 }

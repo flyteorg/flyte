@@ -4,7 +4,7 @@ import { resolveAfter } from 'common/promiseUtils';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
 import { mapValues } from 'lodash';
-import { Variable, Workflow } from 'models';
+import { Literal, Variable, Workflow } from 'models';
 import { createMockLaunchPlan } from 'models/__mocks__/launchPlanData';
 import {
     createMockWorkflow,
@@ -16,13 +16,18 @@ import {
     createMockWorkflowInputsInterface,
     mockCollectionVariables,
     mockNestedCollectionVariables,
-    mockSimpleVariables
+    mockSimpleVariables,
+    simpleVariableDefaults,
+    SimpleVariableKey
 } from '../__mocks__/mockInputs';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 
+const booleanInputName = 'simpleBoolean';
+const stringInputName = 'simpleString';
+const integerInputName = 'simpleInteger';
 const submitAction = action('createWorkflowExecution');
 
-const renderForm = (variables: Record<string, Variable>) => {
+const generateMocks = (variables: Record<string, Variable>) => {
     const mockWorkflow = createMockWorkflow('MyWorkflow');
     const mockLaunchPlan = createMockLaunchPlan(
         mockWorkflow.id.name,
@@ -63,6 +68,13 @@ const renderForm = (variables: Record<string, Variable>) => {
         listLaunchPlans: () => resolveAfter(500, { entities: [mockLaunchPlan] })
     });
 
+    return { mockWorkflow, mockLaunchPlan, mockWorkflowVersions, mockApi };
+};
+
+const renderForm = ({
+    mockApi,
+    mockWorkflow
+}: ReturnType<typeof generateMocks>) => {
     const onClose = () => console.log('Close');
 
     return (
@@ -79,8 +91,28 @@ const renderForm = (variables: Record<string, Variable>) => {
 
 const stories = storiesOf('Launch/LaunchWorkflowForm', module);
 
-stories.add('Simple', () => renderForm(mockSimpleVariables));
-stories.add('Collections', () => renderForm(mockCollectionVariables));
+stories.add('Simple', () => renderForm(generateMocks(mockSimpleVariables)));
+stories.add('Required Inputs', () => {
+    const mocks = generateMocks(mockSimpleVariables);
+    const parameters = mocks.mockLaunchPlan.closure!.expectedInputs.parameters;
+    parameters[stringInputName].required = true;
+    parameters[integerInputName].required = true;
+    parameters[booleanInputName].required = true;
+    return renderForm(mocks);
+});
+stories.add('Default Values', () => {
+    const mocks = generateMocks(mockSimpleVariables);
+    const parameters = mocks.mockLaunchPlan.closure!.expectedInputs.parameters;
+    Object.keys(parameters).forEach(paramName => {
+        const defaultValue =
+            simpleVariableDefaults[paramName as SimpleVariableKey];
+        parameters[paramName].default = defaultValue as Literal;
+    });
+    return renderForm(mocks);
+});
+stories.add('Collections', () =>
+    renderForm(generateMocks(mockCollectionVariables))
+);
 stories.add('Nested Collections', () =>
-    renderForm(mockNestedCollectionVariables)
+    renderForm(generateMocks(mockNestedCollectionVariables))
 );

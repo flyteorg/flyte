@@ -87,9 +87,9 @@ export function createCorsProxyURL(path: string) {
 }
 
 /** Returns entires for an object, sorted lexicographically */
-export function sortedObjectEntries(
-    object: Object
-): ReturnType<typeof Object.entries> {
+export function sortedObjectEntries<T = any>(object: {
+    [s: string]: T;
+}): [string, T][] {
     return Object.entries(object).sort((a, b) => a[0].localeCompare(b[0]));
 }
 

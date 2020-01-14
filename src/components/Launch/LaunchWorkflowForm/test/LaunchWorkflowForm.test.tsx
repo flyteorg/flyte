@@ -14,6 +14,7 @@ import { APIContext } from 'components/data/apiContext';
 import { muiTheme } from 'components/Theme';
 import { Core } from 'flyteidl';
 import { get, mapValues } from 'lodash';
+import * as Long from 'long';
 import {
     createWorkflowExecution,
     CreateWorkflowExecutionArguments,
@@ -23,6 +24,7 @@ import {
     LaunchPlan,
     listLaunchPlans,
     listWorkflows,
+    Literal,
     NamedEntityIdentifier,
     Variable,
     Workflow
@@ -375,10 +377,7 @@ describe('LaunchWorkflowForm', () => {
         });
 
         describe('Input Values', () => {
-            /* TODO: Un-skip this when https://github.com/lyft/flyte/issues/18
-             * is fixed.
-             */
-            it.skip('Should send false for untouched toggles', async () => {
+            it('Should send false for untouched toggles', async () => {
                 let inputs: Core.ILiteralMap = {};
                 mockCreateWorkflowExecution.mockImplementation(
                     ({
@@ -402,6 +401,45 @@ describe('LaunchWorkflowForm', () => {
                     `${booleanInputName}.scalar.primitive.boolean`
                 );
                 expect(value).toBe(false);
+            });
+
+            it('should use default values when provided', async () => {
+                // Add defaults for the string/integer inputs and check that they are
+                // correctly populated
+                const parameters = mockLaunchPlans[0].closure!.expectedInputs
+                    .parameters;
+                parameters[stringInputName].default = {
+                    scalar: { primitive: { stringValue: 'abc' } }
+                } as Literal;
+                parameters[integerInputName].default = {
+                    scalar: { primitive: { integer: Long.fromNumber(10000) } }
+                } as Literal;
+                mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[0]);
+
+                const { getByLabelText } = renderForm();
+                await wait();
+
+                expect(
+                    getByLabelText(stringInputName, { exact: false })
+                ).toHaveValue('abc');
+                expect(
+                    getByLabelText(integerInputName, { exact: false })
+                ).toHaveValue('10000');
+            });
+
+            it('should decorate labels for required inputs', async () => {
+                // Add defaults for the string/integer inputs and check that they are
+                // correctly populated
+                const parameters = mockLaunchPlans[0].closure!.expectedInputs
+                    .parameters;
+                parameters[stringInputName].required = true;
+                mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[0]);
+
+                const { getByText } = renderForm();
+                await wait();
+                expect(
+                    getByText(stringInputName, { exact: false }).textContent
+                ).toContain('*');
             });
         });
     });

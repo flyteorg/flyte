@@ -1,4 +1,5 @@
 import { Admin, Core, Protobuf } from 'flyteidl';
+import { Collection } from 'react-virtualized';
 
 /* --- BEGIN flyteidl type aliases --- */
 /** These are types shared across multiple sections of the data model. Most of
@@ -59,6 +60,8 @@ export interface Error extends RequiredNonNullable<Core.IError> {}
 
 export interface Literal extends Core.Literal {
     value: keyof Core.ILiteral;
+    collection?: Core.ILiteralCollection;
+    map?: Core.ILiteralMap;
     scalar?: Scalar;
 }
 
@@ -72,6 +75,7 @@ export interface LiteralMapBlob extends Admin.ILiteralMapBlob {
 }
 
 export interface Scalar extends Core.IScalar {
+    primitive?: Primitive;
     value: keyof Core.IScalar;
 }
 
