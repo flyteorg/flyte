@@ -552,7 +552,7 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, w v1alpha1.Exec
 }
 
 func (c *nodeExecutor) FinalizeHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) error {
-	nodeStatus := w.GetExecutionStatus().GetNodeExecutionStatus(ctx, currentNode.GetID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, currentNode.GetID())
 
 	switch nodeStatus.GetPhase() {
 	case v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseSucceeding, v1alpha1.NodePhaseRetryableFailure:
@@ -605,7 +605,7 @@ func (c *nodeExecutor) FinalizeHandler(ctx context.Context, w v1alpha1.Executabl
 }
 
 func (c *nodeExecutor) AbortHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode, reason string) error {
-	nodeStatus := w.GetExecutionStatus().GetNodeExecutionStatus(ctx, currentNode.GetID())
+	nodeStatus := w.GetNodeExecutionStatus(ctx, currentNode.GetID())
 
 	switch nodeStatus.GetPhase() {
 	case v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseSucceeding, v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseQueued:
