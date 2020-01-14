@@ -152,7 +152,9 @@ func (e *PluginManager) getPodEffectiveResourceLimits(ctx context.Context, pod *
 			podRequestedResources[k] = qC
 		}
 	}
-	logger.Infof(ctx, "The resource requirement for creating Pod [%v] is [%v]\n", pod, podRequestedResources)
+
+	logger.Infof(ctx, "The resource requirement for creating Pod [%v/%v] is [%v]\n",
+		pod.Namespace, pod.Name, podRequestedResources)
 
 	return podRequestedResources
 }
