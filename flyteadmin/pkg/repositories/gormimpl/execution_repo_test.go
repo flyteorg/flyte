@@ -45,7 +45,7 @@ func TestUpdate(t *testing.T) {
 	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
 	executionEventQuery := GlobalMock.NewMock()
-	executionEventQuery.WithQuery(`INSERT  INTO "execution_events" ("created_at","updated_at","deleted_at",` +
+	executionEventQuery.WithQuery(`INSERT INTO "execution_events" ("created_at","updated_at","deleted_at",` +
 		`"execution_project","execution_domain","execution_name","request_id","occurred_at","phase") VALUES ` +
 		`(?,?,?,?,?,?,?,?,?)`)
 	executionQuery := GlobalMock.NewMock()

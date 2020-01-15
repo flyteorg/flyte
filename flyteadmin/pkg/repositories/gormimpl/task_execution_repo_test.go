@@ -85,7 +85,7 @@ func TestUpdateTaskExecution(t *testing.T) {
 	GlobalMock.Logging = true
 
 	taskExecutionQuery := GlobalMock.NewMock()
-	taskExecutionQuery.WithQuery(`INSERT  INTO "task_executions" ("created_at","updated_at","deleted_at",` +
+	taskExecutionQuery.WithQuery(`INSERT INTO "task_executions" ("created_at","updated_at","deleted_at",` +
 		`"project","domain","name","version","execution_project","execution_domain","execution_name","node_id",` +
 		`"retry_attempt","phase","phase_version","input_uri","closure","started_at","task_execution_created_at",` +
 		`"task_execution_updated_at","duration") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)

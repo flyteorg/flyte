@@ -30,13 +30,13 @@ func TestCreateNodeExecution(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 
 	nodeExecutionQuery := GlobalMock.NewMock()
-	nodeExecutionQuery.WithQuery(`INSERT  INTO "node_executions" ("id","created_at","updated_at","deleted_at",` +
+	nodeExecutionQuery.WithQuery(`INSERT INTO "node_executions" ("id","created_at","updated_at","deleted_at",` +
 		`"execution_project","execution_domain","execution_name","node_id","phase","input_uri","closure","started_at",` +
 		`"node_execution_created_at","node_execution_updated_at","duration") VALUES ` +
 		`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
 
 	nodeExecutionEventQuery := GlobalMock.NewMock()
-	nodeExecutionEventQuery.WithQuery(`INSERT  INTO "node_execution_events" ("created_at","updated_at",` +
+	nodeExecutionEventQuery.WithQuery(`INSERT INTO "node_execution_events" ("created_at","updated_at",` +
 		`"deleted_at","execution_project","execution_domain","execution_name","node_id","request_id","occurred_at",` +
 		`"phase") VALUES (?,?,?,?,?,?,?,?,?,?)`)
 
@@ -86,7 +86,7 @@ func TestUpdateNodeExecution(t *testing.T) {
 
 	// Only match on queries that append the name filter
 	nodeExecutionEventQuery := GlobalMock.NewMock()
-	nodeExecutionEventQuery.WithQuery(`INSERT  INTO "node_execution_events" ("created_at","updated_at",` +
+	nodeExecutionEventQuery.WithQuery(`INSERT INTO "node_execution_events" ("created_at","updated_at",` +
 		`"deleted_at","execution_project","execution_domain","execution_name","node_id","request_id","occurred_at",` +
 		`"phase") VALUES (?,?,?,?,?,?,?,?,?,?)`)
 	nodeExecutionQuery := GlobalMock.NewMock()

@@ -60,7 +60,7 @@
 [[override]]
   name = "github.com/lyft/flyteidl"
   source = "https://github.com/lyft/flyteidl"
-  version = "^0.16.5"
+  version = "=0.16.5"
 
 [[constraint]]
   name = "github.com/lyft/flytepropeller"
@@ -94,15 +94,17 @@
 
 [[override]]
   name = "k8s.io/apimachinery"
-  version = "kubernetes-1.14.1"
+  source = "https://github.com/lyft/apimachinery"
+  revision = "047e3ea32d7fb5984f444d7dd9510cfd362d7d7c"
 
 [[override]]
   name = "k8s.io/api"
-  version = "kubernetes-1.14.1"
+  revision = "b49a72c274e072a6e385d55c671acb3717186ce5"
+  source = "https://github.com/lyft/api"
 
 [[override]]
   name = "k8s.io/client-go"
-  version = "kubernetes-1.14.6"
+  version = "kubernetes-1.16.2"
 
 [[override]]
   branch = "master"
@@ -114,7 +116,7 @@
 
 [[override]]
   name = "sigs.k8s.io/controller-runtime"
-  version = "0.2.0"
+  revision = "40070e2a1958c3d974ba95da883a2bd088137789"
 
 [prune]
   go-tests = true

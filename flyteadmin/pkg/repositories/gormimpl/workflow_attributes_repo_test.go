@@ -18,7 +18,7 @@ func TestCreateWorkflowAttributes(t *testing.T) {
 
 	query := GlobalMock.NewMock()
 	query.WithQuery(
-		`INSERT  INTO "workflow_attributes" ("id","created_at","updated_at","deleted_at","project","domain",` +
+		`INSERT INTO "workflow_attributes" ("id","created_at","updated_at","deleted_at","project","domain",` +
 			`"workflow","resource","attributes") VALUES (?,?,?,?,?,?,?,?,?)`)
 
 	err := workflowRepo.CreateOrUpdate(context.Background(), models.WorkflowAttributes{

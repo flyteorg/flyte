@@ -20,7 +20,7 @@ func TestCreateProjectAttributes(t *testing.T) {
 
 	query := GlobalMock.NewMock()
 	query.WithQuery(
-		`INSERT  INTO "project_attributes" ` +
+		`INSERT INTO "project_attributes" ` +
 			`("created_at","updated_at","deleted_at","project","resource","attributes") VALUES (?,?,?,?,?,?)`)
 
 	err := projectRepo.CreateOrUpdate(context.Background(), models.ProjectAttributes{
