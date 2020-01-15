@@ -20,7 +20,7 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = u'Flyte'
-copyright = u'2019, Flyte Authors'
+copyright = u'2020, Flyte Authors'
 author = u'Flyte Authors'
 
 # The short X.Y version
