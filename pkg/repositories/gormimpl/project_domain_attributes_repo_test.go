@@ -17,7 +17,7 @@ func TestCreateProjectDomainAttributes(t *testing.T) {
 
 	query := GlobalMock.NewMock()
 	query.WithQuery(
-		`INSERT  INTO "project_domain_attributes" ` +
+		`INSERT INTO "project_domain_attributes" ` +
 			`("created_at","updated_at","deleted_at","project","domain","resource","attributes") VALUES (?,?,?,?,?,?,?)`)
 
 	err := projectDomainRepo.CreateOrUpdate(context.Background(), models.ProjectDomainAttributes{

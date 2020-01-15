@@ -108,7 +108,7 @@ func TestUpdateNamedEntity_CreateNew(t *testing.T) {
 
 	mockQuery := GlobalMock.NewMock()
 	mockQuery.WithQuery(
-		`INSERT  INTO "named_entity_metadata" ("created_at","updated_at","deleted_at","resource_type","project","domain","name","description") VALUES (?,?,?,?,?,?,?,?)`)
+		`INSERT INTO "named_entity_metadata" ("created_at","updated_at","deleted_at","resource_type","project","domain","name","description") VALUES (?,?,?,?,?,?,?,?)`)
 
 	err := metadataRepo.Update(context.Background(), models.NamedEntity{
 		NamedEntityKey: models.NamedEntityKey{
