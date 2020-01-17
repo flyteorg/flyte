@@ -110,7 +110,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 
 		indexLookup := CatalogBitsetToLiteralCollection(cachedResults, resp.GetResultsSize())
 		// TODO: Is the right thing to use?  Haytham please take a look
-		indexLookupPath, err := ioutils.GetIndexLookupPath(ctx, tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath())
+		indexLookupPath, err := ioutils.GetIndexLookupPath(ctx, tCtx.DataStore(), tCtx.InputReader().GetInputPrefixPath())
 		if err != nil {
 			return state, err
 		}
