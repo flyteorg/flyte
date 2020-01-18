@@ -217,7 +217,6 @@ func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *execCo
 			), nil
 		}
 
-		nodeStatus.IncrementAttempts()
 		// Retrying to clearing all status
 		nCtx.nsm.clearNodeStatus()
 	}
@@ -360,7 +359,7 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 		if err := c.finalize(ctx, h, nCtx); err != nil {
 			return executors.NodeStatusUndefined, err
 		}
-
+		nodeStatus.IncrementAttempts()
 		nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, v1.Now(), "retrying")
 		// We are going to retry in the next round, so we should clear all current state
 		nodeStatus.ClearSubNodeStatus()
