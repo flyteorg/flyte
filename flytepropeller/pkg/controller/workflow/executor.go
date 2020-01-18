@@ -175,8 +175,8 @@ func (c *workflowExecutor) handleSucceedingWorkflow(ctx context.Context, w *v1al
 	logger.Infof(ctx, "Workflow completed successfully")
 	endNodeStatus := w.GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID)
 	if endNodeStatus.GetPhase() == v1alpha1.NodePhaseSucceeded {
-		if endNodeStatus.GetDataDir() != "" {
-			w.Status.SetOutputReference(v1alpha1.GetOutputsFile(endNodeStatus.GetDataDir()))
+		if endNodeStatus.GetOutputDir() != "" {
+			w.Status.SetOutputReference(v1alpha1.GetOutputsFile(endNodeStatus.GetOutputDir()))
 		}
 	}
 	return StatusSuccess

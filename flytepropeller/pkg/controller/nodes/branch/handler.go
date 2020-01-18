@@ -113,7 +113,7 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx handler.Node
 		nodeStatus.SetDataDir(childNodeStatus.GetDataDir())
 		nodeStatus.SetOutputDir(childNodeStatus.GetOutputDir())
 		phase := handler.PhaseInfoSuccess(&handler.ExecutionInfo{
-			OutputInfo: &handler.OutputInfo{OutputURI: v1alpha1.GetOutputsFile(childNodeStatus.GetDataDir())},
+			OutputInfo: &handler.OutputInfo{OutputURI: v1alpha1.GetOutputsFile(childNodeStatus.GetOutputDir())},
 		})
 		return handler.DoTransition(handler.TransitionTypeEphemeral, phase), nil
 	}
