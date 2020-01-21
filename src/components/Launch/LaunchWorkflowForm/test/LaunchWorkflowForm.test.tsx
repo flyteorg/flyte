@@ -317,6 +317,35 @@ describe('LaunchWorkflowForm', () => {
             ).toBeNull();
         });
 
+        it('should preserve input values when changing launch plan', async () => {
+            jest.useFakeTimers();
+            const { getByLabelText, getByTitle } = renderForm();
+            await wait();
+
+            const integerInput = getByLabelText(integerInputName, {
+                exact: false
+            });
+            fireEvent.change(integerInput, { target: { value: '10' } });
+            act(jest.runAllTimers);
+            await wait();
+
+            // Click the expander for the launch plan, select the second item
+            const launchPlanDiv = getByTitle(formStrings.launchPlan);
+            const expander = getByRole(launchPlanDiv, 'button');
+            fireEvent.click(expander);
+            const items = await waitForElement(() =>
+                getAllByRole(launchPlanDiv, 'menuitem')
+            );
+            fireEvent.click(items[1]);
+            await wait();
+
+            expect(
+                getByLabelText(integerInputName, {
+                    exact: false
+                })
+            ).toHaveValue('10');
+        });
+
         it('should reset form error when inputs change', async () => {
             const errorString = 'Something went wrong';
             mockCreateWorkflowExecution.mockRejectedValue(
