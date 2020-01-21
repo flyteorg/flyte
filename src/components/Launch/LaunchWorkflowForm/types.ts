@@ -6,6 +6,7 @@ import {
     WorkflowExecutionIdentifier,
     WorkflowId
 } from 'models';
+import { InputValueCache } from './inputValueCache';
 import { SearchableSelectorOption } from './SearchableSelector';
 
 export interface LaunchWorkflowFormProps {
@@ -24,6 +25,7 @@ export interface LaunchWorkflowFormState {
     formInputsRef: React.RefObject<LaunchWorkflowFormInputsRef>;
     inputLoadingState: MultiFetchableState;
     inputs: ParsedInput[];
+    inputValueCache: InputValueCache;
     launchPlanOptionsLoadingState: MultiFetchableState;
     launchPlanSelectorOptions: SearchableSelectorOption<LaunchPlan>[];
     selectedLaunchPlan?: SearchableSelectorOption<LaunchPlan>;
@@ -82,5 +84,6 @@ export interface ParsedInput
         InputProps,
         'description' | 'label' | 'name' | 'required' | 'typeDefinition'
     > {
+    /** Indicates the value to use when the input is in a default state */
     defaultValue?: InputValue;
 }

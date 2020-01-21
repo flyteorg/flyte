@@ -18,6 +18,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { history, Routes } from 'routes';
 import { getInputs } from './getInputs';
+import { createInputValueCache } from './inputValueCache';
 import { SearchableSelectorOption } from './SearchableSelector';
 import {
     LaunchWorkflowFormInputsRef,
@@ -106,6 +107,8 @@ export function useLaunchWorkflowFormState({
         SearchableSelectorOption<WorkflowId>
     >();
     const selectedWorkflowId = selectedWorkflow ? selectedWorkflow.data : null;
+
+    const [inputValueCache] = useState(createInputValueCache());
 
     // We have to do a single item get once a workflow is selected so that we
     // receive the full workflow spec
@@ -236,6 +239,7 @@ export function useLaunchWorkflowFormState({
         formInputsRef,
         formKey,
         inputLoadingState,
+        inputValueCache,
         launchPlanOptionsLoadingState,
         launchPlanSelectorOptions,
         onCancel,
