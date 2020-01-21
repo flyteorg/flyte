@@ -433,12 +433,12 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:697f2e18b181eeb64fbd3ff601636816439d89535e00dd6fd34ea1b117543cd9"
+  digest = "1:80112204c5f2d6d1b172e61655f11f38d0fdade07d3206f366e508251e7f106b"
   name = "github.com/lyft/datacatalog"
   packages = ["protos/gen"]
   pruneopts = ""
-  revision = "2ee1d756da821e8616019b8e5310119c01b611ba"
-  version = "v0.1.1"
+  revision = "58a33f52c0310da6e5666b5c3003376c96f88410"
+  version = "v0.1.2"
 
 [[projects]]
   digest = "1:970dc58fa00dcc9564052ac331d3eaec6aa4aa8d15dd40ce09f1530cddd7d492"
