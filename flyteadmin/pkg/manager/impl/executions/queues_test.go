@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/mocks"
@@ -31,16 +33,14 @@ func TestGetQueue(t *testing.T) {
 		},
 	}
 	db := mocks.NewMockRepository()
-	db.WorkflowAttributesRepo().(*mocks.MockWorkflowAttributesRepo).GetFunction = func(
-		ctx context.Context, project, domain, workflow, resource string) (
-		models.WorkflowAttributes, error) {
-		response := models.WorkflowAttributes{
-			Project:  project,
-			Domain:   domain,
-			Workflow: workflow,
-			Resource: resource,
+	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (resource models.Resource, e error) {
+		response := models.Resource{
+			Project:      ID.Project,
+			Domain:       ID.Domain,
+			Workflow:     ID.Workflow,
+			ResourceType: ID.ResourceType,
 		}
-		if project == testProject && domain == testDomain && workflow == testWorkflow {
+		if ID.Project == testProject && ID.Domain == testDomain && ID.Workflow == testWorkflow {
 			matchingAttributes := &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
 					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
@@ -122,11 +122,9 @@ func TestGetQueueDefaults(t *testing.T) {
 		},
 	}
 	db := mocks.NewMockRepository()
-	db.WorkflowAttributesRepo().(*mocks.MockWorkflowAttributesRepo).GetFunction = func(
-		ctx context.Context, project, domain, workflow, resource string) (
-		models.WorkflowAttributes, error) {
-		if project == testProject && domain == testDomain && workflow == "workflow" &&
-			resource == admin.MatchableResource_EXECUTION_QUEUE.String() {
+	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (resource models.Resource, e error) {
+		if ID.Project == testProject && ID.Domain == testDomain && ID.Workflow == "workflow" &&
+			ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
 			matchingAttributes := &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
 					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
@@ -135,19 +133,15 @@ func TestGetQueueDefaults(t *testing.T) {
 				},
 			}
 			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			return models.WorkflowAttributes{
-				Project:    project,
-				Domain:     domain,
-				Workflow:   workflow,
-				Resource:   resource,
-				Attributes: marshalledMatchingAttributes,
+			return models.Resource{
+				Project:      ID.Project,
+				Domain:       ID.Domain,
+				Workflow:     ID.Workflow,
+				ResourceType: ID.ResourceType,
+				Attributes:   marshalledMatchingAttributes,
 			}, nil
 		}
-		return models.WorkflowAttributes{}, errors.NewFlyteAdminError(codes.NotFound, "foo")
-	}
-	db.ProjectDomainAttributesRepo().(*mocks.MockProjectDomainAttributesRepo).GetFunction = func(
-		ctx context.Context, project, domain, resource string) (models.ProjectDomainAttributes, error) {
-		if project == testProject && domain == testDomain && resource == admin.MatchableResource_EXECUTION_QUEUE.String() {
+		if ID.Project == testProject && ID.Domain == testDomain && ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
 			matchingAttributes := &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
 					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
@@ -156,18 +150,15 @@ func TestGetQueueDefaults(t *testing.T) {
 				},
 			}
 			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			return models.ProjectDomainAttributes{
-				Project:    project,
-				Domain:     domain,
-				Resource:   resource,
-				Attributes: marshalledMatchingAttributes,
+			return models.Resource{
+				Project:      ID.Project,
+				Domain:       ID.Domain,
+				ResourceType: ID.ResourceType,
+				Attributes:   marshalledMatchingAttributes,
 			}, nil
 		}
-		return models.ProjectDomainAttributes{}, errors.NewFlyteAdminError(codes.NotFound, "foo")
-	}
-	db.ProjectAttributesRepo().(*mocks.MockProjectAttributesRepo).GetFunction = func(
-		ctx context.Context, project, resource string) (models.ProjectAttributes, error) {
-		if project == testProject && resource == admin.MatchableResource_EXECUTION_QUEUE.String() {
+
+		if ID.Project == testProject && ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
 			matchingAttributes := &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
 					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
@@ -176,13 +167,13 @@ func TestGetQueueDefaults(t *testing.T) {
 				},
 			}
 			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
-			return models.ProjectAttributes{
-				Project:    project,
-				Resource:   resource,
-				Attributes: marshalledMatchingAttributes,
+			return models.Resource{
+				Project:      ID.Project,
+				ResourceType: ID.ResourceType,
+				Attributes:   marshalledMatchingAttributes,
 			}, nil
 		}
-		return models.ProjectAttributes{}, errors.NewFlyteAdminError(codes.NotFound, "foo")
+		return models.Resource{}, errors.NewFlyteAdminError(codes.NotFound, "foo")
 	}
 
 	queueAllocator := NewQueueAllocator(runtimeMocks.NewMockConfigurationProvider(

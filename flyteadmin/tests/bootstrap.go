@@ -53,6 +53,7 @@ func truncateAllTablesForTestingOnly() {
 	TruncateNodeExecutions := fmt.Sprintf("TRUNCATE TABLE node_executions;")
 	TruncateNodeExecutionEvents := fmt.Sprintf("TRUNCATE TABLE node_execution_events;")
 	TruncateTaskExecutions := fmt.Sprintf("TRUNCATE TABLE task_executions;")
+	TruncateResources := fmt.Sprintf("TRUNCATE TABLE resources;")
 	db := database_config.OpenDbConnection(database_config.NewPostgresConfigProvider(getDbConfig(), adminScope))
 	defer db.Close()
 	db.Exec(TruncateTasks)
@@ -64,6 +65,7 @@ func truncateAllTablesForTestingOnly() {
 	db.Exec(TruncateNodeExecutions)
 	db.Exec(TruncateNodeExecutionEvents)
 	db.Exec(TruncateTaskExecutions)
+	db.Exec(TruncateResources)
 }
 
 func populateWorkflowExecutionForTestingOnly(project, domain, name string) {

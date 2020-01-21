@@ -3,13 +3,7 @@ package validation
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
-
-	"github.com/lyft/flyteadmin/pkg/repositories/mocks"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-
-	"github.com/golang/protobuf/proto"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -300,7 +294,7 @@ func TestValidateTaskResources_LimitLessThanRequested(t *testing.T) {
 				Value: "1Gi",
 			},
 		})
-	assert.EqualError(t, err, "Resource CPU for [name:\"name\" ] cannot set default > limit")
+	assert.EqualError(t, err, "Type CPU for [name:\"name\" ] cannot set default > limit")
 }
 
 func TestValidateTaskResources_LimitGreaterThanConfig(t *testing.T) {
@@ -320,7 +314,7 @@ func TestValidateTaskResources_LimitGreaterThanConfig(t *testing.T) {
 				Value: "1.5Gi",
 			},
 		})
-	assert.EqualError(t, err, "Resource CPU for [name:\"name\" ] cannot set limit > platform limit")
+	assert.EqualError(t, err, "Type CPU for [name:\"name\" ] cannot set limit > platform limit")
 }
 
 func TestValidateTaskResources_DefaultGreaterThanConfig(t *testing.T) {
@@ -335,7 +329,7 @@ func TestValidateTaskResources_DefaultGreaterThanConfig(t *testing.T) {
 				Value: "1.5Gi",
 			},
 		}, []*core.Resources_ResourceEntry{})
-	assert.EqualError(t, err, "Resource CPU for [name:\"name\" ] cannot set default > platform limit")
+	assert.EqualError(t, err, "Type CPU for [name:\"name\" ] cannot set default > platform limit")
 }
 
 func TestValidateTaskResources_GPULimitNotEqualToRequested(t *testing.T) {
@@ -374,7 +368,7 @@ func TestValidateTaskResources_GPULimitGreaterThanConfig(t *testing.T) {
 				Value: "2",
 			},
 		})
-	assert.EqualError(t, err, "Resource GPU for [name:\"name\" ] cannot set default > platform limit")
+	assert.EqualError(t, err, "Type GPU for [name:\"name\" ] cannot set default > platform limit")
 }
 
 func TestValidateTaskResources_GPUDefaultGreaterThanConfig(t *testing.T) {
@@ -389,7 +383,7 @@ func TestValidateTaskResources_GPUDefaultGreaterThanConfig(t *testing.T) {
 				Value: "2",
 			},
 		}, []*core.Resources_ResourceEntry{})
-	assert.EqualError(t, err, "Resource GPU for [name:\"name\" ] cannot set default > platform limit")
+	assert.EqualError(t, err, "Type GPU for [name:\"name\" ] cannot set default > platform limit")
 }
 
 func TestIsWholeNumber(t *testing.T) {
@@ -415,187 +409,4 @@ func TestIsWholeNumber(t *testing.T) {
 		assert.False(t, isWholeNumber(resource.MustParse(fraction)),
 			"%s should not be treated as a whole number", fraction)
 	}
-}
-
-func TestAssignResourcesIfUnset(t *testing.T) {
-	platformValues := runtimeInterfaces.TaskResourceSet{
-		CPU:    "200m",
-		GPU:    "8",
-		Memory: "200Gi",
-	}
-	taskResourceSpec := &admin.TaskResourceSpec{
-		Cpu:    "400m",
-		Memory: "400Gi",
-	}
-	assignedResources := assignResourcesIfUnset(context.Background(), &core.Identifier{
-		Project: "project",
-		Domain:  "domain",
-		Name:    "name",
-		Version: "version",
-	}, platformValues, []*core.Resources_ResourceEntry{}, taskResourceSpec)
-
-	assert.EqualValues(t, []*core.Resources_ResourceEntry{
-		{
-			Name:  core.Resources_CPU,
-			Value: taskResourceSpec.Cpu,
-		},
-		{
-			Name:  core.Resources_MEMORY,
-			Value: taskResourceSpec.Memory,
-		},
-	}, assignedResources)
-}
-
-func TestSetDefaults(t *testing.T) {
-	task := &core.CompiledTask{
-		Template: &core.TaskTemplate{
-			Target: &core.TaskTemplate_Container{
-				Container: &core.Container{
-					Resources: &core.Resources{
-						Requests: []*core.Resources_ResourceEntry{
-							{
-								Name:  core.Resources_CPU,
-								Value: "200m",
-							},
-						},
-					},
-				},
-			},
-			Id: &core.Identifier{
-				Project: "project",
-				Domain:  "domain",
-				Name:    "task_name",
-				Version: "version",
-			},
-		},
-	}
-
-	taskConfig := runtimeMocks.MockTaskResourceConfiguration{}
-	taskConfig.Defaults = runtimeInterfaces.TaskResourceSet{
-		CPU:    "200m",
-		GPU:    "8",
-		Memory: "200Gi",
-	}
-	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
-		CPU:    "300m",
-		GPU:    "8",
-		Memory: "500Gi",
-	}
-	SetDefaults(context.Background(), &taskConfig, task, mocks.NewMockRepository(), "workflow")
-	assert.True(t, proto.Equal(
-		&core.Container{
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{
-						Name:  core.Resources_CPU,
-						Value: "200m",
-					},
-					{
-						Name:  core.Resources_MEMORY,
-						Value: "200Gi",
-					},
-				},
-				Limits: []*core.Resources_ResourceEntry{
-					{
-						Name:  core.Resources_CPU,
-						Value: "200m",
-					},
-					{
-						Name:  core.Resources_MEMORY,
-						Value: "200Gi",
-					},
-				},
-			},
-		},
-		task.Template.GetContainer()), fmt.Sprintf("%+v", task.Template.GetContainer()))
-}
-
-func TestSetDefaults_MissingDefaults(t *testing.T) {
-	task := &core.CompiledTask{
-		Template: &core.TaskTemplate{
-			Target: &core.TaskTemplate_Container{
-				Container: &core.Container{
-					Resources: &core.Resources{
-						Requests: []*core.Resources_ResourceEntry{
-							{
-								Name:  core.Resources_CPU,
-								Value: "200m",
-							},
-						},
-					},
-				},
-			},
-			Id: &core.Identifier{
-				Project: "project",
-				Domain:  "domain",
-				Name:    "task_name",
-				Version: "version",
-			},
-		},
-	}
-
-	taskConfig := runtimeMocks.MockTaskResourceConfiguration{}
-	taskConfig.Defaults = runtimeInterfaces.TaskResourceSet{
-		CPU:    "200m",
-		GPU:    "8",
-		Memory: "200Gi",
-	}
-	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
-		CPU: "300m",
-		GPU: "8",
-	}
-	SetDefaults(context.Background(), &taskConfig, task, mocks.NewMockRepository(), "workflow")
-	assert.True(t, proto.Equal(
-		&core.Container{
-			Resources: &core.Resources{
-				Requests: []*core.Resources_ResourceEntry{
-					{
-						Name:  core.Resources_CPU,
-						Value: "200m",
-					},
-					{
-						Name:  core.Resources_MEMORY,
-						Value: "200Gi",
-					},
-				},
-				Limits: []*core.Resources_ResourceEntry{
-					{
-						Name:  core.Resources_CPU,
-						Value: "200m",
-					},
-					{
-						Name:  core.Resources_MEMORY,
-						Value: "200Gi",
-					},
-				},
-			},
-		},
-		task.Template.GetContainer()), fmt.Sprintf("%+v", task.Template.GetContainer()))
-}
-
-func TestCreateTaskDefaultLimits(t *testing.T) {
-	task := &core.CompiledTask{
-		Template: &core.TaskTemplate{
-			Target: &core.TaskTemplate_Container{
-				Container: &core.Container{
-					Resources: &core.Resources{
-						Requests: []*core.Resources_ResourceEntry{
-							{
-								Name:  core.Resources_CPU,
-								Value: "200m",
-							},
-							{
-								Name:  core.Resources_MEMORY,
-								Value: "200Mi",
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
-	defaultLimits := createTaskDefaultLimits(context.Background(), task)
-	assert.Equal(t, "200Mi", defaultLimits.Memory)
-	assert.Equal(t, "200m", defaultLimits.CPU)
 }

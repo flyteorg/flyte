@@ -7,6 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lyft/flyteadmin/pkg/manager/impl/resources"
+	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 
@@ -161,16 +164,16 @@ func TestGetCustomTemplateValues(t *testing.T) {
 			},
 		},
 	}
-	projectDomainModel, err := transformers.ToProjectDomainAttributesModel(projectDomainAttributes, admin.MatchableResource_CLUSTER_RESOURCE)
+	resourceModel, err := transformers.ProjectDomainAttributesToResourceModel(projectDomainAttributes, admin.MatchableResource_CLUSTER_RESOURCE)
 	assert.Nil(t, err)
-	mockRepository.ProjectDomainAttributesRepo().(*repositoryMocks.MockProjectDomainAttributesRepo).GetFunction = func(
-		ctx context.Context, project, domain, resource string) (models.ProjectDomainAttributes, error) {
-		assert.Equal(t, "project-foo", project)
-		assert.Equal(t, "domain-bar", domain)
-		return projectDomainModel, nil
+	mockRepository.ResourceRepo().(*repositoryMocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (resource models.Resource, e error) {
+		assert.Equal(t, "project-foo", ID.Project)
+		assert.Equal(t, "domain-bar", ID.Domain)
+		return resourceModel, nil
 	}
 	testController := controller{
-		db: mockRepository,
+		db:              mockRepository,
+		resourceManager: resources.NewResourceManager(mockRepository),
 	}
 	domainTemplateValues := templateValuesType{
 		"{{ var1 }}": "i'm getting overwritten",
@@ -191,7 +194,8 @@ func TestGetCustomTemplateValues(t *testing.T) {
 func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
 	mockRepository := repositoryMocks.NewMockRepository()
 	testController := controller{
-		db: mockRepository,
+		db:              mockRepository,
+		resourceManager: resources.NewResourceManager(mockRepository),
 	}
 	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), "project-foo", "domain-bar", templateValuesType{
 		"{{ var1 }}": "val1",
@@ -207,14 +211,14 @@ func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
 
 func TestGetCustomTemplateValues_InvalidDBModel(t *testing.T) {
 	mockRepository := repositoryMocks.NewMockRepository()
-	mockRepository.ProjectDomainAttributesRepo().(*repositoryMocks.MockProjectDomainAttributesRepo).GetFunction = func(
-		ctx context.Context, project, domain, resource string) (models.ProjectDomainAttributes, error) {
-		return models.ProjectDomainAttributes{
+	mockRepository.ResourceRepo().(*repositoryMocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (resource models.Resource, e error) {
+		return models.Resource{
 			Attributes: []byte("i'm invalid"),
 		}, nil
 	}
 	testController := controller{
-		db: mockRepository,
+		db:              mockRepository,
+		resourceManager: resources.NewResourceManager(mockRepository),
 	}
 	_, err := testController.getCustomTemplateValues(context.Background(), "project-foo", "domain-bar", templateValuesType{
 		"{{ var1 }}": "val1",

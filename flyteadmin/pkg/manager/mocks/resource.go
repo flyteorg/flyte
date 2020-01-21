@@ -3,6 +3,8 @@ package mocks
 import (
 	"context"
 
+	"github.com/lyft/flyteadmin/pkg/manager/interfaces"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
@@ -13,17 +15,36 @@ type GetProjectDomainFunc func(ctx context.Context, request admin.ProjectDomainA
 type DeleteProjectDomainFunc func(ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (
 	*admin.ProjectDomainAttributesDeleteResponse, error)
 
-type MockProjectDomainAttributesManager struct {
+type MockResourceManager struct {
 	updateProjectDomainFunc UpdateProjectDomainFunc
 	GetFunc                 GetProjectDomainFunc
 	DeleteFunc              DeleteProjectDomainFunc
 }
 
-func (m *MockProjectDomainAttributesManager) SetUpdateProjectDomainAttributes(updateProjectDomainFunc UpdateProjectDomainFunc) {
+func (m *MockResourceManager) GetResource(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
+	panic("implement me")
+}
+
+func (m *MockResourceManager) UpdateWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesUpdateRequest) (
+	*admin.WorkflowAttributesUpdateResponse, error) {
+	panic("implement me")
+}
+
+func (m *MockResourceManager) GetWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesGetRequest) (
+	*admin.WorkflowAttributesGetResponse, error) {
+	panic("implement me")
+}
+
+func (m *MockResourceManager) DeleteWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesDeleteRequest) (
+	*admin.WorkflowAttributesDeleteResponse, error) {
+	panic("implement me")
+}
+
+func (m *MockResourceManager) SetUpdateProjectDomainAttributes(updateProjectDomainFunc UpdateProjectDomainFunc) {
 	m.updateProjectDomainFunc = updateProjectDomainFunc
 }
 
-func (m *MockProjectDomainAttributesManager) UpdateProjectDomainAttributes(
+func (m *MockResourceManager) UpdateProjectDomainAttributes(
 	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (
 	*admin.ProjectDomainAttributesUpdateResponse, error) {
 	if m.updateProjectDomainFunc != nil {
@@ -32,7 +53,7 @@ func (m *MockProjectDomainAttributesManager) UpdateProjectDomainAttributes(
 	return nil, nil
 }
 
-func (m *MockProjectDomainAttributesManager) GetProjectDomainAttributes(
+func (m *MockResourceManager) GetProjectDomainAttributes(
 	ctx context.Context, request admin.ProjectDomainAttributesGetRequest) (
 	*admin.ProjectDomainAttributesGetResponse, error) {
 	if m.GetFunc != nil {
@@ -41,7 +62,7 @@ func (m *MockProjectDomainAttributesManager) GetProjectDomainAttributes(
 	return nil, nil
 }
 
-func (m *MockProjectDomainAttributesManager) DeleteProjectDomainAttributes(
+func (m *MockResourceManager) DeleteProjectDomainAttributes(
 	ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (
 	*admin.ProjectDomainAttributesDeleteResponse, error) {
 	if m.DeleteFunc != nil {

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"runtime/debug"
 
+	"github.com/lyft/flyteadmin/pkg/manager/impl/resources"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flyteadmin/pkg/async/notifications"
 	"github.com/lyft/flyteadmin/pkg/async/schedule"
@@ -23,18 +25,16 @@ import (
 )
 
 type AdminService struct {
-	TaskManager                    interfaces.TaskInterface
-	WorkflowManager                interfaces.WorkflowInterface
-	LaunchPlanManager              interfaces.LaunchPlanInterface
-	ExecutionManager               interfaces.ExecutionInterface
-	NodeExecutionManager           interfaces.NodeExecutionInterface
-	TaskExecutionManager           interfaces.TaskExecutionInterface
-	ProjectManager                 interfaces.ProjectInterface
-	ProjectAttributesManager       interfaces.ProjectAttributesInterface
-	ProjectDomainAttributesManager interfaces.ProjectDomainAttributesInterface
-	WorkflowAttributesManager      interfaces.WorkflowAttributesInterface
-	NamedEntityManager             interfaces.NamedEntityInterface
-	Metrics                        AdminMetrics
+	TaskManager          interfaces.TaskInterface
+	WorkflowManager      interfaces.WorkflowInterface
+	LaunchPlanManager    interfaces.LaunchPlanInterface
+	ExecutionManager     interfaces.ExecutionInterface
+	NodeExecutionManager interfaces.NodeExecutionInterface
+	TaskExecutionManager interfaces.TaskExecutionInterface
+	ProjectManager       interfaces.ProjectInterface
+	ResourceManager      interfaces.ResourceInterface
+	NamedEntityManager   interfaces.NamedEntityInterface
+	Metrics              AdminMetrics
 }
 
 // Intercepts all admin requests to handle panics during execution.
@@ -161,10 +161,8 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 			db, adminScope.NewSubScope("node_execution_manager"), urlData),
 		TaskExecutionManager: manager.NewTaskExecutionManager(
 			db, adminScope.NewSubScope("task_execution_manager"), urlData),
-		ProjectManager:                 manager.NewProjectManager(db, configuration),
-		ProjectAttributesManager:       manager.NewProjectAttributesManager(db),
-		ProjectDomainAttributesManager: manager.NewProjectDomainAttributesManager(db),
-		WorkflowAttributesManager:      manager.NewWorkflowAttributesManager(db),
-		Metrics:                        InitMetrics(adminScope),
+		ProjectManager:  manager.NewProjectManager(db, configuration),
+		ResourceManager: resources.NewResourceManager(db),
+		Metrics:         InitMetrics(adminScope),
 	}
 }

@@ -70,49 +70,6 @@ func TestValidateMatchingAttributes(t *testing.T) {
 	}
 }
 
-func TestValidateProjectAttributesUpdateRequest(t *testing.T) {
-	_, err := ValidateProjectAttributesUpdateRequest(admin.ProjectAttributesUpdateRequest{})
-	assert.Equal(t, "missing attributes", err.Error())
-
-	_, err = ValidateProjectAttributesUpdateRequest(admin.ProjectAttributesUpdateRequest{
-		Attributes: &admin.ProjectAttributes{}})
-	assert.Equal(t, "missing project", err.Error())
-
-	matchableResource, err := ValidateProjectAttributesUpdateRequest(admin.ProjectAttributesUpdateRequest{
-		Attributes: &admin.ProjectAttributes{
-			Project: "project",
-			MatchingAttributes: &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_TaskResourceAttributes{
-					TaskResourceAttributes: &admin.TaskResourceAttributes{
-						Defaults: &admin.TaskResourceSpec{
-							Cpu: "1",
-						},
-					},
-				},
-			},
-		}})
-	assert.Equal(t, admin.MatchableResource_TASK_RESOURCE, matchableResource)
-	assert.Nil(t, err)
-}
-
-func TestValidateProjectAttributesGetRequest(t *testing.T) {
-	err := ValidateProjectAttributesGetRequest(admin.ProjectAttributesGetRequest{})
-	assert.Equal(t, "missing project", err.Error())
-
-	assert.Nil(t, ValidateProjectAttributesGetRequest(admin.ProjectAttributesGetRequest{
-		Project: "project",
-	}))
-}
-
-func TestValidateProjectAttributesDeleteRequest(t *testing.T) {
-	err := ValidateProjectAttributesDeleteRequest(admin.ProjectAttributesDeleteRequest{})
-	assert.Equal(t, "missing project", err.Error())
-
-	assert.Nil(t, ValidateProjectAttributesDeleteRequest(admin.ProjectAttributesDeleteRequest{
-		Project: "project",
-	}))
-}
-
 func TestValidateProjectDomainAttributesUpdateRequest(t *testing.T) {
 	_, err := ValidateProjectDomainAttributesUpdateRequest(admin.ProjectDomainAttributesUpdateRequest{})
 	assert.Equal(t, "missing attributes", err.Error())

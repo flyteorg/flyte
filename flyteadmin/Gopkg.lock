@@ -54,7 +54,7 @@
   version = "v1.0.7"
 
 [[projects]]
-  digest = "1:f5eadf80885cb45a08e0baf4c86079016a27bf9df179fba726a806d8a4dcd1c8"
+  digest = "1:39cc2836b0733b809ab56eb991d3d58c96c08b6381fded8dc636c53656a0f5cc"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -110,8 +110,8 @@
     "service/sts/stsiface",
   ]
   pruneopts = "UT"
-  revision = "a27888d3507a35a68e9240d5d7cf0d9552e6ef3b"
-  version = "v1.28.2"
+  revision = "5abff723756e51686a6a4377e7c5b1d74a9e18a3"
+  version = "v1.28.5"
 
 [[projects]]
   digest = "1:390dd851aedb37e9ef896e7e4e5c8553576798f8be769657e2f507090c96449d"
@@ -456,7 +456,7 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:9f01843d5ce98395a8af3da88dc6c67d169e0e94d253337026c423e2b18cdf4f"
+  digest = "1:93e28b61815df4d76c520ffe48f5995503c581f3752a823be85141cc278b6745"
   name = "github.com/lyft/flyteidl"
   packages = [
     "clients/go/admin",
@@ -469,9 +469,9 @@
     "gen/pb-go/flyteidl/service",
   ]
   pruneopts = "UT"
-  revision = "28c0dfb6608b70262aac9cb1ff83a750521ded8e"
+  revision = "ed373f903580e70fa1a08820b61d124163cb52da"
   source = "https://github.com/lyft/flyteidl"
-  version = "v0.16.5"
+  version = "v0.16.6"
 
 [[projects]]
   digest = "1:aef670729de939f423811651dcc81328bb82f15ab3a6026db7c32e18b4dc9d9a"
@@ -726,12 +726,12 @@
   version = "v1.0.5"
 
 [[projects]]
-  digest = "1:8d0b79a29be9946ea00b2f2b778ec5b36db07453d97abe9d754b25bc2cc49a0e"
+  digest = "1:83d0e0f3f46dc86daf27e4d7c834c8c492db787c53c09d94183de7478db92142"
   name = "github.com/spf13/viper"
   packages = ["."]
   pruneopts = "UT"
-  revision = "eabbc68a3ecd5cf8c11a2f84dbda5e7a38493b2f"
-  version = "v1.6.1"
+  revision = "4525543ce4fe90f7970f5e2cdc300b8ffc8c0582"
+  version = "v1.6.2"
 
 [[projects]]
   digest = "1:ac83cf90d08b63ad5f7e020ef480d319ae890c208f8524622a2f3136e2686b02"
@@ -787,7 +787,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:08644aeff6284192f9b529821257b83245e3a3a48e216074929629f62c3c5799"
+  digest = "1:096ab5deba256597722219f6bebd2efeec569368ba281b5df172937478049a6b"
   name = "golang.org/x/crypto"
   packages = [
     "ed25519",
@@ -796,7 +796,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "61a87790db17894570dfb32dbaa0a4af9ce60cb4"
+  revision = "530e935923ad688be97c15eeb8e5ee42ebf2b54a"
 
 [[projects]]
   branch = "master"
@@ -832,14 +832,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c8faf148023f13e62a93d3ed6c01fc586b3c6b52a40c5c9b0f2220bae71f390a"
+  digest = "1:f7b9c8ac6e14581494d8f20a044878b1d23aac99e49bc4f1ac831a973fb9ccfd"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "86b910548bc16777f40503131aa424ae0a092199"
+  revision = "59e60aa80a0c64fa4b088976ee16ad7f04252c25"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -887,7 +887,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:92be4e1210ff0dfe76525dbfeadeab782f41622cf8510b6a132ccffe04203ab3"
+  digest = "1:8da46a0888e0645a407823ba529400ab5150831745941b93b74bb69c5f756da2"
   name = "google.golang.org/api"
   packages = [
     "googleapi",
@@ -901,7 +901,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "abe50cf84d67c0039411f2fb036cfa09991a6e32"
+  revision = "b4cd77d6a56cb166fb09be9d2264a9f42264fffd"
 
 [[projects]]
   digest = "1:3c03b58f57452764a4499c55c582346c0ee78c8a5033affe5bdfd9efd3da5bd1"
@@ -933,13 +933,14 @@
     "protobuf/field_mask",
   ]
   pruneopts = "UT"
-  revision = "e1de0a7b01eb2fc11d735e4bfb79d2e53ec9edb3"
+  revision = "32f20d992d240fbca6ef7dec6c05d1f024314e02"
 
 [[projects]]
-  digest = "1:24c7bbb52f35264c506e5d404a257408937953cab7f39b898bd7edde0103b52a"
+  digest = "1:3abb0cc9fcc8c2a4bbe49b6d2c5894d7ba782b17a3463fdbfc5820b764633643"
   name = "google.golang.org/grpc"
   packages = [
     ".",
+    "attributes",
     "backoff",
     "balancer",
     "balancer/base",
@@ -978,8 +979,8 @@
     "tap",
   ]
   pruneopts = "UT"
-  revision = "1a3960e4bd028ac0cec0a2afd27d7d8e67c11514"
-  version = "v1.25.1"
+  revision = "f5b0812e6fe574d90da76b205e9eb51f6ddb1919"
+  version = "v1.26.0"
 
 [[projects]]
   digest = "1:1048ae210f190cd7b6aea19a92a055bd6112b025dd49f560579dfdfd76c8c42e"

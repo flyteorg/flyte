@@ -2355,3 +2355,186 @@ func TestListExecutions_LegacyModel(t *testing.T) {
 	}
 	assert.Empty(t, executionList.Token)
 }
+
+func TestAssignResourcesIfUnset(t *testing.T) {
+	platformValues := runtimeInterfaces.TaskResourceSet{
+		CPU:    "200m",
+		GPU:    "8",
+		Memory: "200Gi",
+	}
+	taskResourceSpec := &admin.TaskResourceSpec{
+		Cpu:    "400m",
+		Memory: "400Gi",
+	}
+	assignedResources := assignResourcesIfUnset(context.Background(), &core.Identifier{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "name",
+		Version: "version",
+	}, platformValues, []*core.Resources_ResourceEntry{}, taskResourceSpec)
+
+	assert.EqualValues(t, []*core.Resources_ResourceEntry{
+		{
+			Name:  core.Resources_CPU,
+			Value: taskResourceSpec.Cpu,
+		},
+		{
+			Name:  core.Resources_MEMORY,
+			Value: taskResourceSpec.Memory,
+		},
+	}, assignedResources)
+}
+
+func TestSetDefaults(t *testing.T) {
+	task := &core.CompiledTask{
+		Template: &core.TaskTemplate{
+			Target: &core.TaskTemplate_Container{
+				Container: &core.Container{
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{
+								Name:  core.Resources_CPU,
+								Value: "200m",
+							},
+						},
+					},
+				},
+			},
+			Id: &core.Identifier{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "task_name",
+				Version: "version",
+			},
+		},
+	}
+
+	taskConfig := runtimeMocks.MockTaskResourceConfiguration{}
+	taskConfig.Defaults = runtimeInterfaces.TaskResourceSet{
+		CPU:    "200m",
+		GPU:    "8",
+		Memory: "200Gi",
+	}
+	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
+		CPU:    "300m",
+		GPU:    "8",
+		Memory: "500Gi",
+	}
+	setCompiledTaskDefaults(context.Background(), &taskConfig, task, repositoryMocks.NewMockRepository(), "workflow")
+	assert.True(t, proto.Equal(
+		&core.Container{
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{
+						Name:  core.Resources_CPU,
+						Value: "200m",
+					},
+					{
+						Name:  core.Resources_MEMORY,
+						Value: "200Gi",
+					},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{
+						Name:  core.Resources_CPU,
+						Value: "200m",
+					},
+					{
+						Name:  core.Resources_MEMORY,
+						Value: "200Gi",
+					},
+				},
+			},
+		},
+		task.Template.GetContainer()), fmt.Sprintf("%+v", task.Template.GetContainer()))
+}
+
+func TestSetDefaults_MissingDefaults(t *testing.T) {
+	task := &core.CompiledTask{
+		Template: &core.TaskTemplate{
+			Target: &core.TaskTemplate_Container{
+				Container: &core.Container{
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{
+								Name:  core.Resources_CPU,
+								Value: "200m",
+							},
+						},
+					},
+				},
+			},
+			Id: &core.Identifier{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "task_name",
+				Version: "version",
+			},
+		},
+	}
+
+	taskConfig := runtimeMocks.MockTaskResourceConfiguration{}
+	taskConfig.Defaults = runtimeInterfaces.TaskResourceSet{
+		CPU:    "200m",
+		GPU:    "8",
+		Memory: "200Gi",
+	}
+	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
+		CPU: "300m",
+		GPU: "8",
+	}
+	setCompiledTaskDefaults(context.Background(), &taskConfig, task, repositoryMocks.NewMockRepository(), "workflow")
+	assert.True(t, proto.Equal(
+		&core.Container{
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{
+						Name:  core.Resources_CPU,
+						Value: "200m",
+					},
+					{
+						Name:  core.Resources_MEMORY,
+						Value: "200Gi",
+					},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{
+						Name:  core.Resources_CPU,
+						Value: "200m",
+					},
+					{
+						Name:  core.Resources_MEMORY,
+						Value: "200Gi",
+					},
+				},
+			},
+		},
+		task.Template.GetContainer()), fmt.Sprintf("%+v", task.Template.GetContainer()))
+}
+
+func TestCreateTaskDefaultLimits(t *testing.T) {
+	task := &core.CompiledTask{
+		Template: &core.TaskTemplate{
+			Target: &core.TaskTemplate_Container{
+				Container: &core.Container{
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{
+								Name:  core.Resources_CPU,
+								Value: "200m",
+							},
+							{
+								Name:  core.Resources_MEMORY,
+								Value: "200Mi",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	defaultLimits := createTaskDefaultLimits(context.Background(), task)
+	assert.Equal(t, "200Mi", defaultLimits.Memory)
+	assert.Equal(t, "200m", defaultLimits.CPU)
+}

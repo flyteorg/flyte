@@ -60,7 +60,7 @@
 [[override]]
   name = "github.com/lyft/flyteidl"
   source = "https://github.com/lyft/flyteidl"
-  version = "=0.16.5"
+  version = "^0.16.6"
 
 [[constraint]]
   name = "github.com/lyft/flytepropeller"
@@ -93,11 +93,6 @@
   version = "1.2.1"
 
 [[override]]
-  name = "k8s.io/apimachinery"
-  source = "https://github.com/lyft/apimachinery"
-  revision = "047e3ea32d7fb5984f444d7dd9510cfd362d7d7c"
-
-[[override]]
   name = "k8s.io/api"
   revision = "b49a72c274e072a6e385d55c671acb3717186ce5"
   source = "https://github.com/lyft/api"
@@ -121,6 +116,11 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[override]]
+  name = "k8s.io/apimachinery"
+  source = "https://github.com/lyft/apimachinery"
+  revision = "047e3ea32d7fb5984f444d7dd9510cfd362d7d7c"
 
 [[constraint]]
   name = "github.com/graymeta/stow"
