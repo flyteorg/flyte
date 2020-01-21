@@ -68,10 +68,10 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kubeCli
 		return currentState, errors2.Wrapf(ErrBuildPodTemplate, err, "Failed to convert task template to a pod template for task")
 	}
 
-	var command []string
+	var args []string
 	if len(podTemplate.Spec.Containers) > 0 {
-		command = append(podTemplate.Spec.Containers[0].Command, podTemplate.Spec.Containers[0].Args...)
-		podTemplate.Spec.Containers[0].Args = []string{}
+		args = append(podTemplate.Spec.Containers[0].Command, podTemplate.Spec.Containers[0].Args...)
+		podTemplate.Spec.Containers[0].Command = []string{}
 	}
 
 	size := currentState.GetExecutionArraySize()
@@ -87,7 +87,7 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kubeCli
 
 		pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, arrayJobEnvVars...)
 
-		pod.Spec.Containers[0].Command, err = utils.ReplaceTemplateCommandArgs(ctx, command, arrayJobInputReader{tCtx.InputReader()}, tCtx.OutputWriter())
+		pod.Spec.Containers[0].Args, err = utils.ReplaceTemplateCommandArgs(ctx, args, arrayJobInputReader{tCtx.InputReader()}, tCtx.OutputWriter())
 		if err != nil {
 			return currentState, errors2.Wrapf(ErrReplaceCmdTemplate, err, "Failed to replace cmd args")
 		}
