@@ -4,8 +4,10 @@ import (
 	"context"
 	"math/rand"
 
+	"github.com/lyft/flyteadmin/pkg/manager/impl/resources"
+	"github.com/lyft/flyteadmin/pkg/manager/interfaces"
+
 	"github.com/lyft/flyteadmin/pkg/repositories"
-	"github.com/lyft/flyteadmin/pkg/resourcematching"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"github.com/lyft/flytestdlib/logger"
@@ -31,9 +33,10 @@ type QueueAllocator interface {
 }
 
 type queueAllocatorImpl struct {
-	queueConfigMap queueConfig
-	config         runtimeInterfaces.Configuration
-	db             repositories.RepositoryInterface
+	queueConfigMap  queueConfig
+	config          runtimeInterfaces.Configuration
+	db              repositories.RepositoryInterface
+	resourceManager interfaces.ResourceInterface
 }
 
 func (q *queueAllocatorImpl) refreshExecutionQueues(executionQueues []runtimeInterfaces.ExecutionQueue) {
@@ -60,20 +63,20 @@ func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier core.Ident
 	executionQueues := q.config.QueueConfiguration().GetExecutionQueues()
 	q.refreshExecutionQueues(executionQueues)
 
-	attributes, err := resourcematching.GetOverrideValuesToApply(ctx, resourcematching.GetOverrideValuesInput{
-		Db:       q.db,
-		Project:  identifier.Project,
-		Domain:   identifier.Domain,
-		Workflow: identifier.Name,
-		Resource: admin.MatchableResource_EXECUTION_QUEUE,
+	resource, err := q.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
+		Project:      identifier.Project,
+		Domain:       identifier.Domain,
+		Workflow:     identifier.Name,
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
 	})
+
 	if err != nil {
 		logger.Warningf(ctx, "Failed to fetch override values when assigning execution queue for [%+v] with err: %v",
 			identifier, err)
 	}
 
-	if attributes != nil && attributes.GetExecutionQueueAttributes() != nil {
-		for _, tag := range attributes.GetExecutionQueueAttributes().Tags {
+	if resource != nil && resource.Attributes != nil && resource.Attributes.GetExecutionQueueAttributes() != nil {
+		for _, tag := range resource.Attributes.GetExecutionQueueAttributes().Tags {
 			matches, ok := q.queueConfigMap[tag]
 			if !ok {
 				continue
@@ -108,8 +111,9 @@ func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier core.Ident
 
 func NewQueueAllocator(config runtimeInterfaces.Configuration, db repositories.RepositoryInterface) QueueAllocator {
 	queueAllocator := queueAllocatorImpl{
-		config: config,
-		db:     db,
+		config:          config,
+		db:              db,
+		resourceManager: resources.NewResourceManager(db),
 	}
 	return &queueAllocator
 }

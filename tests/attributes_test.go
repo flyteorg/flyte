@@ -24,58 +24,13 @@ var matchingAttributes = &admin.MatchingAttributes{
 	},
 }
 
-func TestProjectAttributes(t *testing.T) {
-	ctx := context.Background()
-
-	db := databaseConfig.OpenDbConnection(databaseConfig.NewPostgresConfigProvider(getLocalDbConfig(), adminScope))
-	truncateTableForTesting(db, "project_attributes")
-	db.Close()
-
-	client, conn := GetTestAdminServiceClient()
-	defer conn.Close()
-
-	req := admin.ProjectAttributesUpdateRequest{
-		Attributes: &admin.ProjectAttributes{
-			Project:            "admintests",
-			MatchingAttributes: matchingAttributes,
-		},
-	}
-
-	_, err := client.UpdateProjectAttributes(ctx, &req)
-	assert.Nil(t, err)
-
-	response, err := client.GetProjectAttributes(ctx, &admin.ProjectAttributesGetRequest{
-		Project:      "admintests",
-		ResourceType: admin.MatchableResource_TASK_RESOURCE,
-	})
-	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&admin.ProjectAttributesGetResponse{
-		Attributes: &admin.ProjectAttributes{
-			Project:            "admintests",
-			MatchingAttributes: matchingAttributes,
-		},
-	}, response))
-
-	_, err = client.DeleteProjectAttributes(ctx, &admin.ProjectAttributesDeleteRequest{
-		Project:      "admintests",
-		ResourceType: admin.MatchableResource_TASK_RESOURCE,
-	})
-	assert.Nil(t, err)
-
-	_, err = client.GetProjectAttributes(ctx, &admin.ProjectAttributesGetRequest{
-		Project:      "admintests",
-		ResourceType: admin.MatchableResource_TASK_RESOURCE,
-	})
-	assert.EqualError(t, err, "rpc error: code = NotFound desc = entry not found")
-}
-
 func TestUpdateProjectDomainAttributes(t *testing.T) {
 	ctx := context.Background()
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
 
-	db := databaseConfig.OpenDbConnection(databaseConfig.NewPostgresConfigProvider(getLocalDbConfig(), adminScope))
-	truncateTableForTesting(db, "project_domain_attributes")
+	db := databaseConfig.OpenDbConnection(databaseConfig.NewPostgresConfigProvider(getDbConfig(), adminScope))
+	truncateTableForTesting(db, "resources")
 	db.Close()
 
 	req := admin.ProjectDomainAttributesUpdateRequest{
@@ -103,6 +58,23 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 		},
 	}, response))
 
+	workflowResponse, err := client.GetWorkflowAttributes(ctx, &admin.WorkflowAttributesGetRequest{
+		Project:      "admintests",
+		Domain:       "development",
+		Workflow:     "workflow",
+		ResourceType: admin.MatchableResource_TASK_RESOURCE,
+	})
+	assert.Nil(t, err)
+	// Testing that if overrides are not set at workflow level, the one from Project-Domain is returned
+	assert.True(t, proto.Equal(&admin.WorkflowAttributesGetResponse{
+		Attributes: &admin.WorkflowAttributes{
+			Project:            "admintests",
+			Domain:             "development",
+			Workflow:           "",
+			MatchingAttributes: matchingAttributes,
+		},
+	}, workflowResponse))
+
 	_, err = client.DeleteProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesDeleteRequest{
 		Project:      "admintests",
 		Domain:       "development",
@@ -110,12 +82,13 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
-	_, err = client.GetProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesGetRequest{
+	response, err = client.GetProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesGetRequest{
 		Project:      "admintests",
 		Domain:       "development",
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	})
-	assert.EqualError(t, err, "rpc error: code = NotFound desc = entry not found")
+	assert.Nil(t, response)
+	assert.EqualError(t, err, "rpc error: code = NotFound desc = {Project:admintests Domain:development Workflow: LaunchPlan: ResourceType:TASK_RESOURCE}")
 }
 
 func TestUpdateWorkflowAttributes(t *testing.T) {
@@ -123,8 +96,8 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
 
-	db := databaseConfig.OpenDbConnection(databaseConfig.NewPostgresConfigProvider(getLocalDbConfig(), adminScope))
-	truncateTableForTesting(db, "workflow_attributes")
+	db := databaseConfig.OpenDbConnection(databaseConfig.NewPostgresConfigProvider(getDbConfig(), adminScope))
+	truncateTableForTesting(db, "resources")
 	db.Close()
 
 	req := admin.WorkflowAttributesUpdateRequest{
@@ -169,5 +142,5 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 		Workflow:     "workflow",
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	})
-	assert.EqualError(t, err, "rpc error: code = NotFound desc = entry not found")
+	assert.EqualError(t, err, "rpc error: code = NotFound desc = {Project:admintests Domain:development Workflow:workflow LaunchPlan: ResourceType:TASK_RESOURCE}")
 }

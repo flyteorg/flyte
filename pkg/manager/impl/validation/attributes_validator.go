@@ -26,34 +26,6 @@ func validateMatchingAttributes(attributes *admin.MatchingAttributes, identifier
 		"Unrecognized matching attributes type for request %s", identifier)
 }
 
-func ValidateProjectAttributesUpdateRequest(request admin.ProjectAttributesUpdateRequest) (
-	admin.MatchableResource, error) {
-	if request.Attributes == nil {
-		return defaultMatchableResource, shared.GetMissingArgumentError(shared.Attributes)
-	}
-	if err := ValidateEmptyStringField(request.Attributes.Project, shared.Project); err != nil {
-		return defaultMatchableResource, err
-	}
-
-	return validateMatchingAttributes(request.Attributes.MatchingAttributes, request.Attributes.Project)
-}
-
-func ValidateProjectAttributesGetRequest(request admin.ProjectAttributesGetRequest) error {
-	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ValidateProjectAttributesDeleteRequest(request admin.ProjectAttributesDeleteRequest) error {
-	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func ValidateProjectDomainAttributesUpdateRequest(request admin.ProjectDomainAttributesUpdateRequest) (
 	admin.MatchableResource, error) {
 	if request.Attributes == nil {

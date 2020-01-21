@@ -151,33 +151,12 @@ var Migrations = []*gormigrate.Migration{
 	},
 	// Add ProjectAttributes with custom resource attributes.
 	{
-		ID: "2019-12-30-project-attributes",
+		ID: "2020-01-10-resource",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.ProjectAttributes{}).Error
+			return tx.AutoMigrate(&models.Resource{}).Error
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("project_attributes").Error
-		},
-	},
-
-	// Add ProjectDomainAttributes with custom resource attributes.
-	{
-		ID: "2019-12-30-project-domain-attributes",
-		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.ProjectDomainAttributes{}).Error
-		},
-		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("project_domain_attributes").Error
-		},
-	},
-	// Add WorkflowAttributes with custom resource attributes.
-	{
-		ID: "2019-12-30-workflow-attributes",
-		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.WorkflowAttributes{}).Error
-		},
-		Rollback: func(tx *gorm.DB) error {
-			return tx.DropTable("workflow_attributes").Error
+			return tx.DropTable("resources").Error
 		},
 	},
 }
