@@ -62,7 +62,7 @@ type RequestBody struct {
 
 // Interface to interact with QuboleClient for hive tasks
 type QuboleClient interface {
-	ExecuteHiveCommand(ctx context.Context, commandStr string, timeoutVal uint32, clusterLabel string,
+	ExecuteHiveCommand(ctx context.Context, commandStr string, timeoutVal uint32, clusterPrimaryLabel string,
 		accountKey string, tags []string) (*QuboleCommandDetails, error)
 	KillCommand(ctx context.Context, commandID string, accountKey string) error
 	GetCommandStatus(ctx context.Context, commandID string, accountKey string) (QuboleStatus, error)
@@ -167,7 +167,7 @@ func (q *quboleClient) ExecuteHiveCommand(
 	ctx context.Context,
 	commandStr string,
 	timeoutVal uint32,
-	clusterLabel string,
+	clusterPrimaryLabel string,
 	accountKey string,
 	tags []string) (*QuboleCommandDetails, error) {
 
@@ -175,7 +175,7 @@ func (q *quboleClient) ExecuteHiveCommand(
 		CommandType:  hiveCommandType,
 		Query:        commandStr,
 		Timeout:      timeoutVal,
-		ClusterLabel: clusterLabel,
+		ClusterLabel: clusterPrimaryLabel,
 		Tags:         tags,
 	}
 

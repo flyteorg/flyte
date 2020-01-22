@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"testing"
 
+	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	mocks2 "github.com/lyft/flytestdlib/cache/mocks"
@@ -168,7 +169,7 @@ func TestGetAllocationToken(t *testing.T) {
 		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusGranted, nil)
 
-		state, err := GetAllocationToken(ctx, quboleResourceNamespace, tCtx)
+		state, err := GetAllocationToken(ctx, tCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, PhaseQueued, state.Phase)
 	})
@@ -180,7 +181,7 @@ func TestGetAllocationToken(t *testing.T) {
 		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusExhausted, nil)
 
-		state, err := GetAllocationToken(ctx, quboleResourceNamespace, tCtx)
+		state, err := GetAllocationToken(ctx, tCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, PhaseNotStarted, state.Phase)
 	})
@@ -192,7 +193,7 @@ func TestGetAllocationToken(t *testing.T) {
 		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusNamespaceQuotaExceeded, nil)
 
-		state, err := GetAllocationToken(ctx, quboleResourceNamespace, tCtx)
+		state, err := GetAllocationToken(ctx, tCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, PhaseNotStarted, state.Phase)
 	})
@@ -243,7 +244,7 @@ func TestFinalize(t *testing.T) {
 		called = true
 	}).Return(nil)
 
-	err := Finalize(ctx, tCtx, quboleResourceNamespace, state)
+	err := Finalize(ctx, tCtx, state)
 	assert.NoError(t, err)
 	assert.True(t, called)
 }
@@ -297,4 +298,102 @@ func TestKickOffQuery(t *testing.T) {
 	assert.Equal(t, "453298043", newState.CommandId)
 	assert.True(t, getOrCreateCalled)
 	assert.True(t, quboleCalled)
+}
+
+func createMockQuboleCfg() *config.Config {
+	return &config.Config{
+		ClusterConfigs: []config.ClusterConfig{
+			{PrimaryLabel: "primary A", Labels: []string{"primary A", "A", "label A", "A-prod"}, Limit: 10},
+			{PrimaryLabel: "primary B", Labels: []string{"B"}, Limit: 10},
+			{PrimaryLabel: "primary C", Labels: []string{"C-prod"}, Limit: 1},
+		},
+		DestinationClusterConfigs: []config.DestinationClusterConfig{
+			{Project: "project A", Domain: "domain X", ClusterLabel: "A-prod"},
+			{Project: "project A", Domain: "domain Y", ClusterLabel: "A"},
+			{Project: "project A", Domain: "domain Z", ClusterLabel: "B"},
+			{Project: "project C", Domain: "domain X", ClusterLabel: "C-prod"},
+		},
+	}
+}
+
+func Test_mapLabelToPrimaryLabel(t *testing.T) {
+	ctx := context.TODO()
+	mockQuboleCfg := createMockQuboleCfg()
+
+	type args struct {
+		ctx       context.Context
+		quboleCfg *config.Config
+		label     string
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      string
+		wantFound bool
+	}{
+		{name: "Label has a mapping", args: args{ctx: ctx, quboleCfg: mockQuboleCfg, label: "A-prod"}, want: "primary A", wantFound: true},
+		{name: "Label has a typo", args: args{ctx: ctx, quboleCfg: mockQuboleCfg, label: "a"}, want: DefaultClusterPrimaryLabel, wantFound: false},
+		{name: "Label has a mapping 2", args: args{ctx: ctx, quboleCfg: mockQuboleCfg, label: "C-prod"}, want: "primary C", wantFound: true},
+		{name: "Label has a typo 2", args: args{ctx: ctx, quboleCfg: mockQuboleCfg, label: "C_prod"}, want: DefaultClusterPrimaryLabel, wantFound: false},
+		{name: "Label has a mapping 3", args: args{ctx: ctx, quboleCfg: mockQuboleCfg, label: "primary A"}, want: "primary A", wantFound: true},
+		{name: "Label has no mapping", args: args{ctx: ctx, quboleCfg: mockQuboleCfg, label: "D"}, want: DefaultClusterPrimaryLabel, wantFound: false},
+		{name: "Label is an empty string", args: args{ctx: ctx, quboleCfg: mockQuboleCfg, label: ""}, want: DefaultClusterPrimaryLabel, wantFound: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, found := mapLabelToPrimaryLabel(tt.args.ctx, tt.args.quboleCfg, tt.args.label); got != tt.want || found != tt.wantFound {
+				t.Errorf("mapLabelToPrimaryLabel() = (%v, %v), want (%v, %v)", got, found, tt.want, tt.wantFound)
+			}
+		})
+	}
+}
+
+func createMockTaskExecutionContextWithProjectDomain(project string, domain string) *mocks.TaskExecutionContext {
+	mockTaskExecutionContext := mocks.TaskExecutionContext{}
+	taskExecId := &pluginsCoreMocks.TaskExecutionID{}
+	taskExecId.OnGetID().Return(idlCore.TaskExecutionIdentifier{
+		NodeExecutionId: &idlCore.NodeExecutionIdentifier{ExecutionId: &idlCore.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    "random name",
+		}},
+	})
+
+	taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
+	taskMetadata.OnGetTaskExecutionID().Return(taskExecId)
+	mockTaskExecutionContext.On("TaskExecutionMetadata").Return(taskMetadata)
+	return &mockTaskExecutionContext
+}
+
+func Test_getClusterPrimaryLabel(t *testing.T) {
+	ctx := context.TODO()
+	err := config.SetQuboleConfig(createMockQuboleCfg())
+	assert.Nil(t, err)
+
+	type args struct {
+		ctx                  context.Context
+		tCtx                 core.TaskExecutionContext
+		clusterLabelOverride string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name: "Override is not empty + override has NO existing mapping + project-domain has an existing mapping", args: args{ctx: ctx, tCtx: createMockTaskExecutionContextWithProjectDomain("project A", "domain Z"), clusterLabelOverride: "AAAA"}, want: "primary B"},
+		{name: "Override is not empty + override has NO existing mapping + project-domain has NO existing mapping", args: args{ctx: ctx, tCtx: createMockTaskExecutionContextWithProjectDomain("project A", "domain blah"), clusterLabelOverride: "blh"}, want: DefaultClusterPrimaryLabel},
+		{name: "Override is not empty + override has an existing mapping + project-domain has NO existing mapping", args: args{ctx: ctx, tCtx: createMockTaskExecutionContextWithProjectDomain("project blah", "domain blah"), clusterLabelOverride: "C-prod"}, want: "primary C"},
+		{name: "Override is not empty + override has an existing mapping + project-domain has an existing mapping", args: args{ctx: ctx, tCtx: createMockTaskExecutionContextWithProjectDomain("project A", "domain A"), clusterLabelOverride: "C-prod"}, want: "primary C"},
+		{name: "Override is empty + project-domain has an existing mapping", args: args{ctx: ctx, tCtx: createMockTaskExecutionContextWithProjectDomain("project A", "domain X"), clusterLabelOverride: ""}, want: "primary A"},
+		{name: "Override is empty + project-domain has an existing mapping2", args: args{ctx: ctx, tCtx: createMockTaskExecutionContextWithProjectDomain("project A", "domain Z"), clusterLabelOverride: ""}, want: "primary B"},
+		{name: "Override is empty + project-domain has NO existing mapping", args: args{ctx: ctx, tCtx: createMockTaskExecutionContextWithProjectDomain("project A", "domain blah"), clusterLabelOverride: ""}, want: DefaultClusterPrimaryLabel},
+		{name: "Override is empty + project-domain has NO existing mapping2", args: args{ctx: ctx, tCtx: createMockTaskExecutionContextWithProjectDomain("project blah", "domain X"), clusterLabelOverride: ""}, want: DefaultClusterPrimaryLabel},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getClusterPrimaryLabel(tt.args.ctx, tt.args.tCtx, tt.args.clusterLabelOverride); got != tt.want {
+				t.Errorf("getClusterPrimaryLabel() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

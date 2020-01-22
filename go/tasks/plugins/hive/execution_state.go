@@ -65,14 +65,14 @@ type ExecutionState struct {
 
 // This is the main state iteration
 func HandleExecutionState(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, quboleClient client.QuboleClient,
-	executionsCache cache.AutoRefresh, resourceNamespace core.ResourceNamespace, cfg *config.Config) (ExecutionState, error) {
+	executionsCache cache.AutoRefresh, cfg *config.Config) (ExecutionState, error) {
 
 	var transformError error
 	var newState ExecutionState
 
 	switch currentState.Phase {
 	case PhaseNotStarted:
-		newState, transformError = GetAllocationToken(ctx, resourceNamespace, tCtx)
+		newState, transformError = GetAllocationToken(ctx, tCtx)
 
 	case PhaseQueued:
 		newState, transformError = KickOffQuery(ctx, tCtx, currentState, quboleClient, executionsCache, cfg)
@@ -141,24 +141,25 @@ func ConstructTaskInfo(e ExecutionState) *core.TaskInfo {
 	return nil
 }
 
-func composeResourceNamespaceWithClusterLabel(ctx context.Context, tCtx core.TaskExecutionContext, resourceNamespace core.ResourceNamespace) (core.ResourceNamespace, error) {
-	_, clusterLabel, _, _, err := GetQueryInfo(ctx, tCtx)
+func composeResourceNamespaceWithClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext) (core.ResourceNamespace, error) {
+	_, clusterLabelOverride, _, _, err := GetQueryInfo(ctx, tCtx)
 	if err != nil {
-		return resourceNamespace, err
+		return "", err
 	}
-	return resourceNamespace.CreateSubNamespace(core.ResourceNamespace(clusterLabel)), nil
+	clusterPrimaryLabel := getClusterPrimaryLabel(ctx, tCtx, clusterLabelOverride)
+	return core.ResourceNamespace(clusterPrimaryLabel), nil
 }
 
-func GetAllocationToken(ctx context.Context, resourceNamespace core.ResourceNamespace, tCtx core.TaskExecutionContext) (ExecutionState, error) {
+func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext) (ExecutionState, error) {
 	newState := ExecutionState{}
 	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 
-	resourceNamespaceWithClusterLabel, err := composeResourceNamespaceWithClusterLabel(ctx, tCtx, resourceNamespace)
+	clusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx)
 	if err != nil {
 		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when requesting allocation token %s", uniqueId)
 	}
 
-	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, resourceNamespaceWithClusterLabel, uniqueId)
+	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, clusterPrimaryLabel, uniqueId)
 	if err != nil {
 		logger.Errorf(ctx, "Resource manager failed for TaskExecId [%s] token [%s]. error %s",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueId, err)
@@ -216,8 +217,71 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 	for k, v := range tCtx.TaskExecutionMetadata().GetLabels() {
 		tags = append(tags, fmt.Sprintf("%s:%s", k, v))
 	}
-
+	logger.Debugf(ctx, "QueryInfo: query: [%v], cluster: [%v], timeoutSec: [%v], tags: [%v]", query, cluster, timeoutSec, tags)
 	return
+}
+
+func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label string) (string, bool) {
+	primaryLabel := DefaultClusterPrimaryLabel
+	found := false
+
+	if label == "" {
+		logger.Debugf(ctx, "Input cluster label is an empty string; falling back to using the default primary label [%v]", label, DefaultClusterPrimaryLabel)
+		return primaryLabel, found
+	}
+
+	// Using a linear search because N is small and because of ClusterConfig's struct definition
+	// which is determined specifically for the readability of the corresponding configmap yaml file
+	for _, clusterCfg := range quboleCfg.ClusterConfigs {
+		for _, l := range clusterCfg.Labels {
+			if label != "" && l == label {
+				logger.Debugf(ctx, "Found the primary label [%v] for label [%v]", clusterCfg.PrimaryLabel, label)
+				primaryLabel, found = clusterCfg.PrimaryLabel, true
+				break
+			}
+		}
+	}
+
+	logger.Debugf(ctx, "Cannot find the primary cluster label for label [%v] in configmap; "+
+		"falling back to using the default primary label [%v]", label, DefaultClusterPrimaryLabel)
+	return primaryLabel, found
+}
+
+func mapProjectDomainToDestinationClusterLabel(ctx context.Context, tCtx core.TaskExecutionContext, quboleCfg *config.Config) (string, bool) {
+	tExecId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	project := tExecId.NodeExecutionId.GetExecutionId().GetProject()
+	domain := tExecId.NodeExecutionId.GetExecutionId().GetDomain()
+	logger.Debugf(ctx, "No clusterLabelOverride. Finding the pre-defined cluster label for (project: %v, domain: %v)", project, domain)
+	// Using a linear search because N is small
+	for _, m := range quboleCfg.DestinationClusterConfigs {
+		if project == m.Project && domain == m.Domain {
+			logger.Debugf(ctx, "Found the pre-defined cluster label [%v] for (project: %v, domain: %v)", m.ClusterLabel, project, domain)
+			return m.ClusterLabel, true
+		}
+	}
+
+	// This function finds the label, not primary label, so in the case where no mapping is found, this function should return an empty string
+	return "", false
+}
+
+func getClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext, clusterLabelOverride string) string {
+	cfg := config.GetQuboleConfig()
+
+	// If override is not empty and if it has a mapping, we return the mapped primary label
+	if clusterLabelOverride != "" {
+		if primaryLabel, found := mapLabelToPrimaryLabel(ctx, cfg, clusterLabelOverride); found {
+			return primaryLabel
+		}
+	}
+
+	// If override is empty or if the override does not have a mapping, we return the primary label mapped using (project, domain)
+	if clusterLabel, found := mapProjectDomainToDestinationClusterLabel(ctx, tCtx, cfg); found {
+		primaryLabel, _ := mapLabelToPrimaryLabel(ctx, cfg, clusterLabel)
+		return primaryLabel
+	}
+
+	// Else we return the default primary label
+	return DefaultClusterPrimaryLabel
 }
 
 func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, quboleClient client.QuboleClient,
@@ -229,13 +293,15 @@ func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 		return currentState, errors.Wrapf(errors.RuntimeFailure, err, "Failed to read token from secrets manager")
 	}
 
-	query, cluster, tags, timeoutSec, err := GetQueryInfo(ctx, tCtx)
+	query, clusterLabelOverride, tags, timeoutSec, err := GetQueryInfo(ctx, tCtx)
 	if err != nil {
 		return currentState, err
 	}
 
+	clusterPrimaryLabel := getClusterPrimaryLabel(ctx, tCtx, clusterLabelOverride)
+
 	cmdDetails, err := quboleClient.ExecuteHiveCommand(ctx, query, timeoutSec,
-		cluster, apiKey, tags)
+		clusterPrimaryLabel, apiKey, tags)
 	if err != nil {
 		// If we failed, we'll keep the NotStarted state
 		currentState.CreationFailureCount = currentState.CreationFailureCount + 1
@@ -310,15 +376,15 @@ func Abort(ctx context.Context, tCtx core.TaskExecutionContext, currentState Exe
 	return nil
 }
 
-func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, resourceNamespace core.ResourceNamespace, _ ExecutionState) error {
+func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, _ ExecutionState) error {
 	// Release allocation token
 	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	resourceNamespaceWithClusterLabel, err := composeResourceNamespaceWithClusterLabel(ctx, tCtx, resourceNamespace)
+	clusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx)
 	if err != nil {
 		return errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when releasing allocation token %s", uniqueId)
 	}
 
-	err = tCtx.ResourceManager().ReleaseResource(ctx, resourceNamespaceWithClusterLabel, uniqueId)
+	err = tCtx.ResourceManager().ReleaseResource(ctx, clusterPrimaryLabel, uniqueId)
 
 	if err != nil {
 		logger.Errorf(ctx, "Error releasing allocation token [%s] in Finalize [%s]", uniqueId, err)
