@@ -143,7 +143,7 @@ func (sidecarResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8
 	}
 	switch pod.Status.Phase {
 	case k8sv1.PodSucceeded:
-		return pluginsCore.PhaseInfoSuccess(&info), nil
+		return flytek8s.DemystifySuccess(pod.Status, info)
 	case k8sv1.PodFailed:
 		code, message := flytek8s.ConvertPodFailureToError(pod.Status)
 		return pluginsCore.PhaseInfoRetryableFailure(code, message, &info), nil

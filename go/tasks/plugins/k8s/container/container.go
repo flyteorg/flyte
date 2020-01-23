@@ -6,7 +6,7 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 
 	"github.com/lyft/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
@@ -37,7 +37,7 @@ func (containerTaskExecutor) GetTaskPhase(ctx context.Context, pluginContext k8s
 	}
 	switch pod.Status.Phase {
 	case v1.PodSucceeded:
-		return pluginsCore.PhaseInfoSuccess(&info), nil
+		return flytek8s.DemystifySuccess(pod.Status, info)
 	case v1.PodFailed:
 		code, message := flytek8s.ConvertPodFailureToError(pod.Status)
 		return pluginsCore.PhaseInfoRetryableFailure(code, message, &info), nil

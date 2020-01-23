@@ -3,6 +3,7 @@ package flytek8s
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/lyft/flytestdlib/logger"
@@ -14,6 +15,7 @@ import (
 )
 
 const PodKind = "pod"
+const OOMKilled = "OOMKilled"
 
 func ToK8sPodSpec(ctx context.Context, taskExecutionMetadata pluginsCore.TaskExecutionMetadata, taskReader pluginsCore.TaskReader,
 	inputs io.InputReader, outputPaths io.OutputFilePaths) (*v1.PodSpec, error) {
@@ -165,6 +167,22 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 	}
 
 	return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
+}
+
+func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
+	for _, status := range status.ContainerStatuses {
+		if status.State.Terminated != nil && strings.Contains(status.State.Terminated.Reason, OOMKilled) {
+			return pluginsCore.PhaseInfoRetryableFailure("OOMKilled",
+				"Pod reported success despite being OOMKilled", &info), nil
+		}
+	}
+	for _, status := range status.InitContainerStatuses {
+		if status.State.Terminated != nil && strings.Contains(status.State.Terminated.Reason, OOMKilled) {
+			return pluginsCore.PhaseInfoRetryableFailure("OOMKilled",
+				"Pod reported success despite being OOMKilled", &info), nil
+		}
+	}
+	return pluginsCore.PhaseInfoSuccess(&info), nil
 }
 
 func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
