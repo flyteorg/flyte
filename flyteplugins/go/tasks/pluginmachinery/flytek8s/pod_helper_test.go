@@ -12,7 +12,7 @@ import (
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -335,6 +335,48 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+	})
+}
+
+func TestDemystifySuccess(t *testing.T) {
+	t.Run("OOMKilled", func(t *testing.T) {
+		phaseInfo, err := DemystifySuccess(v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason: OOMKilled,
+						},
+					},
+				},
+			},
+		}, pluginsCore.TaskInfo{})
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
+	})
+
+	t.Run("InitContainer OOMKilled", func(t *testing.T) {
+		phaseInfo, err := DemystifySuccess(v1.PodStatus{
+			InitContainerStatuses: []v1.ContainerStatus{
+				{
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason: OOMKilled,
+						},
+					},
+				},
+			},
+		}, pluginsCore.TaskInfo{})
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "OOMKilled", phaseInfo.Err().Code)
+	})
+
+	t.Run("success", func(t *testing.T) {
+		phaseInfo, err := DemystifySuccess(v1.PodStatus{}, pluginsCore.TaskInfo{})
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
 	})
 }
 
