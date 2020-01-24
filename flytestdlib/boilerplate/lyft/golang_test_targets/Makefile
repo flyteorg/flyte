@@ -1,8 +1,16 @@
+# WARNING: THIS FILE IS MANAGED IN THE 'BOILERPLATE' REPO AND COPIED TO OTHER REPOSITORIES.
+# ONLY EDIT THIS FILE FROM WITHIN THE 'LYFT/BOILERPLATE' REPOSITORY:
+#
+# TO OPT OUT OF UPDATES, SEE https://github.com/lyft/boilerplate/blob/master/Readme.rst
+
+
+.PHONY: download_tooling
+download_tooling: #download dependencies (including test deps) for the package
+	@boilerplate/lyft/golang_test_targets/download_tooling.sh
+
 .PHONY: lint
-lint: #lints the package for common code smells
-	# install outside of current module, workaround https://github.com/golang/go/issues/30515
-	which golangci-lint || (cd /tmp && go get github.com/golangci/golangci-lint/cmd/golangci-lint && cd -)
-	golangci-lint run
+lint: download_tooling #lints the package for common code smells
+	GL_DEBUG=linters_output,env golangci-lint run --deadline=5m --exclude deprecated -v
 
 # If code is failing goimports linter, this will fix.
 # skips 'vendor'
@@ -10,9 +18,15 @@ lint: #lints the package for common code smells
 goimports:
 	@boilerplate/lyft/golang_test_targets/goimports
 
-.PHONY: install
-install: #download dependencies (including test deps) for the package
+.PHONY: mod_download
+mod_download: #download dependencies (including test deps) for the package
 	go mod download
+
+.PHONY: install
+install: download_tooling mod_download
+
+.PHONY: show
+show: go list -m all
 
 .PHONY: test_unit
 test_unit:
@@ -28,4 +42,5 @@ test_unit_cover:
 
 .PHONY: test_unit_visual
 test_unit_visual:
-	go test ./... -coverprofile /tmp/cover.out -covermode=count; go tool cover -html=/tmp/cover.out
+	go test ./... -coverprofile /tmp/cover.out -covermode=count; go tool cover -html=/tmp/cover.out 
+

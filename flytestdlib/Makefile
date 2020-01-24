@@ -1,6 +1,10 @@
 export REPOSITORY=flytestdlib
 include boilerplate/lyft/golang_test_targets/Makefile
 
+.PHONY: update_boilerplate
+update_boilerplate:
+	@boilerplate/update.sh
+
 # Generate golden files. Add test packages that generate golden files here.
 golden:
 	go test ./cli/pflags/api -update
@@ -19,8 +23,7 @@ compile:
 	mkdir -p ./bin
 	go build -o pflags ./cli/pflags/main.go && mv ./pflags ./bin
 
-gen-config:
-	which pflags || (go get github.com/lyft/flytestdlib/cli/pflags)
+gen-config: download_tooling
 	@go generate ./...
 
 .PHONY: test_unit_codecov
