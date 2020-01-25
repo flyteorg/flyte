@@ -12,6 +12,11 @@ import (
 const defaultScopeDelimiterStr = ":"
 const defaultMetricDelimiterStr = "_"
 
+var (
+	defaultObjectives = map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001}
+	defaultBuckets    = []float64{.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10}
+)
+
 func panicIfError(err error) {
 	if err != nil {
 		panic("Failed to register metrics. Error: " + err.Error())
@@ -222,8 +227,9 @@ func (m metricsScope) MustNewGaugeVec(name, description string, labelNames ...st
 func (m metricsScope) NewSummary(name, description string) (prometheus.Summary, error) {
 	s := prometheus.NewSummary(
 		prometheus.SummaryOpts{
-			Name: m.NewScopedMetricName(name),
-			Help: description,
+			Name:       m.NewScopedMetricName(name),
+			Help:       description,
+			Objectives: defaultObjectives,
 		},
 	)
 
@@ -239,8 +245,9 @@ func (m metricsScope) MustNewSummary(name, description string) prometheus.Summar
 func (m metricsScope) NewSummaryVec(name, description string, labelNames ...string) (*prometheus.SummaryVec, error) {
 	s := prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
-			Name: m.NewScopedMetricName(name),
-			Help: description,
+			Name:       m.NewScopedMetricName(name),
+			Help:       description,
+			Objectives: defaultObjectives,
 		},
 		labelNames,
 	)
@@ -256,8 +263,9 @@ func (m metricsScope) MustNewSummaryVec(name, description string, labelNames ...
 func (m metricsScope) NewHistogram(name, description string) (prometheus.Histogram, error) {
 	h := prometheus.NewHistogram(
 		prometheus.HistogramOpts{
-			Name: m.NewScopedMetricName(name),
-			Help: description,
+			Name:    m.NewScopedMetricName(name),
+			Help:    description,
+			Buckets: defaultBuckets,
 		},
 	)
 	return h, prometheus.Register(h)
@@ -272,8 +280,9 @@ func (m metricsScope) MustNewHistogram(name, description string) prometheus.Hist
 func (m metricsScope) NewHistogramVec(name, description string, labelNames ...string) (*prometheus.HistogramVec, error) {
 	h := prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name: m.NewScopedMetricName(name),
-			Help: description,
+			Name:    m.NewScopedMetricName(name),
+			Help:    description,
+			Buckets: defaultBuckets,
 		},
 		labelNames,
 	)
