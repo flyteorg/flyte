@@ -1,18 +1,17 @@
 # WARNING: THIS FILE IS MANAGED IN THE 'BOILERPLATE' REPO AND COPIED TO OTHER REPOSITORIES.
 # ONLY EDIT THIS FILE FROM WITHIN THE 'LYFT/BOILERPLATE' REPOSITORY:
-#
+# 
 # TO OPT OUT OF UPDATES, SEE https://github.com/lyft/boilerplate/blob/master/Readme.rst
 
-# Using go1.13.3
 FROM golang:1.13.3-alpine3.10 as builder
-RUN apk add git openssh-client make curl dep
+RUN apk add git openssh-client make curl
 
-# COPY only the dep files for efficient caching
-COPY Gopkg.* /go/src/github.com/lyft/flytepropeller/
+# COPY only the go mod files for efficient caching
+COPY go.mod go.sum /go/src/github.com/lyft/flytepropeller/
 WORKDIR /go/src/github.com/lyft/flytepropeller
 
 # Pull dependencies
-RUN dep ensure -vendor-only
+RUN go mod download
 
 # COPY the rest of the source code
 COPY . /go/src/github.com/lyft/flytepropeller/
