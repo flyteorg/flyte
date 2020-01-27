@@ -1,4 +1,3 @@
-export GO111MODULE=off
 export REPOSITORY=flyteadmin
 include boilerplate/lyft/docker_build/Makefile
 include boilerplate/lyft/golang_test_targets/Makefile
@@ -37,8 +36,5 @@ seed_projects:
 
 all: compile
 
-generate:
-	which pflags || (go get github.com/lyft/flytestdlib/cli/pflags)
-	which mockery || (go get github.com/enghabu/mockery/cmd/mockery)
-	which enumer || (go get github.com/alvaroloes/enumer)
+generate: download_tooling
 	@go generate ./...

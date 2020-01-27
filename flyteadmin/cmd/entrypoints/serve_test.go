@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/grpc/grpc-go/credentials/oauth"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/oauth"
 )
 
 func TestClient(t *testing.T) {
