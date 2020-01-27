@@ -375,8 +375,8 @@ func TestGetTaskExecutionData(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, resp)
 
-	assert.Equal(t, taskExecInputURI, resp.Inputs.Url)
+	assert.NotEmpty(t, resp.Inputs.Url)
 	assert.Equal(t, int64(25), resp.Inputs.Bytes)
-	assert.Equal(t, "s3://flyte/metadata/admin/output/uri", resp.Outputs.Url)
+	assert.NotEmpty(t, resp.Outputs.Url)
 	assert.Equal(t, int64(26), resp.Outputs.Bytes)
 }
