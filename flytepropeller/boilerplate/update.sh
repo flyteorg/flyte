@@ -34,6 +34,7 @@ if [ -z "$REPOSITORY" ]; then
 fi
 
 while read directory; do
+  # TODO: Skip empty lines, whitespace only lines, and comment lines
   echo "***********************************************************************************"
   echo "$directory is configured in update.cfg."
   echo "-----------------------------------------------------------------------------------"
