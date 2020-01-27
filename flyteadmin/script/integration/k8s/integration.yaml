@@ -243,13 +243,16 @@ metadata:
 data:
   # this will need to be templatized
   development.integration: |-
-    application:
+    server:
       httpPort: 8088
       grpcPort: 8089
       kube-config: "$HOME/.kube/config"
+      grpcServerReflection: true
+      security:
+        secure: false
+        useAuth: false
     flyteadmin:
-      httpPort: 8088
-      grpcPort: 8089
+      runScheduler: false
       roleNameKey: "iam.amazonaws.com/role"
       metricsScope: "flyte:"
       testing:
@@ -294,6 +297,9 @@ data:
       scheme: local
       signedUrls:
         durationMinutes: 3
+    Logger:
+      show-source: true
+      level: 5
     storage:
       type: minio
       connection:
@@ -307,7 +313,6 @@ data:
         max_size_mbs: 10
         target_gc_percent: 100
       container: "flyte"
-      prefix: metadata/admin
     task_resources:
       defaults:
         cpu: 100m
@@ -397,7 +402,7 @@ spec:
         image: flyteadmin:test
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                  "--application.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "run"]
+                  "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "run"]
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
@@ -405,7 +410,7 @@ spec:
         image: flyteadmin:test
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                  "--application.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "seed-projects",
+                  "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "seed-projects",
                   "project", "admintests", "flytekit"]
         volumeMounts:
         - name: config-volume
@@ -421,7 +426,7 @@ spec:
             path: /healthcheck
             port: 8088
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                  "--application.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "serve"]
+                  "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "serve"]
         ports:
         - containerPort: 8088
         volumeMounts:
