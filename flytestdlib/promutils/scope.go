@@ -113,6 +113,13 @@ func (s Timer) Stop() float64 {
 	return scaled
 }
 
+// A SummaryOptions represents a set of options that can be supplied when creating a new prometheus summary metric
+type SummaryOptions struct {
+	// An Objectives defines the quantile rank estimates with their respective absolute errors.
+	// Refer to https://godoc.org/github.com/prometheus/client_golang/prometheus#SummaryOpts for details
+	Objectives map[float64]float64
+}
+
 // A Scope represents a prefix in Prometheus. It is nestable, thus every metric that is published does not need to
 // provide a prefix, but just the name of the metric. As long as the Scope is used to create a new instance of the metric
 // The prefix (or scope) is automatically set.
@@ -132,6 +139,11 @@ type Scope interface {
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	NewSummary(name, description string) (prometheus.Summary, error)
 	MustNewSummary(name, description string) prometheus.Summary
+
+	// Creates new prometheus.Summary metric with custom options, such as a custom set of objectives (i.e., target quantiles).
+	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
+	NewSummaryWithOptions(name, description string, options SummaryOptions) (prometheus.Summary, error)
+	MustNewSummaryWithOptions(name, description string, options SummaryOptions) prometheus.Summary
 
 	// Creates new prometheus.SummaryVec metric with the prefix as the CurrentScope
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
@@ -225,19 +237,29 @@ func (m metricsScope) MustNewGaugeVec(name, description string, labelNames ...st
 }
 
 func (m metricsScope) NewSummary(name, description string) (prometheus.Summary, error) {
+	return m.NewSummaryWithOptions(name, description, SummaryOptions{Objectives: defaultObjectives})
+}
+
+func (m metricsScope) MustNewSummary(name, description string) prometheus.Summary {
+	s, err := m.NewSummary(name, description)
+	panicIfError(err)
+	return s
+}
+
+func (m metricsScope) NewSummaryWithOptions(name, description string, options SummaryOptions) (prometheus.Summary, error) {
 	s := prometheus.NewSummary(
 		prometheus.SummaryOpts{
 			Name:       m.NewScopedMetricName(name),
 			Help:       description,
-			Objectives: defaultObjectives,
+			Objectives: options.Objectives,
 		},
 	)
 
 	return s, prometheus.Register(s)
 }
 
-func (m metricsScope) MustNewSummary(name, description string) prometheus.Summary {
-	s, err := m.NewSummary(name, description)
+func (m metricsScope) MustNewSummaryWithOptions(name, description string, options SummaryOptions) prometheus.Summary {
+	s, err := m.NewSummaryWithOptions(name, description, options)
 	panicIfError(err)
 	return s
 }
