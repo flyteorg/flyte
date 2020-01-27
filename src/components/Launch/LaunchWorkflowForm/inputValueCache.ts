@@ -1,13 +1,11 @@
 import { createContext, useContext } from 'react';
-import { InputValue } from './types';
+import { InputValueMap } from './types';
 
-export type InputValueCache = Map<string, InputValue>;
-
-export function createInputValueCache(): InputValueCache {
-    return new Map();
+export function createInputValueCache(values?: InputValueMap): InputValueMap {
+    return values ? new Map(values.entries()) : new Map();
 }
 
-export const InputValueCacheContext = createContext<InputValueCache>(
+export const InputValueCacheContext = createContext<InputValueMap>(
     createInputValueCache()
 );
 

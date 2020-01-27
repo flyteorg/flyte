@@ -13,6 +13,17 @@ import { inputToLiteral } from './inputHelpers/inputHelpers';
 import { SearchableSelectorOption } from './SearchableSelector';
 import { InputProps, InputType, InputTypeDefinition } from './types';
 
+/** Creates a unique cache key for an input based on its name and type.
+ * Note: This will not be *globally* unique, only unique within a single workflow
+ * definition.
+ */
+export function createInputCacheKey(
+    name: string,
+    { type }: InputTypeDefinition
+): string {
+    return `${name}_${type}`;
+}
+
 /** Safely retrieves the input mapping stored in a workflow, or an empty
  * logic if any optional property along the chain is undefined.
  */

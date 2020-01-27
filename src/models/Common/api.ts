@@ -4,15 +4,18 @@ import {
     defaultPaginationConfig,
     getAdminEntity,
     getProfileUrl,
+    getProtobufObject,
     PaginatedEntityResponse,
     RequestConfig
 } from 'models/AdminEntity';
 
 import { log } from 'common/log';
+import { createCorsProxyURL } from 'common/utils';
 import { transformRequestError } from 'models/AdminEntity/transformRequestError';
 import { defaultAxiosConfig, identifierPrefixes } from './constants';
 import {
     IdentifierScope,
+    LiteralMap,
     NamedEntity,
     NamedEntityIdentifier,
     ResourceType,
@@ -123,3 +126,6 @@ export const getUserProfile = async () => {
         return null;
     }
 };
+
+export const getRemoteLiteralMap = async (url: string) =>
+    getProtobufObject<LiteralMap>({ url: createCorsProxyURL(url) }, LiteralMap);

@@ -4,17 +4,9 @@ import { useEffect, useState } from 'react';
 import { validateInput } from './inputHelpers/inputHelpers';
 import { useInputValueCacheContext } from './inputValueCache';
 import { InputProps, InputValue, ParsedInput } from './types';
-import { convertFormInputsToLiterals } from './utils';
+import { convertFormInputsToLiterals, createInputCacheKey } from './utils';
 
 const debounceDelay = 500;
-
-function createInputCacheKey(input: ParsedInput) {
-    const {
-        name,
-        typeDefinition: { type }
-    } = input;
-    return `${name}_${type}`;
-}
 
 interface FormInputState extends InputProps {
     validate(): boolean;
@@ -28,7 +20,10 @@ interface FormInputsState {
 
 function useFormInputState(parsedInput: ParsedInput): FormInputState {
     const inputValueCache = useInputValueCacheContext();
-    const cacheKey = createInputCacheKey(parsedInput);
+    const cacheKey = createInputCacheKey(
+        parsedInput.name,
+        parsedInput.typeDefinition
+    );
 
     const defaultValue = inputValueCache.has(cacheKey)
         ? inputValueCache.get(cacheKey)

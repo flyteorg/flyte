@@ -89,6 +89,7 @@ function useLaunchPlansForWorkflow(workflowId: WorkflowId | null = null) {
  * definitions, current input values, and errors.
  */
 export function useLaunchWorkflowFormState({
+    initialParameters = {},
     onClose,
     workflowId
 }: LaunchWorkflowFormProps): LaunchWorkflowFormState {
@@ -108,7 +109,11 @@ export function useLaunchWorkflowFormState({
     >();
     const selectedWorkflowId = selectedWorkflow ? selectedWorkflow.data : null;
 
-    const [inputValueCache] = useState(createInputValueCache());
+    const inputValueCache = useMemo(
+        () => createInputValueCache(initialParameters.values),
+        [initialParameters.values]
+    );
+    // const [inputValueCache] = useState(createInputValueCache());
 
     // We have to do a single item get once a workflow is selected so that we
     // receive the full workflow spec

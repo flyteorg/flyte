@@ -1,16 +1,25 @@
 import { FetchableData, MultiFetchableState } from 'components/hooks';
 import { Core } from 'flyteidl';
 import {
+    Identifier,
     LaunchPlan,
     NamedEntityIdentifier,
     WorkflowExecutionIdentifier,
     WorkflowId
 } from 'models';
-import { InputValueCache } from './inputValueCache';
 import { SearchableSelectorOption } from './SearchableSelector';
+
+export type InputValueMap = Map<string, InputValue>;
+
+export interface InitialLaunchParameters {
+    launchPlan?: Identifier;
+    workflow?: WorkflowId;
+    values?: InputValueMap;
+}
 
 export interface LaunchWorkflowFormProps {
     workflowId: NamedEntityIdentifier;
+    initialParameters?: InitialLaunchParameters;
     onClose(): void;
 }
 
@@ -25,7 +34,7 @@ export interface LaunchWorkflowFormState {
     formInputsRef: React.RefObject<LaunchWorkflowFormInputsRef>;
     inputLoadingState: MultiFetchableState;
     inputs: ParsedInput[];
-    inputValueCache: InputValueCache;
+    inputValueCache: InputValueMap;
     launchPlanOptionsLoadingState: MultiFetchableState;
     launchPlanSelectorOptions: SearchableSelectorOption<LaunchPlan>[];
     selectedLaunchPlan?: SearchableSelectorOption<LaunchPlan>;

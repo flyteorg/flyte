@@ -2,7 +2,7 @@ import { WaitForData } from 'components/common';
 import { useRemoteLiteralMap } from 'components/hooks';
 import { UrlBlob } from 'models';
 import * as React from 'react';
-import { maxViewSizeBytes } from './constants';
+import { maxBlobDownloadSizeBytes } from './constants';
 import { LiteralMapViewer } from './LiteralMapViewer';
 
 const DownloadAndRenderBlob: React.FC<{ url: string }> = ({ url }) => {
@@ -37,7 +37,7 @@ export const RemoteLiteralMapViewer: React.FC<{ blob: UrlBlob }> = ({
         );
     }
 
-    return blob.bytes.gt(maxViewSizeBytes) ? (
+    return blob.bytes.gt(maxBlobDownloadSizeBytes) ? (
         <BlobTooLarge url={blob.url} />
     ) : (
         <DownloadAndRenderBlob url={blob.url} />
