@@ -240,10 +240,12 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Con
 		if err != nil {
 			return nil, err
 		}
-		outputDir, err := nCtx.DataStore().ConstructReference(ctx, originalNodePath, "0")
+
+		outputDir, err := nCtx.DataStore().ConstructReference(ctx, originalNodePath, currentAttemptStr)
 		if err != nil {
 			return nil, err
 		}
+
 		subNodeStatus.SetDataDir(originalNodePath)
 		subNodeStatus.SetOutputDir(outputDir)
 		n.Id = newID
