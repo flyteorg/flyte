@@ -11,7 +11,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/lyft/flyteidl v0.17.0
-	github.com/lyft/flytestdlib v0.3.0
+	github.com/lyft/flytestdlib v0.3.2
 	github.com/magiconair/properties v1.8.1
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pkg/errors v0.9.1
