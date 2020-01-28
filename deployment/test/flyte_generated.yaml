@@ -632,7 +632,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.2.0
+        image: docker.io/lyft/flyteadmin:v0.2.1
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -683,7 +683,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.2.0
+        image: docker.io/lyft/flyteadmin:v0.2.1
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -698,7 +698,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flytetester
-        image: docker.io/lyft/flyteadmin:v0.2.0
+        image: docker.io/lyft/flyteadmin:v0.2.1
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -711,7 +711,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.2.0
+        image: docker.io/lyft/flyteadmin:v0.2.1
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -1009,7 +1009,7 @@ spec:
             - /etc/flyte/config/flyteadmin_config.yaml
             - clusterresource
             - sync
-            image: docker.io/lyft/flyteadmin:v0.2.0
+            image: docker.io/lyft/flyteadmin:v0.2.1
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
