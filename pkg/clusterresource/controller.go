@@ -183,7 +183,9 @@ func (c *controller) getCustomTemplateValues(
 		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
 	})
 	if err != nil {
-		collectedErrs = append(collectedErrs, err)
+		if _, ok := err.(errors.FlyteAdminError); !ok || err.(errors.FlyteAdminError).Code() != codes.NotFound {
+			collectedErrs = append(collectedErrs, err)
+		}
 	}
 	if resource != nil && resource.Attributes != nil && resource.Attributes.GetClusterResourceAttributes() != nil {
 		for templateKey, templateValue := range resource.Attributes.GetClusterResourceAttributes().Attributes {

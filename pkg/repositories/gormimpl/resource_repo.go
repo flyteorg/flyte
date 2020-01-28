@@ -111,7 +111,7 @@ func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (model
 	}
 	if tx.RecordNotFound() || len(resources) == 0 {
 		return models.Resource{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound,
-			"%+v", ID)
+			"Resource [%+v] not found", ID)
 	}
 	return resources[0], nil
 }
