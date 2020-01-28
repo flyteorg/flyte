@@ -4,6 +4,12 @@ import (
 	"context"
 	"net/url"
 	"testing"
+	"time"
+
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
+	"github.com/lyft/flytestdlib/promutils"
 
 	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -20,6 +26,10 @@ import (
 	quboleMocks "github.com/lyft/flyteplugins/go/tasks/plugins/hive/client/mocks"
 	"github.com/lyft/flyteplugins/go/tasks/plugins/hive/config"
 )
+
+func init() {
+	labeled.SetMetricKeys(contextutils.NamespaceKey)
+}
 
 func TestInTerminalState(t *testing.T) {
 	var stateTests = []struct {
@@ -169,7 +179,9 @@ func TestGetAllocationToken(t *testing.T) {
 		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusGranted, nil)
 
-		state, err := GetAllocationToken(ctx, tCtx)
+		mockCurrentState := ExecutionState{AllocationTokenRequestStartTime: time.Now()}
+		mockMetrics := getQuboleHiveExecutorMetrics(promutils.NewTestScope())
+		state, err := GetAllocationToken(ctx, tCtx, mockCurrentState, mockMetrics)
 		assert.NoError(t, err)
 		assert.Equal(t, PhaseQueued, state.Phase)
 	})
@@ -181,7 +193,9 @@ func TestGetAllocationToken(t *testing.T) {
 		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusExhausted, nil)
 
-		state, err := GetAllocationToken(ctx, tCtx)
+		mockCurrentState := ExecutionState{AllocationTokenRequestStartTime: time.Now()}
+		mockMetrics := getQuboleHiveExecutorMetrics(promutils.NewTestScope())
+		state, err := GetAllocationToken(ctx, tCtx, mockCurrentState, mockMetrics)
 		assert.NoError(t, err)
 		assert.Equal(t, PhaseNotStarted, state.Phase)
 	})
@@ -193,9 +207,41 @@ func TestGetAllocationToken(t *testing.T) {
 		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusNamespaceQuotaExceeded, nil)
 
-		state, err := GetAllocationToken(ctx, tCtx)
+		mockCurrentState := ExecutionState{AllocationTokenRequestStartTime: time.Now()}
+		mockMetrics := getQuboleHiveExecutorMetrics(promutils.NewTestScope())
+		state, err := GetAllocationToken(ctx, tCtx, mockCurrentState, mockMetrics)
 		assert.NoError(t, err)
 		assert.Equal(t, PhaseNotStarted, state.Phase)
+	})
+
+	t.Run("Request start time, if empty in current state, should be set", func(t *testing.T) {
+		tCtx := GetMockTaskExecutionContext()
+		mockResourceManager := tCtx.ResourceManager()
+		x := mockResourceManager.(*mocks.ResourceManager)
+		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
+			Return(core.AllocationStatusNamespaceQuotaExceeded, nil)
+
+		mockCurrentState := ExecutionState{}
+		mockMetrics := getQuboleHiveExecutorMetrics(promutils.NewTestScope())
+		state, err := GetAllocationToken(ctx, tCtx, mockCurrentState, mockMetrics)
+		assert.NoError(t, err)
+		assert.Equal(t, state.AllocationTokenRequestStartTime.IsZero(), false)
+	})
+
+	t.Run("Request start time, if already set in current state, should be maintained", func(t *testing.T) {
+		tCtx := GetMockTaskExecutionContext()
+		mockResourceManager := tCtx.ResourceManager()
+		x := mockResourceManager.(*mocks.ResourceManager)
+		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
+			Return(core.AllocationStatusGranted, nil)
+
+		startTime := time.Now()
+		mockCurrentState := ExecutionState{AllocationTokenRequestStartTime: startTime}
+		mockMetrics := getQuboleHiveExecutorMetrics(promutils.NewTestScope())
+		state, err := GetAllocationToken(ctx, tCtx, mockCurrentState, mockMetrics)
+		assert.NoError(t, err)
+		assert.Equal(t, state.AllocationTokenRequestStartTime.IsZero(), false)
+		assert.Equal(t, state.AllocationTokenRequestStartTime, startTime)
 	})
 }
 
