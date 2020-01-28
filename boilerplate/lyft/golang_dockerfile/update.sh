@@ -9,7 +9,5 @@ set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-# Dockerfile for Golang Services
 echo "     - generating Dockerfile in root directory."
-# replace FLYTEADMIN_SHA with the test SHA
 sed -e "s/{{REPOSITORY}}/${REPOSITORY}/g" ${DIR}/Dockerfile.GoTemplate > ${DIR}/../../../Dockerfile
