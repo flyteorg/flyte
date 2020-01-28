@@ -1,7 +1,7 @@
 Golang Test Targets
 ~~~~~~~~~~~~~~~~~~~
 
-Provides an ``install`` make target that uses ``dep`` install golang dependencies.
+Provides an ``install`` make target that uses ``go mod`` to install golang dependencies.
 
 Provides a ``lint`` make target that uses golangci to lint your code.
 
@@ -17,7 +17,7 @@ Provides a ``test_benchmark`` target for benchmark tests.
 
 Add ``lyft/golang_test_targets`` to your ``boilerplate/update.cfg`` file.
 
-Make sure you're using ``dep`` for dependency management.
+Make sure you're using ``go mod`` for dependency management.
 
 Provide a ``.golangci`` configuration (the lint target requires it).
 
