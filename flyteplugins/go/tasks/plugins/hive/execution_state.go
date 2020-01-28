@@ -61,18 +61,21 @@ type ExecutionState struct {
 
 	// In kicking off the Qubole command, this is the number of failures
 	CreationFailureCount int `json:"creation_failure_count,omitempty"`
+
+	// The time the execution first requests for an allocation token
+	AllocationTokenRequestStartTime time.Time `json:"allocation_token_request_start_time,omitempty"`
 }
 
 // This is the main state iteration
 func HandleExecutionState(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, quboleClient client.QuboleClient,
-	executionsCache cache.AutoRefresh, cfg *config.Config) (ExecutionState, error) {
+	executionsCache cache.AutoRefresh, cfg *config.Config, metrics QuboleHiveExecutorMetrics) (ExecutionState, error) {
 
 	var transformError error
 	var newState ExecutionState
 
 	switch currentState.Phase {
 	case PhaseNotStarted:
-		newState, transformError = GetAllocationToken(ctx, tCtx)
+		newState, transformError = GetAllocationToken(ctx, tCtx, currentState, metrics)
 
 	case PhaseQueued:
 		newState, transformError = KickOffQuery(ctx, tCtx, currentState, quboleClient, executionsCache, cfg)
@@ -150,7 +153,7 @@ func composeResourceNamespaceWithClusterPrimaryLabel(ctx context.Context, tCtx c
 	return core.ResourceNamespace(clusterPrimaryLabel), nil
 }
 
-func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext) (ExecutionState, error) {
+func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, metric QuboleHiveExecutorMetrics) (ExecutionState, error) {
 	newState := ExecutionState{}
 	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 
@@ -166,6 +169,15 @@ func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext) (Ex
 		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error requesting allocation token %s", uniqueId)
 	}
 	logger.Infof(ctx, "Allocation result for [%s] is [%s]", uniqueId, allocationStatus)
+
+	// Emitting the duration this execution has been waiting for a token allocation
+	if currentState.AllocationTokenRequestStartTime.IsZero() {
+		newState.AllocationTokenRequestStartTime = time.Now()
+	} else {
+		newState.AllocationTokenRequestStartTime = currentState.AllocationTokenRequestStartTime
+	}
+	waitTime := time.Since(newState.AllocationTokenRequestStartTime)
+	metric.ResourceWaitTime.Observe(waitTime.Seconds())
 
 	if allocationStatus == core.AllocationStatusGranted {
 		newState.Phase = PhaseQueued
