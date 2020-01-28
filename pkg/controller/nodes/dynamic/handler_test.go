@@ -341,6 +341,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		subNs.On("ResetDirty").Return()
 		subNs.On("GetOutputDir").Return(finalOutput)
 		subNs.On("SetParentTaskID", mock.Anything).Return()
+		subNs.OnGetAttempts().Return(0)
 
 		dynamicNS := &flyteMocks.ExecutableNodeStatus{}
 		dynamicNS.On("SetDataDir", mock.Anything).Return()
