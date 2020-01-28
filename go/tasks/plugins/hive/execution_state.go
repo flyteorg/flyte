@@ -176,7 +176,7 @@ func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext, cur
 	} else {
 		newState.AllocationTokenRequestStartTime = currentState.AllocationTokenRequestStartTime
 	}
-	waitTime := time.Now().Sub(newState.AllocationTokenRequestStartTime)
+	waitTime := time.Since(newState.AllocationTokenRequestStartTime)
 	metric.ResourceWaitTime.Observe(waitTime.Seconds())
 
 	if allocationStatus == core.AllocationStatusGranted {
