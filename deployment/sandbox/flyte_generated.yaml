@@ -719,10 +719,9 @@ data:
     plugins:
       qubole:
         quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"
-        quboleLimit: 10
 kind: ConfigMap
 metadata:
-  name: flyte-qubole-config-t7226b4tck
+  name: flyte-qubole-config-9tcd8mk2c2
   namespace: flyte
 ---
 apiVersion: v1
@@ -964,7 +963,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.1.6
+        image: docker.io/lyft/flyteadmin:v0.2.1
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -1015,7 +1014,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.1.6
+        image: docker.io/lyft/flyteadmin:v0.2.1
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -1030,7 +1029,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flytetester
-        image: docker.io/lyft/flyteadmin:v0.1.6
+        image: docker.io/lyft/flyteadmin:v0.2.1
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -1043,7 +1042,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.1.6
+        image: docker.io/lyft/flyteadmin:v0.2.1
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -1119,7 +1118,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.1.16
+        app.kubernetes.io/version: 0.2.0
     spec:
       containers:
       - args:
@@ -1134,7 +1133,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.1.16
+        image: docker.io/lyft/flytepropeller:v0.2.0
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -1158,7 +1157,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-qubole-config-t7226b4tck
+          name: flyte-qubole-config-9tcd8mk2c2
         name: qubole-config-volume
       - configMap:
           name: flyte-container-config-5k78b9cm42
@@ -1439,7 +1438,7 @@ spec:
             - /etc/flyte/config/flyteadmin_config.yaml
             - clusterresource
             - sync
-            image: docker.io/lyft/flyteadmin:v0.1.6
+            image: docker.io/lyft/flyteadmin:v0.2.1
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
