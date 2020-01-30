@@ -1,0 +1,69 @@
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: statsagent
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: stats
+  namespace: statsagent
+spec:
+  clusterIP: None
+  ports:
+    - name: udp
+      protocol: UDP
+      port: 8125
+      targetPort: 9125
+  selector:
+    app: stats
+---
+
+# Create a deamonSet so that a pod is created on every node that joins the cluster and garbage colleter
+# from nodes that leave the cluster
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: stats
+  namespace: statsagent
+  labels:
+    app: stats
+spec:
+  selector:
+    matchLabels:
+      app: stats
+  template:
+    metadata:
+      labels:
+        app: stats
+    spec:
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: exporter
+        image: docker.io/prom/statsd-exporter:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8125
+        - containerPort: 9125
+        - containerPort: 9102
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sleep
+              - "300"
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: "200m"
+            memory: 500Mi
