@@ -43,6 +43,12 @@ spec:
     metadata:
       labels:
         app: stats
+        app.kubernetes.io/name: statsdagent
+        app.kubernetes.io/version: latest
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9102"
+        prometheus.io/path: "/metrics"
     spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
@@ -51,7 +57,6 @@ spec:
         image: docker.io/prom/statsd-exporter:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 8125
         - containerPort: 9125
         - containerPort: 9102
         lifecycle:
