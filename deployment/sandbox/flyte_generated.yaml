@@ -18,6 +18,16 @@ kind: Namespace
 metadata:
   name: sparkoperator
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: statsagent
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active
+---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
@@ -861,6 +871,21 @@ spec:
     app: contour
   type: NodePort
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stats
+  namespace: statsagent
+spec:
+  clusterIP: None
+  ports:
+  - name: udp
+    port: 8125
+    protocol: UDP
+    targetPort: 9125
+  selector:
+    app: stats
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1456,6 +1481,51 @@ spec:
               name: flyte-admin-config-4k466cfctf
             name: config-volume
   schedule: '*/1 * * * *'
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: stats
+  name: stats
+  namespace: statsagent
+spec:
+  selector:
+    matchLabels:
+      app: stats
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9102"
+        prometheus.io/scrape: "true"
+      labels:
+        app: stats
+        app.kubernetes.io/name: statsdagent
+        app.kubernetes.io/version: latest
+    spec:
+      containers:
+      - image: docker.io/prom/statsd-exporter:latest
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sleep
+              - "300"
+        name: exporter
+        ports:
+        - containerPort: 9125
+        - containerPort: 9102
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress

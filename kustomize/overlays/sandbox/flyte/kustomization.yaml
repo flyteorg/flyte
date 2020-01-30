@@ -1,6 +1,7 @@
 bases:
 # global resources
 - ../../../base/namespace
+- ../../../base/statsd-exporter
 - ../../../dependencies/database
 - ../../../dependencies/storage
 
