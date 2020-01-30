@@ -644,9 +644,10 @@ data:
           - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
           - FLYTE_AWS_ACCESS_KEY_ID: minio
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+          - FLYTE_STATSD_HOST: stats.statsagent
 kind: ConfigMap
 metadata:
-  name: flyte-plugin-config-b525btf774
+  name: flyte-plugin-config-h7t6tbcf22
   namespace: flyte
 ---
 apiVersion: v1
@@ -1194,7 +1195,7 @@ spec:
           name: flyte-propeller-config-55gc695955
         name: config-volume
       - configMap:
-          name: flyte-plugin-config-b525btf774
+          name: flyte-plugin-config-h7t6tbcf22
         name: plugin-config-volume
 ---
 apiVersion: apps/v1
