@@ -38,6 +38,7 @@ import {
 } from '../__mocks__/mockInputs';
 import { formStrings } from '../constants';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
+import { InitialLaunchParameters, LaunchWorkflowFormProps } from '../types';
 import {
     booleanInputName,
     integerInputName,
@@ -107,7 +108,7 @@ describe('LaunchWorkflowForm', () => {
             .mockResolvedValue({ entities: mockWorkflowVersions });
     };
 
-    const renderForm = () => {
+    const renderForm = (props?: Partial<LaunchWorkflowFormProps>) => {
         return render(
             <ThemeProvider theme={muiTheme}>
                 <APIContext.Provider
@@ -122,6 +123,7 @@ describe('LaunchWorkflowForm', () => {
                     <LaunchWorkflowForm
                         onClose={onClose}
                         workflowId={workflowId}
+                        {...props}
                     />
                 </APIContext.Provider>
             </ThemeProvider>
@@ -443,6 +445,37 @@ describe('LaunchWorkflowForm', () => {
                     getByText(stringInputName, { exact: false }).textContent
                 ).toContain('*');
             });
+        });
+
+        describe('When using initial parameters', () => {
+            it('should prefer the provided workflow version', async () => {
+                const initialParameters: InitialLaunchParameters = {
+                    workflow: mockWorkflowVersions[2].id
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
+                    mockWorkflowVersions[2].id.version
+                );
+            });
+
+            it('should fall back to the first item in the list if preferred workflow is not found', async () => {
+                const baseId = mockWorkflowVersions[2].id;
+                const initialParameters: InitialLaunchParameters = {
+                    workflow: { ...baseId, version: 'nonexistentValue' }
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
+                    mockWorkflowVersions[0].id.version
+                );
+            });
+
+            it('should prefer the provided launch plan', async () => {});
+
+            it('should fall back to the first launch plan if the preferred is not found', async () => {});
+
+            it('should prepopulate inputs with provided initial values', async () => {});
         });
     });
 });

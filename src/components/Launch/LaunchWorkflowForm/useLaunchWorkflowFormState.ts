@@ -1,16 +1,15 @@
-import { log } from 'common/log';
 import { getCacheKey } from 'components/Cache';
 import { useAPIContext } from 'components/data/apiContext';
 import {
     useFetchableData,
     useWorkflow,
-    useWorkflows,
     waitForAllFetchables
 } from 'components/hooks';
 import { uniqBy } from 'lodash';
 import {
     FilterOperationName,
     Identifier,
+    IdentifierScope,
     LaunchPlan,
     SortDirection,
     Workflow,
@@ -54,11 +53,14 @@ interface UseLaunchPlansForWorkflowArgs {
     workflowId?: WorkflowId | null;
     preferredLaunchPlanId?: Identifier;
 }
+/** Lists launch plans for a given workflowId, optionally fetching a preferred
+ * launch plan. The result is a merged, de-duplicated list.
+ */
 function useLaunchPlansForWorkflow({
     workflowId = null,
     preferredLaunchPlanId
 }: UseLaunchPlansForWorkflowArgs) {
-    const { getLaunchPlan, listLaunchPlans } = useAPIContext();
+    const { listLaunchPlans } = useAPIContext();
     return useFetchableData<LaunchPlan[], WorkflowId | null>(
         {
             autoFetch: workflowId !== null,
@@ -69,14 +71,10 @@ function useLaunchPlansForWorkflow({
                     return Promise.reject('No workflowId specified');
                 }
 
-                // If we fail to retrieve the preferred launch plan,
-                // we still want to return the available options. So
-                // we will catch and return undefined.
-                const preferredLaunchPlanPromise = preferredLaunchPlanId
-                    ? getLaunchPlan(preferredLaunchPlanId).catch(error =>
-                          log.error(error)
-                      )
-                    : Promise.resolve(undefined);
+                const preferredLaunchPlanPromise =
+                    preferredLaunchPlanId === undefined
+                        ? Promise.resolve({ entities: [] })
+                        : listLaunchPlans(preferredLaunchPlanId, { limit: 1 });
 
                 const { project, domain, name, version } = workflowId;
                 const launchPlansPromise = listLaunchPlans(
@@ -99,40 +97,66 @@ function useLaunchPlansForWorkflow({
                     }
                 );
 
-                const [{ entities }, preferredLaunchPlan] = await Promise.all([
+                const [
+                    launchPlansResult,
+                    preferredLaunchPlanResult
+                ] = await Promise.all([
                     launchPlansPromise,
                     preferredLaunchPlanPromise
                 ]);
-                if (preferredLaunchPlan) {
-                    entities.unshift(preferredLaunchPlan);
-                }
-                // The preferred launch plan may have existed in
-                // the list we fetched. Make sure it isn't listed twice.
-                return uniqBy(entities, ({ id: name }) => name);
+                const merged = [
+                    ...launchPlansResult.entities,
+                    ...preferredLaunchPlanResult.entities
+                ];
+                return uniqBy(merged, ({ id: name }) => name);
             }
         },
         workflowId
     );
 }
 
-/** If preferred workflow id exists, will ensure the passed workflows array contains
- * it. Returns a new array if merging the id is required.
+/** Fetches workflow versions matching a specific scope, optionally also
+ * fetching a preferred version. The result is a merged, de-duplicated list.
  */
-function mergePreferredWorkflowId(
-    workflows: Workflow[],
-    preferredWorkflowId?: WorkflowId
-): Workflow[] {
-    if (!preferredWorkflowId) {
-        return workflows;
-    }
-    if (
-        workflows.find(
-            ({ id: { version } }) => version === preferredWorkflowId.version
-        ) === undefined
-    ) {
-        return [...workflows, { id: preferredWorkflowId }];
-    }
-    return workflows;
+function useWorkflowsWithPreferredVersion(
+    scope: IdentifierScope,
+    preferredVersion?: WorkflowId
+) {
+    const { listWorkflows } = useAPIContext();
+    return useFetchableData(
+        {
+            debugName: 'UseWorkflowsWithPreferredVersion',
+            defaultValue: [] as Workflow[],
+            doFetch: async () => {
+                const workflowsPromise = listWorkflows(scope, {
+                    limit: 10,
+                    sort: {
+                        key: workflowSortFields.createdAt,
+                        direction: SortDirection.DESCENDING
+                    }
+                });
+
+                const preferredWorkflowPromise =
+                    preferredVersion === undefined
+                        ? Promise.resolve({ entities: [] })
+                        : listWorkflows(preferredVersion, { limit: 1 });
+
+                const [
+                    workflowsResult,
+                    preferredWorkflowResult
+                ] = await Promise.all([
+                    workflowsPromise,
+                    preferredWorkflowPromise
+                ]);
+                const merged = [
+                    ...workflowsResult.entities,
+                    ...preferredWorkflowResult.entities
+                ];
+                return uniqBy(merged, ({ id: { version } }) => version);
+            }
+        },
+        { scope, preferredVersion }
+    );
 }
 
 /** Contains all of the form state for a LaunchWorkflowForm, including input
@@ -153,18 +177,12 @@ export function useLaunchWorkflowFormState({
     const { createWorkflowExecution } = useAPIContext();
     const formInputsRef = useRef<LaunchWorkflowFormInputsRef>(null);
     const [showErrors, setShowErrors] = useState(false);
-    const workflows = useWorkflows(workflowId, {
-        limit: 10,
-        sort: {
-            key: workflowSortFields.createdAt,
-            direction: SortDirection.DESCENDING
-        }
-    });
-    // If we have a preferred workflow version, we want to merge
-    // that with the options fetched for our workflow name
-    const workflowSelectorOptions = useWorkflowSelectorOptions(
-        mergePreferredWorkflowId(workflows.value, preferredWorkflowId)
+    const workflows = useWorkflowsWithPreferredVersion(
+        workflowId,
+        preferredWorkflowId
     );
+
+    const workflowSelectorOptions = useWorkflowSelectorOptions(workflows.value);
     const [selectedWorkflow, setWorkflow] = useState<
         SearchableSelectorOption<WorkflowId>
     >();
@@ -276,6 +294,8 @@ export function useLaunchWorkflowFormState({
     };
     const onCancel = onClose;
 
+    // Once the selected workflow and launch plan have loaded, parse and set
+    // the inputs so we can render the rest of the form
     useEffect(() => {
         const parsedInputs =
             launchPlanData && workflow.hasLoaded
