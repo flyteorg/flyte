@@ -49,6 +49,7 @@ type Controller interface {
 
 type controllerMetrics struct {
 	Scope                           promutils.Scope
+	SyncStarted                     prometheus.Counter
 	KubernetesResourcesCreated      prometheus.Counter
 	KubernetesResourcesCreateErrors prometheus.Counter
 	ResourcesAdded                  prometheus.Counter
@@ -336,6 +337,7 @@ func (c *controller) Sync(ctx context.Context) error {
 			logger.Warningf(ctx, fmt.Sprintf("caught panic: %v [%+v]", err, string(debug.Stack())))
 		}
 	}()
+	c.metrics.SyncStarted.Inc()
 
 	// Prefer to sync projects most newly created to ensure their resources get created first when other resources exist.
 	projects, err := c.db.ProjectRepo().ListAll(ctx, descCreatedAtSortParam)
@@ -397,6 +399,8 @@ func (c *controller) Run() {
 func newMetrics(scope promutils.Scope) controllerMetrics {
 	return controllerMetrics{
 		Scope: scope,
+		SyncStarted: scope.MustNewCounter("k8s_resource_syncs",
+			"overall count of the number of invocations of the resource controller 'sync' method"),
 		KubernetesResourcesCreated: scope.MustNewCounter("k8s_resources_created",
 			"overall count of successfully created resources in kubernetes"),
 		KubernetesResourcesCreateErrors: scope.MustNewCounter("k8s_resource_create_errors",
