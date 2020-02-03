@@ -338,6 +338,7 @@ func (c *controller) Sync(ctx context.Context) error {
 		}
 	}()
 	c.metrics.SyncStarted.Inc()
+	logger.Info(ctx, "Running an invocation of ClusterResource Sync")
 
 	// Prefer to sync projects most newly created to ensure their resources get created first when other resources exist.
 	projects, err := c.db.ProjectRepo().ListAll(ctx, descCreatedAtSortParam)
