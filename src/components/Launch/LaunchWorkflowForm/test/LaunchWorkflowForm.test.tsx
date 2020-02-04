@@ -178,38 +178,23 @@ describe('LaunchWorkflowForm', () => {
             );
         });
 
-        it('should not render inputs until workflow and launch plan are selected', async () => {
-            // Remove default launch plan so it is not auto-selected
-            const launchPlans = mockLaunchPlans.filter(
-                lp => lp.id.name !== workflowId.name
-            );
+        it('should not render inputs if no launch plan is selected', async () => {
             mockListLaunchPlans.mockResolvedValue({
-                entities: launchPlans
+                entities: []
             });
-            const { getByLabelText, getByTitle } = renderForm();
+            const { getByLabelText, queryByLabelText } = renderForm();
             await wait();
 
             // Find the launch plan selector, verify it has no value selected
             const launchPlanInput = getByLabelText(formStrings.launchPlan);
             expect(launchPlanInput).toBeInTheDocument();
             expect(launchPlanInput).toHaveValue('');
-
-            // Click the expander for the launch plan, select the first/only item
-            const launchPlanDiv = getByTitle(formStrings.launchPlan);
-            const expander = getByRole(launchPlanDiv, 'button');
-            fireEvent.click(expander);
-            const item = await waitForElement(() =>
-                getByRole(launchPlanDiv, 'menuitem')
-            );
-            fireEvent.click(item);
-
-            await wait();
             expect(
-                getByLabelText(stringInputName, {
+                queryByLabelText(stringInputName, {
                     // Don't use exact match because the label will be decorated with type info
                     exact: false
                 })
-            ).toBeInTheDocument();
+            ).toBeNull();
         });
 
         it('should disable submit button until inputs have loaded', async () => {
@@ -471,11 +456,17 @@ describe('LaunchWorkflowForm', () => {
                 );
             });
 
+            // TODO-NOW:
             it('should prefer the provided launch plan', async () => {});
 
-            it('should fall back to the first launch plan if the preferred is not found', async () => {});
+            it('should fall back to the default launch plan if the preferred is not found', async () => {});
+
+            it('should use preferred launch plan after switching workflow versions', async () => {});
 
             it('should prepopulate inputs with provided initial values', async () => {});
+
+            // TODO-NOW: Test for when the preferred values aren't in the first ten.
+            // Needs the mock list endpoint to return different values based on the scope
         });
     });
 });

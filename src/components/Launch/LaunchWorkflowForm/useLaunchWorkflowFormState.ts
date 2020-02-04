@@ -5,7 +5,7 @@ import {
     useWorkflow,
     waitForAllFetchables
 } from 'components/hooks';
-import { uniqBy } from 'lodash';
+import { isEqual, uniqBy } from 'lodash';
 import {
     FilterOperationName,
     Identifier,
@@ -308,6 +308,15 @@ export function useLaunchWorkflowFormState({
     // plan, or fall back to selecting the first option
     useEffect(() => {
         if (workflowSelectorOptions.length > 0 && !selectedWorkflow) {
+            if (preferredWorkflowId) {
+                const preferred = workflowSelectorOptions.find(({ data }) =>
+                    isEqual(data, preferredWorkflowId)
+                );
+                if (preferred) {
+                    setWorkflow(preferred);
+                    return;
+                }
+            }
             setWorkflow(workflowSelectorOptions[0]);
         }
     }, [workflows.value]);
@@ -319,10 +328,25 @@ export function useLaunchWorkflowFormState({
         if (!launchPlanSelectorOptions.length) {
             return;
         }
+
+        if (preferredLaunchPlanId) {
+            const preferred = launchPlanSelectorOptions.find(({ data }) =>
+                isEqual(data, preferredLaunchPlanId)
+            );
+            if (preferred) {
+                setLaunchPlan(preferred);
+                return;
+            }
+        }
+
         const defaultLaunchPlan = launchPlanSelectorOptions.find(
             ({ id }) => id === workflowId.name
         );
-        setLaunchPlan(defaultLaunchPlan);
+        if (defaultLaunchPlan) {
+            setLaunchPlan(defaultLaunchPlan);
+            return;
+        }
+        setLaunchPlan(launchPlanSelectorOptions[0]);
     }, [launchPlanSelectorOptions]);
 
     return {
