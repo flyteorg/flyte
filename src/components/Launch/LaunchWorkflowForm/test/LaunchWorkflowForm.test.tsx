@@ -39,6 +39,7 @@ import {
 import { formStrings } from '../constants';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 import { InitialLaunchParameters, LaunchWorkflowFormProps } from '../types';
+import { createInputCacheKey, getInputDefintionForLiteralType } from '../utils';
 import {
     booleanInputName,
     integerInputName,
@@ -456,14 +457,80 @@ describe('LaunchWorkflowForm', () => {
                 );
             });
 
-            // TODO-NOW:
-            it('should prefer the provided launch plan', async () => {});
+            it('should prefer the provided launch plan', async () => {
+                const initialParameters: InitialLaunchParameters = {
+                    launchPlan: mockLaunchPlans[1].id
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
+                    mockLaunchPlans[1].id.name
+                );
+            });
 
-            it('should fall back to the default launch plan if the preferred is not found', async () => {});
+            it('should fall back to the default launch plan if the preferred is not found', async () => {
+                const launchPlanId = { ...mockLaunchPlans[1].id };
+                launchPlanId.name = 'InvalidLauchPlan';
+                const initialParameters: InitialLaunchParameters = {
+                    launchPlan: launchPlanId
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
+                    mockLaunchPlans[0].id.name
+                );
+            });
 
-            it('should use preferred launch plan after switching workflow versions', async () => {});
+            it('should maintain selected launch plan by name after switching workflow versions', async () => {
+                const { getByLabelText, getByTitle } = renderForm();
+                await wait();
 
-            it('should prepopulate inputs with provided initial values', async () => {});
+                // Click the expander for the launch plan, select the second item
+                const launchPlanDiv = getByTitle(formStrings.launchPlan);
+                const launchPlanExpander = getByRole(launchPlanDiv, 'button');
+                fireEvent.click(launchPlanExpander);
+                const launchPlanItems = await waitForElement(() =>
+                    getAllByRole(launchPlanDiv, 'menuitem')
+                );
+                fireEvent.click(launchPlanItems[1]);
+                await wait();
+
+                // Click the expander for the workflow, select the second item
+                const workflowDiv = getByTitle(formStrings.workflowVersion);
+                const expander = getByRole(workflowDiv, 'button');
+                fireEvent.click(expander);
+                const items = await waitForElement(() =>
+                    getAllByRole(workflowDiv, 'menuitem')
+                );
+                fireEvent.click(items[1]);
+
+                await wait();
+                expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
+                    mockLaunchPlans[1].id.name
+                );
+            });
+
+            it('should prepopulate inputs with provided initial values', async () => {
+                const initialStringValue = 'initialStringValue';
+                const parameters = mockLaunchPlans[0].closure!.expectedInputs
+                    .parameters;
+                const values = new Map();
+                const stringCacheKey = createInputCacheKey(
+                    stringInputName,
+                    getInputDefintionForLiteralType(
+                        parameters[stringInputName].var.type
+                    )
+                );
+                values.set(stringCacheKey, initialStringValue);
+                const { getByLabelText } = renderForm({
+                    initialParameters: { values }
+                });
+                await wait();
+
+                expect(
+                    getByLabelText(stringInputName, { exact: false })
+                ).toHaveValue(initialStringValue);
+            });
 
             // TODO-NOW: Test for when the preferred values aren't in the first ten.
             // Needs the mock list endpoint to return different values based on the scope

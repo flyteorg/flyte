@@ -169,12 +169,12 @@ export function useLaunchWorkflowFormState({
 }: LaunchWorkflowFormProps): LaunchWorkflowFormState {
     // These values will be used to auto-select items from the workflow
     // version/launch plan drop downs.
-    const {
-        workflow: preferredWorkflowId,
-        launchPlan: preferredLaunchPlanId
-    } = initialParameters;
+    const { workflow: preferredWorkflowId } = initialParameters;
 
     const { createWorkflowExecution } = useAPIContext();
+    const [preferredLaunchPlanId, setPreferredLaunchPlanId] = useState(
+        initialParameters.launchPlan
+    );
     const formInputsRef = useRef<LaunchWorkflowFormInputsRef>(null);
     const [showErrors, setShowErrors] = useState(false);
     const workflows = useWorkflowsWithPreferredVersion(
@@ -237,6 +237,13 @@ export function useLaunchWorkflowFormState({
     ) => {
         setLaunchPlan(undefined);
         setWorkflow(newWorkflow);
+    };
+
+    const onSelectLaunchPlan = (
+        newLaunchPlan: SearchableSelectorOption<LaunchPlan>
+    ) => {
+        setPreferredLaunchPlanId(newLaunchPlan.data.id);
+        setLaunchPlan(newLaunchPlan);
     };
 
     const launchWorkflow = async () => {
@@ -321,20 +328,20 @@ export function useLaunchWorkflowFormState({
         }
     }, [workflows.value]);
 
-    // Once launch plans have been loaded, attempt to select the preferred
-    // launch plan, the one matching the workflow name, or just the first
-    // option.
+    // Once launch plans have been loaded, attempt to keep the previously
+    // selected launch plan, followed by the preferred launch plan, the one
+    // matching the workflow name, or just the first option.
     useEffect(() => {
         if (!launchPlanSelectorOptions.length) {
             return;
         }
 
         if (preferredLaunchPlanId) {
-            const preferred = launchPlanSelectorOptions.find(({ data }) =>
-                isEqual(data, preferredLaunchPlanId)
+            const preferred = launchPlanSelectorOptions.find(
+                ({ data: { id } }) => isEqual(id, preferredLaunchPlanId)
             );
             if (preferred) {
-                setLaunchPlan(preferred);
+                onSelectLaunchPlan(preferred);
                 return;
             }
         }
@@ -343,10 +350,10 @@ export function useLaunchWorkflowFormState({
             ({ id }) => id === workflowId.name
         );
         if (defaultLaunchPlan) {
-            setLaunchPlan(defaultLaunchPlan);
+            onSelectLaunchPlan(defaultLaunchPlan);
             return;
         }
-        setLaunchPlan(launchPlanSelectorOptions[0]);
+        onSelectLaunchPlan(launchPlanSelectorOptions[0]);
     }, [launchPlanSelectorOptions]);
 
     return {
@@ -357,6 +364,7 @@ export function useLaunchWorkflowFormState({
         launchPlanOptionsLoadingState,
         launchPlanSelectorOptions,
         onCancel,
+        onSelectLaunchPlan,
         onSelectWorkflow,
         onSubmit,
         selectedLaunchPlan,
@@ -366,7 +374,6 @@ export function useLaunchWorkflowFormState({
         workflowName,
         workflowOptionsLoadingState,
         workflowSelectorOptions,
-        inputs: parsedInputs,
-        onSelectLaunchPlan: setLaunchPlan
+        inputs: parsedInputs
     };
 }
