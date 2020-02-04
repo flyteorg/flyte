@@ -127,5 +127,8 @@ export const getUserProfile = async () => {
     }
 };
 
+/** Given a url to a `LiteralMap` stored at a remote location, will fetch and
+ * decode the resulting object.
+ */
 export const getRemoteLiteralMap = async (url: string) =>
     getProtobufObject<LiteralMap>({ url: createCorsProxyURL(url) }, LiteralMap);

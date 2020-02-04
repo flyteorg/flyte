@@ -11,6 +11,7 @@ export interface UseExecutionLaunchConfigurationArgs {
     workflowInputs: Record<string, Variable>;
 }
 
+/** Returns a fetchable that will result in a `InitialLaunchParameters` object based on a provided `Execution` and its associated workflow inputs. */
 export function useExecutionLaunchConfiguration({
     execution,
     workflowInputs

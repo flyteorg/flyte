@@ -48,6 +48,9 @@ export function useWorkflowExecutionData(
     );
 }
 
+/** A hook for fetching the inputs object associated with an Execution. Will
+ * handle both the legacy (`computedInputs`) and current (externally stored) formats
+ */
 export function useWorkflowExecutionInputs(execution: Execution) {
     const { getExecutionData, getRemoteLiteralMap } = useAPIContext();
     return useFetchableData<LiteralMap, WorkflowExecutionIdentifier>(
