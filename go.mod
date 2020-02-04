@@ -3,7 +3,7 @@ module github.com/lyft/flyteadmin
 go 1.13
 
 require (
-	github.com/NYTimes/gizmo v0.4.3
+	github.com/NYTimes/gizmo v1.3.5
 	github.com/Selvatico/go-mocket v1.0.7
 	github.com/aws/aws-sdk-go v1.28.9
 	github.com/benbjohnson/clock v1.0.0
