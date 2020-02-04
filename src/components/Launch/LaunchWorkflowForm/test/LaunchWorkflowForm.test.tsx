@@ -103,10 +103,34 @@ describe('LaunchWorkflowForm', () => {
             );
         mockListLaunchPlans = jest
             .fn()
-            .mockResolvedValue({ entities: mockLaunchPlans });
+            .mockImplementation((scope: Partial<Identifier>) => {
+                // If the scope has a fully specified identifier, the calling
+                // code is searching for a specific item. So we'll
+                // return a single-item list containing it.
+                if (scope.version) {
+                    const launchPlan = { ...mockLaunchPlans[0] };
+                    launchPlan.id = scope as Identifier;
+                    return Promise.resolve({
+                        entities: [launchPlan]
+                    });
+                }
+                return Promise.resolve({ entities: mockLaunchPlans });
+            });
         mockListWorkflows = jest
             .fn()
-            .mockResolvedValue({ entities: mockWorkflowVersions });
+            .mockImplementation((scope: Partial<Identifier>) => {
+                // If the scope has a fully specified identifier, the calling
+                // code is searching for a specific item. So we'll
+                // return a single-item list containing it.
+                if (scope.version) {
+                    const workflow = { ...mockWorkflowVersions[0] };
+                    workflow.id = scope as Identifier;
+                    return Promise.resolve({
+                        entities: [workflow]
+                    });
+                }
+                return Promise.resolve({ entities: mockWorkflowVersions });
+            });
     };
 
     const renderForm = (props?: Partial<LaunchWorkflowFormProps>) => {
@@ -446,6 +470,18 @@ describe('LaunchWorkflowForm', () => {
             });
 
             it('should fall back to the first item in the list if preferred workflow is not found', async () => {
+                mockListWorkflows.mockImplementation(
+                    (scope: Partial<Identifier>) => {
+                        // If we get a request for a specific item,
+                        // simulate not found
+                        if (scope.version) {
+                            return Promise.resolve({ entities: [] });
+                        }
+                        return Promise.resolve({
+                            entities: mockWorkflowVersions
+                        });
+                    }
+                );
                 const baseId = mockWorkflowVersions[2].id;
                 const initialParameters: InitialLaunchParameters = {
                     workflow: { ...baseId, version: 'nonexistentValue' }
@@ -469,6 +505,16 @@ describe('LaunchWorkflowForm', () => {
             });
 
             it('should fall back to the default launch plan if the preferred is not found', async () => {
+                mockListLaunchPlans.mockImplementation(
+                    (scope: Partial<Identifier>) => {
+                        // If we get a request for a specific item,
+                        // simulate not found
+                        if (scope.version) {
+                            return Promise.resolve({ entities: [] });
+                        }
+                        return Promise.resolve({ entities: mockLaunchPlans });
+                    }
+                );
                 const launchPlanId = { ...mockLaunchPlans[1].id };
                 launchPlanId.name = 'InvalidLauchPlan';
                 const initialParameters: InitialLaunchParameters = {
@@ -532,8 +578,31 @@ describe('LaunchWorkflowForm', () => {
                 ).toHaveValue(initialStringValue);
             });
 
-            // TODO-NOW: Test for when the preferred values aren't in the first ten.
-            // Needs the mock list endpoint to return different values based on the scope
+            it('loads preferred workflow version when it does not exist in the list of suggestions', async () => {
+                const missingWorkflow = { ...mockWorkflowVersions[0] };
+                missingWorkflow.id.version = 'missingVersionString';
+                const initialParameters: InitialLaunchParameters = {
+                    workflow: missingWorkflow.id
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
+                    missingWorkflow.id.version
+                );
+            });
+
+            it('loads the preferred launch plan when it does not exist in the list of suggestions', async () => {
+                const missingLaunchPlan = { ...mockLaunchPlans[0] };
+                missingLaunchPlan.id.name = 'missingLaunchPlanName';
+                const initialParameters: InitialLaunchParameters = {
+                    launchPlan: missingLaunchPlan.id
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
+                    missingLaunchPlan.id.name
+                );
+            });
         });
     });
 });

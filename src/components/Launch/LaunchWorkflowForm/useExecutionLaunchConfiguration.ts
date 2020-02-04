@@ -1,3 +1,4 @@
+import { log } from 'common/log';
 import { FetchableData, useWorkflowExecutionInputs } from 'components/hooks';
 import { Execution, Variable } from 'models';
 import { useEffect, useState } from 'react';
@@ -30,7 +31,7 @@ export function useExecutionLaunchConfiguration({
         const convertedValues = Object.keys(literals).reduce((out, name) => {
             const workflowInput = workflowInputs[name];
             if (!workflowInput) {
-                // TODO-NOW: Log it? Error?
+                log.error(`Unexpected missing workflow input: ${name}`);
                 return out;
             }
             const typeDefinition = getInputDefintionForLiteralType(
