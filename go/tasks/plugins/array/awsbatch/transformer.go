@@ -4,6 +4,8 @@ import (
 	"context"
 	"sort"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/lyft/flytestdlib/storage"
 
@@ -74,13 +76,15 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 	}
 
 	envVars := getEnvVarsForTask(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID(), taskTemplate.GetContainer().GetEnv(), cfg.DefaultEnvVars)
-	resources := newContainerResourcesFromContainerTask(ctx, taskTemplate.GetContainer())
+	res := tCtx.TaskExecutionMetadata().GetOverrides().GetResources()
+	res = flytek8s.ApplyResourceOverrides(ctx, *res)
+
 	return &batch.SubmitJobInput{
 		JobName:            refStr(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()),
 		JobDefinition:      refStr(jobDefinition),
 		JobQueue:           refStr(jobConfig.DynamicTaskQueue),
 		RetryStrategy:      toRetryStrategy(ctx, toBackoffLimit(taskTemplate.Metadata), cfg.MinRetries, cfg.MaxRetries),
-		ContainerOverrides: toContainerOverrides(ctx, append(cmd, args...), resources, envVars),
+		ContainerOverrides: toContainerOverrides(ctx, append(cmd, args...), res, envVars),
 	}, nil
 }
 
@@ -144,12 +148,12 @@ func toEnvironmentVariables(_ context.Context, envVars []v1.EnvVar) []*batch.Key
 	return res
 }
 
-func toContainerOverrides(ctx context.Context, command []string, overrides resourceOverrides,
+func toContainerOverrides(ctx context.Context, command []string, overrides *v1.ResourceRequirements,
 	envVars []v1.EnvVar) *batch.ContainerOverrides {
 
 	return &batch.ContainerOverrides{
-		Memory:      refInt(overrides.MemoryMB),
-		Vcpus:       refInt(overrides.Cpus),
+		Memory:      refInt(overrides.Limits.Memory().ScaledValue(resource.Mega)),
+		Vcpus:       refInt(overrides.Limits.Cpu().ScaledValue(resource.Mega)),
 		Environment: toEnvironmentVariables(ctx, envVars),
 		Command:     refStrSlice(command),
 	}

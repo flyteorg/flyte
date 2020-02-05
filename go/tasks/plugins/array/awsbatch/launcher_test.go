@@ -3,6 +3,8 @@ package awsbatch
 import (
 	"testing"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	core3 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flyteplugins/go/tasks/plugins/array/arraystatus"
 	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
@@ -60,6 +62,11 @@ func TestLaunchSubTasks(t *testing.T) {
 	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
 		DynamicTaskQueueKey: "queue1",
 	}})
+	overrides.OnGetResources().Return(&v1.ResourceRequirements{
+		Requests: v1.ResourceList{
+			v1.ResourceCPU: resource.MustParse("10"),
+		},
+	})
 
 	tMeta := &mocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)

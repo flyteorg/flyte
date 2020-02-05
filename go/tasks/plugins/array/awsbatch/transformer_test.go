@@ -8,6 +8,8 @@ import (
 	"context"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	flyteK8sConfig "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 
 	mocks2 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
@@ -45,6 +47,26 @@ func ref(s string) *string {
 	return &s
 }
 
+func TestResourceRequirementsToBatchRequirements(t *testing.T) {
+	memoryTests := []struct {
+		Input    string
+		Expected int64
+	}{
+		// resource Quantity gets the ceiling of values to the nearest scale
+		{"200", 1},
+		{"200M", 200},
+		{"64G", 64000},
+	}
+
+	for i, testCase := range memoryTests {
+		q, err := resource.ParseQuantity(testCase.Input)
+		if assert.NoError(t, err) {
+			assert.Equal(t, testCase.Expected, q.ScaledValue(resource.Mega),
+				"Expected != Actual for test case [%v] with Input [%v]", i, testCase.Input)
+		}
+	}
+}
+
 func TestArrayJobToBatchInput(t *testing.T) {
 	expectedBatchInput := &batch.SubmitJobInput{
 		ArrayProperties: &batch.ArrayProperties{
@@ -58,8 +80,8 @@ func TestArrayJobToBatchInput(t *testing.T) {
 			Environment: []*batch.KeyValuePair{
 				{Name: refStr("BATCH_JOB_ARRAY_INDEX_VAR_NAME"), Value: refStr("AWS_BATCH_JOB_ARRAY_INDEX")},
 			},
-			Memory: refInt(700),
-			Vcpus:  refInt(2),
+			Memory: refInt(1074),
+			Vcpus:  refInt(1),
 		},
 	}
 
@@ -77,6 +99,11 @@ func TestArrayJobToBatchInput(t *testing.T) {
 		Data: map[string]string{
 			DynamicTaskQueueKey: "child_queue",
 		},
+	})
+
+	to.OnGetResources().Return(&v12.ResourceRequirements{
+		Limits:   v12.ResourceList{},
+		Requests: v12.ResourceList{},
 	})
 
 	tMetadata := &mocks.TaskExecutionMetadata{}
