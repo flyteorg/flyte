@@ -3407,6 +3407,60 @@ public final class WorkflowOuterClass {
      * <code>.flyteidl.core.WorkflowTemplate template = 1;</code>
      */
     flyteidl.core.Workflow.WorkflowTemplateOrBuilder getTemplateOrBuilder();
+
+    /**
+     * <pre>
+     * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+     * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+     * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+     */
+    java.util.List<flyteidl.core.Workflow.WorkflowTemplate> 
+        getSubWorkflowsList();
+    /**
+     * <pre>
+     * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+     * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+     * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+     */
+    flyteidl.core.Workflow.WorkflowTemplate getSubWorkflows(int index);
+    /**
+     * <pre>
+     * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+     * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+     * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+     */
+    int getSubWorkflowsCount();
+    /**
+     * <pre>
+     * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+     * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+     * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+     */
+    java.util.List<? extends flyteidl.core.Workflow.WorkflowTemplateOrBuilder> 
+        getSubWorkflowsOrBuilderList();
+    /**
+     * <pre>
+     * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+     * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+     * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+     */
+    flyteidl.core.Workflow.WorkflowTemplateOrBuilder getSubWorkflowsOrBuilder(
+        int index);
   }
   /**
    * <pre>
@@ -3425,6 +3479,7 @@ public final class WorkflowOuterClass {
       super(builder);
     }
     private WorkflowSpec() {
+      subWorkflows_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -3464,6 +3519,15 @@ public final class WorkflowOuterClass {
 
               break;
             }
+            case 18: {
+              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+                subWorkflows_ = new java.util.ArrayList<flyteidl.core.Workflow.WorkflowTemplate>();
+                mutable_bitField0_ |= 0x00000002;
+              }
+              subWorkflows_.add(
+                  input.readMessage(flyteidl.core.Workflow.WorkflowTemplate.parser(), extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -3479,6 +3543,9 @@ public final class WorkflowOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000002) != 0)) {
+          subWorkflows_ = java.util.Collections.unmodifiableList(subWorkflows_);
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -3496,6 +3563,7 @@ public final class WorkflowOuterClass {
               flyteidl.admin.WorkflowOuterClass.WorkflowSpec.class, flyteidl.admin.WorkflowOuterClass.WorkflowSpec.Builder.class);
     }
 
+    private int bitField0_;
     public static final int TEMPLATE_FIELD_NUMBER = 1;
     private flyteidl.core.Workflow.WorkflowTemplate template_;
     /**
@@ -3529,6 +3597,71 @@ public final class WorkflowOuterClass {
       return getTemplate();
     }
 
+    public static final int SUB_WORKFLOWS_FIELD_NUMBER = 2;
+    private java.util.List<flyteidl.core.Workflow.WorkflowTemplate> subWorkflows_;
+    /**
+     * <pre>
+     * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+     * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+     * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+     */
+    public java.util.List<flyteidl.core.Workflow.WorkflowTemplate> getSubWorkflowsList() {
+      return subWorkflows_;
+    }
+    /**
+     * <pre>
+     * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+     * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+     * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+     */
+    public java.util.List<? extends flyteidl.core.Workflow.WorkflowTemplateOrBuilder> 
+        getSubWorkflowsOrBuilderList() {
+      return subWorkflows_;
+    }
+    /**
+     * <pre>
+     * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+     * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+     * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+     */
+    public int getSubWorkflowsCount() {
+      return subWorkflows_.size();
+    }
+    /**
+     * <pre>
+     * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+     * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+     * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+     */
+    public flyteidl.core.Workflow.WorkflowTemplate getSubWorkflows(int index) {
+      return subWorkflows_.get(index);
+    }
+    /**
+     * <pre>
+     * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+     * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+     * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+     */
+    public flyteidl.core.Workflow.WorkflowTemplateOrBuilder getSubWorkflowsOrBuilder(
+        int index) {
+      return subWorkflows_.get(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3546,6 +3679,9 @@ public final class WorkflowOuterClass {
       if (template_ != null) {
         output.writeMessage(1, getTemplate());
       }
+      for (int i = 0; i < subWorkflows_.size(); i++) {
+        output.writeMessage(2, subWorkflows_.get(i));
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3558,6 +3694,10 @@ public final class WorkflowOuterClass {
       if (template_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getTemplate());
+      }
+      for (int i = 0; i < subWorkflows_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, subWorkflows_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3579,6 +3719,8 @@ public final class WorkflowOuterClass {
         if (!getTemplate()
             .equals(other.getTemplate())) return false;
       }
+      if (!getSubWorkflowsList()
+          .equals(other.getSubWorkflowsList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3593,6 +3735,10 @@ public final class WorkflowOuterClass {
       if (hasTemplate()) {
         hash = (37 * hash) + TEMPLATE_FIELD_NUMBER;
         hash = (53 * hash) + getTemplate().hashCode();
+      }
+      if (getSubWorkflowsCount() > 0) {
+        hash = (37 * hash) + SUB_WORKFLOWS_FIELD_NUMBER;
+        hash = (53 * hash) + getSubWorkflowsList().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -3726,6 +3872,7 @@ public final class WorkflowOuterClass {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
+          getSubWorkflowsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -3736,6 +3883,12 @@ public final class WorkflowOuterClass {
         } else {
           template_ = null;
           templateBuilder_ = null;
+        }
+        if (subWorkflowsBuilder_ == null) {
+          subWorkflows_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+        } else {
+          subWorkflowsBuilder_.clear();
         }
         return this;
       }
@@ -3763,11 +3916,23 @@ public final class WorkflowOuterClass {
       @java.lang.Override
       public flyteidl.admin.WorkflowOuterClass.WorkflowSpec buildPartial() {
         flyteidl.admin.WorkflowOuterClass.WorkflowSpec result = new flyteidl.admin.WorkflowOuterClass.WorkflowSpec(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (templateBuilder_ == null) {
           result.template_ = template_;
         } else {
           result.template_ = templateBuilder_.build();
         }
+        if (subWorkflowsBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0)) {
+            subWorkflows_ = java.util.Collections.unmodifiableList(subWorkflows_);
+            bitField0_ = (bitField0_ & ~0x00000002);
+          }
+          result.subWorkflows_ = subWorkflows_;
+        } else {
+          result.subWorkflows_ = subWorkflowsBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -3819,6 +3984,32 @@ public final class WorkflowOuterClass {
         if (other.hasTemplate()) {
           mergeTemplate(other.getTemplate());
         }
+        if (subWorkflowsBuilder_ == null) {
+          if (!other.subWorkflows_.isEmpty()) {
+            if (subWorkflows_.isEmpty()) {
+              subWorkflows_ = other.subWorkflows_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+            } else {
+              ensureSubWorkflowsIsMutable();
+              subWorkflows_.addAll(other.subWorkflows_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.subWorkflows_.isEmpty()) {
+            if (subWorkflowsBuilder_.isEmpty()) {
+              subWorkflowsBuilder_.dispose();
+              subWorkflowsBuilder_ = null;
+              subWorkflows_ = other.subWorkflows_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+              subWorkflowsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getSubWorkflowsFieldBuilder() : null;
+            } else {
+              subWorkflowsBuilder_.addAllMessages(other.subWorkflows_);
+            }
+          }
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -3847,6 +4038,7 @@ public final class WorkflowOuterClass {
         }
         return this;
       }
+      private int bitField0_;
 
       private flyteidl.core.Workflow.WorkflowTemplate template_;
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -3999,6 +4191,354 @@ public final class WorkflowOuterClass {
           template_ = null;
         }
         return templateBuilder_;
+      }
+
+      private java.util.List<flyteidl.core.Workflow.WorkflowTemplate> subWorkflows_ =
+        java.util.Collections.emptyList();
+      private void ensureSubWorkflowsIsMutable() {
+        if (!((bitField0_ & 0x00000002) != 0)) {
+          subWorkflows_ = new java.util.ArrayList<flyteidl.core.Workflow.WorkflowTemplate>(subWorkflows_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Workflow.WorkflowTemplate, flyteidl.core.Workflow.WorkflowTemplate.Builder, flyteidl.core.Workflow.WorkflowTemplateOrBuilder> subWorkflowsBuilder_;
+
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public java.util.List<flyteidl.core.Workflow.WorkflowTemplate> getSubWorkflowsList() {
+        if (subWorkflowsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(subWorkflows_);
+        } else {
+          return subWorkflowsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public int getSubWorkflowsCount() {
+        if (subWorkflowsBuilder_ == null) {
+          return subWorkflows_.size();
+        } else {
+          return subWorkflowsBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public flyteidl.core.Workflow.WorkflowTemplate getSubWorkflows(int index) {
+        if (subWorkflowsBuilder_ == null) {
+          return subWorkflows_.get(index);
+        } else {
+          return subWorkflowsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public Builder setSubWorkflows(
+          int index, flyteidl.core.Workflow.WorkflowTemplate value) {
+        if (subWorkflowsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSubWorkflowsIsMutable();
+          subWorkflows_.set(index, value);
+          onChanged();
+        } else {
+          subWorkflowsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public Builder setSubWorkflows(
+          int index, flyteidl.core.Workflow.WorkflowTemplate.Builder builderForValue) {
+        if (subWorkflowsBuilder_ == null) {
+          ensureSubWorkflowsIsMutable();
+          subWorkflows_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          subWorkflowsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public Builder addSubWorkflows(flyteidl.core.Workflow.WorkflowTemplate value) {
+        if (subWorkflowsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSubWorkflowsIsMutable();
+          subWorkflows_.add(value);
+          onChanged();
+        } else {
+          subWorkflowsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public Builder addSubWorkflows(
+          int index, flyteidl.core.Workflow.WorkflowTemplate value) {
+        if (subWorkflowsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureSubWorkflowsIsMutable();
+          subWorkflows_.add(index, value);
+          onChanged();
+        } else {
+          subWorkflowsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public Builder addSubWorkflows(
+          flyteidl.core.Workflow.WorkflowTemplate.Builder builderForValue) {
+        if (subWorkflowsBuilder_ == null) {
+          ensureSubWorkflowsIsMutable();
+          subWorkflows_.add(builderForValue.build());
+          onChanged();
+        } else {
+          subWorkflowsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public Builder addSubWorkflows(
+          int index, flyteidl.core.Workflow.WorkflowTemplate.Builder builderForValue) {
+        if (subWorkflowsBuilder_ == null) {
+          ensureSubWorkflowsIsMutable();
+          subWorkflows_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          subWorkflowsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public Builder addAllSubWorkflows(
+          java.lang.Iterable<? extends flyteidl.core.Workflow.WorkflowTemplate> values) {
+        if (subWorkflowsBuilder_ == null) {
+          ensureSubWorkflowsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, subWorkflows_);
+          onChanged();
+        } else {
+          subWorkflowsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public Builder clearSubWorkflows() {
+        if (subWorkflowsBuilder_ == null) {
+          subWorkflows_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+          onChanged();
+        } else {
+          subWorkflowsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public Builder removeSubWorkflows(int index) {
+        if (subWorkflowsBuilder_ == null) {
+          ensureSubWorkflowsIsMutable();
+          subWorkflows_.remove(index);
+          onChanged();
+        } else {
+          subWorkflowsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public flyteidl.core.Workflow.WorkflowTemplate.Builder getSubWorkflowsBuilder(
+          int index) {
+        return getSubWorkflowsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public flyteidl.core.Workflow.WorkflowTemplateOrBuilder getSubWorkflowsOrBuilder(
+          int index) {
+        if (subWorkflowsBuilder_ == null) {
+          return subWorkflows_.get(index);  } else {
+          return subWorkflowsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public java.util.List<? extends flyteidl.core.Workflow.WorkflowTemplateOrBuilder> 
+           getSubWorkflowsOrBuilderList() {
+        if (subWorkflowsBuilder_ != null) {
+          return subWorkflowsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(subWorkflows_);
+        }
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public flyteidl.core.Workflow.WorkflowTemplate.Builder addSubWorkflowsBuilder() {
+        return getSubWorkflowsFieldBuilder().addBuilder(
+            flyteidl.core.Workflow.WorkflowTemplate.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public flyteidl.core.Workflow.WorkflowTemplate.Builder addSubWorkflowsBuilder(
+          int index) {
+        return getSubWorkflowsFieldBuilder().addBuilder(
+            index, flyteidl.core.Workflow.WorkflowTemplate.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+       * propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+       * to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;</code>
+       */
+      public java.util.List<flyteidl.core.Workflow.WorkflowTemplate.Builder> 
+           getSubWorkflowsBuilderList() {
+        return getSubWorkflowsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Workflow.WorkflowTemplate, flyteidl.core.Workflow.WorkflowTemplate.Builder, flyteidl.core.Workflow.WorkflowTemplateOrBuilder> 
+          getSubWorkflowsFieldBuilder() {
+        if (subWorkflowsBuilder_ == null) {
+          subWorkflowsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.core.Workflow.WorkflowTemplate, flyteidl.core.Workflow.WorkflowTemplate.Builder, flyteidl.core.Workflow.WorkflowTemplateOrBuilder>(
+                  subWorkflows_,
+                  ((bitField0_ & 0x00000002) != 0),
+                  getParentForChildren(),
+                  isClean());
+          subWorkflows_ = null;
+        }
+        return subWorkflowsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -5032,14 +5572,15 @@ public final class WorkflowOuterClass {
       "\031.flyteidl.core.Identifier\0220\n\007closure\030\002 " +
       "\001(\0132\037.flyteidl.admin.WorkflowClosure\"J\n\014" +
       "WorkflowList\022+\n\tworkflows\030\001 \003(\0132\030.flytei" +
-      "dl.admin.Workflow\022\r\n\005token\030\002 \001(\t\"A\n\014Work" +
+      "dl.admin.Workflow\022\r\n\005token\030\002 \001(\t\"y\n\014Work" +
       "flowSpec\0221\n\010template\030\001 \001(\0132\037.flyteidl.co" +
-      "re.WorkflowTemplate\"\204\001\n\017WorkflowClosure\022" +
-      "A\n\021compiled_workflow\030\001 \001(\0132&.flyteidl.co" +
-      "re.CompiledWorkflowClosure\022.\n\ncreated_at" +
-      "\030\002 \001(\0132\032.google.protobuf.TimestampB3Z1gi" +
-      "thub.com/lyft/flyteidl/gen/pb-go/flyteid" +
-      "l/adminb\006proto3"
+      "re.WorkflowTemplate\0226\n\rsub_workflows\030\002 \003" +
+      "(\0132\037.flyteidl.core.WorkflowTemplate\"\204\001\n\017" +
+      "WorkflowClosure\022A\n\021compiled_workflow\030\001 \001" +
+      "(\0132&.flyteidl.core.CompiledWorkflowClosu" +
+      "re\022.\n\ncreated_at\030\002 \001(\0132\032.google.protobuf" +
+      ".TimestampB3Z1github.com/lyft/flyteidl/g" +
+      "en/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5087,7 +5628,7 @@ public final class WorkflowOuterClass {
     internal_static_flyteidl_admin_WorkflowSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_WorkflowSpec_descriptor,
-        new java.lang.String[] { "Template", });
+        new java.lang.String[] { "Template", "SubWorkflows", });
     internal_static_flyteidl_admin_WorkflowClosure_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_WorkflowClosure_fieldAccessorTable = new
