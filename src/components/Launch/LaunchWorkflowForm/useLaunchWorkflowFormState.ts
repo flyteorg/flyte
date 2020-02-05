@@ -72,10 +72,22 @@ function useLaunchPlansForWorkflow({
                     return Promise.reject('No workflowId specified');
                 }
 
-                const preferredLaunchPlanPromise =
-                    preferredLaunchPlanId === undefined
-                        ? Promise.resolve({ entities: [] })
-                        : listLaunchPlans(preferredLaunchPlanId, { limit: 1 });
+                let preferredLaunchPlanPromise = Promise.resolve({
+                    entities: [] as LaunchPlan[]
+                });
+                if (preferredLaunchPlanId) {
+                    const { version, ...scope } = preferredLaunchPlanId;
+                    preferredLaunchPlanPromise = listLaunchPlans(scope, {
+                        limit: 1,
+                        filter: [
+                            {
+                                key: 'version',
+                                operation: FilterOperationName.EQ,
+                                value: version
+                            }
+                        ]
+                    });
+                }
 
                 const { project, domain, name, version } = workflowId;
                 const launchPlansPromise = listLaunchPlans(
@@ -141,10 +153,22 @@ function useWorkflowsWithPreferredVersion(
                     }
                 );
 
-                const preferredWorkflowPromise =
-                    preferredVersion === undefined
-                        ? Promise.resolve({ entities: [] })
-                        : listWorkflows(preferredVersion, { limit: 1 });
+                let preferredWorkflowPromise = Promise.resolve({
+                    entities: [] as Workflow[]
+                });
+                if (preferredVersion) {
+                    const { version, ...scope } = preferredVersion;
+                    preferredWorkflowPromise = listWorkflows(scope, {
+                        limit: 1,
+                        filter: [
+                            {
+                                key: 'version',
+                                operation: FilterOperationName.EQ,
+                                value: version
+                            }
+                        ]
+                    });
+                }
 
                 const [
                     workflowsResult,
