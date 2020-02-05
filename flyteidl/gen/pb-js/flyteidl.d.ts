@@ -10920,6 +10920,9 @@ export namespace flyteidl {
 
             /** WorkflowSpec template */
             template?: (flyteidl.core.IWorkflowTemplate|null);
+
+            /** WorkflowSpec subWorkflows */
+            subWorkflows?: (flyteidl.core.IWorkflowTemplate[]|null);
         }
 
         /** Represents a WorkflowSpec. */
@@ -10933,6 +10936,9 @@ export namespace flyteidl {
 
             /** WorkflowSpec template. */
             public template?: (flyteidl.core.IWorkflowTemplate|null);
+
+            /** WorkflowSpec subWorkflows. */
+            public subWorkflows: flyteidl.core.IWorkflowTemplate[];
 
             /**
              * Creates a new WorkflowSpec instance using the specified properties.

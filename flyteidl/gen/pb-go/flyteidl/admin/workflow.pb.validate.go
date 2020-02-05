@@ -374,6 +374,21 @@ func (m *WorkflowSpec) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetSubWorkflows() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WorkflowSpecValidationError{
+					field:  fmt.Sprintf("SubWorkflows[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 

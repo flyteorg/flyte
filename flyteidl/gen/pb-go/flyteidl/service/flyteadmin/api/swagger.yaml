@@ -16672,6 +16672,15 @@ definitions:
         description: "Template of the task that encapsulates all the metadata of the\
           \ workflow."
         $ref: "#/definitions/coreWorkflowTemplate"
+      sub_workflows:
+        type: "array"
+        description: "Workflows that are embedded into other workflows need to be\
+          \ passed alongside the parent workflow to the\npropeller compiler (since\
+          \ the compiler doesn't have any knowledge of other workflows - ie, it doesn't\
+          \ reach out\nto Admin to see other registered workflows).  In fact, subworkflows\
+          \ do not even need to be registered."
+        items:
+          $ref: "#/definitions/coreWorkflowTemplate"
     description: "Represents a structure that encapsulates the specification of the\
       \ workflow."
   coreAlias:
