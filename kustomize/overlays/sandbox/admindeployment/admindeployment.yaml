@@ -28,7 +28,7 @@ spec:
         image: docker.io/lyft/flyteadmin:v0.2.1
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                  "migrate", "seed-projects", "flytesnacks", "flytetester"]
+                  "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config

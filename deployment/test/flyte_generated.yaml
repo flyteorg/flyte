@@ -698,6 +698,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flytetester
+        - flyteexamples
         image: docker.io/lyft/flyteadmin:v0.2.1
         imagePullPolicy: IfNotPresent
         name: seed-projects
