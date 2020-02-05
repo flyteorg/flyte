@@ -2,10 +2,9 @@ package flytek8s
 
 import (
 	"context"
-	"testing"
-
 	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/mock"
+	"testing"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
@@ -389,5 +388,21 @@ func TestConvertPodFailureToError(t *testing.T) {
 	t.Run("known-error", func(t *testing.T) {
 		code, _ := ConvertPodFailureToError(v1.PodStatus{Reason: "hello"})
 		assert.Equal(t, code, "hello")
+	})
+
+	t.Run("OOMKilled", func(t *testing.T) {
+		code, _ := ConvertPodFailureToError(v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   OOMKilled,
+							ExitCode: 137,
+						},
+					},
+				},
+			},
+		})
+		assert.Equal(t, code, "OOMKilled")
 	})
 }
