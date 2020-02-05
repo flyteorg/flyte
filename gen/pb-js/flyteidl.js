@@ -25894,6 +25894,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @memberof flyteidl.admin
              * @interface IWorkflowSpec
              * @property {flyteidl.core.IWorkflowTemplate|null} [template] WorkflowSpec template
+             * @property {Array.<flyteidl.core.IWorkflowTemplate>|null} [subWorkflows] WorkflowSpec subWorkflows
              */
 
             /**
@@ -25905,6 +25906,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @param {flyteidl.admin.IWorkflowSpec=} [properties] Properties to set
              */
             function WorkflowSpec(properties) {
+                this.subWorkflows = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
@@ -25918,6 +25920,14 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              */
             WorkflowSpec.prototype.template = null;
+
+            /**
+             * WorkflowSpec subWorkflows.
+             * @member {Array.<flyteidl.core.IWorkflowTemplate>} subWorkflows
+             * @memberof flyteidl.admin.WorkflowSpec
+             * @instance
+             */
+            WorkflowSpec.prototype.subWorkflows = $util.emptyArray;
 
             /**
              * Creates a new WorkflowSpec instance using the specified properties.
@@ -25945,6 +25955,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer = $Writer.create();
                 if (message.template != null && message.hasOwnProperty("template"))
                     $root.flyteidl.core.WorkflowTemplate.encode(message.template, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.subWorkflows != null && message.subWorkflows.length)
+                    for (let i = 0; i < message.subWorkflows.length; ++i)
+                        $root.flyteidl.core.WorkflowTemplate.encode(message.subWorkflows[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                 return writer;
             };
 
@@ -25969,6 +25982,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 1:
                         message.template = $root.flyteidl.core.WorkflowTemplate.decode(reader, reader.uint32());
                         break;
+                    case 2:
+                        if (!(message.subWorkflows && message.subWorkflows.length))
+                            message.subWorkflows = [];
+                        message.subWorkflows.push($root.flyteidl.core.WorkflowTemplate.decode(reader, reader.uint32()));
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -25992,6 +26010,15 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.core.WorkflowTemplate.verify(message.template);
                     if (error)
                         return "template." + error;
+                }
+                if (message.subWorkflows != null && message.hasOwnProperty("subWorkflows")) {
+                    if (!Array.isArray(message.subWorkflows))
+                        return "subWorkflows: array expected";
+                    for (let i = 0; i < message.subWorkflows.length; ++i) {
+                        let error = $root.flyteidl.core.WorkflowTemplate.verify(message.subWorkflows[i]);
+                        if (error)
+                            return "subWorkflows." + error;
+                    }
                 }
                 return null;
             };

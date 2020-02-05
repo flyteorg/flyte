@@ -673,6 +673,18 @@ class WorkflowSpec final :
 
   // accessors -------------------------------------------------------
 
+  // repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;
+  int sub_workflows_size() const;
+  void clear_sub_workflows();
+  static const int kSubWorkflowsFieldNumber = 2;
+  ::flyteidl::core::WorkflowTemplate* mutable_sub_workflows(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::WorkflowTemplate >*
+      mutable_sub_workflows();
+  const ::flyteidl::core::WorkflowTemplate& sub_workflows(int index) const;
+  ::flyteidl::core::WorkflowTemplate* add_sub_workflows();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::WorkflowTemplate >&
+      sub_workflows() const;
+
   // .flyteidl.core.WorkflowTemplate template = 1;
   bool has_template_() const;
   void clear_template_();
@@ -687,6 +699,7 @@ class WorkflowSpec final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::WorkflowTemplate > sub_workflows_;
   ::flyteidl::core::WorkflowTemplate* template__;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_2eproto;
@@ -1161,6 +1174,33 @@ inline void WorkflowSpec::set_allocated_template_(::flyteidl::core::WorkflowTemp
   }
   template__ = template_;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowSpec.template)
+}
+
+// repeated .flyteidl.core.WorkflowTemplate sub_workflows = 2;
+inline int WorkflowSpec::sub_workflows_size() const {
+  return sub_workflows_.size();
+}
+inline ::flyteidl::core::WorkflowTemplate* WorkflowSpec::mutable_sub_workflows(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowSpec.sub_workflows)
+  return sub_workflows_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::WorkflowTemplate >*
+WorkflowSpec::mutable_sub_workflows() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.WorkflowSpec.sub_workflows)
+  return &sub_workflows_;
+}
+inline const ::flyteidl::core::WorkflowTemplate& WorkflowSpec::sub_workflows(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowSpec.sub_workflows)
+  return sub_workflows_.Get(index);
+}
+inline ::flyteidl::core::WorkflowTemplate* WorkflowSpec::add_sub_workflows() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.WorkflowSpec.sub_workflows)
+  return sub_workflows_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::WorkflowTemplate >&
+WorkflowSpec::sub_workflows() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.WorkflowSpec.sub_workflows)
+  return sub_workflows_;
 }
 
 // -------------------------------------------------------------------

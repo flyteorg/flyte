@@ -33,21 +33,26 @@ class AdminWorkflowSpec(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'template': 'CoreWorkflowTemplate'
+        'template': 'CoreWorkflowTemplate',
+        'sub_workflows': 'list[CoreWorkflowTemplate]'
     }
 
     attribute_map = {
-        'template': 'template'
+        'template': 'template',
+        'sub_workflows': 'sub_workflows'
     }
 
-    def __init__(self, template=None):  # noqa: E501
+    def __init__(self, template=None, sub_workflows=None):  # noqa: E501
         """AdminWorkflowSpec - a model defined in Swagger"""  # noqa: E501
 
         self._template = None
+        self._sub_workflows = None
         self.discriminator = None
 
         if template is not None:
             self.template = template
+        if sub_workflows is not None:
+            self.sub_workflows = sub_workflows
 
     @property
     def template(self):
@@ -71,6 +76,29 @@ class AdminWorkflowSpec(object):
         """
 
         self._template = template
+
+    @property
+    def sub_workflows(self):
+        """Gets the sub_workflows of this AdminWorkflowSpec.  # noqa: E501
+
+        Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.  # noqa: E501
+
+        :return: The sub_workflows of this AdminWorkflowSpec.  # noqa: E501
+        :rtype: list[CoreWorkflowTemplate]
+        """
+        return self._sub_workflows
+
+    @sub_workflows.setter
+    def sub_workflows(self, sub_workflows):
+        """Sets the sub_workflows of this AdminWorkflowSpec.
+
+        Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.  # noqa: E501
+
+        :param sub_workflows: The sub_workflows of this AdminWorkflowSpec.  # noqa: E501
+        :type: list[CoreWorkflowTemplate]
+        """
+
+        self._sub_workflows = sub_workflows
 
     def to_dict(self):
         """Returns the model properties as a dict"""

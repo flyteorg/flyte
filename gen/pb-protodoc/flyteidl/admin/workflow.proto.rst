@@ -123,13 +123,22 @@ Represents a structure that encapsulates the specification of the workflow.
 .. code-block:: json
 
   {
-    "template": "{...}"
+    "template": "{...}",
+    "sub_workflows": []
   }
 
 .. _api_field_flyteidl.admin.WorkflowSpec.template:
 
 template
   (:ref:`flyteidl.core.WorkflowTemplate <api_msg_flyteidl.core.WorkflowTemplate>`) Template of the task that encapsulates all the metadata of the workflow.
+  
+  
+.. _api_field_flyteidl.admin.WorkflowSpec.sub_workflows:
+
+sub_workflows
+  (:ref:`flyteidl.core.WorkflowTemplate <api_msg_flyteidl.core.WorkflowTemplate>`) Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+  propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+  to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
   
   
 
@@ -139,7 +148,7 @@ template
 flyteidl.admin.WorkflowClosure
 ------------------------------
 
-`[flyteidl.admin.WorkflowClosure proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/workflow.proto#L52>`_
+`[flyteidl.admin.WorkflowClosure proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/workflow.proto#L57>`_
 
 A container holding the compiled workflow produced from the WorkflowSpec and additional metadata.
 

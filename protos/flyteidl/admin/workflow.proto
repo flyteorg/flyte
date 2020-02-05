@@ -47,6 +47,11 @@ message WorkflowList {
 message WorkflowSpec {
     // Template of the task that encapsulates all the metadata of the workflow.
     core.WorkflowTemplate template = 1;
+
+    // Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+    // propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+    // to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+    repeated core.WorkflowTemplate sub_workflows = 2;
 }
 
 // A container holding the compiled workflow produced from the WorkflowSpec and additional metadata.
