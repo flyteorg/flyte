@@ -13,7 +13,7 @@ import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
 import { muiTheme } from 'components/Theme';
 import { Core } from 'flyteidl';
-import { get } from 'lodash';
+import { cloneDeep, get } from 'lodash';
 import * as Long from 'long';
 import {
     createWorkflowExecution,
@@ -26,6 +26,7 @@ import {
     listWorkflows,
     Literal,
     NamedEntityIdentifier,
+    RequestConfig,
     Variable,
     Workflow
 } from 'models';
@@ -103,34 +104,44 @@ describe('LaunchWorkflowForm', () => {
             );
         mockListLaunchPlans = jest
             .fn()
-            .mockImplementation((scope: Partial<Identifier>) => {
-                // If the scope has a fully specified identifier, the calling
-                // code is searching for a specific item. So we'll
-                // return a single-item list containing it.
-                if (scope.version) {
-                    const launchPlan = { ...mockLaunchPlans[0] };
-                    launchPlan.id = scope as Identifier;
-                    return Promise.resolve({
-                        entities: [launchPlan]
-                    });
+            .mockImplementation(
+                (scope: Partial<Identifier>, { filter }: RequestConfig) => {
+                    // If the scope has a filter, the calling
+                    // code is searching for a specific item. So we'll
+                    // return a single-item list containing it.
+                    if (filter && filter[0].key === 'version') {
+                        const launchPlan = { ...mockLaunchPlans[0] };
+                        launchPlan.id = {
+                            ...scope,
+                            version: filter[0].value
+                        } as Identifier;
+                        return Promise.resolve({
+                            entities: [launchPlan]
+                        });
+                    }
+                    return Promise.resolve({ entities: mockLaunchPlans });
                 }
-                return Promise.resolve({ entities: mockLaunchPlans });
-            });
+            );
         mockListWorkflows = jest
             .fn()
-            .mockImplementation((scope: Partial<Identifier>) => {
-                // If the scope has a fully specified identifier, the calling
-                // code is searching for a specific item. So we'll
-                // return a single-item list containing it.
-                if (scope.version) {
-                    const workflow = { ...mockWorkflowVersions[0] };
-                    workflow.id = scope as Identifier;
-                    return Promise.resolve({
-                        entities: [workflow]
-                    });
+            .mockImplementation(
+                (scope: Partial<Identifier>, { filter }: RequestConfig) => {
+                    // If the scope has a filter, the calling
+                    // code is searching for a specific item. So we'll
+                    // return a single-item list containing it.
+                    if (filter && filter[0].key === 'version') {
+                        const workflow = { ...mockWorkflowVersions[0] };
+                        workflow.id = {
+                            ...scope,
+                            version: filter[0].value
+                        } as Identifier;
+                        return Promise.resolve({
+                            entities: [workflow]
+                        });
+                    }
+                    return Promise.resolve({ entities: mockWorkflowVersions });
                 }
-                return Promise.resolve({ entities: mockWorkflowVersions });
-            });
+            );
     };
 
     const renderForm = (props?: Partial<LaunchWorkflowFormProps>) => {
@@ -579,7 +590,7 @@ describe('LaunchWorkflowForm', () => {
             });
 
             it('loads preferred workflow version when it does not exist in the list of suggestions', async () => {
-                const missingWorkflow = { ...mockWorkflowVersions[0] };
+                const missingWorkflow = cloneDeep(mockWorkflowVersions[0]);
                 missingWorkflow.id.version = 'missingVersionString';
                 const initialParameters: InitialLaunchParameters = {
                     workflow: missingWorkflow.id
@@ -592,7 +603,7 @@ describe('LaunchWorkflowForm', () => {
             });
 
             it('loads the preferred launch plan when it does not exist in the list of suggestions', async () => {
-                const missingLaunchPlan = { ...mockLaunchPlans[0] };
+                const missingLaunchPlan = cloneDeep(mockLaunchPlans[0]);
                 missingLaunchPlan.id.name = 'missingLaunchPlanName';
                 const initialParameters: InitialLaunchParameters = {
                     launchPlan: missingLaunchPlan.id
