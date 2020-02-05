@@ -170,13 +170,8 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 }
 
 func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
-	for _, status := range status.ContainerStatuses {
-		if status.State.Terminated != nil && strings.Contains(status.State.Terminated.Reason, OOMKilled) {
-			return pluginsCore.PhaseInfoRetryableFailure("OOMKilled",
-				"Pod reported success despite being OOMKilled", &info), nil
-		}
-	}
-	for _, status := range status.InitContainerStatuses {
+	for _, status := range append(
+		append(status.InitContainerStatuses, status.ContainerStatuses...), status.EphemeralContainerStatuses...) {
 		if status.State.Terminated != nil && strings.Contains(status.State.Terminated.Reason, OOMKilled) {
 			return pluginsCore.PhaseInfoRetryableFailure("OOMKilled",
 				"Pod reported success despite being OOMKilled", &info), nil
@@ -194,38 +189,27 @@ func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
 
 	if len(status.Message) > 0 {
 		message = status.Message
-	} else {
-		for _, c := range status.InitContainerStatuses {
-			if c.LastTerminationState.Terminated != nil {
-				message += fmt.Sprintf("\r\nInit Container [%v] terminated with exit code (%v). Reason [%v]. Message: [%v].",
-					c.ContainerID,
-					c.LastTerminationState.Terminated.ExitCode,
-					c.LastTerminationState.Terminated.Reason,
-					c.LastTerminationState.Terminated.Message)
-			}
-		}
-
-		for _, c := range status.ContainerStatuses {
-			if c.LastTerminationState.Terminated != nil {
-				message += fmt.Sprintf("\r\nContainer [%v] terminated with exit code (%v). Reason [%v]. Message: [%v].",
-					c.ContainerID,
-					c.LastTerminationState.Terminated.ExitCode,
-					c.LastTerminationState.Terminated.Reason,
-					c.LastTerminationState.Terminated.Message)
-			}
-		}
-
-		for _, c := range status.EphemeralContainerStatuses {
-			if c.LastTerminationState.Terminated != nil {
-				message += fmt.Sprintf("\r\nEphemeral Container [%v] terminated with exit code (%v). Reason [%v]. Message: [%v].",
-					c.ContainerID,
-					c.LastTerminationState.Terminated.ExitCode,
-					c.LastTerminationState.Terminated.Reason,
-					c.LastTerminationState.Terminated.Message)
-			}
-		}
 	}
 
+	for _, c := range append(
+		append(status.InitContainerStatuses, status.ContainerStatuses...), status.EphemeralContainerStatuses...) {
+		var containerState v1.ContainerState
+		if c.LastTerminationState.Terminated != nil {
+			containerState = c.LastTerminationState
+		} else if c.State.Terminated != nil {
+			containerState = c.State
+		}
+		if containerState.Terminated != nil {
+			if strings.Contains(c.State.Terminated.Reason, OOMKilled) {
+				code = OOMKilled
+			}
+			message += fmt.Sprintf("\r\nContainer [%v] terminated with exit code (%v). Reason [%v]. Message: [%v].",
+				c.Name,
+				containerState.Terminated.ExitCode,
+				containerState.Terminated.Reason,
+				containerState.Terminated.Message)
+		}
+	}
 	return
 }
 
