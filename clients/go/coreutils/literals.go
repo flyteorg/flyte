@@ -148,7 +148,7 @@ func MakeLiteral(v interface{}) (*core.Literal, error) {
 			Value: &core.Literal_Scalar{
 				Scalar: &core.Scalar{
 					Value: &core.Scalar_NoneType{
-						NoneType: nil,
+						NoneType: &core.Void{},
 					},
 				},
 			},
