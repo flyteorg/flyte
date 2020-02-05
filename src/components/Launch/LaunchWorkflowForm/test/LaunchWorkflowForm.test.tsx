@@ -38,6 +38,8 @@ import {
 } from '../__mocks__/mockInputs';
 import { formStrings } from '../constants';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
+import { InitialLaunchParameters, LaunchWorkflowFormProps } from '../types';
+import { createInputCacheKey, getInputDefintionForLiteralType } from '../utils';
 import {
     booleanInputName,
     integerInputName,
@@ -101,13 +103,37 @@ describe('LaunchWorkflowForm', () => {
             );
         mockListLaunchPlans = jest
             .fn()
-            .mockResolvedValue({ entities: mockLaunchPlans });
+            .mockImplementation((scope: Partial<Identifier>) => {
+                // If the scope has a fully specified identifier, the calling
+                // code is searching for a specific item. So we'll
+                // return a single-item list containing it.
+                if (scope.version) {
+                    const launchPlan = { ...mockLaunchPlans[0] };
+                    launchPlan.id = scope as Identifier;
+                    return Promise.resolve({
+                        entities: [launchPlan]
+                    });
+                }
+                return Promise.resolve({ entities: mockLaunchPlans });
+            });
         mockListWorkflows = jest
             .fn()
-            .mockResolvedValue({ entities: mockWorkflowVersions });
+            .mockImplementation((scope: Partial<Identifier>) => {
+                // If the scope has a fully specified identifier, the calling
+                // code is searching for a specific item. So we'll
+                // return a single-item list containing it.
+                if (scope.version) {
+                    const workflow = { ...mockWorkflowVersions[0] };
+                    workflow.id = scope as Identifier;
+                    return Promise.resolve({
+                        entities: [workflow]
+                    });
+                }
+                return Promise.resolve({ entities: mockWorkflowVersions });
+            });
     };
 
-    const renderForm = () => {
+    const renderForm = (props?: Partial<LaunchWorkflowFormProps>) => {
         return render(
             <ThemeProvider theme={muiTheme}>
                 <APIContext.Provider
@@ -122,6 +148,7 @@ describe('LaunchWorkflowForm', () => {
                     <LaunchWorkflowForm
                         onClose={onClose}
                         workflowId={workflowId}
+                        {...props}
                     />
                 </APIContext.Provider>
             </ThemeProvider>
@@ -176,38 +203,23 @@ describe('LaunchWorkflowForm', () => {
             );
         });
 
-        it('should not render inputs until workflow and launch plan are selected', async () => {
-            // Remove default launch plan so it is not auto-selected
-            const launchPlans = mockLaunchPlans.filter(
-                lp => lp.id.name !== workflowId.name
-            );
+        it('should not render inputs if no launch plan is selected', async () => {
             mockListLaunchPlans.mockResolvedValue({
-                entities: launchPlans
+                entities: []
             });
-            const { getByLabelText, getByTitle } = renderForm();
+            const { getByLabelText, queryByLabelText } = renderForm();
             await wait();
 
             // Find the launch plan selector, verify it has no value selected
             const launchPlanInput = getByLabelText(formStrings.launchPlan);
             expect(launchPlanInput).toBeInTheDocument();
             expect(launchPlanInput).toHaveValue('');
-
-            // Click the expander for the launch plan, select the first/only item
-            const launchPlanDiv = getByTitle(formStrings.launchPlan);
-            const expander = getByRole(launchPlanDiv, 'button');
-            fireEvent.click(expander);
-            const item = await waitForElement(() =>
-                getByRole(launchPlanDiv, 'menuitem')
-            );
-            fireEvent.click(item);
-
-            await wait();
             expect(
-                getByLabelText(stringInputName, {
+                queryByLabelText(stringInputName, {
                     // Don't use exact match because the label will be decorated with type info
                     exact: false
                 })
-            ).toBeInTheDocument();
+            ).toBeNull();
         });
 
         it('should disable submit button until inputs have loaded', async () => {
@@ -317,6 +329,35 @@ describe('LaunchWorkflowForm', () => {
             ).toBeNull();
         });
 
+        it('should preserve input values when changing launch plan', async () => {
+            jest.useFakeTimers();
+            const { getByLabelText, getByTitle } = renderForm();
+            await wait();
+
+            const integerInput = getByLabelText(integerInputName, {
+                exact: false
+            });
+            fireEvent.change(integerInput, { target: { value: '10' } });
+            act(jest.runAllTimers);
+            await wait();
+
+            // Click the expander for the launch plan, select the second item
+            const launchPlanDiv = getByTitle(formStrings.launchPlan);
+            const expander = getByRole(launchPlanDiv, 'button');
+            fireEvent.click(expander);
+            const items = await waitForElement(() =>
+                getAllByRole(launchPlanDiv, 'menuitem')
+            );
+            fireEvent.click(items[1]);
+            await wait();
+
+            expect(
+                getByLabelText(integerInputName, {
+                    exact: false
+                })
+            ).toHaveValue('10');
+        });
+
         it('should reset form error when inputs change', async () => {
             const errorString = 'Something went wrong';
             mockCreateWorkflowExecution.mockRejectedValue(
@@ -413,6 +454,154 @@ describe('LaunchWorkflowForm', () => {
                 expect(
                     getByText(stringInputName, { exact: false }).textContent
                 ).toContain('*');
+            });
+        });
+
+        describe('When using initial parameters', () => {
+            it('should prefer the provided workflow version', async () => {
+                const initialParameters: InitialLaunchParameters = {
+                    workflow: mockWorkflowVersions[2].id
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
+                    mockWorkflowVersions[2].id.version
+                );
+            });
+
+            it('should fall back to the first item in the list if preferred workflow is not found', async () => {
+                mockListWorkflows.mockImplementation(
+                    (scope: Partial<Identifier>) => {
+                        // If we get a request for a specific item,
+                        // simulate not found
+                        if (scope.version) {
+                            return Promise.resolve({ entities: [] });
+                        }
+                        return Promise.resolve({
+                            entities: mockWorkflowVersions
+                        });
+                    }
+                );
+                const baseId = mockWorkflowVersions[2].id;
+                const initialParameters: InitialLaunchParameters = {
+                    workflow: { ...baseId, version: 'nonexistentValue' }
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
+                    mockWorkflowVersions[0].id.version
+                );
+            });
+
+            it('should prefer the provided launch plan', async () => {
+                const initialParameters: InitialLaunchParameters = {
+                    launchPlan: mockLaunchPlans[1].id
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
+                    mockLaunchPlans[1].id.name
+                );
+            });
+
+            it('should fall back to the default launch plan if the preferred is not found', async () => {
+                mockListLaunchPlans.mockImplementation(
+                    (scope: Partial<Identifier>) => {
+                        // If we get a request for a specific item,
+                        // simulate not found
+                        if (scope.version) {
+                            return Promise.resolve({ entities: [] });
+                        }
+                        return Promise.resolve({ entities: mockLaunchPlans });
+                    }
+                );
+                const launchPlanId = { ...mockLaunchPlans[1].id };
+                launchPlanId.name = 'InvalidLauchPlan';
+                const initialParameters: InitialLaunchParameters = {
+                    launchPlan: launchPlanId
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
+                    mockLaunchPlans[0].id.name
+                );
+            });
+
+            it('should maintain selected launch plan by name after switching workflow versions', async () => {
+                const { getByLabelText, getByTitle } = renderForm();
+                await wait();
+
+                // Click the expander for the launch plan, select the second item
+                const launchPlanDiv = getByTitle(formStrings.launchPlan);
+                const launchPlanExpander = getByRole(launchPlanDiv, 'button');
+                fireEvent.click(launchPlanExpander);
+                const launchPlanItems = await waitForElement(() =>
+                    getAllByRole(launchPlanDiv, 'menuitem')
+                );
+                fireEvent.click(launchPlanItems[1]);
+                await wait();
+
+                // Click the expander for the workflow, select the second item
+                const workflowDiv = getByTitle(formStrings.workflowVersion);
+                const expander = getByRole(workflowDiv, 'button');
+                fireEvent.click(expander);
+                const items = await waitForElement(() =>
+                    getAllByRole(workflowDiv, 'menuitem')
+                );
+                fireEvent.click(items[1]);
+
+                await wait();
+                expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
+                    mockLaunchPlans[1].id.name
+                );
+            });
+
+            it('should prepopulate inputs with provided initial values', async () => {
+                const initialStringValue = 'initialStringValue';
+                const parameters = mockLaunchPlans[0].closure!.expectedInputs
+                    .parameters;
+                const values = new Map();
+                const stringCacheKey = createInputCacheKey(
+                    stringInputName,
+                    getInputDefintionForLiteralType(
+                        parameters[stringInputName].var.type
+                    )
+                );
+                values.set(stringCacheKey, initialStringValue);
+                const { getByLabelText } = renderForm({
+                    initialParameters: { values }
+                });
+                await wait();
+
+                expect(
+                    getByLabelText(stringInputName, { exact: false })
+                ).toHaveValue(initialStringValue);
+            });
+
+            it('loads preferred workflow version when it does not exist in the list of suggestions', async () => {
+                const missingWorkflow = { ...mockWorkflowVersions[0] };
+                missingWorkflow.id.version = 'missingVersionString';
+                const initialParameters: InitialLaunchParameters = {
+                    workflow: missingWorkflow.id
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
+                    missingWorkflow.id.version
+                );
+            });
+
+            it('loads the preferred launch plan when it does not exist in the list of suggestions', async () => {
+                const missingLaunchPlan = { ...mockLaunchPlans[0] };
+                missingLaunchPlan.id.name = 'missingLaunchPlanName';
+                const initialParameters: InitialLaunchParameters = {
+                    launchPlan: missingLaunchPlan.id
+                };
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+                expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
+                    missingLaunchPlan.id.name
+                );
             });
         });
     });

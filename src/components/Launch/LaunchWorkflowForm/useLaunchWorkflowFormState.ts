@@ -3,12 +3,15 @@ import { useAPIContext } from 'components/data/apiContext';
 import {
     useFetchableData,
     useWorkflow,
-    useWorkflows,
     waitForAllFetchables
 } from 'components/hooks';
+import { isEqual, uniqBy } from 'lodash';
 import {
     FilterOperationName,
+    Identifier,
+    IdentifierScope,
     LaunchPlan,
+    NamedEntityIdentifier,
     SortDirection,
     Workflow,
     WorkflowExecutionIdentifier,
@@ -18,6 +21,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { history, Routes } from 'routes';
 import { getInputs } from './getInputs';
+import { createInputValueCache } from './inputValueCache';
 import { SearchableSelectorOption } from './SearchableSelector';
 import {
     LaunchWorkflowFormInputsRef,
@@ -46,7 +50,17 @@ function useLaunchPlanSelectorOptions(launchPlans: LaunchPlan[]) {
     ]);
 }
 
-function useLaunchPlansForWorkflow(workflowId: WorkflowId | null = null) {
+interface UseLaunchPlansForWorkflowArgs {
+    workflowId?: WorkflowId | null;
+    preferredLaunchPlanId?: Identifier;
+}
+/** Lists launch plans for a given workflowId, optionally fetching a preferred
+ * launch plan. The result is a merged, de-duplicated list.
+ */
+function useLaunchPlansForWorkflow({
+    workflowId = null,
+    preferredLaunchPlanId
+}: UseLaunchPlansForWorkflowArgs) {
     const { listLaunchPlans } = useAPIContext();
     return useFetchableData<LaunchPlan[], WorkflowId | null>(
         {
@@ -57,8 +71,14 @@ function useLaunchPlansForWorkflow(workflowId: WorkflowId | null = null) {
                 if (workflowId === null) {
                     return Promise.reject('No workflowId specified');
                 }
+
+                const preferredLaunchPlanPromise =
+                    preferredLaunchPlanId === undefined
+                        ? Promise.resolve({ entities: [] })
+                        : listLaunchPlans(preferredLaunchPlanId, { limit: 1 });
+
                 const { project, domain, name, version } = workflowId;
-                const { entities } = await listLaunchPlans(
+                const launchPlansPromise = listLaunchPlans(
                     { project, domain },
                     // TODO: Only active?
                     {
@@ -77,10 +97,70 @@ function useLaunchPlansForWorkflow(workflowId: WorkflowId | null = null) {
                         limit: 10
                     }
                 );
-                return entities;
+
+                const [
+                    launchPlansResult,
+                    preferredLaunchPlanResult
+                ] = await Promise.all([
+                    launchPlansPromise,
+                    preferredLaunchPlanPromise
+                ]);
+                const merged = [
+                    ...launchPlansResult.entities,
+                    ...preferredLaunchPlanResult.entities
+                ];
+                return uniqBy(merged, ({ id: name }) => name);
             }
         },
         workflowId
+    );
+}
+
+/** Fetches workflow versions matching a specific scope, optionally also
+ * fetching a preferred version. The result is a merged, de-duplicated list.
+ */
+function useWorkflowsWithPreferredVersion(
+    workflowName: NamedEntityIdentifier,
+    preferredVersion?: WorkflowId
+) {
+    const { listWorkflows } = useAPIContext();
+    return useFetchableData(
+        {
+            debugName: 'UseWorkflowsWithPreferredVersion',
+            defaultValue: [] as Workflow[],
+            doFetch: async () => {
+                const { project, domain, name } = workflowName;
+                const workflowsPromise = listWorkflows(
+                    { project, domain, name },
+                    {
+                        limit: 10,
+                        sort: {
+                            key: workflowSortFields.createdAt,
+                            direction: SortDirection.DESCENDING
+                        }
+                    }
+                );
+
+                const preferredWorkflowPromise =
+                    preferredVersion === undefined
+                        ? Promise.resolve({ entities: [] })
+                        : listWorkflows(preferredVersion, { limit: 1 });
+
+                const [
+                    workflowsResult,
+                    preferredWorkflowResult
+                ] = await Promise.all([
+                    workflowsPromise,
+                    preferredWorkflowPromise
+                ]);
+                const merged = [
+                    ...workflowsResult.entities,
+                    ...preferredWorkflowResult.entities
+                ];
+                return uniqBy(merged, ({ id: { version } }) => version);
+            }
+        },
+        { workflowName, preferredVersion }
     );
 }
 
@@ -88,29 +168,47 @@ function useLaunchPlansForWorkflow(workflowId: WorkflowId | null = null) {
  * definitions, current input values, and errors.
  */
 export function useLaunchWorkflowFormState({
+    initialParameters = {},
     onClose,
     workflowId
 }: LaunchWorkflowFormProps): LaunchWorkflowFormState {
+    // These values will be used to auto-select items from the workflow
+    // version/launch plan drop downs.
+    const {
+        launchPlan: preferredLaunchPlanId,
+        workflow: preferredWorkflowId
+    } = initialParameters;
+
     const { createWorkflowExecution } = useAPIContext();
+    const [
+        lastSelectedLaunchPlanName,
+        setLastSelectedLaunchPlanName
+    ] = useState<string>();
     const formInputsRef = useRef<LaunchWorkflowFormInputsRef>(null);
     const [showErrors, setShowErrors] = useState(false);
-    const workflows = useWorkflows(workflowId, {
-        limit: 10,
-        sort: {
-            key: workflowSortFields.createdAt,
-            direction: SortDirection.DESCENDING
-        }
-    });
+    const workflows = useWorkflowsWithPreferredVersion(
+        workflowId,
+        preferredWorkflowId
+    );
+
     const workflowSelectorOptions = useWorkflowSelectorOptions(workflows.value);
     const [selectedWorkflow, setWorkflow] = useState<
         SearchableSelectorOption<WorkflowId>
     >();
     const selectedWorkflowId = selectedWorkflow ? selectedWorkflow.data : null;
 
+    const inputValueCache = useMemo(
+        () => createInputValueCache(initialParameters.values),
+        [initialParameters.values]
+    );
+
     // We have to do a single item get once a workflow is selected so that we
     // receive the full workflow spec
     const workflow = useWorkflow(selectedWorkflowId);
-    const launchPlans = useLaunchPlansForWorkflow(selectedWorkflowId);
+    const launchPlans = useLaunchPlansForWorkflow({
+        preferredLaunchPlanId,
+        workflowId: selectedWorkflowId
+    });
     const launchPlanSelectorOptions = useLaunchPlanSelectorOptions(
         launchPlans.value
     );
@@ -148,6 +246,13 @@ export function useLaunchWorkflowFormState({
     ) => {
         setLaunchPlan(undefined);
         setWorkflow(newWorkflow);
+    };
+
+    const onSelectLaunchPlan = (
+        newLaunchPlan: SearchableSelectorOption<LaunchPlan>
+    ) => {
+        setLastSelectedLaunchPlanName(newLaunchPlan.name);
+        setLaunchPlan(newLaunchPlan);
     };
 
     const launchWorkflow = async () => {
@@ -205,6 +310,8 @@ export function useLaunchWorkflowFormState({
     };
     const onCancel = onClose;
 
+    // Once the selected workflow and launch plan have loaded, parse and set
+    // the inputs so we can render the rest of the form
     useEffect(() => {
         const parsedInputs =
             launchPlanData && workflow.hasLoaded
@@ -213,32 +320,70 @@ export function useLaunchWorkflowFormState({
         setParsedInputs(parsedInputs);
     }, [workflow.hasLoaded, workflow.value, launchPlanData]);
 
-    // Once workflows have loaded, attempt to select the first option
+    // Once workflows have loaded, attempt to select the preferred workflow
+    // plan, or fall back to selecting the first option
     useEffect(() => {
         if (workflowSelectorOptions.length > 0 && !selectedWorkflow) {
+            if (preferredWorkflowId) {
+                const preferred = workflowSelectorOptions.find(({ data }) =>
+                    isEqual(data, preferredWorkflowId)
+                );
+                if (preferred) {
+                    setWorkflow(preferred);
+                    return;
+                }
+            }
             setWorkflow(workflowSelectorOptions[0]);
         }
     }, [workflows.value]);
 
-    // Once launch plans have been loaded, attempt to select the default
-    // launch plan
+    // Once launch plans have been loaded, attempt to keep the previously
+    // selected launch plan, followed by the preferred launch plan, the one
+    // matching the workflow name, or just the first option.
     useEffect(() => {
         if (!launchPlanSelectorOptions.length) {
             return;
         }
+
+        if (lastSelectedLaunchPlanName) {
+            const lastSelected = launchPlanSelectorOptions.find(
+                ({ name }) => name === lastSelectedLaunchPlanName
+            );
+            if (lastSelected) {
+                onSelectLaunchPlan(lastSelected);
+                return;
+            }
+        }
+
+        if (preferredLaunchPlanId) {
+            const preferred = launchPlanSelectorOptions.find(
+                ({ data: { id } }) => isEqual(id, preferredLaunchPlanId)
+            );
+            if (preferred) {
+                onSelectLaunchPlan(preferred);
+                return;
+            }
+        }
+
         const defaultLaunchPlan = launchPlanSelectorOptions.find(
             ({ id }) => id === workflowId.name
         );
-        setLaunchPlan(defaultLaunchPlan);
+        if (defaultLaunchPlan) {
+            onSelectLaunchPlan(defaultLaunchPlan);
+            return;
+        }
+        onSelectLaunchPlan(launchPlanSelectorOptions[0]);
     }, [launchPlanSelectorOptions]);
 
     return {
         formInputsRef,
         formKey,
         inputLoadingState,
+        inputValueCache,
         launchPlanOptionsLoadingState,
         launchPlanSelectorOptions,
         onCancel,
+        onSelectLaunchPlan,
         onSelectWorkflow,
         onSubmit,
         selectedLaunchPlan,
@@ -248,7 +393,6 @@ export function useLaunchWorkflowFormState({
         workflowName,
         workflowOptionsLoadingState,
         workflowSelectorOptions,
-        inputs: parsedInputs,
-        onSelectLaunchPlan: setLaunchPlan
+        inputs: parsedInputs
     };
 }

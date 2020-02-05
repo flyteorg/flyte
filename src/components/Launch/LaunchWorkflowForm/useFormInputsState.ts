@@ -2,8 +2,9 @@ import { useDebouncedValue } from 'components/hooks/useDebouncedValue';
 import { Core } from 'flyteidl';
 import { useEffect, useState } from 'react';
 import { validateInput } from './inputHelpers/inputHelpers';
+import { useInputValueCacheContext } from './inputValueCache';
 import { InputProps, InputValue, ParsedInput } from './types';
-import { convertFormInputsToLiterals } from './utils';
+import { convertFormInputsToLiterals, createInputCacheKey } from './utils';
 
 const debounceDelay = 500;
 
@@ -18,9 +19,17 @@ interface FormInputsState {
 }
 
 function useFormInputState(parsedInput: ParsedInput): FormInputState {
-    const [value, setValue] = useState<InputValue | undefined>(
-        parsedInput.defaultValue
+    const inputValueCache = useInputValueCacheContext();
+    const cacheKey = createInputCacheKey(
+        parsedInput.name,
+        parsedInput.typeDefinition
     );
+
+    const defaultValue = inputValueCache.has(cacheKey)
+        ? inputValueCache.get(cacheKey)
+        : parsedInput.defaultValue;
+
+    const [value, setValue] = useState<InputValue | undefined>(defaultValue);
     const [error, setError] = useState<string>();
 
     const validationValue = useDebouncedValue(value, debounceDelay);
@@ -42,6 +51,7 @@ function useFormInputState(parsedInput: ParsedInput): FormInputState {
     }, [validationValue]);
 
     const onChange = (value: InputValue) => {
+        inputValueCache.set(cacheKey, value);
         setValue(value);
     };
 

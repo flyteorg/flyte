@@ -17,6 +17,7 @@ import {
 } from 'models';
 import * as React from 'react';
 import { formStrings } from './constants';
+import { InputValueCacheContext } from './inputValueCache';
 import { LaunchWorkflowFormInputs } from './LaunchWorkflowFormInputs';
 import { SearchableSelector } from './SearchableSelector';
 import { useStyles } from './styles';
@@ -63,7 +64,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
     };
 
     return (
-        <>
+        <InputValueCacheContext.Provider value={state.inputValueCache}>
             <DialogTitle disableTypography={true} className={styles.header}>
                 <div className={styles.inputLabel}>{formStrings.title}</div>
                 <Typography variant="h6">{state.workflowName}</Typography>
@@ -152,6 +153,6 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     </Button>
                 </DialogActions>
             </div>
-        </>
+        </InputValueCacheContext.Provider>
     );
 };

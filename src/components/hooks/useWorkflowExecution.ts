@@ -2,11 +2,13 @@ import {
     Execution,
     ExecutionData,
     getExecution,
-    getExecutionData,
+    LiteralMap,
     terminateWorkflowExecution,
     WorkflowExecutionIdentifier
 } from 'models';
 
+import { useAPIContext } from 'components/data/apiContext';
+import { maxBlobDownloadSizeBytes } from 'components/Literals/constants';
 import { FetchableData, FetchableExecution } from './types';
 import { useFetchableData } from './useFetchableData';
 
@@ -35,6 +37,7 @@ export function useWorkflowExecution(
 export function useWorkflowExecutionData(
     id: WorkflowExecutionIdentifier
 ): FetchableData<ExecutionData> {
+    const { getExecutionData } = useAPIContext();
     return useFetchableData<ExecutionData, WorkflowExecutionIdentifier>(
         {
             debugName: 'ExecutionData',
@@ -42,5 +45,33 @@ export function useWorkflowExecutionData(
             doFetch: id => getExecutionData(id)
         },
         id
+    );
+}
+
+/** A hook for fetching the inputs object associated with an Execution. Will
+ * handle both the legacy (`computedInputs`) and current (externally stored) formats
+ */
+export function useWorkflowExecutionInputs(execution: Execution) {
+    const { getExecutionData, getRemoteLiteralMap } = useAPIContext();
+    return useFetchableData<LiteralMap, WorkflowExecutionIdentifier>(
+        {
+            debugName: 'ExecutionInputs',
+            defaultValue: { literals: {} } as LiteralMap,
+            doFetch: async () => {
+                if (execution.closure.computedInputs) {
+                    return execution.closure.computedInputs;
+                }
+                const { inputs } = await getExecutionData(execution.id);
+                if (
+                    !inputs.url ||
+                    !inputs.bytes ||
+                    inputs.bytes.gt(maxBlobDownloadSizeBytes)
+                ) {
+                    return { literals: {} };
+                }
+                return getRemoteLiteralMap(inputs.url);
+            }
+        },
+        execution.id
     );
 }
