@@ -2,8 +2,8 @@ package array
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/go-test/deep"
@@ -88,20 +88,6 @@ func Test_assembleOutputsWorker_Process(t *testing.T) {
 	ow := &mocks2.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("/bucket/prefix")
 	ow.OnGetOutputPath().Return("/bucket/prefix/outputs.pb")
-	ow.On("Put", mock.Anything, mock.Anything).Return(func(ctx context.Context, reader io.OutputReader) error {
-		// Since 2nd and 4th tasks failed, there should be nil literals in their expected places.
-		expected := coreutils.MustMakeLiteral(map[string]interface{}{
-			"var1": []interface{}{5, nil, 5, nil},
-			"var2": []interface{}{"hello world", nil, "hello world", nil},
-		}).GetMap()
-
-		final, ee, err := reader.Read(ctx)
-		assert.NoError(t, err)
-		assert.Nil(t, ee)
-
-		assert.True(t, reflect.DeepEqual(final, expected))
-		return nil
-	}).Once()
 
 	// Setup the input phases that inform outputs worker about which tasks failed/succeeded.
 	phases := arrayCore.NewPhasesCompactArray(4)
@@ -121,6 +107,24 @@ func Test_assembleOutputsWorker_Process(t *testing.T) {
 	actual, err := w.Process(ctx, item)
 	assert.NoError(t, err)
 	assert.Equal(t, workqueue.WorkStatusSucceeded, actual)
+
+	actualOutputs := &core.LiteralMap{}
+	assert.NoError(t, memStore.ReadProtobuf(ctx, "/bucket/prefix/outputs.pb", actualOutputs))
+	// Since 2nd and 4th tasks failed, there should be nil literals in their expected places.
+	expected := coreutils.MustMakeLiteral(map[string]interface{}{
+		"var1": []interface{}{5, nil, 5, nil},
+		"var2": []interface{}{"hello world", nil, "hello world", nil},
+	}).GetMap()
+
+	expectedBytes, err := json.Marshal(expected)
+	assert.NoError(t, err)
+
+	actualBytes, err := json.Marshal(actualOutputs)
+	assert.NoError(t, err)
+
+	if diff := deep.Equal(string(actualBytes), string(expectedBytes)); diff != nil {
+		assert.FailNow(t, "Should be equal.", "Diff: %v", diff)
+	}
 }
 
 func Test_appendSubTaskOutput(t *testing.T) {
@@ -161,16 +165,21 @@ func Test_appendSubTaskOutput(t *testing.T) {
 
 func TestAssembleFinalOutputs(t *testing.T) {
 	ctx := context.Background()
-	q := &mocks.IndexedWorkQueue{}
-	q.On("Queue", mock.Anything, mock.Anything, mock.Anything).Return(
-		func(ctx context.Context, id workqueue.WorkItemID, workItem workqueue.WorkItem) error {
-			return nil
-		})
-	assemblyQueue := OutputAssembler{
-		IndexedWorkQueue: q,
-	}
-
 	t.Run("Found succeeded", func(t *testing.T) {
+		q := &mocks.IndexedWorkQueue{}
+		called := false
+		q.On("Queue", mock.Anything, mock.Anything, mock.Anything).Return(
+			func(ctx context.Context, id workqueue.WorkItemID, workItem workqueue.WorkItem) error {
+				i, casted := workItem.(*outputAssembleItem)
+				assert.True(t, casted)
+				assert.Equal(t, []string{"var1"}, i.varNames)
+				called = true
+				return nil
+			})
+		assemblyQueue := OutputAssembler{
+			IndexedWorkQueue: q,
+		}
+
 		info := &mocks.WorkItemInfo{}
 		info.OnStatus().Return(workqueue.WorkStatusSucceeded)
 		q.OnGet("found").Return(info, true, nil)
@@ -200,9 +209,24 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		_, err = AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, s)
 		assert.NoError(t, err)
 		assert.Equal(t, arrayCore.PhaseSuccess, s.CurrentPhase)
+		assert.False(t, called)
 	})
 
 	t.Run("Found failed", func(t *testing.T) {
+		q := &mocks.IndexedWorkQueue{}
+		called := false
+		q.On("Queue", mock.Anything, mock.Anything, mock.Anything).Return(
+			func(ctx context.Context, id workqueue.WorkItemID, workItem workqueue.WorkItem) error {
+				i, casted := workItem.(*outputAssembleItem)
+				assert.True(t, casted)
+				assert.Equal(t, []string{"var1"}, i.varNames)
+				called = true
+				return nil
+			})
+		assemblyQueue := OutputAssembler{
+			IndexedWorkQueue: q,
+		}
+
 		info := &mocks.WorkItemInfo{}
 		info.OnStatus().Return(workqueue.WorkStatusFailed)
 		info.OnError().Return(fmt.Errorf("expected error"))
@@ -223,9 +247,24 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		_, err := AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, s)
 		assert.NoError(t, err)
 		assert.Equal(t, arrayCore.PhaseRetryableFailure, s.CurrentPhase)
+		assert.False(t, called)
 	})
 
 	t.Run("Not Found Queued then Succeeded", func(t *testing.T) {
+		q := &mocks.IndexedWorkQueue{}
+		called := false
+		q.On("Queue", mock.Anything, mock.Anything, mock.Anything).Return(
+			func(ctx context.Context, id workqueue.WorkItemID, workItem workqueue.WorkItem) error {
+				i, casted := workItem.(*outputAssembleItem)
+				assert.True(t, casted)
+				assert.Equal(t, []string{"var1"}, i.varNames)
+				called = true
+				return nil
+			})
+		assemblyQueue := OutputAssembler{
+			IndexedWorkQueue: q,
+		}
+
 		info := &mocks.WorkItemInfo{}
 		info.OnStatus().Return(workqueue.WorkStatusSucceeded)
 		q.OnGet("notfound").Return(nil, false, nil).Once()
@@ -291,6 +330,7 @@ func TestAssembleFinalOutputs(t *testing.T) {
 		_, err = AssembleFinalOutputs(ctx, assemblyQueue, tCtx, arrayCore.PhaseSuccess, s)
 		assert.NoError(t, err)
 		assert.Equal(t, arrayCore.PhaseSuccess, s.CurrentPhase)
+		assert.True(t, called)
 	})
 }
 
