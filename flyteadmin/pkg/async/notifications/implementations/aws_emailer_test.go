@@ -66,6 +66,25 @@ func TestAwsEmailer_SendEmail(t *testing.T) {
 	assert.Nil(t, testEmail.SendEmail(context.Background(), emailNotification))
 }
 
+func TestFlyteEmailToSesEmailInput(t *testing.T) {
+	emailNotification := admin.EmailMessage{
+		SubjectLine: "Notice: Execution \"name\" has succeeded in \"domain\".",
+		SenderEmail: "no-reply@example.com",
+		RecipientsEmail: []string{
+			"my@example.com",
+			"john@example.com",
+		},
+		Body: "Execution \"name\" has succeeded in \"domain\". View details at " +
+			"<a href=\"https://example.com/executions/T/B/D\">" +
+			"https://example.com/executions/T/B/D</a>.",
+	}
+
+	sesEmailInput := FlyteEmailToSesEmailInput(emailNotification)
+	assert.Equal(t, *sesEmailInput.Destination.ToAddresses[0], emailNotification.RecipientsEmail[0])
+	assert.Equal(t, *sesEmailInput.Destination.ToAddresses[1], emailNotification.RecipientsEmail[1])
+	assert.Equal(t, *sesEmailInput.Message.Subject.Data, "Notice: Execution \"name\" has succeeded in \"domain\".")
+}
+
 func TestAwsEmailer_SendEmailError(t *testing.T) {
 	mockAwsEmail := mocks.SESClient{}
 	var awsSES sesiface.SESAPI
