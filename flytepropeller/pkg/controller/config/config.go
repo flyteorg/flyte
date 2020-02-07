@@ -1,17 +1,49 @@
 package config
 
 import (
+	"time"
+
 	"github.com/lyft/flytestdlib/config"
 	"k8s.io/apimachinery/pkg/types"
 )
 
-//go:generate pflags Config
+//go:generate pflags Config --default-var=defaultConfig
 
 const configSectionKey = "propeller"
 
-var ConfigSection = config.MustRegisterSection(configSectionKey, &Config{
-	MaxDatasetSizeBytes: 10 * 1024 * 1024,
-})
+var (
+	configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
+
+	defaultConfig = &Config{
+		MaxDatasetSizeBytes: 10 * 1024 * 1024,
+		Queue: CompositeQueueConfig{
+			Type: CompositeQueueSimple,
+			Queue: WorkqueueConfig{
+				Type:      WorkqueueTypeDefault,
+				BaseDelay: config.Duration{Duration: time.Second * 10},
+				MaxDelay:  config.Duration{Duration: time.Second * 10},
+				Rate:      10,
+				Capacity:  100,
+			},
+		},
+		KubeConfig: KubeClientConfig{
+			QPS:     5,
+			Burst:   10,
+			Timeout: config.Duration{Duration: 0},
+		},
+		LeaderElection: LeaderElectionConfig{
+			Enabled:       false,
+			LeaseDuration: config.Duration{Duration: time.Second * 15},
+			RenewDeadline: config.Duration{Duration: time.Second * 10},
+			RetryPeriod:   config.Duration{Duration: time.Second * 2},
+		},
+		DefaultDeadlines: DefaultDeadlines{
+			DefaultNodeExecutionDeadline:  config.Duration{Duration: time.Hour * 48},
+			DefaultNodeActiveDeadline:     config.Duration{Duration: time.Hour * 48},
+			DefaultWorkflowActiveDeadline: config.Duration{Duration: time.Hour * 72},
+		},
+	}
+)
 
 // NOTE: when adding new fields, do not mark them as "omitempty" if it's desirable to read the value from env variables.
 // Config that uses the flytestdlib Config module to generate commandline and load config files. This configuration is
@@ -41,7 +73,7 @@ type Config struct {
 type KubeClientConfig struct {
 	// QPS indicates the maximum QPS to the master from this client.
 	// If it's zero, the created RESTClient will use DefaultQPS: 5
-	QPS float32 `json:"qps" pflag:",Max QPS to the master for requests to KubeAPI. 0 defaults to 5."`
+	QPS float32 `json:"qps" pflag:"-,Max QPS to the master for requests to KubeAPI. 0 defaults to 5."`
 	// Maximum burst for throttle.
 	// If it's zero, the created RESTClient will use DefaultBurst: 10.
 	Burst int `json:"burst" pflag:",Max burst rate for throttle. 0 defaults to 10"`
@@ -57,10 +89,10 @@ const (
 )
 
 type CompositeQueueConfig struct {
-	Type             CompositeQueueType `json:"type" pflag:"\"simple\",Type of composite queue to use for the WorkQueue"`
+	Type             CompositeQueueType `json:"type" pflag:",Type of composite queue to use for the WorkQueue"`
 	Queue            WorkqueueConfig    `json:"queue,omitempty" pflag:",Workflow workqueue configuration, affects the way the work is consumed from the queue."`
 	Sub              WorkqueueConfig    `json:"sub-queue,omitempty" pflag:",SubQueue configuration, affects the way the nodes cause the top-level Work to be re-evaluated."`
-	BatchingInterval config.Duration    `json:"batching-interval" pflag:"\"1s\",Duration for which downstream updates are buffered"`
+	BatchingInterval config.Duration    `json:"batching-interval" pflag:",Duration for which downstream updates are buffered"`
 	BatchSize        int                `json:"batch-size" pflag:"-1,Number of downstream triggered top-level objects to re-enqueue every duration. -1 indicates all available."`
 }
 
@@ -76,18 +108,18 @@ const (
 // prototypical configuration to configure a workqueue. We may want to generalize this in a package like k8sutils
 type WorkqueueConfig struct {
 	// Refer to https://github.com/kubernetes/client-go/tree/master/util/workqueue
-	Type      WorkqueueType   `json:"type" pflag:"\"default\",Type of RateLimiter to use for the WorkQueue"`
-	BaseDelay config.Duration `json:"base-delay" pflag:"\"10s\",base backoff delay for failure"`
-	MaxDelay  config.Duration `json:"max-delay" pflag:"\"10s\",Max backoff delay for failure"`
-	Rate      int64           `json:"rate" pflag:"int64(10),Bucket Refill rate per second"`
-	Capacity  int             `json:"capacity" pflag:"100,Bucket capacity as number of items"`
+	Type      WorkqueueType   `json:"type" pflag:",Type of RateLimiter to use for the WorkQueue"`
+	BaseDelay config.Duration `json:"base-delay" pflag:",base backoff delay for failure"`
+	MaxDelay  config.Duration `json:"max-delay" pflag:",Max backoff delay for failure"`
+	Rate      int64           `json:"rate" pflag:",Bucket Refill rate per second"`
+	Capacity  int             `json:"capacity" pflag:",Bucket capacity as number of items"`
 }
 
 // Contains default values for timeouts
 type DefaultDeadlines struct {
-	DefaultNodeExecutionDeadline  config.Duration `json:"node-execution-deadline" pflag:"\"48h0m0s\",Default value of node execution timeout"`
-	DefaultNodeActiveDeadline     config.Duration `json:"node-active-deadline" pflag:"\"48h0m0s\",Default value of node timeout"`
-	DefaultWorkflowActiveDeadline config.Duration `json:"workflow-active-deadline" pflag:"\"72h0m0s\",Default value of workflow timeout"`
+	DefaultNodeExecutionDeadline  config.Duration `json:"node-execution-deadline" pflag:",Default value of node execution timeout"`
+	DefaultNodeActiveDeadline     config.Duration `json:"node-active-deadline" pflag:",Default value of node timeout"`
+	DefaultWorkflowActiveDeadline config.Duration `json:"workflow-active-deadline" pflag:",Default value of workflow timeout"`
 }
 
 // Contains leader election configuration.
@@ -100,21 +132,21 @@ type LeaderElectionConfig struct {
 
 	// Duration that non-leader candidates will wait to force acquire leadership. This is measured against time of last
 	// observed ack
-	LeaseDuration config.Duration `json:"lease-duration" pflag:"\"15s\",Duration that non-leader candidates will wait to force acquire leadership. This is measured against time of last observed ack."`
+	LeaseDuration config.Duration `json:"lease-duration" pflag:",Duration that non-leader candidates will wait to force acquire leadership. This is measured against time of last observed ack."`
 
 	// RenewDeadline is the duration that the acting master will retry refreshing leadership before giving up.
-	RenewDeadline config.Duration `json:"renew-deadline" pflag:"\"10s\",Duration that the acting master will retry refreshing leadership before giving up."`
+	RenewDeadline config.Duration `json:"renew-deadline" pflag:",Duration that the acting master will retry refreshing leadership before giving up."`
 
 	// RetryPeriod is the duration the LeaderElector clients should wait between tries of actions.
-	RetryPeriod config.Duration `json:"retry-period" pflag:"\"2s\",Duration the LeaderElector clients should wait between tries of actions."`
+	RetryPeriod config.Duration `json:"retry-period" pflag:",Duration the LeaderElector clients should wait between tries of actions."`
 }
 
 // Extracts the Configuration from the global config module in flytestdlib and returns the corresponding type-casted object.
 // TODO What if the type is incorrect?
 func GetConfig() *Config {
-	return ConfigSection.GetConfig().(*Config)
+	return configSection.GetConfig().(*Config)
 }
 
 func MustRegisterSubSection(subSectionKey string, section config.Config) config.Section {
-	return ConfigSection.MustRegisterSection(subSectionKey, section)
+	return configSection.MustRegisterSection(subSectionKey, section)
 }

@@ -6,7 +6,7 @@ import (
 
 //go:generate pflags Config --default-var=defaultConfig
 
-type Policy string
+type Policy = string
 
 const (
 	PolicyInMemory             = "InMemory"
