@@ -77,7 +77,7 @@ func (r RemoteFileOutputReader) Exists(ctx context.Context) (bool, error) {
 	}
 	if md.Exists() {
 		if md.Size() > r.maxPayloadSize {
-			return false, errors.Wrapf(err, "error file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.outPath.GetErrorPath(), md.Size(), r.maxPayloadSize)
+			return false, errors.Errorf("error file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.outPath.GetErrorPath(), md.Size(), r.maxPayloadSize)
 		}
 		return true, nil
 	}
