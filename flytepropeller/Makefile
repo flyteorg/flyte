@@ -33,7 +33,7 @@ benchmark:
 # server starts the service in development mode
 .PHONY: server
 server:
-	@go run ./cmd/controller/main.go -logtostderr --kubeconfig=$(HOME)/.kube/config
+	@go run ./cmd/controller/main.go --alsologtostderr --propeller.kube-config=$(HOME)/.kube/config
 
 clean:
 	rm -rf bin
