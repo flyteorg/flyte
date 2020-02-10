@@ -1,4 +1,4 @@
-import { Link, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import * as classnames from 'classnames';
@@ -7,15 +7,11 @@ import { timestampToDate } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
 import { NavBarContent } from 'components/Navigation/NavBarContent';
 import { interactiveTextDisabledColor, smallFontSize } from 'components/Theme';
-import { Execution, TaskExecution } from 'models';
+import { TaskExecution } from 'models';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Routes } from 'routes';
-import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
-import { RelaunchExecutionButton } from '../RelaunchExecution';
-import { TerminateExecutionButton } from '../TerminateExecution';
-import { executionIsTerminal } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) => {
     const actionsMinWidth = theme.spacing(34);
