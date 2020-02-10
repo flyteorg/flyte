@@ -1,5 +1,5 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { ThemeStyle } from '@material-ui/core/styles/createTypography';
+import { Variant } from '@material-ui/core/styles/createTypography';
 import { SvgIconProps } from '@material-ui/core/SvgIcon';
 import Typography from '@material-ui/core/Typography';
 import classnames from 'classnames';
@@ -27,13 +27,13 @@ const iconSizes: Record<SizeValue, number> = {
     large: 80
 };
 
-const titleVariants: Record<SizeValue, ThemeStyle> = {
+const titleVariants: Record<SizeValue, Variant> = {
     small: 'body1',
     medium: 'h5',
     large: 'h4'
 };
 
-const descriptionVariants: Record<SizeValue, ThemeStyle> = {
+const descriptionVariants: Record<SizeValue, Variant> = {
     small: 'body2',
     medium: 'body1',
     large: 'body1'

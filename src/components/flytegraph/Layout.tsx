@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash';
-import memoizeOne from 'memoize-one';
+import memoizeOne, { EqualityFn } from 'memoize-one';
 import * as React from 'react';
 import * as shallowEqual from 'shallowequal';
 
@@ -29,7 +29,7 @@ export class Layout<T> extends React.Component<LayoutProps<T>> {
     // input props actually change
     layoutGraph = memoizeOne<typeof layoutGraph>(
         (data, config) => layoutGraph(data, config),
-        layoutArgsAreEqual
+        layoutArgsAreEqual as EqualityFn
     );
     public render() {
         const { config, data } = this.props;

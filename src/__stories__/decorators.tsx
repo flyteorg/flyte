@@ -1,11 +1,11 @@
-import { StoryDecorator } from '@storybook/react';
+import { DecoratorFn } from '@storybook/react';
 import * as React from 'react';
 
 import { ContentContainer } from 'components/common';
 import { NavBar } from 'components/Navigation/NavBar';
 import { SideNavigation } from 'components/Navigation/SideNavigation';
 
-export const withNavigation: StoryDecorator = story => (
+export const withNavigation: DecoratorFn = story => (
     <>
         <NavBar />
         <SideNavigation />
@@ -13,7 +13,7 @@ export const withNavigation: StoryDecorator = story => (
     </>
 );
 
-export const basicStoryContainer: StoryDecorator = story => (
+export const basicStoryContainer: DecoratorFn = story => (
     <div
         style={{
             display: 'flex',

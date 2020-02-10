@@ -19,7 +19,7 @@ function toLiterals<T>(
     type: keyof Core.ILiteral,
     values: Dictionary<T>
 ): Dictionary<Literal> {
-    return mapValues<T, Literal>(values, value => ({
+    return mapValues(values, (value: T) => ({
         value: type,
         [type]: value
     }));

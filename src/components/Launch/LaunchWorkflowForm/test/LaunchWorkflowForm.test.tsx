@@ -263,7 +263,9 @@ describe('LaunchWorkflowForm', () => {
             });
             fireEvent.change(integerInput, { target: { value: 'abc' } });
 
-            act(jest.runAllTimers);
+            act(() => {
+                jest.runAllTimers;
+            });
             await wait();
             expect(integerInput).not.toBeInvalid();
 
@@ -287,7 +289,9 @@ describe('LaunchWorkflowForm', () => {
             expect(integerInput).toBeInvalid();
 
             fireEvent.change(integerInput, { target: { value: '123' } });
-            act(jest.runAllTimers);
+            act(() => {
+                jest.runAllTimers;
+            });
             await wait();
             expect(integerInput).toBeValid();
         });
