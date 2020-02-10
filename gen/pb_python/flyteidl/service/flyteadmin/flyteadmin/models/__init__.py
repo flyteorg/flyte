@@ -23,6 +23,7 @@ from flyteadmin.models.admin_domain import AdminDomain
 from flyteadmin.models.admin_email_notification import AdminEmailNotification
 from flyteadmin.models.admin_execution import AdminExecution
 from flyteadmin.models.admin_execution_closure import AdminExecutionClosure
+from flyteadmin.models.admin_execution_cluster_label import AdminExecutionClusterLabel
 from flyteadmin.models.admin_execution_create_request import AdminExecutionCreateRequest
 from flyteadmin.models.admin_execution_create_response import AdminExecutionCreateResponse
 from flyteadmin.models.admin_execution_list import AdminExecutionList

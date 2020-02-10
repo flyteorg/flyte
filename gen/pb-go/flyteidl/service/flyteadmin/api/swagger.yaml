@@ -1286,7 +1286,8 @@ paths:
         description: " - TASK_RESOURCE: Applies to customizable task resource requests\
           \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
           \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
-          \ execution queue assignment."
+          \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
+          \ K8s cluster label to be used for execution to be run"
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1294,6 +1295,7 @@ paths:
         - "TASK_RESOURCE"
         - "CLUSTER_RESOURCE"
         - "EXECUTION_QUEUE"
+        - "EXECUTION_CLUSTER_LABEL"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -1880,7 +1882,8 @@ paths:
         description: " - TASK_RESOURCE: Applies to customizable task resource requests\
           \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
           \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
-          \ execution queue assignment."
+          \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
+          \ K8s cluster label to be used for execution to be run"
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1888,6 +1891,7 @@ paths:
         - "TASK_RESOURCE"
         - "CLUSTER_RESOURCE"
         - "EXECUTION_QUEUE"
+        - "EXECUTION_CLUSTER_LABEL"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -2669,6 +2673,14 @@ definitions:
           recipients_email:
           - "recipients_email"
           - "recipients_email"
+  adminExecutionClusterLabel:
+    type: "object"
+    properties:
+      value:
+        type: "string"
+        title: "Label value to determine where the execution will be run"
+    example:
+      value: "value"
   adminExecutionCreateRequest:
     type: "object"
     properties:
@@ -4353,11 +4365,13 @@ definitions:
       \ ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE:\
       \ Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE:\
       \ Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE:\
-      \ Configures task and dynamic task execution queue assignment."
+      \ Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL:\
+      \ Configures the K8s cluster label to be used for execution to be run"
     enum:
     - "TASK_RESOURCE"
     - "CLUSTER_RESOURCE"
     - "EXECUTION_QUEUE"
+    - "EXECUTION_CLUSTER_LABEL"
     default: "TASK_RESOURCE"
   adminMatchingAttributes:
     type: "object"
@@ -4368,6 +4382,8 @@ definitions:
         $ref: "#/definitions/adminClusterResourceAttributes"
       execution_queue_attributes:
         $ref: "#/definitions/adminExecutionQueueAttributes"
+      execution_cluster_label:
+        $ref: "#/definitions/adminExecutionClusterLabel"
     description: "Generic container for encapsulating all types of the above attributes\
       \ messages."
     example:
@@ -4389,6 +4405,8 @@ definitions:
           cpu: "cpu"
           storage: "storage"
           gpu: "gpu"
+      execution_cluster_label:
+        value: "value"
   adminNamedEntity:
     type: "object"
     properties:
@@ -4790,6 +4808,8 @@ definitions:
             cpu: "cpu"
             storage: "storage"
             gpu: "gpu"
+        execution_cluster_label:
+          value: "value"
   adminProjectDomainAttributesDeleteRequest:
     type: "object"
     properties:
@@ -4832,6 +4852,8 @@ definitions:
               cpu: "cpu"
               storage: "storage"
               gpu: "gpu"
+          execution_cluster_label:
+            value: "value"
   adminProjectDomainAttributesUpdateRequest:
     type: "object"
     properties:
@@ -8473,6 +8495,8 @@ definitions:
             cpu: "cpu"
             storage: "storage"
             gpu: "gpu"
+        execution_cluster_label:
+          value: "value"
   adminWorkflowAttributesDeleteRequest:
     type: "object"
     properties:
@@ -8519,6 +8543,8 @@ definitions:
               cpu: "cpu"
               storage: "storage"
               gpu: "gpu"
+          execution_cluster_label:
+            value: "value"
   adminWorkflowAttributesUpdateRequest:
     type: "object"
     properties:

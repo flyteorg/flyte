@@ -126,6 +126,7 @@ Class | Method | HTTP request | Description
  - [AdminEmailNotification](docs/AdminEmailNotification.md)
  - [AdminExecution](docs/AdminExecution.md)
  - [AdminExecutionClosure](docs/AdminExecutionClosure.md)
+ - [AdminExecutionClusterLabel](docs/AdminExecutionClusterLabel.md)
  - [AdminExecutionCreateRequest](docs/AdminExecutionCreateRequest.md)
  - [AdminExecutionCreateResponse](docs/AdminExecutionCreateResponse.md)
  - [AdminExecutionList](docs/AdminExecutionList.md)

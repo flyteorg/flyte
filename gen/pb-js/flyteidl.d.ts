@@ -8224,7 +8224,8 @@ export namespace flyteidl {
         enum MatchableResource {
             TASK_RESOURCE = 0,
             CLUSTER_RESOURCE = 1,
-            EXECUTION_QUEUE = 2
+            EXECUTION_QUEUE = 2,
+            EXECUTION_CLUSTER_LABEL = 3
         }
 
         /** Properties of a TaskResourceSpec. */
@@ -8459,6 +8460,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ExecutionClusterLabel. */
+        interface IExecutionClusterLabel {
+
+            /** ExecutionClusterLabel value */
+            value?: (string|null);
+        }
+
+        /** Represents an ExecutionClusterLabel. */
+        class ExecutionClusterLabel implements IExecutionClusterLabel {
+
+            /**
+             * Constructs a new ExecutionClusterLabel.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IExecutionClusterLabel);
+
+            /** ExecutionClusterLabel value. */
+            public value: string;
+
+            /**
+             * Creates a new ExecutionClusterLabel instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionClusterLabel instance
+             */
+            public static create(properties?: flyteidl.admin.IExecutionClusterLabel): flyteidl.admin.ExecutionClusterLabel;
+
+            /**
+             * Encodes the specified ExecutionClusterLabel message. Does not implicitly {@link flyteidl.admin.ExecutionClusterLabel.verify|verify} messages.
+             * @param message ExecutionClusterLabel message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IExecutionClusterLabel, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionClusterLabel message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionClusterLabel
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ExecutionClusterLabel;
+
+            /**
+             * Verifies an ExecutionClusterLabel message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a MatchingAttributes. */
         interface IMatchingAttributes {
 
@@ -8470,6 +8523,9 @@ export namespace flyteidl {
 
             /** MatchingAttributes executionQueueAttributes */
             executionQueueAttributes?: (flyteidl.admin.IExecutionQueueAttributes|null);
+
+            /** MatchingAttributes executionClusterLabel */
+            executionClusterLabel?: (flyteidl.admin.IExecutionClusterLabel|null);
         }
 
         /** Represents a MatchingAttributes. */
@@ -8490,8 +8546,11 @@ export namespace flyteidl {
             /** MatchingAttributes executionQueueAttributes. */
             public executionQueueAttributes?: (flyteidl.admin.IExecutionQueueAttributes|null);
 
+            /** MatchingAttributes executionClusterLabel. */
+            public executionClusterLabel?: (flyteidl.admin.IExecutionClusterLabel|null);
+
             /** MatchingAttributes target. */
-            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes");
+            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel");
 
             /**
              * Creates a new MatchingAttributes instance using the specified properties.
