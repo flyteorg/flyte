@@ -1817,7 +1817,7 @@ class AdminServiceApi(object):
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. (required)
         :param str domain: Unique domain id which this set of attributes references. (required)
-        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run
         :return: AdminProjectDomainAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1841,7 +1841,7 @@ class AdminServiceApi(object):
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. (required)
         :param str domain: Unique domain id which this set of attributes references. (required)
-        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run
         :return: AdminProjectDomainAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2517,7 +2517,7 @@ class AdminServiceApi(object):
         :param str project: Unique project id which this set of attributes references. (required)
         :param str domain: Unique domain id which this set of attributes references. (required)
         :param str workflow: Workflow name which this set of attributes references. (required)
-        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run
         :return: AdminWorkflowAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2542,7 +2542,7 @@ class AdminServiceApi(object):
         :param str project: Unique project id which this set of attributes references. (required)
         :param str domain: Unique domain id which this set of attributes references. (required)
         :param str workflow: Workflow name which this set of attributes references. (required)
-        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run
         :return: AdminWorkflowAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.

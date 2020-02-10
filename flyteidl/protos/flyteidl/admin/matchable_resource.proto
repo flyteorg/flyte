@@ -14,6 +14,9 @@ enum MatchableResource {
 
   // Configures task and dynamic task execution queue assignment.
   EXECUTION_QUEUE = 2;
+
+  // Configures the K8s cluster label to be used for execution to be run
+  EXECUTION_CLUSTER_LABEL = 3;
 }
 
 message TaskResourceSpec {
@@ -44,6 +47,11 @@ message ExecutionQueueAttributes {
   repeated string tags           = 1; 
 }
 
+message ExecutionClusterLabel {
+  // Label value to determine where the execution will be run
+  string value	= 1;
+}
+
 // Generic container for encapsulating all types of the above attributes messages.
 message MatchingAttributes {
   oneof target {
@@ -52,5 +60,7 @@ message MatchingAttributes {
     ClusterResourceAttributes cluster_resource_attributes = 2; 
 
     ExecutionQueueAttributes execution_queue_attributes = 3;
+
+    ExecutionClusterLabel execution_cluster_label = 4;
   }
 }
