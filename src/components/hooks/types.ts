@@ -10,7 +10,7 @@ export interface FetchArgs {
 }
 
 export interface FetchableData<T> {
-    fetch(fetchArgs?: FetchArgs): Promise<T>;
+    fetch(fetchArgs?: FetchArgs): Promise<any>;
     hasLoaded: boolean;
     lastError: Error | null;
     loading: boolean;

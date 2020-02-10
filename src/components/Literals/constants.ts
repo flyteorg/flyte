@@ -1,4 +1,4 @@
-export const maxViewSizeBytes = 100000;
+export const maxBlobDownloadSizeBytes = 100000;
 export const htmlEntities = {
     leftBracket: '\u005B',
     rightBracket: '\u005D',

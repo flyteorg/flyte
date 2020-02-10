@@ -1,4 +1,4 @@
-import { Link, Typography } from '@material-ui/core';
+import { Button, Dialog, Link, Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import * as classnames from 'classnames';
@@ -14,9 +14,9 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Routes } from 'routes';
 import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
-import { RelaunchExecutionButton } from '../RelaunchExecution';
 import { TerminateExecutionButton } from '../TerminateExecution';
 import { executionIsTerminal } from '../utils';
+import { RelaunchExecutionForm } from './RelaunchExecutionForm';
 
 const useStyles = makeStyles((theme: Theme) => {
     const actionsMinWidth = theme.spacing(34);
@@ -91,6 +91,7 @@ export const ExecutionDetailsAppBarContent: React.FC<{
     const commonStyles = useCommonStyles();
     const styles = useStyles();
     const [showInputsOutputs, setShowInputsOutputs] = React.useState(false);
+    const [showRelaunchForm, setShowRelaunchForm] = React.useState(false);
 
     const { domain, name, project } = execution.id;
     const { duration, startedAt, phase, workflowId } = execution.closure;
@@ -114,11 +115,22 @@ export const ExecutionDetailsAppBarContent: React.FC<{
         );
     }
     const onClickShowInputsOutputs = () => setShowInputsOutputs(true);
+    const onClickRelaunch = () => setShowRelaunchForm(true);
+    const onCloseRelaunch = () => setShowRelaunchForm(false);
+
     const actionContent = executionIsTerminal(execution) ? (
-        <RelaunchExecutionButton
-            className={styles.actionButton}
-            execution={execution}
-        />
+        <Button
+            variant="outlined"
+            color="primary"
+            className={classnames(
+                styles.actionButton,
+                commonStyles.buttonWhiteOutlined
+            )}
+            onClick={onClickRelaunch}
+            size="small"
+        >
+            Relaunch
+        </Button>
     ) : (
         <TerminateExecutionButton className={styles.actionButton} />
     );
@@ -194,6 +206,17 @@ export const ExecutionDetailsAppBarContent: React.FC<{
                         {actionContent}
                     </div>
                 </div>
+                <Dialog
+                    scroll="paper"
+                    maxWidth="sm"
+                    fullWidth={true}
+                    open={showRelaunchForm}
+                >
+                    <RelaunchExecutionForm
+                        execution={execution}
+                        onClose={onCloseRelaunch}
+                    />
+                </Dialog>
             </NavBarContent>
             {modalContent}
         </>
