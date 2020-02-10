@@ -17,6 +17,7 @@
 #include <google/protobuf/port_def.inc>
 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ClusterResourceAttributes_AttributesEntry_DoNotUse_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_TaskResourceSpec_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ClusterResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
@@ -43,12 +44,17 @@ class ExecutionQueueAttributesDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<ExecutionQueueAttributes> _instance;
 } _ExecutionQueueAttributes_default_instance_;
+class ExecutionClusterLabelDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<ExecutionClusterLabel> _instance;
+} _ExecutionClusterLabel_default_instance_;
 class MatchingAttributesDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<MatchingAttributes> _instance;
   const ::flyteidl::admin::TaskResourceAttributes* task_resource_attributes_;
   const ::flyteidl::admin::ClusterResourceAttributes* cluster_resource_attributes_;
   const ::flyteidl::admin::ExecutionQueueAttributes* execution_queue_attributes_;
+  const ::flyteidl::admin::ExecutionClusterLabel* execution_cluster_label_;
 } _MatchingAttributes_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
@@ -123,6 +129,20 @@ static void InitDefaultsExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5f
 ::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto}, {}};
 
+static void InitDefaultsExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::admin::_ExecutionClusterLabel_default_instance_;
+    new (ptr) ::flyteidl::admin::ExecutionClusterLabel();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::admin::ExecutionClusterLabel::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto}, {}};
+
 static void InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -134,11 +154,12 @@ static void InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresour
   ::flyteidl::admin::MatchingAttributes::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<3> scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 3, InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto}, {
+::google::protobuf::internal::SCCInfo<4> scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 4, InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto}, {
       &scc_info_TaskResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
       &scc_info_ClusterResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
-      &scc_info_ExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,}};
+      &scc_info_ExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
+      &scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,}};
 
 void InitDefaults_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_TaskResourceSpec_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
@@ -146,10 +167,11 @@ void InitDefaults_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_ClusterResourceAttributes_AttributesEntry_DoNotUse_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ClusterResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[6];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[7];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[1];
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto = nullptr;
 
@@ -192,6 +214,12 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fmatchable_5freso
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionQueueAttributes, tags_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionClusterLabel, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionClusterLabel, value_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::MatchingAttributes, _internal_metadata_),
   ~0u,  // no _extensions_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::MatchingAttributes, _oneof_case_[0]),
@@ -199,6 +227,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fmatchable_5freso
   offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, task_resource_attributes_),
   offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, cluster_resource_attributes_),
   offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, execution_queue_attributes_),
+  offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, execution_cluster_label_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::MatchingAttributes, target_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -207,7 +236,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 16, 23, sizeof(::flyteidl::admin::ClusterResourceAttributes_AttributesEntry_DoNotUse)},
   { 25, -1, sizeof(::flyteidl::admin::ClusterResourceAttributes)},
   { 31, -1, sizeof(::flyteidl::admin::ExecutionQueueAttributes)},
-  { 37, -1, sizeof(::flyteidl::admin::MatchingAttributes)},
+  { 37, -1, sizeof(::flyteidl::admin::ExecutionClusterLabel)},
+  { 43, -1, sizeof(::flyteidl::admin::MatchingAttributes)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -216,13 +246,14 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ClusterResourceAttributes_AttributesEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ClusterResourceAttributes_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ExecutionQueueAttributes_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ExecutionClusterLabel_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_MatchingAttributes_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto = {
   {}, AddDescriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, "flyteidl/admin/matchable_resource.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto::offsets,
-  file_level_metadata_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 6, file_level_enum_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto,
+  file_level_metadata_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 7, file_level_enum_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[] =
@@ -237,23 +268,26 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fmatchable_5fresource_2ep
   "teidl.admin.ClusterResourceAttributes.At"
   "tributesEntry\0321\n\017AttributesEntry\022\013\n\003key\030"
   "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"(\n\030ExecutionQue"
-  "ueAttributes\022\014\n\004tags\030\001 \003(\t\"\214\002\n\022MatchingA"
+  "ueAttributes\022\014\n\004tags\030\001 \003(\t\"&\n\025ExecutionC"
+  "lusterLabel\022\r\n\005value\030\001 \001(\t\"\326\002\n\022MatchingA"
   "ttributes\022J\n\030task_resource_attributes\030\001 "
   "\001(\0132&.flyteidl.admin.TaskResourceAttribu"
   "tesH\000\022P\n\033cluster_resource_attributes\030\002 \001"
   "(\0132).flyteidl.admin.ClusterResourceAttri"
   "butesH\000\022N\n\032execution_queue_attributes\030\003 "
   "\001(\0132(.flyteidl.admin.ExecutionQueueAttri"
-  "butesH\000B\010\n\006target*Q\n\021MatchableResource\022\021"
-  "\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_RESOURCE\020\001\022"
-  "\023\n\017EXECUTION_QUEUE\020\002B3Z1github.com/lyft/"
-  "flyteidl/gen/pb-go/flyteidl/adminb\006proto"
-  "3"
+  "butesH\000\022H\n\027execution_cluster_label\030\004 \001(\013"
+  "2%.flyteidl.admin.ExecutionClusterLabelH"
+  "\000B\010\n\006target*n\n\021MatchableResource\022\021\n\rTASK"
+  "_RESOURCE\020\000\022\024\n\020CLUSTER_RESOURCE\020\001\022\023\n\017EXE"
+  "CUTION_QUEUE\020\002\022\033\n\027EXECUTION_CLUSTER_LABE"
+  "L\020\003B3Z1github.com/lyft/flyteidl/gen/pb-g"
+  "o/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fmatchable_5fresource_2eproto,
-  "flyteidl/admin/matchable_resource.proto", &assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 881,
+  "flyteidl/admin/matchable_resource.proto", &assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 1024,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
@@ -276,6 +310,7 @@ bool MatchableResource_IsValid(int value) {
     case 0:
     case 1:
     case 2:
+    case 3:
       return true;
     default:
       return false;
@@ -1871,6 +1906,303 @@ void ExecutionQueueAttributes::InternalSwap(ExecutionQueueAttributes* other) {
 
 // ===================================================================
 
+void ExecutionClusterLabel::InitAsDefaultInstance() {
+}
+class ExecutionClusterLabel::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int ExecutionClusterLabel::kValueFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+ExecutionClusterLabel::ExecutionClusterLabel()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.admin.ExecutionClusterLabel)
+}
+ExecutionClusterLabel::ExecutionClusterLabel(const ExecutionClusterLabel& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  value_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.value().size() > 0) {
+    value_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.value_);
+  }
+  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.ExecutionClusterLabel)
+}
+
+void ExecutionClusterLabel::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
+  value_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+ExecutionClusterLabel::~ExecutionClusterLabel() {
+  // @@protoc_insertion_point(destructor:flyteidl.admin.ExecutionClusterLabel)
+  SharedDtor();
+}
+
+void ExecutionClusterLabel::SharedDtor() {
+  value_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void ExecutionClusterLabel::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ExecutionClusterLabel& ExecutionClusterLabel::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void ExecutionClusterLabel::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.admin.ExecutionClusterLabel)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  value_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* ExecutionClusterLabel::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<ExecutionClusterLabel*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string value = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.ExecutionClusterLabel.value");
+        object = msg->mutable_value();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool ExecutionClusterLabel::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.admin.ExecutionClusterLabel)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string value = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_value()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->value().data(), static_cast<int>(this->value().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.ExecutionClusterLabel.value"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.admin.ExecutionClusterLabel)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.admin.ExecutionClusterLabel)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void ExecutionClusterLabel::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.admin.ExecutionClusterLabel)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string value = 1;
+  if (this->value().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->value().data(), static_cast<int>(this->value().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ExecutionClusterLabel.value");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->value(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.admin.ExecutionClusterLabel)
+}
+
+::google::protobuf::uint8* ExecutionClusterLabel::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.ExecutionClusterLabel)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string value = 1;
+  if (this->value().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->value().data(), static_cast<int>(this->value().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ExecutionClusterLabel.value");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->value(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.ExecutionClusterLabel)
+  return target;
+}
+
+size_t ExecutionClusterLabel::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.ExecutionClusterLabel)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string value = 1;
+  if (this->value().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->value());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void ExecutionClusterLabel::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.ExecutionClusterLabel)
+  GOOGLE_DCHECK_NE(&from, this);
+  const ExecutionClusterLabel* source =
+      ::google::protobuf::DynamicCastToGenerated<ExecutionClusterLabel>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.ExecutionClusterLabel)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.ExecutionClusterLabel)
+    MergeFrom(*source);
+  }
+}
+
+void ExecutionClusterLabel::MergeFrom(const ExecutionClusterLabel& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.ExecutionClusterLabel)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.value().size() > 0) {
+
+    value_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.value_);
+  }
+}
+
+void ExecutionClusterLabel::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.ExecutionClusterLabel)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ExecutionClusterLabel::CopyFrom(const ExecutionClusterLabel& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.ExecutionClusterLabel)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ExecutionClusterLabel::IsInitialized() const {
+  return true;
+}
+
+void ExecutionClusterLabel::Swap(ExecutionClusterLabel* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void ExecutionClusterLabel::InternalSwap(ExecutionClusterLabel* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  value_.Swap(&other->value_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+}
+
+::google::protobuf::Metadata ExecutionClusterLabel::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto);
+  return ::file_level_metadata_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
 void MatchingAttributes::InitAsDefaultInstance() {
   ::flyteidl::admin::_MatchingAttributes_default_instance_.task_resource_attributes_ = const_cast< ::flyteidl::admin::TaskResourceAttributes*>(
       ::flyteidl::admin::TaskResourceAttributes::internal_default_instance());
@@ -1878,12 +2210,15 @@ void MatchingAttributes::InitAsDefaultInstance() {
       ::flyteidl::admin::ClusterResourceAttributes::internal_default_instance());
   ::flyteidl::admin::_MatchingAttributes_default_instance_.execution_queue_attributes_ = const_cast< ::flyteidl::admin::ExecutionQueueAttributes*>(
       ::flyteidl::admin::ExecutionQueueAttributes::internal_default_instance());
+  ::flyteidl::admin::_MatchingAttributes_default_instance_.execution_cluster_label_ = const_cast< ::flyteidl::admin::ExecutionClusterLabel*>(
+      ::flyteidl::admin::ExecutionClusterLabel::internal_default_instance());
 }
 class MatchingAttributes::HasBitSetters {
  public:
   static const ::flyteidl::admin::TaskResourceAttributes& task_resource_attributes(const MatchingAttributes* msg);
   static const ::flyteidl::admin::ClusterResourceAttributes& cluster_resource_attributes(const MatchingAttributes* msg);
   static const ::flyteidl::admin::ExecutionQueueAttributes& execution_queue_attributes(const MatchingAttributes* msg);
+  static const ::flyteidl::admin::ExecutionClusterLabel& execution_cluster_label(const MatchingAttributes* msg);
 };
 
 const ::flyteidl::admin::TaskResourceAttributes&
@@ -1897,6 +2232,10 @@ MatchingAttributes::HasBitSetters::cluster_resource_attributes(const MatchingAtt
 const ::flyteidl::admin::ExecutionQueueAttributes&
 MatchingAttributes::HasBitSetters::execution_queue_attributes(const MatchingAttributes* msg) {
   return *msg->target_.execution_queue_attributes_;
+}
+const ::flyteidl::admin::ExecutionClusterLabel&
+MatchingAttributes::HasBitSetters::execution_cluster_label(const MatchingAttributes* msg) {
+  return *msg->target_.execution_cluster_label_;
 }
 void MatchingAttributes::set_allocated_task_resource_attributes(::flyteidl::admin::TaskResourceAttributes* task_resource_attributes) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
@@ -1940,10 +2279,25 @@ void MatchingAttributes::set_allocated_execution_queue_attributes(::flyteidl::ad
   }
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchingAttributes.execution_queue_attributes)
 }
+void MatchingAttributes::set_allocated_execution_cluster_label(::flyteidl::admin::ExecutionClusterLabel* execution_cluster_label) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  clear_target();
+  if (execution_cluster_label) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      execution_cluster_label = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, execution_cluster_label, submessage_arena);
+    }
+    set_has_execution_cluster_label();
+    target_.execution_cluster_label_ = execution_cluster_label;
+  }
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchingAttributes.execution_cluster_label)
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int MatchingAttributes::kTaskResourceAttributesFieldNumber;
 const int MatchingAttributes::kClusterResourceAttributesFieldNumber;
 const int MatchingAttributes::kExecutionQueueAttributesFieldNumber;
+const int MatchingAttributes::kExecutionClusterLabelFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 MatchingAttributes::MatchingAttributes()
@@ -1967,6 +2321,10 @@ MatchingAttributes::MatchingAttributes(const MatchingAttributes& from)
     }
     case kExecutionQueueAttributes: {
       mutable_execution_queue_attributes()->::flyteidl::admin::ExecutionQueueAttributes::MergeFrom(from.execution_queue_attributes());
+      break;
+    }
+    case kExecutionClusterLabel: {
+      mutable_execution_cluster_label()->::flyteidl::admin::ExecutionClusterLabel::MergeFrom(from.execution_cluster_label());
       break;
     }
     case TARGET_NOT_SET: {
@@ -2015,6 +2373,10 @@ void MatchingAttributes::clear_target() {
     }
     case kExecutionQueueAttributes: {
       delete target_.execution_queue_attributes_;
+      break;
+    }
+    case kExecutionClusterLabel: {
+      delete target_.execution_cluster_label_;
       break;
     }
     case TARGET_NOT_SET: {
@@ -2087,6 +2449,19 @@ const char* MatchingAttributes::_InternalParse(const char* begin, const char* en
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
+      // .flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::admin::ExecutionClusterLabel::_InternalParse;
+        object = msg->mutable_execution_cluster_label();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -2150,6 +2525,17 @@ bool MatchingAttributes::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_execution_cluster_label()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2195,6 +2581,12 @@ void MatchingAttributes::SerializeWithCachedSizes(
       3, HasBitSetters::execution_queue_attributes(this), output);
   }
 
+  // .flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;
+  if (has_execution_cluster_label()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, HasBitSetters::execution_cluster_label(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -2227,6 +2619,13 @@ void MatchingAttributes::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         3, HasBitSetters::execution_queue_attributes(this), target);
+  }
+
+  // .flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;
+  if (has_execution_cluster_label()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        4, HasBitSetters::execution_cluster_label(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2272,6 +2671,13 @@ size_t MatchingAttributes::ByteSizeLong() const {
           *target_.execution_queue_attributes_);
       break;
     }
+    // .flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;
+    case kExecutionClusterLabel: {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          *target_.execution_cluster_label_);
+      break;
+    }
     case TARGET_NOT_SET: {
       break;
     }
@@ -2314,6 +2720,10 @@ void MatchingAttributes::MergeFrom(const MatchingAttributes& from) {
     }
     case kExecutionQueueAttributes: {
       mutable_execution_queue_attributes()->::flyteidl::admin::ExecutionQueueAttributes::MergeFrom(from.execution_queue_attributes());
+      break;
+    }
+    case kExecutionClusterLabel: {
+      mutable_execution_cluster_label()->::flyteidl::admin::ExecutionClusterLabel::MergeFrom(from.execution_cluster_label());
       break;
     }
     case TARGET_NOT_SET: {
@@ -2376,6 +2786,9 @@ template<> PROTOBUF_NOINLINE ::flyteidl::admin::ClusterResourceAttributes* Arena
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::admin::ExecutionQueueAttributes* Arena::CreateMaybeMessage< ::flyteidl::admin::ExecutionQueueAttributes >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::admin::ExecutionQueueAttributes >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::admin::ExecutionClusterLabel* Arena::CreateMaybeMessage< ::flyteidl::admin::ExecutionClusterLabel >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::admin::ExecutionClusterLabel >(arena);
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::admin::MatchingAttributes* Arena::CreateMaybeMessage< ::flyteidl::admin::MatchingAttributes >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::admin::MatchingAttributes >(arena);

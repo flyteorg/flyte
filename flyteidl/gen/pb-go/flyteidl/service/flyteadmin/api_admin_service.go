@@ -1588,7 +1588,7 @@ Retrieve the customized resource attributes associated with a project-domain com
  * @param project Unique project id which this set of attributes references.
  * @param domain Unique domain id which this set of attributes references.
  * @param optional nil or *GetProjectDomainAttributesOpts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+     * @param "ResourceType" (optional.String) -   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run
 
 @return AdminProjectDomainAttributesGetResponse
 */
@@ -2130,7 +2130,7 @@ Retrieve the customized resource attributes associated with a project, domain an
  * @param domain Unique domain id which this set of attributes references.
  * @param workflow Workflow name which this set of attributes references.
  * @param optional nil or *GetWorkflowAttributesOpts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.
+     * @param "ResourceType" (optional.String) -   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run
 
 @return AdminWorkflowAttributesGetResponse
 */

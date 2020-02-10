@@ -48,6 +48,14 @@ public final class MatchableResourceOuterClass {
      * <code>EXECUTION_QUEUE = 2;</code>
      */
     EXECUTION_QUEUE(2),
+    /**
+     * <pre>
+     * Configures the K8s cluster label to be used for execution to be run
+     * </pre>
+     *
+     * <code>EXECUTION_CLUSTER_LABEL = 3;</code>
+     */
+    EXECUTION_CLUSTER_LABEL(3),
     UNRECOGNIZED(-1),
     ;
 
@@ -75,6 +83,14 @@ public final class MatchableResourceOuterClass {
      * <code>EXECUTION_QUEUE = 2;</code>
      */
     public static final int EXECUTION_QUEUE_VALUE = 2;
+    /**
+     * <pre>
+     * Configures the K8s cluster label to be used for execution to be run
+     * </pre>
+     *
+     * <code>EXECUTION_CLUSTER_LABEL = 3;</code>
+     */
+    public static final int EXECUTION_CLUSTER_LABEL_VALUE = 3;
 
 
     public final int getNumber() {
@@ -98,6 +114,7 @@ public final class MatchableResourceOuterClass {
         case 0: return TASK_RESOURCE;
         case 1: return CLUSTER_RESOURCE;
         case 2: return EXECUTION_QUEUE;
+        case 3: return EXECUTION_CLUSTER_LABEL;
         default: return null;
       }
     }
@@ -3398,6 +3415,591 @@ public final class MatchableResourceOuterClass {
 
   }
 
+  public interface ExecutionClusterLabelOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.ExecutionClusterLabel)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Label value to determine where the execution will be run
+     * </pre>
+     *
+     * <code>string value = 1;</code>
+     */
+    java.lang.String getValue();
+    /**
+     * <pre>
+     * Label value to determine where the execution will be run
+     * </pre>
+     *
+     * <code>string value = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getValueBytes();
+  }
+  /**
+   * Protobuf type {@code flyteidl.admin.ExecutionClusterLabel}
+   */
+  public  static final class ExecutionClusterLabel extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.ExecutionClusterLabel)
+      ExecutionClusterLabelOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ExecutionClusterLabel.newBuilder() to construct.
+    private ExecutionClusterLabel(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ExecutionClusterLabel() {
+      value_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ExecutionClusterLabel(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              value_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_ExecutionClusterLabel_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_ExecutionClusterLabel_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.class, flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.Builder.class);
+    }
+
+    public static final int VALUE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object value_;
+    /**
+     * <pre>
+     * Label value to determine where the execution will be run
+     * </pre>
+     *
+     * <code>string value = 1;</code>
+     */
+    public java.lang.String getValue() {
+      java.lang.Object ref = value_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        value_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Label value to determine where the execution will be run
+     * </pre>
+     *
+     * <code>string value = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getValueBytes() {
+      java.lang.Object ref = value_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        value_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getValueBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, value_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getValueBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, value_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel other = (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) obj;
+
+      if (!getValue()
+          .equals(other.getValue())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + VALUE_FIELD_NUMBER;
+      hash = (53 * hash) + getValue().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.admin.ExecutionClusterLabel}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.ExecutionClusterLabel)
+        flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabelOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_ExecutionClusterLabel_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_ExecutionClusterLabel_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.class, flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        value_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_ExecutionClusterLabel_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel getDefaultInstanceForType() {
+        return flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel build() {
+        flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel buildPartial() {
+        flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel result = new flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel(this);
+        result.value_ = value_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) {
+          return mergeFrom((flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel other) {
+        if (other == flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.getDefaultInstance()) return this;
+        if (!other.getValue().isEmpty()) {
+          value_ = other.value_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object value_ = "";
+      /**
+       * <pre>
+       * Label value to determine where the execution will be run
+       * </pre>
+       *
+       * <code>string value = 1;</code>
+       */
+      public java.lang.String getValue() {
+        java.lang.Object ref = value_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          value_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Label value to determine where the execution will be run
+       * </pre>
+       *
+       * <code>string value = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getValueBytes() {
+        java.lang.Object ref = value_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          value_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Label value to determine where the execution will be run
+       * </pre>
+       *
+       * <code>string value = 1;</code>
+       */
+      public Builder setValue(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        value_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Label value to determine where the execution will be run
+       * </pre>
+       *
+       * <code>string value = 1;</code>
+       */
+      public Builder clearValue() {
+        
+        value_ = getDefaultInstance().getValue();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Label value to determine where the execution will be run
+       * </pre>
+       *
+       * <code>string value = 1;</code>
+       */
+      public Builder setValueBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        value_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.ExecutionClusterLabel)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.ExecutionClusterLabel)
+    private static final flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel();
+    }
+
+    public static flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ExecutionClusterLabel>
+        PARSER = new com.google.protobuf.AbstractParser<ExecutionClusterLabel>() {
+      @java.lang.Override
+      public ExecutionClusterLabel parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ExecutionClusterLabel(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ExecutionClusterLabel> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ExecutionClusterLabel> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface MatchingAttributesOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.MatchingAttributes)
       com.google.protobuf.MessageOrBuilder {
@@ -3440,6 +4042,19 @@ public final class MatchableResourceOuterClass {
      * <code>.flyteidl.admin.ExecutionQueueAttributes execution_queue_attributes = 3;</code>
      */
     flyteidl.admin.MatchableResourceOuterClass.ExecutionQueueAttributesOrBuilder getExecutionQueueAttributesOrBuilder();
+
+    /**
+     * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+     */
+    boolean hasExecutionClusterLabel();
+    /**
+     * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+     */
+    flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel getExecutionClusterLabel();
+    /**
+     * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+     */
+    flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabelOrBuilder getExecutionClusterLabelOrBuilder();
 
     public flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.TargetCase getTargetCase();
   }
@@ -3528,6 +4143,20 @@ public final class MatchableResourceOuterClass {
               targetCase_ = 3;
               break;
             }
+            case 34: {
+              flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.Builder subBuilder = null;
+              if (targetCase_ == 4) {
+                subBuilder = ((flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_).toBuilder();
+              }
+              target_ =
+                  input.readMessage(flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_);
+                target_ = subBuilder.buildPartial();
+              }
+              targetCase_ = 4;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -3567,6 +4196,7 @@ public final class MatchableResourceOuterClass {
       TASK_RESOURCE_ATTRIBUTES(1),
       CLUSTER_RESOURCE_ATTRIBUTES(2),
       EXECUTION_QUEUE_ATTRIBUTES(3),
+      EXECUTION_CLUSTER_LABEL(4),
       TARGET_NOT_SET(0);
       private final int value;
       private TargetCase(int value) {
@@ -3585,6 +4215,7 @@ public final class MatchableResourceOuterClass {
           case 1: return TASK_RESOURCE_ATTRIBUTES;
           case 2: return CLUSTER_RESOURCE_ATTRIBUTES;
           case 3: return EXECUTION_QUEUE_ATTRIBUTES;
+          case 4: return EXECUTION_CLUSTER_LABEL;
           case 0: return TARGET_NOT_SET;
           default: return null;
         }
@@ -3678,6 +4309,32 @@ public final class MatchableResourceOuterClass {
       return flyteidl.admin.MatchableResourceOuterClass.ExecutionQueueAttributes.getDefaultInstance();
     }
 
+    public static final int EXECUTION_CLUSTER_LABEL_FIELD_NUMBER = 4;
+    /**
+     * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+     */
+    public boolean hasExecutionClusterLabel() {
+      return targetCase_ == 4;
+    }
+    /**
+     * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+     */
+    public flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel getExecutionClusterLabel() {
+      if (targetCase_ == 4) {
+         return (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_;
+      }
+      return flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+     */
+    public flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabelOrBuilder getExecutionClusterLabelOrBuilder() {
+      if (targetCase_ == 4) {
+         return (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_;
+      }
+      return flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3701,6 +4358,9 @@ public final class MatchableResourceOuterClass {
       if (targetCase_ == 3) {
         output.writeMessage(3, (flyteidl.admin.MatchableResourceOuterClass.ExecutionQueueAttributes) target_);
       }
+      if (targetCase_ == 4) {
+        output.writeMessage(4, (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3721,6 +4381,10 @@ public final class MatchableResourceOuterClass {
       if (targetCase_ == 3) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, (flyteidl.admin.MatchableResourceOuterClass.ExecutionQueueAttributes) target_);
+      }
+      if (targetCase_ == 4) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3751,6 +4415,10 @@ public final class MatchableResourceOuterClass {
           if (!getExecutionQueueAttributes()
               .equals(other.getExecutionQueueAttributes())) return false;
           break;
+        case 4:
+          if (!getExecutionClusterLabel()
+              .equals(other.getExecutionClusterLabel())) return false;
+          break;
         case 0:
         default:
       }
@@ -3777,6 +4445,10 @@ public final class MatchableResourceOuterClass {
         case 3:
           hash = (37 * hash) + EXECUTION_QUEUE_ATTRIBUTES_FIELD_NUMBER;
           hash = (53 * hash) + getExecutionQueueAttributes().hashCode();
+          break;
+        case 4:
+          hash = (37 * hash) + EXECUTION_CLUSTER_LABEL_FIELD_NUMBER;
+          hash = (53 * hash) + getExecutionClusterLabel().hashCode();
           break;
         case 0:
         default:
@@ -3967,6 +4639,13 @@ public final class MatchableResourceOuterClass {
             result.target_ = executionQueueAttributesBuilder_.build();
           }
         }
+        if (targetCase_ == 4) {
+          if (executionClusterLabelBuilder_ == null) {
+            result.target_ = target_;
+          } else {
+            result.target_ = executionClusterLabelBuilder_.build();
+          }
+        }
         result.targetCase_ = targetCase_;
         onBuilt();
         return result;
@@ -4027,6 +4706,10 @@ public final class MatchableResourceOuterClass {
           }
           case EXECUTION_QUEUE_ATTRIBUTES: {
             mergeExecutionQueueAttributes(other.getExecutionQueueAttributes());
+            break;
+          }
+          case EXECUTION_CLUSTER_LABEL: {
+            mergeExecutionClusterLabel(other.getExecutionClusterLabel());
             break;
           }
           case TARGET_NOT_SET: {
@@ -4484,6 +5167,142 @@ public final class MatchableResourceOuterClass {
         onChanged();;
         return executionQueueAttributesBuilder_;
       }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel, flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.Builder, flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabelOrBuilder> executionClusterLabelBuilder_;
+      /**
+       * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+       */
+      public boolean hasExecutionClusterLabel() {
+        return targetCase_ == 4;
+      }
+      /**
+       * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel getExecutionClusterLabel() {
+        if (executionClusterLabelBuilder_ == null) {
+          if (targetCase_ == 4) {
+            return (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_;
+          }
+          return flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.getDefaultInstance();
+        } else {
+          if (targetCase_ == 4) {
+            return executionClusterLabelBuilder_.getMessage();
+          }
+          return flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+       */
+      public Builder setExecutionClusterLabel(flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel value) {
+        if (executionClusterLabelBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          target_ = value;
+          onChanged();
+        } else {
+          executionClusterLabelBuilder_.setMessage(value);
+        }
+        targetCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+       */
+      public Builder setExecutionClusterLabel(
+          flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.Builder builderForValue) {
+        if (executionClusterLabelBuilder_ == null) {
+          target_ = builderForValue.build();
+          onChanged();
+        } else {
+          executionClusterLabelBuilder_.setMessage(builderForValue.build());
+        }
+        targetCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+       */
+      public Builder mergeExecutionClusterLabel(flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel value) {
+        if (executionClusterLabelBuilder_ == null) {
+          if (targetCase_ == 4 &&
+              target_ != flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.getDefaultInstance()) {
+            target_ = flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.newBuilder((flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            target_ = value;
+          }
+          onChanged();
+        } else {
+          if (targetCase_ == 4) {
+            executionClusterLabelBuilder_.mergeFrom(value);
+          }
+          executionClusterLabelBuilder_.setMessage(value);
+        }
+        targetCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+       */
+      public Builder clearExecutionClusterLabel() {
+        if (executionClusterLabelBuilder_ == null) {
+          if (targetCase_ == 4) {
+            targetCase_ = 0;
+            target_ = null;
+            onChanged();
+          }
+        } else {
+          if (targetCase_ == 4) {
+            targetCase_ = 0;
+            target_ = null;
+          }
+          executionClusterLabelBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.Builder getExecutionClusterLabelBuilder() {
+        return getExecutionClusterLabelFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabelOrBuilder getExecutionClusterLabelOrBuilder() {
+        if ((targetCase_ == 4) && (executionClusterLabelBuilder_ != null)) {
+          return executionClusterLabelBuilder_.getMessageOrBuilder();
+        } else {
+          if (targetCase_ == 4) {
+            return (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_;
+          }
+          return flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.ExecutionClusterLabel execution_cluster_label = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel, flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.Builder, flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabelOrBuilder> 
+          getExecutionClusterLabelFieldBuilder() {
+        if (executionClusterLabelBuilder_ == null) {
+          if (!(targetCase_ == 4)) {
+            target_ = flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.getDefaultInstance();
+          }
+          executionClusterLabelBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel, flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.Builder, flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabelOrBuilder>(
+                  (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_,
+                  getParentForChildren(),
+                  isClean());
+          target_ = null;
+        }
+        targetCase_ = 4;
+        onChanged();;
+        return executionClusterLabelBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -4563,6 +5382,11 @@ public final class MatchableResourceOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_ExecutionQueueAttributes_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_ExecutionClusterLabel_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_ExecutionClusterLabel_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_MatchingAttributes_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -4587,18 +5411,21 @@ public final class MatchableResourceOuterClass {
       "teidl.admin.ClusterResourceAttributes.At" +
       "tributesEntry\0321\n\017AttributesEntry\022\013\n\003key\030" +
       "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"(\n\030ExecutionQue" +
-      "ueAttributes\022\014\n\004tags\030\001 \003(\t\"\214\002\n\022MatchingA" +
+      "ueAttributes\022\014\n\004tags\030\001 \003(\t\"&\n\025ExecutionC" +
+      "lusterLabel\022\r\n\005value\030\001 \001(\t\"\326\002\n\022MatchingA" +
       "ttributes\022J\n\030task_resource_attributes\030\001 " +
       "\001(\0132&.flyteidl.admin.TaskResourceAttribu" +
       "tesH\000\022P\n\033cluster_resource_attributes\030\002 \001" +
       "(\0132).flyteidl.admin.ClusterResourceAttri" +
       "butesH\000\022N\n\032execution_queue_attributes\030\003 " +
       "\001(\0132(.flyteidl.admin.ExecutionQueueAttri" +
-      "butesH\000B\010\n\006target*Q\n\021MatchableResource\022\021" +
-      "\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_RESOURCE\020\001\022" +
-      "\023\n\017EXECUTION_QUEUE\020\002B3Z1github.com/lyft/" +
-      "flyteidl/gen/pb-go/flyteidl/adminb\006proto" +
-      "3"
+      "butesH\000\022H\n\027execution_cluster_label\030\004 \001(\013" +
+      "2%.flyteidl.admin.ExecutionClusterLabelH" +
+      "\000B\010\n\006target*n\n\021MatchableResource\022\021\n\rTASK" +
+      "_RESOURCE\020\000\022\024\n\020CLUSTER_RESOURCE\020\001\022\023\n\017EXE" +
+      "CUTION_QUEUE\020\002\022\033\n\027EXECUTION_CLUSTER_LABE" +
+      "L\020\003B3Z1github.com/lyft/flyteidl/gen/pb-g" +
+      "o/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4642,12 +5469,18 @@ public final class MatchableResourceOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionQueueAttributes_descriptor,
         new java.lang.String[] { "Tags", });
-    internal_static_flyteidl_admin_MatchingAttributes_descriptor =
+    internal_static_flyteidl_admin_ExecutionClusterLabel_descriptor =
       getDescriptor().getMessageTypes().get(4);
+    internal_static_flyteidl_admin_ExecutionClusterLabel_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_ExecutionClusterLabel_descriptor,
+        new java.lang.String[] { "Value", });
+    internal_static_flyteidl_admin_MatchingAttributes_descriptor =
+      getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_MatchingAttributes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_MatchingAttributes_descriptor,
-        new java.lang.String[] { "TaskResourceAttributes", "ClusterResourceAttributes", "ExecutionQueueAttributes", "Target", });
+        new java.lang.String[] { "TaskResourceAttributes", "ClusterResourceAttributes", "ExecutionQueueAttributes", "ExecutionClusterLabel", "Target", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
