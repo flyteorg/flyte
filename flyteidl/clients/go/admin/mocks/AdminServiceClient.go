@@ -1265,6 +1265,54 @@ func (_m *AdminServiceClient) ListLaunchPlans(ctx context.Context, in *admin.Res
 	return r0, r1
 }
 
+type AdminServiceClient_ListMatchableAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_ListMatchableAttributes) Return(_a0 *admin.ListMatchableAttributesResponse, _a1 error) *AdminServiceClient_ListMatchableAttributes {
+	return &AdminServiceClient_ListMatchableAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnListMatchableAttributes(ctx context.Context, in *admin.ListMatchableAttributesRequest, opts ...grpc.CallOption) *AdminServiceClient_ListMatchableAttributes {
+	c := _m.On("ListMatchableAttributes", ctx, in, opts)
+	return &AdminServiceClient_ListMatchableAttributes{Call: c}
+}
+
+func (_m *AdminServiceClient) OnListMatchableAttributesMatch(matchers ...interface{}) *AdminServiceClient_ListMatchableAttributes {
+	c := _m.On("ListMatchableAttributes", matchers...)
+	return &AdminServiceClient_ListMatchableAttributes{Call: c}
+}
+
+// ListMatchableAttributes provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) ListMatchableAttributes(ctx context.Context, in *admin.ListMatchableAttributesRequest, opts ...grpc.CallOption) (*admin.ListMatchableAttributesResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ListMatchableAttributesResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ListMatchableAttributesRequest, ...grpc.CallOption) *admin.ListMatchableAttributesResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ListMatchableAttributesResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ListMatchableAttributesRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_ListNamedEntities struct {
 	*mock.Call
 }

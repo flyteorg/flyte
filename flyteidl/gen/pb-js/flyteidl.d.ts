@@ -8585,6 +8585,186 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a MatchableAttributesConfiguration. */
+        interface IMatchableAttributesConfiguration {
+
+            /** MatchableAttributesConfiguration attributes */
+            attributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /** MatchableAttributesConfiguration domain */
+            domain?: (string|null);
+
+            /** MatchableAttributesConfiguration project */
+            project?: (string|null);
+
+            /** MatchableAttributesConfiguration workflow */
+            workflow?: (string|null);
+
+            /** MatchableAttributesConfiguration launchPlan */
+            launchPlan?: (string|null);
+        }
+
+        /** Represents a MatchableAttributesConfiguration. */
+        class MatchableAttributesConfiguration implements IMatchableAttributesConfiguration {
+
+            /**
+             * Constructs a new MatchableAttributesConfiguration.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IMatchableAttributesConfiguration);
+
+            /** MatchableAttributesConfiguration attributes. */
+            public attributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /** MatchableAttributesConfiguration domain. */
+            public domain: string;
+
+            /** MatchableAttributesConfiguration project. */
+            public project: string;
+
+            /** MatchableAttributesConfiguration workflow. */
+            public workflow: string;
+
+            /** MatchableAttributesConfiguration launchPlan. */
+            public launchPlan: string;
+
+            /**
+             * Creates a new MatchableAttributesConfiguration instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns MatchableAttributesConfiguration instance
+             */
+            public static create(properties?: flyteidl.admin.IMatchableAttributesConfiguration): flyteidl.admin.MatchableAttributesConfiguration;
+
+            /**
+             * Encodes the specified MatchableAttributesConfiguration message. Does not implicitly {@link flyteidl.admin.MatchableAttributesConfiguration.verify|verify} messages.
+             * @param message MatchableAttributesConfiguration message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IMatchableAttributesConfiguration, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a MatchableAttributesConfiguration message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns MatchableAttributesConfiguration
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.MatchableAttributesConfiguration;
+
+            /**
+             * Verifies a MatchableAttributesConfiguration message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ListMatchableAttributesRequest. */
+        interface IListMatchableAttributesRequest {
+
+            /** ListMatchableAttributesRequest resourceType */
+            resourceType?: (flyteidl.admin.MatchableResource|null);
+        }
+
+        /** Represents a ListMatchableAttributesRequest. */
+        class ListMatchableAttributesRequest implements IListMatchableAttributesRequest {
+
+            /**
+             * Constructs a new ListMatchableAttributesRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IListMatchableAttributesRequest);
+
+            /** ListMatchableAttributesRequest resourceType. */
+            public resourceType: flyteidl.admin.MatchableResource;
+
+            /**
+             * Creates a new ListMatchableAttributesRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ListMatchableAttributesRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IListMatchableAttributesRequest): flyteidl.admin.ListMatchableAttributesRequest;
+
+            /**
+             * Encodes the specified ListMatchableAttributesRequest message. Does not implicitly {@link flyteidl.admin.ListMatchableAttributesRequest.verify|verify} messages.
+             * @param message ListMatchableAttributesRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IListMatchableAttributesRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ListMatchableAttributesRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ListMatchableAttributesRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ListMatchableAttributesRequest;
+
+            /**
+             * Verifies a ListMatchableAttributesRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ListMatchableAttributesResponse. */
+        interface IListMatchableAttributesResponse {
+
+            /** ListMatchableAttributesResponse configurations */
+            configurations?: (flyteidl.admin.IMatchableAttributesConfiguration[]|null);
+        }
+
+        /** Represents a ListMatchableAttributesResponse. */
+        class ListMatchableAttributesResponse implements IListMatchableAttributesResponse {
+
+            /**
+             * Constructs a new ListMatchableAttributesResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IListMatchableAttributesResponse);
+
+            /** ListMatchableAttributesResponse configurations. */
+            public configurations: flyteidl.admin.IMatchableAttributesConfiguration[];
+
+            /**
+             * Creates a new ListMatchableAttributesResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ListMatchableAttributesResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IListMatchableAttributesResponse): flyteidl.admin.ListMatchableAttributesResponse;
+
+            /**
+             * Encodes the specified ListMatchableAttributesResponse message. Does not implicitly {@link flyteidl.admin.ListMatchableAttributesResponse.verify|verify} messages.
+             * @param message ListMatchableAttributesResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IListMatchableAttributesResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ListMatchableAttributesResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ListMatchableAttributesResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ListMatchableAttributesResponse;
+
+            /**
+             * Verifies a ListMatchableAttributesResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a NodeExecutionGetRequest. */
         interface INodeExecutionGetRequest {
 
@@ -12067,6 +12247,20 @@ export namespace flyteidl {
             public deleteWorkflowAttributes(request: flyteidl.admin.IWorkflowAttributesDeleteRequest): Promise<flyteidl.admin.WorkflowAttributesDeleteResponse>;
 
             /**
+             * Calls ListMatchableAttributes.
+             * @param request ListMatchableAttributesRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ListMatchableAttributesResponse
+             */
+            public listMatchableAttributes(request: flyteidl.admin.IListMatchableAttributesRequest, callback: flyteidl.service.AdminService.ListMatchableAttributesCallback): void;
+
+            /**
+             * Calls ListMatchableAttributes.
+             * @param request ListMatchableAttributesRequest message or plain object
+             * @returns Promise
+             */
+            public listMatchableAttributes(request: flyteidl.admin.IListMatchableAttributesRequest): Promise<flyteidl.admin.ListMatchableAttributesResponse>;
+
+            /**
              * Calls ListNamedEntities.
              * @param request NamedEntityListRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and NamedEntityList
@@ -12383,6 +12577,13 @@ export namespace flyteidl {
              * @param [response] WorkflowAttributesDeleteResponse
              */
             type DeleteWorkflowAttributesCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowAttributesDeleteResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#listMatchableAttributes}.
+             * @param error Error, if any
+             * @param [response] ListMatchableAttributesResponse
+             */
+            type ListMatchableAttributesCallback = (error: (Error|null), response?: flyteidl.admin.ListMatchableAttributesResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listNamedEntities}.

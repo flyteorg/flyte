@@ -45,7 +45,7 @@ struct TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[7]
+  static const ::google::protobuf::internal::ParseTable schema[10]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -66,6 +66,15 @@ extern ExecutionClusterLabelDefaultTypeInternal _ExecutionClusterLabel_default_i
 class ExecutionQueueAttributes;
 class ExecutionQueueAttributesDefaultTypeInternal;
 extern ExecutionQueueAttributesDefaultTypeInternal _ExecutionQueueAttributes_default_instance_;
+class ListMatchableAttributesRequest;
+class ListMatchableAttributesRequestDefaultTypeInternal;
+extern ListMatchableAttributesRequestDefaultTypeInternal _ListMatchableAttributesRequest_default_instance_;
+class ListMatchableAttributesResponse;
+class ListMatchableAttributesResponseDefaultTypeInternal;
+extern ListMatchableAttributesResponseDefaultTypeInternal _ListMatchableAttributesResponse_default_instance_;
+class MatchableAttributesConfiguration;
+class MatchableAttributesConfigurationDefaultTypeInternal;
+extern MatchableAttributesConfigurationDefaultTypeInternal _MatchableAttributesConfiguration_default_instance_;
 class MatchingAttributes;
 class MatchingAttributesDefaultTypeInternal;
 extern MatchingAttributesDefaultTypeInternal _MatchingAttributes_default_instance_;
@@ -83,6 +92,9 @@ template<> ::flyteidl::admin::ClusterResourceAttributes* Arena::CreateMaybeMessa
 template<> ::flyteidl::admin::ClusterResourceAttributes_AttributesEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::admin::ClusterResourceAttributes_AttributesEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::admin::ExecutionClusterLabel* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionClusterLabel>(Arena*);
 template<> ::flyteidl::admin::ExecutionQueueAttributes* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionQueueAttributes>(Arena*);
+template<> ::flyteidl::admin::ListMatchableAttributesRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ListMatchableAttributesRequest>(Arena*);
+template<> ::flyteidl::admin::ListMatchableAttributesResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ListMatchableAttributesResponse>(Arena*);
+template<> ::flyteidl::admin::MatchableAttributesConfiguration* Arena::CreateMaybeMessage<::flyteidl::admin::MatchableAttributesConfiguration>(Arena*);
 template<> ::flyteidl::admin::MatchingAttributes* Arena::CreateMaybeMessage<::flyteidl::admin::MatchingAttributes>(Arena*);
 template<> ::flyteidl::admin::TaskResourceAttributes* Arena::CreateMaybeMessage<::flyteidl::admin::TaskResourceAttributes>(Arena*);
 template<> ::flyteidl::admin::TaskResourceSpec* Arena::CreateMaybeMessage<::flyteidl::admin::TaskResourceSpec>(Arena*);
@@ -964,6 +976,411 @@ class MatchingAttributes final :
 
   friend struct ::TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 };
+// -------------------------------------------------------------------
+
+class MatchableAttributesConfiguration final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.MatchableAttributesConfiguration) */ {
+ public:
+  MatchableAttributesConfiguration();
+  virtual ~MatchableAttributesConfiguration();
+
+  MatchableAttributesConfiguration(const MatchableAttributesConfiguration& from);
+
+  inline MatchableAttributesConfiguration& operator=(const MatchableAttributesConfiguration& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  MatchableAttributesConfiguration(MatchableAttributesConfiguration&& from) noexcept
+    : MatchableAttributesConfiguration() {
+    *this = ::std::move(from);
+  }
+
+  inline MatchableAttributesConfiguration& operator=(MatchableAttributesConfiguration&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const MatchableAttributesConfiguration& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MatchableAttributesConfiguration* internal_default_instance() {
+    return reinterpret_cast<const MatchableAttributesConfiguration*>(
+               &_MatchableAttributesConfiguration_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(MatchableAttributesConfiguration* other);
+  friend void swap(MatchableAttributesConfiguration& a, MatchableAttributesConfiguration& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MatchableAttributesConfiguration* New() const final {
+    return CreateMaybeMessage<MatchableAttributesConfiguration>(nullptr);
+  }
+
+  MatchableAttributesConfiguration* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<MatchableAttributesConfiguration>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const MatchableAttributesConfiguration& from);
+  void MergeFrom(const MatchableAttributesConfiguration& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MatchableAttributesConfiguration* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string domain = 2;
+  void clear_domain();
+  static const int kDomainFieldNumber = 2;
+  const ::std::string& domain() const;
+  void set_domain(const ::std::string& value);
+  #if LANG_CXX11
+  void set_domain(::std::string&& value);
+  #endif
+  void set_domain(const char* value);
+  void set_domain(const char* value, size_t size);
+  ::std::string* mutable_domain();
+  ::std::string* release_domain();
+  void set_allocated_domain(::std::string* domain);
+
+  // string project = 3;
+  void clear_project();
+  static const int kProjectFieldNumber = 3;
+  const ::std::string& project() const;
+  void set_project(const ::std::string& value);
+  #if LANG_CXX11
+  void set_project(::std::string&& value);
+  #endif
+  void set_project(const char* value);
+  void set_project(const char* value, size_t size);
+  ::std::string* mutable_project();
+  ::std::string* release_project();
+  void set_allocated_project(::std::string* project);
+
+  // string workflow = 4;
+  void clear_workflow();
+  static const int kWorkflowFieldNumber = 4;
+  const ::std::string& workflow() const;
+  void set_workflow(const ::std::string& value);
+  #if LANG_CXX11
+  void set_workflow(::std::string&& value);
+  #endif
+  void set_workflow(const char* value);
+  void set_workflow(const char* value, size_t size);
+  ::std::string* mutable_workflow();
+  ::std::string* release_workflow();
+  void set_allocated_workflow(::std::string* workflow);
+
+  // string launch_plan = 5;
+  void clear_launch_plan();
+  static const int kLaunchPlanFieldNumber = 5;
+  const ::std::string& launch_plan() const;
+  void set_launch_plan(const ::std::string& value);
+  #if LANG_CXX11
+  void set_launch_plan(::std::string&& value);
+  #endif
+  void set_launch_plan(const char* value);
+  void set_launch_plan(const char* value, size_t size);
+  ::std::string* mutable_launch_plan();
+  ::std::string* release_launch_plan();
+  void set_allocated_launch_plan(::std::string* launch_plan);
+
+  // .flyteidl.admin.MatchingAttributes attributes = 1;
+  bool has_attributes() const;
+  void clear_attributes();
+  static const int kAttributesFieldNumber = 1;
+  const ::flyteidl::admin::MatchingAttributes& attributes() const;
+  ::flyteidl::admin::MatchingAttributes* release_attributes();
+  ::flyteidl::admin::MatchingAttributes* mutable_attributes();
+  void set_allocated_attributes(::flyteidl::admin::MatchingAttributes* attributes);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.MatchableAttributesConfiguration)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr domain_;
+  ::google::protobuf::internal::ArenaStringPtr project_;
+  ::google::protobuf::internal::ArenaStringPtr workflow_;
+  ::google::protobuf::internal::ArenaStringPtr launch_plan_;
+  ::flyteidl::admin::MatchingAttributes* attributes_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ListMatchableAttributesRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ListMatchableAttributesRequest) */ {
+ public:
+  ListMatchableAttributesRequest();
+  virtual ~ListMatchableAttributesRequest();
+
+  ListMatchableAttributesRequest(const ListMatchableAttributesRequest& from);
+
+  inline ListMatchableAttributesRequest& operator=(const ListMatchableAttributesRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ListMatchableAttributesRequest(ListMatchableAttributesRequest&& from) noexcept
+    : ListMatchableAttributesRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline ListMatchableAttributesRequest& operator=(ListMatchableAttributesRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ListMatchableAttributesRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ListMatchableAttributesRequest* internal_default_instance() {
+    return reinterpret_cast<const ListMatchableAttributesRequest*>(
+               &_ListMatchableAttributesRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  void Swap(ListMatchableAttributesRequest* other);
+  friend void swap(ListMatchableAttributesRequest& a, ListMatchableAttributesRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ListMatchableAttributesRequest* New() const final {
+    return CreateMaybeMessage<ListMatchableAttributesRequest>(nullptr);
+  }
+
+  ListMatchableAttributesRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ListMatchableAttributesRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ListMatchableAttributesRequest& from);
+  void MergeFrom(const ListMatchableAttributesRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ListMatchableAttributesRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.MatchableResource resource_type = 1;
+  void clear_resource_type();
+  static const int kResourceTypeFieldNumber = 1;
+  ::flyteidl::admin::MatchableResource resource_type() const;
+  void set_resource_type(::flyteidl::admin::MatchableResource value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ListMatchableAttributesRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  int resource_type_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ListMatchableAttributesResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ListMatchableAttributesResponse) */ {
+ public:
+  ListMatchableAttributesResponse();
+  virtual ~ListMatchableAttributesResponse();
+
+  ListMatchableAttributesResponse(const ListMatchableAttributesResponse& from);
+
+  inline ListMatchableAttributesResponse& operator=(const ListMatchableAttributesResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ListMatchableAttributesResponse(ListMatchableAttributesResponse&& from) noexcept
+    : ListMatchableAttributesResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline ListMatchableAttributesResponse& operator=(ListMatchableAttributesResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ListMatchableAttributesResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ListMatchableAttributesResponse* internal_default_instance() {
+    return reinterpret_cast<const ListMatchableAttributesResponse*>(
+               &_ListMatchableAttributesResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  void Swap(ListMatchableAttributesResponse* other);
+  friend void swap(ListMatchableAttributesResponse& a, ListMatchableAttributesResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ListMatchableAttributesResponse* New() const final {
+    return CreateMaybeMessage<ListMatchableAttributesResponse>(nullptr);
+  }
+
+  ListMatchableAttributesResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ListMatchableAttributesResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ListMatchableAttributesResponse& from);
+  void MergeFrom(const ListMatchableAttributesResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ListMatchableAttributesResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .flyteidl.admin.MatchableAttributesConfiguration configurations = 1;
+  int configurations_size() const;
+  void clear_configurations();
+  static const int kConfigurationsFieldNumber = 1;
+  ::flyteidl::admin::MatchableAttributesConfiguration* mutable_configurations(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::MatchableAttributesConfiguration >*
+      mutable_configurations();
+  const ::flyteidl::admin::MatchableAttributesConfiguration& configurations(int index) const;
+  ::flyteidl::admin::MatchableAttributesConfiguration* add_configurations();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::MatchableAttributesConfiguration >&
+      configurations() const;
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ListMatchableAttributesResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::MatchableAttributesConfiguration > configurations_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
+};
 // ===================================================================
 
 
@@ -1624,9 +2041,334 @@ inline void MatchingAttributes::clear_has_target() {
 inline MatchingAttributes::TargetCase MatchingAttributes::target_case() const {
   return MatchingAttributes::TargetCase(_oneof_case_[0]);
 }
+// -------------------------------------------------------------------
+
+// MatchableAttributesConfiguration
+
+// .flyteidl.admin.MatchingAttributes attributes = 1;
+inline bool MatchableAttributesConfiguration::has_attributes() const {
+  return this != internal_default_instance() && attributes_ != nullptr;
+}
+inline void MatchableAttributesConfiguration::clear_attributes() {
+  if (GetArenaNoVirtual() == nullptr && attributes_ != nullptr) {
+    delete attributes_;
+  }
+  attributes_ = nullptr;
+}
+inline const ::flyteidl::admin::MatchingAttributes& MatchableAttributesConfiguration::attributes() const {
+  const ::flyteidl::admin::MatchingAttributes* p = attributes_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchableAttributesConfiguration.attributes)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::MatchingAttributes*>(
+      &::flyteidl::admin::_MatchingAttributes_default_instance_);
+}
+inline ::flyteidl::admin::MatchingAttributes* MatchableAttributesConfiguration::release_attributes() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchableAttributesConfiguration.attributes)
+  
+  ::flyteidl::admin::MatchingAttributes* temp = attributes_;
+  attributes_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::MatchingAttributes* MatchableAttributesConfiguration::mutable_attributes() {
+  
+  if (attributes_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::MatchingAttributes>(GetArenaNoVirtual());
+    attributes_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchableAttributesConfiguration.attributes)
+  return attributes_;
+}
+inline void MatchableAttributesConfiguration::set_allocated_attributes(::flyteidl::admin::MatchingAttributes* attributes) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete attributes_;
+  }
+  if (attributes) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      attributes = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, attributes, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  attributes_ = attributes;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchableAttributesConfiguration.attributes)
+}
+
+// string domain = 2;
+inline void MatchableAttributesConfiguration::clear_domain() {
+  domain_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& MatchableAttributesConfiguration::domain() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchableAttributesConfiguration.domain)
+  return domain_.GetNoArena();
+}
+inline void MatchableAttributesConfiguration::set_domain(const ::std::string& value) {
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.MatchableAttributesConfiguration.domain)
+}
+#if LANG_CXX11
+inline void MatchableAttributesConfiguration::set_domain(::std::string&& value) {
+  
+  domain_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.MatchableAttributesConfiguration.domain)
+}
+#endif
+inline void MatchableAttributesConfiguration::set_domain(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.MatchableAttributesConfiguration.domain)
+}
+inline void MatchableAttributesConfiguration::set_domain(const char* value, size_t size) {
+  
+  domain_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.MatchableAttributesConfiguration.domain)
+}
+inline ::std::string* MatchableAttributesConfiguration::mutable_domain() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchableAttributesConfiguration.domain)
+  return domain_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* MatchableAttributesConfiguration::release_domain() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchableAttributesConfiguration.domain)
+  
+  return domain_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void MatchableAttributesConfiguration::set_allocated_domain(::std::string* domain) {
+  if (domain != nullptr) {
+    
+  } else {
+    
+  }
+  domain_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), domain);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchableAttributesConfiguration.domain)
+}
+
+// string project = 3;
+inline void MatchableAttributesConfiguration::clear_project() {
+  project_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& MatchableAttributesConfiguration::project() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchableAttributesConfiguration.project)
+  return project_.GetNoArena();
+}
+inline void MatchableAttributesConfiguration::set_project(const ::std::string& value) {
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.MatchableAttributesConfiguration.project)
+}
+#if LANG_CXX11
+inline void MatchableAttributesConfiguration::set_project(::std::string&& value) {
+  
+  project_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.MatchableAttributesConfiguration.project)
+}
+#endif
+inline void MatchableAttributesConfiguration::set_project(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.MatchableAttributesConfiguration.project)
+}
+inline void MatchableAttributesConfiguration::set_project(const char* value, size_t size) {
+  
+  project_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.MatchableAttributesConfiguration.project)
+}
+inline ::std::string* MatchableAttributesConfiguration::mutable_project() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchableAttributesConfiguration.project)
+  return project_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* MatchableAttributesConfiguration::release_project() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchableAttributesConfiguration.project)
+  
+  return project_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void MatchableAttributesConfiguration::set_allocated_project(::std::string* project) {
+  if (project != nullptr) {
+    
+  } else {
+    
+  }
+  project_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), project);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchableAttributesConfiguration.project)
+}
+
+// string workflow = 4;
+inline void MatchableAttributesConfiguration::clear_workflow() {
+  workflow_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& MatchableAttributesConfiguration::workflow() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchableAttributesConfiguration.workflow)
+  return workflow_.GetNoArena();
+}
+inline void MatchableAttributesConfiguration::set_workflow(const ::std::string& value) {
+  
+  workflow_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.MatchableAttributesConfiguration.workflow)
+}
+#if LANG_CXX11
+inline void MatchableAttributesConfiguration::set_workflow(::std::string&& value) {
+  
+  workflow_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.MatchableAttributesConfiguration.workflow)
+}
+#endif
+inline void MatchableAttributesConfiguration::set_workflow(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  workflow_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.MatchableAttributesConfiguration.workflow)
+}
+inline void MatchableAttributesConfiguration::set_workflow(const char* value, size_t size) {
+  
+  workflow_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.MatchableAttributesConfiguration.workflow)
+}
+inline ::std::string* MatchableAttributesConfiguration::mutable_workflow() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchableAttributesConfiguration.workflow)
+  return workflow_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* MatchableAttributesConfiguration::release_workflow() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchableAttributesConfiguration.workflow)
+  
+  return workflow_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void MatchableAttributesConfiguration::set_allocated_workflow(::std::string* workflow) {
+  if (workflow != nullptr) {
+    
+  } else {
+    
+  }
+  workflow_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), workflow);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchableAttributesConfiguration.workflow)
+}
+
+// string launch_plan = 5;
+inline void MatchableAttributesConfiguration::clear_launch_plan() {
+  launch_plan_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& MatchableAttributesConfiguration::launch_plan() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchableAttributesConfiguration.launch_plan)
+  return launch_plan_.GetNoArena();
+}
+inline void MatchableAttributesConfiguration::set_launch_plan(const ::std::string& value) {
+  
+  launch_plan_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.MatchableAttributesConfiguration.launch_plan)
+}
+#if LANG_CXX11
+inline void MatchableAttributesConfiguration::set_launch_plan(::std::string&& value) {
+  
+  launch_plan_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.MatchableAttributesConfiguration.launch_plan)
+}
+#endif
+inline void MatchableAttributesConfiguration::set_launch_plan(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  launch_plan_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.MatchableAttributesConfiguration.launch_plan)
+}
+inline void MatchableAttributesConfiguration::set_launch_plan(const char* value, size_t size) {
+  
+  launch_plan_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.MatchableAttributesConfiguration.launch_plan)
+}
+inline ::std::string* MatchableAttributesConfiguration::mutable_launch_plan() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchableAttributesConfiguration.launch_plan)
+  return launch_plan_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* MatchableAttributesConfiguration::release_launch_plan() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchableAttributesConfiguration.launch_plan)
+  
+  return launch_plan_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void MatchableAttributesConfiguration::set_allocated_launch_plan(::std::string* launch_plan) {
+  if (launch_plan != nullptr) {
+    
+  } else {
+    
+  }
+  launch_plan_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), launch_plan);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchableAttributesConfiguration.launch_plan)
+}
+
+// -------------------------------------------------------------------
+
+// ListMatchableAttributesRequest
+
+// .flyteidl.admin.MatchableResource resource_type = 1;
+inline void ListMatchableAttributesRequest::clear_resource_type() {
+  resource_type_ = 0;
+}
+inline ::flyteidl::admin::MatchableResource ListMatchableAttributesRequest::resource_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ListMatchableAttributesRequest.resource_type)
+  return static_cast< ::flyteidl::admin::MatchableResource >(resource_type_);
+}
+inline void ListMatchableAttributesRequest::set_resource_type(::flyteidl::admin::MatchableResource value) {
+  
+  resource_type_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ListMatchableAttributesRequest.resource_type)
+}
+
+// -------------------------------------------------------------------
+
+// ListMatchableAttributesResponse
+
+// repeated .flyteidl.admin.MatchableAttributesConfiguration configurations = 1;
+inline int ListMatchableAttributesResponse::configurations_size() const {
+  return configurations_.size();
+}
+inline void ListMatchableAttributesResponse::clear_configurations() {
+  configurations_.Clear();
+}
+inline ::flyteidl::admin::MatchableAttributesConfiguration* ListMatchableAttributesResponse::mutable_configurations(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ListMatchableAttributesResponse.configurations)
+  return configurations_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::MatchableAttributesConfiguration >*
+ListMatchableAttributesResponse::mutable_configurations() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.ListMatchableAttributesResponse.configurations)
+  return &configurations_;
+}
+inline const ::flyteidl::admin::MatchableAttributesConfiguration& ListMatchableAttributesResponse::configurations(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ListMatchableAttributesResponse.configurations)
+  return configurations_.Get(index);
+}
+inline ::flyteidl::admin::MatchableAttributesConfiguration* ListMatchableAttributesResponse::add_configurations() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.ListMatchableAttributesResponse.configurations)
+  return configurations_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::MatchableAttributesConfiguration >&
+ListMatchableAttributesResponse::configurations() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.ListMatchableAttributesResponse.configurations)
+  return configurations_;
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
