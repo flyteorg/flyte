@@ -48,6 +48,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**ListLaunchPlanIds**](docs/AdminServiceApi.md#listlaunchplanids) | **Get** /api/v1/launch_plan_ids/{project}/{domain} | 
 *AdminServiceApi* | [**ListLaunchPlans**](docs/AdminServiceApi.md#listlaunchplans) | **Get** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**ListLaunchPlans2**](docs/AdminServiceApi.md#listlaunchplans2) | **Get** /api/v1/launch_plans/{id.project}/{id.domain} | 
+*AdminServiceApi* | [**ListMatchableAttributes**](docs/AdminServiceApi.md#listmatchableattributes) | **Get** /api/v1/matchable_attributes | 
 *AdminServiceApi* | [**ListNamedEntities**](docs/AdminServiceApi.md#listnamedentities) | **Get** /api/v1/named_entities/{resource_type}/{project}/{domain} | 
 *AdminServiceApi* | [**ListNodeExecutions**](docs/AdminServiceApi.md#listnodeexecutions) | **Get** /api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name} | 
 *AdminServiceApi* | [**ListNodeExecutionsForTask**](docs/AdminServiceApi.md#listnodeexecutionsfortask) | **Get** /api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt} | 
@@ -101,7 +102,9 @@ Class | Method | HTTP request | Description
  - [AdminLaunchPlanState](docs/AdminLaunchPlanState.md)
  - [AdminLaunchPlanUpdateRequest](docs/AdminLaunchPlanUpdateRequest.md)
  - [AdminLaunchPlanUpdateResponse](docs/AdminLaunchPlanUpdateResponse.md)
+ - [AdminListMatchableAttributesResponse](docs/AdminListMatchableAttributesResponse.md)
  - [AdminLiteralMapBlob](docs/AdminLiteralMapBlob.md)
+ - [AdminMatchableAttributesConfiguration](docs/AdminMatchableAttributesConfiguration.md)
  - [AdminMatchableResource](docs/AdminMatchableResource.md)
  - [AdminMatchingAttributes](docs/AdminMatchingAttributes.md)
  - [AdminNamedEntity](docs/AdminNamedEntity.md)

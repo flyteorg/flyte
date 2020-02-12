@@ -38,6 +38,7 @@
 #include "flyteidl/admin/launch_plan.pb.h"
 #include "flyteidl/admin/event.pb.h"
 #include "flyteidl/admin/execution.pb.h"
+#include "flyteidl/admin/matchable_resource.pb.h"
 #include "flyteidl/admin/node_execution.pb.h"
 #include "flyteidl/admin/task_execution.pb.h"
 #include "flyteidl/admin/common.pb.h"
