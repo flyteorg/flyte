@@ -27,4 +27,4 @@ spec:
           - name: config-volume
             configMap:
               name: flyte-admin-config
-          restartPolicy: OnFailure
+          restartPolicy: Forbid
