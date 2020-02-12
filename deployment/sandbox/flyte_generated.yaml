@@ -1447,7 +1447,7 @@ spec:
               name: resource-templates
             - mountPath: /etc/flyte/config
               name: config-volume
-          restartPolicy: OnFailure
+          restartPolicy: Forbid
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
