@@ -353,7 +353,9 @@ describe('LaunchWorkflowForm', () => {
                 exact: false
             });
             fireEvent.change(integerInput, { target: { value: '10' } });
-            act(jest.runAllTimers);
+            act(() => {
+                jest.runAllTimers;
+            });
             await wait();
 
             // Click the expander for the launch plan, select the second item
