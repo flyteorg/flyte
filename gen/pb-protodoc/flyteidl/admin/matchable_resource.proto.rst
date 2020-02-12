@@ -188,6 +188,97 @@ execution_cluster_label
   Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>` may be set.
   
 
+
+.. _api_msg_flyteidl.admin.MatchableAttributesConfiguration:
+
+flyteidl.admin.MatchableAttributesConfiguration
+-----------------------------------------------
+
+`[flyteidl.admin.MatchableAttributesConfiguration proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L69>`_
+
+Represents a custom set of attributes applied for either a domain; a domain and project; or
+domain, project and workflow name.
+
+.. code-block:: json
+
+  {
+    "attributes": "{...}",
+    "domain": "...",
+    "project": "...",
+    "workflow": "...",
+    "launch_plan": "..."
+  }
+
+.. _api_field_flyteidl.admin.MatchableAttributesConfiguration.attributes:
+
+attributes
+  (:ref:`flyteidl.admin.MatchingAttributes <api_msg_flyteidl.admin.MatchingAttributes>`) 
+  
+.. _api_field_flyteidl.admin.MatchableAttributesConfiguration.domain:
+
+domain
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_flyteidl.admin.MatchableAttributesConfiguration.project:
+
+project
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_flyteidl.admin.MatchableAttributesConfiguration.workflow:
+
+workflow
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_flyteidl.admin.MatchableAttributesConfiguration.launch_plan:
+
+launch_plan
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+
+
+.. _api_msg_flyteidl.admin.ListMatchableAttributesRequest:
+
+flyteidl.admin.ListMatchableAttributesRequest
+---------------------------------------------
+
+`[flyteidl.admin.ListMatchableAttributesRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L82>`_
+
+Request all matching resource attributes.
+
+.. code-block:: json
+
+  {
+    "resource_type": "..."
+  }
+
+.. _api_field_flyteidl.admin.ListMatchableAttributesRequest.resource_type:
+
+resource_type
+  (:ref:`flyteidl.admin.MatchableResource <api_enum_flyteidl.admin.MatchableResource>`) 
+  
+
+
+.. _api_msg_flyteidl.admin.ListMatchableAttributesResponse:
+
+flyteidl.admin.ListMatchableAttributesResponse
+----------------------------------------------
+
+`[flyteidl.admin.ListMatchableAttributesResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L87>`_
+
+Response for a request for all matching resource attributes.
+
+.. code-block:: json
+
+  {
+    "configurations": []
+  }
+
+.. _api_field_flyteidl.admin.ListMatchableAttributesResponse.configurations:
+
+configurations
+  (:ref:`flyteidl.admin.MatchableAttributesConfiguration <api_msg_flyteidl.admin.MatchableAttributesConfiguration>`) 
+  
+
 .. _api_enum_flyteidl.admin.MatchableResource:
 
 Enum flyteidl.admin.MatchableResource

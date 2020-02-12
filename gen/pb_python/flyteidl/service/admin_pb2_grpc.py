@@ -5,6 +5,7 @@ from flyteidl.admin import common_pb2 as flyteidl_dot_admin_dot_common__pb2
 from flyteidl.admin import event_pb2 as flyteidl_dot_admin_dot_event__pb2
 from flyteidl.admin import execution_pb2 as flyteidl_dot_admin_dot_execution__pb2
 from flyteidl.admin import launch_plan_pb2 as flyteidl_dot_admin_dot_launch__plan__pb2
+from flyteidl.admin import matchable_resource_pb2 as flyteidl_dot_admin_dot_matchable__resource__pb2
 from flyteidl.admin import node_execution_pb2 as flyteidl_dot_admin_dot_node__execution__pb2
 from flyteidl.admin import project_domain_attributes_pb2 as flyteidl_dot_admin_dot_project__domain__attributes__pb2
 from flyteidl.admin import project_pb2 as flyteidl_dot_admin_dot_project__pb2
@@ -219,6 +220,11 @@ class AdminServiceStub(object):
         '/flyteidl.service.AdminService/DeleteWorkflowAttributes',
         request_serializer=flyteidl_dot_admin_dot_workflow__attributes__pb2.WorkflowAttributesDeleteRequest.SerializeToString,
         response_deserializer=flyteidl_dot_admin_dot_workflow__attributes__pb2.WorkflowAttributesDeleteResponse.FromString,
+        )
+    self.ListMatchableAttributes = channel.unary_unary(
+        '/flyteidl.service.AdminService/ListMatchableAttributes',
+        request_serializer=flyteidl_dot_admin_dot_matchable__resource__pb2.ListMatchableAttributesRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_admin_dot_matchable__resource__pb2.ListMatchableAttributesResponse.FromString,
         )
     self.ListNamedEntities = channel.unary_unary(
         '/flyteidl.service.AdminService/ListNamedEntities',
@@ -515,6 +521,13 @@ class AdminServiceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def ListMatchableAttributes(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def ListNamedEntities(self, request, context):
     # missing associated documentation comment in .proto file
     pass
@@ -733,6 +746,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
           servicer.DeleteWorkflowAttributes,
           request_deserializer=flyteidl_dot_admin_dot_workflow__attributes__pb2.WorkflowAttributesDeleteRequest.FromString,
           response_serializer=flyteidl_dot_admin_dot_workflow__attributes__pb2.WorkflowAttributesDeleteResponse.SerializeToString,
+      ),
+      'ListMatchableAttributes': grpc.unary_unary_rpc_method_handler(
+          servicer.ListMatchableAttributes,
+          request_deserializer=flyteidl_dot_admin_dot_matchable__resource__pb2.ListMatchableAttributesRequest.FromString,
+          response_serializer=flyteidl_dot_admin_dot_matchable__resource__pb2.ListMatchableAttributesResponse.SerializeToString,
       ),
       'ListNamedEntities': grpc.unary_unary_rpc_method_handler(
           servicer.ListNamedEntities,

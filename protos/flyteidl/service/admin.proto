@@ -12,6 +12,7 @@ import "flyteidl/admin/workflow_attributes.proto";
 import "flyteidl/admin/launch_plan.proto";
 import "flyteidl/admin/event.proto";
 import "flyteidl/admin/execution.proto";
+import "flyteidl/admin/matchable_resource.proto";
 import "flyteidl/admin/node_execution.proto";
 import "flyteidl/admin/task_execution.proto";
 import "flyteidl/admin/common.proto";
@@ -436,6 +437,16 @@ service AdminService {
       description: "Delete the customized resource attributes associated with a project, domain and workflow combination"
     };
   }
+
+  rpc ListMatchableAttributes (flyteidl.admin.ListMatchableAttributesRequest) returns (flyteidl.admin.ListMatchableAttributesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/matchable_attributes"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Retrieve a list of MatchableAttributesConfiguration objects."
+    };
+  }
+
 
   rpc ListNamedEntities (flyteidl.admin.NamedEntityListRequest) returns (flyteidl.admin.NamedEntityList) {
     option (google.api.http) = {

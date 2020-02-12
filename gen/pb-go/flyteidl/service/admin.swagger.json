@@ -1119,6 +1119,39 @@
         ]
       }
     },
+    "/api/v1/matchable_attributes": {
+      "get": {
+        "description": "Retrieve a list of MatchableAttributesConfiguration objects.",
+        "operationId": "ListMatchableAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminListMatchableAttributesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE",
+              "EXECUTION_CLUSTER_LABEL"
+            ],
+            "default": "TASK_RESOURCE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "description": "Retrieve a NamedEntity object.",
@@ -3234,6 +3267,18 @@
       "type": "object",
       "description": "Purposefully empty, may be populated in the future."
     },
+    "adminListMatchableAttributesResponse": {
+      "type": "object",
+      "properties": {
+        "configurations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adminMatchableAttributesConfiguration"
+          }
+        }
+      },
+      "description": "Response for a request for all matching resource attributes."
+    },
     "adminLiteralMapBlob": {
       "type": "object",
       "properties": {
@@ -3247,6 +3292,27 @@
         }
       },
       "title": "Input/output data can represented by actual values or a link to where values are stored"
+    },
+    "adminMatchableAttributesConfiguration": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "$ref": "#/definitions/adminMatchingAttributes"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        },
+        "workflow": {
+          "type": "string"
+        },
+        "launch_plan": {
+          "type": "string"
+        }
+      },
+      "description": "Represents a custom set of attributes applied for either a domain; a domain and project; or\ndomain, project and workflow name."
     },
     "adminMatchableResource": {
       "type": "string",
