@@ -315,6 +315,28 @@ describe('LaunchWorkflowForm', () => {
             expect(mockListLaunchPlans).toHaveBeenCalled();
         });
 
+        it('should not clear launch plan when selecting the already selected workflow version', async () => {
+            const { getByLabelText, getByTitle } = renderForm();
+            await wait();
+
+            mockListLaunchPlans.mockClear();
+
+            // Click the expander for the workflow, select the second item
+            const workflowDiv = getByTitle(formStrings.workflowVersion);
+            const expander = getByRole(workflowDiv, 'button');
+            fireEvent.click(expander);
+            const items = await waitForElement(() =>
+                getAllByRole(workflowDiv, 'menuitem')
+            );
+            fireEvent.click(items[0]);
+
+            await wait();
+            expect(mockListLaunchPlans).not.toHaveBeenCalled();
+            expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
+                mockWorkflow.id.name
+            );
+        });
+
         it('should update inputs when selecting a new launch plan', async () => {
             const { queryByLabelText, getByTitle } = renderForm();
             await wait();
@@ -486,6 +508,30 @@ describe('LaunchWorkflowForm', () => {
                 );
             });
 
+            it('should only include one instance of the preferred version in the selector', async () => {
+                const initialParameters: InitialLaunchParameters = {
+                    workflow: mockWorkflowVersions[2].id
+                };
+                const { getByTitle } = renderForm({ initialParameters });
+                await wait();
+                // Click the expander for the workflow, select the second item
+                const versionDiv = getByTitle(formStrings.workflowVersion);
+                const expander = getByRole(versionDiv, 'button');
+                fireEvent.click(expander);
+                const items = await waitForElement(() =>
+                    getAllByRole(versionDiv, 'menuitem')
+                );
+
+                const expectedVersion = mockWorkflowVersions[2].id.version;
+                expect(
+                    items.filter(
+                        item =>
+                            item.textContent &&
+                            item.textContent.includes(expectedVersion)
+                    )
+                ).toHaveLength(1);
+            });
+
             it('should fall back to the first item in the list if preferred workflow is not found', async () => {
                 mockListWorkflows.mockImplementation(
                     (scope: Partial<Identifier>) => {
@@ -519,6 +565,30 @@ describe('LaunchWorkflowForm', () => {
                 expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
                     mockLaunchPlans[1].id.name
                 );
+            });
+
+            it('should only include one instance of the preferred launch plan in the selector', async () => {
+                const initialParameters: InitialLaunchParameters = {
+                    launchPlan: mockLaunchPlans[1].id
+                };
+                const { getByTitle } = renderForm({ initialParameters });
+                await wait();
+                // Click the expander for the LaunchPlan, select the second item
+                const launchPlanDiv = getByTitle(formStrings.launchPlan);
+                const expander = getByRole(launchPlanDiv, 'button');
+                fireEvent.click(expander);
+                const items = await waitForElement(() =>
+                    getAllByRole(launchPlanDiv, 'menuitem')
+                );
+
+                const expectedName = mockLaunchPlans[1].id.name;
+                expect(
+                    items.filter(
+                        item =>
+                            item.textContent &&
+                            item.textContent.includes(expectedName)
+                    )
+                ).toHaveLength(1);
             });
 
             it('should fall back to the default launch plan if the preferred is not found', async () => {

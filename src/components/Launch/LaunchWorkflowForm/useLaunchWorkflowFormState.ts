@@ -121,7 +121,7 @@ function useLaunchPlansForWorkflow({
                     ...launchPlansResult.entities,
                     ...preferredLaunchPlanResult.entities
                 ];
-                return uniqBy(merged, ({ id: name }) => name);
+                return uniqBy(merged, ({ id }) => id.name);
             }
         },
         workflowId
@@ -268,6 +268,9 @@ export function useLaunchWorkflowFormState({
     const onSelectWorkflow = (
         newWorkflow: SearchableSelectorOption<WorkflowId>
     ) => {
+        if (newWorkflow === selectedWorkflow) {
+            return;
+        }
         setLaunchPlan(undefined);
         setWorkflow(newWorkflow);
     };
@@ -275,6 +278,9 @@ export function useLaunchWorkflowFormState({
     const onSelectLaunchPlan = (
         newLaunchPlan: SearchableSelectorOption<LaunchPlan>
     ) => {
+        if (newLaunchPlan === selectedLaunchPlan) {
+            return;
+        }
         setLastSelectedLaunchPlanName(newLaunchPlan.name);
         setLaunchPlan(newLaunchPlan);
     };
