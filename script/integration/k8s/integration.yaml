@@ -326,16 +326,13 @@ data:
         storage: 10G
     queues:
       executionQueues:
-        - primary: "gpu_primary"
-          dynamic: "gpu_dynamic"
+        - dynamic: "gpu_dynamic"
           attributes:
             - gpu
-        - primary: "critical"
-          dynamic: "critical"
+        - dynamic: "critical"
           attributes:
             - critical
-        - primary: "default"
-          dynamic: "default"
+        - dynamic: "default"
           attributes:
             - default
       workflowConfigs:

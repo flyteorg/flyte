@@ -42,7 +42,6 @@ import (
 	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
 )
 
-const parentContainerQueueKey = "parent_queue"
 const childContainerQueueKey = "child_queue"
 const noSourceExecutionID = 0
 const principalContextKeyFormat = "%v"
@@ -106,13 +105,6 @@ func (m *ExecutionManager) populateExecutionQueue(
 		if container == nil {
 			// Unrecognized target type, nothing to do
 			continue
-		}
-		if queueConfig.PrimaryQueue != "" {
-			logger.Debugf(ctx, "Assigning %s as parent queue for task %+v", queueConfig.PrimaryQueue, task.Template.Id)
-			container.Config = append(container.Config, &core.KeyValuePair{
-				Key:   parentContainerQueueKey,
-				Value: queueConfig.PrimaryQueue,
-			})
 		}
 
 		if queueConfig.DynamicQueue != "" {
