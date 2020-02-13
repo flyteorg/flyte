@@ -263,7 +263,9 @@ describe('LaunchWorkflowForm', () => {
             });
             fireEvent.change(integerInput, { target: { value: 'abc' } });
 
-            act(jest.runAllTimers);
+            act(() => {
+                jest.runAllTimers();
+            });
             await wait();
             expect(integerInput).not.toBeInvalid();
 
@@ -287,7 +289,9 @@ describe('LaunchWorkflowForm', () => {
             expect(integerInput).toBeInvalid();
 
             fireEvent.change(integerInput, { target: { value: '123' } });
-            act(jest.runAllTimers);
+            act(() => {
+                jest.runAllTimers();
+            });
             await wait();
             expect(integerInput).toBeValid();
         });
@@ -349,7 +353,6 @@ describe('LaunchWorkflowForm', () => {
                 exact: false
             });
             fireEvent.change(integerInput, { target: { value: '10' } });
-            act(jest.runAllTimers);
             await wait();
 
             // Click the expander for the launch plan, select the second item
@@ -463,7 +466,10 @@ describe('LaunchWorkflowForm', () => {
                 const { getByText } = renderForm();
                 await wait();
                 expect(
-                    getByText(stringInputName, { exact: false }).textContent
+                    getByText(stringInputName, {
+                        exact: false,
+                        selector: 'label'
+                    }).textContent
                 ).toContain('*');
             });
         });

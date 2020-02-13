@@ -15,7 +15,7 @@ function toScalars<T>(
     type: keyof Core.IScalar,
     values: Dictionary<T>
 ): Dictionary<Scalar> {
-    return mapValues<T, Scalar>(values, value => ({
+    return mapValues(values, (value: T) => ({
         value: type,
         [type]: value
     }));

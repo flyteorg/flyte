@@ -26,7 +26,7 @@ describe('WorkflowSchedules', () => {
     const renderSchedules = async () => {
         await act(() => {
             render(<WorkflowSchedules workflowId={workflowId} />);
-            return new Promise(resolve => setTimeout(resolve, 0));
+            return new Promise<void>(resolve => setTimeout(resolve, 0));
         });
     };
 
