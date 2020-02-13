@@ -32,7 +32,7 @@ const (
 	Event                 = "event"
 	ParentTaskExecutionID = "parent_task_execution_id"
 	UserInputs            = "user_inputs"
-	ProjectDomain         = "project_domain"
 	Attributes            = "attributes"
 	MatchingAttributes    = "matching_attributes"
+	Resourcetype          = "resource_type"
 )

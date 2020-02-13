@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	interfaces2 "github.com/lyft/flyteadmin/pkg/manager/interfaces"
-	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
+	"github.com/lyft/flyteadmin/pkg/manager/interfaces"
+	repoInterfaces "github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
@@ -56,7 +56,7 @@ func TestGetWorkflowAttributes(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
-		ctx context.Context, ID interfaces.ResourceID) (models.Resource, error) {
+		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
 		assert.Equal(t, project, ID.Project)
 		assert.Equal(t, domain, ID.Domain)
 		assert.Equal(t, workflow, ID.Workflow)
@@ -92,7 +92,7 @@ func TestDeleteWorkflowAttributes(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).DeleteFunction = func(
-		ctx context.Context, ID interfaces.ResourceID) error {
+		ctx context.Context, ID repoInterfaces.ResourceID) error {
 		assert.Equal(t, project, ID.Project)
 		assert.Equal(t, domain, ID.Domain)
 		assert.Equal(t, workflow, ID.Workflow)
@@ -139,7 +139,7 @@ func TestGetProjectDomainAttributes(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
-		ctx context.Context, ID interfaces.ResourceID) (models.Resource, error) {
+		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
 		assert.Equal(t, project, ID.Project)
 		assert.Equal(t, domain, ID.Domain)
 		assert.Equal(t, "", ID.Workflow)
@@ -172,7 +172,7 @@ func TestDeleteProjectDomainAttributes(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).DeleteFunction = func(
-		ctx context.Context, ID interfaces.ResourceID) error {
+		ctx context.Context, ID repoInterfaces.ResourceID) error {
 		assert.Equal(t, project, ID.Project)
 		assert.Equal(t, domain, ID.Domain)
 		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
@@ -184,7 +184,7 @@ func TestDeleteProjectDomainAttributes(t *testing.T) {
 }
 
 func TestGetResource(t *testing.T) {
-	request := interfaces2.ResourceRequest{
+	request := interfaces.ResourceRequest{
 		Project:      project,
 		Domain:       domain,
 		Workflow:     workflow,
@@ -193,7 +193,7 @@ func TestGetResource(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
-		ctx context.Context, ID interfaces.ResourceID) (models.Resource, error) {
+		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
 		assert.Equal(t, project, ID.Project)
 		assert.Equal(t, domain, ID.Domain)
 		assert.Equal(t, workflow, ID.Workflow)
@@ -218,4 +218,63 @@ func TestGetResource(t *testing.T) {
 	assert.Equal(t, request.LaunchPlan, response.LaunchPlan)
 	assert.Equal(t, request.ResourceType.String(), response.ResourceType)
 	assert.True(t, proto.Equal(response.Attributes, testutils.ExecutionQueueAttributes))
+}
+
+func TestListAllResources(t *testing.T) {
+	db := mocks.NewMockRepository()
+	projectAttributes := admin.MatchingAttributes{
+		Target: &admin.MatchingAttributes_ClusterResourceAttributes{
+			ClusterResourceAttributes: &admin.ClusterResourceAttributes{
+				Attributes: map[string]string{
+					"foo": "foofoo",
+				},
+			},
+		},
+	}
+	marshaledProjectAttrs, _ := proto.Marshal(&projectAttributes)
+	workflowAttributes := admin.MatchingAttributes{
+		Target: &admin.MatchingAttributes_ClusterResourceAttributes{
+			ClusterResourceAttributes: &admin.ClusterResourceAttributes{
+				Attributes: map[string]string{
+					"bar": "barbar",
+				},
+			},
+		},
+	}
+	marshaledWorkflowAttrs, _ := proto.Marshal(&workflowAttributes)
+	db.ResourceRepo().(*mocks.MockResourceRepo).ListAllFunction = func(ctx context.Context, resourceType string) (
+		[]models.Resource, error) {
+		assert.Equal(t, admin.MatchableResource_CLUSTER_RESOURCE.String(), resourceType)
+		return []models.Resource{
+			{
+				Project:      "projectA",
+				ResourceType: admin.MatchableResource_CLUSTER_RESOURCE.String(),
+				Attributes:   marshaledProjectAttrs,
+			},
+			{
+				Project:      "projectB",
+				Domain:       "development",
+				Workflow:     "workflow",
+				ResourceType: admin.MatchableResource_CLUSTER_RESOURCE.String(),
+				Attributes:   marshaledWorkflowAttrs,
+			},
+		}, nil
+	}
+	manager := NewResourceManager(db)
+	response, err := manager.ListAll(context.Background(), admin.ListMatchableAttributesRequest{
+		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, response.Configurations)
+	assert.Len(t, response.Configurations, 2)
+	assert.True(t, proto.Equal(&admin.MatchableAttributesConfiguration{
+		Project:    "projectA",
+		Attributes: &projectAttributes,
+	}, response.Configurations[0]))
+	assert.True(t, proto.Equal(&admin.MatchableAttributesConfiguration{
+		Project:    "projectB",
+		Domain:     "development",
+		Workflow:   "workflow",
+		Attributes: &workflowAttributes,
+	}, response.Configurations[1]))
 }

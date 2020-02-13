@@ -110,3 +110,10 @@ func ValidateWorkflowAttributesDeleteRequest(request admin.WorkflowAttributesDel
 
 	return nil
 }
+
+func ValidateListAllMatchableAttributesRequest(request admin.ListMatchableAttributesRequest) error {
+	if _, ok := admin.MatchableResource_name[int32(request.ResourceType)]; !ok {
+		return shared.GetInvalidArgumentError(shared.ResourceType)
+	}
+	return nil
+}

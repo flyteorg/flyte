@@ -20,6 +20,8 @@ type ResourceRepo struct {
 	metrics          gormMetrics
 }
 
+const priorityDescending = "priority desc"
+
 /*
 	The data in the Resource repo maps to the following rules:
 	* Domain and ResourceType can never be empty.
@@ -103,7 +105,7 @@ func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (model
 	}
 
 	tx := r.db.Where(txWhereClause, ID.ResourceType, ID.Domain, project, workflow, launchPlan)
-	tx.Order("priority desc").First(&resources)
+	tx.Order(priorityDescending).First(&resources)
 	timer.Stop()
 
 	if tx.Error != nil {
@@ -138,6 +140,19 @@ func (r *ResourceRepo) GetRaw(ctx context.Context, ID interfaces.ResourceID) (mo
 			"%v", ID)
 	}
 	return model, nil
+}
+
+func (r *ResourceRepo) ListAll(ctx context.Context, resourceType string) ([]models.Resource, error) {
+	var resources []models.Resource
+	timer := r.metrics.ListDuration.Start()
+
+	tx := r.db.Where(&models.Resource{ResourceType: resourceType}).Order(priorityDescending).Find(&resources)
+	timer.Stop()
+
+	if tx.Error != nil {
+		return nil, r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	return resources, nil
 }
 
 func (r *ResourceRepo) Delete(ctx context.Context, ID interfaces.ResourceID) error {

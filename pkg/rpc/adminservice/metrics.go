@@ -62,6 +62,7 @@ type attributeEndpointMetrics struct {
 	update util.RequestMetrics
 	get    util.RequestMetrics
 	delete util.RequestMetrics
+	list   util.RequestMetrics
 }
 
 type taskEndpointMetrics struct {
@@ -103,6 +104,7 @@ type AdminMetrics struct {
 	projectAttributesEndpointMetrics       attributeEndpointMetrics
 	projectDomainAttributesEndpointMetrics attributeEndpointMetrics
 	workflowAttributesEndpointMetrics      attributeEndpointMetrics
+	matchableAttributesEndpointMetrics     attributeEndpointMetrics
 	taskEndpointMetrics                    taskEndpointMetrics
 	taskExecutionEndpointMetrics           taskExecutionEndpointMetrics
 	workflowEndpointMetrics                workflowEndpointMetrics
@@ -170,6 +172,10 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			update: util.NewRequestMetrics(adminScope, "update_workflow_attrs"),
 			get:    util.NewRequestMetrics(adminScope, "get_workflow_attrs"),
 			delete: util.NewRequestMetrics(adminScope, "delete_workflow_attrs"),
+		},
+		matchableAttributesEndpointMetrics: attributeEndpointMetrics{
+			scope: adminScope,
+			list:  util.NewRequestMetrics(adminScope, "list_matchable_resource_attrs"),
 		},
 		taskEndpointMetrics: taskEndpointMetrics{
 			scope:   adminScope,

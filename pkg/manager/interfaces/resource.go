@@ -23,6 +23,9 @@ type ResourceInterface interface {
 		*admin.ProjectDomainAttributesGetResponse, error)
 	DeleteProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (
 		*admin.ProjectDomainAttributesDeleteResponse, error)
+
+	ListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) (
+		*admin.ListMatchableAttributesResponse, error)
 }
 
 // TODO we can move this to flyteidl, once we are exposing an endpoint
