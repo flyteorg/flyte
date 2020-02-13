@@ -23,4 +23,4 @@ jobs:
     - stage: test
       name: unit tests
       install: make install
-      script: make test_unit
+      script: make test_unit_codecov
