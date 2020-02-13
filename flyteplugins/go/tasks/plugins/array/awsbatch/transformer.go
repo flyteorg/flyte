@@ -3,6 +3,9 @@ package awsbatch
 import (
 	"context"
 	"sort"
+	"time"
+
+	"github.com/golang/protobuf/ptypes/duration"
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -85,6 +88,7 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 		JobQueue:           refStr(jobConfig.DynamicTaskQueue),
 		RetryStrategy:      toRetryStrategy(ctx, toBackoffLimit(taskTemplate.Metadata), cfg.MinRetries, cfg.MaxRetries),
 		ContainerOverrides: toContainerOverrides(ctx, append(cmd, args...), res, envVars),
+		Timeout:            toTimeout(taskTemplate.Metadata.GetTimeout(), cfg.DefaultTimeOut.Duration),
 	}, nil
 }
 
@@ -130,6 +134,18 @@ func getEnvVarsForTask(ctx context.Context, execID pluginCore.TaskExecutionID, c
 	}
 
 	return finalEnvVars
+}
+
+func toTimeout(templateTimeout *duration.Duration, defaultTimeout time.Duration) *batch.JobTimeout {
+	if templateTimeout != nil {
+		return (&batch.JobTimeout{}).SetAttemptDurationSeconds(templateTimeout.GetSeconds())
+	}
+
+	if defaultTimeout.Seconds() > 0 {
+		return (&batch.JobTimeout{}).SetAttemptDurationSeconds(int64(defaultTimeout.Seconds()))
+	}
+
+	return nil
 }
 
 func toEnvironmentVariables(_ context.Context, envVars []v1.EnvVar) []*batch.KeyValuePair {
@@ -192,7 +208,9 @@ func toRetryStrategy(_ context.Context, backoffLimit *int32, minRetryAttempts, m
 	}
 
 	return &batch.RetryStrategy{
-		Attempts: refInt(int64(retries)),
+		// Attempts is the total number of attempts for a task, if retries is set to 1, attempts should be set to 2 to
+		// account for the first try.
+		Attempts: refInt(int64(retries) + 1),
 	}
 }
 
