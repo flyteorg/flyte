@@ -3,7 +3,6 @@ package interfaces
 // Holds details about a queue used for task execution.
 // Matching attributes determine which workflows' tasks will run where.
 type ExecutionQueue struct {
-	Primary    string
 	Dynamic    string
 	Attributes []string
 }

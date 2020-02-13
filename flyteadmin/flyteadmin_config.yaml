@@ -95,29 +95,26 @@ storage:
   container: "flyte"
 queues:
   executionQueues:
-    - primary: "gpu_primary"
-      dynamic: "gpu_dynamic"
+    - dynamic: "gpu_dynamic"
       attributes:
         - gpu
-    - primary: "critical"
-      dynamic: "critical"
+    - dynamic: "critical"
       attributes:
         - critical
-    - primary: "default"
-      dynamic: "default"
+    - dynamic: "default"
       attributes:
         - defaultclusters
-    - primary: "my_queue_1"
+  workflowConfigs
+    - project: "my_queue_1"
       domain: "production"
       workflowName: "my_workflow_1"
       tags:
         - critical
-    - primary: "my_queue_1"
-      domain: "production"
+    - project: "production"
       workflowName: "my_workflow_2"
       tags:
         - gpu
-    - primary: "my_queue_3"
+    - project: "my_queue_3"
       domain: "production"
       workflowName: "my_workflow_3"
       tags:

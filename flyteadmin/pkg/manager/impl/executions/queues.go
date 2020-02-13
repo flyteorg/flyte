@@ -20,7 +20,6 @@ import (
 type tag = string
 
 type singleQueueConfiguration struct {
-	PrimaryQueue string
 	DynamicQueue string
 }
 
@@ -49,7 +48,6 @@ func (q *queueAllocatorImpl) refreshExecutionQueues(executionQueues []runtimeInt
 				queuesForTag = make(queues, 0, 1)
 			}
 			queueConfigMap[tag] = append(queuesForTag, singleQueueConfiguration{
-				PrimaryQueue: queue.Primary,
 				DynamicQueue: queue.Dynamic,
 			})
 		}

@@ -27,7 +27,6 @@ const testWorkflow = "name"
 func TestGetQueue(t *testing.T) {
 	executionQueues := []runtimeInterfaces.ExecutionQueue{
 		{
-			Primary:    "queue primary",
 			Dynamic:    "queue dynamic",
 			Attributes: []string{"attribute"},
 		},
@@ -68,7 +67,6 @@ func TestGetQueue(t *testing.T) {
 		nil, runtimeMocks.NewMockQueueConfigurationProvider(executionQueues, nil),
 		nil, nil, nil, nil), db)
 	queueConfig := singleQueueConfiguration{
-		PrimaryQueue: "queue primary",
 		DynamicQueue: "queue dynamic",
 	}
 	assert.Equal(t, queueConfig, queueAllocator.GetQueue(context.Background(), core.Identifier{
@@ -96,22 +94,18 @@ func TestGetQueue(t *testing.T) {
 func TestGetQueueDefaults(t *testing.T) {
 	executionQueues := []runtimeInterfaces.ExecutionQueue{
 		{
-			Primary:    "queue1 primary",
 			Dynamic:    "queue1 dynamic",
 			Attributes: []string{"attr1"},
 		},
 		{
-			Primary:    "queue2 primary",
 			Dynamic:    "queue2 dynamic",
 			Attributes: []string{"attr2"},
 		},
 		{
-			Primary:    "queue3 primary",
 			Dynamic:    "queue3 dynamic",
 			Attributes: []string{"attr3"},
 		},
 		{
-			Primary:    "default primary",
 			Dynamic:    "default dynamic",
 			Attributes: []string{"default"},
 		},
@@ -180,7 +174,6 @@ func TestGetQueueDefaults(t *testing.T) {
 		nil, runtimeMocks.NewMockQueueConfigurationProvider(executionQueues, workflowConfigs), nil,
 		nil, nil, nil), db)
 	assert.Equal(t, singleQueueConfiguration{
-		PrimaryQueue: "default primary",
 		DynamicQueue: "default dynamic",
 	}, queueAllocator.GetQueue(
 		context.Background(), core.Identifier{
@@ -189,7 +182,6 @@ func TestGetQueueDefaults(t *testing.T) {
 			Name:    "workflow",
 		}))
 	assert.EqualValues(t, singleQueueConfiguration{
-		PrimaryQueue: "queue1 primary",
 		DynamicQueue: "queue1 dynamic",
 	}, queueAllocator.GetQueue(
 		context.Background(), core.Identifier{
@@ -198,7 +190,6 @@ func TestGetQueueDefaults(t *testing.T) {
 			Name:    "workflow",
 		}))
 	assert.EqualValues(t, singleQueueConfiguration{
-		PrimaryQueue: "queue2 primary",
 		DynamicQueue: "queue2 dynamic",
 	}, queueAllocator.GetQueue(
 		context.Background(), core.Identifier{
@@ -207,7 +198,6 @@ func TestGetQueueDefaults(t *testing.T) {
 			Name:    "UNMATCHED",
 		}))
 	assert.Equal(t, singleQueueConfiguration{
-		PrimaryQueue: "queue3 primary",
 		DynamicQueue: "queue3 dynamic",
 	}, queueAllocator.GetQueue(
 		context.Background(), core.Identifier{
