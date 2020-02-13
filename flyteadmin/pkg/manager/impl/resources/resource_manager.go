@@ -161,6 +161,28 @@ func (m *ResourceManager) DeleteProjectDomainAttributes(ctx context.Context,
 	return &admin.ProjectDomainAttributesDeleteResponse{}, nil
 }
 
+func (m *ResourceManager) ListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) (
+	*admin.ListMatchableAttributesResponse, error) {
+	if err := validation.ValidateListAllMatchableAttributesRequest(request); err != nil {
+		return nil, err
+	}
+	resources, err := m.db.ResourceRepo().ListAll(ctx, request.ResourceType.String())
+	if err != nil {
+		return nil, err
+	}
+	if resources == nil {
+		// That's fine - there don't necessarily need to exist overrides in the database
+		return &admin.ListMatchableAttributesResponse{}, nil
+	}
+	configurations, err := transformers.FromResourceModelsToMatchableAttributes(resources)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.ListMatchableAttributesResponse{
+		Configurations: configurations,
+	}, nil
+}
+
 func NewResourceManager(db repositories.RepositoryInterface) interfaces.ResourceInterface {
 	return &ResourceManager{
 		db: db,

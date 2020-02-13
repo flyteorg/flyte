@@ -24,7 +24,7 @@ require (
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/lib/pq v1.3.0
-	github.com/lyft/flyteidl v0.17.0
+	github.com/lyft/flyteidl v0.17.3
 	github.com/lyft/flytepropeller v0.1.30
 	github.com/lyft/flytestdlib v0.3.0
 	github.com/magiconair/properties v1.8.1

@@ -66,3 +66,32 @@ func FromResourceModelToProjectDomainAttributes(model models.Resource) (admin.Pr
 		MatchingAttributes: &attributes,
 	}, nil
 }
+
+func FromResourceModelToMatchableAttributes(model models.Resource) (admin.MatchableAttributesConfiguration, error) {
+	var attributes admin.MatchingAttributes
+	err := proto.Unmarshal(model.Attributes, &attributes)
+	if err != nil {
+		return admin.MatchableAttributesConfiguration{}, errors.NewFlyteAdminErrorf(
+			codes.Internal, "Failed to decode MatchableAttributesConfiguration with err: %v", err)
+	}
+	return admin.MatchableAttributesConfiguration{
+		Attributes: &attributes,
+		Project:    model.Project,
+		Domain:     model.Domain,
+		Workflow:   model.Workflow,
+		LaunchPlan: model.LaunchPlan,
+	}, nil
+}
+
+func FromResourceModelsToMatchableAttributes(models []models.Resource) (
+	[]*admin.MatchableAttributesConfiguration, error) {
+	configs := make([]*admin.MatchableAttributesConfiguration, len(models))
+	for idx, model := range models {
+		attributesConfig, err := FromResourceModelToMatchableAttributes(model)
+		if err != nil {
+			return nil, err
+		}
+		configs[idx] = &attributesConfig
+	}
+	return configs, nil
+}

@@ -13,6 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const resourceTestWorkflowName = "workflow"
+
 func TestCreateWorkflowAttributes(t *testing.T) {
 	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
@@ -25,7 +27,7 @@ func TestCreateWorkflowAttributes(t *testing.T) {
 	err := resourceRepo.CreateOrUpdate(context.Background(), models.Resource{
 		Project:      "project",
 		Domain:       "domain",
-		Workflow:     "workflow",
+		Workflow:     resourceTestWorkflowName,
 		ResourceType: "resource",
 		Priority:     models.ResourcePriorityLaunchPlanLevel,
 		Attributes:   []byte("attrs"),
@@ -41,7 +43,7 @@ func TestGetWorkflowAttributes(t *testing.T) {
 	response := make(map[string]interface{})
 	response["project"] = "project"
 	response["domain"] = "domain"
-	response["workflow"] = "workflow"
+	response["workflow"] = resourceTestWorkflowName
 	response["resource_type"] = "resource-type"
 	response["attributes"] = []byte("attrs")
 
@@ -98,7 +100,7 @@ func TestGetRawWorkflowAttributes(t *testing.T) {
 	response := make(map[string]interface{})
 	response[project] = project
 	response[domain] = domain
-	response["workflow"] = "workflow"
+	response["workflow"] = resourceTestWorkflowName
 	response["resource_type"] = "resource"
 	response["launch_plan"] = "launch_plan"
 	response["attributes"] = []byte("attrs")
@@ -133,5 +135,35 @@ func TestDeleteWorkflowAttributes(t *testing.T) {
 
 	err := resourceRepo.Delete(context.Background(), interfaces.ResourceID{Project: "project", Domain: "domain", Workflow: "workflow", LaunchPlan: "launch_plan", ResourceType: "resource"})
 	assert.Nil(t, err)
+	assert.True(t, fakeResponse.Triggered)
+}
+
+func TestListAll(t *testing.T) {
+	resourceRepo := NewResourceRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	query := GlobalMock.NewMock()
+
+	response := make(map[string]interface{})
+	response[project] = project
+	response[domain] = domain
+	response["workflow"] = resourceTestWorkflowName
+	response["resource_type"] = "resource"
+	response["launch_plan"] = "launch_plan"
+	response["attributes"] = []byte("attrs")
+
+	fakeResponse := query.WithQuery(`SELECT * FROM "resources"  WHERE "resources"."deleted_at" IS NULL AND ` +
+		`(("resources"."resource_type" = resource)) ORDER BY priority desc`).WithReply(
+		[]map[string]interface{}{response})
+	output, err := resourceRepo.ListAll(context.Background(), "resource")
+	assert.Nil(t, err)
+	assert.Len(t, output, 1)
+	assert.Equal(t, project, output[0].Project)
+	assert.Equal(t, domain, output[0].Domain)
+	assert.Equal(t, "workflow", output[0].Workflow)
+	assert.Equal(t, "launch_plan", output[0].LaunchPlan)
+	assert.Equal(t, "resource", output[0].ResourceType)
+	assert.Equal(t, []byte("attrs"), output[0].Attributes)
 	assert.True(t, fakeResponse.Triggered)
 }

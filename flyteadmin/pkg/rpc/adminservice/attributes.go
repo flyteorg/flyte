@@ -182,3 +182,30 @@ func (m *AdminService) DeleteProjectDomainAttributes(ctx context.Context, reques
 
 	return response, nil
 }
+
+func (m *AdminService) ListMatchableAttributes(ctx context.Context, request *admin.ListMatchableAttributesRequest) (
+	*admin.ListMatchableAttributesResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.ListMatchableAttributesResponse
+	var err error
+	m.Metrics.matchableAttributesEndpointMetrics.list.Time(func() {
+		response, err = m.ResourceManager.ListAll(ctx, *request)
+	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"ListMatchableAttributes",
+		map[string]string{
+			audit.ResourceType: request.ResourceType.String(),
+		},
+		audit.ReadOnly,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.matchableAttributesEndpointMetrics.list)
+	}
+
+	return response, nil
+}

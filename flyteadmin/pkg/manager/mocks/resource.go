@@ -14,11 +14,14 @@ type GetProjectDomainFunc func(ctx context.Context, request admin.ProjectDomainA
 	*admin.ProjectDomainAttributesGetResponse, error)
 type DeleteProjectDomainFunc func(ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (
 	*admin.ProjectDomainAttributesDeleteResponse, error)
+type ListResourceFunc func(ctx context.Context, request admin.ListMatchableAttributesRequest) (
+	*admin.ListMatchableAttributesResponse, error)
 
 type MockResourceManager struct {
 	updateProjectDomainFunc UpdateProjectDomainFunc
 	GetFunc                 GetProjectDomainFunc
 	DeleteFunc              DeleteProjectDomainFunc
+	ListFunc                ListResourceFunc
 }
 
 func (m *MockResourceManager) GetResource(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
@@ -67,6 +70,14 @@ func (m *MockResourceManager) DeleteProjectDomainAttributes(
 	*admin.ProjectDomainAttributesDeleteResponse, error) {
 	if m.DeleteFunc != nil {
 		return m.DeleteFunc(ctx, request)
+	}
+	return nil, nil
+}
+
+func (m *MockResourceManager) ListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) (
+	*admin.ListMatchableAttributesResponse, error) {
+	if m.ListFunc != nil {
+		return m.ListFunc(ctx, request)
 	}
 	return nil, nil
 }

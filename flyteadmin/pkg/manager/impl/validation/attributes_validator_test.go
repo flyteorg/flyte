@@ -213,3 +213,15 @@ func TestValidateWorkflowAttributesDeleteRequest(t *testing.T) {
 		Workflow: "workflow",
 	}))
 }
+
+func TestValidateListAllMatchableAttributesRequest(t *testing.T) {
+	err := ValidateListAllMatchableAttributesRequest(admin.ListMatchableAttributesRequest{
+		ResourceType: 44,
+	})
+	assert.EqualError(t, err, "invalid value for resource_type")
+
+	err = ValidateListAllMatchableAttributesRequest(admin.ListMatchableAttributesRequest{
+		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+	})
+	assert.Nil(t, err)
+}
