@@ -8,7 +8,6 @@ import * as webpack from 'webpack';
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
 const FavIconWebpackPlugin = require('favicons-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const HappyPack = require('happypack');
 const HTMLExternalsWebpackPlugin = require('html-webpack-externals-plugin');
 const nodeExternals = require('webpack-node-externals');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
@@ -67,7 +66,7 @@ export const resolve: webpack.Resolve = {
     /** Base directories that Webpack will look to resolve absolutely imported modules */
     modules: ['src', 'node_modules'],
     /** Extension that are allowed to be omitted from import statements */
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
     /** "main" fields in package.json files to resolve a CommonJS module for */
     mainFields: ['browser', 'module', 'main']
 };
@@ -210,7 +209,7 @@ export const limitChunksPlugin = new webpack.optimize.LimitChunkCountPlugin({
 const typescriptRule = {
     test: /\.tsx?$/,
     exclude: /node_modules/,
-    loader: 'happypack/loader?id=ts'
+    use: ['babel-loader', 'ts-loader']
 };
 
 /**
@@ -273,10 +272,6 @@ export const clientConfig: webpack.Configuration = {
     get plugins() {
         const plugins: webpack.Plugin[] = [
             htmlPlugin,
-            new HappyPack({
-                id: 'ts',
-                loaders: ['babel-loader', 'ts-loader?happyPackMode=true']
-            }),
             new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
             favIconPlugin,
             statsWriterPlugin,
@@ -323,10 +318,6 @@ export const serverConfig: webpack.Configuration = {
     },
     plugins: [
         limitChunksPlugin,
-        new HappyPack({
-            id: 'ts',
-            loaders: ['babel-loader', 'ts-loader?happyPackMode=true']
-        }),
         new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
         getDefinePlugin(true)
         // namedModulesPlugin,
