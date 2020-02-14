@@ -13,5 +13,5 @@ This doc explains how to install Flyte, starting with the simplest method, and e
    production
    multi_cluster
    optional_components
-   configure/index
    managing_customizable_resources
+   configure/index
