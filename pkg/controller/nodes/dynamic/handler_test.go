@@ -443,6 +443,160 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 	}
 }
 
+func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
+	ctx := context.TODO()
+
+	t.Run("dynamicnodephase-none", func(t *testing.T) {
+		s := handler.DynamicNodeState{
+			Phase:  v1alpha1.DynamicNodePhaseNone,
+			Reason: "",
+		}
+		nCtx := &nodeMocks.NodeExecutionContext{}
+		sr := &nodeMocks.NodeStateReader{}
+		sr.OnGetDynamicNodeState().Return(s)
+		nCtx.OnNodeStateReader().Return(sr)
+
+		h := &mocks.TaskNodeHandler{}
+		h.OnFinalize(ctx, nCtx).Return(nil)
+		n := &executorMocks.Node{}
+		d := New(h, n, promutils.NewTestScope())
+		assert.NoError(t, d.Finalize(ctx, nCtx))
+		assert.NotZero(t, len(h.ExpectedCalls))
+		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)
+	})
+
+	createNodeContext := func(ttype string, finalOutput storage.DataReference) *nodeMocks.NodeExecutionContext {
+		ctx := context.TODO()
+
+		wfExecID := &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		}
+
+		nm := &nodeMocks.NodeExecutionMetadata{}
+		nm.On("GetAnnotations").Return(map[string]string{})
+		nm.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
+			WorkflowExecutionIdentifier: wfExecID,
+		})
+		nm.On("GetK8sServiceAccount").Return("service-account")
+		nm.On("GetLabels").Return(map[string]string{})
+		nm.On("GetNamespace").Return("namespace")
+		nm.On("GetOwnerID").Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.On("GetOwnerReference").Return(v1.OwnerReference{
+			Kind: "sample",
+			Name: "name",
+		})
+
+		taskID := &core.Identifier{}
+		tk := &core.TaskTemplate{
+			Id:   taskID,
+			Type: "test",
+			Metadata: &core.TaskMetadata{
+				Discoverable: true,
+			},
+			Interface: &core.TypedInterface{
+				Outputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"x": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		tr := &nodeMocks.TaskReader{}
+		tr.On("GetTaskID").Return(taskID)
+		tr.On("GetTaskType").Return(ttype)
+		tr.On("Read", mock.Anything).Return(tk, nil)
+
+		n := &flyteMocks.ExecutableNode{}
+		tID := "task-1"
+		n.On("GetTaskID").Return(&tID)
+
+		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		assert.NoError(t, err)
+
+		ir := &ioMocks.InputReader{}
+		nCtx := &nodeMocks.NodeExecutionContext{}
+		nCtx.On("NodeExecutionMetadata").Return(nm)
+		nCtx.On("Node").Return(n)
+		nCtx.On("InputReader").Return(ir)
+		nCtx.On("DataReferenceConstructor").Return(storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope()))
+		nCtx.On("CurrentAttempt").Return(uint32(1))
+		nCtx.On("TaskReader").Return(tr)
+		nCtx.On("MaxDatasetSizeBytes").Return(int64(1))
+		nCtx.On("NodeID").Return("n1")
+		nCtx.On("EnqueueOwnerFunc").Return(func() error { return nil })
+		nCtx.OnDataStore().Return(dataStore)
+
+		endNodeStatus := &flyteMocks.ExecutableNodeStatus{}
+		endNodeStatus.On("GetDataDir").Return(storage.DataReference("end-node"))
+		endNodeStatus.On("GetOutputDir").Return(storage.DataReference("end-node"))
+
+		subNs := &flyteMocks.ExecutableNodeStatus{}
+		subNs.On("SetDataDir", mock.Anything).Return()
+		subNs.On("SetOutputDir", mock.Anything).Return()
+		subNs.On("ResetDirty").Return()
+		subNs.On("GetOutputDir").Return(finalOutput)
+		subNs.On("SetParentTaskID", mock.Anything).Return()
+		subNs.OnGetAttempts().Return(0)
+
+		dynamicNS := &flyteMocks.ExecutableNodeStatus{}
+		dynamicNS.On("SetDataDir", mock.Anything).Return()
+		dynamicNS.On("SetOutputDir", mock.Anything).Return()
+		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
+		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
+		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_2").Return(subNs)
+		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_3").Return(subNs)
+		dynamicNS.OnGetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
+
+		ns := &flyteMocks.ExecutableNodeStatus{}
+		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+		ns.On("GetOutputDir").Return(storage.DataReference("output-dir"))
+		ns.On("GetNodeExecutionStatus", dynamicNodeID).Return(dynamicNS)
+		ns.OnGetNodeExecutionStatus(ctx, dynamicNodeID).Return(dynamicNS)
+		nCtx.On("NodeStatus").Return(ns)
+
+		w := &flyteMocks.ExecutableWorkflow{}
+		ws := &flyteMocks.ExecutableWorkflowStatus{}
+		ws.OnGetNodeExecutionStatus(ctx, "n1").Return(ns)
+		w.On("GetExecutionStatus").Return(ws)
+		nCtx.On("Workflow").Return(w)
+
+		r := &nodeMocks.NodeStateReader{}
+		r.On("GetDynamicNodeState").Return(handler.DynamicNodeState{
+			Phase: v1alpha1.DynamicNodePhaseExecuting,
+		})
+		nCtx.On("NodeStateReader").Return(r)
+		return nCtx
+	}
+
+	t.Run("dynamicnodephase-executing", func(t *testing.T) {
+
+		nCtx := createNodeContext("test", "x")
+		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetOutputDir(), "futures.pb")
+		assert.NoError(t, err)
+		dj := createDynamicJobSpec()
+		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
+
+		h := &mocks.TaskNodeHandler{}
+		h.OnFinalize(ctx, nCtx).Return(nil)
+		n := &executorMocks.Node{}
+		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything).Return(nil)
+		d := New(h, n, promutils.NewTestScope())
+		assert.NoError(t, d.Finalize(ctx, nCtx))
+		assert.NotZero(t, len(h.ExpectedCalls))
+		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)
+		assert.NotZero(t, len(n.ExpectedCalls))
+		assert.Equal(t, "FinalizeHandler", n.ExpectedCalls[0].Method)
+	})
+}
+
 func init() {
 	labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey,
 		contextutils.TaskIDKey)
