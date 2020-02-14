@@ -67,6 +67,11 @@ describe('LaunchWorkflowForm', () => {
 
     beforeEach(() => {
         onClose = jest.fn();
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.clearAllTimers();
     });
 
     const createMockWorkflowWithInputs = (id: Identifier) => {
@@ -254,7 +259,6 @@ describe('LaunchWorkflowForm', () => {
         });
 
         it('should not show validation errors until first submit', async () => {
-            jest.useFakeTimers();
             const { container, getByLabelText } = renderForm();
             await wait();
 
@@ -276,7 +280,6 @@ describe('LaunchWorkflowForm', () => {
         });
 
         it('should update validation errors while typing', async () => {
-            jest.useFakeTimers();
             const { container, getByLabelText } = renderForm();
             await wait();
 
@@ -367,7 +370,6 @@ describe('LaunchWorkflowForm', () => {
         });
 
         it('should preserve input values when changing launch plan', async () => {
-            jest.useFakeTimers();
             const { getByLabelText, getByTitle } = renderForm();
             await wait();
 
@@ -688,6 +690,37 @@ describe('LaunchWorkflowForm', () => {
                 await wait();
                 expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
                     missingLaunchPlan.id.name
+                );
+            });
+
+            it('should correctly render workflow version search results', async () => {
+                const initialParameters: InitialLaunchParameters = {
+                    workflow: mockWorkflowVersions[2].id
+                };
+                const inputString = mockWorkflowVersions[1].id.version.substring(
+                    0,
+                    4
+                );
+                const { getByLabelText } = renderForm({ initialParameters });
+                await wait();
+
+                mockListWorkflows.mockClear();
+
+                const versionInput = getByLabelText(
+                    formStrings.workflowVersion
+                );
+                fireEvent.change(versionInput, {
+                    target: { value: inputString }
+                });
+
+                act(() => {
+                    jest.runAllTimers();
+                });
+                await wait();
+                const { project, domain, name } = mockWorkflowVersions[2].id;
+                expect(mockListWorkflows).toHaveBeenCalledWith(
+                    { project, domain, name },
+                    expect.anything()
                 );
             });
         });

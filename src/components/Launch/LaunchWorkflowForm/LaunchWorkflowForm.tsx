@@ -30,19 +30,23 @@ function generateFetchSearchResults(
     workflowId: NamedEntityIdentifier
 ) {
     return async (query: string) => {
-        const { entities: workflows } = await listWorkflows(workflowId, {
-            filter: [
-                {
-                    key: 'version',
-                    operation: FilterOperationName.CONTAINS,
-                    value: query
+        const { project, domain, name } = workflowId;
+        const { entities: workflows } = await listWorkflows(
+            { project, domain, name },
+            {
+                filter: [
+                    {
+                        key: 'version',
+                        operation: FilterOperationName.CONTAINS,
+                        value: query
+                    }
+                ],
+                sort: {
+                    key: workflowSortFields.createdAt,
+                    direction: SortDirection.DESCENDING
                 }
-            ],
-            sort: {
-                key: workflowSortFields.createdAt,
-                direction: SortDirection.DESCENDING
             }
-        });
+        );
         return workflowsToSearchableSelectorOptions(workflows);
     };
 }
