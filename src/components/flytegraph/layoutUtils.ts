@@ -139,7 +139,7 @@ export function layoutGraph<T extends GraphInputNode>(
     // The layout operations will modify the data in place, so make a copy
     const nodeList = cloneDeep(input);
 
-    const dag = d3.dratify<T>()(nodeList);
+    const dag = d3.dagStratify<T>()(nodeList);
 
     const {
         coordFunction,

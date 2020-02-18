@@ -176,7 +176,7 @@ declare module 'd3-dag' {
      * Must return an array of data representing the children, and return null or undefined if the current datum has no children.
      * If children is not specified, it defaults to: `(d) => d.children`.
      */
-    export function dierarchy<Datum>(
+    export function dagHierarchy<Datum>(
         data: Datum,
         children?: (d: Datum) => Datum[] | null | undefined
     ): DierarchyNode<Datum>;
@@ -248,7 +248,7 @@ declare module 'd3-dag' {
     /**
      * Constructs a new dratify operator with the default settings.
      */
-    export function dratify<Datum>(): DratifyOperator<Datum>;
+    export function dagStratify<Datum>(): DratifyOperator<Datum>;
 
     export interface Decross<Datum> {
         (root: DierarchyNode<Datum>): DierarchyPointNode<Datum>;
