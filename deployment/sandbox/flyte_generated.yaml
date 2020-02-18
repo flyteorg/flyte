@@ -1083,7 +1083,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: docker.io/lyft/flyteconsole:v0.3.1
+        image: docker.io/lyft/flyteconsole:v0.3.2
         name: flyteconsole
         ports:
         - containerPort: 8080
