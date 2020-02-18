@@ -18,6 +18,7 @@ type Config struct {
 	MaxArrayJobSize    int64                 `json:"maxArrayJobSize" pflag:",Maximum size of array job."`
 	MinRetries         int32                 `json:"minRetries" pflag:",Minimum number of retries"`
 	MaxRetries         int32                 `json:"maxRetries" pflag:",Maximum number of retries"`
+	DefaultTimeOut     config.Duration       `json:"defaultTimeout" pflag:",Default timeout for the batch job."`
 	// Provide additional environment variable pairs that plugin authors will provide to containers
 	DefaultEnvVars       map[string]string `json:"defaultEnvVars" pflag:"-,Additional environment variable that should be injected into every resource"`
 	MaxErrorStringLength int               `json:"maxErrLength" pflag:",Determines the maximum length of the error string returned for the array."`
@@ -53,6 +54,7 @@ var (
 		},
 		MinRetries:           1,
 		MaxRetries:           10,
+		DefaultTimeOut:       config.Duration{Duration: 3 * 24 * time.Hour},
 		MaxErrorStringLength: 500,
 		OutputAssembler: workqueue.Config{
 			IndexCacheMaxItems: 100000,
