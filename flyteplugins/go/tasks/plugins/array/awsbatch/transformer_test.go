@@ -7,6 +7,9 @@ package awsbatch
 import (
 	"context"
 	"testing"
+	"time"
+
+	"github.com/golang/protobuf/ptypes/duration"
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -65,6 +68,31 @@ func TestResourceRequirementsToBatchRequirements(t *testing.T) {
 				"Expected != Actual for test case [%v] with Input [%v]", i, testCase.Input)
 		}
 	}
+}
+
+func TestToTimeout(t *testing.T) {
+	t.Run("Nil", func(t *testing.T) {
+		timeout := toTimeout(nil, 0*time.Second)
+		assert.Nil(t, timeout)
+	})
+
+	t.Run("TaskTemplate duration set", func(t *testing.T) {
+		timeout := toTimeout(&duration.Duration{Seconds: 100}, 3*24*time.Hour)
+		assert.NotNil(t, timeout.AttemptDurationSeconds)
+		assert.Equal(t, int64(100), *timeout.AttemptDurationSeconds)
+	})
+
+	t.Run("Default timeout used", func(t *testing.T) {
+		timeout := toTimeout(nil, 3*24*time.Hour)
+		assert.NotNil(t, timeout.AttemptDurationSeconds)
+		assert.Equal(t, int64((3 * 24 * time.Hour).Seconds()), *timeout.AttemptDurationSeconds)
+	})
+
+	t.Run("TaskTemplate duration set to 0", func(t *testing.T) {
+		timeout := toTimeout(&duration.Duration{Seconds: 0}, 3*24*time.Hour)
+		assert.NotNil(t, timeout.AttemptDurationSeconds)
+		assert.Equal(t, int64((3 * 24 * time.Hour).Seconds()), *timeout.AttemptDurationSeconds)
+	})
 }
 
 func TestArrayJobToBatchInput(t *testing.T) {

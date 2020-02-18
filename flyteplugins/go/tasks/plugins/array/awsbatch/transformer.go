@@ -137,7 +137,7 @@ func getEnvVarsForTask(ctx context.Context, execID pluginCore.TaskExecutionID, c
 }
 
 func toTimeout(templateTimeout *duration.Duration, defaultTimeout time.Duration) *batch.JobTimeout {
-	if templateTimeout != nil {
+	if templateTimeout != nil && templateTimeout.Seconds > 0 {
 		return (&batch.JobTimeout{}).SetAttemptDurationSeconds(templateTimeout.GetSeconds())
 	}
 

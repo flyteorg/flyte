@@ -47,6 +47,7 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchCl
 
 	j, err := batchClient.SubmitJob(ctx, batchInput)
 	if err != nil {
+		logger.Errorf(ctx, "Failed to submit job [%+v]. Error: %v", batchInput, err)
 		return nil, err
 	}
 
