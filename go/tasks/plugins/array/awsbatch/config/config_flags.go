@@ -53,6 +53,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "maxArrayJobSize"), defaultConfig.MaxArrayJobSize, "Maximum size of array job.")
 	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "minRetries"), defaultConfig.MinRetries, "Minimum number of retries")
 	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "maxRetries"), defaultConfig.MaxRetries, "Maximum number of retries")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultTimeout"), defaultConfig.DefaultTimeOut.String(), "Default timeout for the batch job.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "maxErrLength"), defaultConfig.MaxErrorStringLength, "Determines the maximum length of the error string returned for the array.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "roleAnnotationKey"), defaultConfig.RoleAnnotationKey, "Map key to use to lookup role from task annotations.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "outputAssembler.workers"), defaultConfig.OutputAssembler.Workers, "Number of concurrent workers to start processing the queue.")
