@@ -2,7 +2,6 @@ package hive
 
 import (
 	"context"
-
 	"github.com/lyft/flytestdlib/cache"
 
 	"github.com/lyft/flyteplugins/go/tasks/errors"
@@ -124,12 +123,14 @@ func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, cfg *co
 	}
 
 	for clusterPrimaryLabel, clusterLimit := range resourceConfig {
-		logger.Infof(ctx, "Registering resource quota for cluster [%v]", clusterPrimaryLabel)
+		logger.Infof(ctx, "Registering resource quota ([%v]) and namespace quota cap ([%v]) for cluster [%v]", clusterPrimaryLabel)
 		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, core.ResourceNamespace(clusterPrimaryLabel), clusterLimit); err != nil {
 			logger.Errorf(ctx, "Resource quota registration for [%v] failed due to error [%v]", clusterPrimaryLabel, err)
 			return nil, err
 		}
 	}
+
+	iCtx.ResourceRegistrar().RegisterResourceNamespaceQuotaProportionCap(ctx, cfg.NamespaceQuotaProportionCap)
 
 	return q, nil
 }

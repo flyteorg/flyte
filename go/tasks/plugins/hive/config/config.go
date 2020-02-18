@@ -54,14 +54,15 @@ var (
 
 // Qubole plugin configs
 type Config struct {
-	Endpoint                  config.URL                 `json:"endpoint" pflag:",Endpoint for qubole to use"`
-	CommandAPIPath            config.URL                 `json:"commandApiPath" pflag:",API Path where commands can be launched on Qubole. Should be a valid url."`
-	AnalyzeLinkPath           config.URL                 `json:"analyzeLinkPath" pflag:",URL path where queries can be visualized on qubole website. Should be a valid url."`
-	TokenKey                  string                     `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
-	LruCacheSize              int                        `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
-	Workers                   int                        `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
-	ClusterConfigs            []ClusterConfig            `json:"clusterConfigs" pflag:"-,A list of cluster configs. Each of the configs corresponds to a service cluster"`
-	DestinationClusterConfigs []DestinationClusterConfig `json:"destinationClusterConfigs" pflag:"-,A list configs specifying the destination service cluster for (project, domain)"`
+	Endpoint                    config.URL                 `json:"endpoint" pflag:",Endpoint for qubole to use"`
+	CommandAPIPath              config.URL                 `json:"commandApiPath" pflag:",API Path where commands can be launched on Qubole. Should be a valid url."`
+	AnalyzeLinkPath             config.URL                 `json:"analyzeLinkPath" pflag:",URL path where queries can be visualized on qubole website. Should be a valid url."`
+	TokenKey                    string                     `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
+	LruCacheSize                int                        `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
+	Workers                     int                        `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
+	ClusterConfigs              []ClusterConfig            `json:"clusterConfigs" pflag:"-,A list of cluster configs. Each of the configs corresponds to a service cluster"`
+	DestinationClusterConfigs   []DestinationClusterConfig `json:"destinationClusterConfigs" pflag:"-,A list configs specifying the destination service cluster for (project, domain)"`
+	NamespaceQuotaProportionCap float64                    `json:"namespaceQuotaProportionCap" pflag:",A floating point number between 0 and 1, specifying the hard cap on the maximum proportion of quotas a namespace can claim"`
 }
 
 // Retrieves the current config value or default.
