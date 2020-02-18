@@ -31,6 +31,7 @@ func (r ResourceNamespace) CreateSubNamespace(namespace ResourceNamespace) Resou
 
 type ResourceRegistrar interface {
 	RegisterResourceQuota(ctx context.Context, namespace ResourceNamespace, quota int) error
+	RegisterResourceNamespaceQuotaProportionCap(ctx context.Context, proportionCap float64) error
 }
 
 // Resource Manager manages a single resource type, and each allocation is of size one
