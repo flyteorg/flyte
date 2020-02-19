@@ -11,8 +11,6 @@ import (
 	"github.com/lyft/flytestdlib/promutils"
 )
 
-//go:generate mockery -name ResourceManager -case=underscore
-
 type TokenPrefix string
 
 const execUrnPrefix = "ex"
