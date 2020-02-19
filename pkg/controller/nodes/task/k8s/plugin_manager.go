@@ -176,7 +176,7 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 		podRequestedResources := e.getPodEffectiveResourceLimits(ctx, pod)
 
 		cfg := nodeTaskConfig.GetConfig()
-		backOffHandler := e.backOffController.GetOrCreateHandler(ctx, key, cfg.BackOffConfig.BaseSecond, cfg.BackOffConfig.MaxDuration)
+		backOffHandler := e.backOffController.GetOrCreateHandler(ctx, key, cfg.BackOffConfig.BaseSecond, cfg.BackOffConfig.MaxDuration.Duration)
 
 		err = backOffHandler.Handle(ctx, func() error {
 			return e.kubeClient.GetClient().Create(ctx, o)

@@ -103,7 +103,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("kube-config"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(defaultConfig.KubeConfigPath), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -125,7 +125,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("master"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(defaultConfig.MasterURL), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -147,7 +147,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("workers"); err == nil {
-				assert.Equal(t, int(2), vInt)
+				assert.Equal(t, int(defaultConfig.Workers), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -169,14 +169,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("workflow-reeval-duration"); err == nil {
-				assert.Equal(t, string("30s"), vString)
+				assert.Equal(t, string(defaultConfig.WorkflowReEval.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "30s"
+			testValue := defaultConfig.WorkflowReEval.String()
 
 			cmdFlags.Set("workflow-reeval-duration", testValue)
 			if vString, err := cmdFlags.GetString("workflow-reeval-duration"); err == nil {
@@ -191,14 +191,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("downstream-eval-duration"); err == nil {
-				assert.Equal(t, string("60s"), vString)
+				assert.Equal(t, string(defaultConfig.DownstreamEval.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "60s"
+			testValue := defaultConfig.DownstreamEval.String()
 
 			cmdFlags.Set("downstream-eval-duration", testValue)
 			if vString, err := cmdFlags.GetString("downstream-eval-duration"); err == nil {
@@ -213,7 +213,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("limit-namespace"); err == nil {
-				assert.Equal(t, string("all"), vString)
+				assert.Equal(t, string(defaultConfig.LimitNamespace), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -235,14 +235,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("prof-port"); err == nil {
-				assert.Equal(t, string("10254"), vString)
+				assert.Equal(t, string(defaultConfig.ProfilerPort.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "10254"
+			testValue := defaultConfig.ProfilerPort.String()
 
 			cmdFlags.Set("prof-port", testValue)
 			if vString, err := cmdFlags.GetString("prof-port"); err == nil {
@@ -257,7 +257,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("metadata-prefix"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(defaultConfig.MetadataPrefix), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -279,7 +279,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("queue.type"); err == nil {
-				assert.Equal(t, string("simple"), vString)
+				assert.Equal(t, string(defaultConfig.Queue.Type), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -301,7 +301,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("queue.queue.type"); err == nil {
-				assert.Equal(t, string("default"), vString)
+				assert.Equal(t, string(defaultConfig.Queue.Queue.Type), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -323,14 +323,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("queue.queue.base-delay"); err == nil {
-				assert.Equal(t, string("10s"), vString)
+				assert.Equal(t, string(defaultConfig.Queue.Queue.BaseDelay.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "10s"
+			testValue := defaultConfig.Queue.Queue.BaseDelay.String()
 
 			cmdFlags.Set("queue.queue.base-delay", testValue)
 			if vString, err := cmdFlags.GetString("queue.queue.base-delay"); err == nil {
@@ -345,14 +345,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("queue.queue.max-delay"); err == nil {
-				assert.Equal(t, string("10s"), vString)
+				assert.Equal(t, string(defaultConfig.Queue.Queue.MaxDelay.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "10s"
+			testValue := defaultConfig.Queue.Queue.MaxDelay.String()
 
 			cmdFlags.Set("queue.queue.max-delay", testValue)
 			if vString, err := cmdFlags.GetString("queue.queue.max-delay"); err == nil {
@@ -367,7 +367,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt64, err := cmdFlags.GetInt64("queue.queue.rate"); err == nil {
-				assert.Equal(t, int64(int64(10)), vInt64)
+				assert.Equal(t, int64(defaultConfig.Queue.Queue.Rate), vInt64)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -389,7 +389,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("queue.queue.capacity"); err == nil {
-				assert.Equal(t, int(100), vInt)
+				assert.Equal(t, int(defaultConfig.Queue.Queue.Capacity), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -411,7 +411,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("queue.sub-queue.type"); err == nil {
-				assert.Equal(t, string("default"), vString)
+				assert.Equal(t, string(defaultConfig.Queue.Sub.Type), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -433,14 +433,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("queue.sub-queue.base-delay"); err == nil {
-				assert.Equal(t, string("10s"), vString)
+				assert.Equal(t, string(defaultConfig.Queue.Sub.BaseDelay.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "10s"
+			testValue := defaultConfig.Queue.Sub.BaseDelay.String()
 
 			cmdFlags.Set("queue.sub-queue.base-delay", testValue)
 			if vString, err := cmdFlags.GetString("queue.sub-queue.base-delay"); err == nil {
@@ -455,14 +455,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("queue.sub-queue.max-delay"); err == nil {
-				assert.Equal(t, string("10s"), vString)
+				assert.Equal(t, string(defaultConfig.Queue.Sub.MaxDelay.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "10s"
+			testValue := defaultConfig.Queue.Sub.MaxDelay.String()
 
 			cmdFlags.Set("queue.sub-queue.max-delay", testValue)
 			if vString, err := cmdFlags.GetString("queue.sub-queue.max-delay"); err == nil {
@@ -477,7 +477,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt64, err := cmdFlags.GetInt64("queue.sub-queue.rate"); err == nil {
-				assert.Equal(t, int64(int64(10)), vInt64)
+				assert.Equal(t, int64(defaultConfig.Queue.Sub.Rate), vInt64)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -499,7 +499,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("queue.sub-queue.capacity"); err == nil {
-				assert.Equal(t, int(100), vInt)
+				assert.Equal(t, int(defaultConfig.Queue.Sub.Capacity), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -521,14 +521,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("queue.batching-interval"); err == nil {
-				assert.Equal(t, string("1s"), vString)
+				assert.Equal(t, string(defaultConfig.Queue.BatchingInterval.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "1s"
+			testValue := defaultConfig.Queue.BatchingInterval.String()
 
 			cmdFlags.Set("queue.batching-interval", testValue)
 			if vString, err := cmdFlags.GetString("queue.batching-interval"); err == nil {
@@ -543,7 +543,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("queue.batch-size"); err == nil {
-				assert.Equal(t, int(-1), vInt)
+				assert.Equal(t, int(defaultConfig.Queue.BatchSize), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -565,7 +565,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("metrics-prefix"); err == nil {
-				assert.Equal(t, string("flyte:"), vString)
+				assert.Equal(t, string(defaultConfig.MetricsPrefix), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -587,7 +587,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vBool, err := cmdFlags.GetBool("enable-admin-launcher"); err == nil {
-				assert.Equal(t, bool(false), vBool)
+				assert.Equal(t, bool(defaultConfig.EnableAdminLauncher), vBool)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -609,7 +609,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("max-workflow-retries"); err == nil {
-				assert.Equal(t, int(50), vInt)
+				assert.Equal(t, int(defaultConfig.MaxWorkflowRetries), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -631,7 +631,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt, err := cmdFlags.GetInt("max-ttl-hours"); err == nil {
-				assert.Equal(t, int(23), vInt)
+				assert.Equal(t, int(defaultConfig.MaxTTLInHours), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -653,14 +653,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("gc-interval"); err == nil {
-				assert.Equal(t, string("30m"), vString)
+				assert.Equal(t, string(defaultConfig.GCInterval.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "30m"
+			testValue := defaultConfig.GCInterval.String()
 
 			cmdFlags.Set("gc-interval", testValue)
 			if vString, err := cmdFlags.GetString("gc-interval"); err == nil {
@@ -675,7 +675,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vBool, err := cmdFlags.GetBool("leader-election.enabled"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
+				assert.Equal(t, bool(defaultConfig.LeaderElection.Enabled), vBool)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -697,7 +697,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("leader-election.lock-config-map.Namespace"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(defaultConfig.LeaderElection.LockConfigMap.Namespace), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -719,7 +719,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("leader-election.lock-config-map.Name"); err == nil {
-				assert.Equal(t, string(*new(string)), vString)
+				assert.Equal(t, string(defaultConfig.LeaderElection.LockConfigMap.Name), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -741,14 +741,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("leader-election.lease-duration"); err == nil {
-				assert.Equal(t, string("15s"), vString)
+				assert.Equal(t, string(defaultConfig.LeaderElection.LeaseDuration.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "15s"
+			testValue := defaultConfig.LeaderElection.LeaseDuration.String()
 
 			cmdFlags.Set("leader-election.lease-duration", testValue)
 			if vString, err := cmdFlags.GetString("leader-election.lease-duration"); err == nil {
@@ -763,14 +763,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("leader-election.renew-deadline"); err == nil {
-				assert.Equal(t, string("10s"), vString)
+				assert.Equal(t, string(defaultConfig.LeaderElection.RenewDeadline.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "10s"
+			testValue := defaultConfig.LeaderElection.RenewDeadline.String()
 
 			cmdFlags.Set("leader-election.renew-deadline", testValue)
 			if vString, err := cmdFlags.GetString("leader-election.renew-deadline"); err == nil {
@@ -785,14 +785,14 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("leader-election.retry-period"); err == nil {
-				assert.Equal(t, string("2s"), vString)
+				assert.Equal(t, string(defaultConfig.LeaderElection.RetryPeriod.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "2s"
+			testValue := defaultConfig.LeaderElection.RetryPeriod.String()
 
 			cmdFlags.Set("leader-election.retry-period", testValue)
 			if vString, err := cmdFlags.GetString("leader-election.retry-period"); err == nil {
@@ -807,7 +807,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vBool, err := cmdFlags.GetBool("publish-k8s-events"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
+				assert.Equal(t, bool(defaultConfig.PublishK8sEvents), vBool)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -829,7 +829,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt64, err := cmdFlags.GetInt64("max-output-size-bytes"); err == nil {
-				assert.Equal(t, int64(*new(int64)), vInt64)
+				assert.Equal(t, int64(defaultConfig.MaxDatasetSizeBytes), vInt64)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -841,6 +841,116 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("max-output-size-bytes", testValue)
 			if vInt64, err := cmdFlags.GetInt64("max-output-size-bytes"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.MaxDatasetSizeBytes)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kube-client-config.burst", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt, err := cmdFlags.GetInt("kube-client-config.burst"); err == nil {
+				assert.Equal(t, int(defaultConfig.KubeConfig.Burst), vInt)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kube-client-config.burst", testValue)
+			if vInt, err := cmdFlags.GetInt("kube-client-config.burst"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.KubeConfig.Burst)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kube-client-config.timeout", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("kube-client-config.timeout"); err == nil {
+				assert.Equal(t, string(defaultConfig.KubeConfig.Timeout.String()), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.KubeConfig.Timeout.String()
+
+			cmdFlags.Set("kube-client-config.timeout", testValue)
+			if vString, err := cmdFlags.GetString("kube-client-config.timeout"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.KubeConfig.Timeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_default-deadlines.node-execution-deadline", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("default-deadlines.node-execution-deadline"); err == nil {
+				assert.Equal(t, string(defaultConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.String()), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.String()
+
+			cmdFlags.Set("default-deadlines.node-execution-deadline", testValue)
+			if vString, err := cmdFlags.GetString("default-deadlines.node-execution-deadline"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultDeadlines.DefaultNodeExecutionDeadline)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_default-deadlines.node-active-deadline", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("default-deadlines.node-active-deadline"); err == nil {
+				assert.Equal(t, string(defaultConfig.DefaultDeadlines.DefaultNodeActiveDeadline.String()), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.DefaultDeadlines.DefaultNodeActiveDeadline.String()
+
+			cmdFlags.Set("default-deadlines.node-active-deadline", testValue)
+			if vString, err := cmdFlags.GetString("default-deadlines.node-active-deadline"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultDeadlines.DefaultNodeActiveDeadline)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_default-deadlines.workflow-active-deadline", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("default-deadlines.workflow-active-deadline"); err == nil {
+				assert.Equal(t, string(defaultConfig.DefaultDeadlines.DefaultWorkflowActiveDeadline.String()), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.DefaultDeadlines.DefaultWorkflowActiveDeadline.String()
+
+			cmdFlags.Set("default-deadlines.workflow-active-deadline", testValue)
+			if vString, err := cmdFlags.GetString("default-deadlines.workflow-active-deadline"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultDeadlines.DefaultWorkflowActiveDeadline)
 
 			} else {
 				assert.FailNow(t, err.Error())

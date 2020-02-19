@@ -191,11 +191,16 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.Node
 
 // This is a weird method. We should always finalize before we set the dynamic parent node phase as complete?
 func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext) error {
+	// We should always finalize the parent node success of failure.
+	// If we use the state to decide the finalize then we will never invoke the finalizer for the parent.
+	logger.Infof(ctx, "Finalizing Parent node")
+	if err := d.TaskNodeHandler.Finalize(ctx, nCtx); err != nil {
+		logger.Errorf(ctx, "Failed to finalize Dynamic Nodes Parent.")
+		return err
+	}
+
 	ds := nCtx.NodeStateReader().GetDynamicNodeState()
-	switch ds.Phase {
-	case v1alpha1.DynamicNodePhaseFailing:
-		fallthrough
-	case v1alpha1.DynamicNodePhaseExecuting:
+	if ds.Phase == v1alpha1.DynamicNodePhaseFailing || ds.Phase == v1alpha1.DynamicNodePhaseExecuting {
 		logger.Infof(ctx, "Finalizing dynamic workflow")
 		dynamicWF, isDynamic, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		if err != nil {
@@ -205,12 +210,10 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.N
 		if !isDynamic {
 			return nil
 		}
-
 		return d.nodeExecutor.FinalizeHandler(ctx, dynamicWF, dynamicWF.StartNode())
-	default:
-		logger.Infof(ctx, "Finalizing regular node")
-		return d.TaskNodeHandler.Finalize(ctx, nCtx)
 	}
+
+	return nil
 }
 
 func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Context, djSpec *core.DynamicJobSpec,
@@ -240,10 +243,12 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Con
 		if err != nil {
 			return nil, err
 		}
-		outputDir, err := nCtx.DataStore().ConstructReference(ctx, originalNodePath, "0")
+
+		outputDir, err := nCtx.DataStore().ConstructReference(ctx, originalNodePath, strconv.Itoa(int(subNodeStatus.GetAttempts())))
 		if err != nil {
 			return nil, err
 		}
+
 		subNodeStatus.SetDataDir(originalNodePath)
 		subNodeStatus.SetOutputDir(outputDir)
 		n.Id = newID

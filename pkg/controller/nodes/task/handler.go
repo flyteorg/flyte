@@ -573,7 +573,7 @@ func (t Handler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext
 			if r := recover(); r != nil {
 				t.metrics.pluginPanics.Inc(ctx)
 				stack := debug.Stack()
-				logger.Errorf(ctx, "Panic in plugin.Abort for TaskType [%s]", tCtx.tr.GetTaskType())
+				logger.Errorf(ctx, "Panic in plugin.Finalize for TaskType [%s]", tCtx.tr.GetTaskType())
 				err = fmt.Errorf("panic when executing a plugin for TaskType [%s]. Stack: [%s]", tCtx.tr.GetTaskType(), string(stack))
 			}
 		}()

@@ -4,15 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 type ErrorMessage = string
 
 type NodeError struct {
-	errors.StackTrace
 	ErrCode ErrorCode
 	Message ErrorMessage
 	Node    v1alpha1.NodeID
@@ -40,7 +37,17 @@ func (n *NodeErrorWithCause) Code() ErrorCode {
 }
 
 func (n *NodeErrorWithCause) Error() string {
-	return fmt.Sprintf("%v, caused by: %v", n.NodeError.Error(), n.cause)
+	nodeError := ""
+	if n.NodeError != nil {
+		nodeError = n.NodeError.Error()
+	}
+
+	cause := ""
+	if n.cause != nil {
+		cause = n.cause.Error()
+	}
+
+	return fmt.Sprintf("%v, caused by: %v", nodeError, cause)
 }
 
 func (n *NodeErrorWithCause) Cause() error {

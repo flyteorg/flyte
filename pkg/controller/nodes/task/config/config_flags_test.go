@@ -209,4 +209,48 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_backoff.base-second", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt, err := cmdFlags.GetInt("backoff.base-second"); err == nil {
+				assert.Equal(t, int(defaultConfig.BackOffConfig.BaseSecond), vInt)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("backoff.base-second", testValue)
+			if vInt, err := cmdFlags.GetInt("backoff.base-second"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.BackOffConfig.BaseSecond)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_backoff.max-duration", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("backoff.max-duration"); err == nil {
+				assert.Equal(t, string(defaultConfig.BackOffConfig.MaxDuration.String()), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.BackOffConfig.MaxDuration.String()
+
+			cmdFlags.Set("backoff.max-duration", testValue)
+			if vString, err := cmdFlags.GetString("backoff.max-duration"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.BackOffConfig.MaxDuration)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
