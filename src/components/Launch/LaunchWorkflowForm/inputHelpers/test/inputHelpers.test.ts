@@ -7,6 +7,7 @@ import {
     literalToInputValue,
     validateInput
 } from '../inputHelpers';
+import { collectionChildToString } from '../utils';
 import {
     literalTestCases,
     literalToInputTestCases,
@@ -89,8 +90,7 @@ describe('literalToInputValue', () => {
                         literals: [input, input]
                     }
                 };
-                const stringifiedValue =
-                    output === undefined ? '' : output.toString();
+                const stringifiedValue = collectionChildToString(type, output);
                 const expectedString = `[${stringifiedValue},${stringifiedValue}]`;
                 const result = literalToInputValue(
                     { type: InputType.Collection, subtype: { type } },
