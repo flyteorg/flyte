@@ -3,6 +3,9 @@ package transformers
 import (
 	"testing"
 
+	"time"
+
+	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -101,6 +104,8 @@ func TestCreateArtifactModelNoMetdata(t *testing.T) {
 }
 
 func TestFromArtifactModel(t *testing.T) {
+	createdAt := time.Now()
+
 	artifactModel := models.Artifact{
 		ArtifactKey: models.ArtifactKey{
 			DatasetProject: "project1",
@@ -112,6 +117,9 @@ func TestFromArtifactModel(t *testing.T) {
 		SerializedMetadata: []byte{},
 		Partitions:         getTestPartitions(),
 		Tags:               getTestTags(),
+		BaseModel: models.BaseModel{
+			CreatedAt: createdAt,
+		},
 	}
 
 	actual, err := FromArtifactModel(artifactModel)
@@ -130,6 +138,10 @@ func TestFromArtifactModel(t *testing.T) {
 
 	assert.Len(t, actual.Tags, 1)
 	assert.EqualValues(t, artifactModel.Tags[0].TagName, actual.Tags[0].Name)
+
+	timestampProto, err := ptypes.TimestampProto(createdAt)
+	assert.NoError(t, err)
+	assert.Equal(t, actual.CreatedAt, timestampProto)
 }
 
 func TestToArtifactKey(t *testing.T) {
