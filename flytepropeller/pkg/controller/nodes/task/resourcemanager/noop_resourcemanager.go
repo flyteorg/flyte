@@ -26,6 +26,9 @@ func (r *NoopResourceManagerBuilder) RegisterResourceQuota(ctx context.Context, 
 	return nil
 }
 
+func (r *NoopResourceManagerBuilder) RegisterResourceNamespaceQuotaProportionCap(_ context.Context, quotaProportionCap float64) {
+}
+
 func (r *NoopResourceManagerBuilder) BuildResourceManager(ctx context.Context) (pluginCore.ResourceManager, error) {
 	return &NoopResourceManager{}, nil
 }
