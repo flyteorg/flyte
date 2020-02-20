@@ -3,10 +3,12 @@ package impl
 import (
 	"context"
 	"testing"
+	"time"
 
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/datacatalog/pkg/common"
 	"github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/mocks"
@@ -48,6 +50,11 @@ func getTestStringLiteral() *core.Literal {
 	}
 }
 
+func getTestTimestamp() time.Time {
+	timestamp, _ := time.Parse(time.RFC3339, "2019-12-26T00:00:00+00:00")
+	return timestamp
+}
+
 func getTestArtifact() *datacatalog.Artifact {
 	datasetID := &datacatalog.DatasetID{
 		Project: "test-project",
@@ -56,6 +63,8 @@ func getTestArtifact() *datacatalog.Artifact {
 		Version: "test-version",
 		UUID:    "test-uuid",
 	}
+	createdAt, _ := ptypes.TimestampProto(getTestTimestamp())
+
 	return &datacatalog.Artifact{
 		Id:      "test-id",
 		Dataset: datasetID,
@@ -75,6 +84,7 @@ func getTestArtifact() *datacatalog.Artifact {
 		Tags: []*datacatalog.Tag{
 			{Name: "test-tag", Dataset: datasetID, ArtifactId: "test-id"},
 		},
+		CreatedAt: createdAt,
 	}
 }
 
@@ -133,6 +143,9 @@ func getExpectedArtifactModel(ctx context.Context, t *testing.T, datastore *stor
 		},
 		Tags: []models.Tag{
 			{TagKey: models.TagKey{TagName: "test-tag"}, DatasetUUID: expectedDataset.UUID, ArtifactID: artifact.Id},
+		},
+		BaseModel: models.BaseModel{
+			CreatedAt: getTestTimestamp(),
 		},
 	}
 }

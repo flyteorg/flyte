@@ -1,8 +1,11 @@
 package transformers
 
 import (
+	"github.com/golang/protobuf/ptypes"
+	"github.com/lyft/datacatalog/pkg/errors"
 	"github.com/lyft/datacatalog/pkg/repositories/models"
 	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"google.golang.org/grpc/codes"
 )
 
 func CreateArtifactModel(request datacatalog.CreateArtifactRequest, artifactData []models.ArtifactData, dataset models.Dataset) (models.Artifact, error) {
@@ -63,12 +66,19 @@ func FromArtifactModel(artifact models.Artifact) (datacatalog.Artifact, error) {
 	for i, tag := range artifact.Tags {
 		tags[i] = FromTagModel(datasetID, tag)
 	}
+
+	createdAt, err := ptypes.TimestampProto(artifact.CreatedAt)
+	if err != nil {
+		return datacatalog.Artifact{}, errors.NewDataCatalogErrorf(codes.Internal,
+			"artifact [%+v] invalid createdAt time conversion", artifact)
+	}
 	return datacatalog.Artifact{
 		Id:         artifact.ArtifactID,
 		Dataset:    &datasetID,
 		Metadata:   metadata,
 		Partitions: partitions,
 		Tags:       tags,
+		CreatedAt:  createdAt,
 	}, nil
 }
 
