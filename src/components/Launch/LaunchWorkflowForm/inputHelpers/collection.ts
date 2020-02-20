@@ -1,9 +1,10 @@
 import { Core } from 'flyteidl';
-import { InputTypeDefinition, InputValue } from '../types';
+import { InputType, InputTypeDefinition, InputValue } from '../types';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
 import { parseJSON } from './parseJson';
 import { ConverterInput, InputHelper } from './types';
+import { collectionChildToString } from './utils';
 
 const missingSubTypeError = 'Unexpected missing subtype for collection';
 
@@ -36,7 +37,7 @@ function fromLiteral(
         (out, literal) => {
             const value = subTypeHelper.fromLiteral(literal, subtype);
             if (value !== undefined) {
-                out.push(value.toString());
+                out.push(collectionChildToString(subtype.type, value));
             }
             return out;
         },
