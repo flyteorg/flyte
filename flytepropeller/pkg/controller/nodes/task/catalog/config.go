@@ -30,9 +30,9 @@ const (
 )
 
 type Config struct {
-	Type       DiscoveryType   `json:"type" pflag:"\"noop\", Catalog Implementation to use"`
-	Endpoint   string          `json:"endpoint" pflag:"\"\", Endpoint for catalog service"`
-	Insecure   bool            `json:"insecure" pflag:"false, Use insecure grpc connection"`
+	Type        DiscoveryType   `json:"type" pflag:"\"noop\", Catalog Implementation to use"`
+	Endpoint    string          `json:"endpoint" pflag:"\"\", Endpoint for catalog service"`
+	Insecure    bool            `json:"insecure" pflag:"false, Use insecure grpc connection"`
 	MaxCacheAge config.Duration `json:"max-cache-age" pflag:", Cache entries past this age will incur cache miss. 0 means cache never expires"`
 }
 

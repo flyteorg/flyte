@@ -13,13 +13,13 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/pkg/errors"
 
+	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flytestdlib/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/util/uuid"
-	"github.com/golang/protobuf/ptypes"
 )
 
 const (
@@ -33,7 +33,7 @@ var (
 
 // This is the client that caches task executions to DataCatalog service.
 type CatalogClient struct {
-	client datacatalog.DataCatalogClient
+	client      datacatalog.DataCatalogClient
 	maxCacheAge time.Duration
 }
 
@@ -80,7 +80,7 @@ func (m *CatalogClient) GetArtifactByTag(ctx context.Context, tagName string, da
 			return nil, err
 		}
 
-		if time.Now().Sub(createdAt) >= m.maxCacheAge {
+		if time.Since(createdAt) >= m.maxCacheAge {
 			logger.Warningf(ctx, "Expired Cached Artifact %v created on %v, older than max age %v",
 				artifact.Id, artifact.CreatedAt.String(), m.maxCacheAge)
 			return nil, status.Error(codes.NotFound, "Artifact over age limit")
@@ -306,7 +306,7 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 	client := datacatalog.NewDataCatalogClient(clientConn)
 
 	return &CatalogClient{
-		client: client,
+		client:      client,
 		maxCacheAge: maxCacheAge,
 	}, nil
 }
