@@ -13,6 +13,7 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/pkg/errors"
 
+	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flytestdlib/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -32,7 +33,8 @@ var (
 
 // This is the client that caches task executions to DataCatalog service.
 type CatalogClient struct {
-	client datacatalog.DataCatalogClient
+	client      datacatalog.DataCatalogClient
+	maxCacheAge time.Duration
 }
 
 // Helper method to retrieve a dataset that is associated with the task
@@ -67,6 +69,22 @@ func (m *CatalogClient) GetArtifactByTag(ctx context.Context, tagName string, da
 	response, err := m.client.GetArtifact(ctx, artifactQuery)
 	if err != nil {
 		return nil, err
+	}
+
+	// check artifact's age if the configuration specifies a max age
+	if m.maxCacheAge > time.Duration(0) {
+		artifact := response.Artifact
+		createdAt, err := ptypes.Timestamp(artifact.CreatedAt)
+		if err != nil {
+			logger.Errorf(ctx, "DataCatalog Artifact has invalid createdAt %+v, err: %+v", artifact.CreatedAt, err)
+			return nil, err
+		}
+
+		if time.Since(createdAt) > m.maxCacheAge {
+			logger.Warningf(ctx, "Expired Cached Artifact %v created on %v, older than max age %v",
+				artifact.Id, createdAt.String(), m.maxCacheAge)
+			return nil, status.Error(codes.NotFound, "Artifact over age limit")
+		}
 	}
 
 	return response.Artifact, nil
@@ -254,7 +272,7 @@ func (m *CatalogClient) Put(ctx context.Context, key catalog.Key, reader io.Outp
 }
 
 // Create a new Datacatalog client for task execution caching
-func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool) (*CatalogClient, error) {
+func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection bool, maxCacheAge time.Duration) (*CatalogClient, error) {
 	var opts []grpc.DialOption
 
 	grpcOptions := []grpcRetry.CallOption{
@@ -288,6 +306,7 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 	client := datacatalog.NewDataCatalogClient(clientConn)
 
 	return &CatalogClient{
-		client: client,
+		client:      client,
+		maxCacheAge: maxCacheAge,
 	}, nil
 }
