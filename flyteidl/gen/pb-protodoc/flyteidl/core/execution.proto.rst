@@ -210,7 +210,8 @@ Represents the error message from the execution.
   {
     "code": "...",
     "message": "...",
-    "error_uri": "..."
+    "error_uri": "...",
+    "kind": "..."
   }
 
 .. _api_field_flyteidl.core.ExecutionError.code:
@@ -232,14 +233,43 @@ error_uri
   (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Full error contents accessible via a URI
   
   
+.. _api_field_flyteidl.core.ExecutionError.kind:
 
+kind
+  (:ref:`flyteidl.core.ExecutionError.ErrorKind <api_enum_flyteidl.core.ExecutionError.ErrorKind>`) 
+  
+
+.. _api_enum_flyteidl.core.ExecutionError.ErrorKind:
+
+Enum flyteidl.core.ExecutionError.ErrorKind
+-------------------------------------------
+
+`[flyteidl.core.ExecutionError.ErrorKind proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L62>`_
+
+Error type: System or User
+
+.. _api_enum_value_flyteidl.core.ExecutionError.ErrorKind.UNKNOWN:
+
+UNKNOWN
+  *(DEFAULT)* ⁣
+  
+.. _api_enum_value_flyteidl.core.ExecutionError.ErrorKind.USER:
+
+USER
+  ⁣
+  
+.. _api_enum_value_flyteidl.core.ExecutionError.ErrorKind.SYSTEM:
+
+SYSTEM
+  ⁣
+  
 
 .. _api_msg_flyteidl.core.TaskLog:
 
 flyteidl.core.TaskLog
 ---------------------
 
-`[flyteidl.core.TaskLog proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L65>`_
+`[flyteidl.core.TaskLog proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L72>`_
 
 Log information for the task that is specific to a log sink
 When our log story is flushed out, we may have more metadata here like log link expiry
@@ -279,7 +309,7 @@ ttl
 Enum flyteidl.core.TaskLog.MessageFormat
 ----------------------------------------
 
-`[flyteidl.core.TaskLog.MessageFormat proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L67>`_
+`[flyteidl.core.TaskLog.MessageFormat proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L74>`_
 
 
 .. _api_enum_value_flyteidl.core.TaskLog.MessageFormat.UNKNOWN:

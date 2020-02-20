@@ -121,7 +121,7 @@ void InitDefaults_flyteidl_2fcore_2fexecution_2eproto() {
 }
 
 ::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fexecution_2eproto[5];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fcore_2fexecution_2eproto[4];
+const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fcore_2fexecution_2eproto[5];
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fcore_2fexecution_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fexecution_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -148,6 +148,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fexecution_2eproto
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::ExecutionError, code_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::ExecutionError, message_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::ExecutionError, error_uri_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ExecutionError, kind_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskLog, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -163,7 +164,7 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 5, -1, sizeof(::flyteidl::core::NodeExecution)},
   { 10, -1, sizeof(::flyteidl::core::TaskExecution)},
   { 15, -1, sizeof(::flyteidl::core::ExecutionError)},
-  { 23, -1, sizeof(::flyteidl::core::TaskLog)},
+  { 24, -1, sizeof(::flyteidl::core::TaskLog)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -193,20 +194,22 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fexecution_2eproto[] =
   "KIPPED\020\007\022\r\n\tTIMED_OUT\020\010\"h\n\rTaskExecution"
   "\"W\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n\006QUEUED\020\001\022\013\n\007"
   "RUNNING\020\002\022\r\n\tSUCCEEDED\020\003\022\013\n\007ABORTED\020\004\022\n\n"
-  "\006FAILED\020\005\"B\n\016ExecutionError\022\014\n\004code\030\001 \001("
-  "\t\022\017\n\007message\030\002 \001(\t\022\021\n\terror_uri\030\003 \001(\t\"\273\001"
-  "\n\007TaskLog\022\013\n\003uri\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\016"
-  "message_format\030\003 \001(\0162$.flyteidl.core.Tas"
-  "kLog.MessageFormat\022&\n\003ttl\030\004 \001(\0132\031.google"
-  ".protobuf.Duration\"/\n\rMessageFormat\022\013\n\007U"
-  "NKNOWN\020\000\022\007\n\003CSV\020\001\022\010\n\004JSON\020\002B2Z0github.co"
-  "m/lyft/flyteidl/gen/pb-go/flyteidl/coreb"
-  "\006proto3"
+  "\006FAILED\020\005\"\251\001\n\016ExecutionError\022\014\n\004code\030\001 \001"
+  "(\t\022\017\n\007message\030\002 \001(\t\022\021\n\terror_uri\030\003 \001(\t\0225"
+  "\n\004kind\030\004 \001(\0162\'.flyteidl.core.ExecutionEr"
+  "ror.ErrorKind\".\n\tErrorKind\022\013\n\007UNKNOWN\020\000\022"
+  "\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\273\001\n\007TaskLog\022\013\n\003uri"
+  "\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\016message_format\030\003"
+  " \001(\0162$.flyteidl.core.TaskLog.MessageForm"
+  "at\022&\n\003ttl\030\004 \001(\0132\031.google.protobuf.Durati"
+  "on\"/\n\rMessageFormat\022\013\n\007UNKNOWN\020\000\022\007\n\003CSV\020"
+  "\001\022\010\n\004JSON\020\002B2Z0github.com/lyft/flyteidl/"
+  "gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fexecution_2eproto,
-  "flyteidl/core/execution.proto", &assign_descriptors_table_flyteidl_2fcore_2fexecution_2eproto, 807,
+  "flyteidl/core/execution.proto", &assign_descriptors_table_flyteidl_2fcore_2fexecution_2eproto, 911,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fexecution_2eproto() {
@@ -320,9 +323,32 @@ const TaskExecution_Phase TaskExecution::Phase_MIN;
 const TaskExecution_Phase TaskExecution::Phase_MAX;
 const int TaskExecution::Phase_ARRAYSIZE;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-const ::google::protobuf::EnumDescriptor* TaskLog_MessageFormat_descriptor() {
+const ::google::protobuf::EnumDescriptor* ExecutionError_ErrorKind_descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fcore_2fexecution_2eproto);
   return file_level_enum_descriptors_flyteidl_2fcore_2fexecution_2eproto[3];
+}
+bool ExecutionError_ErrorKind_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const ExecutionError_ErrorKind ExecutionError::UNKNOWN;
+const ExecutionError_ErrorKind ExecutionError::USER;
+const ExecutionError_ErrorKind ExecutionError::SYSTEM;
+const ExecutionError_ErrorKind ExecutionError::ErrorKind_MIN;
+const ExecutionError_ErrorKind ExecutionError::ErrorKind_MAX;
+const int ExecutionError::ErrorKind_ARRAYSIZE;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+const ::google::protobuf::EnumDescriptor* TaskLog_MessageFormat_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fcore_2fexecution_2eproto);
+  return file_level_enum_descriptors_flyteidl_2fcore_2fexecution_2eproto[4];
 }
 bool TaskLog_MessageFormat_IsValid(int value) {
   switch (value) {
@@ -983,6 +1009,7 @@ class ExecutionError::HasBitSetters {
 const int ExecutionError::kCodeFieldNumber;
 const int ExecutionError::kMessageFieldNumber;
 const int ExecutionError::kErrorUriFieldNumber;
+const int ExecutionError::kKindFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ExecutionError::ExecutionError()
@@ -1006,6 +1033,7 @@ ExecutionError::ExecutionError(const ExecutionError& from)
   if (from.error_uri().size() > 0) {
     error_uri_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.error_uri_);
   }
+  kind_ = from.kind_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.ExecutionError)
 }
 
@@ -1015,6 +1043,7 @@ void ExecutionError::SharedCtor() {
   code_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   error_uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  kind_ = 0;
 }
 
 ExecutionError::~ExecutionError() {
@@ -1046,6 +1075,7 @@ void ExecutionError::Clear() {
   code_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   error_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  kind_ = 0;
   _internal_metadata_.Clear();
 }
 
@@ -1108,6 +1138,14 @@ const char* ExecutionError::_InternalParse(const char* begin, const char* end, v
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // .flyteidl.core.ExecutionError.ErrorKind kind = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_kind(static_cast<::flyteidl::core::ExecutionError_ErrorKind>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -1189,6 +1227,20 @@ bool ExecutionError::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.core.ExecutionError.ErrorKind kind = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
+          int value = 0;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_kind(static_cast< ::flyteidl::core::ExecutionError_ErrorKind >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1246,6 +1298,12 @@ void ExecutionError::SerializeWithCachedSizes(
       3, this->error_uri(), output);
   }
 
+  // .flyteidl.core.ExecutionError.ErrorKind kind = 4;
+  if (this->kind() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      4, this->kind(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1292,6 +1350,12 @@ void ExecutionError::SerializeWithCachedSizes(
         3, this->error_uri(), target);
   }
 
+  // .flyteidl.core.ExecutionError.ErrorKind kind = 4;
+  if (this->kind() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      4, this->kind(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -1334,6 +1398,12 @@ size_t ExecutionError::ByteSizeLong() const {
         this->error_uri());
   }
 
+  // .flyteidl.core.ExecutionError.ErrorKind kind = 4;
+  if (this->kind() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->kind());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -1373,6 +1443,9 @@ void ExecutionError::MergeFrom(const ExecutionError& from) {
 
     error_uri_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.error_uri_);
   }
+  if (from.kind() != 0) {
+    set_kind(from.kind());
+  }
 }
 
 void ExecutionError::CopyFrom(const ::google::protobuf::Message& from) {
@@ -1406,6 +1479,7 @@ void ExecutionError::InternalSwap(ExecutionError* other) {
     GetArenaNoVirtual());
   error_uri_.Swap(&other->error_uri_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
+  swap(kind_, other->kind_);
 }
 
 ::google::protobuf::Metadata ExecutionError::GetMetadata() const {

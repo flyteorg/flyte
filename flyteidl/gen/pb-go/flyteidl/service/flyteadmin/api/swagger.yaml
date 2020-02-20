@@ -2295,6 +2295,14 @@ definitions:
       ids:
       - "ids"
       - "ids"
+  ExecutionErrorErrorKind:
+    type: "string"
+    title: "Error type: System or User"
+    enum:
+    - "UNKNOWN"
+    - "USER"
+    - "SYSTEM"
+    default: "UNKNOWN"
   ExecutionMetadataExecutionMode:
     type: "string"
     description: "The method by which this execution was launched.\n\n - MANUAL: The\
@@ -2497,6 +2505,7 @@ definitions:
         created_at: "2000-01-23T04:56:07.000+00:00"
         error:
           code: "code"
+          kind: {}
           message: "message"
           error_uri: "error_uri"
         abort_cause: "abort_cause"
@@ -2668,6 +2677,7 @@ definitions:
       created_at: "2000-01-23T04:56:07.000+00:00"
       error:
         code: "code"
+        kind: {}
         message: "message"
         error_uri: "error_uri"
       abort_cause: "abort_cause"
@@ -2789,6 +2799,7 @@ definitions:
           created_at: "2000-01-23T04:56:07.000+00:00"
           error:
             code: "code"
+            kind: {}
             message: "message"
             error_uri: "error_uri"
           abort_cause: "abort_cause"
@@ -2913,6 +2924,7 @@ definitions:
           created_at: "2000-01-23T04:56:07.000+00:00"
           error:
             code: "code"
+            kind: {}
             message: "message"
             error_uri: "error_uri"
           abort_cause: "abort_cause"
@@ -4699,6 +4711,7 @@ definitions:
       created_at: "2000-01-23T04:56:07.000+00:00"
       error:
         code: "code"
+        kind: {}
         message: "message"
         error_uri: "error_uri"
   adminNodeExecutionEventRequest:
@@ -4767,6 +4780,7 @@ definitions:
           created_at: "2000-01-23T04:56:07.000+00:00"
           error:
             code: "code"
+            kind: {}
             message: "message"
             error_uri: "error_uri"
       - input_uri: "input_uri"
@@ -4790,6 +4804,7 @@ definitions:
           created_at: "2000-01-23T04:56:07.000+00:00"
           error:
             code: "code"
+            kind: {}
             message: "message"
             error_uri: "error_uri"
       token: "token"
@@ -5410,6 +5425,7 @@ definitions:
       created_at: "2000-01-23T04:56:07.000+00:00"
       error:
         code: "code"
+        kind: {}
         message: "message"
         error_uri: "error_uri"
       logs:
@@ -5502,6 +5518,7 @@ definitions:
           created_at: "2000-01-23T04:56:07.000+00:00"
           error:
             code: "code"
+            kind: {}
             message: "message"
             error_uri: "error_uri"
           logs:
@@ -5549,6 +5566,7 @@ definitions:
           created_at: "2000-01-23T04:56:07.000+00:00"
           error:
             code: "code"
+            kind: {}
             message: "message"
             error_uri: "error_uri"
           logs:
@@ -21018,9 +21036,12 @@ definitions:
       error_uri:
         type: "string"
         title: "Full error contents accessible via a URI"
+      kind:
+        $ref: "#/definitions/ExecutionErrorErrorKind"
     description: "Represents the error message from the execution."
     example:
       code: "code"
+      kind: {}
       message: "message"
       error_uri: "error_uri"
   coreIdentifier:
@@ -23460,6 +23481,7 @@ definitions:
         created_at: "2000-01-23T04:56:07.000+00:00"
         error:
           code: "code"
+          kind: {}
           message: "message"
           error_uri: "error_uri"
   flyteidladminTaskExecution:
@@ -23519,6 +23541,7 @@ definitions:
         created_at: "2000-01-23T04:56:07.000+00:00"
         error:
           code: "code"
+          kind: {}
           message: "message"
           error_uri: "error_uri"
         logs:

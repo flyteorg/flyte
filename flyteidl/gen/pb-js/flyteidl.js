@@ -9700,6 +9700,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [code] ExecutionError code
              * @property {string|null} [message] ExecutionError message
              * @property {string|null} [errorUri] ExecutionError errorUri
+             * @property {flyteidl.core.ExecutionError.ErrorKind|null} [kind] ExecutionError kind
              */
 
             /**
@@ -9742,6 +9743,14 @@ export const flyteidl = $root.flyteidl = (() => {
             ExecutionError.prototype.errorUri = "";
 
             /**
+             * ExecutionError kind.
+             * @member {flyteidl.core.ExecutionError.ErrorKind} kind
+             * @memberof flyteidl.core.ExecutionError
+             * @instance
+             */
+            ExecutionError.prototype.kind = 0;
+
+            /**
              * Creates a new ExecutionError instance using the specified properties.
              * @function create
              * @memberof flyteidl.core.ExecutionError
@@ -9771,6 +9780,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
                 if (message.errorUri != null && message.hasOwnProperty("errorUri"))
                     writer.uint32(/* id 3, wireType 2 =*/26).string(message.errorUri);
+                if (message.kind != null && message.hasOwnProperty("kind"))
+                    writer.uint32(/* id 4, wireType 0 =*/32).int32(message.kind);
                 return writer;
             };
 
@@ -9801,6 +9812,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 3:
                         message.errorUri = reader.string();
                         break;
+                    case 4:
+                        message.kind = reader.int32();
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -9829,8 +9843,33 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.errorUri != null && message.hasOwnProperty("errorUri"))
                     if (!$util.isString(message.errorUri))
                         return "errorUri: string expected";
+                if (message.kind != null && message.hasOwnProperty("kind"))
+                    switch (message.kind) {
+                    default:
+                        return "kind: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
+                    }
                 return null;
             };
+
+            /**
+             * ErrorKind enum.
+             * @name flyteidl.core.ExecutionError.ErrorKind
+             * @enum {string}
+             * @property {number} UNKNOWN=0 UNKNOWN value
+             * @property {number} USER=1 USER value
+             * @property {number} SYSTEM=2 SYSTEM value
+             */
+            ExecutionError.ErrorKind = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "UNKNOWN"] = 0;
+                values[valuesById[1] = "USER"] = 1;
+                values[valuesById[2] = "SYSTEM"] = 2;
+                return values;
+            })();
 
             return ExecutionError;
         })();

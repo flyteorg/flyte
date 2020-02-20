@@ -15,4 +15,5 @@ type CoreExecutionError struct {
 	// Detailed description of the error - including stack trace.
 	Message string `json:"message,omitempty"`
 	ErrorUri string `json:"error_uri,omitempty"`
+	Kind *ExecutionErrorErrorKind `json:"kind,omitempty"`
 }

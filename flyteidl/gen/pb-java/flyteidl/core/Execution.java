@@ -1788,6 +1788,15 @@ public final class Execution {
      */
     com.google.protobuf.ByteString
         getErrorUriBytes();
+
+    /**
+     * <code>.flyteidl.core.ExecutionError.ErrorKind kind = 4;</code>
+     */
+    int getKindValue();
+    /**
+     * <code>.flyteidl.core.ExecutionError.ErrorKind kind = 4;</code>
+     */
+    flyteidl.core.Execution.ExecutionError.ErrorKind getKind();
   }
   /**
    * <pre>
@@ -1809,6 +1818,7 @@ public final class Execution {
       code_ = "";
       message_ = "";
       errorUri_ = "";
+      kind_ = 0;
     }
 
     @java.lang.Override
@@ -1853,6 +1863,12 @@ public final class Execution {
               errorUri_ = s;
               break;
             }
+            case 32: {
+              int rawValue = input.readEnum();
+
+              kind_ = rawValue;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -1883,6 +1899,117 @@ public final class Execution {
       return flyteidl.core.Execution.internal_static_flyteidl_core_ExecutionError_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               flyteidl.core.Execution.ExecutionError.class, flyteidl.core.Execution.ExecutionError.Builder.class);
+    }
+
+    /**
+     * <pre>
+     * Error type: System or User
+     * </pre>
+     *
+     * Protobuf enum {@code flyteidl.core.ExecutionError.ErrorKind}
+     */
+    public enum ErrorKind
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>UNKNOWN = 0;</code>
+       */
+      UNKNOWN(0),
+      /**
+       * <code>USER = 1;</code>
+       */
+      USER(1),
+      /**
+       * <code>SYSTEM = 2;</code>
+       */
+      SYSTEM(2),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <code>UNKNOWN = 0;</code>
+       */
+      public static final int UNKNOWN_VALUE = 0;
+      /**
+       * <code>USER = 1;</code>
+       */
+      public static final int USER_VALUE = 1;
+      /**
+       * <code>SYSTEM = 2;</code>
+       */
+      public static final int SYSTEM_VALUE = 2;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static ErrorKind valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static ErrorKind forNumber(int value) {
+        switch (value) {
+          case 0: return UNKNOWN;
+          case 1: return USER;
+          case 2: return SYSTEM;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<ErrorKind>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          ErrorKind> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<ErrorKind>() {
+              public ErrorKind findValueByNumber(int number) {
+                return ErrorKind.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return flyteidl.core.Execution.ExecutionError.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final ErrorKind[] VALUES = values();
+
+      public static ErrorKind valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private ErrorKind(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:flyteidl.core.ExecutionError.ErrorKind)
     }
 
     public static final int CODE_FIELD_NUMBER = 1;
@@ -2013,6 +2140,23 @@ public final class Execution {
       }
     }
 
+    public static final int KIND_FIELD_NUMBER = 4;
+    private int kind_;
+    /**
+     * <code>.flyteidl.core.ExecutionError.ErrorKind kind = 4;</code>
+     */
+    public int getKindValue() {
+      return kind_;
+    }
+    /**
+     * <code>.flyteidl.core.ExecutionError.ErrorKind kind = 4;</code>
+     */
+    public flyteidl.core.Execution.ExecutionError.ErrorKind getKind() {
+      @SuppressWarnings("deprecation")
+      flyteidl.core.Execution.ExecutionError.ErrorKind result = flyteidl.core.Execution.ExecutionError.ErrorKind.valueOf(kind_);
+      return result == null ? flyteidl.core.Execution.ExecutionError.ErrorKind.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2036,6 +2180,9 @@ public final class Execution {
       if (!getErrorUriBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, errorUri_);
       }
+      if (kind_ != flyteidl.core.Execution.ExecutionError.ErrorKind.UNKNOWN.getNumber()) {
+        output.writeEnum(4, kind_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2053,6 +2200,10 @@ public final class Execution {
       }
       if (!getErrorUriBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, errorUri_);
+      }
+      if (kind_ != flyteidl.core.Execution.ExecutionError.ErrorKind.UNKNOWN.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(4, kind_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2075,6 +2226,7 @@ public final class Execution {
           .equals(other.getMessage())) return false;
       if (!getErrorUri()
           .equals(other.getErrorUri())) return false;
+      if (kind_ != other.kind_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2092,6 +2244,8 @@ public final class Execution {
       hash = (53 * hash) + getMessage().hashCode();
       hash = (37 * hash) + ERROR_URI_FIELD_NUMBER;
       hash = (53 * hash) + getErrorUri().hashCode();
+      hash = (37 * hash) + KIND_FIELD_NUMBER;
+      hash = (53 * hash) + kind_;
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2235,6 +2389,8 @@ public final class Execution {
 
         errorUri_ = "";
 
+        kind_ = 0;
+
         return this;
       }
 
@@ -2264,6 +2420,7 @@ public final class Execution {
         result.code_ = code_;
         result.message_ = message_;
         result.errorUri_ = errorUri_;
+        result.kind_ = kind_;
         onBuilt();
         return result;
       }
@@ -2323,6 +2480,9 @@ public final class Execution {
         if (!other.getErrorUri().isEmpty()) {
           errorUri_ = other.errorUri_;
           onChanged();
+        }
+        if (other.kind_ != 0) {
+          setKindValue(other.getKindValue());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2621,6 +2781,51 @@ public final class Execution {
   checkByteStringIsUtf8(value);
         
         errorUri_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int kind_ = 0;
+      /**
+       * <code>.flyteidl.core.ExecutionError.ErrorKind kind = 4;</code>
+       */
+      public int getKindValue() {
+        return kind_;
+      }
+      /**
+       * <code>.flyteidl.core.ExecutionError.ErrorKind kind = 4;</code>
+       */
+      public Builder setKindValue(int value) {
+        kind_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.ExecutionError.ErrorKind kind = 4;</code>
+       */
+      public flyteidl.core.Execution.ExecutionError.ErrorKind getKind() {
+        @SuppressWarnings("deprecation")
+        flyteidl.core.Execution.ExecutionError.ErrorKind result = flyteidl.core.Execution.ExecutionError.ErrorKind.valueOf(kind_);
+        return result == null ? flyteidl.core.Execution.ExecutionError.ErrorKind.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>.flyteidl.core.ExecutionError.ErrorKind kind = 4;</code>
+       */
+      public Builder setKind(flyteidl.core.Execution.ExecutionError.ErrorKind value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        kind_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.ExecutionError.ErrorKind kind = 4;</code>
+       */
+      public Builder clearKind() {
+        
+        kind_ = 0;
         onChanged();
         return this;
       }
@@ -3814,15 +4019,17 @@ public final class Execution {
       "KIPPED\020\007\022\r\n\tTIMED_OUT\020\010\"h\n\rTaskExecution" +
       "\"W\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n\006QUEUED\020\001\022\013\n\007" +
       "RUNNING\020\002\022\r\n\tSUCCEEDED\020\003\022\013\n\007ABORTED\020\004\022\n\n" +
-      "\006FAILED\020\005\"B\n\016ExecutionError\022\014\n\004code\030\001 \001(" +
-      "\t\022\017\n\007message\030\002 \001(\t\022\021\n\terror_uri\030\003 \001(\t\"\273\001" +
-      "\n\007TaskLog\022\013\n\003uri\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\016" +
-      "message_format\030\003 \001(\0162$.flyteidl.core.Tas" +
-      "kLog.MessageFormat\022&\n\003ttl\030\004 \001(\0132\031.google" +
-      ".protobuf.Duration\"/\n\rMessageFormat\022\013\n\007U" +
-      "NKNOWN\020\000\022\007\n\003CSV\020\001\022\010\n\004JSON\020\002B2Z0github.co" +
-      "m/lyft/flyteidl/gen/pb-go/flyteidl/coreb" +
-      "\006proto3"
+      "\006FAILED\020\005\"\251\001\n\016ExecutionError\022\014\n\004code\030\001 \001" +
+      "(\t\022\017\n\007message\030\002 \001(\t\022\021\n\terror_uri\030\003 \001(\t\0225" +
+      "\n\004kind\030\004 \001(\0162\'.flyteidl.core.ExecutionEr" +
+      "ror.ErrorKind\".\n\tErrorKind\022\013\n\007UNKNOWN\020\000\022" +
+      "\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\273\001\n\007TaskLog\022\013\n\003uri" +
+      "\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\016message_format\030\003" +
+      " \001(\0162$.flyteidl.core.TaskLog.MessageForm" +
+      "at\022&\n\003ttl\030\004 \001(\0132\031.google.protobuf.Durati" +
+      "on\"/\n\rMessageFormat\022\013\n\007UNKNOWN\020\000\022\007\n\003CSV\020" +
+      "\001\022\010\n\004JSON\020\002B2Z0github.com/lyft/flyteidl/" +
+      "gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3860,7 +4067,7 @@ public final class Execution {
     internal_static_flyteidl_core_ExecutionError_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_ExecutionError_descriptor,
-        new java.lang.String[] { "Code", "Message", "ErrorUri", });
+        new java.lang.String[] { "Code", "Message", "ErrorUri", "Kind", });
     internal_static_flyteidl_core_TaskLog_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_core_TaskLog_fieldAccessorTable = new
