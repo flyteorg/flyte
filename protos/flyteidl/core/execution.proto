@@ -59,6 +59,13 @@ message ExecutionError {
     string message  = 2;
     // Full error contents accessible via a URI
     string error_uri = 3;
+    // Error type: System or User
+    enum ErrorKind {
+        UNKNOWN = 0;
+        USER = 1;
+        SYSTEM = 2;
+    }
+    ErrorKind kind = 4; 
 }
 
 // Log information for the task that is specific to a log sink
