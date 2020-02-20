@@ -2663,6 +2663,16 @@
         }
       }
     },
+    "ExecutionErrorErrorKind": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "USER",
+        "SYSTEM"
+      ],
+      "default": "UNKNOWN",
+      "title": "Error type: System or User"
+    },
     "ExecutionMetadataExecutionMode": {
       "type": "string",
       "enum": [
@@ -4432,6 +4442,9 @@
         "error_uri": {
           "type": "string",
           "title": "Full error contents accessible via a URI"
+        },
+        "kind": {
+          "$ref": "#/definitions/ExecutionErrorErrorKind"
         }
       },
       "description": "Represents the error message from the execution."

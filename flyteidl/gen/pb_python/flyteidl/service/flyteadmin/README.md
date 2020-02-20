@@ -280,6 +280,7 @@ Class | Method | HTTP request | Description
  - [EventParentTaskExecutionMetadata](docs/EventParentTaskExecutionMetadata.md)
  - [EventTaskExecutionEvent](docs/EventTaskExecutionEvent.md)
  - [EventWorkflowExecutionEvent](docs/EventWorkflowExecutionEvent.md)
+ - [ExecutionErrorErrorKind](docs/ExecutionErrorErrorKind.md)
  - [ExecutionMetadataExecutionMode](docs/ExecutionMetadataExecutionMode.md)
  - [FlyteidladminNodeExecution](docs/FlyteidladminNodeExecution.md)
  - [FlyteidladminTaskExecution](docs/FlyteidladminTaskExecution.md)

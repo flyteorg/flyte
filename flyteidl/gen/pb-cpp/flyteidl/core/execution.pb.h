@@ -162,6 +162,28 @@ inline bool TaskExecution_Phase_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<TaskExecution_Phase>(
     TaskExecution_Phase_descriptor(), name, value);
 }
+enum ExecutionError_ErrorKind {
+  ExecutionError_ErrorKind_UNKNOWN = 0,
+  ExecutionError_ErrorKind_USER = 1,
+  ExecutionError_ErrorKind_SYSTEM = 2,
+  ExecutionError_ErrorKind_ExecutionError_ErrorKind_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  ExecutionError_ErrorKind_ExecutionError_ErrorKind_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool ExecutionError_ErrorKind_IsValid(int value);
+const ExecutionError_ErrorKind ExecutionError_ErrorKind_ErrorKind_MIN = ExecutionError_ErrorKind_UNKNOWN;
+const ExecutionError_ErrorKind ExecutionError_ErrorKind_ErrorKind_MAX = ExecutionError_ErrorKind_SYSTEM;
+const int ExecutionError_ErrorKind_ErrorKind_ARRAYSIZE = ExecutionError_ErrorKind_ErrorKind_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* ExecutionError_ErrorKind_descriptor();
+inline const ::std::string& ExecutionError_ErrorKind_Name(ExecutionError_ErrorKind value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    ExecutionError_ErrorKind_descriptor(), value);
+}
+inline bool ExecutionError_ErrorKind_Parse(
+    const ::std::string& name, ExecutionError_ErrorKind* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<ExecutionError_ErrorKind>(
+    ExecutionError_ErrorKind_descriptor(), name, value);
+}
 enum TaskLog_MessageFormat {
   TaskLog_MessageFormat_UNKNOWN = 0,
   TaskLog_MessageFormat_CSV = 1,
@@ -708,6 +730,34 @@ class ExecutionError final :
 
   // nested types ----------------------------------------------------
 
+  typedef ExecutionError_ErrorKind ErrorKind;
+  static const ErrorKind UNKNOWN =
+    ExecutionError_ErrorKind_UNKNOWN;
+  static const ErrorKind USER =
+    ExecutionError_ErrorKind_USER;
+  static const ErrorKind SYSTEM =
+    ExecutionError_ErrorKind_SYSTEM;
+  static inline bool ErrorKind_IsValid(int value) {
+    return ExecutionError_ErrorKind_IsValid(value);
+  }
+  static const ErrorKind ErrorKind_MIN =
+    ExecutionError_ErrorKind_ErrorKind_MIN;
+  static const ErrorKind ErrorKind_MAX =
+    ExecutionError_ErrorKind_ErrorKind_MAX;
+  static const int ErrorKind_ARRAYSIZE =
+    ExecutionError_ErrorKind_ErrorKind_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  ErrorKind_descriptor() {
+    return ExecutionError_ErrorKind_descriptor();
+  }
+  static inline const ::std::string& ErrorKind_Name(ErrorKind value) {
+    return ExecutionError_ErrorKind_Name(value);
+  }
+  static inline bool ErrorKind_Parse(const ::std::string& name,
+      ErrorKind* value) {
+    return ExecutionError_ErrorKind_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   // string code = 1;
@@ -752,6 +802,12 @@ class ExecutionError final :
   ::std::string* release_error_uri();
   void set_allocated_error_uri(::std::string* error_uri);
 
+  // .flyteidl.core.ExecutionError.ErrorKind kind = 4;
+  void clear_kind();
+  static const int kKindFieldNumber = 4;
+  ::flyteidl::core::ExecutionError_ErrorKind kind() const;
+  void set_kind(::flyteidl::core::ExecutionError_ErrorKind value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.ExecutionError)
  private:
   class HasBitSetters;
@@ -760,6 +816,7 @@ class ExecutionError final :
   ::google::protobuf::internal::ArenaStringPtr code_;
   ::google::protobuf::internal::ArenaStringPtr message_;
   ::google::protobuf::internal::ArenaStringPtr error_uri_;
+  int kind_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fexecution_2eproto;
 };
@@ -1125,6 +1182,20 @@ inline void ExecutionError::set_allocated_error_uri(::std::string* error_uri) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ExecutionError.error_uri)
 }
 
+// .flyteidl.core.ExecutionError.ErrorKind kind = 4;
+inline void ExecutionError::clear_kind() {
+  kind_ = 0;
+}
+inline ::flyteidl::core::ExecutionError_ErrorKind ExecutionError::kind() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.ExecutionError.kind)
+  return static_cast< ::flyteidl::core::ExecutionError_ErrorKind >(kind_);
+}
+inline void ExecutionError::set_kind(::flyteidl::core::ExecutionError_ErrorKind value) {
+  
+  kind_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.ExecutionError.kind)
+}
+
 // -------------------------------------------------------------------
 
 // TaskLog
@@ -1329,6 +1400,11 @@ template <> struct is_proto_enum< ::flyteidl::core::TaskExecution_Phase> : ::std
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::TaskExecution_Phase>() {
   return ::flyteidl::core::TaskExecution_Phase_descriptor();
+}
+template <> struct is_proto_enum< ::flyteidl::core::ExecutionError_ErrorKind> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::ExecutionError_ErrorKind>() {
+  return ::flyteidl::core::ExecutionError_ErrorKind_descriptor();
 }
 template <> struct is_proto_enum< ::flyteidl::core::TaskLog_MessageFormat> : ::std::true_type {};
 template <>

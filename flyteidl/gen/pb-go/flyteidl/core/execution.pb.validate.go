@@ -247,6 +247,8 @@ func (m *ExecutionError) Validate() error {
 
 	// no validation rules for ErrorUri
 
+	// no validation rules for Kind
+
 	return nil
 }
 

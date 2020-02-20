@@ -4042,6 +4042,9 @@ export namespace flyteidl {
 
             /** ExecutionError errorUri */
             errorUri?: (string|null);
+
+            /** ExecutionError kind */
+            kind?: (flyteidl.core.ExecutionError.ErrorKind|null);
         }
 
         /** Represents an ExecutionError. */
@@ -4061,6 +4064,9 @@ export namespace flyteidl {
 
             /** ExecutionError errorUri. */
             public errorUri: string;
+
+            /** ExecutionError kind. */
+            public kind: flyteidl.core.ExecutionError.ErrorKind;
 
             /**
              * Creates a new ExecutionError instance using the specified properties.
@@ -4093,6 +4099,16 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace ExecutionError {
+
+            /** ErrorKind enum. */
+            enum ErrorKind {
+                UNKNOWN = 0,
+                USER = 1,
+                SYSTEM = 2
+            }
         }
 
         /** Properties of a TaskLog. */
