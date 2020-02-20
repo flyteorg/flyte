@@ -118,28 +118,11 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 }
 
 func (e Executor) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {
-	pluginState := &State{}
-	if _, err := tCtx.PluginStateReader().Get(pluginState); err != nil {
-		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to read unmarshal custom state")
-	}
-
-	if pluginState.State == nil {
-		pluginState.State = &arrayCore.State{}
-	}
-
-	p, _ := pluginState.GetPhase()
-	logger.Infof(ctx, "Abort is called with phase [%v]", p)
-
-	switch p {
-	case arrayCore.PhaseCheckingSubTaskExecutions:
-		return TerminateSubTasks(ctx, e.jobStore.Client, *pluginState.GetExternalJobID())
-	}
-
-	return nil
+	return TerminateSubTasks(ctx, tCtx, e.jobStore.Client, "Aborted")
 }
 
 func (e Executor) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
-	return nil
+	return TerminateSubTasks(ctx, tCtx, e.jobStore.Client, "Finalized")
 }
 
 func NewExecutor(ctx context.Context, awsClient aws.Client, cfg *batchConfig.Config,

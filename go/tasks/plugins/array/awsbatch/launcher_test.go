@@ -3,6 +3,8 @@ package awsbatch
 import (
 	"testing"
 
+	"github.com/stretchr/testify/mock"
+
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	core3 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
@@ -124,6 +126,29 @@ func TestLaunchSubTasks(t *testing.T) {
 		assert.NoError(t, err)
 		assertEqual(t, expectedState, newState)
 	})
+}
+
+func TestTerminateSubTasks(t *testing.T) {
+	ctx := context.Background()
+	pStateReader := &mocks.PluginStateReader{}
+	pStateReader.OnGetMatch(mock.Anything).Return(0, nil).Run(func(args mock.Arguments) {
+		s := args.Get(0).(*State)
+		s.ExternalJobID = refStr("abc-123")
+	})
+
+	tCtx := &mocks.TaskExecutionContext{}
+	tCtx.OnPluginStateReader().Return(pStateReader)
+
+	batchClient := &mocks2.Client{}
+	batchClient.OnTerminateJob(ctx, "abc-123", "Test terminate").Return(nil).Once()
+
+	t.Run("Simple", func(t *testing.T) {
+		assert.NoError(t, TerminateSubTasks(ctx, tCtx, batchClient, "Test terminate"))
+	})
+
+	batchClient.AssertExpectations(t)
+	tCtx.AssertExpectations(t)
+	pStateReader.AssertExpectations(t)
 }
 
 func assertEqual(t testing.TB, a, b interface{}) {
