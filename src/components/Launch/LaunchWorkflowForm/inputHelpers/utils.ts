@@ -16,7 +16,7 @@ export function extractLiteralWithCheck<T>(
     return value as T;
 }
 
-/** Converts a value within a collection to it appropriate string
+/** Converts a value within a collection to the appropriate string
  * representation. Some values require additional quotes.
  */
 export function collectionChildToString(type: InputType, value: any) {
@@ -25,7 +25,6 @@ export function collectionChildToString(type: InputType, value: any) {
     }
     switch (type) {
         case InputType.Integer:
-        case InputType.Float:
             return `${value}`;
         default:
             return JSON.stringify(value);
