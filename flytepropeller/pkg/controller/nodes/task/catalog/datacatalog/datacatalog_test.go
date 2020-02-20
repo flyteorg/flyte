@@ -219,7 +219,7 @@ func TestCatalog_Get(t *testing.T) {
 				return true
 			}),
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
-		createdAt, err := ptypes.TimestampProto(time.Now().Add(-1 * time.Hour))
+		createdAt, err := ptypes.TimestampProto(time.Now().Add(time.Minute * -61))
 		assert.NoError(t, err)
 
 		sampleArtifact := &datacatalog.Artifact{
@@ -269,7 +269,7 @@ func TestCatalog_Get(t *testing.T) {
 				return true
 			}),
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
-		createdAt, err := ptypes.TimestampProto(time.Now().Add(-1 * time.Minute * 59))
+		createdAt, err := ptypes.TimestampProto(time.Now().Add(time.Minute * -59))
 		assert.NoError(t, err)
 
 		sampleArtifact := &datacatalog.Artifact{
