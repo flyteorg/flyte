@@ -29,7 +29,7 @@ var (
 type Config struct {
 	Type             Type        `json:"type" pflag:"noop,Which resource manager to use"`
 	ResourceMaxQuota int         `json:"resourceMaxQuota" pflag:",Global limit for concurrent Qubole queries"`
-	RedisConfig      RedisConfig `json:"redis" pflag:",Config for Redist resourcemanager."`
+	RedisConfig      RedisConfig `json:"redis" pflag:",Config for Redis resourcemanager."`
 }
 
 // Specific configs for Redis resource manager

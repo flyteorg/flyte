@@ -3,6 +3,7 @@ package resourcemanager
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -21,6 +22,14 @@ func (t TokenPrefix) append(s string) string {
 	return fmt.Sprintf("%s%s%s", t, tokenNamespaceSeparator, s)
 }
 
+func extractTokenPrefix(t string) (string, error) {
+	splits := strings.Split(t, tokenNamespaceSeparator)
+	if len(splits) == 0 {
+		return "", fmt.Errorf("error occurred when trying to extract token prefix from token [%v] using the separator [%v]", t, tokenNamespaceSeparator)
+	}
+	return splits[0], nil
+}
+
 func composeExecutionUrn(id *core.TaskExecutionIdentifier) string {
 	return execUrnPrefix + execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetProject() +
 		execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetDomain() + execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetName()
@@ -33,9 +42,10 @@ func ComposeTokenPrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
 
 // This struct is designed to serve as the identifier of an user of resource manager
 type Resource struct {
-	quota          int
-	metrics        Metrics
-	rejectedTokens sync.Map
+	quota             int
+	namespaceQuotaCap int
+	metrics           Metrics
+	rejectedTokens    sync.Map
 }
 
 type Metrics interface {

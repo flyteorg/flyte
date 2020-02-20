@@ -2,6 +2,7 @@ package resourcemanager
 
 import (
 	"context"
+	"math"
 	"strings"
 	"sync"
 	"time"
@@ -23,6 +24,7 @@ type RedisResourceManagerBuilder struct {
 	client                      RedisClient
 	MetricsScope                promutils.Scope
 	namespacedResourcesQuotaMap map[pluginCore.ResourceNamespace]int
+	quotaProportionCap          float64
 }
 
 func (r *RedisResourceManagerBuilder) GetID() string {
@@ -60,6 +62,10 @@ func (r *RedisResourceManagerBuilder) RegisterResourceQuota(ctx context.Context,
 	return nil
 }
 
+func (r *RedisResourceManagerBuilder) RegisterResourceNamespaceQuotaProportionCap(_ context.Context, quotaProportionCap float64) {
+	r.quotaProportionCap = quotaProportionCap
+}
+
 func getValidMetricScopeName(name string) string {
 	return strings.Replace(name, "-", "_", -1)
 }
@@ -81,11 +87,19 @@ func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) 
 		// `namespace` is always prefixed with the RedisSetKeyPrefix and the plugin ID. Each plugin can then affix additional sub-namespaces to it to create different resource pools.
 		// For example, hive qubole plugin's namespaces contain plugin ID and qubole cluster (e.g., "redisresourcemanager:qubole-hive-executor:default-cluster").
 		metrics := NewRedisResourceManagerMetrics(r.MetricsScope.NewSubScope(getValidMetricScopeName(string(namespace))))
-
+		var namespaceResourceQuotaCap int
+		if r.quotaProportionCap <= 0.0 {
+			// 0.0 or negative number means there's no cap
+			namespaceResourceQuotaCap = 0
+		} else {
+			// If a cap is set, we want to make sure it's at least 1 or otherwise no allocation can be done
+			namespaceResourceQuotaCap = int(math.Max(1.0, math.Floor(r.quotaProportionCap*float64(quota))))
+		}
 		rm.namespacedResourcesMap[namespace] = &Resource{
-			quota:          quota,
-			metrics:        metrics,
-			rejectedTokens: sync.Map{},
+			quota:             quota,
+			namespaceQuotaCap: namespaceResourceQuotaCap,
+			metrics:           metrics,
+			rejectedTokens:    sync.Map{},
 		}
 		logger.Infof(ctx, "Creating namespacedResourcesMap: added namespace [%v] and resource [%v]", namespace, rm.namespacedResourcesMap[namespace])
 	}
@@ -98,6 +112,7 @@ func NewRedisResourceManagerBuilder(_ context.Context, client RedisClient, scope
 		client:                      client,
 		MetricsScope:                scope,
 		namespacedResourcesQuotaMap: map[pluginCore.ResourceNamespace]int{},
+		quotaProportionCap:          0.0,
 	}
 
 	return rn, nil
@@ -142,7 +157,7 @@ func (r *RedisResourceManager) pollRedis(ctx context.Context, namespace pluginCo
 	}
 	stopWatch := resource.metrics.(*RedisResourceManagerMetrics).RedisSizeCheckTime.Start()
 	defer stopWatch.Stop()
-	size, err := r.client.SCard(string(namespace)).Result()
+	size, err := r.client.SCard(string(namespace))
 	if err != nil {
 		logger.Errorf(ctx, "Error getting size of Redis set in metrics poller %v", err)
 		return
@@ -184,16 +199,45 @@ func (r *RedisResourceManager) GetID() string {
 	return RedisSetKeyPrefix
 }
 
+func (r *RedisResourceManager) getNamespaceAllocatedCount(ctx context.Context, client RedisClient, namespace pluginCore.ResourceNamespace, allocationToken string) (int, error) {
+	// TODO: redis's SMembers potentially leads to performance degradation at Redis side when there are too many members in the set.
+	// 		 If that happens, we should replace SMembers with Sscan, which needs extra work to deal with duplicated members
+	tokenPrefix, err := extractTokenPrefix(allocationToken)
+	if err != nil {
+		logger.Errorf(ctx, "Error occurred when extracting the prefix of the token [%v]: %v", allocationToken, err)
+		return -1, err
+	}
+
+	allocated, err := client.SMembers(string(namespace))
+	if err != nil {
+		logger.Errorf(ctx, "Error occurred when getting the list of allocated tokens from Redis: %v", allocationToken, err)
+		return -1, err
+	}
+
+	count := 0
+	for _, atok := range allocated {
+		atokPrefix, err := extractTokenPrefix(atok)
+		if err != nil {
+			logger.Errorf(ctx, "At least one allocated token is malformed [%v]: %v", allocationToken, err)
+			return -1, err
+		}
+		// We are assuming there's no duplicated tokens because we are using SMEMBERS
+		if atokPrefix == tokenPrefix {
+			count++
+		}
+	}
+	return count, err
+}
+
 func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) (
 	pluginCore.AllocationStatus, error) {
-
 	namespacedResource, err := r.getResource(namespace)
 	if err != nil {
 		logger.Errorf(ctx, "Error finding resource [%v] during allocation", namespace)
 		return pluginCore.AllocationUndefined, err
 	}
 	// Check to see if the allocation token is already in the set
-	found, err := r.client.SIsMember(string(namespace), allocationToken).Result()
+	found, err := r.client.SIsMember(string(namespace), allocationToken)
 	if err != nil {
 		logger.Errorf(ctx, "Error getting size of Redis set %v", err)
 		return pluginCore.AllocationUndefined, err
@@ -203,19 +247,35 @@ func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace p
 		return pluginCore.AllocationStatusGranted, nil
 	}
 
-	size, err := r.client.SCard(string(namespace)).Result()
+	size, err := r.client.SCard(string(namespace))
 	if err != nil {
 		logger.Errorf(ctx, "Error getting size of Redis set %v", err)
 		return pluginCore.AllocationUndefined, err
 	}
 
-	if size > int64(namespacedResource.quota) {
+	if size >= int64(namespacedResource.quota) {
 		logger.Infof(ctx, "Too many allocations (total [%d]), rejecting [%s:%s]", size, namespace, allocationToken)
 		namespacedResource.rejectedTokens.Store(allocationToken, struct{}{})
 		return pluginCore.AllocationStatusExhausted, nil
 	}
 
-	countAdded, err := r.client.SAdd(string(namespace), allocationToken).Result()
+	namespaceAllocatedCount, err := r.getNamespaceAllocatedCount(ctx, r.client, namespace, allocationToken)
+	if err != nil {
+		logger.Errorf(ctx, "Error checking available quota for namespace [%v]: [%v]", namespace, err)
+		return pluginCore.AllocationUndefined, err
+	}
+
+	// Checking the number of allocation of a namespace against the namespace's quota cap
+	// if the cap <= 0, it means no cap is enforced; otherwise, the cap will be enforced
+	// Note that, due to race condition there might be cases where the allocated count is > cap. This is OK.
+	if namespacedResource.namespaceQuotaCap > 0 && namespaceAllocatedCount >= namespacedResource.namespaceQuotaCap {
+		logger.Infof(ctx, "Too many allocations for namespace [%v] ([%d of %d] allocated), rejecting token [%s:%s]",
+			namespace, namespaceAllocatedCount, namespacedResource.namespaceQuotaCap, namespace, allocationToken)
+		namespacedResource.rejectedTokens.Store(allocationToken, struct{}{})
+		return pluginCore.AllocationStatusExhausted, nil
+	}
+
+	countAdded, err := r.client.SAdd(string(namespace), allocationToken)
 	if err != nil {
 		logger.Errorf(ctx, "Error adding token [%s:%s] %v", namespace, allocationToken, err)
 		return pluginCore.AllocationUndefined, err
@@ -228,7 +288,7 @@ func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace p
 }
 
 func (r *RedisResourceManager) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) error {
-	countRemoved, err := r.client.SRem(string(namespace), allocationToken).Result()
+	countRemoved, err := r.client.SRem(string(namespace), allocationToken)
 	if err != nil {
 		logger.Errorf(ctx, "Error removing token [%v:%s] %v", namespace, allocationToken, err)
 		return err
