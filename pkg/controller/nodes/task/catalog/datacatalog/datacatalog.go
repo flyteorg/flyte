@@ -82,7 +82,7 @@ func (m *CatalogClient) GetArtifactByTag(ctx context.Context, tagName string, da
 
 		if time.Since(createdAt) >= m.maxCacheAge {
 			logger.Warningf(ctx, "Expired Cached Artifact %v created on %v, older than max age %v",
-				artifact.Id, artifact.CreatedAt.String(), m.maxCacheAge)
+				artifact.Id, createdAt.String(), m.maxCacheAge)
 			return nil, status.Error(codes.NotFound, "Artifact over age limit")
 		}
 	}
