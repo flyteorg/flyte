@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyteconsole
+  namespace: flyte
+spec:
+  template:
+    spec:
+      containers:
+      - name: flyteconsole
+        resources:
+          limits:
+            memory: "150Mi"
+            cpu: "0.1"
+            ephemeral-storage: "100Mi"

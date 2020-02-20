@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudsqlproxy
+  namespace: flyte
+  labels:
+    app: cloudsqlproxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudsqlproxy
+  template:
+    metadata:
+      labels:
+        app: cloudsqlproxy
+    spec:
+      containers:
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.14
+          imagePullPolicy: IfNotPresent
+          command: ["/cloud_sql_proxy", "-instances=gcp-flyte-test:europe-west1:flyte=tcp:0.0.0.0:5432"]
+          ports:
+            - containerPort: 5432

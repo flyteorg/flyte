@@ -1,0 +1,7 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: flyte-console-config
+  namespace: flyte
+data:
+  ADMIN_API_URL: http://flyteadmin.flyte.svc.cluster.local:80

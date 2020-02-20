@@ -1,0 +1,25 @@
+logger:
+  show-source: true
+  level: 5
+datacatalog:
+  storage-prefix: metadata/datacatalog
+  metrics-scope: "datacatalog"
+  profiler-port: 10254
+application:
+  grpcPort: 8089
+storage:
+  type: stow
+  stow:
+    kind: google
+    config:
+      json: ""
+      project_id: gcp-flyte-test
+      scopes: https://www.googleapis.com/auth/devstorage.read_write
+  container: "flyte"
+database:
+  port: 5432
+  username: flyte
+  host: cloudsqlproxy
+  dbname: datacatalog
+  options: "sslmode=disable"
+  passwordPath: /etc/gcp/pwd.txt
