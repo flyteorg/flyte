@@ -21,6 +21,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog/datacatalog/mocks"
+	"time"
+	"github.com/golang/protobuf/ptypes"
 )
 
 func init() {
@@ -194,6 +196,62 @@ func TestCatalog_Get(t *testing.T) {
 		assert.NotNil(t, resp)
 	})
 
+	t.Run("Found expired artifact", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		catalogClient := &CatalogClient{
+			client: mockClient,
+			maxCacheAge: time.Hour,
+		}
+
+		sampleDataSet := &datacatalog.Dataset{
+			Id: datasetID,
+		}
+
+		mockClient.On("GetDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
+				assert.EqualValues(t, datasetID, o.Dataset)
+				return true
+			}),
+		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
+
+		sampleArtifactData := &datacatalog.ArtifactData{
+			Name:  "test",
+			Value: newStringLiteral("output1-stringval"),
+		}
+
+		createdAt, err := ptypes.TimestampProto(time.Now().Add(-1 * time.Hour))
+		assert.NoError(t, err)
+
+		sampleArtifact := &datacatalog.Artifact{
+			Id:      "test-artifact",
+			Dataset: sampleDataSet.Id,
+			Data:    []*datacatalog.ArtifactData{sampleArtifactData},
+			CreatedAt: createdAt,
+		}
+		mockClient.On("GetArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetArtifactRequest) bool {
+				assert.EqualValues(t, datasetID, o.Dataset)
+				assert.Equal(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", o.GetTagName())
+				return true
+			}),
+		).Return(&datacatalog.GetArtifactResponse{Artifact: sampleArtifact}, nil)
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		resp, err := catalogClient.Get(ctx, newKey)
+		assert.Error(t, err)
+		assert.Nil(t, resp)
+
+		getStatus, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, getStatus.Code(), codes.NotFound)
+	})
+
 	t.Run("Found w/ tag no inputs or outputs", func(t *testing.T) {
 		mockClient := &mocks.DataCatalogClient{}
 		discovery := &CatalogClient{
@@ -231,9 +289,12 @@ func TestCatalog_Get(t *testing.T) {
 			}),
 		).Return(&datacatalog.GetArtifactResponse{Artifact: sampleArtifact}, nil)
 
+		assert.False(t, discovery.maxCacheAge > time.Duration(0))
+
 		resp, err := discovery.Get(ctx, noInputOutputKey)
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
+
 		v, e, err := resp.Read(ctx)
 		assert.NoError(t, err)
 		assert.Nil(t, e)
