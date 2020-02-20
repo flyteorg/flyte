@@ -23,10 +23,5 @@ export function collectionChildToString(type: InputType, value: any) {
     if (value === undefined) {
         return '';
     }
-    switch (type) {
-        case InputType.Integer:
-            return `${value}`;
-        default:
-            return JSON.stringify(value);
-    }
+    return type === InputType.Integer ? `${value}` : JSON.stringify(value);
 }
