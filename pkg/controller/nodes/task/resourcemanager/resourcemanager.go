@@ -24,8 +24,10 @@ func (t TokenPrefix) append(s string) string {
 
 func extractTokenPrefix(t string) (string, error) {
 	splits := strings.Split(t, tokenNamespaceSeparator)
-	if len(splits) == 0 {
-		return "", fmt.Errorf("error occurred when trying to extract token prefix from token [%v] using the separator [%v]", t, tokenNamespaceSeparator)
+
+	// If there's only prefix,
+	if len(splits) < 2 || splits[0] == "" || splits[1] == "" {
+		return "", fmt.Errorf("error occurred when trying to extract token prefix from token [%v] using the separator [%v]: received a malformed token", t, tokenNamespaceSeparator)
 	}
 	return splits[0], nil
 }

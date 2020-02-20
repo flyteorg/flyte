@@ -12,13 +12,9 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestRedisResourceManager_AllocateResource(t *testing.T) {
-
-	mockRedisClient := &mocks.RedisClient{}
-
-	mockScope := promutils.NewScope("testscope")
-	mockScope1 := mockScope.NewSubScope("test_resource1")
-	mockScope2 := mockScope.NewSubScope("test_resource2")
+func createMockNamespacedResourcesMap(mScope promutils.Scope) map[core.ResourceNamespace]*Resource {
+	mockScope1 := mScope.NewSubScope("test_resource1")
+	mockScope2 := mScope.NewSubScope("test_resource2")
 	mockMetric1 := NewRedisResourceManagerMetrics(mockScope1)
 	mockMetric2 := NewRedisResourceManagerMetrics(mockScope2)
 	mockNamespacedResourcesMap := map[core.ResourceNamespace]*Resource{
@@ -35,12 +31,19 @@ func TestRedisResourceManager_AllocateResource(t *testing.T) {
 			rejectedTokens:    sync.Map{},
 		},
 	}
-	mockContext := context.TODO()
+	return mockNamespacedResourcesMap
+}
+
+func TestRedisResourceManager_AllocateResource(t *testing.T) {
+
 	t.Run("Namespace cap is enforced. Namespace1 should not be granted while namespace2 should", func(t *testing.T) {
+		mockScope := promutils.NewTestScope()
+		mockRedisClient := &mocks.RedisClient{}
+		mockContext := context.TODO()
 		r := &RedisResourceManager{
 			client:                 mockRedisClient,
 			MetricsScope:           mockScope,
-			namespacedResourcesMap: mockNamespacedResourcesMap,
+			namespacedResourcesMap: createMockNamespacedResourcesMap(mockScope),
 		}
 		allocatedTokens := []string{"ns1-token1"}
 		mockRedisClient.OnSIsMember("test-resource1", mock.Anything).Return(false, nil) // how can I assign val?
@@ -57,10 +60,13 @@ func TestRedisResourceManager_AllocateResource(t *testing.T) {
 	})
 
 	t.Run("Namespace cap is not enforced. Namespace1 should be granted the 4th token of resource 2.", func(t *testing.T) {
+		mockScope := promutils.NewTestScope()
+		mockRedisClient := &mocks.RedisClient{}
+		mockContext := context.TODO()
 		r := &RedisResourceManager{
 			client:                 mockRedisClient,
 			MetricsScope:           mockScope,
-			namespacedResourcesMap: mockNamespacedResourcesMap,
+			namespacedResourcesMap: createMockNamespacedResourcesMap(mockScope),
 		}
 		allocatedTokens := []string{"ns1-token1", "ns1-token2", "ns1-token3"}
 		mockRedisClient.OnSIsMember("test-resource2", mock.Anything).Return(false, nil) // how can I assign val?
@@ -74,10 +80,13 @@ func TestRedisResourceManager_AllocateResource(t *testing.T) {
 	})
 
 	t.Run("Namespace cap is not enforced but resource 2 is exhausted. No namespace should be granted any token of resource 2.", func(t *testing.T) {
+		mockScope := promutils.NewTestScope()
+		mockRedisClient := &mocks.RedisClient{}
+		mockContext := context.TODO()
 		r := &RedisResourceManager{
 			client:                 mockRedisClient,
 			MetricsScope:           mockScope,
-			namespacedResourcesMap: mockNamespacedResourcesMap,
+			namespacedResourcesMap: createMockNamespacedResourcesMap(mockScope),
 		}
 		allocatedTokens := []string{"ns1-token1", "ns1-token2", "ns1-token3", "ns1-token4"}
 		mockRedisClient.OnSIsMember("test-resource2", mock.Anything).Return(false, nil) // how can I assign val?
@@ -96,49 +105,32 @@ func TestRedisResourceManager_AllocateResource(t *testing.T) {
 }
 
 func TestRedisResourceManager_getNamespaceAllocatedCount(t *testing.T) {
-	mockRedisClient := &mocks.RedisClient{}
-
-	mockScope := promutils.NewScope("testscope2")
-	mockScope1 := mockScope.NewSubScope("test_resource1")
-	mockScope2 := mockScope.NewSubScope("test_resource2")
-	mockMetric1 := NewRedisResourceManagerMetrics(mockScope1)
-	mockMetric2 := NewRedisResourceManagerMetrics(mockScope2)
-	mockNamespacedResourcesMap := map[core.ResourceNamespace]*Resource{
-		core.ResourceNamespace("test-resource1"): &Resource{
-			quota:             3,
-			namespaceQuotaCap: 1,
-			metrics:           mockMetric1,
-			rejectedTokens:    sync.Map{},
-		},
-		core.ResourceNamespace("test-resource2"): &Resource{
-			quota:             4,
-			namespaceQuotaCap: 0,
-			metrics:           mockMetric2,
-			rejectedTokens:    sync.Map{},
-		},
-	}
-	mockContext := context.TODO()
-	t.Run("Malformed token should not trigger an error but the count should be 0", func(t *testing.T) {
+	t.Run("Malformed token should trigger an error", func(t *testing.T) {
+		mockScope := promutils.NewTestScope()
+		mockRedisClient := &mocks.RedisClient{}
+		mockContext := context.TODO()
 		r := &RedisResourceManager{
 			client:                 mockRedisClient,
 			MetricsScope:           mockScope,
-			namespacedResourcesMap: mockNamespacedResourcesMap,
+			namespacedResourcesMap: createMockNamespacedResourcesMap(mockScope),
 		}
 		allocatedTokens := []string{"ns1-token1"}
 		mockRedisClient.OnSIsMember("test-resource1", mock.Anything).Return(false, nil) // how can I assign val?
 		mockRedisClient.OnSMembers("test-resource1").Return(allocatedTokens, nil)
 		mockRedisClient.OnSCard("test-resource1").Return(int64(len(allocatedTokens)), nil)
 		mockRedisClient.OnSAdd(mock.Anything, mock.Anything).Return(0, nil)
-		count, err := r.getNamespaceAllocatedCount(mockContext, mockRedisClient, "test-resource1", "token2")
-		assert.Nil(t, err)
-		assert.Equal(t, 0, count)
+		_, err := r.getNamespaceAllocatedCount(mockContext, mockRedisClient, "test-resource1", "token2")
+		assert.NotNil(t, err)
 	})
 
 	t.Run("Wellformed token should get the corresponding count", func(t *testing.T) {
+		mockScope := promutils.NewTestScope()
+		mockRedisClient := &mocks.RedisClient{}
+		mockContext := context.TODO()
 		r := &RedisResourceManager{
 			client:                 mockRedisClient,
 			MetricsScope:           mockScope,
-			namespacedResourcesMap: mockNamespacedResourcesMap,
+			namespacedResourcesMap: createMockNamespacedResourcesMap(mockScope),
 		}
 		allocatedTokens := []string{"ns1-token1"}
 		mockRedisClient.OnSIsMember("test-resource1", mock.Anything).Return(false, nil) // how can I assign val?
