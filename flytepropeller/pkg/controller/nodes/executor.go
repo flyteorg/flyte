@@ -13,7 +13,6 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/lyft/flytepropeller/pkg/controller/config"
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils"
@@ -21,12 +20,15 @@ import (
 	"github.com/lyft/flytestdlib/storage"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/lyft/flytepropeller/pkg/controller/config"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type nodeMetrics struct {
@@ -179,9 +181,9 @@ func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *execCo
 		return handler.PhaseInfoUndefined, err
 	}
 
-	phase := t.Info().GetPhase()
+	phase := t.Info()
 	// check for timeout for non-terminal phases
-	if !phase.IsTerminal() {
+	if !phase.GetPhase().IsTerminal() {
 		activeDeadline := c.defaultActiveDeadline
 		if nCtx.Node().GetActiveDeadline() != nil {
 			activeDeadline = *nCtx.Node().GetActiveDeadline()
@@ -198,11 +200,11 @@ func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *execCo
 		}
 		if c.isTimeoutExpired(nodeStatus.GetLastAttemptStartedAt(), executionDeadline) {
 			logger.Errorf(ctx, "Current execution for the node timed out; timeout configured: %v", executionDeadline)
-			return handler.PhaseInfoRetryableFailure("TimeOut", "node execution timed out", nil), nil
+			phase = handler.PhaseInfoRetryableFailure("TimeoutExpired", fmt.Sprintf("task execution timeout [%s] expired", executionDeadline.String()), nil)
 		}
 	}
 
-	if t.Info().GetPhase() == handler.EPhaseRetryableFailure {
+	if phase.GetPhase() == handler.EPhaseRetryableFailure {
 		maxAttempts := uint32(0)
 		if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil {
 			maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
@@ -211,9 +213,9 @@ func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *execCo
 		attempts := nodeStatus.GetAttempts() + 1
 		if attempts >= maxAttempts {
 			return handler.PhaseInfoFailure(
-				fmt.Sprintf("RetriesExhausted|%s", t.Info().GetErr().Code),
-				fmt.Sprintf("[%d/%d] attempts done. Last Error: %s", attempts, maxAttempts, t.Info().GetErr().Message),
-				t.Info().GetInfo(),
+				fmt.Sprintf("RetriesExhausted|%s", phase.GetErr().Code),
+				fmt.Sprintf("[%d/%d] attempts done. Last Error: %s", attempts, maxAttempts, phase.GetErr().Message),
+				phase.GetInfo(),
 			), nil
 		}
 
@@ -221,7 +223,7 @@ func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *execCo
 		nCtx.nsm.clearNodeStatus()
 	}
 
-	return t.Info(), nil
+	return phase, nil
 }
 
 func (c *nodeExecutor) abort(ctx context.Context, h handler.Node, nCtx handler.NodeExecutionContext, reason string) error {
@@ -355,10 +357,11 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 	}
 
 	if currentPhase == v1alpha1.NodePhaseRetryableFailure {
-		logger.Debugf(ctx, "node failed with retryable failure, finalizing")
-		if err := c.finalize(ctx, h, nCtx); err != nil {
+		logger.Debugf(ctx, "node failed with retryable failure, aborting and finalizing, message: %s", nodeStatus.GetMessage())
+		if err := c.abort(ctx, h, nCtx, nodeStatus.GetMessage()); err != nil {
 			return executors.NodeStatusUndefined, err
 		}
+
 		nodeStatus.IncrementAttempts()
 		nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, v1.Now(), "retrying")
 		// We are going to retry in the next round, so we should clear all current state

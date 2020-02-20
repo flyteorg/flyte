@@ -595,6 +595,46 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		assert.NotZero(t, len(n.ExpectedCalls))
 		assert.Equal(t, "FinalizeHandler", n.ExpectedCalls[0].Method)
 	})
+
+	t.Run("dynamicnodephase-executing-parenterror", func(t *testing.T) {
+
+		nCtx := createNodeContext("test", "x")
+		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetOutputDir(), "futures.pb")
+		assert.NoError(t, err)
+		dj := createDynamicJobSpec()
+		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
+
+		h := &mocks.TaskNodeHandler{}
+		h.OnFinalize(ctx, nCtx).Return(fmt.Errorf("err"))
+		n := &executorMocks.Node{}
+		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything).Return(nil)
+		d := New(h, n, promutils.NewTestScope())
+		assert.Error(t, d.Finalize(ctx, nCtx))
+		assert.NotZero(t, len(h.ExpectedCalls))
+		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)
+		assert.NotZero(t, len(n.ExpectedCalls))
+		assert.Equal(t, "FinalizeHandler", n.ExpectedCalls[0].Method)
+	})
+
+	t.Run("dynamicnodephase-executing-childerror", func(t *testing.T) {
+
+		nCtx := createNodeContext("test", "x")
+		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetOutputDir(), "futures.pb")
+		assert.NoError(t, err)
+		dj := createDynamicJobSpec()
+		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
+
+		h := &mocks.TaskNodeHandler{}
+		h.OnFinalize(ctx, nCtx).Return(nil)
+		n := &executorMocks.Node{}
+		n.OnFinalizeHandlerMatch(ctx, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
+		d := New(h, n, promutils.NewTestScope())
+		assert.Error(t, d.Finalize(ctx, nCtx))
+		assert.NotZero(t, len(h.ExpectedCalls))
+		assert.Equal(t, "Finalize", h.ExpectedCalls[0].Method)
+		assert.NotZero(t, len(n.ExpectedCalls))
+		assert.Equal(t, "FinalizeHandler", n.ExpectedCalls[0].Method)
+	})
 }
 
 func init() {
