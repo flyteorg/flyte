@@ -20,9 +20,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog/datacatalog/mocks"
 	"time"
+
 	"github.com/golang/protobuf/ptypes"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog/datacatalog/mocks"
 )
 
 func init() {
@@ -202,7 +203,7 @@ func TestCatalog_Get(t *testing.T) {
 
 		mockClient := &mocks.DataCatalogClient{}
 		catalogClient := &CatalogClient{
-			client: mockClient,
+			client:      mockClient,
 			maxCacheAge: time.Hour,
 		}
 
@@ -227,9 +228,9 @@ func TestCatalog_Get(t *testing.T) {
 		assert.NoError(t, err)
 
 		sampleArtifact := &datacatalog.Artifact{
-			Id:      "test-artifact",
-			Dataset: sampleDataSet.Id,
-			Data:    []*datacatalog.ArtifactData{sampleArtifactData},
+			Id:        "test-artifact",
+			Dataset:   sampleDataSet.Id,
+			Data:      []*datacatalog.ArtifactData{sampleArtifactData},
 			CreatedAt: createdAt,
 		}
 		mockClient.On("GetArtifact",
