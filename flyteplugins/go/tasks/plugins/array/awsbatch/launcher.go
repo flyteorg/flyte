@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/lyft/flyteplugins/go/tasks/errors"
+
 	"github.com/lyft/flytestdlib/logger"
 
 	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
@@ -67,6 +69,28 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchCl
 	return nextState, nil
 }
 
-func TerminateSubTasks(ctx context.Context, batchClient Client, jobID string) error {
-	return batchClient.TerminateJob(ctx, jobID, "aborted")
+// Attempts to terminate the AWS Job if one is recorded in the pluginState. This API is idempotent and should be safe
+// to call multiple times on the same job. It'll result in multiple calls to AWS Batch in that case, however.
+func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchClient Client, reason string) error {
+	pluginState := &State{}
+	if _, err := tCtx.PluginStateReader().Get(pluginState); err != nil {
+		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to unmarshal custom state")
+	}
+
+	// This only makes sense if the task has "just" been kicked off. Assigning state here is meant to make subsequent
+	// code simpler.
+	if pluginState.State == nil {
+		pluginState.State = &arrayCore.State{}
+	}
+
+	p, _ := pluginState.GetPhase()
+	logger.Infof(ctx, "TerminateSubTasks is called with phase [%v] and reason [%v]", p, reason)
+
+	if pluginState.GetExternalJobID() != nil {
+		jobID := *pluginState.GetExternalJobID()
+		logger.Infof(ctx, "Cancelling AWS Job [%v] because [%v].", jobID, reason)
+		return batchClient.TerminateJob(ctx, jobID, reason)
+	}
+
+	return nil
 }
