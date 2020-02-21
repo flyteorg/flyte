@@ -693,6 +693,29 @@ describe('LaunchWorkflowForm', () => {
                 );
             });
 
+            it('should select contents of workflow version input on focus', async () => {
+                const { getByLabelText } = renderForm();
+                await wait();
+
+                // Focus the workflow version input
+                const workflowInput = getByLabelText(
+                    formStrings.workflowVersion
+                );
+                fireEvent.focus(workflowInput);
+
+                act(() => {
+                    jest.runAllTimers();
+                });
+
+                const expectedValue = mockWorkflowVersions[0].id.version;
+
+                // The value should remain, but selection should be the entire string
+                expect(workflowInput).toHaveValue(expectedValue);
+                expect((workflowInput as HTMLInputElement).selectionEnd).toBe(
+                    expectedValue.length
+                );
+            });
+
             it('should correctly render workflow version search results', async () => {
                 const initialParameters: InitialLaunchParameters = {
                     workflow: mockWorkflowVersions[2].id
