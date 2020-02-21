@@ -925,6 +925,8 @@ func (m *ExecutionMetadata) Validate() error {
 		}
 	}
 
+	// no validation rules for Interruptible
+
 	return nil
 }
 

@@ -2562,6 +2562,7 @@ definitions:
             project: "project"
           scheduled_at: "2000-01-23T04:56:07.000+00:00"
           nesting: 0
+          interruptible: true
         disable_all: true
         inputs:
           literals: {}
@@ -2856,6 +2857,7 @@ definitions:
               project: "project"
             scheduled_at: "2000-01-23T04:56:07.000+00:00"
             nesting: 0
+            interruptible: true
           disable_all: true
           inputs:
             literals: {}
@@ -2981,6 +2983,7 @@ definitions:
               project: "project"
             scheduled_at: "2000-01-23T04:56:07.000+00:00"
             nesting: 0
+            interruptible: true
           disable_all: true
           inputs:
             literals: {}
@@ -3053,6 +3056,10 @@ definitions:
         description: "Optional, a reference workflow execution related to this execution.\n\
           In the case of a relaunch, this references the original workflow execution."
         $ref: "#/definitions/coreWorkflowExecutionIdentifier"
+      interruptible:
+        type: "boolean"
+        format: "boolean"
+        title: "Identify whether execution is interruptible"
     description: "Represents attributes about an execution which are not required\
       \ to launch the execution but are useful to record.\nThese attributes are assigned\
       \ at launch time and do not change."
@@ -3071,6 +3078,7 @@ definitions:
         project: "project"
       scheduled_at: "2000-01-23T04:56:07.000+00:00"
       nesting: 0
+      interruptible: true
   adminExecutionQueueAttributes:
     type: "object"
     properties:
@@ -3149,6 +3157,7 @@ definitions:
           project: "project"
         scheduled_at: "2000-01-23T04:56:07.000+00:00"
         nesting: 0
+        interruptible: true
       disable_all: true
       inputs:
         literals: {}
@@ -4759,7 +4768,9 @@ definitions:
     description: "Request structure to retrieve a list of node execution entities."
     example:
       node_executions:
-      - input_uri: "input_uri"
+      - metadata:
+          interruptible: true
+        input_uri: "input_uri"
         id:
           execution_id:
             domain: "domain"
@@ -4783,7 +4794,9 @@ definitions:
             kind: {}
             message: "message"
             error_uri: "error_uri"
-      - input_uri: "input_uri"
+      - metadata:
+          interruptible: true
+        input_uri: "input_uri"
         id:
           execution_id:
             domain: "domain"
@@ -4808,6 +4821,15 @@ definitions:
             message: "message"
             error_uri: "error_uri"
       token: "token"
+  adminNodeExecutionMetaData:
+    type: "object"
+    properties:
+      interruptible:
+        type: "boolean"
+        format: "boolean"
+    title: "Represents additional attributes related to a Node Execution"
+    example:
+      interruptible: true
   adminNotification:
     type: "object"
     properties:
@@ -23454,12 +23476,17 @@ definitions:
       closure:
         description: "Computed results associated with this node execution."
         $ref: "#/definitions/adminNodeExecutionClosure"
+      metadata:
+        title: "Metadata for Node Execution"
+        $ref: "#/definitions/adminNodeExecutionMetaData"
     description: "Encapsulates all details for a single node execution entity.\nA\
       \ node represents a component in the overall workflow graph. A node launch a\
       \ task, multiple tasks, an entire nested\nsub-workflow, or even a separate child-workflow\
       \ execution.\nThe same task can be called repeatedly in a single workflow but\
       \ each node is unique."
     example:
+      metadata:
+        interruptible: true
       input_uri: "input_uri"
       id:
         execution_id:

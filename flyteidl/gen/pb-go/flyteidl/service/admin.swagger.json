@@ -3001,6 +3001,11 @@
         "reference_execution": {
           "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
           "description": "Optional, a reference workflow execution related to this execution.\nIn the case of a relaunch, this references the original workflow execution."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Identify whether execution is interruptible"
         }
       },
       "description": "Represents attributes about an execution which are not required to launch the execution but are useful to record.\nThese attributes are assigned at launch time and do not change."
@@ -3536,6 +3541,16 @@
         }
       },
       "description": "Request structure to retrieve a list of node execution entities."
+    },
+    "adminNodeExecutionMetaData": {
+      "type": "object",
+      "properties": {
+        "interruptible": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      },
+      "title": "Represents additional attributes related to a Node Execution"
     },
     "adminNotification": {
       "type": "object",
@@ -5290,6 +5305,10 @@
         "closure": {
           "$ref": "#/definitions/adminNodeExecutionClosure",
           "description": "Computed results associated with this node execution."
+        },
+        "metadata": {
+          "$ref": "#/definitions/adminNodeExecutionMetaData",
+          "title": "Metadata for Node Execution"
         }
       },
       "description": "Encapsulates all details for a single node execution entity.\nA node represents a component in the overall workflow graph. A node launch a task, multiple tasks, an entire nested\nsub-workflow, or even a separate child-workflow execution.\nThe same task can be called repeatedly in a single workflow but each node is unique."

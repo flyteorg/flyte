@@ -155,7 +155,8 @@ The same task can be called repeatedly in a single workflow but each node is uni
   {
     "id": "{...}",
     "input_uri": "...",
-    "closure": "{...}"
+    "closure": "{...}",
+    "metadata": "{...}"
   }
 
 .. _api_field_flyteidl.admin.NodeExecution.id:
@@ -176,6 +177,34 @@ closure
   (:ref:`flyteidl.admin.NodeExecutionClosure <api_msg_flyteidl.admin.NodeExecutionClosure>`) Computed results associated with this node execution.
   
   
+.. _api_field_flyteidl.admin.NodeExecution.metadata:
+
+metadata
+  (:ref:`flyteidl.admin.NodeExecutionMetaData <api_msg_flyteidl.admin.NodeExecutionMetaData>`) Metadata for Node Execution
+  
+  
+
+
+.. _api_msg_flyteidl.admin.NodeExecutionMetaData:
+
+flyteidl.admin.NodeExecutionMetaData
+------------------------------------
+
+`[flyteidl.admin.NodeExecutionMetaData proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L80>`_
+
+Represents additional attributes related to a Node Execution
+
+.. code-block:: json
+
+  {
+    "interruptible": "..."
+  }
+
+.. _api_field_flyteidl.admin.NodeExecutionMetaData.interruptible:
+
+interruptible
+  (`bool <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
 
 
 .. _api_msg_flyteidl.admin.NodeExecutionList:
@@ -183,7 +212,7 @@ closure
 flyteidl.admin.NodeExecutionList
 --------------------------------
 
-`[flyteidl.admin.NodeExecutionList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L77>`_
+`[flyteidl.admin.NodeExecutionList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L85>`_
 
 Request structure to retrieve a list of node execution entities.
 
@@ -213,7 +242,7 @@ token
 flyteidl.admin.NodeExecutionClosure
 -----------------------------------
 
-`[flyteidl.admin.NodeExecutionClosure proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L86>`_
+`[flyteidl.admin.NodeExecutionClosure proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L94>`_
 
 Container for node execution details and results.
 
@@ -294,7 +323,7 @@ workflow_node_metadata
 flyteidl.admin.WorkflowNodeMetadata
 -----------------------------------
 
-`[flyteidl.admin.WorkflowNodeMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L118>`_
+`[flyteidl.admin.WorkflowNodeMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L126>`_
 
 Metadata for a WorkflowNode
 
@@ -316,7 +345,7 @@ executionId
 flyteidl.admin.NodeExecutionGetDataRequest
 ------------------------------------------
 
-`[flyteidl.admin.NodeExecutionGetDataRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L123>`_
+`[flyteidl.admin.NodeExecutionGetDataRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L131>`_
 
 Request structure to fetch inputs and output urls for a node execution.
 
@@ -339,7 +368,7 @@ id
 flyteidl.admin.NodeExecutionGetDataResponse
 -------------------------------------------
 
-`[flyteidl.admin.NodeExecutionGetDataResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L129>`_
+`[flyteidl.admin.NodeExecutionGetDataResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L137>`_
 
 Response structure for NodeExecutionGetDataRequest which contains inputs and outputs for a node execution.
 
