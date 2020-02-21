@@ -25,4 +25,5 @@ type AdminExecutionMetadata struct {
 	ParentNodeExecution *CoreNodeExecutionIdentifier `json:"parent_node_execution,omitempty"`
 	// Optional, a reference workflow execution related to this execution. In the case of a relaunch, this references the original workflow execution.
 	ReferenceExecution *CoreWorkflowExecutionIdentifier `json:"reference_execution,omitempty"`
+	Interruptible bool `json:"interruptible,omitempty"`
 }

@@ -3573,6 +3573,31 @@ public final class NodeExecutionOuterClass {
      * <code>.flyteidl.admin.NodeExecutionClosure closure = 3;</code>
      */
     flyteidl.admin.NodeExecutionOuterClass.NodeExecutionClosureOrBuilder getClosureOrBuilder();
+
+    /**
+     * <pre>
+     * Metadata for Node Execution
+     * </pre>
+     *
+     * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+     */
+    boolean hasMetadata();
+    /**
+     * <pre>
+     * Metadata for Node Execution
+     * </pre>
+     *
+     * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+     */
+    flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData getMetadata();
+    /**
+     * <pre>
+     * Metadata for Node Execution
+     * </pre>
+     *
+     * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+     */
+    flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaDataOrBuilder getMetadataOrBuilder();
   }
   /**
    * <pre>
@@ -3649,6 +3674,19 @@ public final class NodeExecutionOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(closure_);
                 closure_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 34: {
+              flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.Builder subBuilder = null;
+              if (metadata_ != null) {
+                subBuilder = metadata_.toBuilder();
+              }
+              metadata_ = input.readMessage(flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(metadata_);
+                metadata_ = subBuilder.buildPartial();
               }
 
               break;
@@ -3793,6 +3831,39 @@ public final class NodeExecutionOuterClass {
       return getClosure();
     }
 
+    public static final int METADATA_FIELD_NUMBER = 4;
+    private flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData metadata_;
+    /**
+     * <pre>
+     * Metadata for Node Execution
+     * </pre>
+     *
+     * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+     */
+    public boolean hasMetadata() {
+      return metadata_ != null;
+    }
+    /**
+     * <pre>
+     * Metadata for Node Execution
+     * </pre>
+     *
+     * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+     */
+    public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData getMetadata() {
+      return metadata_ == null ? flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.getDefaultInstance() : metadata_;
+    }
+    /**
+     * <pre>
+     * Metadata for Node Execution
+     * </pre>
+     *
+     * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+     */
+    public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaDataOrBuilder getMetadataOrBuilder() {
+      return getMetadata();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3816,6 +3887,9 @@ public final class NodeExecutionOuterClass {
       if (closure_ != null) {
         output.writeMessage(3, getClosure());
       }
+      if (metadata_ != null) {
+        output.writeMessage(4, getMetadata());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3835,6 +3909,10 @@ public final class NodeExecutionOuterClass {
       if (closure_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, getClosure());
+      }
+      if (metadata_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getMetadata());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3863,6 +3941,11 @@ public final class NodeExecutionOuterClass {
         if (!getClosure()
             .equals(other.getClosure())) return false;
       }
+      if (hasMetadata() != other.hasMetadata()) return false;
+      if (hasMetadata()) {
+        if (!getMetadata()
+            .equals(other.getMetadata())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3883,6 +3966,10 @@ public final class NodeExecutionOuterClass {
       if (hasClosure()) {
         hash = (37 * hash) + CLOSURE_FIELD_NUMBER;
         hash = (53 * hash) + getClosure().hashCode();
+      }
+      if (hasMetadata()) {
+        hash = (37 * hash) + METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + getMetadata().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -4038,6 +4125,12 @@ public final class NodeExecutionOuterClass {
           closure_ = null;
           closureBuilder_ = null;
         }
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
+        } else {
+          metadata_ = null;
+          metadataBuilder_ = null;
+        }
         return this;
       }
 
@@ -4074,6 +4167,11 @@ public final class NodeExecutionOuterClass {
           result.closure_ = closure_;
         } else {
           result.closure_ = closureBuilder_.build();
+        }
+        if (metadataBuilder_ == null) {
+          result.metadata_ = metadata_;
+        } else {
+          result.metadata_ = metadataBuilder_.build();
         }
         onBuilt();
         return result;
@@ -4132,6 +4230,9 @@ public final class NodeExecutionOuterClass {
         }
         if (other.hasClosure()) {
           mergeClosure(other.getClosure());
+        }
+        if (other.hasMetadata()) {
+          mergeMetadata(other.getMetadata());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -4556,6 +4657,159 @@ public final class NodeExecutionOuterClass {
         }
         return closureBuilder_;
       }
+
+      private flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData metadata_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData, flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.Builder, flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaDataOrBuilder> metadataBuilder_;
+      /**
+       * <pre>
+       * Metadata for Node Execution
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+       */
+      public boolean hasMetadata() {
+        return metadataBuilder_ != null || metadata_ != null;
+      }
+      /**
+       * <pre>
+       * Metadata for Node Execution
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+       */
+      public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData getMetadata() {
+        if (metadataBuilder_ == null) {
+          return metadata_ == null ? flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.getDefaultInstance() : metadata_;
+        } else {
+          return metadataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Metadata for Node Execution
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+       */
+      public Builder setMetadata(flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData value) {
+        if (metadataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          metadata_ = value;
+          onChanged();
+        } else {
+          metadataBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata for Node Execution
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+       */
+      public Builder setMetadata(
+          flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.Builder builderForValue) {
+        if (metadataBuilder_ == null) {
+          metadata_ = builderForValue.build();
+          onChanged();
+        } else {
+          metadataBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata for Node Execution
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+       */
+      public Builder mergeMetadata(flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData value) {
+        if (metadataBuilder_ == null) {
+          if (metadata_ != null) {
+            metadata_ =
+              flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.newBuilder(metadata_).mergeFrom(value).buildPartial();
+          } else {
+            metadata_ = value;
+          }
+          onChanged();
+        } else {
+          metadataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata for Node Execution
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+       */
+      public Builder clearMetadata() {
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
+          onChanged();
+        } else {
+          metadata_ = null;
+          metadataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata for Node Execution
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+       */
+      public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.Builder getMetadataBuilder() {
+        
+        onChanged();
+        return getMetadataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Metadata for Node Execution
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+       */
+      public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaDataOrBuilder getMetadataOrBuilder() {
+        if (metadataBuilder_ != null) {
+          return metadataBuilder_.getMessageOrBuilder();
+        } else {
+          return metadata_ == null ?
+              flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.getDefaultInstance() : metadata_;
+        }
+      }
+      /**
+       * <pre>
+       * Metadata for Node Execution
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NodeExecutionMetaData metadata = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData, flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.Builder, flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaDataOrBuilder> 
+          getMetadataFieldBuilder() {
+        if (metadataBuilder_ == null) {
+          metadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData, flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.Builder, flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaDataOrBuilder>(
+                  getMetadata(),
+                  getParentForChildren(),
+                  isClean());
+          metadata_ = null;
+        }
+        return metadataBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -4604,6 +4858,489 @@ public final class NodeExecutionOuterClass {
 
     @java.lang.Override
     public flyteidl.admin.NodeExecutionOuterClass.NodeExecution getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface NodeExecutionMetaDataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.NodeExecutionMetaData)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>bool interruptible = 1;</code>
+     */
+    boolean getInterruptible();
+  }
+  /**
+   * <pre>
+   * Represents additional attributes related to a Node Execution
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.NodeExecutionMetaData}
+   */
+  public  static final class NodeExecutionMetaData extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.NodeExecutionMetaData)
+      NodeExecutionMetaDataOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use NodeExecutionMetaData.newBuilder() to construct.
+    private NodeExecutionMetaData(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private NodeExecutionMetaData() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private NodeExecutionMetaData(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 8: {
+
+              interruptible_ = input.readBool();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.NodeExecutionOuterClass.internal_static_flyteidl_admin_NodeExecutionMetaData_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.NodeExecutionOuterClass.internal_static_flyteidl_admin_NodeExecutionMetaData_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.class, flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.Builder.class);
+    }
+
+    public static final int INTERRUPTIBLE_FIELD_NUMBER = 1;
+    private boolean interruptible_;
+    /**
+     * <code>bool interruptible = 1;</code>
+     */
+    public boolean getInterruptible() {
+      return interruptible_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (interruptible_ != false) {
+        output.writeBool(1, interruptible_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (interruptible_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, interruptible_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData other = (flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData) obj;
+
+      if (getInterruptible()
+          != other.getInterruptible()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getInterruptible());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Represents additional attributes related to a Node Execution
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.NodeExecutionMetaData}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.NodeExecutionMetaData)
+        flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaDataOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.NodeExecutionOuterClass.internal_static_flyteidl_admin_NodeExecutionMetaData_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.NodeExecutionOuterClass.internal_static_flyteidl_admin_NodeExecutionMetaData_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.class, flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        interruptible_ = false;
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.NodeExecutionOuterClass.internal_static_flyteidl_admin_NodeExecutionMetaData_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData getDefaultInstanceForType() {
+        return flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData build() {
+        flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData buildPartial() {
+        flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData result = new flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData(this);
+        result.interruptible_ = interruptible_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData) {
+          return mergeFrom((flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData other) {
+        if (other == flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData.getDefaultInstance()) return this;
+        if (other.getInterruptible() != false) {
+          setInterruptible(other.getInterruptible());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private boolean interruptible_ ;
+      /**
+       * <code>bool interruptible = 1;</code>
+       */
+      public boolean getInterruptible() {
+        return interruptible_;
+      }
+      /**
+       * <code>bool interruptible = 1;</code>
+       */
+      public Builder setInterruptible(boolean value) {
+        
+        interruptible_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool interruptible = 1;</code>
+       */
+      public Builder clearInterruptible() {
+        
+        interruptible_ = false;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.NodeExecutionMetaData)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.NodeExecutionMetaData)
+    private static final flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData();
+    }
+
+    public static flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<NodeExecutionMetaData>
+        PARSER = new com.google.protobuf.AbstractParser<NodeExecutionMetaData>() {
+      @java.lang.Override
+      public NodeExecutionMetaData parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new NodeExecutionMetaData(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<NodeExecutionMetaData> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<NodeExecutionMetaData> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.NodeExecutionOuterClass.NodeExecutionMetaData getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -10180,6 +10917,11 @@ public final class NodeExecutionOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_NodeExecution_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_NodeExecutionMetaData_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_NodeExecutionMetaData_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_NodeExecutionList_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -10229,33 +10971,35 @@ public final class NodeExecutionOuterClass {
       "ask_execution_id\030\001 \001(\0132&.flyteidl.core.T" +
       "askExecutionIdentifier\022\r\n\005limit\030\002 \001(\r\022\r\n" +
       "\005token\030\003 \001(\t\022\017\n\007filters\030\004 \001(\t\022%\n\007sort_by" +
-      "\030\005 \001(\0132\024.flyteidl.admin.Sort\"\215\001\n\rNodeExe" +
+      "\030\005 \001(\0132\024.flyteidl.admin.Sort\"\306\001\n\rNodeExe" +
       "cution\0222\n\002id\030\001 \001(\0132&.flyteidl.core.NodeE" +
       "xecutionIdentifier\022\021\n\tinput_uri\030\002 \001(\t\0225\n" +
       "\007closure\030\003 \001(\0132$.flyteidl.admin.NodeExec" +
-      "utionClosure\"Z\n\021NodeExecutionList\0226\n\017nod" +
-      "e_executions\030\001 \003(\0132\035.flyteidl.admin.Node" +
-      "Execution\022\r\n\005token\030\002 \001(\t\"\270\003\n\024NodeExecuti" +
-      "onClosure\022\024\n\noutput_uri\030\001 \001(\tH\000\022.\n\005error" +
-      "\030\002 \001(\0132\035.flyteidl.core.ExecutionErrorH\000\022" +
-      "1\n\005phase\030\003 \001(\0162\".flyteidl.core.NodeExecu" +
-      "tion.Phase\022.\n\nstarted_at\030\004 \001(\0132\032.google." +
-      "protobuf.Timestamp\022+\n\010duration\030\005 \001(\0132\031.g" +
-      "oogle.protobuf.Duration\022.\n\ncreated_at\030\006 " +
-      "\001(\0132\032.google.protobuf.Timestamp\022.\n\nupdat" +
-      "ed_at\030\007 \001(\0132\032.google.protobuf.Timestamp\022" +
-      "F\n\026workflow_node_metadata\030\010 \001(\0132$.flytei" +
-      "dl.admin.WorkflowNodeMetadataH\001B\017\n\routpu" +
-      "t_resultB\021\n\017target_metadata\"W\n\024WorkflowN" +
-      "odeMetadata\022?\n\013executionId\030\001 \001(\0132*.flyte" +
-      "idl.core.WorkflowExecutionIdentifier\"Q\n\033" +
-      "NodeExecutionGetDataRequest\0222\n\002id\030\001 \001(\0132" +
-      "&.flyteidl.core.NodeExecutionIdentifier\"" +
-      "q\n\034NodeExecutionGetDataResponse\022\'\n\006input" +
-      "s\030\001 \001(\0132\027.flyteidl.admin.UrlBlob\022(\n\007outp" +
-      "uts\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB3Z1gi" +
-      "thub.com/lyft/flyteidl/gen/pb-go/flyteid" +
-      "l/adminb\006proto3"
+      "utionClosure\0227\n\010metadata\030\004 \001(\0132%.flyteid" +
+      "l.admin.NodeExecutionMetaData\".\n\025NodeExe" +
+      "cutionMetaData\022\025\n\rinterruptible\030\001 \001(\010\"Z\n" +
+      "\021NodeExecutionList\0226\n\017node_executions\030\001 " +
+      "\003(\0132\035.flyteidl.admin.NodeExecution\022\r\n\005to" +
+      "ken\030\002 \001(\t\"\270\003\n\024NodeExecutionClosure\022\024\n\nou" +
+      "tput_uri\030\001 \001(\tH\000\022.\n\005error\030\002 \001(\0132\035.flytei" +
+      "dl.core.ExecutionErrorH\000\0221\n\005phase\030\003 \001(\0162" +
+      "\".flyteidl.core.NodeExecution.Phase\022.\n\ns" +
+      "tarted_at\030\004 \001(\0132\032.google.protobuf.Timest" +
+      "amp\022+\n\010duration\030\005 \001(\0132\031.google.protobuf." +
+      "Duration\022.\n\ncreated_at\030\006 \001(\0132\032.google.pr" +
+      "otobuf.Timestamp\022.\n\nupdated_at\030\007 \001(\0132\032.g" +
+      "oogle.protobuf.Timestamp\022F\n\026workflow_nod" +
+      "e_metadata\030\010 \001(\0132$.flyteidl.admin.Workfl" +
+      "owNodeMetadataH\001B\017\n\routput_resultB\021\n\017tar" +
+      "get_metadata\"W\n\024WorkflowNodeMetadata\022?\n\013" +
+      "executionId\030\001 \001(\0132*.flyteidl.core.Workfl" +
+      "owExecutionIdentifier\"Q\n\033NodeExecutionGe" +
+      "tDataRequest\0222\n\002id\030\001 \001(\0132&.flyteidl.core" +
+      ".NodeExecutionIdentifier\"q\n\034NodeExecutio" +
+      "nGetDataResponse\022\'\n\006inputs\030\001 \001(\0132\027.flyte" +
+      "idl.admin.UrlBlob\022(\n\007outputs\030\002 \001(\0132\027.fly" +
+      "teidl.admin.UrlBlobB3Z1github.com/lyft/f" +
+      "lyteidl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10297,33 +11041,39 @@ public final class NodeExecutionOuterClass {
     internal_static_flyteidl_admin_NodeExecution_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NodeExecution_descriptor,
-        new java.lang.String[] { "Id", "InputUri", "Closure", });
-    internal_static_flyteidl_admin_NodeExecutionList_descriptor =
+        new java.lang.String[] { "Id", "InputUri", "Closure", "Metadata", });
+    internal_static_flyteidl_admin_NodeExecutionMetaData_descriptor =
       getDescriptor().getMessageTypes().get(4);
+    internal_static_flyteidl_admin_NodeExecutionMetaData_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_NodeExecutionMetaData_descriptor,
+        new java.lang.String[] { "Interruptible", });
+    internal_static_flyteidl_admin_NodeExecutionList_descriptor =
+      getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_NodeExecutionList_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NodeExecutionList_descriptor,
         new java.lang.String[] { "NodeExecutions", "Token", });
     internal_static_flyteidl_admin_NodeExecutionClosure_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_NodeExecutionClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NodeExecutionClosure_descriptor,
         new java.lang.String[] { "OutputUri", "Error", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "WorkflowNodeMetadata", "OutputResult", "TargetMetadata", });
     internal_static_flyteidl_admin_WorkflowNodeMetadata_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_admin_WorkflowNodeMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_WorkflowNodeMetadata_descriptor,
         new java.lang.String[] { "ExecutionId", });
     internal_static_flyteidl_admin_NodeExecutionGetDataRequest_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_admin_NodeExecutionGetDataRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NodeExecutionGetDataRequest_descriptor,
         new java.lang.String[] { "Id", });
     internal_static_flyteidl_admin_NodeExecutionGetDataResponse_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_admin_NodeExecutionGetDataResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NodeExecutionGetDataResponse_descriptor,

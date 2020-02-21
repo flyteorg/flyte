@@ -17,4 +17,5 @@ type FlyteidladminNodeExecution struct {
 	InputUri string `json:"input_uri,omitempty"`
 	// Computed results associated with this node execution.
 	Closure *AdminNodeExecutionClosure `json:"closure,omitempty"`
+	Metadata *AdminNodeExecutionMetaData `json:"metadata,omitempty"`
 }

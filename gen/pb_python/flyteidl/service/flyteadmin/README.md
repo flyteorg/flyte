@@ -167,6 +167,7 @@ Class | Method | HTTP request | Description
  - [AdminNodeExecutionEventResponse](docs/AdminNodeExecutionEventResponse.md)
  - [AdminNodeExecutionGetDataResponse](docs/AdminNodeExecutionGetDataResponse.md)
  - [AdminNodeExecutionList](docs/AdminNodeExecutionList.md)
+ - [AdminNodeExecutionMetaData](docs/AdminNodeExecutionMetaData.md)
  - [AdminNotification](docs/AdminNotification.md)
  - [AdminNotificationList](docs/AdminNotificationList.md)
  - [AdminPagerDutyNotification](docs/AdminPagerDutyNotification.md)

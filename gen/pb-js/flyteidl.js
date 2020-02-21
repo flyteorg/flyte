@@ -16559,6 +16559,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {google.protobuf.ITimestamp|null} [scheduledAt] ExecutionMetadata scheduledAt
              * @property {flyteidl.core.INodeExecutionIdentifier|null} [parentNodeExecution] ExecutionMetadata parentNodeExecution
              * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] ExecutionMetadata referenceExecution
+             * @property {boolean|null} [interruptible] ExecutionMetadata interruptible
              */
 
             /**
@@ -16625,6 +16626,14 @@ export const flyteidl = $root.flyteidl = (() => {
             ExecutionMetadata.prototype.referenceExecution = null;
 
             /**
+             * ExecutionMetadata interruptible.
+             * @member {boolean} interruptible
+             * @memberof flyteidl.admin.ExecutionMetadata
+             * @instance
+             */
+            ExecutionMetadata.prototype.interruptible = false;
+
+            /**
              * Creates a new ExecutionMetadata instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.ExecutionMetadata
@@ -16658,6 +16667,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.google.protobuf.Timestamp.encode(message.scheduledAt, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 if (message.parentNodeExecution != null && message.hasOwnProperty("parentNodeExecution"))
                     $root.flyteidl.core.NodeExecutionIdentifier.encode(message.parentNodeExecution, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                if (message.interruptible != null && message.hasOwnProperty("interruptible"))
+                    writer.uint32(/* id 7, wireType 0 =*/56).bool(message.interruptible);
                 if (message.referenceExecution != null && message.hasOwnProperty("referenceExecution"))
                     $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.referenceExecution, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
@@ -16698,6 +16709,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 16:
                         message.referenceExecution = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                        break;
+                    case 7:
+                        message.interruptible = reader.bool();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -16750,6 +16764,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "referenceExecution." + error;
                 }
+                if (message.interruptible != null && message.hasOwnProperty("interruptible"))
+                    if (typeof message.interruptible !== "boolean")
+                        return "interruptible: boolean expected";
                 return null;
             };
 
@@ -21453,6 +21470,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.INodeExecutionIdentifier|null} [id] NodeExecution id
              * @property {string|null} [inputUri] NodeExecution inputUri
              * @property {flyteidl.admin.INodeExecutionClosure|null} [closure] NodeExecution closure
+             * @property {flyteidl.admin.INodeExecutionMetaData|null} [metadata] NodeExecution metadata
              */
 
             /**
@@ -21495,6 +21513,14 @@ export const flyteidl = $root.flyteidl = (() => {
             NodeExecution.prototype.closure = null;
 
             /**
+             * NodeExecution metadata.
+             * @member {flyteidl.admin.INodeExecutionMetaData|null|undefined} metadata
+             * @memberof flyteidl.admin.NodeExecution
+             * @instance
+             */
+            NodeExecution.prototype.metadata = null;
+
+            /**
              * Creates a new NodeExecution instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.NodeExecution
@@ -21524,6 +21550,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 2, wireType 2 =*/18).string(message.inputUri);
                 if (message.closure != null && message.hasOwnProperty("closure"))
                     $root.flyteidl.admin.NodeExecutionClosure.encode(message.closure, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                if (message.metadata != null && message.hasOwnProperty("metadata"))
+                    $root.flyteidl.admin.NodeExecutionMetaData.encode(message.metadata, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 return writer;
             };
 
@@ -21553,6 +21581,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 3:
                         message.closure = $root.flyteidl.admin.NodeExecutionClosure.decode(reader, reader.uint32());
+                        break;
+                    case 4:
+                        message.metadata = $root.flyteidl.admin.NodeExecutionMetaData.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -21586,10 +21617,125 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "closure." + error;
                 }
+                if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                    let error = $root.flyteidl.admin.NodeExecutionMetaData.verify(message.metadata);
+                    if (error)
+                        return "metadata." + error;
+                }
                 return null;
             };
 
             return NodeExecution;
+        })();
+
+        admin.NodeExecutionMetaData = (function() {
+
+            /**
+             * Properties of a NodeExecutionMetaData.
+             * @memberof flyteidl.admin
+             * @interface INodeExecutionMetaData
+             * @property {boolean|null} [interruptible] NodeExecutionMetaData interruptible
+             */
+
+            /**
+             * Constructs a new NodeExecutionMetaData.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a NodeExecutionMetaData.
+             * @implements INodeExecutionMetaData
+             * @constructor
+             * @param {flyteidl.admin.INodeExecutionMetaData=} [properties] Properties to set
+             */
+            function NodeExecutionMetaData(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * NodeExecutionMetaData interruptible.
+             * @member {boolean} interruptible
+             * @memberof flyteidl.admin.NodeExecutionMetaData
+             * @instance
+             */
+            NodeExecutionMetaData.prototype.interruptible = false;
+
+            /**
+             * Creates a new NodeExecutionMetaData instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.NodeExecutionMetaData
+             * @static
+             * @param {flyteidl.admin.INodeExecutionMetaData=} [properties] Properties to set
+             * @returns {flyteidl.admin.NodeExecutionMetaData} NodeExecutionMetaData instance
+             */
+            NodeExecutionMetaData.create = function create(properties) {
+                return new NodeExecutionMetaData(properties);
+            };
+
+            /**
+             * Encodes the specified NodeExecutionMetaData message. Does not implicitly {@link flyteidl.admin.NodeExecutionMetaData.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.NodeExecutionMetaData
+             * @static
+             * @param {flyteidl.admin.INodeExecutionMetaData} message NodeExecutionMetaData message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            NodeExecutionMetaData.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.interruptible != null && message.hasOwnProperty("interruptible"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).bool(message.interruptible);
+                return writer;
+            };
+
+            /**
+             * Decodes a NodeExecutionMetaData message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.NodeExecutionMetaData
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.NodeExecutionMetaData} NodeExecutionMetaData
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            NodeExecutionMetaData.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.NodeExecutionMetaData();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.interruptible = reader.bool();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a NodeExecutionMetaData message.
+             * @function verify
+             * @memberof flyteidl.admin.NodeExecutionMetaData
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            NodeExecutionMetaData.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.interruptible != null && message.hasOwnProperty("interruptible"))
+                    if (typeof message.interruptible !== "boolean")
+                        return "interruptible: boolean expected";
+                return null;
+            };
+
+            return NodeExecutionMetaData;
         })();
 
         admin.NodeExecutionList = (function() {
