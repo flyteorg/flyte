@@ -91,6 +91,7 @@ function useSearchableSelectorState<DataType>({
     onSelectionChanged
 }: SearchableSelectorProps<DataType>): SearchableSelectorState<DataType> {
     const fetchResults = fetchSearchResults || generateDefaultFetch(options);
+    const [hasReceivedInput, setHasReceivedInput] = React.useState(false);
     const [rawSearchValue, setSearchValue] = React.useState('');
     const debouncedSearchValue = useDebouncedValue(
         rawSearchValue,
@@ -99,7 +100,8 @@ function useSearchableSelectorState<DataType>({
 
     const [isExpanded, setIsExpanded] = React.useState(false);
     const [focused, setFocused] = React.useState(false);
-    const minimumQueryMet = debouncedSearchValue.length > minimumQuerySize;
+    const minimumQueryMet =
+        hasReceivedInput && debouncedSearchValue.length > minimumQuerySize;
 
     const searchResults = useFetchableData<
         SearchableSelectorOption<DataType>[],
@@ -116,7 +118,7 @@ function useSearchableSelectorState<DataType>({
     const items = focused ? searchResults.value : options;
 
     let inputValue = '';
-    if (focused) {
+    if (focused && hasReceivedInput) {
         inputValue = rawSearchValue;
     } else if (selectedItem) {
         inputValue = selectedItem.name;
@@ -127,18 +129,21 @@ function useSearchableSelectorState<DataType>({
     };
 
     const onFocus = () => {
+        setIsExpanded(false);
+        setHasReceivedInput(false);
+        setSearchValue('');
         setFocused(true);
     };
 
     const onChange = ({
         target: { value }
     }: React.ChangeEvent<HTMLInputElement>) => {
+        setHasReceivedInput(true);
         setSearchValue(value);
     };
 
     const selectItem = (item: SearchableSelectorOption<DataType>) => {
         onSelectionChanged(item);
-        setSearchValue('');
         setFocused(false);
         setIsExpanded(false);
     };
@@ -239,7 +244,6 @@ export const SearchableSelector = <DataType extends {}>(
         isExpanded,
         onBlur,
         onChange,
-        onFocus,
         setIsExpanded,
         showList
     } = state;
@@ -249,6 +253,17 @@ export const SearchableSelector = <DataType extends {}>(
         if (inputRef.current) {
             inputRef.current.blur();
         }
+    };
+
+    const onFocus = () => {
+        state.onFocus();
+        // Select existing text on focus, using the next event loop to allow
+        // event handler to finish correctly.
+        setTimeout(() => {
+            if (inputRef.current) {
+                inputRef.current.select();
+            }
+        }, 0);
     };
 
     const selectItem = (item: SearchableSelectorOption<DataType>) => {
