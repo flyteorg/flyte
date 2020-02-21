@@ -186,6 +186,9 @@ message ExecutionMetadata {
     // Optional, a reference workflow execution related to this execution.
     // In the case of a relaunch, this references the original workflow execution.
     core.WorkflowExecutionIdentifier reference_execution = 16;
+
+    // Identify whether execution is interruptible
+    bool interruptible = 7;
 }
 
 message NotificationList {
@@ -222,6 +225,7 @@ message ExecutionSpec {
 
     // Annotations to apply to the execution resource.
     Annotations annotations   = 8;
+
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.

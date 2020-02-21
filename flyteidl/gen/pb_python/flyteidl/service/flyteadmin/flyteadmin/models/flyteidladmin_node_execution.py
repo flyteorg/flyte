@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.admin_node_execution_closure import AdminNodeExecutionClosure  # noqa: F401,E501
+from flyteadmin.models.admin_node_execution_meta_data import AdminNodeExecutionMetaData  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
 
 
@@ -36,21 +37,24 @@ class FlyteidladminNodeExecution(object):
     swagger_types = {
         'id': 'CoreNodeExecutionIdentifier',
         'input_uri': 'str',
-        'closure': 'AdminNodeExecutionClosure'
+        'closure': 'AdminNodeExecutionClosure',
+        'metadata': 'AdminNodeExecutionMetaData'
     }
 
     attribute_map = {
         'id': 'id',
         'input_uri': 'input_uri',
-        'closure': 'closure'
+        'closure': 'closure',
+        'metadata': 'metadata'
     }
 
-    def __init__(self, id=None, input_uri=None, closure=None):  # noqa: E501
+    def __init__(self, id=None, input_uri=None, closure=None, metadata=None):  # noqa: E501
         """FlyteidladminNodeExecution - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
         self._input_uri = None
         self._closure = None
+        self._metadata = None
         self.discriminator = None
 
         if id is not None:
@@ -59,6 +63,8 @@ class FlyteidladminNodeExecution(object):
             self.input_uri = input_uri
         if closure is not None:
             self.closure = closure
+        if metadata is not None:
+            self.metadata = metadata
 
     @property
     def id(self):
@@ -128,6 +134,27 @@ class FlyteidladminNodeExecution(object):
         """
 
         self._closure = closure
+
+    @property
+    def metadata(self):
+        """Gets the metadata of this FlyteidladminNodeExecution.  # noqa: E501
+
+
+        :return: The metadata of this FlyteidladminNodeExecution.  # noqa: E501
+        :rtype: AdminNodeExecutionMetaData
+        """
+        return self._metadata
+
+    @metadata.setter
+    def metadata(self, metadata):
+        """Sets the metadata of this FlyteidladminNodeExecution.
+
+
+        :param metadata: The metadata of this FlyteidladminNodeExecution.  # noqa: E501
+        :type: AdminNodeExecutionMetaData
+        """
+
+        self._metadata = metadata
 
     def to_dict(self):
         """Returns the model properties as a dict"""

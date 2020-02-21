@@ -40,7 +40,8 @@ class AdminExecutionMetadata(object):
         'nesting': 'int',
         'scheduled_at': 'datetime',
         'parent_node_execution': 'CoreNodeExecutionIdentifier',
-        'reference_execution': 'CoreWorkflowExecutionIdentifier'
+        'reference_execution': 'CoreWorkflowExecutionIdentifier',
+        'interruptible': 'bool'
     }
 
     attribute_map = {
@@ -49,10 +50,11 @@ class AdminExecutionMetadata(object):
         'nesting': 'nesting',
         'scheduled_at': 'scheduled_at',
         'parent_node_execution': 'parent_node_execution',
-        'reference_execution': 'reference_execution'
+        'reference_execution': 'reference_execution',
+        'interruptible': 'interruptible'
     }
 
-    def __init__(self, mode=None, principal=None, nesting=None, scheduled_at=None, parent_node_execution=None, reference_execution=None):  # noqa: E501
+    def __init__(self, mode=None, principal=None, nesting=None, scheduled_at=None, parent_node_execution=None, reference_execution=None, interruptible=None):  # noqa: E501
         """AdminExecutionMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._mode = None
@@ -61,6 +63,7 @@ class AdminExecutionMetadata(object):
         self._scheduled_at = None
         self._parent_node_execution = None
         self._reference_execution = None
+        self._interruptible = None
         self.discriminator = None
 
         if mode is not None:
@@ -75,6 +78,8 @@ class AdminExecutionMetadata(object):
             self.parent_node_execution = parent_node_execution
         if reference_execution is not None:
             self.reference_execution = reference_execution
+        if interruptible is not None:
+            self.interruptible = interruptible
 
     @property
     def mode(self):
@@ -209,6 +214,27 @@ class AdminExecutionMetadata(object):
         """
 
         self._reference_execution = reference_execution
+
+    @property
+    def interruptible(self):
+        """Gets the interruptible of this AdminExecutionMetadata.  # noqa: E501
+
+
+        :return: The interruptible of this AdminExecutionMetadata.  # noqa: E501
+        :rtype: bool
+        """
+        return self._interruptible
+
+    @interruptible.setter
+    def interruptible(self, interruptible):
+        """Sets the interruptible of this AdminExecutionMetadata.
+
+
+        :param interruptible: The interruptible of this AdminExecutionMetadata.  # noqa: E501
+        :type: bool
+        """
+
+        self._interruptible = interruptible
 
     def to_dict(self):
         """Returns the model properties as a dict"""

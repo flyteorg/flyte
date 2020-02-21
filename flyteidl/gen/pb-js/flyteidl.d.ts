@@ -6920,6 +6920,9 @@ export namespace flyteidl {
 
             /** ExecutionMetadata referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** ExecutionMetadata interruptible */
+            interruptible?: (boolean|null);
         }
 
         /** Represents an ExecutionMetadata. */
@@ -6948,6 +6951,9 @@ export namespace flyteidl {
 
             /** ExecutionMetadata referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** ExecutionMetadata interruptible. */
+            public interruptible: boolean;
 
             /**
              * Creates a new ExecutionMetadata instance using the specified properties.
@@ -8996,6 +9002,9 @@ export namespace flyteidl {
 
             /** NodeExecution closure */
             closure?: (flyteidl.admin.INodeExecutionClosure|null);
+
+            /** NodeExecution metadata */
+            metadata?: (flyteidl.admin.INodeExecutionMetaData|null);
         }
 
         /** Represents a NodeExecution. */
@@ -9015,6 +9024,9 @@ export namespace flyteidl {
 
             /** NodeExecution closure. */
             public closure?: (flyteidl.admin.INodeExecutionClosure|null);
+
+            /** NodeExecution metadata. */
+            public metadata?: (flyteidl.admin.INodeExecutionMetaData|null);
 
             /**
              * Creates a new NodeExecution instance using the specified properties.
@@ -9043,6 +9055,58 @@ export namespace flyteidl {
 
             /**
              * Verifies a NodeExecution message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a NodeExecutionMetaData. */
+        interface INodeExecutionMetaData {
+
+            /** NodeExecutionMetaData interruptible */
+            interruptible?: (boolean|null);
+        }
+
+        /** Represents a NodeExecutionMetaData. */
+        class NodeExecutionMetaData implements INodeExecutionMetaData {
+
+            /**
+             * Constructs a new NodeExecutionMetaData.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.INodeExecutionMetaData);
+
+            /** NodeExecutionMetaData interruptible. */
+            public interruptible: boolean;
+
+            /**
+             * Creates a new NodeExecutionMetaData instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns NodeExecutionMetaData instance
+             */
+            public static create(properties?: flyteidl.admin.INodeExecutionMetaData): flyteidl.admin.NodeExecutionMetaData;
+
+            /**
+             * Encodes the specified NodeExecutionMetaData message. Does not implicitly {@link flyteidl.admin.NodeExecutionMetaData.verify|verify} messages.
+             * @param message NodeExecutionMetaData message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.INodeExecutionMetaData, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a NodeExecutionMetaData message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns NodeExecutionMetaData
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.NodeExecutionMetaData;
+
+            /**
+             * Verifies a NodeExecutionMetaData message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
