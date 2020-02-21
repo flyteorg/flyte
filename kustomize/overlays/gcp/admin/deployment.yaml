@@ -28,6 +28,18 @@ spec:
       #     mountPath: /etc/flyte/config
       #   - name: db-user-pass
       #     mountPath: /etc/gcp
+      - name: sync-cluster-resources
+        image: docker.io/lyft/flyteadmin:v0.2.1
+        imagePullPolicy: IfNotPresent
+        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
+        volumeMounts:
+        - name: resource-templates
+          mountPath: /etc/flyte/clusterresource/templates
+        - name: config-volume
+          mountPath: /etc/flyte/config
+        - name: db-user-pass
+          mountPath: /etc/gcp
+
       containers:
       - name: flyteadmin
         volumeMounts:
@@ -39,6 +51,10 @@ spec:
             cpu: "1"
             ephemeral-storage: "100Mi"
       volumes:
-        - name: db-user-pass
-          secret:
-            secretName: db-user-pass
+      - name: db-user-pass
+        secret:
+          secretName: db-user-pass
+      - name: resource-templates
+        configMap:
+          name: clusterresource-template
+
