@@ -130,7 +130,7 @@ func ToError(executionError *core.ExecutionError, reason string) string {
 	if reason != "" {
 		return reason
 	}
-	return "unknown error"
+	return "unknown"
 }
 
 func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n *nodeStateManager, s v1alpha1.ExecutableNodeStatus) {

@@ -19,10 +19,10 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
 	github.com/imdario/mergo v0.3.8 // indirect
-	github.com/lyft/datacatalog v0.1.2
+	// github.com/lyft/flyteplugins v0.3.3
+	github.com/lyft/datacatalog v0.2.1
 	github.com/lyft/flyteidl v0.17.3
 	github.com/lyft/flyteplugins v0.3.4-0.20200218200451-1ce137d446ba
-	// github.com/lyft/flyteplugins v0.3.3
 	github.com/lyft/flytestdlib v0.3.2
 	github.com/magiconair/properties v1.8.1
 	github.com/mitchellh/mapstructure v1.1.2
@@ -52,7 +52,6 @@ require (
 replace (
 	github.com/GoogleCloudPlatform/spark-on-k8s-operator => github.com/lyft/spark-on-k8s-operator v0.1.3
 	github.com/googleapis/gnostic => github.com/googleapis/gnostic v0.3.1
-	github.com/lyft/datacatalog => github.com/lyft/datacatalog v0.1.1
 	gopkg.in/fsnotify.v1 => github.com/fsnotify/fsnotify v1.4.7
 	k8s.io/api => github.com/lyft/api v0.0.0-20191031200350-b49a72c274e0
 	k8s.io/apimachinery => github.com/lyft/apimachinery v0.0.0-20191031200210-047e3ea32d7f

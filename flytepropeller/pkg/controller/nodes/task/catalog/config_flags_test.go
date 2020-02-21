@@ -165,4 +165,26 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_max-cache-age", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("max-cache-age"); err == nil {
+				assert.Equal(t, string(defaultConfig.MaxCacheAge.String()), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.MaxCacheAge.String()
+
+			cmdFlags.Set("max-cache-age", testValue)
+			if vString, err := cmdFlags.GetString("max-cache-age"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.MaxCacheAge)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
