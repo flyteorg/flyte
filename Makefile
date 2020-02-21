@@ -14,7 +14,7 @@ linux_compile:
 .PHONY: compile
 compile:
 	mkdir -p ./bin
-	go build -o bin/flytepropeller ./cmd/controller/main.go 
+	go build -o bin/flytepropeller ./cmd/controller/main.go
 	go build -o bin/kubectl-flyte ./cmd/kubectl-flyte/main.go && cp bin/kubectl-flyte ${GOPATH}/bin
 
 cross_compile:
@@ -27,7 +27,7 @@ op_code_generate:
 	@RESOURCE_NAME=flyteworkflow OPERATOR_PKG=github.com/lyft/flytepropeller ./hack/update-codegen.sh
 
 benchmark:
-	mkdir -p ./bin/benchmark 
+	mkdir -p ./bin/benchmark
 	@go test -run=^$ -bench=. -cpuprofile=cpu.out -memprofile=mem.out ./pkg/controller/nodes/. && mv *.out ./bin/benchmark/ && mv *.test ./bin/benchmark/
 
 # server starts the service in development mode
@@ -42,3 +42,7 @@ clean:
 golden:
 	go test ./cmd/kubectl-flyte/cmd -update
 	go test ./pkg/compiler/test -update
+
+.PHONY: test_unit_codecov
+test_unit_codecov:
+	go test ./... -race -coverprofile=coverage.txt -covermode=atomic; curl -s https://codecov.io/bash > codecov_bash.sh; bash codecov_bash.sh

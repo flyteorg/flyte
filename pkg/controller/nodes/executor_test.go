@@ -2,6 +2,7 @@ package nodes
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
@@ -25,8 +26,6 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
-
-	"errors"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/lyft/flytepropeller/pkg/controller/config"
@@ -790,8 +789,10 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				).Return(test.handlerReturn())
 				h.On("FinalizeRequired").Return(true)
 				if test.currentNodePhase == v1alpha1.NodePhaseRetryableFailure {
+					h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 					h.On("Finalize", mock.Anything, mock.Anything).Return(nil)
 				} else {
+					h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 					h.On("Finalize", mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
 				}
 				hf.On("GetHandler", v1alpha1.NodeKindTask).Return(h, nil)
@@ -1148,6 +1149,7 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 		expectedPhase     handler.EPhase
 		activeDeadline    time.Duration
 		executionDeadline time.Duration
+		retries           int
 		err               error
 	}{
 		{
@@ -1164,6 +1166,16 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 			expectedPhase:     handler.EPhaseRetryableFailure,
 			activeDeadline:    time.Second * 15,
 			executionDeadline: time.Second * 5,
+			retries:           2,
+			err:               nil,
+		},
+		{
+			name:              "retries-exhausted",
+			phaseInfo:         handler.PhaseInfoRunning(nil),
+			expectedPhase:     handler.EPhaseFailed,
+			activeDeadline:    time.Second * 15,
+			executionDeadline: time.Second * 5,
+			retries:           1,
 			err:               nil,
 		},
 		{
@@ -1197,6 +1209,9 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 	queuedAtTime := &v1.Time{Time: queuedAt}
 	ns.On("GetQueuedAt").Return(queuedAtTime)
 	ns.On("GetLastAttemptStartedAt").Return(queuedAtTime)
+	ns.OnGetAttempts().Return(0)
+	ns.On("ClearLastAttemptStartedAt").Return()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &nodeExecutor{}
@@ -1224,8 +1239,9 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 			mockNode.On("GetInputBindings").Return([]*v1alpha1.Binding{})
 			mockNode.On("GetActiveDeadline").Return(&tt.activeDeadline)
 			mockNode.On("GetExecutionDeadline").Return(&tt.executionDeadline)
+			mockNode.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &tt.retries})
 
-			nCtx := &execContext{node: mockNode, nsm: &nodeStateManager{}}
+			nCtx := &execContext{node: mockNode, nsm: &nodeStateManager{nodeStatus: ns}}
 			phaseInfo, err := c.execute(context.TODO(), h, nCtx, ns)
 
 			if tt.err != nil {
@@ -1233,7 +1249,7 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			assert.Equal(t, tt.expectedPhase, phaseInfo.GetPhase())
+			assert.Equal(t, tt.expectedPhase.String(), phaseInfo.GetPhase().String())
 		})
 	}
 }
