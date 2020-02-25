@@ -138,7 +138,7 @@ type Handler struct {
 	pluginRegistry  PluginRegistryIface
 	kubeClient      pluginCore.KubeClient
 	secretManager   pluginCore.SecretManager
-	resourceManager pluginCore.ResourceManager
+	resourceManager resourcemanager.BaseResourceManager
 	barrierCache    *barrier
 	cfg             *config.Config
 }

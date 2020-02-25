@@ -303,7 +303,7 @@ func (t taskNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState) err
 	panic("not implemented")
 }
 
-func CreateNoopResourceManager(ctx context.Context, scope promutils.Scope) pluginCore.ResourceManager {
+func CreateNoopResourceManager(ctx context.Context, scope promutils.Scope) resourcemanager.BaseResourceManager {
 	rmBuilder, _ := resourcemanager.GetResourceManagerBuilderByType(ctx, rmConfig.TypeNoop, scope)
 	rm, _ := rmBuilder.BuildResourceManager(ctx)
 	return rm
