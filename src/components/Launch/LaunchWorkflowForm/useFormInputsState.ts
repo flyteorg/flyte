@@ -101,7 +101,6 @@ export function useFormInputsState(
         return valid;
     };
 
-    // TODO: We need the initialValues passed into this as well
     const getValues = () => convertFormInputsToLiterals(inputs);
 
     return {
