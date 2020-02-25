@@ -1,7 +1,10 @@
 import { useDebouncedValue } from 'components/hooks/useDebouncedValue';
 import { Core } from 'flyteidl';
-import { useEffect, useState } from 'react';
-import { validateInput } from './inputHelpers/inputHelpers';
+import { useEffect, useMemo, useState } from 'react';
+import {
+    literalToInputValue,
+    validateInput
+} from './inputHelpers/inputHelpers';
 import { useInputValueCacheContext } from './inputValueCache';
 import { InputProps, InputValue, ParsedInput } from './types';
 import { convertFormInputsToLiterals, createInputCacheKey } from './utils';
@@ -20,24 +23,35 @@ interface FormInputsState {
 
 function useFormInputState(parsedInput: ParsedInput): FormInputState {
     const inputValueCache = useInputValueCacheContext();
+
     const cacheKey = createInputCacheKey(
         parsedInput.name,
         parsedInput.typeDefinition
     );
 
-    const defaultValue = inputValueCache.has(cacheKey)
-        ? inputValueCache.get(cacheKey)
-        : parsedInput.defaultValue;
+    const { initialValue, name, required, typeDefinition } = parsedInput;
 
-    const [value, setValue] = useState<InputValue | undefined>(defaultValue);
+    const [value, setValue] = useState<InputValue | undefined>(() => {
+        const parsedInitialValue = initialValue
+            ? literalToInputValue(parsedInput.typeDefinition, initialValue)
+            : undefined;
+        return inputValueCache.has(cacheKey)
+            ? inputValueCache.get(cacheKey)
+            : parsedInitialValue;
+    });
     const [error, setError] = useState<string>();
 
     const validationValue = useDebouncedValue(value, debounceDelay);
 
     const validate = () => {
-        const { name, required, typeDefinition } = parsedInput;
         try {
-            validateInput({ name, required, typeDefinition, value });
+            validateInput({
+                name,
+                required,
+                typeDefinition,
+                value,
+                initialValue: parsedInput.initialValue
+            });
             setError(undefined);
             return true;
         } catch (e) {
@@ -58,6 +72,7 @@ function useFormInputState(parsedInput: ParsedInput): FormInputState {
     return {
         ...parsedInput,
         error,
+        initialValue,
         onChange,
         validate,
         value,
@@ -85,6 +100,7 @@ export function useFormInputsState(
         return valid;
     };
 
+    // TODO: We need the initialValues passed into this as well
     const getValues = () => convertFormInputsToLiterals(inputs);
 
     return {

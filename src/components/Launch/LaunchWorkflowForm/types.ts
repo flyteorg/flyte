@@ -10,11 +10,12 @@ import {
 import { SearchableSelectorOption } from './SearchableSelector';
 
 export type InputValueMap = Map<string, InputValue>;
+export type LiteralValueMap = Map<string, Core.ILiteral>;
 
 export interface InitialLaunchParameters {
     launchPlan?: Identifier;
     workflow?: WorkflowId;
-    values?: InputValueMap;
+    values?: LiteralValueMap;
 }
 
 export interface LaunchWorkflowFormProps {
@@ -80,6 +81,7 @@ export interface InputProps {
     description: string;
     error?: string;
     helperText?: string;
+    initialValue?: Core.ILiteral;
     name: string;
     label: string;
     required: boolean;
@@ -93,6 +95,6 @@ export interface ParsedInput
         InputProps,
         'description' | 'label' | 'name' | 'required' | 'typeDefinition'
     > {
-    /** Indicates the value to use when the input is in a default state */
-    defaultValue?: InputValue;
+    /** Provides an initial value for the input, which can be changed by the user. */
+    initialValue?: Core.ILiteral;
 }
