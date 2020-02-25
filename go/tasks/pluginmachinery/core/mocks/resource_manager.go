@@ -22,8 +22,8 @@ func (_m ResourceManager_AllocateResource) Return(_a0 core.AllocationStatus, _a1
 	return &ResourceManager_AllocateResource{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ResourceManager) OnAllocateResource(ctx context.Context, namespace core.ResourceNamespace, allocationToken string) *ResourceManager_AllocateResource {
-	c := _m.On("AllocateResource", ctx, namespace, allocationToken)
+func (_m *ResourceManager) OnAllocateResource(ctx context.Context, namespace core.ResourceNamespace, allocationToken string, constraintsSpec core.ResourceConstraintsSpec) *ResourceManager_AllocateResource {
+	c := _m.On("AllocateResource", ctx, namespace, allocationToken, constraintsSpec)
 	return &ResourceManager_AllocateResource{Call: c}
 }
 
@@ -32,20 +32,20 @@ func (_m *ResourceManager) OnAllocateResourceMatch(matchers ...interface{}) *Res
 	return &ResourceManager_AllocateResource{Call: c}
 }
 
-// AllocateResource provides a mock function with given fields: ctx, namespace, allocationToken
-func (_m *ResourceManager) AllocateResource(ctx context.Context, namespace core.ResourceNamespace, allocationToken string) (core.AllocationStatus, error) {
-	ret := _m.Called(ctx, namespace, allocationToken)
+// AllocateResource provides a mock function with given fields: ctx, namespace, allocationToken, constraintsSpec
+func (_m *ResourceManager) AllocateResource(ctx context.Context, namespace core.ResourceNamespace, allocationToken string, constraintsSpec core.ResourceConstraintsSpec) (core.AllocationStatus, error) {
+	ret := _m.Called(ctx, namespace, allocationToken, constraintsSpec)
 
 	var r0 core.AllocationStatus
-	if rf, ok := ret.Get(0).(func(context.Context, core.ResourceNamespace, string) core.AllocationStatus); ok {
-		r0 = rf(ctx, namespace, allocationToken)
+	if rf, ok := ret.Get(0).(func(context.Context, core.ResourceNamespace, string, core.ResourceConstraintsSpec) core.AllocationStatus); ok {
+		r0 = rf(ctx, namespace, allocationToken, constraintsSpec)
 	} else {
 		r0 = ret.Get(0).(core.AllocationStatus)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, core.ResourceNamespace, string) error); ok {
-		r1 = rf(ctx, namespace, allocationToken)
+	if rf, ok := ret.Get(1).(func(context.Context, core.ResourceNamespace, string, core.ResourceConstraintsSpec) error); ok {
+		r1 = rf(ctx, namespace, allocationToken, constraintsSpec)
 	} else {
 		r1 = ret.Error(1)
 	}

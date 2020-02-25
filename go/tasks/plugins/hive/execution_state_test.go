@@ -176,7 +176,7 @@ func TestGetAllocationToken(t *testing.T) {
 		tCtx := GetMockTaskExecutionContext()
 		mockResourceManager := tCtx.ResourceManager()
 		x := mockResourceManager.(*mocks.ResourceManager)
-		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
+		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusGranted, nil)
 
 		mockCurrentState := ExecutionState{AllocationTokenRequestStartTime: time.Now()}
@@ -190,7 +190,7 @@ func TestGetAllocationToken(t *testing.T) {
 		tCtx := GetMockTaskExecutionContext()
 		mockResourceManager := tCtx.ResourceManager()
 		x := mockResourceManager.(*mocks.ResourceManager)
-		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
+		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusExhausted, nil)
 
 		mockCurrentState := ExecutionState{AllocationTokenRequestStartTime: time.Now()}
@@ -204,7 +204,7 @@ func TestGetAllocationToken(t *testing.T) {
 		tCtx := GetMockTaskExecutionContext()
 		mockResourceManager := tCtx.ResourceManager()
 		x := mockResourceManager.(*mocks.ResourceManager)
-		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
+		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusNamespaceQuotaExceeded, nil)
 
 		mockCurrentState := ExecutionState{AllocationTokenRequestStartTime: time.Now()}
@@ -218,7 +218,7 @@ func TestGetAllocationToken(t *testing.T) {
 		tCtx := GetMockTaskExecutionContext()
 		mockResourceManager := tCtx.ResourceManager()
 		x := mockResourceManager.(*mocks.ResourceManager)
-		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
+		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusNamespaceQuotaExceeded, nil)
 
 		mockCurrentState := ExecutionState{}
@@ -232,7 +232,7 @@ func TestGetAllocationToken(t *testing.T) {
 		tCtx := GetMockTaskExecutionContext()
 		mockResourceManager := tCtx.ResourceManager()
 		x := mockResourceManager.(*mocks.ResourceManager)
-		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything).
+		x.On("AllocateResource", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 			Return(core.AllocationStatusGranted, nil)
 
 		startTime := time.Now()
