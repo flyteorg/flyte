@@ -2,6 +2,7 @@ import { useDebouncedValue } from 'components/hooks/useDebouncedValue';
 import { Core } from 'flyteidl';
 import { useEffect, useMemo, useState } from 'react';
 import {
+    defaultValueForInputType,
     literalToInputValue,
     validateInput
 } from './inputHelpers/inputHelpers';
@@ -34,7 +35,7 @@ function useFormInputState(parsedInput: ParsedInput): FormInputState {
     const [value, setValue] = useState<InputValue | undefined>(() => {
         const parsedInitialValue = initialValue
             ? literalToInputValue(parsedInput.typeDefinition, initialValue)
-            : undefined;
+            : defaultValueForInputType(typeDefinition);
         return inputValueCache.has(cacheKey)
             ? inputValueCache.get(cacheKey)
             : parsedInitialValue;
