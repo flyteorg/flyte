@@ -40,3 +40,14 @@ type ResourceManager interface {
 	AllocateResource(ctx context.Context, namespace ResourceNamespace, allocationToken string) (AllocationStatus, error)
 	ReleaseResource(ctx context.Context, namespace ResourceNamespace, allocationToken string) error
 }
+
+
+type ResourceConstraint struct {
+	Value int64
+}
+
+type ResourceConstraintsSpec struct {
+	ProjectScopeResourceConstraint ResourceConstraint
+	NamespaceScopeResourceConstraint ResourceConstraint
+}
+
