@@ -47,7 +47,7 @@ type ResourceConstraint struct {
 }
 
 type ResourceConstraintsSpec struct {
-	ProjectScopeResourceConstraint ResourceConstraint
-	NamespaceScopeResourceConstraint ResourceConstraint
+	ProjectScopeResourceConstraint *ResourceConstraint
+	NamespaceScopeResourceConstraint *ResourceConstraint
 }
 
