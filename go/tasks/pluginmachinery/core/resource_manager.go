@@ -37,7 +37,7 @@ type ResourceRegistrar interface {
 // Resource Manager manages a single resource type, and each allocation is of size one
 type ResourceManager interface {
 	GetID() string
-	AllocateResource(ctx context.Context, namespace ResourceNamespace, allocationToken string) (AllocationStatus, error)
+	AllocateResource(ctx context.Context, namespace ResourceNamespace, allocationToken string, constraintsSpec ResourceConstraintsSpec) (AllocationStatus, error)
 	ReleaseResource(ctx context.Context, namespace ResourceNamespace, allocationToken string) error
 }
 
