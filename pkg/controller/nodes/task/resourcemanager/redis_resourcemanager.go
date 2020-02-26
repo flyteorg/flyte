@@ -23,7 +23,6 @@ type RedisResourceManagerBuilder struct {
 	client                      RedisClient
 	MetricsScope                promutils.Scope
 	namespacedResourcesQuotaMap map[pluginCore.ResourceNamespace]int
-	quotaProportionCap          float64
 }
 
 func (r *RedisResourceManagerBuilder) GetID() string {
@@ -59,10 +58,6 @@ func (r *RedisResourceManagerBuilder) RegisterResourceQuota(ctx context.Context,
 	r.namespacedResourcesQuotaMap[namespace] = quota
 	logger.Infof(ctx, "Registering resource quota for Namespace [%v]. Quota [%v]", namespace, quota)
 	return nil
-}
-
-func (r *RedisResourceManagerBuilder) RegisterResourceNamespaceQuotaProportionCap(_ context.Context, quotaProportionCap float64) {
-	r.quotaProportionCap = quotaProportionCap
 }
 
 func getValidMetricScopeName(name string) string {
@@ -102,7 +97,6 @@ func NewRedisResourceManagerBuilder(_ context.Context, client RedisClient, scope
 		client:                      client,
 		MetricsScope:                scope,
 		namespacedResourcesQuotaMap: map[pluginCore.ResourceNamespace]int{},
-		quotaProportionCap:          0.0,
 	}
 
 	return rn, nil
