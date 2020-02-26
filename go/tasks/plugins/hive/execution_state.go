@@ -153,6 +153,27 @@ func composeResourceNamespaceWithClusterPrimaryLabel(ctx context.Context, tCtx c
 	return core.ResourceNamespace(clusterPrimaryLabel), nil
 }
 
+func createResourceConstraintsSpec(ctx context.Context, _ core.TaskExecutionContext, targetClusterPrimaryLabel core.ResourceNamespace) core.ResourceConstraintsSpec {
+	cfg := config.GetQuboleConfig()
+	constraintsSpec := core.ResourceConstraintsSpec{
+		ProjectScopeResourceConstraint:   nil,
+		NamespaceScopeResourceConstraint: nil,
+	}
+	if cfg.ClusterConfigs == nil {
+		logger.Infof(ctx, "No cluster config is found. Returning an empty resource constraints spec")
+		return constraintsSpec
+	}
+	for _, cluster := range cfg.ClusterConfigs {
+		if cluster.PrimaryLabel == string(targetClusterPrimaryLabel) {
+			constraintsSpec.ProjectScopeResourceConstraint = &core.ResourceConstraint{Value: int64(float64(cluster.Limit) * cluster.ProjectScopeQuotaProportionCap)}
+			constraintsSpec.NamespaceScopeResourceConstraint = &core.ResourceConstraint{Value: int64(float64(cluster.Limit) * cluster.NamespaceScopeQuotaProportionCap)}
+			break
+		}
+	}
+	logger.Infof(ctx, "Created a resource constraints spec: [%v]", constraintsSpec)
+	return constraintsSpec
+}
+
 func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, metric QuboleHiveExecutorMetrics) (ExecutionState, error) {
 	newState := ExecutionState{}
 	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
@@ -162,7 +183,9 @@ func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext, cur
 		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when requesting allocation token %s", uniqueId)
 	}
 
-	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, clusterPrimaryLabel, uniqueId, core.ResourceConstraintsSpec{})  // TODO: replace it with proper values from the config
+	resourceConstraintsSpec := createResourceConstraintsSpec(ctx, tCtx, clusterPrimaryLabel)
+
+	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, clusterPrimaryLabel, uniqueId, resourceConstraintsSpec)
 	if err != nil {
 		logger.Errorf(ctx, "Resource manager failed for TaskExecId [%s] token [%s]. error %s",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueId, err)
