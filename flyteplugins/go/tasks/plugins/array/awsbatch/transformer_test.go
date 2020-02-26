@@ -6,6 +6,7 @@ package awsbatch
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -62,11 +63,33 @@ func TestResourceRequirementsToBatchRequirements(t *testing.T) {
 	}
 
 	for i, testCase := range memoryTests {
-		q, err := resource.ParseQuantity(testCase.Input)
-		if assert.NoError(t, err) {
-			assert.Equal(t, testCase.Expected, q.ScaledValue(resource.Mega),
-				"Expected != Actual for test case [%v] with Input [%v]", i, testCase.Input)
-		}
+		t.Run(fmt.Sprintf("Memory Test [%v] %v", i, testCase.Input), func(t *testing.T) {
+			q, err := resource.ParseQuantity(testCase.Input)
+			if assert.NoError(t, err) {
+				assert.Equal(t, testCase.Expected, q.ScaledValue(resource.Mega),
+					"Expected != Actual for test case [%v] with Input [%v]", i, testCase.Input)
+			}
+		})
+	}
+
+	cpuTests := []struct {
+		Input    string
+		Expected int64
+	}{
+		// resource Quantity gets the ceiling of values to the nearest scale
+		{"200", 200},
+		{"1M", 1000000},
+		{"15000m", 15},
+	}
+
+	for i, testCase := range cpuTests {
+		t.Run(fmt.Sprintf("CPU Test [%v] %v", i, testCase.Input), func(t *testing.T) {
+			q, err := resource.ParseQuantity(testCase.Input)
+			if assert.NoError(t, err) {
+				assert.Equal(t, testCase.Expected, q.Value(),
+					"Expected != Actual for test case [%v] with Input [%v]", i, testCase.Input)
+			}
+		})
 	}
 }
 
