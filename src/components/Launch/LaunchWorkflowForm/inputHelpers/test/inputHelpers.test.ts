@@ -1,4 +1,5 @@
 import { Core } from 'flyteidl';
+import { primitiveLiteral } from '../../__mocks__/utils';
 import { InputProps, InputType } from '../../types';
 import { literalNone } from '../constants';
 import { getHelperForInput } from '../getHelperForInput';
@@ -192,6 +193,18 @@ describe('inputToLiteral', () => {
             })
         );
     });
+
+    it('Should return initial value for inputs with no value', () => {
+        const simpleInput = makeSimpleInput(
+            InputType.String,
+            primitiveLiteral({ stringValue: '' })
+        );
+        const initialValue = primitiveLiteral({ stringValue: 'abcdefg' });
+        simpleInput.required = true;
+        simpleInput.initialValue = initialValue;
+        delete simpleInput.value;
+        expect(inputToLiteral(simpleInput)).toEqual(initialValue);
+    });
 });
 
 function generateValidityTests(
@@ -242,5 +255,16 @@ describe('validateInput', () => {
         simpleInput.required = true;
         delete simpleInput.value;
         expect(() => validateInput(simpleInput)).toThrowError();
+    });
+
+    it('should not throw an error for a required input with an initial value and no value', () => {
+        const simpleInput = makeSimpleInput(
+            InputType.String,
+            primitiveLiteral({ stringValue: '' })
+        );
+        simpleInput.required = true;
+        simpleInput.initialValue = primitiveLiteral({ stringValue: 'abcdefg' });
+        delete simpleInput.value;
+        expect(() => validateInput(simpleInput)).not.toThrowError();
     });
 });

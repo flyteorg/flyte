@@ -221,10 +221,7 @@ export function useLaunchWorkflowFormState({
     >();
     const selectedWorkflowId = selectedWorkflow ? selectedWorkflow.data : null;
 
-    const inputValueCache = useMemo(
-        () => createInputValueCache(initialParameters.values),
-        [initialParameters.values]
-    );
+    const [inputValueCache] = useState(createInputValueCache());
 
     // We have to do a single item get once a workflow is selected so that we
     // receive the full workflow spec
@@ -345,7 +342,11 @@ export function useLaunchWorkflowFormState({
     useEffect(() => {
         const parsedInputs =
             launchPlanData && workflow.hasLoaded
-                ? getInputs(workflow.value, launchPlanData)
+                ? getInputs(
+                      workflow.value,
+                      launchPlanData,
+                      initialParameters.values
+                  )
                 : [];
         setParsedInputs(parsedInputs);
     }, [workflow.hasLoaded, workflow.value, launchPlanData]);

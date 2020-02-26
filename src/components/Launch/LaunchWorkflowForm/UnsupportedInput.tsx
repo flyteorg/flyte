@@ -14,7 +14,7 @@ export const UnsupportedInput: React.FC<InputProps> = props => {
             variant="outlined"
             disabled={true}
             helperText={description}
-            value="This type is not supported by Flyte Console"
+            value="Flyte Console does not support entering values of this type"
         />
     );
 };

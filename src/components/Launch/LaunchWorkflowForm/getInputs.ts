@@ -1,11 +1,8 @@
 import { sortedObjectEntries } from 'common/utils';
 import { LaunchPlan, Workflow } from 'models';
+import { LiteralValueMap, ParsedInput } from './types';
 import {
-    defaultValueForInputType,
-    literalToInputValue
-} from './inputHelpers/inputHelpers';
-import { ParsedInput } from './types';
-import {
+    createInputCacheKey,
     formatLabelWithType,
     getInputDefintionForLiteralType,
     getWorkflowInputs
@@ -17,7 +14,8 @@ const emptyDescription = ' ';
 
 export function getInputs(
     workflow: Workflow,
-    launchPlan: LaunchPlan
+    launchPlan: LaunchPlan,
+    initialValues: LiteralValueMap = new Map()
 ): ParsedInput[] {
     if (!launchPlan.closure || !workflow) {
         return [];
@@ -39,15 +37,16 @@ export function getInputs(
         );
         const typeLabel = formatLabelWithType(name, typeDefinition);
         const label = required ? `${typeLabel}*` : typeLabel;
-
-        const defaultValue =
-            parameter.default != null
-                ? literalToInputValue(typeDefinition, parameter.default)
-                : defaultValueForInputType(typeDefinition);
+        const inputKey = createInputCacheKey(name, typeDefinition);
+        const defaultVaue =
+            parameter.default != null ? parameter.default : undefined;
+        const initialValue = initialValues.has(inputKey)
+            ? initialValues.get(inputKey)
+            : defaultVaue;
 
         return {
-            defaultValue,
             description,
+            initialValue,
             label,
             name,
             required,

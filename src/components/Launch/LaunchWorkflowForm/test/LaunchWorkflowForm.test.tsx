@@ -646,7 +646,10 @@ describe('LaunchWorkflowForm', () => {
             });
 
             it('should prepopulate inputs with provided initial values', async () => {
-                const initialStringValue = 'initialStringValue';
+                const stringValue = 'initialStringValue';
+                const initialStringValue: Core.ILiteral = {
+                    scalar: { primitive: { stringValue } }
+                };
                 const parameters = mockLaunchPlans[0].closure!.expectedInputs
                     .parameters;
                 const values = new Map();
@@ -664,7 +667,7 @@ describe('LaunchWorkflowForm', () => {
 
                 expect(
                     getByLabelText(stringInputName, { exact: false })
-                ).toHaveValue(initialStringValue);
+                ).toHaveValue(stringValue);
             });
 
             it('loads preferred workflow version when it does not exist in the list of suggestions', async () => {

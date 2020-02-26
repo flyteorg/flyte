@@ -1,19 +1,24 @@
 import { ValueError } from 'errors';
 import { Core } from 'flyteidl';
-import { Literal } from 'models';
 import { InputProps, InputTypeDefinition, InputValue } from '../types';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
 
-type ToLiteralParams = Pick<InputProps, 'typeDefinition' | 'value'>;
+type ToLiteralParams = Pick<
+    InputProps,
+    'initialValue' | 'typeDefinition' | 'value'
+>;
 /** Converts a type/InputValue combination to a `Core.ILiteral` which can be
  * submitted to Admin for creating an execution.
  */
-export function inputToLiteral(input: ToLiteralParams): Core.ILiteral {
-    if (input.value == null) {
-        return literalNone();
+export function inputToLiteral({
+    initialValue,
+    typeDefinition,
+    value
+}: ToLiteralParams): Core.ILiteral {
+    if (value == null) {
+        return initialValue != null ? initialValue : literalNone();
     }
-    const { typeDefinition, value } = input;
 
     const { toLiteral } = getHelperForInput(typeDefinition.type);
     return toLiteral({ value, typeDefinition });
@@ -53,26 +58,30 @@ export function literalToInputValue(
 
 type ValidationParams = Pick<
     InputProps,
-    'name' | 'required' | 'typeDefinition' | 'value'
+    'initialValue' | 'name' | 'required' | 'typeDefinition' | 'value'
 >;
 /** Validates a given InputValue based on rules for the provided type. Returns
  * void if no errors, throws an error otherwise.
  */
-export function validateInput(input: ValidationParams) {
-    if (input.value == null) {
-        if (input.required) {
-            throw new ValueError(input.name, 'Value is required');
+export function validateInput({
+    initialValue,
+    name,
+    required,
+    typeDefinition,
+    value
+}: ValidationParams) {
+    if (value == null) {
+        if (required && initialValue == null) {
+            throw new ValueError(name, 'Value is required');
         }
         return;
     }
-
-    const { typeDefinition, value } = input;
 
     const { validate } = getHelperForInput(typeDefinition.type);
     try {
         validate({ value, typeDefinition });
     } catch (e) {
         const error = e as Error;
-        throw new ValueError(input.name, error.message);
+        throw new ValueError(name, error.message);
     }
 }
