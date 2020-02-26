@@ -16,8 +16,8 @@ var (
 )
 
 type Config struct {
-	SecretFilePrefix  string `json:"secrets-prefix" pflag:", TargetedPrefixString where to look for secrets file"`
-	EnvironmentPrefix string `json:"env-prefix" pflag:", TargetedPrefixString for environment variables"`
+	SecretFilePrefix  string `json:"secrets-prefix" pflag:", Prefix where to look for secrets file"`
+	EnvironmentPrefix string `json:"env-prefix" pflag:", Prefix for environment variables"`
 }
 
 func GetConfig() *Config {
