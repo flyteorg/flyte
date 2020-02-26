@@ -175,7 +175,7 @@ func (r *RedisResourceManager) GetID() string {
 	return RedisSetKeyPrefix
 }
 
-func (r *RedisResourceManager) checkAgainstOneConstraint(cotx context.Context, allAllocated []string,
+func (r *RedisResourceManager) checkAgainstOneConstraint(_ context.Context, allAllocated []string,
 	constraint ComposedResourceConstraint) bool {
 	var count int64 = 0
 	for _, allocated := range allAllocated {

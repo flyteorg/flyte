@@ -3,7 +3,6 @@ package resourcemanager
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -20,16 +19,6 @@ const tokenNamespaceSeparator = "-"
 
 func (t TokenPrefix) append(s string) TokenPrefix {
 	return TokenPrefix(fmt.Sprintf("%s%s%s", t, tokenNamespaceSeparator, s))
-}
-
-func extractTokenPrefix(t string) (string, error) {
-	splits := strings.Split(t, tokenNamespaceSeparator)
-
-	// If there's only prefix,
-	if len(splits) < 2 || splits[0] == "" || splits[1] == "" {
-		return "", fmt.Errorf("error occurred when trying to extract token prefix from token [%v] using the separator [%v]: received a malformed token", t, tokenNamespaceSeparator)
-	}
-	return splits[0], nil
 }
 
 func composeProjectScopePrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
