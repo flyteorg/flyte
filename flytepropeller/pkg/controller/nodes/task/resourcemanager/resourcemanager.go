@@ -45,7 +45,7 @@ func composeExecutionScopePrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
 }
 
 func ComposeTokenPrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
-	return composeExecutionScopePrefix(id) // This is for the ease of debugging. Doesn't necessarily need to have this
+	return composeExecutionScopePrefix(id) // Token prefix is a required part of the token. We leverage the prefix to achieve project-level and namespace-level capping
 }
 
 // This struct is designed to serve as the identifier of an user of resource manager
