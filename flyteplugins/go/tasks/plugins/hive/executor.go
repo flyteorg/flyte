@@ -130,8 +130,6 @@ func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, cfg *co
 		}
 	}
 
-	iCtx.ResourceRegistrar().RegisterResourceNamespaceQuotaProportionCap(ctx, cfg.NamespaceQuotaProportionCap)
-
 	return q, nil
 }
 
