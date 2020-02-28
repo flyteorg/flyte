@@ -154,7 +154,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// So be default if the container is not waiting with the PodInitializing/ContainerCreating
 								// reasons, then we will assume a failure reason, and fail instantly
 								t := c.LastTransitionTime.Time
-								return pluginsCore.PhaseInfoRetryableFailure(c.Reason, c.Message, &pluginsCore.TaskInfo{
+								return pluginsCore.PhaseInfoSystemRetryableFailure(c.Reason, c.Message, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
 								}), nil
 							}
