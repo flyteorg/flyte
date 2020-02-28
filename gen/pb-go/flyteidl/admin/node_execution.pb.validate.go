@@ -409,8 +409,6 @@ func (m *NodeExecutionMetaData) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Interruptible
-
 	return nil
 }
 

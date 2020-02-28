@@ -14,7 +14,7 @@ type CoreWorkflowTemplate struct {
 	// A globally unique identifier for the workflow.
 	Id *CoreIdentifier `json:"id,omitempty"`
 	// Extra metadata about the workflow.
-	Metadata *CoreWorkflowMetadata `json:"metadata,omitempty"`
+	MetadataDefaults *CoreWorkflowMetadataDefaults `json:"metadata_defaults,omitempty"`
 	// Defines a strongly typed interface for the Workflow. This can include some optional parameters.
 	Interface_ *CoreTypedInterface `json:"interface,omitempty"`
 	// A list of nodes. In addition, \"globals\" is a special reserved node id that can be used to consume workflow inputs.

@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import flyteadmin
-from flyteadmin.models.core_workflow_metadata import CoreWorkflowMetadata  # noqa: E501
+from flyteadmin.models.core_workflow_metadata_defaults import CoreWorkflowMetadataDefaults  # noqa: E501
 from flyteadmin.rest import ApiException
 
 
-class TestCoreWorkflowMetadata(unittest.TestCase):
-    """CoreWorkflowMetadata unit test stubs"""
+class TestCoreWorkflowMetadataDefaults(unittest.TestCase):
+    """CoreWorkflowMetadataDefaults unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestCoreWorkflowMetadata(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testCoreWorkflowMetadata(self):
-        """Test CoreWorkflowMetadata"""
+    def testCoreWorkflowMetadataDefaults(self):
+        """Test CoreWorkflowMetadataDefaults"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = flyteadmin.models.core_workflow_metadata.CoreWorkflowMetadata()  # noqa: E501
+        # model = flyteadmin.models.core_workflow_metadata_defaults.CoreWorkflowMetadataDefaults()  # noqa: E501
         pass
 
 

@@ -9,12 +9,8 @@
 
 package flyteadmin
 
-// Defines extra information about the Node.
-type CoreNodeMetadata struct {
-	Name string `json:"name,omitempty"`
-	// The overall timeout of a task.
-	Timeout string `json:"timeout,omitempty"`
-	// Number of retries per task.
-	Retries *CoreRetryStrategy `json:"retries,omitempty"`
+// Default Workflow Metadata for the entire workflow.
+type CoreWorkflowMetadataDefaults struct {
+	// Identify whether workflow is interruptible. The value set at the workflow level will be the defualt value used for nodes unless explicitly set at the node level.
 	Interruptible bool `json:"interruptible,omitempty"`
 }

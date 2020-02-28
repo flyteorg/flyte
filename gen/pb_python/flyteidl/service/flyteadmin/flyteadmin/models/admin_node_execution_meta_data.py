@@ -31,42 +31,14 @@ class AdminNodeExecutionMetaData(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'interruptible': 'bool'
     }
 
     attribute_map = {
-        'interruptible': 'interruptible'
     }
 
-    def __init__(self, interruptible=None):  # noqa: E501
+    def __init__(self):  # noqa: E501
         """AdminNodeExecutionMetaData - a model defined in Swagger"""  # noqa: E501
-
-        self._interruptible = None
         self.discriminator = None
-
-        if interruptible is not None:
-            self.interruptible = interruptible
-
-    @property
-    def interruptible(self):
-        """Gets the interruptible of this AdminNodeExecutionMetaData.  # noqa: E501
-
-
-        :return: The interruptible of this AdminNodeExecutionMetaData.  # noqa: E501
-        :rtype: bool
-        """
-        return self._interruptible
-
-    @interruptible.setter
-    def interruptible(self, interruptible):
-        """Sets the interruptible of this AdminNodeExecutionMetaData.
-
-
-        :param interruptible: The interruptible of this AdminNodeExecutionMetaData.  # noqa: E501
-        :type: bool
-        """
-
-        self._interruptible = interruptible
 
     def to_dict(self):
         """Returns the model properties as a dict"""

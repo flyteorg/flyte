@@ -11402,15 +11402,6 @@ public final class ExecutionOuterClass {
      * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 16;</code>
      */
     flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getReferenceExecutionOrBuilder();
-
-    /**
-     * <pre>
-     * Identify whether execution is interruptible
-     * </pre>
-     *
-     * <code>bool interruptible = 7;</code>
-     */
-    boolean getInterruptible();
   }
   /**
    * <pre>
@@ -11499,11 +11490,6 @@ public final class ExecutionOuterClass {
                 parentNodeExecution_ = subBuilder.buildPartial();
               }
 
-              break;
-            }
-            case 56: {
-
-              interruptible_ = input.readBool();
               break;
             }
             case 130: {
@@ -11910,19 +11896,6 @@ public final class ExecutionOuterClass {
       return getReferenceExecution();
     }
 
-    public static final int INTERRUPTIBLE_FIELD_NUMBER = 7;
-    private boolean interruptible_;
-    /**
-     * <pre>
-     * Identify whether execution is interruptible
-     * </pre>
-     *
-     * <code>bool interruptible = 7;</code>
-     */
-    public boolean getInterruptible() {
-      return interruptible_;
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -11951,9 +11924,6 @@ public final class ExecutionOuterClass {
       }
       if (parentNodeExecution_ != null) {
         output.writeMessage(5, getParentNodeExecution());
-      }
-      if (interruptible_ != false) {
-        output.writeBool(7, interruptible_);
       }
       if (referenceExecution_ != null) {
         output.writeMessage(16, getReferenceExecution());
@@ -11985,10 +11955,6 @@ public final class ExecutionOuterClass {
       if (parentNodeExecution_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, getParentNodeExecution());
-      }
-      if (interruptible_ != false) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(7, interruptible_);
       }
       if (referenceExecution_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -12029,8 +11995,6 @@ public final class ExecutionOuterClass {
         if (!getReferenceExecution()
             .equals(other.getReferenceExecution())) return false;
       }
-      if (getInterruptible()
-          != other.getInterruptible()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -12060,9 +12024,6 @@ public final class ExecutionOuterClass {
         hash = (37 * hash) + REFERENCE_EXECUTION_FIELD_NUMBER;
         hash = (53 * hash) + getReferenceExecution().hashCode();
       }
-      hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getInterruptible());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -12225,8 +12186,6 @@ public final class ExecutionOuterClass {
           referenceExecution_ = null;
           referenceExecutionBuilder_ = null;
         }
-        interruptible_ = false;
-
         return this;
       }
 
@@ -12271,7 +12230,6 @@ public final class ExecutionOuterClass {
         } else {
           result.referenceExecution_ = referenceExecutionBuilder_.build();
         }
-        result.interruptible_ = interruptible_;
         onBuilt();
         return result;
       }
@@ -12338,9 +12296,6 @@ public final class ExecutionOuterClass {
         }
         if (other.hasReferenceExecution()) {
           mergeReferenceExecution(other.getReferenceExecution());
-        }
-        if (other.getInterruptible() != false) {
-          setInterruptible(other.getInterruptible());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -13051,44 +13006,6 @@ public final class ExecutionOuterClass {
           referenceExecution_ = null;
         }
         return referenceExecutionBuilder_;
-      }
-
-      private boolean interruptible_ ;
-      /**
-       * <pre>
-       * Identify whether execution is interruptible
-       * </pre>
-       *
-       * <code>bool interruptible = 7;</code>
-       */
-      public boolean getInterruptible() {
-        return interruptible_;
-      }
-      /**
-       * <pre>
-       * Identify whether execution is interruptible
-       * </pre>
-       *
-       * <code>bool interruptible = 7;</code>
-       */
-      public Builder setInterruptible(boolean value) {
-        
-        interruptible_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Identify whether execution is interruptible
-       * </pre>
-       *
-       * <code>bool interruptible = 7;</code>
-       */
-      public Builder clearInterruptible() {
-        
-        interruptible_ = false;
-        onChanged();
-        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -19095,7 +19012,7 @@ public final class ExecutionOuterClass {
       "\001(\0132\032.google.protobuf.Timestamp\0223\n\rnotif" +
       "ications\030\t \003(\0132\034.flyteidl.admin.Notifica" +
       "tion\022.\n\013workflow_id\030\013 \001(\0132\031.flyteidl.cor" +
-      "e.IdentifierB\017\n\routput_result\"\251\003\n\021Execut" +
+      "e.IdentifierB\017\n\routput_result\"\222\003\n\021Execut" +
       "ionMetadata\022=\n\004mode\030\001 \001(\0162/.flyteidl.adm" +
       "in.ExecutionMetadata.ExecutionMode\022\021\n\tpr" +
       "incipal\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220\n\014schedu" +
@@ -19103,31 +19020,30 @@ public final class ExecutionOuterClass {
       "\022E\n\025parent_node_execution\030\005 \001(\0132&.flytei" +
       "dl.core.NodeExecutionIdentifier\022G\n\023refer" +
       "ence_execution\030\020 \001(\0132*.flyteidl.core.Wor" +
-      "kflowExecutionIdentifier\022\025\n\rinterruptibl" +
-      "e\030\007 \001(\010\"X\n\rExecutionMode\022\n\n\006MANUAL\020\000\022\r\n\t" +
-      "SCHEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n" +
-      "\016CHILD_WORKFLOW\020\004\"G\n\020NotificationList\0223\n" +
-      "\rnotifications\030\001 \003(\0132\034.flyteidl.admin.No" +
-      "tification\"\357\002\n\rExecutionSpec\022.\n\013launch_p" +
-      "lan\030\001 \001(\0132\031.flyteidl.core.Identifier\022-\n\006" +
-      "inputs\030\002 \001(\0132\031.flyteidl.core.LiteralMapB" +
-      "\002\030\001\0223\n\010metadata\030\003 \001(\0132!.flyteidl.admin.E" +
-      "xecutionMetadata\0229\n\rnotifications\030\005 \001(\0132" +
-      " .flyteidl.admin.NotificationListH\000\022\025\n\013d" +
-      "isable_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132\026.fly" +
-      "teidl.admin.Labels\0220\n\013annotations\030\010 \001(\0132" +
-      "\033.flyteidl.admin.AnnotationsB\030\n\026notifica" +
-      "tion_overridesJ\004\010\004\020\005\"b\n\031ExecutionTermina" +
-      "teRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wo" +
-      "rkflowExecutionIdentifier\022\r\n\005cause\030\002 \001(\t" +
-      "\"\034\n\032ExecutionTerminateResponse\"Y\n\037Workfl" +
-      "owExecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*." +
-      "flyteidl.core.WorkflowExecutionIdentifie" +
-      "r\"u\n WorkflowExecutionGetDataResponse\022(\n" +
-      "\007outputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlob\022" +
-      "\'\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlob" +
-      "B3Z1github.com/lyft/flyteidl/gen/pb-go/f" +
-      "lyteidl/adminb\006proto3"
+      "kflowExecutionIdentifier\"X\n\rExecutionMod" +
+      "e\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006SYSTEM\020\002" +
+      "\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORKFLOW\020\004\"G\n\020No" +
+      "tificationList\0223\n\rnotifications\030\001 \003(\0132\034." +
+      "flyteidl.admin.Notification\"\357\002\n\rExecutio" +
+      "nSpec\022.\n\013launch_plan\030\001 \001(\0132\031.flyteidl.co" +
+      "re.Identifier\022-\n\006inputs\030\002 \001(\0132\031.flyteidl" +
+      ".core.LiteralMapB\002\030\001\0223\n\010metadata\030\003 \001(\0132!" +
+      ".flyteidl.admin.ExecutionMetadata\0229\n\rnot" +
+      "ifications\030\005 \001(\0132 .flyteidl.admin.Notifi" +
+      "cationListH\000\022\025\n\013disable_all\030\006 \001(\010H\000\022&\n\006l" +
+      "abels\030\007 \001(\0132\026.flyteidl.admin.Labels\0220\n\013a" +
+      "nnotations\030\010 \001(\0132\033.flyteidl.admin.Annota" +
+      "tionsB\030\n\026notification_overridesJ\004\010\004\020\005\"b\n" +
+      "\031ExecutionTerminateRequest\0226\n\002id\030\001 \001(\0132*" +
+      ".flyteidl.core.WorkflowExecutionIdentifi" +
+      "er\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTerminateR" +
+      "esponse\"Y\n\037WorkflowExecutionGetDataReque" +
+      "st\0226\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowE" +
+      "xecutionIdentifier\"u\n WorkflowExecutionG" +
+      "etDataResponse\022(\n\007outputs\030\001 \001(\0132\027.flytei" +
+      "dl.admin.UrlBlob\022\'\n\006inputs\030\002 \001(\0132\027.flyte" +
+      "idl.admin.UrlBlobB3Z1github.com/lyft/fly" +
+      "teidl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -19206,7 +19122,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionMetadata_descriptor,
-        new java.lang.String[] { "Mode", "Principal", "Nesting", "ScheduledAt", "ParentNodeExecution", "ReferenceExecution", "Interruptible", });
+        new java.lang.String[] { "Mode", "Principal", "Nesting", "ScheduledAt", "ParentNodeExecution", "ReferenceExecution", });
     internal_static_flyteidl_admin_NotificationList_descriptor =
       getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_admin_NotificationList_fieldAccessorTable = new

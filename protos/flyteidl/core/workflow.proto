@@ -73,6 +73,11 @@ message NodeMetadata {
 
     // Number of retries per task.
     RetryStrategy retries = 5;
+
+    // Identify whether node is interruptible
+    oneof interruptible_value {
+        bool interruptible = 6;
+    };
 }
 
 // Links a variable to an alias.
@@ -121,9 +126,12 @@ message Node {
     }
 }
 
-// Metadata for the entire workflow.
-// To be used in the future.
-message WorkflowMetadata {
+// Default Workflow Metadata for the entire workflow.
+message WorkflowMetadataDefaults {
+    // Identify whether workflow is interruptible.
+    // The value set at the workflow level will be the defualt value used for nodes
+    // unless explicitly set at the node level.
+    bool interruptible = 1;
 }
 
 // Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,
@@ -133,7 +141,7 @@ message WorkflowTemplate {
     Identifier id = 1;
 
     // Extra metadata about the workflow.
-    WorkflowMetadata metadata = 2;
+    WorkflowMetadataDefaults metadata_defaults = 2;
 
     // Defines a strongly typed interface for the Workflow. This can include some optional parameters.
     TypedInterface interface = 3;

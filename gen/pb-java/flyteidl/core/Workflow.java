@@ -5158,6 +5158,13 @@ public final class Workflow {
      * <code>.flyteidl.core.RetryStrategy retries = 5;</code>
      */
     flyteidl.core.Literals.RetryStrategyOrBuilder getRetriesOrBuilder();
+
+    /**
+     * <code>bool interruptible = 6;</code>
+     */
+    boolean getInterruptible();
+
+    public flyteidl.core.Workflow.NodeMetadata.InterruptibleValueCase getInterruptibleValueCase();
   }
   /**
    * <pre>
@@ -5235,6 +5242,11 @@ public final class Workflow {
 
               break;
             }
+            case 48: {
+              interruptibleValueCase_ = 6;
+              interruptibleValue_ = input.readBool();
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -5265,6 +5277,42 @@ public final class Workflow {
       return flyteidl.core.Workflow.internal_static_flyteidl_core_NodeMetadata_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               flyteidl.core.Workflow.NodeMetadata.class, flyteidl.core.Workflow.NodeMetadata.Builder.class);
+    }
+
+    private int interruptibleValueCase_ = 0;
+    private java.lang.Object interruptibleValue_;
+    public enum InterruptibleValueCase
+        implements com.google.protobuf.Internal.EnumLite {
+      INTERRUPTIBLE(6),
+      INTERRUPTIBLEVALUE_NOT_SET(0);
+      private final int value;
+      private InterruptibleValueCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static InterruptibleValueCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static InterruptibleValueCase forNumber(int value) {
+        switch (value) {
+          case 6: return INTERRUPTIBLE;
+          case 0: return INTERRUPTIBLEVALUE_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public InterruptibleValueCase
+    getInterruptibleValueCase() {
+      return InterruptibleValueCase.forNumber(
+          interruptibleValueCase_);
     }
 
     public static final int NAME_FIELD_NUMBER = 1;
@@ -5375,6 +5423,17 @@ public final class Workflow {
       return getRetries();
     }
 
+    public static final int INTERRUPTIBLE_FIELD_NUMBER = 6;
+    /**
+     * <code>bool interruptible = 6;</code>
+     */
+    public boolean getInterruptible() {
+      if (interruptibleValueCase_ == 6) {
+        return (java.lang.Boolean) interruptibleValue_;
+      }
+      return false;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5398,6 +5457,10 @@ public final class Workflow {
       if (retries_ != null) {
         output.writeMessage(5, getRetries());
       }
+      if (interruptibleValueCase_ == 6) {
+        output.writeBool(
+            6, (boolean)((java.lang.Boolean) interruptibleValue_));
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5417,6 +5480,11 @@ public final class Workflow {
       if (retries_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, getRetries());
+      }
+      if (interruptibleValueCase_ == 6) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(
+              6, (boolean)((java.lang.Boolean) interruptibleValue_));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5445,6 +5513,15 @@ public final class Workflow {
         if (!getRetries()
             .equals(other.getRetries())) return false;
       }
+      if (!getInterruptibleValueCase().equals(other.getInterruptibleValueCase())) return false;
+      switch (interruptibleValueCase_) {
+        case 6:
+          if (getInterruptible()
+              != other.getInterruptible()) return false;
+          break;
+        case 0:
+        default:
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5465,6 +5542,15 @@ public final class Workflow {
       if (hasRetries()) {
         hash = (37 * hash) + RETRIES_FIELD_NUMBER;
         hash = (53 * hash) + getRetries().hashCode();
+      }
+      switch (interruptibleValueCase_) {
+        case 6:
+          hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+              getInterruptible());
+          break;
+        case 0:
+        default:
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -5617,6 +5703,8 @@ public final class Workflow {
           retries_ = null;
           retriesBuilder_ = null;
         }
+        interruptibleValueCase_ = 0;
+        interruptibleValue_ = null;
         return this;
       }
 
@@ -5654,6 +5742,10 @@ public final class Workflow {
         } else {
           result.retries_ = retriesBuilder_.build();
         }
+        if (interruptibleValueCase_ == 6) {
+          result.interruptibleValue_ = interruptibleValue_;
+        }
+        result.interruptibleValueCase_ = interruptibleValueCase_;
         onBuilt();
         return result;
       }
@@ -5712,6 +5804,15 @@ public final class Workflow {
         if (other.hasRetries()) {
           mergeRetries(other.getRetries());
         }
+        switch (other.getInterruptibleValueCase()) {
+          case INTERRUPTIBLE: {
+            setInterruptible(other.getInterruptible());
+            break;
+          }
+          case INTERRUPTIBLEVALUE_NOT_SET: {
+            break;
+          }
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -5740,6 +5841,21 @@ public final class Workflow {
         }
         return this;
       }
+      private int interruptibleValueCase_ = 0;
+      private java.lang.Object interruptibleValue_;
+      public InterruptibleValueCase
+          getInterruptibleValueCase() {
+        return InterruptibleValueCase.forNumber(
+            interruptibleValueCase_);
+      }
+
+      public Builder clearInterruptibleValue() {
+        interruptibleValueCase_ = 0;
+        interruptibleValue_ = null;
+        onChanged();
+        return this;
+      }
+
 
       private java.lang.Object name_ = "";
       /**
@@ -6134,6 +6250,36 @@ public final class Workflow {
           retries_ = null;
         }
         return retriesBuilder_;
+      }
+
+      /**
+       * <code>bool interruptible = 6;</code>
+       */
+      public boolean getInterruptible() {
+        if (interruptibleValueCase_ == 6) {
+          return (java.lang.Boolean) interruptibleValue_;
+        }
+        return false;
+      }
+      /**
+       * <code>bool interruptible = 6;</code>
+       */
+      public Builder setInterruptible(boolean value) {
+        interruptibleValueCase_ = 6;
+        interruptibleValue_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool interruptible = 6;</code>
+       */
+      public Builder clearInterruptible() {
+        if (interruptibleValueCase_ == 6) {
+          interruptibleValueCase_ = 0;
+          interruptibleValue_ = null;
+          onChanged();
+        }
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -10049,28 +10195,38 @@ public final class Workflow {
 
   }
 
-  public interface WorkflowMetadataOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:flyteidl.core.WorkflowMetadata)
+  public interface WorkflowMetadataDefaultsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.WorkflowMetadataDefaults)
       com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Identify whether workflow is interruptible.
+     * The value set at the workflow level will be the defualt value used for nodes
+     * unless explicitly set at the node level.
+     * </pre>
+     *
+     * <code>bool interruptible = 1;</code>
+     */
+    boolean getInterruptible();
   }
   /**
    * <pre>
-   * Metadata for the entire workflow.
-   * To be used in the future.
+   * Default Workflow Metadata for the entire workflow.
    * </pre>
    *
-   * Protobuf type {@code flyteidl.core.WorkflowMetadata}
+   * Protobuf type {@code flyteidl.core.WorkflowMetadataDefaults}
    */
-  public  static final class WorkflowMetadata extends
+  public  static final class WorkflowMetadataDefaults extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:flyteidl.core.WorkflowMetadata)
-      WorkflowMetadataOrBuilder {
+      // @@protoc_insertion_point(message_implements:flyteidl.core.WorkflowMetadataDefaults)
+      WorkflowMetadataDefaultsOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use WorkflowMetadata.newBuilder() to construct.
-    private WorkflowMetadata(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use WorkflowMetadataDefaults.newBuilder() to construct.
+    private WorkflowMetadataDefaults(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private WorkflowMetadata() {
+    private WorkflowMetadataDefaults() {
     }
 
     @java.lang.Override
@@ -10078,7 +10234,7 @@ public final class Workflow {
     getUnknownFields() {
       return this.unknownFields;
     }
-    private WorkflowMetadata(
+    private WorkflowMetadataDefaults(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -10086,6 +10242,7 @@ public final class Workflow {
       if (extensionRegistry == null) {
         throw new java.lang.NullPointerException();
       }
+      int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -10096,6 +10253,11 @@ public final class Workflow {
             case 0:
               done = true;
               break;
+            case 8: {
+
+              interruptible_ = input.readBool();
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -10117,15 +10279,30 @@ public final class Workflow {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
+      return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable
+      return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadataDefaults_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              flyteidl.core.Workflow.WorkflowMetadata.class, flyteidl.core.Workflow.WorkflowMetadata.Builder.class);
+              flyteidl.core.Workflow.WorkflowMetadataDefaults.class, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder.class);
+    }
+
+    public static final int INTERRUPTIBLE_FIELD_NUMBER = 1;
+    private boolean interruptible_;
+    /**
+     * <pre>
+     * Identify whether workflow is interruptible.
+     * The value set at the workflow level will be the defualt value used for nodes
+     * unless explicitly set at the node level.
+     * </pre>
+     *
+     * <code>bool interruptible = 1;</code>
+     */
+    public boolean getInterruptible() {
+      return interruptible_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -10142,6 +10319,9 @@ public final class Workflow {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (interruptible_ != false) {
+        output.writeBool(1, interruptible_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -10151,6 +10331,10 @@ public final class Workflow {
       if (size != -1) return size;
 
       size = 0;
+      if (interruptible_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, interruptible_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -10161,11 +10345,13 @@ public final class Workflow {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof flyteidl.core.Workflow.WorkflowMetadata)) {
+      if (!(obj instanceof flyteidl.core.Workflow.WorkflowMetadataDefaults)) {
         return super.equals(obj);
       }
-      flyteidl.core.Workflow.WorkflowMetadata other = (flyteidl.core.Workflow.WorkflowMetadata) obj;
+      flyteidl.core.Workflow.WorkflowMetadataDefaults other = (flyteidl.core.Workflow.WorkflowMetadataDefaults) obj;
 
+      if (getInterruptible()
+          != other.getInterruptible()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -10177,74 +10363,77 @@ public final class Workflow {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getInterruptible());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
-    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(byte[] data)
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(java.io.InputStream input)
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseDelimitedFrom(java.io.InputStream input)
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseDelimitedFrom(
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -10257,7 +10446,7 @@ public final class Workflow {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(flyteidl.core.Workflow.WorkflowMetadata prototype) {
+    public static Builder newBuilder(flyteidl.core.Workflow.WorkflowMetadataDefaults prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -10274,30 +10463,29 @@ public final class Workflow {
     }
     /**
      * <pre>
-     * Metadata for the entire workflow.
-     * To be used in the future.
+     * Default Workflow Metadata for the entire workflow.
      * </pre>
      *
-     * Protobuf type {@code flyteidl.core.WorkflowMetadata}
+     * Protobuf type {@code flyteidl.core.WorkflowMetadataDefaults}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:flyteidl.core.WorkflowMetadata)
-        flyteidl.core.Workflow.WorkflowMetadataOrBuilder {
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.WorkflowMetadataDefaults)
+        flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadataDefaults_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                flyteidl.core.Workflow.WorkflowMetadata.class, flyteidl.core.Workflow.WorkflowMetadata.Builder.class);
+                flyteidl.core.Workflow.WorkflowMetadataDefaults.class, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder.class);
       }
 
-      // Construct using flyteidl.core.Workflow.WorkflowMetadata.newBuilder()
+      // Construct using flyteidl.core.Workflow.WorkflowMetadataDefaults.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -10315,23 +10503,25 @@ public final class Workflow {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        interruptible_ = false;
+
         return this;
       }
 
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor;
       }
 
       @java.lang.Override
-      public flyteidl.core.Workflow.WorkflowMetadata getDefaultInstanceForType() {
-        return flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance();
+      public flyteidl.core.Workflow.WorkflowMetadataDefaults getDefaultInstanceForType() {
+        return flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance();
       }
 
       @java.lang.Override
-      public flyteidl.core.Workflow.WorkflowMetadata build() {
-        flyteidl.core.Workflow.WorkflowMetadata result = buildPartial();
+      public flyteidl.core.Workflow.WorkflowMetadataDefaults build() {
+        flyteidl.core.Workflow.WorkflowMetadataDefaults result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -10339,8 +10529,9 @@ public final class Workflow {
       }
 
       @java.lang.Override
-      public flyteidl.core.Workflow.WorkflowMetadata buildPartial() {
-        flyteidl.core.Workflow.WorkflowMetadata result = new flyteidl.core.Workflow.WorkflowMetadata(this);
+      public flyteidl.core.Workflow.WorkflowMetadataDefaults buildPartial() {
+        flyteidl.core.Workflow.WorkflowMetadataDefaults result = new flyteidl.core.Workflow.WorkflowMetadataDefaults(this);
+        result.interruptible_ = interruptible_;
         onBuilt();
         return result;
       }
@@ -10379,16 +10570,19 @@ public final class Workflow {
       }
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof flyteidl.core.Workflow.WorkflowMetadata) {
-          return mergeFrom((flyteidl.core.Workflow.WorkflowMetadata)other);
+        if (other instanceof flyteidl.core.Workflow.WorkflowMetadataDefaults) {
+          return mergeFrom((flyteidl.core.Workflow.WorkflowMetadataDefaults)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(flyteidl.core.Workflow.WorkflowMetadata other) {
-        if (other == flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance()) return this;
+      public Builder mergeFrom(flyteidl.core.Workflow.WorkflowMetadataDefaults other) {
+        if (other == flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance()) return this;
+        if (other.getInterruptible() != false) {
+          setInterruptible(other.getInterruptible());
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -10404,17 +10598,61 @@ public final class Workflow {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        flyteidl.core.Workflow.WorkflowMetadata parsedMessage = null;
+        flyteidl.core.Workflow.WorkflowMetadataDefaults parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (flyteidl.core.Workflow.WorkflowMetadata) e.getUnfinishedMessage();
+          parsedMessage = (flyteidl.core.Workflow.WorkflowMetadataDefaults) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
           }
         }
+        return this;
+      }
+
+      private boolean interruptible_ ;
+      /**
+       * <pre>
+       * Identify whether workflow is interruptible.
+       * The value set at the workflow level will be the defualt value used for nodes
+       * unless explicitly set at the node level.
+       * </pre>
+       *
+       * <code>bool interruptible = 1;</code>
+       */
+      public boolean getInterruptible() {
+        return interruptible_;
+      }
+      /**
+       * <pre>
+       * Identify whether workflow is interruptible.
+       * The value set at the workflow level will be the defualt value used for nodes
+       * unless explicitly set at the node level.
+       * </pre>
+       *
+       * <code>bool interruptible = 1;</code>
+       */
+      public Builder setInterruptible(boolean value) {
+        
+        interruptible_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Identify whether workflow is interruptible.
+       * The value set at the workflow level will be the defualt value used for nodes
+       * unless explicitly set at the node level.
+       * </pre>
+       *
+       * <code>bool interruptible = 1;</code>
+       */
+      public Builder clearInterruptible() {
+        
+        interruptible_ = false;
+        onChanged();
         return this;
       }
       @java.lang.Override
@@ -10430,41 +10668,41 @@ public final class Workflow {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:flyteidl.core.WorkflowMetadata)
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.WorkflowMetadataDefaults)
     }
 
-    // @@protoc_insertion_point(class_scope:flyteidl.core.WorkflowMetadata)
-    private static final flyteidl.core.Workflow.WorkflowMetadata DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:flyteidl.core.WorkflowMetadataDefaults)
+    private static final flyteidl.core.Workflow.WorkflowMetadataDefaults DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new flyteidl.core.Workflow.WorkflowMetadata();
+      DEFAULT_INSTANCE = new flyteidl.core.Workflow.WorkflowMetadataDefaults();
     }
 
-    public static flyteidl.core.Workflow.WorkflowMetadata getDefaultInstance() {
+    public static flyteidl.core.Workflow.WorkflowMetadataDefaults getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<WorkflowMetadata>
-        PARSER = new com.google.protobuf.AbstractParser<WorkflowMetadata>() {
+    private static final com.google.protobuf.Parser<WorkflowMetadataDefaults>
+        PARSER = new com.google.protobuf.AbstractParser<WorkflowMetadataDefaults>() {
       @java.lang.Override
-      public WorkflowMetadata parsePartialFrom(
+      public WorkflowMetadataDefaults parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new WorkflowMetadata(input, extensionRegistry);
+        return new WorkflowMetadataDefaults(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<WorkflowMetadata> parser() {
+    public static com.google.protobuf.Parser<WorkflowMetadataDefaults> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<WorkflowMetadata> getParserForType() {
+    public com.google.protobuf.Parser<WorkflowMetadataDefaults> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public flyteidl.core.Workflow.WorkflowMetadata getDefaultInstanceForType() {
+    public flyteidl.core.Workflow.WorkflowMetadataDefaults getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -10504,25 +10742,25 @@ public final class Workflow {
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
      */
-    boolean hasMetadata();
+    boolean hasMetadataDefaults();
     /**
      * <pre>
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
      */
-    flyteidl.core.Workflow.WorkflowMetadata getMetadata();
+    flyteidl.core.Workflow.WorkflowMetadataDefaults getMetadataDefaults();
     /**
      * <pre>
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
      */
-    flyteidl.core.Workflow.WorkflowMetadataOrBuilder getMetadataOrBuilder();
+    flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder getMetadataDefaultsOrBuilder();
 
     /**
      * <pre>
@@ -10758,14 +10996,14 @@ public final class Workflow {
               break;
             }
             case 18: {
-              flyteidl.core.Workflow.WorkflowMetadata.Builder subBuilder = null;
-              if (metadata_ != null) {
-                subBuilder = metadata_.toBuilder();
+              flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder subBuilder = null;
+              if (metadataDefaults_ != null) {
+                subBuilder = metadataDefaults_.toBuilder();
               }
-              metadata_ = input.readMessage(flyteidl.core.Workflow.WorkflowMetadata.parser(), extensionRegistry);
+              metadataDefaults_ = input.readMessage(flyteidl.core.Workflow.WorkflowMetadataDefaults.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(metadata_);
-                metadata_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(metadataDefaults_);
+                metadataDefaults_ = subBuilder.buildPartial();
               }
 
               break;
@@ -10886,37 +11124,37 @@ public final class Workflow {
       return getId();
     }
 
-    public static final int METADATA_FIELD_NUMBER = 2;
-    private flyteidl.core.Workflow.WorkflowMetadata metadata_;
+    public static final int METADATA_DEFAULTS_FIELD_NUMBER = 2;
+    private flyteidl.core.Workflow.WorkflowMetadataDefaults metadataDefaults_;
     /**
      * <pre>
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
      */
-    public boolean hasMetadata() {
-      return metadata_ != null;
+    public boolean hasMetadataDefaults() {
+      return metadataDefaults_ != null;
     }
     /**
      * <pre>
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
      */
-    public flyteidl.core.Workflow.WorkflowMetadata getMetadata() {
-      return metadata_ == null ? flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance() : metadata_;
+    public flyteidl.core.Workflow.WorkflowMetadataDefaults getMetadataDefaults() {
+      return metadataDefaults_ == null ? flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance() : metadataDefaults_;
     }
     /**
      * <pre>
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
      */
-    public flyteidl.core.Workflow.WorkflowMetadataOrBuilder getMetadataOrBuilder() {
-      return getMetadata();
+    public flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder getMetadataDefaultsOrBuilder() {
+      return getMetadataDefaults();
     }
 
     public static final int INTERFACE_FIELD_NUMBER = 3;
@@ -11148,8 +11386,8 @@ public final class Workflow {
       if (id_ != null) {
         output.writeMessage(1, getId());
       }
-      if (metadata_ != null) {
-        output.writeMessage(2, getMetadata());
+      if (metadataDefaults_ != null) {
+        output.writeMessage(2, getMetadataDefaults());
       }
       if (interface_ != null) {
         output.writeMessage(3, getInterface());
@@ -11176,9 +11414,9 @@ public final class Workflow {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getId());
       }
-      if (metadata_ != null) {
+      if (metadataDefaults_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getMetadata());
+          .computeMessageSize(2, getMetadataDefaults());
       }
       if (interface_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -11216,10 +11454,10 @@ public final class Workflow {
         if (!getId()
             .equals(other.getId())) return false;
       }
-      if (hasMetadata() != other.hasMetadata()) return false;
-      if (hasMetadata()) {
-        if (!getMetadata()
-            .equals(other.getMetadata())) return false;
+      if (hasMetadataDefaults() != other.hasMetadataDefaults()) return false;
+      if (hasMetadataDefaults()) {
+        if (!getMetadataDefaults()
+            .equals(other.getMetadataDefaults())) return false;
       }
       if (hasInterface() != other.hasInterface()) return false;
       if (hasInterface()) {
@@ -11250,9 +11488,9 @@ public final class Workflow {
         hash = (37 * hash) + ID_FIELD_NUMBER;
         hash = (53 * hash) + getId().hashCode();
       }
-      if (hasMetadata()) {
-        hash = (37 * hash) + METADATA_FIELD_NUMBER;
-        hash = (53 * hash) + getMetadata().hashCode();
+      if (hasMetadataDefaults()) {
+        hash = (37 * hash) + METADATA_DEFAULTS_FIELD_NUMBER;
+        hash = (53 * hash) + getMetadataDefaults().hashCode();
       }
       if (hasInterface()) {
         hash = (37 * hash) + INTERFACE_FIELD_NUMBER;
@@ -11416,11 +11654,11 @@ public final class Workflow {
           id_ = null;
           idBuilder_ = null;
         }
-        if (metadataBuilder_ == null) {
-          metadata_ = null;
+        if (metadataDefaultsBuilder_ == null) {
+          metadataDefaults_ = null;
         } else {
-          metadata_ = null;
-          metadataBuilder_ = null;
+          metadataDefaults_ = null;
+          metadataDefaultsBuilder_ = null;
         }
         if (interfaceBuilder_ == null) {
           interface_ = null;
@@ -11479,10 +11717,10 @@ public final class Workflow {
         } else {
           result.id_ = idBuilder_.build();
         }
-        if (metadataBuilder_ == null) {
-          result.metadata_ = metadata_;
+        if (metadataDefaultsBuilder_ == null) {
+          result.metadataDefaults_ = metadataDefaults_;
         } else {
-          result.metadata_ = metadataBuilder_.build();
+          result.metadataDefaults_ = metadataDefaultsBuilder_.build();
         }
         if (interfaceBuilder_ == null) {
           result.interface_ = interface_;
@@ -11564,8 +11802,8 @@ public final class Workflow {
         if (other.hasId()) {
           mergeId(other.getId());
         }
-        if (other.hasMetadata()) {
-          mergeMetadata(other.getMetadata());
+        if (other.hasMetadataDefaults()) {
+          mergeMetadataDefaults(other.getMetadataDefaults());
         }
         if (other.hasInterface()) {
           mergeInterface(other.getInterface());
@@ -11808,31 +12046,31 @@ public final class Workflow {
         return idBuilder_;
       }
 
-      private flyteidl.core.Workflow.WorkflowMetadata metadata_;
+      private flyteidl.core.Workflow.WorkflowMetadataDefaults metadataDefaults_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Workflow.WorkflowMetadata, flyteidl.core.Workflow.WorkflowMetadata.Builder, flyteidl.core.Workflow.WorkflowMetadataOrBuilder> metadataBuilder_;
+          flyteidl.core.Workflow.WorkflowMetadataDefaults, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder, flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder> metadataDefaultsBuilder_;
       /**
        * <pre>
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
        */
-      public boolean hasMetadata() {
-        return metadataBuilder_ != null || metadata_ != null;
+      public boolean hasMetadataDefaults() {
+        return metadataDefaultsBuilder_ != null || metadataDefaults_ != null;
       }
       /**
        * <pre>
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
        */
-      public flyteidl.core.Workflow.WorkflowMetadata getMetadata() {
-        if (metadataBuilder_ == null) {
-          return metadata_ == null ? flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance() : metadata_;
+      public flyteidl.core.Workflow.WorkflowMetadataDefaults getMetadataDefaults() {
+        if (metadataDefaultsBuilder_ == null) {
+          return metadataDefaults_ == null ? flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance() : metadataDefaults_;
         } else {
-          return metadataBuilder_.getMessage();
+          return metadataDefaultsBuilder_.getMessage();
         }
       }
       /**
@@ -11840,17 +12078,17 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
        */
-      public Builder setMetadata(flyteidl.core.Workflow.WorkflowMetadata value) {
-        if (metadataBuilder_ == null) {
+      public Builder setMetadataDefaults(flyteidl.core.Workflow.WorkflowMetadataDefaults value) {
+        if (metadataDefaultsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          metadata_ = value;
+          metadataDefaults_ = value;
           onChanged();
         } else {
-          metadataBuilder_.setMessage(value);
+          metadataDefaultsBuilder_.setMessage(value);
         }
 
         return this;
@@ -11860,15 +12098,15 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
        */
-      public Builder setMetadata(
-          flyteidl.core.Workflow.WorkflowMetadata.Builder builderForValue) {
-        if (metadataBuilder_ == null) {
-          metadata_ = builderForValue.build();
+      public Builder setMetadataDefaults(
+          flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder builderForValue) {
+        if (metadataDefaultsBuilder_ == null) {
+          metadataDefaults_ = builderForValue.build();
           onChanged();
         } else {
-          metadataBuilder_.setMessage(builderForValue.build());
+          metadataDefaultsBuilder_.setMessage(builderForValue.build());
         }
 
         return this;
@@ -11878,19 +12116,19 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
        */
-      public Builder mergeMetadata(flyteidl.core.Workflow.WorkflowMetadata value) {
-        if (metadataBuilder_ == null) {
-          if (metadata_ != null) {
-            metadata_ =
-              flyteidl.core.Workflow.WorkflowMetadata.newBuilder(metadata_).mergeFrom(value).buildPartial();
+      public Builder mergeMetadataDefaults(flyteidl.core.Workflow.WorkflowMetadataDefaults value) {
+        if (metadataDefaultsBuilder_ == null) {
+          if (metadataDefaults_ != null) {
+            metadataDefaults_ =
+              flyteidl.core.Workflow.WorkflowMetadataDefaults.newBuilder(metadataDefaults_).mergeFrom(value).buildPartial();
           } else {
-            metadata_ = value;
+            metadataDefaults_ = value;
           }
           onChanged();
         } else {
-          metadataBuilder_.mergeFrom(value);
+          metadataDefaultsBuilder_.mergeFrom(value);
         }
 
         return this;
@@ -11900,15 +12138,15 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
        */
-      public Builder clearMetadata() {
-        if (metadataBuilder_ == null) {
-          metadata_ = null;
+      public Builder clearMetadataDefaults() {
+        if (metadataDefaultsBuilder_ == null) {
+          metadataDefaults_ = null;
           onChanged();
         } else {
-          metadata_ = null;
-          metadataBuilder_ = null;
+          metadataDefaults_ = null;
+          metadataDefaultsBuilder_ = null;
         }
 
         return this;
@@ -11918,26 +12156,26 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
        */
-      public flyteidl.core.Workflow.WorkflowMetadata.Builder getMetadataBuilder() {
+      public flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder getMetadataDefaultsBuilder() {
         
         onChanged();
-        return getMetadataFieldBuilder().getBuilder();
+        return getMetadataDefaultsFieldBuilder().getBuilder();
       }
       /**
        * <pre>
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
        */
-      public flyteidl.core.Workflow.WorkflowMetadataOrBuilder getMetadataOrBuilder() {
-        if (metadataBuilder_ != null) {
-          return metadataBuilder_.getMessageOrBuilder();
+      public flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder getMetadataDefaultsOrBuilder() {
+        if (metadataDefaultsBuilder_ != null) {
+          return metadataDefaultsBuilder_.getMessageOrBuilder();
         } else {
-          return metadata_ == null ?
-              flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance() : metadata_;
+          return metadataDefaults_ == null ?
+              flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance() : metadataDefaults_;
         }
       }
       /**
@@ -11945,20 +12183,20 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Workflow.WorkflowMetadata, flyteidl.core.Workflow.WorkflowMetadata.Builder, flyteidl.core.Workflow.WorkflowMetadataOrBuilder> 
-          getMetadataFieldBuilder() {
-        if (metadataBuilder_ == null) {
-          metadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Workflow.WorkflowMetadata, flyteidl.core.Workflow.WorkflowMetadata.Builder, flyteidl.core.Workflow.WorkflowMetadataOrBuilder>(
-                  getMetadata(),
+          flyteidl.core.Workflow.WorkflowMetadataDefaults, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder, flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder> 
+          getMetadataDefaultsFieldBuilder() {
+        if (metadataDefaultsBuilder_ == null) {
+          metadataDefaultsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Workflow.WorkflowMetadataDefaults, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder, flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder>(
+                  getMetadataDefaults(),
                   getParentForChildren(),
                   isClean());
-          metadata_ = null;
+          metadataDefaults_ = null;
         }
-        return metadataBuilder_;
+        return metadataDefaultsBuilder_;
       }
 
       private flyteidl.core.Interface.TypedInterface interface_;
@@ -13110,10 +13348,10 @@ public final class Workflow {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_Node_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_flyteidl_core_WorkflowMetadata_descriptor;
+    internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable;
+      internal_static_flyteidl_core_WorkflowMetadataDefaults_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_WorkflowTemplate_descriptor;
   private static final 
@@ -13147,29 +13385,31 @@ public final class Workflow {
       "\013\n\treference\"\207\001\n\014WorkflowNode\0223\n\016launchp" +
       "lan_ref\030\001 \001(\0132\031.flyteidl.core.Identifier" +
       "H\000\0225\n\020sub_workflow_ref\030\002 \001(\0132\031.flyteidl." +
-      "core.IdentifierH\000B\013\n\treference\"w\n\014NodeMe" +
-      "tadata\022\014\n\004name\030\001 \001(\t\022*\n\007timeout\030\004 \001(\0132\031." +
-      "google.protobuf.Duration\022-\n\007retries\030\005 \001(" +
-      "\0132\034.flyteidl.core.RetryStrategy\"#\n\005Alias" +
-      "\022\013\n\003var\030\001 \001(\t\022\r\n\005alias\030\002 \001(\t\"\322\002\n\004Node\022\n\n" +
-      "\002id\030\001 \001(\t\022-\n\010metadata\030\002 \001(\0132\033.flyteidl.c" +
-      "ore.NodeMetadata\022&\n\006inputs\030\003 \003(\0132\026.flyte" +
-      "idl.core.Binding\022\031\n\021upstream_node_ids\030\004 " +
-      "\003(\t\022,\n\016output_aliases\030\005 \003(\0132\024.flyteidl.c" +
-      "ore.Alias\022,\n\ttask_node\030\006 \001(\0132\027.flyteidl." +
-      "core.TaskNodeH\000\0224\n\rworkflow_node\030\007 \001(\0132\033" +
-      ".flyteidl.core.WorkflowNodeH\000\0220\n\013branch_" +
-      "node\030\010 \001(\0132\031.flyteidl.core.BranchNodeH\000B" +
-      "\010\n\006target\"\022\n\020WorkflowMetadata\"\226\002\n\020Workfl" +
+      "core.IdentifierH\000B\013\n\treference\"\247\001\n\014NodeM" +
+      "etadata\022\014\n\004name\030\001 \001(\t\022*\n\007timeout\030\004 \001(\0132\031" +
+      ".google.protobuf.Duration\022-\n\007retries\030\005 \001" +
+      "(\0132\034.flyteidl.core.RetryStrategy\022\027\n\rinte" +
+      "rruptible\030\006 \001(\010H\000B\025\n\023interruptible_value" +
+      "\"#\n\005Alias\022\013\n\003var\030\001 \001(\t\022\r\n\005alias\030\002 \001(\t\"\322\002" +
+      "\n\004Node\022\n\n\002id\030\001 \001(\t\022-\n\010metadata\030\002 \001(\0132\033.f" +
+      "lyteidl.core.NodeMetadata\022&\n\006inputs\030\003 \003(" +
+      "\0132\026.flyteidl.core.Binding\022\031\n\021upstream_no" +
+      "de_ids\030\004 \003(\t\022,\n\016output_aliases\030\005 \003(\0132\024.f" +
+      "lyteidl.core.Alias\022,\n\ttask_node\030\006 \001(\0132\027." +
+      "flyteidl.core.TaskNodeH\000\0224\n\rworkflow_nod" +
+      "e\030\007 \001(\0132\033.flyteidl.core.WorkflowNodeH\000\0220" +
+      "\n\013branch_node\030\010 \001(\0132\031.flyteidl.core.Bran" +
+      "chNodeH\000B\010\n\006target\"1\n\030WorkflowMetadataDe" +
+      "faults\022\025\n\rinterruptible\030\001 \001(\010\"\247\002\n\020Workfl" +
       "owTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.I" +
-      "dentifier\0221\n\010metadata\030\002 \001(\0132\037.flyteidl.c" +
-      "ore.WorkflowMetadata\0220\n\tinterface\030\003 \001(\0132" +
-      "\035.flyteidl.core.TypedInterface\022\"\n\005nodes\030" +
-      "\004 \003(\0132\023.flyteidl.core.Node\022\'\n\007outputs\030\005 " +
-      "\003(\0132\026.flyteidl.core.Binding\022)\n\014failure_n" +
-      "ode\030\006 \001(\0132\023.flyteidl.core.NodeB2Z0github" +
-      ".com/lyft/flyteidl/gen/pb-go/flyteidl/co" +
-      "reb\006proto3"
+      "dentifier\022B\n\021metadata_defaults\030\002 \001(\0132\'.f" +
+      "lyteidl.core.WorkflowMetadataDefaults\0220\n" +
+      "\tinterface\030\003 \001(\0132\035.flyteidl.core.TypedIn" +
+      "terface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl.core.N" +
+      "ode\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.core.Bin" +
+      "ding\022)\n\014failure_node\030\006 \001(\0132\023.flyteidl.co" +
+      "re.NodeB2Z0github.com/lyft/flyteidl/gen/" +
+      "pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13224,7 +13464,7 @@ public final class Workflow {
     internal_static_flyteidl_core_NodeMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_NodeMetadata_descriptor,
-        new java.lang.String[] { "Name", "Timeout", "Retries", });
+        new java.lang.String[] { "Name", "Timeout", "Retries", "Interruptible", "InterruptibleValue", });
     internal_static_flyteidl_core_Alias_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_core_Alias_fieldAccessorTable = new
@@ -13237,18 +13477,18 @@ public final class Workflow {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Node_descriptor,
         new java.lang.String[] { "Id", "Metadata", "Inputs", "UpstreamNodeIds", "OutputAliases", "TaskNode", "WorkflowNode", "BranchNode", "Target", });
-    internal_static_flyteidl_core_WorkflowMetadata_descriptor =
+    internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor =
       getDescriptor().getMessageTypes().get(8);
-    internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable = new
+    internal_static_flyteidl_core_WorkflowMetadataDefaults_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_flyteidl_core_WorkflowMetadata_descriptor,
-        new java.lang.String[] { });
+        internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor,
+        new java.lang.String[] { "Interruptible", });
     internal_static_flyteidl_core_WorkflowTemplate_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_core_WorkflowTemplate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_WorkflowTemplate_descriptor,
-        new java.lang.String[] { "Id", "Metadata", "Interface", "Nodes", "Outputs", "FailureNode", });
+        new java.lang.String[] { "Id", "MetadataDefaults", "Interface", "Nodes", "Outputs", "FailureNode", });
     flyteidl.core.Condition.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Interface.getDescriptor();
