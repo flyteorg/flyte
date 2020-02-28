@@ -105,7 +105,7 @@ func MapExecutionStateToPhaseInfo(state ExecutionState, quboleClient client.Qubo
 	case PhaseQueued:
 		// TODO: Turn into config
 		if state.CreationFailureCount > 5 {
-			phaseInfo = core.PhaseInfoRetryableFailure("QuboleFailure", "Too many creation attempts", nil)
+			phaseInfo = core.PhaseInfoSystemRetryableFailure("QuboleFailure", "Too many creation attempts", nil)
 		} else {
 			phaseInfo = core.PhaseInfoQueued(t, uint32(state.CreationFailureCount), "Waiting for Qubole launch")
 		}

@@ -6,7 +6,11 @@ package awsbatch
 
 import (
 	"context"
+	"fmt"
 	"testing"
+	"time"
+
+	"github.com/golang/protobuf/ptypes/duration"
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -59,12 +63,59 @@ func TestResourceRequirementsToBatchRequirements(t *testing.T) {
 	}
 
 	for i, testCase := range memoryTests {
-		q, err := resource.ParseQuantity(testCase.Input)
-		if assert.NoError(t, err) {
-			assert.Equal(t, testCase.Expected, q.ScaledValue(resource.Mega),
-				"Expected != Actual for test case [%v] with Input [%v]", i, testCase.Input)
-		}
+		t.Run(fmt.Sprintf("Memory Test [%v] %v", i, testCase.Input), func(t *testing.T) {
+			q, err := resource.ParseQuantity(testCase.Input)
+			if assert.NoError(t, err) {
+				assert.Equal(t, testCase.Expected, q.ScaledValue(resource.Mega),
+					"Expected != Actual for test case [%v] with Input [%v]", i, testCase.Input)
+			}
+		})
 	}
+
+	cpuTests := []struct {
+		Input    string
+		Expected int64
+	}{
+		// resource Quantity gets the ceiling of values to the nearest scale
+		{"200", 200},
+		{"1M", 1000000},
+		{"15000m", 15},
+	}
+
+	for i, testCase := range cpuTests {
+		t.Run(fmt.Sprintf("CPU Test [%v] %v", i, testCase.Input), func(t *testing.T) {
+			q, err := resource.ParseQuantity(testCase.Input)
+			if assert.NoError(t, err) {
+				assert.Equal(t, testCase.Expected, q.Value(),
+					"Expected != Actual for test case [%v] with Input [%v]", i, testCase.Input)
+			}
+		})
+	}
+}
+
+func TestToTimeout(t *testing.T) {
+	t.Run("Nil", func(t *testing.T) {
+		timeout := toTimeout(nil, 0*time.Second)
+		assert.Nil(t, timeout)
+	})
+
+	t.Run("TaskTemplate duration set", func(t *testing.T) {
+		timeout := toTimeout(&duration.Duration{Seconds: 100}, 3*24*time.Hour)
+		assert.NotNil(t, timeout.AttemptDurationSeconds)
+		assert.Equal(t, int64(100), *timeout.AttemptDurationSeconds)
+	})
+
+	t.Run("Default timeout used", func(t *testing.T) {
+		timeout := toTimeout(nil, 3*24*time.Hour)
+		assert.NotNil(t, timeout.AttemptDurationSeconds)
+		assert.Equal(t, int64((3 * 24 * time.Hour).Seconds()), *timeout.AttemptDurationSeconds)
+	})
+
+	t.Run("TaskTemplate duration set to 0", func(t *testing.T) {
+		timeout := toTimeout(&duration.Duration{Seconds: 0}, 3*24*time.Hour)
+		assert.NotNil(t, timeout.AttemptDurationSeconds)
+		assert.Equal(t, int64((3 * 24 * time.Hour).Seconds()), *timeout.AttemptDurationSeconds)
+	})
 }
 
 func TestArrayJobToBatchInput(t *testing.T) {
