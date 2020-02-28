@@ -14,7 +14,7 @@ type CoreWorkflowTemplate struct {
 	// A globally unique identifier for the workflow.
 	Id *CoreIdentifier `json:"id,omitempty"`
 	// Extra metadata about the workflow.
-	MetadataDefaults *CoreWorkflowMetadataDefaults `json:"metadata_defaults,omitempty"`
+	Metadata *CoreWorkflowMetadata `json:"metadata,omitempty"`
 	// Defines a strongly typed interface for the Workflow. This can include some optional parameters.
 	Interface_ *CoreTypedInterface `json:"interface,omitempty"`
 	// A list of nodes. In addition, \"globals\" is a special reserved node id that can be used to consume workflow inputs.
@@ -23,4 +23,5 @@ type CoreWorkflowTemplate struct {
 	Outputs []CoreBinding `json:"outputs,omitempty"`
 	// +optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed. The interface of this node must match the Workflow interface with an additional input named \"error\" of type pb.lyft.flyte.core.Error.
 	FailureNode *CoreNode `json:"failure_node,omitempty"`
+	MetadataDefaults *CoreWorkflowMetadataDefaults `json:"metadata_defaults,omitempty"`
 }

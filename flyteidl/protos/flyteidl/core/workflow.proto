@@ -126,6 +126,12 @@ message Node {
     }
 }
 
+// Metadata for the entire workflow.
+// To be used in the future.
+message WorkflowMetadata {
+    // Default Workflow Metadata for the entire workflow.
+}
+
 // Default Workflow Metadata for the entire workflow.
 message WorkflowMetadataDefaults {
     // Identify whether workflow is interruptible.
@@ -141,7 +147,7 @@ message WorkflowTemplate {
     Identifier id = 1;
 
     // Extra metadata about the workflow.
-    WorkflowMetadataDefaults metadata_defaults = 2;
+    WorkflowMetadata metadata = 2;
 
     // Defines a strongly typed interface for the Workflow. This can include some optional parameters.
     TypedInterface interface = 3;
@@ -162,7 +168,9 @@ message WorkflowTemplate {
     // The interface of this node must match the Workflow interface with an additional input named "error" of type
     // pb.lyft.flyte.core.Error.
     Node failure_node = 6;
-
+    
+    // workflow defaults
+    WorkflowMetadataDefaults metadata_defaults = 7;
 }
 
 

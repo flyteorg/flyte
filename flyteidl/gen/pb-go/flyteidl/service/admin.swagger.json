@@ -5094,6 +5094,10 @@
       ],
       "default": "UNDEFINED"
     },
+    "coreWorkflowMetadata": {
+      "type": "object",
+      "description": "Metadata for the entire workflow.\nTo be used in the future."
+    },
     "coreWorkflowMetadataDefaults": {
       "type": "object",
       "properties": {
@@ -5126,8 +5130,8 @@
           "$ref": "#/definitions/coreIdentifier",
           "description": "A globally unique identifier for the workflow."
         },
-        "metadata_defaults": {
-          "$ref": "#/definitions/coreWorkflowMetadataDefaults",
+        "metadata": {
+          "$ref": "#/definitions/coreWorkflowMetadata",
           "description": "Extra metadata about the workflow."
         },
         "interface": {
@@ -5151,6 +5155,10 @@
         "failure_node": {
           "$ref": "#/definitions/coreNode",
           "description": "+optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.\nThe interface of this node must match the Workflow interface with an additional input named \"error\" of type\npb.lyft.flyte.core.Error."
+        },
+        "metadata_defaults": {
+          "$ref": "#/definitions/coreWorkflowMetadataDefaults",
+          "title": "workflow defaults"
         }
       },
       "description": "Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,\ndirected acyclic graph."
