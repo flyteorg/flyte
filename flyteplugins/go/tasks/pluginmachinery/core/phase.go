@@ -9,6 +9,7 @@ import (
 )
 
 const DefaultPhaseVersion = uint32(0)
+const SystemErrorCode = "SystemError"
 
 //go:generate enumer -type=Phase
 
@@ -184,5 +185,9 @@ func PhaseInfoFailure(code, reason string, info *TaskInfo) PhaseInfo {
 }
 
 func PhaseInfoRetryableFailure(code, reason string, info *TaskInfo) PhaseInfo {
-	return PhaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason}, info)
+	return PhaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info)
+}
+
+func PhaseInfoSystemRetryableFailure(code, reason string, info *TaskInfo) PhaseInfo {
+	return PhaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info)
 }

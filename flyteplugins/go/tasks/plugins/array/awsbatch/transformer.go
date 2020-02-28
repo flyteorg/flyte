@@ -137,7 +137,7 @@ func getEnvVarsForTask(ctx context.Context, execID pluginCore.TaskExecutionID, c
 }
 
 func toTimeout(templateTimeout *duration.Duration, defaultTimeout time.Duration) *batch.JobTimeout {
-	if templateTimeout != nil {
+	if templateTimeout != nil && templateTimeout.Seconds > 0 {
 		return (&batch.JobTimeout{}).SetAttemptDurationSeconds(templateTimeout.GetSeconds())
 	}
 
@@ -168,8 +168,10 @@ func toContainerOverrides(ctx context.Context, command []string, overrides *v1.R
 	envVars []v1.EnvVar) *batch.ContainerOverrides {
 
 	return &batch.ContainerOverrides{
-		Memory:      refInt(overrides.Limits.Memory().ScaledValue(resource.Mega)),
-		Vcpus:       refInt(overrides.Limits.Cpu().ScaledValue(resource.Mega)),
+		// Batch expects memory override in megabytes.
+		Memory: refInt(overrides.Limits.Memory().ScaledValue(resource.Mega)),
+		// Batch expects a rounded number of whole CPUs.
+		Vcpus:       refInt(overrides.Limits.Cpu().Value()),
 		Environment: toEnvironmentVariables(ctx, envVars),
 		Command:     refStrSlice(command),
 	}
