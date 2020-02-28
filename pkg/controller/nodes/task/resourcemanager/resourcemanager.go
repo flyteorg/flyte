@@ -12,25 +12,32 @@ import (
 )
 
 type TokenPrefix string
+type Token string
 
 const execUrnPrefix = "ex"
 const execUrnSeparator = ":"
 const tokenNamespaceSeparator = "-"
 
-func (t TokenPrefix) append(s string) TokenPrefix {
-	return TokenPrefix(fmt.Sprintf("%s%s%s", t, tokenNamespaceSeparator, s))
+// appending the actual token string to the prefix using '-' separator
+func (t TokenPrefix) append(tokenWithoutPrefix string) Token {
+	return Token(fmt.Sprintf("%s%s%s", t, tokenNamespaceSeparator, tokenWithoutPrefix))
+}
+
+// extending the prefix using ':' separator
+func (t TokenPrefix) extend(prefixPart string) TokenPrefix {
+	return TokenPrefix(fmt.Sprintf("%s%s%s", t, execUrnSeparator, prefixPart))
 }
 
 func composeProjectScopePrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
-	return TokenPrefix(execUrnPrefix + execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetProject())
+	return TokenPrefix(execUrnPrefix).extend(id.GetNodeExecutionId().GetExecutionId().GetProject())
 }
 
 func composeNamespaceScopePrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
-	return composeProjectScopePrefix(id).append(execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetDomain())
+	return composeProjectScopePrefix(id).extend(id.GetNodeExecutionId().GetExecutionId().GetDomain())
 }
 
 func composeExecutionScopePrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
-	return composeNamespaceScopePrefix(id).append(execUrnSeparator + id.GetNodeExecutionId().GetExecutionId().GetProject())
+	return composeNamespaceScopePrefix(id).extend(id.GetNodeExecutionId().GetExecutionId().GetProject())
 }
 
 func ComposeTokenPrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
