@@ -793,6 +793,71 @@ var _ interface {
 	ErrorName() string
 } = NodeValidationError{}
 
+// Validate checks the field values on WorkflowMetadata with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *WorkflowMetadata) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// WorkflowMetadataValidationError is the validation error returned by
+// WorkflowMetadata.Validate if the designated constraints aren't met.
+type WorkflowMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowMetadataValidationError) ErrorName() string { return "WorkflowMetadataValidationError" }
+
+// Error satisfies the builtin error interface
+func (e WorkflowMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowMetadataValidationError{}
+
 // Validate checks the field values on WorkflowMetadataDefaults with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -880,10 +945,10 @@ func (m *WorkflowTemplate) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMetadataDefaults()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return WorkflowTemplateValidationError{
-				field:  "MetadataDefaults",
+				field:  "Metadata",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -934,6 +999,16 @@ func (m *WorkflowTemplate) Validate() error {
 		if err := v.Validate(); err != nil {
 			return WorkflowTemplateValidationError{
 				field:  "FailureNode",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetMetadataDefaults()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowTemplateValidationError{
+				field:  "MetadataDefaults",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

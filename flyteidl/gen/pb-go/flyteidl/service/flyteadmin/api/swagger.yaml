@@ -6034,6 +6034,7 @@ definitions:
                     - null
                   map:
                     bindings: {}
+              metadata: {}
               failure_node:
                 branch_node:
                   if_else:
@@ -6854,6 +6855,7 @@ definitions:
                     - null
                   map:
                     bindings: {}
+              metadata: {}
               failure_node:
                 branch_node:
                   if_else:
@@ -7906,6 +7908,7 @@ definitions:
                     - null
                   map:
                     bindings: {}
+              metadata: {}
               failure_node:
                 branch_node:
                   if_else:
@@ -8839,6 +8842,7 @@ definitions:
                   - null
                 map:
                   bindings: {}
+            metadata: {}
             failure_node:
               branch_node:
                 if_else:
@@ -9659,6 +9663,7 @@ definitions:
                   - null
                 map:
                   bindings: {}
+            metadata: {}
             failure_node:
               branch_node:
                 if_else:
@@ -10711,6 +10716,7 @@ definitions:
                   - null
                 map:
                   bindings: {}
+            metadata: {}
             failure_node:
               branch_node:
                 if_else:
@@ -11600,6 +11606,7 @@ definitions:
                       - null
                     map:
                       bindings: {}
+                metadata: {}
                 failure_node:
                   branch_node:
                     if_else:
@@ -12420,6 +12427,7 @@ definitions:
                       - null
                     map:
                       bindings: {}
+                metadata: {}
                 failure_node:
                   branch_node:
                     if_else:
@@ -13472,6 +13480,7 @@ definitions:
                       - null
                     map:
                       bindings: {}
+                metadata: {}
                 failure_node:
                   branch_node:
                     if_else:
@@ -14302,6 +14311,7 @@ definitions:
                       - null
                     map:
                       bindings: {}
+                metadata: {}
                 failure_node:
                   branch_node:
                     if_else:
@@ -15122,6 +15132,7 @@ definitions:
                       - null
                     map:
                       bindings: {}
+                metadata: {}
                 failure_node:
                   branch_node:
                     if_else:
@@ -16174,6 +16185,7 @@ definitions:
                       - null
                     map:
                       bindings: {}
+                metadata: {}
                 failure_node:
                   branch_node:
                     if_else:
@@ -17522,6 +17534,7 @@ definitions:
               - null
             map:
               bindings: {}
+        metadata: {}
         failure_node:
           branch_node:
             if_else:
@@ -18369,6 +18382,7 @@ definitions:
                 - null
               map:
                 bindings: {}
+          metadata: {}
           failure_node:
             branch_node:
               if_else:
@@ -19189,6 +19203,7 @@ definitions:
                 - null
               map:
                 bindings: {}
+          metadata: {}
           failure_node:
             branch_node:
               if_else:
@@ -20241,6 +20256,7 @@ definitions:
                 - null
               map:
                 bindings: {}
+          metadata: {}
           failure_node:
             branch_node:
               if_else:
@@ -22530,6 +22546,9 @@ definitions:
     - "ABORTED"
     - "TIMED_OUT"
     default: "UNDEFINED"
+  coreWorkflowMetadata:
+    type: "object"
+    description: "Metadata for the entire workflow.\nTo be used in the future."
   coreWorkflowMetadataDefaults:
     type: "object"
     properties:
@@ -22572,9 +22591,9 @@ definitions:
       id:
         description: "A globally unique identifier for the workflow."
         $ref: "#/definitions/coreIdentifier"
-      metadata_defaults:
+      metadata:
         description: "Extra metadata about the workflow."
-        $ref: "#/definitions/coreWorkflowMetadataDefaults"
+        $ref: "#/definitions/coreWorkflowMetadata"
       interface:
         description: "Defines a strongly typed interface for the Workflow. This can\
           \ include some optional parameters."
@@ -22604,6 +22623,9 @@ definitions:
           \ this node must match the Workflow interface with an additional input named\
           \ \"error\" of type\npb.lyft.flyte.core.Error."
         $ref: "#/definitions/coreNode"
+      metadata_defaults:
+        title: "workflow defaults"
+        $ref: "#/definitions/coreWorkflowMetadataDefaults"
     description: "Flyte Workflow Structure that encapsulates task, branch and subworkflow\
       \ nodes to form a statically analyzable,\ndirected acyclic graph."
     example:
@@ -22710,6 +22732,7 @@ definitions:
             - null
           map:
             bindings: {}
+      metadata: {}
       failure_node:
         branch_node:
           if_else:

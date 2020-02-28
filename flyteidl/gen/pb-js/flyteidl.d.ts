@@ -819,6 +819,52 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a WorkflowMetadata. */
+        interface IWorkflowMetadata {
+        }
+
+        /** Represents a WorkflowMetadata. */
+        class WorkflowMetadata implements IWorkflowMetadata {
+
+            /**
+             * Constructs a new WorkflowMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IWorkflowMetadata);
+
+            /**
+             * Creates a new WorkflowMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowMetadata instance
+             */
+            public static create(properties?: flyteidl.core.IWorkflowMetadata): flyteidl.core.WorkflowMetadata;
+
+            /**
+             * Encodes the specified WorkflowMetadata message. Does not implicitly {@link flyteidl.core.WorkflowMetadata.verify|verify} messages.
+             * @param message WorkflowMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IWorkflowMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.WorkflowMetadata;
+
+            /**
+             * Verifies a WorkflowMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a WorkflowMetadataDefaults. */
         interface IWorkflowMetadataDefaults {
 
@@ -877,8 +923,8 @@ export namespace flyteidl {
             /** WorkflowTemplate id */
             id?: (flyteidl.core.IIdentifier|null);
 
-            /** WorkflowTemplate metadataDefaults */
-            metadataDefaults?: (flyteidl.core.IWorkflowMetadataDefaults|null);
+            /** WorkflowTemplate metadata */
+            metadata?: (flyteidl.core.IWorkflowMetadata|null);
 
             /** WorkflowTemplate interface */
             "interface"?: (flyteidl.core.ITypedInterface|null);
@@ -891,6 +937,9 @@ export namespace flyteidl {
 
             /** WorkflowTemplate failureNode */
             failureNode?: (flyteidl.core.INode|null);
+
+            /** WorkflowTemplate metadataDefaults */
+            metadataDefaults?: (flyteidl.core.IWorkflowMetadataDefaults|null);
         }
 
         /** Represents a WorkflowTemplate. */
@@ -905,8 +954,8 @@ export namespace flyteidl {
             /** WorkflowTemplate id. */
             public id?: (flyteidl.core.IIdentifier|null);
 
-            /** WorkflowTemplate metadataDefaults. */
-            public metadataDefaults?: (flyteidl.core.IWorkflowMetadataDefaults|null);
+            /** WorkflowTemplate metadata. */
+            public metadata?: (flyteidl.core.IWorkflowMetadata|null);
 
             /** WorkflowTemplate interface. */
             public interface?: (flyteidl.core.ITypedInterface|null);
@@ -919,6 +968,9 @@ export namespace flyteidl {
 
             /** WorkflowTemplate failureNode. */
             public failureNode?: (flyteidl.core.INode|null);
+
+            /** WorkflowTemplate metadataDefaults. */
+            public metadataDefaults?: (flyteidl.core.IWorkflowMetadataDefaults|null);
 
             /**
              * Creates a new WorkflowTemplate instance using the specified properties.

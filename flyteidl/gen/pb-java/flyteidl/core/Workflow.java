@@ -10195,6 +10195,427 @@ public final class Workflow {
 
   }
 
+  public interface WorkflowMetadataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.WorkflowMetadata)
+      com.google.protobuf.MessageOrBuilder {
+  }
+  /**
+   * <pre>
+   * Metadata for the entire workflow.
+   * To be used in the future.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.WorkflowMetadata}
+   */
+  public  static final class WorkflowMetadata extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.WorkflowMetadata)
+      WorkflowMetadataOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use WorkflowMetadata.newBuilder() to construct.
+    private WorkflowMetadata(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private WorkflowMetadata() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private WorkflowMetadata(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Workflow.WorkflowMetadata.class, flyteidl.core.Workflow.WorkflowMetadata.Builder.class);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Workflow.WorkflowMetadata)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Workflow.WorkflowMetadata other = (flyteidl.core.Workflow.WorkflowMetadata) obj;
+
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.WorkflowMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Workflow.WorkflowMetadata prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Metadata for the entire workflow.
+     * To be used in the future.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.WorkflowMetadata}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.WorkflowMetadata)
+        flyteidl.core.Workflow.WorkflowMetadataOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Workflow.WorkflowMetadata.class, flyteidl.core.Workflow.WorkflowMetadata.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Workflow.WorkflowMetadata.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_WorkflowMetadata_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.WorkflowMetadata getDefaultInstanceForType() {
+        return flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.WorkflowMetadata build() {
+        flyteidl.core.Workflow.WorkflowMetadata result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.WorkflowMetadata buildPartial() {
+        flyteidl.core.Workflow.WorkflowMetadata result = new flyteidl.core.Workflow.WorkflowMetadata(this);
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Workflow.WorkflowMetadata) {
+          return mergeFrom((flyteidl.core.Workflow.WorkflowMetadata)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Workflow.WorkflowMetadata other) {
+        if (other == flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Workflow.WorkflowMetadata parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Workflow.WorkflowMetadata) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.WorkflowMetadata)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.WorkflowMetadata)
+    private static final flyteidl.core.Workflow.WorkflowMetadata DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Workflow.WorkflowMetadata();
+    }
+
+    public static flyteidl.core.Workflow.WorkflowMetadata getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<WorkflowMetadata>
+        PARSER = new com.google.protobuf.AbstractParser<WorkflowMetadata>() {
+      @java.lang.Override
+      public WorkflowMetadata parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new WorkflowMetadata(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<WorkflowMetadata> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<WorkflowMetadata> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Workflow.WorkflowMetadata getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface WorkflowMetadataDefaultsOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.WorkflowMetadataDefaults)
       com.google.protobuf.MessageOrBuilder {
@@ -10742,25 +11163,25 @@ public final class Workflow {
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
      */
-    boolean hasMetadataDefaults();
+    boolean hasMetadata();
     /**
      * <pre>
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
      */
-    flyteidl.core.Workflow.WorkflowMetadataDefaults getMetadataDefaults();
+    flyteidl.core.Workflow.WorkflowMetadata getMetadata();
     /**
      * <pre>
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
      */
-    flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder getMetadataDefaultsOrBuilder();
+    flyteidl.core.Workflow.WorkflowMetadataOrBuilder getMetadataOrBuilder();
 
     /**
      * <pre>
@@ -10935,6 +11356,31 @@ public final class Workflow {
      * <code>.flyteidl.core.Node failure_node = 6;</code>
      */
     flyteidl.core.Workflow.NodeOrBuilder getFailureNodeOrBuilder();
+
+    /**
+     * <pre>
+     * workflow defaults
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+     */
+    boolean hasMetadataDefaults();
+    /**
+     * <pre>
+     * workflow defaults
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+     */
+    flyteidl.core.Workflow.WorkflowMetadataDefaults getMetadataDefaults();
+    /**
+     * <pre>
+     * workflow defaults
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+     */
+    flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder getMetadataDefaultsOrBuilder();
   }
   /**
    * <pre>
@@ -10996,14 +11442,14 @@ public final class Workflow {
               break;
             }
             case 18: {
-              flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder subBuilder = null;
-              if (metadataDefaults_ != null) {
-                subBuilder = metadataDefaults_.toBuilder();
+              flyteidl.core.Workflow.WorkflowMetadata.Builder subBuilder = null;
+              if (metadata_ != null) {
+                subBuilder = metadata_.toBuilder();
               }
-              metadataDefaults_ = input.readMessage(flyteidl.core.Workflow.WorkflowMetadataDefaults.parser(), extensionRegistry);
+              metadata_ = input.readMessage(flyteidl.core.Workflow.WorkflowMetadata.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(metadataDefaults_);
-                metadataDefaults_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(metadata_);
+                metadata_ = subBuilder.buildPartial();
               }
 
               break;
@@ -11048,6 +11494,19 @@ public final class Workflow {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(failureNode_);
                 failureNode_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 58: {
+              flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder subBuilder = null;
+              if (metadataDefaults_ != null) {
+                subBuilder = metadataDefaults_.toBuilder();
+              }
+              metadataDefaults_ = input.readMessage(flyteidl.core.Workflow.WorkflowMetadataDefaults.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(metadataDefaults_);
+                metadataDefaults_ = subBuilder.buildPartial();
               }
 
               break;
@@ -11124,37 +11583,37 @@ public final class Workflow {
       return getId();
     }
 
-    public static final int METADATA_DEFAULTS_FIELD_NUMBER = 2;
-    private flyteidl.core.Workflow.WorkflowMetadataDefaults metadataDefaults_;
+    public static final int METADATA_FIELD_NUMBER = 2;
+    private flyteidl.core.Workflow.WorkflowMetadata metadata_;
     /**
      * <pre>
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
      */
-    public boolean hasMetadataDefaults() {
-      return metadataDefaults_ != null;
+    public boolean hasMetadata() {
+      return metadata_ != null;
     }
     /**
      * <pre>
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
      */
-    public flyteidl.core.Workflow.WorkflowMetadataDefaults getMetadataDefaults() {
-      return metadataDefaults_ == null ? flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance() : metadataDefaults_;
+    public flyteidl.core.Workflow.WorkflowMetadata getMetadata() {
+      return metadata_ == null ? flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance() : metadata_;
     }
     /**
      * <pre>
      * Extra metadata about the workflow.
      * </pre>
      *
-     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+     * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
      */
-    public flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder getMetadataDefaultsOrBuilder() {
-      return getMetadataDefaults();
+    public flyteidl.core.Workflow.WorkflowMetadataOrBuilder getMetadataOrBuilder() {
+      return getMetadata();
     }
 
     public static final int INTERFACE_FIELD_NUMBER = 3;
@@ -11369,6 +11828,39 @@ public final class Workflow {
       return getFailureNode();
     }
 
+    public static final int METADATA_DEFAULTS_FIELD_NUMBER = 7;
+    private flyteidl.core.Workflow.WorkflowMetadataDefaults metadataDefaults_;
+    /**
+     * <pre>
+     * workflow defaults
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+     */
+    public boolean hasMetadataDefaults() {
+      return metadataDefaults_ != null;
+    }
+    /**
+     * <pre>
+     * workflow defaults
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+     */
+    public flyteidl.core.Workflow.WorkflowMetadataDefaults getMetadataDefaults() {
+      return metadataDefaults_ == null ? flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance() : metadataDefaults_;
+    }
+    /**
+     * <pre>
+     * workflow defaults
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+     */
+    public flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder getMetadataDefaultsOrBuilder() {
+      return getMetadataDefaults();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -11386,8 +11878,8 @@ public final class Workflow {
       if (id_ != null) {
         output.writeMessage(1, getId());
       }
-      if (metadataDefaults_ != null) {
-        output.writeMessage(2, getMetadataDefaults());
+      if (metadata_ != null) {
+        output.writeMessage(2, getMetadata());
       }
       if (interface_ != null) {
         output.writeMessage(3, getInterface());
@@ -11400,6 +11892,9 @@ public final class Workflow {
       }
       if (failureNode_ != null) {
         output.writeMessage(6, getFailureNode());
+      }
+      if (metadataDefaults_ != null) {
+        output.writeMessage(7, getMetadataDefaults());
       }
       unknownFields.writeTo(output);
     }
@@ -11414,9 +11909,9 @@ public final class Workflow {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getId());
       }
-      if (metadataDefaults_ != null) {
+      if (metadata_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getMetadataDefaults());
+          .computeMessageSize(2, getMetadata());
       }
       if (interface_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -11433,6 +11928,10 @@ public final class Workflow {
       if (failureNode_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, getFailureNode());
+      }
+      if (metadataDefaults_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(7, getMetadataDefaults());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -11454,10 +11953,10 @@ public final class Workflow {
         if (!getId()
             .equals(other.getId())) return false;
       }
-      if (hasMetadataDefaults() != other.hasMetadataDefaults()) return false;
-      if (hasMetadataDefaults()) {
-        if (!getMetadataDefaults()
-            .equals(other.getMetadataDefaults())) return false;
+      if (hasMetadata() != other.hasMetadata()) return false;
+      if (hasMetadata()) {
+        if (!getMetadata()
+            .equals(other.getMetadata())) return false;
       }
       if (hasInterface() != other.hasInterface()) return false;
       if (hasInterface()) {
@@ -11472,6 +11971,11 @@ public final class Workflow {
       if (hasFailureNode()) {
         if (!getFailureNode()
             .equals(other.getFailureNode())) return false;
+      }
+      if (hasMetadataDefaults() != other.hasMetadataDefaults()) return false;
+      if (hasMetadataDefaults()) {
+        if (!getMetadataDefaults()
+            .equals(other.getMetadataDefaults())) return false;
       }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
@@ -11488,9 +11992,9 @@ public final class Workflow {
         hash = (37 * hash) + ID_FIELD_NUMBER;
         hash = (53 * hash) + getId().hashCode();
       }
-      if (hasMetadataDefaults()) {
-        hash = (37 * hash) + METADATA_DEFAULTS_FIELD_NUMBER;
-        hash = (53 * hash) + getMetadataDefaults().hashCode();
+      if (hasMetadata()) {
+        hash = (37 * hash) + METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + getMetadata().hashCode();
       }
       if (hasInterface()) {
         hash = (37 * hash) + INTERFACE_FIELD_NUMBER;
@@ -11507,6 +12011,10 @@ public final class Workflow {
       if (hasFailureNode()) {
         hash = (37 * hash) + FAILURE_NODE_FIELD_NUMBER;
         hash = (53 * hash) + getFailureNode().hashCode();
+      }
+      if (hasMetadataDefaults()) {
+        hash = (37 * hash) + METADATA_DEFAULTS_FIELD_NUMBER;
+        hash = (53 * hash) + getMetadataDefaults().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -11654,11 +12162,11 @@ public final class Workflow {
           id_ = null;
           idBuilder_ = null;
         }
-        if (metadataDefaultsBuilder_ == null) {
-          metadataDefaults_ = null;
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
         } else {
-          metadataDefaults_ = null;
-          metadataDefaultsBuilder_ = null;
+          metadata_ = null;
+          metadataBuilder_ = null;
         }
         if (interfaceBuilder_ == null) {
           interface_ = null;
@@ -11683,6 +12191,12 @@ public final class Workflow {
         } else {
           failureNode_ = null;
           failureNodeBuilder_ = null;
+        }
+        if (metadataDefaultsBuilder_ == null) {
+          metadataDefaults_ = null;
+        } else {
+          metadataDefaults_ = null;
+          metadataDefaultsBuilder_ = null;
         }
         return this;
       }
@@ -11717,10 +12231,10 @@ public final class Workflow {
         } else {
           result.id_ = idBuilder_.build();
         }
-        if (metadataDefaultsBuilder_ == null) {
-          result.metadataDefaults_ = metadataDefaults_;
+        if (metadataBuilder_ == null) {
+          result.metadata_ = metadata_;
         } else {
-          result.metadataDefaults_ = metadataDefaultsBuilder_.build();
+          result.metadata_ = metadataBuilder_.build();
         }
         if (interfaceBuilder_ == null) {
           result.interface_ = interface_;
@@ -11749,6 +12263,11 @@ public final class Workflow {
           result.failureNode_ = failureNode_;
         } else {
           result.failureNode_ = failureNodeBuilder_.build();
+        }
+        if (metadataDefaultsBuilder_ == null) {
+          result.metadataDefaults_ = metadataDefaults_;
+        } else {
+          result.metadataDefaults_ = metadataDefaultsBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -11802,8 +12321,8 @@ public final class Workflow {
         if (other.hasId()) {
           mergeId(other.getId());
         }
-        if (other.hasMetadataDefaults()) {
-          mergeMetadataDefaults(other.getMetadataDefaults());
+        if (other.hasMetadata()) {
+          mergeMetadata(other.getMetadata());
         }
         if (other.hasInterface()) {
           mergeInterface(other.getInterface());
@@ -11862,6 +12381,9 @@ public final class Workflow {
         }
         if (other.hasFailureNode()) {
           mergeFailureNode(other.getFailureNode());
+        }
+        if (other.hasMetadataDefaults()) {
+          mergeMetadataDefaults(other.getMetadataDefaults());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -12046,31 +12568,31 @@ public final class Workflow {
         return idBuilder_;
       }
 
-      private flyteidl.core.Workflow.WorkflowMetadataDefaults metadataDefaults_;
+      private flyteidl.core.Workflow.WorkflowMetadata metadata_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Workflow.WorkflowMetadataDefaults, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder, flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder> metadataDefaultsBuilder_;
+          flyteidl.core.Workflow.WorkflowMetadata, flyteidl.core.Workflow.WorkflowMetadata.Builder, flyteidl.core.Workflow.WorkflowMetadataOrBuilder> metadataBuilder_;
       /**
        * <pre>
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
        */
-      public boolean hasMetadataDefaults() {
-        return metadataDefaultsBuilder_ != null || metadataDefaults_ != null;
+      public boolean hasMetadata() {
+        return metadataBuilder_ != null || metadata_ != null;
       }
       /**
        * <pre>
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
        */
-      public flyteidl.core.Workflow.WorkflowMetadataDefaults getMetadataDefaults() {
-        if (metadataDefaultsBuilder_ == null) {
-          return metadataDefaults_ == null ? flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance() : metadataDefaults_;
+      public flyteidl.core.Workflow.WorkflowMetadata getMetadata() {
+        if (metadataBuilder_ == null) {
+          return metadata_ == null ? flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance() : metadata_;
         } else {
-          return metadataDefaultsBuilder_.getMessage();
+          return metadataBuilder_.getMessage();
         }
       }
       /**
@@ -12078,17 +12600,17 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
        */
-      public Builder setMetadataDefaults(flyteidl.core.Workflow.WorkflowMetadataDefaults value) {
-        if (metadataDefaultsBuilder_ == null) {
+      public Builder setMetadata(flyteidl.core.Workflow.WorkflowMetadata value) {
+        if (metadataBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          metadataDefaults_ = value;
+          metadata_ = value;
           onChanged();
         } else {
-          metadataDefaultsBuilder_.setMessage(value);
+          metadataBuilder_.setMessage(value);
         }
 
         return this;
@@ -12098,15 +12620,15 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
        */
-      public Builder setMetadataDefaults(
-          flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder builderForValue) {
-        if (metadataDefaultsBuilder_ == null) {
-          metadataDefaults_ = builderForValue.build();
+      public Builder setMetadata(
+          flyteidl.core.Workflow.WorkflowMetadata.Builder builderForValue) {
+        if (metadataBuilder_ == null) {
+          metadata_ = builderForValue.build();
           onChanged();
         } else {
-          metadataDefaultsBuilder_.setMessage(builderForValue.build());
+          metadataBuilder_.setMessage(builderForValue.build());
         }
 
         return this;
@@ -12116,19 +12638,19 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
        */
-      public Builder mergeMetadataDefaults(flyteidl.core.Workflow.WorkflowMetadataDefaults value) {
-        if (metadataDefaultsBuilder_ == null) {
-          if (metadataDefaults_ != null) {
-            metadataDefaults_ =
-              flyteidl.core.Workflow.WorkflowMetadataDefaults.newBuilder(metadataDefaults_).mergeFrom(value).buildPartial();
+      public Builder mergeMetadata(flyteidl.core.Workflow.WorkflowMetadata value) {
+        if (metadataBuilder_ == null) {
+          if (metadata_ != null) {
+            metadata_ =
+              flyteidl.core.Workflow.WorkflowMetadata.newBuilder(metadata_).mergeFrom(value).buildPartial();
           } else {
-            metadataDefaults_ = value;
+            metadata_ = value;
           }
           onChanged();
         } else {
-          metadataDefaultsBuilder_.mergeFrom(value);
+          metadataBuilder_.mergeFrom(value);
         }
 
         return this;
@@ -12138,15 +12660,15 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
        */
-      public Builder clearMetadataDefaults() {
-        if (metadataDefaultsBuilder_ == null) {
-          metadataDefaults_ = null;
+      public Builder clearMetadata() {
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
           onChanged();
         } else {
-          metadataDefaults_ = null;
-          metadataDefaultsBuilder_ = null;
+          metadata_ = null;
+          metadataBuilder_ = null;
         }
 
         return this;
@@ -12156,26 +12678,26 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
        */
-      public flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder getMetadataDefaultsBuilder() {
+      public flyteidl.core.Workflow.WorkflowMetadata.Builder getMetadataBuilder() {
         
         onChanged();
-        return getMetadataDefaultsFieldBuilder().getBuilder();
+        return getMetadataFieldBuilder().getBuilder();
       }
       /**
        * <pre>
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
        */
-      public flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder getMetadataDefaultsOrBuilder() {
-        if (metadataDefaultsBuilder_ != null) {
-          return metadataDefaultsBuilder_.getMessageOrBuilder();
+      public flyteidl.core.Workflow.WorkflowMetadataOrBuilder getMetadataOrBuilder() {
+        if (metadataBuilder_ != null) {
+          return metadataBuilder_.getMessageOrBuilder();
         } else {
-          return metadataDefaults_ == null ?
-              flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance() : metadataDefaults_;
+          return metadata_ == null ?
+              flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance() : metadata_;
         }
       }
       /**
@@ -12183,20 +12705,20 @@ public final class Workflow {
        * Extra metadata about the workflow.
        * </pre>
        *
-       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 2;</code>
+       * <code>.flyteidl.core.WorkflowMetadata metadata = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Workflow.WorkflowMetadataDefaults, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder, flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder> 
-          getMetadataDefaultsFieldBuilder() {
-        if (metadataDefaultsBuilder_ == null) {
-          metadataDefaultsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Workflow.WorkflowMetadataDefaults, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder, flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder>(
-                  getMetadataDefaults(),
+          flyteidl.core.Workflow.WorkflowMetadata, flyteidl.core.Workflow.WorkflowMetadata.Builder, flyteidl.core.Workflow.WorkflowMetadataOrBuilder> 
+          getMetadataFieldBuilder() {
+        if (metadataBuilder_ == null) {
+          metadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Workflow.WorkflowMetadata, flyteidl.core.Workflow.WorkflowMetadata.Builder, flyteidl.core.Workflow.WorkflowMetadataOrBuilder>(
+                  getMetadata(),
                   getParentForChildren(),
                   isClean());
-          metadataDefaults_ = null;
+          metadata_ = null;
         }
-        return metadataDefaultsBuilder_;
+        return metadataBuilder_;
       }
 
       private flyteidl.core.Interface.TypedInterface interface_;
@@ -13254,6 +13776,159 @@ public final class Workflow {
         }
         return failureNodeBuilder_;
       }
+
+      private flyteidl.core.Workflow.WorkflowMetadataDefaults metadataDefaults_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Workflow.WorkflowMetadataDefaults, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder, flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder> metadataDefaultsBuilder_;
+      /**
+       * <pre>
+       * workflow defaults
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+       */
+      public boolean hasMetadataDefaults() {
+        return metadataDefaultsBuilder_ != null || metadataDefaults_ != null;
+      }
+      /**
+       * <pre>
+       * workflow defaults
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+       */
+      public flyteidl.core.Workflow.WorkflowMetadataDefaults getMetadataDefaults() {
+        if (metadataDefaultsBuilder_ == null) {
+          return metadataDefaults_ == null ? flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance() : metadataDefaults_;
+        } else {
+          return metadataDefaultsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * workflow defaults
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+       */
+      public Builder setMetadataDefaults(flyteidl.core.Workflow.WorkflowMetadataDefaults value) {
+        if (metadataDefaultsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          metadataDefaults_ = value;
+          onChanged();
+        } else {
+          metadataDefaultsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * workflow defaults
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+       */
+      public Builder setMetadataDefaults(
+          flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder builderForValue) {
+        if (metadataDefaultsBuilder_ == null) {
+          metadataDefaults_ = builderForValue.build();
+          onChanged();
+        } else {
+          metadataDefaultsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * workflow defaults
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+       */
+      public Builder mergeMetadataDefaults(flyteidl.core.Workflow.WorkflowMetadataDefaults value) {
+        if (metadataDefaultsBuilder_ == null) {
+          if (metadataDefaults_ != null) {
+            metadataDefaults_ =
+              flyteidl.core.Workflow.WorkflowMetadataDefaults.newBuilder(metadataDefaults_).mergeFrom(value).buildPartial();
+          } else {
+            metadataDefaults_ = value;
+          }
+          onChanged();
+        } else {
+          metadataDefaultsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * workflow defaults
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+       */
+      public Builder clearMetadataDefaults() {
+        if (metadataDefaultsBuilder_ == null) {
+          metadataDefaults_ = null;
+          onChanged();
+        } else {
+          metadataDefaults_ = null;
+          metadataDefaultsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * workflow defaults
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+       */
+      public flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder getMetadataDefaultsBuilder() {
+        
+        onChanged();
+        return getMetadataDefaultsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * workflow defaults
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+       */
+      public flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder getMetadataDefaultsOrBuilder() {
+        if (metadataDefaultsBuilder_ != null) {
+          return metadataDefaultsBuilder_.getMessageOrBuilder();
+        } else {
+          return metadataDefaults_ == null ?
+              flyteidl.core.Workflow.WorkflowMetadataDefaults.getDefaultInstance() : metadataDefaults_;
+        }
+      }
+      /**
+       * <pre>
+       * workflow defaults
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowMetadataDefaults metadata_defaults = 7;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Workflow.WorkflowMetadataDefaults, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder, flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder> 
+          getMetadataDefaultsFieldBuilder() {
+        if (metadataDefaultsBuilder_ == null) {
+          metadataDefaultsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Workflow.WorkflowMetadataDefaults, flyteidl.core.Workflow.WorkflowMetadataDefaults.Builder, flyteidl.core.Workflow.WorkflowMetadataDefaultsOrBuilder>(
+                  getMetadataDefaults(),
+                  getParentForChildren(),
+                  isClean());
+          metadataDefaults_ = null;
+        }
+        return metadataDefaultsBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -13348,6 +14023,11 @@ public final class Workflow {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_Node_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_WorkflowMetadata_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -13399,17 +14079,19 @@ public final class Workflow {
       "flyteidl.core.TaskNodeH\000\0224\n\rworkflow_nod" +
       "e\030\007 \001(\0132\033.flyteidl.core.WorkflowNodeH\000\0220" +
       "\n\013branch_node\030\010 \001(\0132\031.flyteidl.core.Bran" +
-      "chNodeH\000B\010\n\006target\"1\n\030WorkflowMetadataDe" +
-      "faults\022\025\n\rinterruptible\030\001 \001(\010\"\247\002\n\020Workfl" +
-      "owTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.I" +
-      "dentifier\022B\n\021metadata_defaults\030\002 \001(\0132\'.f" +
-      "lyteidl.core.WorkflowMetadataDefaults\0220\n" +
-      "\tinterface\030\003 \001(\0132\035.flyteidl.core.TypedIn" +
-      "terface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl.core.N" +
-      "ode\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.core.Bin" +
-      "ding\022)\n\014failure_node\030\006 \001(\0132\023.flyteidl.co" +
-      "re.NodeB2Z0github.com/lyft/flyteidl/gen/" +
-      "pb-go/flyteidl/coreb\006proto3"
+      "chNodeH\000B\010\n\006target\"\022\n\020WorkflowMetadata\"1" +
+      "\n\030WorkflowMetadataDefaults\022\025\n\rinterrupti" +
+      "ble\030\001 \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002id\030\001 \001" +
+      "(\0132\031.flyteidl.core.Identifier\0221\n\010metadat" +
+      "a\030\002 \001(\0132\037.flyteidl.core.WorkflowMetadata" +
+      "\0220\n\tinterface\030\003 \001(\0132\035.flyteidl.core.Type" +
+      "dInterface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl.cor" +
+      "e.Node\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.core." +
+      "Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyteidl" +
+      ".core.Node\022B\n\021metadata_defaults\030\007 \001(\0132\'." +
+      "flyteidl.core.WorkflowMetadataDefaultsB2" +
+      "Z0github.com/lyft/flyteidl/gen/pb-go/fly" +
+      "teidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13477,18 +14159,24 @@ public final class Workflow {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Node_descriptor,
         new java.lang.String[] { "Id", "Metadata", "Inputs", "UpstreamNodeIds", "OutputAliases", "TaskNode", "WorkflowNode", "BranchNode", "Target", });
-    internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor =
+    internal_static_flyteidl_core_WorkflowMetadata_descriptor =
       getDescriptor().getMessageTypes().get(8);
+    internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_WorkflowMetadata_descriptor,
+        new java.lang.String[] { });
+    internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor =
+      getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_core_WorkflowMetadataDefaults_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor,
         new java.lang.String[] { "Interruptible", });
     internal_static_flyteidl_core_WorkflowTemplate_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_core_WorkflowTemplate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_WorkflowTemplate_descriptor,
-        new java.lang.String[] { "Id", "MetadataDefaults", "Interface", "Nodes", "Outputs", "FailureNode", });
+        new java.lang.String[] { "Id", "Metadata", "Interface", "Nodes", "Outputs", "FailureNode", "MetadataDefaults", });
     flyteidl.core.Condition.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Interface.getDescriptor();
