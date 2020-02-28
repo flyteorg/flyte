@@ -334,12 +334,29 @@ branch_node
   
 
 
+.. _api_msg_flyteidl.core.WorkflowMetadata:
+
+flyteidl.core.WorkflowMetadata
+------------------------------
+
+`[flyteidl.core.WorkflowMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L130>`_
+
+Metadata for the entire workflow.
+To be used in the future.
+
+.. code-block:: json
+
+  {}
+
+
+
+
 .. _api_msg_flyteidl.core.WorkflowMetadataDefaults:
 
 flyteidl.core.WorkflowMetadataDefaults
 --------------------------------------
 
-`[flyteidl.core.WorkflowMetadataDefaults proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L129>`_
+`[flyteidl.core.WorkflowMetadataDefaults proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L135>`_
 
 Default Workflow Metadata for the entire workflow.
 
@@ -364,7 +381,7 @@ interruptible
 flyteidl.core.WorkflowTemplate
 ------------------------------
 
-`[flyteidl.core.WorkflowTemplate proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L138>`_
+`[flyteidl.core.WorkflowTemplate proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L144>`_
 
 Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,
 directed acyclic graph.
@@ -373,11 +390,12 @@ directed acyclic graph.
 
   {
     "id": "{...}",
-    "metadata_defaults": "{...}",
+    "metadata": "{...}",
     "interface": "{...}",
     "nodes": [],
     "outputs": [],
-    "failure_node": "{...}"
+    "failure_node": "{...}",
+    "metadata_defaults": "{...}"
   }
 
 .. _api_field_flyteidl.core.WorkflowTemplate.id:
@@ -386,10 +404,10 @@ id
   (:ref:`flyteidl.core.Identifier <api_msg_flyteidl.core.Identifier>`) A globally unique identifier for the workflow.
   
   
-.. _api_field_flyteidl.core.WorkflowTemplate.metadata_defaults:
+.. _api_field_flyteidl.core.WorkflowTemplate.metadata:
 
-metadata_defaults
-  (:ref:`flyteidl.core.WorkflowMetadataDefaults <api_msg_flyteidl.core.WorkflowMetadataDefaults>`) Extra metadata about the workflow.
+metadata
+  (:ref:`flyteidl.core.WorkflowMetadata <api_msg_flyteidl.core.WorkflowMetadata>`) Extra metadata about the workflow.
   
   
 .. _api_field_flyteidl.core.WorkflowTemplate.interface:
@@ -422,6 +440,12 @@ failure_node
   (:ref:`flyteidl.core.Node <api_msg_flyteidl.core.Node>`) optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed.
   The interface of this node must match the Workflow interface with an additional input named "error" of type
   pb.lyft.flyte.core.Error.
+  
+  
+.. _api_field_flyteidl.core.WorkflowTemplate.metadata_defaults:
+
+metadata_defaults
+  (:ref:`flyteidl.core.WorkflowMetadataDefaults <api_msg_flyteidl.core.WorkflowMetadataDefaults>`) workflow defaults
   
   
 
