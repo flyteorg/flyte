@@ -79,7 +79,6 @@ message NodeExecution {
 
 // Represents additional attributes related to a Node Execution
 message NodeExecutionMetaData {
-    bool interruptible = 1;
 }
 
 // Request structure to retrieve a list of node execution entities.

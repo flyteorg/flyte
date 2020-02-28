@@ -3001,11 +3001,6 @@
         "reference_execution": {
           "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
           "description": "Optional, a reference workflow execution related to this execution.\nIn the case of a relaunch, this references the original workflow execution."
-        },
-        "interruptible": {
-          "type": "boolean",
-          "format": "boolean",
-          "title": "Identify whether execution is interruptible"
         }
       },
       "description": "Represents attributes about an execution which are not required to launch the execution but are useful to record.\nThese attributes are assigned at launch time and do not change."
@@ -3544,12 +3539,6 @@
     },
     "adminNodeExecutionMetaData": {
       "type": "object",
-      "properties": {
-        "interruptible": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      },
       "title": "Represents additional attributes related to a Node Execution"
     },
     "adminNotification": {
@@ -4701,6 +4690,10 @@
         "retries": {
           "$ref": "#/definitions/coreRetryStrategy",
           "description": "Number of retries per task."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "format": "boolean"
         }
       },
       "description": "Defines extra information about the Node."
@@ -5101,9 +5094,16 @@
       ],
       "default": "UNDEFINED"
     },
-    "coreWorkflowMetadata": {
+    "coreWorkflowMetadataDefaults": {
       "type": "object",
-      "description": "Metadata for the entire workflow.\nTo be used in the future."
+      "properties": {
+        "interruptible": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Identify whether workflow is interruptible.\nThe value set at the workflow level will be the defualt value used for nodes\nunless explicitly set at the node level."
+        }
+      },
+      "description": "Default Workflow Metadata for the entire workflow."
     },
     "coreWorkflowNode": {
       "type": "object",
@@ -5126,8 +5126,8 @@
           "$ref": "#/definitions/coreIdentifier",
           "description": "A globally unique identifier for the workflow."
         },
-        "metadata": {
-          "$ref": "#/definitions/coreWorkflowMetadata",
+        "metadata_defaults": {
+          "$ref": "#/definitions/coreWorkflowMetadataDefaults",
           "description": "Extra metadata about the workflow."
         },
         "interface": {
