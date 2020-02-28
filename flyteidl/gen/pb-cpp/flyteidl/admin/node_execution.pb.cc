@@ -289,7 +289,6 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fnode_5fexecution
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::NodeExecutionMetaData, interruptible_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::NodeExecutionList, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -338,11 +337,11 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 16, -1, sizeof(::flyteidl::admin::NodeExecutionForTaskListRequest)},
   { 26, -1, sizeof(::flyteidl::admin::NodeExecution)},
   { 35, -1, sizeof(::flyteidl::admin::NodeExecutionMetaData)},
-  { 41, -1, sizeof(::flyteidl::admin::NodeExecutionList)},
-  { 48, -1, sizeof(::flyteidl::admin::NodeExecutionClosure)},
-  { 63, -1, sizeof(::flyteidl::admin::WorkflowNodeMetadata)},
-  { 69, -1, sizeof(::flyteidl::admin::NodeExecutionGetDataRequest)},
-  { 75, -1, sizeof(::flyteidl::admin::NodeExecutionGetDataResponse)},
+  { 40, -1, sizeof(::flyteidl::admin::NodeExecutionList)},
+  { 47, -1, sizeof(::flyteidl::admin::NodeExecutionClosure)},
+  { 62, -1, sizeof(::flyteidl::admin::WorkflowNodeMetadata)},
+  { 68, -1, sizeof(::flyteidl::admin::NodeExecutionGetDataRequest)},
+  { 74, -1, sizeof(::flyteidl::admin::NodeExecutionGetDataResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -386,35 +385,35 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto
   "xecutionIdentifier\022\021\n\tinput_uri\030\002 \001(\t\0225\n"
   "\007closure\030\003 \001(\0132$.flyteidl.admin.NodeExec"
   "utionClosure\0227\n\010metadata\030\004 \001(\0132%.flyteid"
-  "l.admin.NodeExecutionMetaData\".\n\025NodeExe"
-  "cutionMetaData\022\025\n\rinterruptible\030\001 \001(\010\"Z\n"
-  "\021NodeExecutionList\0226\n\017node_executions\030\001 "
-  "\003(\0132\035.flyteidl.admin.NodeExecution\022\r\n\005to"
-  "ken\030\002 \001(\t\"\270\003\n\024NodeExecutionClosure\022\024\n\nou"
-  "tput_uri\030\001 \001(\tH\000\022.\n\005error\030\002 \001(\0132\035.flytei"
-  "dl.core.ExecutionErrorH\000\0221\n\005phase\030\003 \001(\0162"
-  "\".flyteidl.core.NodeExecution.Phase\022.\n\ns"
-  "tarted_at\030\004 \001(\0132\032.google.protobuf.Timest"
-  "amp\022+\n\010duration\030\005 \001(\0132\031.google.protobuf."
-  "Duration\022.\n\ncreated_at\030\006 \001(\0132\032.google.pr"
-  "otobuf.Timestamp\022.\n\nupdated_at\030\007 \001(\0132\032.g"
-  "oogle.protobuf.Timestamp\022F\n\026workflow_nod"
-  "e_metadata\030\010 \001(\0132$.flyteidl.admin.Workfl"
-  "owNodeMetadataH\001B\017\n\routput_resultB\021\n\017tar"
-  "get_metadata\"W\n\024WorkflowNodeMetadata\022\?\n\013"
-  "executionId\030\001 \001(\0132*.flyteidl.core.Workfl"
-  "owExecutionIdentifier\"Q\n\033NodeExecutionGe"
-  "tDataRequest\0222\n\002id\030\001 \001(\0132&.flyteidl.core"
-  ".NodeExecutionIdentifier\"q\n\034NodeExecutio"
-  "nGetDataResponse\022\'\n\006inputs\030\001 \001(\0132\027.flyte"
-  "idl.admin.UrlBlob\022(\n\007outputs\030\002 \001(\0132\027.fly"
-  "teidl.admin.UrlBlobB3Z1github.com/lyft/f"
-  "lyteidl/gen/pb-go/flyteidl/adminb\006proto3"
+  "l.admin.NodeExecutionMetaData\"\027\n\025NodeExe"
+  "cutionMetaData\"Z\n\021NodeExecutionList\0226\n\017n"
+  "ode_executions\030\001 \003(\0132\035.flyteidl.admin.No"
+  "deExecution\022\r\n\005token\030\002 \001(\t\"\270\003\n\024NodeExecu"
+  "tionClosure\022\024\n\noutput_uri\030\001 \001(\tH\000\022.\n\005err"
+  "or\030\002 \001(\0132\035.flyteidl.core.ExecutionErrorH"
+  "\000\0221\n\005phase\030\003 \001(\0162\".flyteidl.core.NodeExe"
+  "cution.Phase\022.\n\nstarted_at\030\004 \001(\0132\032.googl"
+  "e.protobuf.Timestamp\022+\n\010duration\030\005 \001(\0132\031"
+  ".google.protobuf.Duration\022.\n\ncreated_at\030"
+  "\006 \001(\0132\032.google.protobuf.Timestamp\022.\n\nupd"
+  "ated_at\030\007 \001(\0132\032.google.protobuf.Timestam"
+  "p\022F\n\026workflow_node_metadata\030\010 \001(\0132$.flyt"
+  "eidl.admin.WorkflowNodeMetadataH\001B\017\n\rout"
+  "put_resultB\021\n\017target_metadata\"W\n\024Workflo"
+  "wNodeMetadata\022\?\n\013executionId\030\001 \001(\0132*.fly"
+  "teidl.core.WorkflowExecutionIdentifier\"Q"
+  "\n\033NodeExecutionGetDataRequest\0222\n\002id\030\001 \001("
+  "\0132&.flyteidl.core.NodeExecutionIdentifie"
+  "r\"q\n\034NodeExecutionGetDataResponse\022\'\n\006inp"
+  "uts\030\001 \001(\0132\027.flyteidl.admin.UrlBlob\022(\n\007ou"
+  "tputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB3Z1"
+  "github.com/lyft/flyteidl/gen/pb-go/flyte"
+  "idl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto,
-  "flyteidl/admin/node_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 1800,
+  "flyteidl/admin/node_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 1777,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fnode_5fexecution_2eproto() {
@@ -2362,7 +2361,6 @@ class NodeExecutionMetaData::HasBitSetters {
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int NodeExecutionMetaData::kInterruptibleFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 NodeExecutionMetaData::NodeExecutionMetaData()
@@ -2374,12 +2372,10 @@ NodeExecutionMetaData::NodeExecutionMetaData(const NodeExecutionMetaData& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  interruptible_ = from.interruptible_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.NodeExecutionMetaData)
 }
 
 void NodeExecutionMetaData::SharedCtor() {
-  interruptible_ = false;
 }
 
 NodeExecutionMetaData::~NodeExecutionMetaData() {
@@ -2405,7 +2401,6 @@ void NodeExecutionMetaData::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  interruptible_ = false;
   _internal_metadata_.Clear();
 }
 
@@ -2422,15 +2417,7 @@ const char* NodeExecutionMetaData::_InternalParse(const char* begin, const char*
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // bool interruptible = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
-        msg->set_interruptible(::google::protobuf::internal::ReadVarint(&ptr));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
       default: {
-      handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
           ctx->EndGroup(tag);
           return ptr;
@@ -2455,30 +2442,12 @@ bool NodeExecutionMetaData::MergePartialFromCodedStream(
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // bool interruptible = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, &interruptible_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
+  handle_unusual:
+    if (tag == 0) {
+      goto success;
     }
+    DO_(::google::protobuf::internal::WireFormat::SkipField(
+          input, tag, _internal_metadata_.mutable_unknown_fields()));
   }
 success:
   // @@protoc_insertion_point(parse_success:flyteidl.admin.NodeExecutionMetaData)
@@ -2496,11 +2465,6 @@ void NodeExecutionMetaData::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // bool interruptible = 1;
-  if (this->interruptible() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->interruptible(), output);
-  }
-
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -2513,11 +2477,6 @@ void NodeExecutionMetaData::SerializeWithCachedSizes(
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.NodeExecutionMetaData)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
-
-  // bool interruptible = 1;
-  if (this->interruptible() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->interruptible(), target);
-  }
 
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
@@ -2539,11 +2498,6 @@ size_t NodeExecutionMetaData::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
-
-  // bool interruptible = 1;
-  if (this->interruptible() != 0) {
-    total_size += 1 + 1;
-  }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
@@ -2572,9 +2526,6 @@ void NodeExecutionMetaData::MergeFrom(const NodeExecutionMetaData& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.interruptible() != 0) {
-    set_interruptible(from.interruptible());
-  }
 }
 
 void NodeExecutionMetaData::CopyFrom(const ::google::protobuf::Message& from) {
@@ -2602,7 +2553,6 @@ void NodeExecutionMetaData::Swap(NodeExecutionMetaData* other) {
 void NodeExecutionMetaData::InternalSwap(NodeExecutionMetaData* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(interruptible_, other->interruptible_);
 }
 
 ::google::protobuf::Metadata NodeExecutionMetaData::GetMetadata() const {

@@ -226,7 +226,7 @@ Class | Method | HTTP request | Description
  - [CoreVoid](docs/CoreVoid.md)
  - [CoreWorkflowExecutionIdentifier](docs/CoreWorkflowExecutionIdentifier.md)
  - [CoreWorkflowExecutionPhase](docs/CoreWorkflowExecutionPhase.md)
- - [CoreWorkflowMetadata](docs/CoreWorkflowMetadata.md)
+ - [CoreWorkflowMetadataDefaults](docs/CoreWorkflowMetadataDefaults.md)
  - [CoreWorkflowNode](docs/CoreWorkflowNode.md)
  - [CoreWorkflowTemplate](docs/CoreWorkflowTemplate.md)
  - [EventNodeExecutionEvent](docs/EventNodeExecutionEvent.md)

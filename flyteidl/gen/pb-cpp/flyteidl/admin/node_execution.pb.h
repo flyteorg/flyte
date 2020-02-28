@@ -790,18 +790,11 @@ class NodeExecutionMetaData final :
 
   // accessors -------------------------------------------------------
 
-  // bool interruptible = 1;
-  void clear_interruptible();
-  static const int kInterruptibleFieldNumber = 1;
-  bool interruptible() const;
-  void set_interruptible(bool value);
-
   // @@protoc_insertion_point(class_scope:flyteidl.admin.NodeExecutionMetaData)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  bool interruptible_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fnode_5fexecution_2eproto;
 };
@@ -2206,20 +2199,6 @@ inline void NodeExecution::set_allocated_metadata(::flyteidl::admin::NodeExecuti
 // -------------------------------------------------------------------
 
 // NodeExecutionMetaData
-
-// bool interruptible = 1;
-inline void NodeExecutionMetaData::clear_interruptible() {
-  interruptible_ = false;
-}
-inline bool NodeExecutionMetaData::interruptible() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionMetaData.interruptible)
-  return interruptible_;
-}
-inline void NodeExecutionMetaData::set_interruptible(bool value) {
-  
-  interruptible_ = value;
-  // @@protoc_insertion_point(field_set:flyteidl.admin.NodeExecutionMetaData.interruptible)
-}
 
 // -------------------------------------------------------------------
 

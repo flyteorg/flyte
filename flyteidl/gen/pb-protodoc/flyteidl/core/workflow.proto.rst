@@ -182,7 +182,8 @@ Defines extra information about the Node.
   {
     "name": "...",
     "timeout": "{...}",
-    "retries": "{...}"
+    "retries": "{...}",
+    "interruptible": "..."
   }
 
 .. _api_field_flyteidl.core.NodeMetadata.name:
@@ -203,6 +204,13 @@ retries
   (:ref:`flyteidl.core.RetryStrategy <api_msg_flyteidl.core.RetryStrategy>`) Number of retries per task.
   
   
+.. _api_field_flyteidl.core.NodeMetadata.interruptible:
+
+interruptible
+  (`bool <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  Identify whether node is interruptible
+  
+  
 
 
 .. _api_msg_flyteidl.core.Alias:
@@ -210,7 +218,7 @@ retries
 flyteidl.core.Alias
 -------------------
 
-`[flyteidl.core.Alias proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L78>`_
+`[flyteidl.core.Alias proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L83>`_
 
 Links a variable to an alias.
 
@@ -240,7 +248,7 @@ alias
 flyteidl.core.Node
 ------------------
 
-`[flyteidl.core.Node proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L88>`_
+`[flyteidl.core.Node proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L93>`_
 
 A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch
 node.
@@ -326,21 +334,29 @@ branch_node
   
 
 
-.. _api_msg_flyteidl.core.WorkflowMetadata:
+.. _api_msg_flyteidl.core.WorkflowMetadataDefaults:
 
-flyteidl.core.WorkflowMetadata
-------------------------------
+flyteidl.core.WorkflowMetadataDefaults
+--------------------------------------
 
-`[flyteidl.core.WorkflowMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L125>`_
+`[flyteidl.core.WorkflowMetadataDefaults proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L129>`_
 
-Metadata for the entire workflow.
-To be used in the future.
+Default Workflow Metadata for the entire workflow.
 
 .. code-block:: json
 
-  {}
+  {
+    "interruptible": "..."
+  }
 
+.. _api_field_flyteidl.core.WorkflowMetadataDefaults.interruptible:
 
+interruptible
+  (`bool <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Identify whether workflow is interruptible.
+  The value set at the workflow level will be the defualt value used for nodes
+  unless explicitly set at the node level.
+  
+  
 
 
 .. _api_msg_flyteidl.core.WorkflowTemplate:
@@ -348,7 +364,7 @@ To be used in the future.
 flyteidl.core.WorkflowTemplate
 ------------------------------
 
-`[flyteidl.core.WorkflowTemplate proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L130>`_
+`[flyteidl.core.WorkflowTemplate proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L138>`_
 
 Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,
 directed acyclic graph.
@@ -357,7 +373,7 @@ directed acyclic graph.
 
   {
     "id": "{...}",
-    "metadata": "{...}",
+    "metadata_defaults": "{...}",
     "interface": "{...}",
     "nodes": [],
     "outputs": [],
@@ -370,10 +386,10 @@ id
   (:ref:`flyteidl.core.Identifier <api_msg_flyteidl.core.Identifier>`) A globally unique identifier for the workflow.
   
   
-.. _api_field_flyteidl.core.WorkflowTemplate.metadata:
+.. _api_field_flyteidl.core.WorkflowTemplate.metadata_defaults:
 
-metadata
-  (:ref:`flyteidl.core.WorkflowMetadata <api_msg_flyteidl.core.WorkflowMetadata>`) Extra metadata about the workflow.
+metadata_defaults
+  (:ref:`flyteidl.core.WorkflowMetadataDefaults <api_msg_flyteidl.core.WorkflowMetadataDefaults>`) Extra metadata about the workflow.
   
   
 .. _api_field_flyteidl.core.WorkflowTemplate.interface:

@@ -35,21 +35,24 @@ class CoreNodeMetadata(object):
     swagger_types = {
         'name': 'str',
         'timeout': 'str',
-        'retries': 'CoreRetryStrategy'
+        'retries': 'CoreRetryStrategy',
+        'interruptible': 'bool'
     }
 
     attribute_map = {
         'name': 'name',
         'timeout': 'timeout',
-        'retries': 'retries'
+        'retries': 'retries',
+        'interruptible': 'interruptible'
     }
 
-    def __init__(self, name=None, timeout=None, retries=None):  # noqa: E501
+    def __init__(self, name=None, timeout=None, retries=None, interruptible=None):  # noqa: E501
         """CoreNodeMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._name = None
         self._timeout = None
         self._retries = None
+        self._interruptible = None
         self.discriminator = None
 
         if name is not None:
@@ -58,6 +61,8 @@ class CoreNodeMetadata(object):
             self.timeout = timeout
         if retries is not None:
             self.retries = retries
+        if interruptible is not None:
+            self.interruptible = interruptible
 
     @property
     def name(self):
@@ -125,6 +130,27 @@ class CoreNodeMetadata(object):
         """
 
         self._retries = retries
+
+    @property
+    def interruptible(self):
+        """Gets the interruptible of this CoreNodeMetadata.  # noqa: E501
+
+
+        :return: The interruptible of this CoreNodeMetadata.  # noqa: E501
+        :rtype: bool
+        """
+        return self._interruptible
+
+    @interruptible.setter
+    def interruptible(self, interruptible):
+        """Sets the interruptible of this CoreNodeMetadata.
+
+
+        :param interruptible: The interruptible of this CoreNodeMetadata.  # noqa: E501
+        :type: bool
+        """
+
+        self._interruptible = interruptible
 
     def to_dict(self):
         """Returns the model properties as a dict"""

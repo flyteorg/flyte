@@ -187,8 +187,6 @@ message ExecutionMetadata {
     // In the case of a relaunch, this references the original workflow execution.
     core.WorkflowExecutionIdentifier reference_execution = 16;
 
-    // Identify whether execution is interruptible
-    bool interruptible = 7;
 }
 
 message NotificationList {

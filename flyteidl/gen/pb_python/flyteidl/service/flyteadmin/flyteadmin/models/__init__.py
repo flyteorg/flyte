@@ -170,7 +170,7 @@ from flyteadmin.models.core_variable_map import CoreVariableMap
 from flyteadmin.models.core_void import CoreVoid
 from flyteadmin.models.core_workflow_execution_identifier import CoreWorkflowExecutionIdentifier
 from flyteadmin.models.core_workflow_execution_phase import CoreWorkflowExecutionPhase
-from flyteadmin.models.core_workflow_metadata import CoreWorkflowMetadata
+from flyteadmin.models.core_workflow_metadata_defaults import CoreWorkflowMetadataDefaults
 from flyteadmin.models.core_workflow_node import CoreWorkflowNode
 from flyteadmin.models.core_workflow_template import CoreWorkflowTemplate
 from flyteadmin.models.event_node_execution_event import EventNodeExecutionEvent

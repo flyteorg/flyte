@@ -20,7 +20,7 @@ from flyteadmin.models.core_binding import CoreBinding  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_node import CoreNode  # noqa: F401,E501
 from flyteadmin.models.core_typed_interface import CoreTypedInterface  # noqa: F401,E501
-from flyteadmin.models.core_workflow_metadata import CoreWorkflowMetadata  # noqa: F401,E501
+from flyteadmin.models.core_workflow_metadata_defaults import CoreWorkflowMetadataDefaults  # noqa: F401,E501
 
 
 class CoreWorkflowTemplate(object):
@@ -38,7 +38,7 @@ class CoreWorkflowTemplate(object):
     """
     swagger_types = {
         'id': 'CoreIdentifier',
-        'metadata': 'CoreWorkflowMetadata',
+        'metadata_defaults': 'CoreWorkflowMetadataDefaults',
         'interface': 'CoreTypedInterface',
         'nodes': 'list[CoreNode]',
         'outputs': 'list[CoreBinding]',
@@ -47,18 +47,18 @@ class CoreWorkflowTemplate(object):
 
     attribute_map = {
         'id': 'id',
-        'metadata': 'metadata',
+        'metadata_defaults': 'metadata_defaults',
         'interface': 'interface',
         'nodes': 'nodes',
         'outputs': 'outputs',
         'failure_node': 'failure_node'
     }
 
-    def __init__(self, id=None, metadata=None, interface=None, nodes=None, outputs=None, failure_node=None):  # noqa: E501
+    def __init__(self, id=None, metadata_defaults=None, interface=None, nodes=None, outputs=None, failure_node=None):  # noqa: E501
         """CoreWorkflowTemplate - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
-        self._metadata = None
+        self._metadata_defaults = None
         self._interface = None
         self._nodes = None
         self._outputs = None
@@ -67,8 +67,8 @@ class CoreWorkflowTemplate(object):
 
         if id is not None:
             self.id = id
-        if metadata is not None:
-            self.metadata = metadata
+        if metadata_defaults is not None:
+            self.metadata_defaults = metadata_defaults
         if interface is not None:
             self.interface = interface
         if nodes is not None:
@@ -102,27 +102,27 @@ class CoreWorkflowTemplate(object):
         self._id = id
 
     @property
-    def metadata(self):
-        """Gets the metadata of this CoreWorkflowTemplate.  # noqa: E501
+    def metadata_defaults(self):
+        """Gets the metadata_defaults of this CoreWorkflowTemplate.  # noqa: E501
 
         Extra metadata about the workflow.  # noqa: E501
 
-        :return: The metadata of this CoreWorkflowTemplate.  # noqa: E501
-        :rtype: CoreWorkflowMetadata
+        :return: The metadata_defaults of this CoreWorkflowTemplate.  # noqa: E501
+        :rtype: CoreWorkflowMetadataDefaults
         """
-        return self._metadata
+        return self._metadata_defaults
 
-    @metadata.setter
-    def metadata(self, metadata):
-        """Sets the metadata of this CoreWorkflowTemplate.
+    @metadata_defaults.setter
+    def metadata_defaults(self, metadata_defaults):
+        """Sets the metadata_defaults of this CoreWorkflowTemplate.
 
         Extra metadata about the workflow.  # noqa: E501
 
-        :param metadata: The metadata of this CoreWorkflowTemplate.  # noqa: E501
-        :type: CoreWorkflowMetadata
+        :param metadata_defaults: The metadata_defaults of this CoreWorkflowTemplate.  # noqa: E501
+        :type: CoreWorkflowMetadataDefaults
         """
 
-        self._metadata = metadata
+        self._metadata_defaults = metadata_defaults
 
     @property
     def interface(self):
