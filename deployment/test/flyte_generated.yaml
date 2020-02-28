@@ -519,9 +519,10 @@ data:
         enabled-plugins:
           - container
           - sidecar
+          - k8s-array
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-4tfk9mf458
+  name: flyte-propeller-config-hd7h56fg47
   namespace: flyte
 ---
 apiVersion: v1
@@ -782,7 +783,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-4tfk9mf458
+          name: flyte-propeller-config-hd7h56fg47
         name: config-volume
       - configMap:
           name: flyte-plugin-config-b525btf774
