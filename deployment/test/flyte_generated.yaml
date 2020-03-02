@@ -196,6 +196,7 @@ rules:
   - flyteworkflows
   - namespaces
   - pods
+  - resourcequotas
   - roles
   - rolebindings
   - secrets
