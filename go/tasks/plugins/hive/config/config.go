@@ -29,6 +29,8 @@ type ClusterConfig struct {
 	PrimaryLabel string   `json:"primaryLabel" pflag:",The primary label of a given service cluster"`
 	Labels       []string `json:"labels" pflag:",Labels of a given service cluster"`
 	Limit        int      `json:"limit" pflag:",Resource quota (in the number of outstanding requests) of the service cluster"`
+	ProjectScopeQuotaProportionCap float64 `json:"projectScopeQuotaProportionCap" pflag:",A floating point number between 0 and 1, specifying the maximum proportion of quotas allowed to allocate to a project in the service cluster"`
+	NamespaceScopeQuotaProportionCap float64 `json:"namespaceScopeQuotaProportionCap" pflag:",A floating point number between 0 and 1, specifying the maximum proportion of quotas allowed to allocate to a namespace in the service cluster"`
 }
 
 type DestinationClusterConfig struct {
@@ -45,7 +47,7 @@ var (
 		TokenKey:                  "FLYTE_QUBOLE_CLIENT_TOKEN",
 		LruCacheSize:              2000,
 		Workers:                   15,
-		ClusterConfigs:            []ClusterConfig{{PrimaryLabel: "default", Labels: []string{"default"}, Limit: 250}},
+		ClusterConfigs:            []ClusterConfig{{PrimaryLabel: "default", Labels: []string{"default"}, Limit: 100, ProjectScopeQuotaProportionCap:0.7, NamespaceScopeQuotaProportionCap:0.7}},
 		DestinationClusterConfigs: []DestinationClusterConfig{},
 	}
 
@@ -54,14 +56,14 @@ var (
 
 // Qubole plugin configs
 type Config struct {
-	Endpoint                  config.URL                 `json:"endpoint" pflag:",Endpoint for qubole to use"`
-	CommandAPIPath            config.URL                 `json:"commandApiPath" pflag:",API Path where commands can be launched on Qubole. Should be a valid url."`
-	AnalyzeLinkPath           config.URL                 `json:"analyzeLinkPath" pflag:",URL path where queries can be visualized on qubole website. Should be a valid url."`
-	TokenKey                  string                     `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
-	LruCacheSize              int                        `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
-	Workers                   int                        `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
-	ClusterConfigs            []ClusterConfig            `json:"clusterConfigs" pflag:"-,A list of cluster configs. Each of the configs corresponds to a service cluster"`
-	DestinationClusterConfigs []DestinationClusterConfig `json:"destinationClusterConfigs" pflag:"-,A list configs specifying the destination service cluster for (project, domain)"`
+	Endpoint                    config.URL                 `json:"endpoint" pflag:",Endpoint for qubole to use"`
+	CommandAPIPath              config.URL                 `json:"commandApiPath" pflag:",API Path where commands can be launched on Qubole. Should be a valid url."`
+	AnalyzeLinkPath             config.URL                 `json:"analyzeLinkPath" pflag:",URL path where queries can be visualized on qubole website. Should be a valid url."`
+	TokenKey                    string                     `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
+	LruCacheSize                int                        `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
+	Workers                     int                        `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
+	ClusterConfigs              []ClusterConfig            `json:"clusterConfigs" pflag:"-,A list of cluster configs. Each of the configs corresponds to a service cluster"`
+	DestinationClusterConfigs   []DestinationClusterConfig `json:"destinationClusterConfigs" pflag:"-,A list configs specifying the destination service cluster for (project, domain)"`
 }
 
 // Retrieves the current config value or default.
