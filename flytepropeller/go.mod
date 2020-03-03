@@ -20,7 +20,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/lyft/datacatalog v0.2.1
-	github.com/lyft/flyteidl v0.17.6
+	github.com/lyft/flyteidl v0.17.7
 	github.com/lyft/flyteplugins v0.3.9
 	//github.com/lyft/flyteplugins v0.3.4-0.20200218200451-1ce137d446ba
 	github.com/lyft/flytestdlib v0.3.2
