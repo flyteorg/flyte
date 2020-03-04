@@ -175,7 +175,8 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 
 	if sparkJob.MainApplicationFile != "" {
 		j.Spec.MainApplicationFile = &sparkJob.MainApplicationFile
-	} else if sparkJob.MainClass != "" {
+	}
+	if sparkJob.MainClass != "" {
 		j.Spec.MainClass = &sparkJob.MainClass
 	}
 
