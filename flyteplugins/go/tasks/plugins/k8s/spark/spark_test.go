@@ -27,6 +27,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const sparkMainClass = "MainClass"
 const sparkApplicationFile = "local:///spark_app.py"
 const testImage = "image://"
 const sparkUIAddress = "spark-ui.flyte"
@@ -176,6 +177,7 @@ func dummySparkApplication(state sj.ApplicationStateType) *sj.SparkApplication {
 func dummySparkCustomObj() *plugins.SparkJob {
 	sparkJob := plugins.SparkJob{}
 
+	sparkJob.MainClass = sparkMainClass
 	sparkJob.MainApplicationFile = sparkApplicationFile
 	sparkJob.SparkConf = dummySparkConf
 	sparkJob.ApplicationType = plugins.SparkApplication_PYTHON
@@ -266,6 +268,7 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.NotNil(t, resource)
 	sparkApp, ok := resource.(*sj.SparkApplication)
 	assert.True(t, ok)
+	assert.Equal(t, sparkMainClass, *sparkApp.Spec.MainClass)
 	assert.Equal(t, sparkApplicationFile, *sparkApp.Spec.MainApplicationFile)
 	assert.Equal(t, sj.PythonApplicationType, sparkApp.Spec.Type)
 	assert.Equal(t, testArgs, sparkApp.Spec.Arguments)
