@@ -113,7 +113,7 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 	case *core.Node_BranchNode:
 		iface, _ = validateBranchInterface(w, node, errs.NewScope())
 	default:
-		errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Target"))
+		errs.Collect(errors.NewValueRequiredErr(node.GetId(), "TargetedPrefixString"))
 	}
 
 	if iface != nil {

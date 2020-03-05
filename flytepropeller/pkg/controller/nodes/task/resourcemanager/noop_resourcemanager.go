@@ -26,7 +26,7 @@ func (r *NoopResourceManagerBuilder) RegisterResourceQuota(ctx context.Context, 
 	return nil
 }
 
-func (r *NoopResourceManagerBuilder) BuildResourceManager(ctx context.Context) (pluginCore.ResourceManager, error) {
+func (r *NoopResourceManagerBuilder) BuildResourceManager(ctx context.Context) (BaseResourceManager, error) {
 	return &NoopResourceManager{}, nil
 }
 
@@ -37,12 +37,12 @@ func (*NoopResourceManager) GetID() string {
 	return NoopResourceManagerID
 }
 
-func (*NoopResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) (
+func (*NoopResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token, constraints []FullyQualifiedResourceConstraint) (
 	pluginCore.AllocationStatus, error) {
 
 	return pluginCore.AllocationStatusGranted, nil
 }
 
-func (*NoopResourceManager) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) error {
+func (*NoopResourceManager) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token) error {
 	return nil
 }
