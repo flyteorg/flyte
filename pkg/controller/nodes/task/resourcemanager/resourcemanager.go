@@ -19,8 +19,8 @@ const execUrnSeparator = ":"
 const tokenNamespaceSeparator = "-"
 
 // appending the actual token string to the prefix using '-' separator
-func (t TokenPrefix) append(tokenWithoutPrefix string) Token {
-	return Token(fmt.Sprintf("%s%s%s", t, tokenNamespaceSeparator, tokenWithoutPrefix))
+func (t Token) prepend(prefix TokenPrefix) Token {
+	return Token(fmt.Sprintf("%s%s%s", prefix, tokenNamespaceSeparator, t))
 }
 
 // extending the prefix using ':' separator
@@ -46,7 +46,7 @@ func ComposeTokenPrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
 
 // This struct is designed to serve as the identifier of an user of resource manager
 type Resource struct {
-	quota          int
+	quota          BaseResourceConstraint
 	metrics        Metrics
 	rejectedTokens sync.Map
 }
@@ -73,13 +73,13 @@ type Proxy struct {
 	ExecutionIdentifier     *core.TaskExecutionIdentifier
 }
 
-func (p Proxy) ComposeResourceConstraint(spec pluginCore.ResourceConstraintsSpec) []ComposedResourceConstraint {
-	composedResourceConstraintList := make([]ComposedResourceConstraint, 0)
+func (p Proxy) ComposeResourceConstraint(spec pluginCore.ResourceConstraintsSpec) []FullyQualifiedResourceConstraint {
+	composedResourceConstraintList := make([]FullyQualifiedResourceConstraint, 0)
 	if spec.ProjectScopeResourceConstraint != nil {
-		composedResourceConstraintList = append(composedResourceConstraintList, composeProjectScopeResourceConstraint(spec, p.ExecutionIdentifier))
+		composedResourceConstraintList = append(composedResourceConstraintList, composeFullyQualifiedProjectScopeResourceConstraint(spec, p.ExecutionIdentifier))
 	}
 	if spec.NamespaceScopeResourceConstraint != nil {
-		composedResourceConstraintList = append(composedResourceConstraintList, composeNamespaceScopeResourceConstraint(spec, p.ExecutionIdentifier))
+		composedResourceConstraintList = append(composedResourceConstraintList, composeFullyQualifiedNamespaceScopeResourceConstraint(spec, p.ExecutionIdentifier))
 	}
 	return composedResourceConstraintList
 }
@@ -89,7 +89,7 @@ func (p Proxy) AllocateResource(ctx context.Context, namespace pluginCore.Resour
 	composedResourceConstraintList := p.ComposeResourceConstraint(constraintsSpec)
 	status, err := p.BaseResourceManager.AllocateResource(ctx,
 		p.ResourceNamespacePrefix.CreateSubNamespace(namespace),
-		string(ComposeTokenPrefix(p.ExecutionIdentifier).append(allocationToken)),
+		Token(allocationToken).prepend(ComposeTokenPrefix(p.ExecutionIdentifier)),
 		composedResourceConstraintList)
 	return status, err
 }
@@ -98,7 +98,7 @@ func (p Proxy) ReleaseResource(ctx context.Context, namespace pluginCore.Resourc
 	allocationToken string) error {
 	err := p.BaseResourceManager.ReleaseResource(ctx,
 		p.ResourceNamespacePrefix.CreateSubNamespace(namespace),
-		string(ComposeTokenPrefix(p.ExecutionIdentifier).append(allocationToken)))
+		Token(allocationToken).prepend(ComposeTokenPrefix(p.ExecutionIdentifier)))
 	return err
 }
 
@@ -124,6 +124,6 @@ func (p ResourceRegistrarProxy) RegisterResourceQuota(ctx context.Context, names
 
 type BaseResourceManager interface {
 	GetID() string
-	AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string, constraints []ComposedResourceConstraint) (pluginCore.AllocationStatus, error)
-	ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) error
+	AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token, constraints []FullyQualifiedResourceConstraint) (pluginCore.AllocationStatus, error)
+	ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token) error
 }

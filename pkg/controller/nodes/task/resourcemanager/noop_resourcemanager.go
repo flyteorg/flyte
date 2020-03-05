@@ -37,12 +37,12 @@ func (*NoopResourceManager) GetID() string {
 	return NoopResourceManagerID
 }
 
-func (*NoopResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string, constraints []ComposedResourceConstraint) (
+func (*NoopResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token, constraints []FullyQualifiedResourceConstraint) (
 	pluginCore.AllocationStatus, error) {
 
 	return pluginCore.AllocationStatusGranted, nil
 }
 
-func (*NoopResourceManager) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) error {
+func (*NoopResourceManager) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token) error {
 	return nil
 }
