@@ -64,7 +64,7 @@ func getValidMetricScopeName(name string) string {
 	return strings.Replace(name, "-", "_", -1)
 }
 
-func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) (pluginCore.ResourceManager, error) {
+func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) (BaseResourceManager, error) {
 	if r.client == nil || r.MetricsScope == nil || r.namespacedResourcesQuotaMap == nil {
 		return nil, errors.Errorf("Failed to build a redis resource manager. Missing key property(s)")
 	}
@@ -81,9 +81,8 @@ func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) 
 		// `namespace` is always prefixed with the RedisSetKeyPrefix and the plugin ID. Each plugin can then affix additional sub-namespaces to it to create different resource pools.
 		// For example, hive qubole plugin's namespaces contain plugin ID and qubole cluster (e.g., "redisresourcemanager:qubole-hive-executor:default-cluster").
 		metrics := NewRedisResourceManagerMetrics(r.MetricsScope.NewSubScope(getValidMetricScopeName(string(namespace))))
-
 		rm.namespacedResourcesMap[namespace] = &Resource{
-			quota:          quota,
+			quota:          BaseResourceConstraint{Value: int64(quota)},
 			metrics:        metrics,
 			rejectedTokens: sync.Map{},
 		}
@@ -107,14 +106,6 @@ type RedisResourceManager struct {
 	client                 RedisClient
 	MetricsScope           promutils.Scope
 	namespacedResourcesMap map[pluginCore.ResourceNamespace]*Resource
-}
-
-func GetTaskResourceManager(r pluginCore.ResourceManager, resourceNamespacePrefix pluginCore.ResourceNamespace, allocationTokenPrefix TokenPrefix) pluginCore.ResourceManager {
-	return Proxy{
-		ResourceManager:         r,
-		ResourceNamespacePrefix: resourceNamespacePrefix,
-		TokenPrefix:             allocationTokenPrefix,
-	}
 }
 
 type RedisResourceManagerMetrics struct {
@@ -142,7 +133,7 @@ func (r *RedisResourceManager) pollRedis(ctx context.Context, namespace pluginCo
 	}
 	stopWatch := resource.metrics.(*RedisResourceManagerMetrics).RedisSizeCheckTime.Start()
 	defer stopWatch.Stop()
-	size, err := r.client.SCard(string(namespace)).Result()
+	size, err := r.client.SCard(string(namespace))
 	if err != nil {
 		logger.Errorf(ctx, "Error getting size of Redis set in metrics poller %v", err)
 		return
@@ -184,16 +175,52 @@ func (r *RedisResourceManager) GetID() string {
 	return RedisSetKeyPrefix
 }
 
-func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) (
-	pluginCore.AllocationStatus, error) {
+func (r *RedisResourceManager) checkAgainstOneConstraint(_ context.Context, allAllocated []string,
+	constraint FullyQualifiedResourceConstraint) bool {
+	var count int64 = 0
+	for _, allocated := range allAllocated {
+		if strings.HasPrefix(allocated, constraint.TargetedPrefixString) {
+			count++
+		}
+		if !constraint.IsAllowed(count) {
+			return false
+		}
+	}
+	return true
+}
 
+func (r *RedisResourceManager) checkAgainstConstraints(ctx context.Context, client RedisClient, resource pluginCore.ResourceNamespace,
+	constraints []FullyQualifiedResourceConstraint) (allowed bool, violatedConstraintIndex int, err error) {
+	// An empty slice means there's no constraints
+	if len(constraints) == 0 {
+		return true, -1, nil
+	}
+
+	allAllocated, err := client.SMembers(string(resource))
+	if err != nil {
+		logger.Errorf(ctx, "Error occurred when getting the list of allocated tokens from Redis: %v", err)
+		return false, -1, err
+	}
+	for idx, c := range constraints {
+		ok := r.checkAgainstOneConstraint(ctx, allAllocated, c)
+		if !ok {
+			return ok, idx, nil
+		}
+	}
+	return true, -1, nil
+}
+
+func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token,
+	composedResourceConstraintList []FullyQualifiedResourceConstraint) (
+
+	pluginCore.AllocationStatus, error) {
 	namespacedResource, err := r.getResource(namespace)
 	if err != nil {
 		logger.Errorf(ctx, "Error finding resource [%v] during allocation", namespace)
 		return pluginCore.AllocationUndefined, err
 	}
 	// Check to see if the allocation token is already in the set
-	found, err := r.client.SIsMember(string(namespace), allocationToken).Result()
+	found, err := r.client.SIsMember(string(namespace), allocationToken)
 	if err != nil {
 		logger.Errorf(ctx, "Error getting size of Redis set %v", err)
 		return pluginCore.AllocationUndefined, err
@@ -203,19 +230,36 @@ func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace p
 		return pluginCore.AllocationStatusGranted, nil
 	}
 
-	size, err := r.client.SCard(string(namespace)).Result()
+	size, err := r.client.SCard(string(namespace))
 	if err != nil {
 		logger.Errorf(ctx, "Error getting size of Redis set %v", err)
 		return pluginCore.AllocationUndefined, err
 	}
 
-	if size > int64(namespacedResource.quota) {
+	if !namespacedResource.quota.IsAllowed(size) {
 		logger.Infof(ctx, "Too many allocations (total [%d]), rejecting [%s:%s]", size, namespace, allocationToken)
 		namespacedResource.rejectedTokens.Store(allocationToken, struct{}{})
 		return pluginCore.AllocationStatusExhausted, nil
 	}
 
-	countAdded, err := r.client.SAdd(string(namespace), allocationToken).Result()
+	ok, violatedConstraintIdx, err := r.checkAgainstConstraints(ctx, r.client, namespace, composedResourceConstraintList)
+	if err != nil {
+		logger.Errorf(ctx, "Error occurred when checking against constraints for resource [%v]: %v", namespace, err)
+		return pluginCore.AllocationUndefined, err
+	}
+
+	// Checking the number of allocation of a namespace against the namespace's quota cap
+	// if the cap <= 0, it means no cap is enforced; otherwise, the cap will be enforced
+	// Note that, due to race condition there might be cases where the allocated count is > cap. This is OK.
+	if !ok {
+		logger.Infof(ctx, "Too many allocations for resource [%v], scope [%v] ([%d of %d] allocated), rejecting token [%s:%s]",
+			namespace, composedResourceConstraintList[violatedConstraintIdx].TargetedPrefixString,
+			composedResourceConstraintList[violatedConstraintIdx].Value, allocationToken)
+		namespacedResource.rejectedTokens.Store(allocationToken, struct{}{})
+		return pluginCore.AllocationStatusExhausted, nil
+	}
+
+	countAdded, err := r.client.SAdd(string(namespace), allocationToken)
 	if err != nil {
 		logger.Errorf(ctx, "Error adding token [%s:%s] %v", namespace, allocationToken, err)
 		return pluginCore.AllocationUndefined, err
@@ -227,8 +271,8 @@ func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace p
 	return pluginCore.AllocationStatusGranted, err
 }
 
-func (r *RedisResourceManager) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) error {
-	countRemoved, err := r.client.SRem(string(namespace), allocationToken).Result()
+func (r *RedisResourceManager) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token) error {
+	countRemoved, err := r.client.SRem(string(namespace), allocationToken)
 	if err != nil {
 		logger.Errorf(ctx, "Error removing token [%v:%s] %v", namespace, allocationToken, err)
 		return err
