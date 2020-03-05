@@ -681,6 +681,38 @@ func (_m *ExecutableNodeStatus) GetStoppedAt() *v1.Time {
 	return r0
 }
 
+type ExecutableNodeStatus_GetSystemFailures struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_GetSystemFailures) Return(_a0 uint32) *ExecutableNodeStatus_GetSystemFailures {
+	return &ExecutableNodeStatus_GetSystemFailures{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnGetSystemFailures() *ExecutableNodeStatus_GetSystemFailures {
+	c := _m.On("GetSystemFailures")
+	return &ExecutableNodeStatus_GetSystemFailures{Call: c}
+}
+
+func (_m *ExecutableNodeStatus) OnGetSystemFailuresMatch(matchers ...interface{}) *ExecutableNodeStatus_GetSystemFailures {
+	c := _m.On("GetSystemFailures", matchers...)
+	return &ExecutableNodeStatus_GetSystemFailures{Call: c}
+}
+
+// GetSystemFailures provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetSystemFailures() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type ExecutableNodeStatus_GetTaskNodeStatus struct {
 	*mock.Call
 }
@@ -837,6 +869,38 @@ func (_m *ExecutableNodeStatus) OnIncrementAttemptsMatch(matchers ...interface{}
 
 // IncrementAttempts provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) IncrementAttempts() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
+type ExecutableNodeStatus_IncrementSystemFailures struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_IncrementSystemFailures) Return(_a0 uint32) *ExecutableNodeStatus_IncrementSystemFailures {
+	return &ExecutableNodeStatus_IncrementSystemFailures{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnIncrementSystemFailures() *ExecutableNodeStatus_IncrementSystemFailures {
+	c := _m.On("IncrementSystemFailures")
+	return &ExecutableNodeStatus_IncrementSystemFailures{Call: c}
+}
+
+func (_m *ExecutableNodeStatus) OnIncrementSystemFailuresMatch(matchers ...interface{}) *ExecutableNodeStatus_IncrementSystemFailures {
+	c := _m.On("IncrementSystemFailures", matchers...)
+	return &ExecutableNodeStatus_IncrementSystemFailures{Call: c}
+}
+
+// IncrementSystemFailures provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) IncrementSystemFailures() uint32 {
 	ret := _m.Called()
 
 	var r0 uint32

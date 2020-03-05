@@ -218,6 +218,7 @@ type MutableNodeStatus interface {
 	SetParentTaskID(t *core.TaskExecutionIdentifier)
 	UpdatePhase(phase NodePhase, occurredAt metav1.Time, reason string)
 	IncrementAttempts() uint32
+	IncrementSystemFailures() uint32
 	SetCached()
 	ResetDirty()
 
@@ -254,6 +255,7 @@ type ExecutableNodeStatus interface {
 	GetOutputDir() DataReference
 	GetMessage() string
 	GetAttempts() uint32
+	GetSystemFailures() uint32
 	GetWorkflowNodeStatus() ExecutableWorkflowNodeStatus
 	GetTaskNodeStatus() ExecutableTaskNodeStatus
 
