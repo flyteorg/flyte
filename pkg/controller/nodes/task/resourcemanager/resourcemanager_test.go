@@ -1,8 +1,9 @@
 package resourcemanager
 
 import (
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"testing"
+
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestComposeTokenPrefix(t *testing.T) {
