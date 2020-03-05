@@ -18,12 +18,13 @@ const execUrnPrefix = "ex"
 const execUrnSeparator = ":"
 const tokenNamespaceSeparator = "-"
 
-// appending the actual token string to the prefix using '-' separator
+// Prepending the prefix to the actual token string using '-' separator.
+// The output is of type Token
 func (t Token) prepend(prefix TokenPrefix) Token {
 	return Token(fmt.Sprintf("%s%s%s", prefix, tokenNamespaceSeparator, t))
 }
 
-// extending the prefix using ':' separator
+// Extending the prefix using ':' separator. The output is still of type TokenPrefix
 func (t TokenPrefix) extend(prefixPart string) TokenPrefix {
 	return TokenPrefix(fmt.Sprintf("%s%s%s", t, execUrnSeparator, prefixPart))
 }
