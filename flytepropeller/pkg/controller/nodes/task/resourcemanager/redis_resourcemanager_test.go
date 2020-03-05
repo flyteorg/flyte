@@ -19,12 +19,12 @@ func createMockNamespacedResourcesMap(mScope promutils.Scope) map[core.ResourceN
 	mockMetric2 := NewRedisResourceManagerMetrics(mockScope2)
 	mockNamespacedResourcesMap := map[core.ResourceNamespace]*Resource{
 		core.ResourceNamespace("test-resource1"): &Resource{
-			quota:          3,
+			quota:          BaseResourceConstraint{Value: 3},
 			metrics:        mockMetric1,
 			rejectedTokens: sync.Map{},
 		},
 		core.ResourceNamespace("test-resource2"): &Resource{
-			quota:          4,
+			quota:          BaseResourceConstraint{Value: 4},
 			metrics:        mockMetric2,
 			rejectedTokens: sync.Map{},
 		},
@@ -32,8 +32,8 @@ func createMockNamespacedResourcesMap(mScope promutils.Scope) map[core.ResourceN
 	return mockNamespacedResourcesMap
 }
 
-func createMockComposedResourceConstraintList() []ComposedResourceConstraint {
-	return []ComposedResourceConstraint{
+func createMockComposedResourceConstraintList() []FullyQualifiedResourceConstraint {
+	return []FullyQualifiedResourceConstraint{
 		{
 			TargetedPrefixString: "ns1",
 			Value:                1,
@@ -63,7 +63,7 @@ func TestRedisResourceManager_AllocateResource(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, core.AllocationStatusExhausted, ns1Got)
 
-		ns2Got, err := r.AllocateResource(mockContext, "test-resource1", "ns2-token1", []ComposedResourceConstraint{})
+		ns2Got, err := r.AllocateResource(mockContext, "test-resource1", "ns2-token1", []FullyQualifiedResourceConstraint{})
 		assert.Nil(t, err)
 		assert.Equal(t, core.AllocationStatusGranted, ns2Got)
 	})
@@ -82,7 +82,7 @@ func TestRedisResourceManager_AllocateResource(t *testing.T) {
 		mockRedisClient.OnSMembers("test-resource2").Return(allocatedTokens, nil)
 		mockRedisClient.OnSCard("test-resource2").Return(int64(len(allocatedTokens)), nil)
 		mockRedisClient.OnSAdd(mock.Anything, mock.Anything).Return(0, nil)
-		got, err := r.AllocateResource(mockContext, "test-resource2", "ns1-token4", []ComposedResourceConstraint{})
+		got, err := r.AllocateResource(mockContext, "test-resource2", "ns1-token4", []FullyQualifiedResourceConstraint{})
 		assert.Nil(t, err)
 		assert.Equal(t, core.AllocationStatusGranted, got)
 	})

@@ -82,7 +82,7 @@ func (r *RedisResourceManagerBuilder) BuildResourceManager(ctx context.Context) 
 		// For example, hive qubole plugin's namespaces contain plugin ID and qubole cluster (e.g., "redisresourcemanager:qubole-hive-executor:default-cluster").
 		metrics := NewRedisResourceManagerMetrics(r.MetricsScope.NewSubScope(getValidMetricScopeName(string(namespace))))
 		rm.namespacedResourcesMap[namespace] = &Resource{
-			quota:          quota,
+			quota:          BaseResourceConstraint{Value: int64(quota)},
 			metrics:        metrics,
 			rejectedTokens: sync.Map{},
 		}
@@ -176,13 +176,13 @@ func (r *RedisResourceManager) GetID() string {
 }
 
 func (r *RedisResourceManager) checkAgainstOneConstraint(_ context.Context, allAllocated []string,
-	constraint ComposedResourceConstraint) bool {
+	constraint FullyQualifiedResourceConstraint) bool {
 	var count int64 = 0
 	for _, allocated := range allAllocated {
-		if does := strings.HasPrefix(allocated, constraint.TargetedPrefixString); does {
+		if strings.HasPrefix(allocated, constraint.TargetedPrefixString) {
 			count++
 		}
-		if count >= constraint.Value {
+		if !constraint.IsAllowed(count) {
 			return false
 		}
 	}
@@ -190,7 +190,7 @@ func (r *RedisResourceManager) checkAgainstOneConstraint(_ context.Context, allA
 }
 
 func (r *RedisResourceManager) checkAgainstConstraints(ctx context.Context, client RedisClient, resource pluginCore.ResourceNamespace,
-	constraints []ComposedResourceConstraint) (bool, int, error) {
+	constraints []FullyQualifiedResourceConstraint) (allowed bool, violatedConstraintIndex int, err error) {
 	// An empty slice means there's no constraints
 	if len(constraints) == 0 {
 		return true, -1, nil
@@ -210,8 +210,8 @@ func (r *RedisResourceManager) checkAgainstConstraints(ctx context.Context, clie
 	return true, -1, nil
 }
 
-func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string,
-	composedResourceConstraintList []ComposedResourceConstraint) (
+func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token,
+	composedResourceConstraintList []FullyQualifiedResourceConstraint) (
 
 	pluginCore.AllocationStatus, error) {
 	namespacedResource, err := r.getResource(namespace)
@@ -236,7 +236,7 @@ func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace p
 		return pluginCore.AllocationUndefined, err
 	}
 
-	if size >= int64(namespacedResource.quota) {
+	if !namespacedResource.quota.IsAllowed(size) {
 		logger.Infof(ctx, "Too many allocations (total [%d]), rejecting [%s:%s]", size, namespace, allocationToken)
 		namespacedResource.rejectedTokens.Store(allocationToken, struct{}{})
 		return pluginCore.AllocationStatusExhausted, nil
@@ -271,7 +271,7 @@ func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace p
 	return pluginCore.AllocationStatusGranted, err
 }
 
-func (r *RedisResourceManager) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken string) error {
+func (r *RedisResourceManager) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token) error {
 	countRemoved, err := r.client.SRem(string(namespace), allocationToken)
 	if err != nil {
 		logger.Errorf(ctx, "Error removing token [%v:%s] %v", namespace, allocationToken, err)
