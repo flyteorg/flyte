@@ -347,6 +347,38 @@ func (_m *MutableNodeStatus) IncrementAttempts() uint32 {
 	return r0
 }
 
+type MutableNodeStatus_IncrementSystemFailures struct {
+	*mock.Call
+}
+
+func (_m MutableNodeStatus_IncrementSystemFailures) Return(_a0 uint32) *MutableNodeStatus_IncrementSystemFailures {
+	return &MutableNodeStatus_IncrementSystemFailures{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MutableNodeStatus) OnIncrementSystemFailures() *MutableNodeStatus_IncrementSystemFailures {
+	c := _m.On("IncrementSystemFailures")
+	return &MutableNodeStatus_IncrementSystemFailures{Call: c}
+}
+
+func (_m *MutableNodeStatus) OnIncrementSystemFailuresMatch(matchers ...interface{}) *MutableNodeStatus_IncrementSystemFailures {
+	c := _m.On("IncrementSystemFailures", matchers...)
+	return &MutableNodeStatus_IncrementSystemFailures{Call: c}
+}
+
+// IncrementSystemFailures provides a mock function with given fields:
+func (_m *MutableNodeStatus) IncrementSystemFailures() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type MutableNodeStatus_IsDirty struct {
 	*mock.Call
 }

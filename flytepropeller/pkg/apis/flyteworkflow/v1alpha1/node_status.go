@@ -159,6 +159,7 @@ type NodeStatus struct {
 	DataDir              DataReference `json:"-"`
 	OutputDir            DataReference `json:"-"`
 	Attempts             uint32        `json:"attempts"`
+	SystemFailures       uint32        `json:"systemFailures,omitempty"`
 	Cached               bool          `json:"cached"`
 
 	// This is useful only for branch nodes. If this is set, then it can be used to determine if execution can proceed
@@ -289,6 +290,10 @@ func (in *NodeStatus) GetAttempts() uint32 {
 	return in.Attempts
 }
 
+func (in *NodeStatus) GetSystemFailures() uint32 {
+	return in.SystemFailures
+}
+
 func (in *NodeStatus) SetCached() {
 	in.Cached = true
 	in.SetDirty()
@@ -302,6 +307,12 @@ func (in *NodeStatus) IncrementAttempts() uint32 {
 	in.Attempts++
 	in.SetDirty()
 	return in.Attempts
+}
+
+func (in *NodeStatus) IncrementSystemFailures() uint32 {
+	in.SystemFailures++
+	in.SetDirty()
+	return in.SystemFailures
 }
 
 func (in *NodeStatus) GetOrCreateDynamicNodeStatus() MutableDynamicNodeStatus {
@@ -556,6 +567,10 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 	}
 
 	if in.Attempts != other.Attempts {
+		return false
+	}
+
+	if in.SystemFailures != other.SystemFailures {
 		return false
 	}
 

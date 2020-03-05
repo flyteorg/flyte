@@ -37,10 +37,13 @@ var (
 			RenewDeadline: config.Duration{Duration: time.Second * 10},
 			RetryPeriod:   config.Duration{Duration: time.Second * 2},
 		},
-		DefaultDeadlines: DefaultDeadlines{
-			DefaultNodeExecutionDeadline:  config.Duration{Duration: time.Hour * 48},
-			DefaultNodeActiveDeadline:     config.Duration{Duration: time.Hour * 48},
-			DefaultWorkflowActiveDeadline: config.Duration{Duration: time.Hour * 72},
+		NodeConfig: NodeConfig{
+			DefaultDeadlines: DefaultDeadlines{
+				DefaultNodeExecutionDeadline:  config.Duration{Duration: time.Hour * 48},
+				DefaultNodeActiveDeadline:     config.Duration{Duration: time.Hour * 48},
+				DefaultWorkflowActiveDeadline: config.Duration{Duration: time.Hour * 72},
+			},
+			MaxNodeRetriesForSystemFailures: 3,
 		},
 	}
 )
@@ -67,7 +70,7 @@ type Config struct {
 	PublishK8sEvents    bool                 `json:"publish-k8s-events" pflag:",Enable events publishing to K8s events API."`
 	MaxDatasetSizeBytes int64                `json:"max-output-size-bytes" pflag:",Maximum size of outputs per task"`
 	KubeConfig          KubeClientConfig     `json:"kube-client-config" pflag:",Configuration to control the Kubernetes client"`
-	DefaultDeadlines    DefaultDeadlines     `json:"default-deadlines,omitempty" pflag:",Default value for timeouts"`
+	NodeConfig          NodeConfig           `json:"node-config,omitempty" pflag:",config for a workflow node"`
 }
 
 type KubeClientConfig struct {
@@ -113,6 +116,12 @@ type WorkqueueConfig struct {
 	MaxDelay  config.Duration `json:"max-delay" pflag:",Max backoff delay for failure"`
 	Rate      int64           `json:"rate" pflag:",Bucket Refill rate per second"`
 	Capacity  int             `json:"capacity" pflag:",Bucket capacity as number of items"`
+}
+
+// configuration for a node
+type NodeConfig struct {
+	DefaultDeadlines                DefaultDeadlines `json:"default-deadlines,omitempty" pflag:",Default value for timeouts"`
+	MaxNodeRetriesForSystemFailures uint32           `json:"max-node-retries-system-failures" pflag:"2,Maximum number of retries per node for node failure due to infra issues"`
 }
 
 // Contains default values for timeouts
