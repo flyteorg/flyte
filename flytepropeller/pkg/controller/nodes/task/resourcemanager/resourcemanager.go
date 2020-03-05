@@ -38,7 +38,7 @@ func composeNamespaceScopePrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
 }
 
 func composeExecutionScopePrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
-	return composeNamespaceScopePrefix(id).extend(id.GetNodeExecutionId().GetExecutionId().GetProject())
+	return composeNamespaceScopePrefix(id).extend(id.GetNodeExecutionId().GetExecutionId().GetName())
 }
 
 func ComposeTokenPrefix(id *core.TaskExecutionIdentifier) TokenPrefix {
