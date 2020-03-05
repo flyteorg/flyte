@@ -220,7 +220,7 @@ func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace p
 		return pluginCore.AllocationUndefined, err
 	}
 	// Check to see if the allocation token is already in the set
-	found, err := r.client.SIsMember(string(namespace), allocationToken)
+	found, err := r.client.SIsMember(string(namespace), string(allocationToken))
 	if err != nil {
 		logger.Errorf(ctx, "Error getting size of Redis set %v", err)
 		return pluginCore.AllocationUndefined, err
@@ -259,7 +259,7 @@ func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace p
 		return pluginCore.AllocationStatusExhausted, nil
 	}
 
-	countAdded, err := r.client.SAdd(string(namespace), allocationToken)
+	countAdded, err := r.client.SAdd(string(namespace), string(allocationToken))
 	if err != nil {
 		logger.Errorf(ctx, "Error adding token [%s:%s] %v", namespace, allocationToken, err)
 		return pluginCore.AllocationUndefined, err
@@ -272,7 +272,7 @@ func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace p
 }
 
 func (r *RedisResourceManager) ReleaseResource(ctx context.Context, namespace pluginCore.ResourceNamespace, allocationToken Token) error {
-	countRemoved, err := r.client.SRem(string(namespace), allocationToken)
+	countRemoved, err := r.client.SRem(string(namespace), string(allocationToken))
 	if err != nil {
 		logger.Errorf(ctx, "Error removing token [%v:%s] %v", namespace, allocationToken, err)
 		return err
