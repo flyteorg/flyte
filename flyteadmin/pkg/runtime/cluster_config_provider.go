@@ -17,11 +17,13 @@ var clusterConfig = config.MustRegisterSection(clustersKey, &interfaces.Clusters
 // Implementation of an interfaces.ClusterConfiguration
 type ClusterConfigurationProvider struct{}
 
-func (p *ClusterConfigurationProvider) GetClusterSelectionStrategy() interfaces.ClusterSelectionStrategy {
+func (p *ClusterConfigurationProvider) GetLabelClusterMap() map[string][]interfaces.ClusterEntity {
 	if clusterConfig != nil {
-		return clusterConfig.GetConfig().(*interfaces.Clusters).ClusterSelection
+		clusters := clusterConfig.GetConfig().(*interfaces.Clusters)
+		return clusters.LabelClusterMap
 	}
-	return interfaces.ClusterSelectionRandom
+	logger.Warningf(context.Background(), "Failed to find clusters in config. Returning an empty slice")
+	return make(map[string][]interfaces.ClusterEntity)
 }
 
 func (p *ClusterConfigurationProvider) GetClusterConfigs() []interfaces.ClusterConfig {

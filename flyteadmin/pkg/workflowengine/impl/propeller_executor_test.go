@@ -114,7 +114,7 @@ func (b *FakeK8FlyteClient) FlyteworkflowV1alpha1() v1alpha12.FlyteworkflowV1alp
 
 func getFakeExecutionCluster() interfaces2.ClusterInterface {
 	fakeCluster := cluster_mock.MockCluster{}
-	fakeCluster.SetGetTargetCallback(func(spec *executioncluster.ExecutionTargetSpec) (target *executioncluster.ExecutionTarget, e error) {
+	fakeCluster.SetGetTargetCallback(func(ctx context.Context, spec *executioncluster.ExecutionTargetSpec) (target *executioncluster.ExecutionTarget, e error) {
 		return &executioncluster.ExecutionTarget{
 			ID:          "C1",
 			FlyteClient: &FakeK8FlyteClient{},
@@ -130,8 +130,8 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 		Domain:  "d",
 		Name:    "n",
 	}
-	cluster.SetGetTargetCallback(func(spec *executioncluster.ExecutionTargetSpec) (target *executioncluster.ExecutionTarget, e error) {
-		assert.Equal(t, execID, *spec.ExecutionID)
+	cluster.SetGetTargetCallback(func(ctx context.Context, spec *executioncluster.ExecutionTargetSpec) (target *executioncluster.ExecutionTarget, e error) {
+		assert.Equal(t, execID.Name, spec.ExecutionID)
 		return &executioncluster.ExecutionTarget{
 			ID:          "C1",
 			FlyteClient: &FakeK8FlyteClient{},
@@ -172,6 +172,9 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 				},
 				Spec: &admin.LaunchPlanSpec{
 					Role: "role-1",
+					WorkflowId: &core.Identifier{
+						Name: "wf",
+					},
 				},
 			},
 			AcceptedAt: acceptedAt,
@@ -224,6 +227,9 @@ func TestExecuteWorkflowCallFailed(t *testing.T) {
 				},
 				Spec: &admin.LaunchPlanSpec{
 					Role: "role-1",
+					WorkflowId: &core.Identifier{
+						Name: "wf",
+					},
 				},
 			},
 			AcceptedAt: acceptedAt,
@@ -273,6 +279,9 @@ func TestExecuteWorkflowAlreadyExistsNoError(t *testing.T) {
 				},
 				Spec: &admin.LaunchPlanSpec{
 					Role: "role-1",
+					WorkflowId: &core.Identifier{
+						Name: "wf",
+					},
 				},
 			},
 			AcceptedAt: acceptedAt,
@@ -359,6 +368,11 @@ func TestExecuteWorkflowRoleKeyNotRequired(t *testing.T) {
 					Project: "p",
 					Domain:  "d",
 				},
+				Spec: &admin.LaunchPlanSpec{
+					WorkflowId: &core.Identifier{
+						Name: "wf",
+					},
+				},
 			},
 			AcceptedAt: acceptedAt,
 		})
@@ -368,7 +382,7 @@ func TestExecuteWorkflowRoleKeyNotRequired(t *testing.T) {
 
 func TestTerminateExecution(t *testing.T) {
 	cluster := getFakeExecutionCluster()
-	target, err := cluster.GetTarget(nil)
+	target, err := cluster.GetTarget(context.Background(), nil)
 	assert.Nil(t, err)
 	target.ID = "C2"
 	builder := FlyteWorkflowBuilderTest{}

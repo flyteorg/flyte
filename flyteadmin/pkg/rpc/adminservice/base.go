@@ -80,7 +80,8 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		adminScope.NewSubScope("executor").NewSubScope("cluster"),
 		kubeConfig,
 		master,
-		configuration)
+		configuration,
+		db)
 	workflowExecutor := workflowengine.NewFlytePropeller(
 		applicationConfiguration.RoleNameKey,
 		execCluster,

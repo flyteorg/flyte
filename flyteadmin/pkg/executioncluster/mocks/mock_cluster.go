@@ -1,8 +1,12 @@
 package mocks
 
-import "github.com/lyft/flyteadmin/pkg/executioncluster"
+import (
+	"context"
 
-type GetTargetFunc func(*executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error)
+	"github.com/lyft/flyteadmin/pkg/executioncluster"
+)
+
+type GetTargetFunc func(context.Context, *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error)
 type GetAllValidTargetsFunc func() []executioncluster.ExecutionTarget
 
 type MockCluster struct {
@@ -18,9 +22,9 @@ func (m *MockCluster) SetGetAllValidTargetsCallback(getAllValidTargetsFunc GetAl
 	m.getAllValidTargetsFunc = getAllValidTargetsFunc
 }
 
-func (m *MockCluster) GetTarget(execCluster *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error) {
+func (m *MockCluster) GetTarget(ctx context.Context, execCluster *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error) {
 	if m.getTargetFunc != nil {
-		return m.getTargetFunc(execCluster)
+		return m.getTargetFunc(ctx, execCluster)
 	}
 	return nil, nil
 }

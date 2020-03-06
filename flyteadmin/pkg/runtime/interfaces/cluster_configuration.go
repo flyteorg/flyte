@@ -8,12 +8,10 @@ import (
 
 // Holds details about a cluster used for workflow execution.
 type ClusterConfig struct {
-	Name           string   `json:"name"`
-	Endpoint       string   `json:"endpoint"`
-	Auth           Auth     `json:"auth"`
-	Enabled        bool     `json:"enabled"`
-	Weight         float32  `json:"weight"`
-	AllowedDomains []string `json:"allowedDomains"`
+	Name     string `json:"name"`
+	Endpoint string `json:"endpoint"`
+	Auth     Auth   `json:"auth"`
+	Enabled  bool   `json:"enabled"`
 }
 
 type Auth struct {
@@ -22,11 +20,10 @@ type Auth struct {
 	CertPath  string `json:"certPath"`
 }
 
-type ClusterSelectionStrategy string
-
-var (
-	ClusterSelectionRandom ClusterSelectionStrategy
-)
+type ClusterEntity struct {
+	ID     string  `json:"id"`
+	Weight float32 `json:"weight"`
+}
 
 func (auth Auth) GetCA() ([]byte, error) {
 	cert, err := ioutil.ReadFile(auth.CertPath)
@@ -45,8 +42,8 @@ func (auth Auth) GetToken() (string, error) {
 }
 
 type Clusters struct {
-	ClusterConfigs   []ClusterConfig          `json:"clusterConfigs"`
-	ClusterSelection ClusterSelectionStrategy `json:"clusterSelectionStrategy"`
+	ClusterConfigs  []ClusterConfig            `json:"clusterConfigs"`
+	LabelClusterMap map[string][]ClusterEntity `json:"labelClusterMap"`
 }
 
 // Provides values set in runtime configuration files.
@@ -55,6 +52,6 @@ type ClusterConfiguration interface {
 	// Returns clusters defined in runtime configuration files.
 	GetClusterConfigs() []ClusterConfig
 
-	// The cluster selection strategy setting
-	GetClusterSelectionStrategy() ClusterSelectionStrategy
+	// Returns label cluster map for routing
+	GetLabelClusterMap() map[string][]ClusterEntity
 }

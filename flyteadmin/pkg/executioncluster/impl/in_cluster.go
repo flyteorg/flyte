@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/lyft/flyteadmin/pkg/executioncluster"
@@ -15,7 +16,7 @@ type InCluster struct {
 	target executioncluster.ExecutionTarget
 }
 
-func (i InCluster) GetTarget(spec *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error) {
+func (i InCluster) GetTarget(ctx context.Context, spec *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error) {
 	if spec != nil && spec.TargetID != "" {
 		return nil, errors.New(fmt.Sprintf("remote target %s is not supported", spec.TargetID))
 	}
