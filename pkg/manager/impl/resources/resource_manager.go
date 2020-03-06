@@ -78,12 +78,12 @@ func (m *ResourceManager) GetWorkflowAttributes(
 	if err := validation.ValidateWorkflowAttributesGetRequest(request); err != nil {
 		return nil, err
 	}
-	projectAttributesModel, err := m.db.ResourceRepo().Get(
+	workflowAttributesModel, err := m.db.ResourceRepo().Get(
 		ctx, repo_interface.ResourceID{Project: request.Project, Domain: request.Domain, Workflow: request.Workflow, ResourceType: request.ResourceType.String()})
 	if err != nil {
 		return nil, err
 	}
-	workflowAttributes, err := transformers.FromResourceModelToWorkflowAttributes(projectAttributesModel)
+	workflowAttributes, err := transformers.FromResourceModelToWorkflowAttributes(workflowAttributesModel)
 	if err != nil {
 		return nil, err
 	}

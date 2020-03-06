@@ -8,14 +8,9 @@ import (
 
 // Interface for managing project, domain and workflow -specific attributes.
 type ResourceInterface interface {
+	ListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) (
+		*admin.ListMatchableAttributesResponse, error)
 	GetResource(ctx context.Context, request ResourceRequest) (*ResourceResponse, error)
-
-	UpdateWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesUpdateRequest) (
-		*admin.WorkflowAttributesUpdateResponse, error)
-	GetWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesGetRequest) (
-		*admin.WorkflowAttributesGetResponse, error)
-	DeleteWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesDeleteRequest) (
-		*admin.WorkflowAttributesDeleteResponse, error)
 
 	UpdateProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (
 		*admin.ProjectDomainAttributesUpdateResponse, error)
@@ -24,8 +19,12 @@ type ResourceInterface interface {
 	DeleteProjectDomainAttributes(ctx context.Context, request admin.ProjectDomainAttributesDeleteRequest) (
 		*admin.ProjectDomainAttributesDeleteResponse, error)
 
-	ListAll(ctx context.Context, request admin.ListMatchableAttributesRequest) (
-		*admin.ListMatchableAttributesResponse, error)
+	UpdateWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesUpdateRequest) (
+		*admin.WorkflowAttributesUpdateResponse, error)
+	GetWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesGetRequest) (
+		*admin.WorkflowAttributesGetResponse, error)
+	DeleteWorkflowAttributes(ctx context.Context, request admin.WorkflowAttributesDeleteRequest) (
+		*admin.WorkflowAttributesDeleteResponse, error)
 }
 
 // TODO we can move this to flyteidl, once we are exposing an endpoint

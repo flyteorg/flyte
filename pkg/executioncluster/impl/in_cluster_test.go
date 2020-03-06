@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"context"
 	"testing"
 
 	"github.com/lyft/flyteadmin/pkg/executioncluster"
@@ -14,7 +15,7 @@ func TestInClusterGetTarget(t *testing.T) {
 			ID: "t1",
 		},
 	}
-	target, err := cluster.GetTarget(nil)
+	target, err := cluster.GetTarget(context.Background(), nil)
 	assert.Nil(t, err)
 	assert.Equal(t, "t1", target.ID)
 }
@@ -23,7 +24,7 @@ func TestInClusterGetRemoteTarget(t *testing.T) {
 	cluster := InCluster{
 		target: executioncluster.ExecutionTarget{},
 	}
-	_, err := cluster.GetTarget(&executioncluster.ExecutionTargetSpec{TargetID: "t1"})
+	_, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{TargetID: "t1"})
 	assert.EqualError(t, err, "remote target t1 is not supported")
 }
 

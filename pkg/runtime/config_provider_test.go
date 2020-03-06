@@ -7,8 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-
 	"path/filepath"
 
 	"github.com/lyft/flytestdlib/config"
@@ -35,7 +33,6 @@ func TestClusterConfig(t *testing.T) {
 
 	configProvider := NewConfigurationProvider()
 	clusterConfig := configProvider.ClusterConfiguration()
-	assert.Equal(t, interfaces.ClusterSelectionRandom, clusterConfig.GetClusterSelectionStrategy())
 	clusters := clusterConfig.GetClusterConfigs()
 	assert.Equal(t, 2, len(clusters))
 

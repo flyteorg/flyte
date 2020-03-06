@@ -56,7 +56,8 @@ var controllerRunCmd = &cobra.Command{
 			scope.NewSubScope("cluster"),
 			cfg.KubeConfig,
 			cfg.Master,
-			configuration)
+			configuration,
+			db)
 
 		clusterResourceController := clusterresource.NewClusterResourceController(db, executionCluster, scope)
 		clusterResourceController.Run()
@@ -88,7 +89,8 @@ var controllerSyncCmd = &cobra.Command{
 			scope.NewSubScope("cluster"),
 			cfg.KubeConfig,
 			cfg.Master,
-			configuration)
+			configuration,
+			db)
 
 		clusterResourceController := clusterresource.NewClusterResourceController(db, executionCluster, scope)
 		err := clusterResourceController.Sync(ctx)
