@@ -709,9 +709,10 @@ data:
           - container
           - sidecar
           - spark
+          - k8s-array
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-55gc695955
+  name: flyte-propeller-config-5dd2784gbb
   namespace: flyte
 ---
 apiVersion: v1
@@ -1168,7 +1169,7 @@ spec:
           name: flyte-spark-config-h72bmtggc2
         name: spark-config-volume
       - configMap:
-          name: flyte-propeller-config-55gc695955
+          name: flyte-propeller-config-5dd2784gbb
         name: config-volume
       - configMap:
           name: flyte-plugin-config-b525btf774

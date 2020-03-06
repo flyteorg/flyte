@@ -64,3 +64,4 @@ tasks:
       - container
       - sidecar
       - spark
+      - k8s-array
