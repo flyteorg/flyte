@@ -252,7 +252,7 @@ func (r *RedisResourceManager) AllocateResource(ctx context.Context, namespace p
 	// if the cap <= 0, it means no cap is enforced; otherwise, the cap will be enforced
 	// Note that, due to race condition there might be cases where the allocated count is > cap. This is OK.
 	if !ok {
-		logger.Infof(ctx, "Too many allocations for resource [%v], scope [%v] ([%d of %d] allocated), rejecting token [%s:%s]",
+		logger.Infof(ctx, "Too many allocations for resource [%v], scope [%v] (max allocation: [%d]), rejecting token [%s]",
 			namespace, composedResourceConstraintList[violatedConstraintIdx].TargetedPrefixString,
 			composedResourceConstraintList[violatedConstraintIdx].Value, allocationToken)
 		namespacedResource.rejectedTokens.Store(allocationToken, struct{}{})
