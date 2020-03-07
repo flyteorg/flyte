@@ -136,7 +136,7 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("default-cpus", testValue)
 			if vString, err := cmdFlags.GetString("default-cpus"); err == nil {
-				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vString), &actual.DefaultCpuRequest)
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vString), &actual.DefaultCPURequest)
 
 			} else {
 				assert.FailNow(t, err.Error())

@@ -19,7 +19,7 @@ type taskPluginRegistry struct {
 // A singleton variable that maintains a registry of all plugins. The framework uses this to access all plugins
 var pluginRegistry = &taskPluginRegistry{}
 
-func PluginRegistry() *taskPluginRegistry {
+func PluginRegistry() TaskPluginRegistry {
 	return pluginRegistry
 }
 
@@ -75,4 +75,11 @@ func (p *taskPluginRegistry) GetK8sPlugins() []k8s.PluginEntry {
 	p.m.Lock()
 	defer p.m.Unlock()
 	return append(p.k8sPlugin[:0:0], p.k8sPlugin...)
+}
+
+type TaskPluginRegistry interface {
+	RegisterK8sPlugin(info k8s.PluginEntry)
+	RegisterCorePlugin(info core.PluginEntry)
+	GetCorePlugins() []core.PluginEntry
+	GetK8sPlugins() []k8s.PluginEntry
 }

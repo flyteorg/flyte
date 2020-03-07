@@ -180,9 +180,9 @@ func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 	return pluginsCore.PhaseInfoSuccess(&info), nil
 }
 
-func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
-	code = "UnknownError"
-	message = "Container/Pod failed. No message received from kubernetes."
+func ConvertPodFailureToError(status v1.PodStatus) (string, string) {
+	code := "UnknownError"
+	message := "Container/Pod failed. No message received from kubernetes."
 	if len(status.Reason) > 0 {
 		code = status.Reason
 	}
@@ -210,7 +210,7 @@ func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
 				containerState.Terminated.Message)
 		}
 	}
-	return
+	return code, message
 }
 
 func GetLastTransitionOccurredAt(pod *v1.Pod) v12.Time {

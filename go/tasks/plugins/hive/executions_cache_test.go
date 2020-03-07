@@ -37,7 +37,7 @@ func TestQuboleHiveExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		}
 		cacheItem := ExecutionStateCacheItem{
 			ExecutionState: state,
-			Id:             "some-id",
+			Identifier:     "some-id",
 		}
 
 		iw := &cacheMocks.ItemWrapper{}
@@ -67,15 +67,15 @@ func TestQuboleHiveExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		}
 
 		state := ExecutionState{
-			CommandId: "123456",
+			CommandID: "123456",
 			Phase:     PhaseSubmitted,
 		}
 		cacheItem := ExecutionStateCacheItem{
 			ExecutionState: state,
-			Id:             "some-id",
+			Identifier:     "some-id",
 		}
 		mockQubole.OnGetCommandStatusMatch(mock.Anything, mock.MatchedBy(func(commandId string) bool {
-			return commandId == state.CommandId
+			return commandId == state.CommandID
 		}), mock.Anything).Return(client.QuboleStatusDone, nil)
 
 		iw := &cacheMocks.ItemWrapper{}

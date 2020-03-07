@@ -240,7 +240,7 @@ func jobPhaseToPluginsPhase(jobStatus string) pluginCore.Phase {
 	case batch.JobStatusSucceeded:
 		return pluginCore.PhaseSuccess
 	case batch.JobStatusFailed:
-		// Retryable failure vs Permanent can be overriden if the task writes an errors.pb in the output prefix.
+		// Retryable failure vs Permanent can be overridden if the task writes an errors.pb in the output prefix.
 		return pluginCore.PhaseRetryableFailure
 	}
 

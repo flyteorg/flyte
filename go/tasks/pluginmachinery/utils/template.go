@@ -9,6 +9,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/logger"
 	"github.com/pkg/errors"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
@@ -140,6 +141,7 @@ func serializeLiteral(ctx context.Context, l *core.Literal) (string, error) {
 	case *core.Literal_Scalar:
 		return serializeLiteralScalar(o.Scalar)
 	default:
+		logger.Debugf(ctx, "received unexpected primitive type")
 		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(l.Value))
 	}
 }

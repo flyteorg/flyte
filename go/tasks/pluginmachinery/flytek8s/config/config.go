@@ -9,7 +9,7 @@ import (
 //go:generate pflags K8sPluginConfig
 
 const k8sPluginConfigSectionKey = "k8s"
-const defaultCpuRequest = "1000m"
+const defaultCPURequest = "1000m"
 const defaultMemoryRequest = "1024Mi"
 
 var (
@@ -19,8 +19,8 @@ var (
 		},
 	}
 
-	// Top level k8s plugin config section. If you are a plugin developer writing a k8s plugin,
-	// register your config section as a subsection to this.
+	// K8sPluginConfigSection provides a singular top level config section for all plugins.
+	// If you are a plugin developer writing a k8s plugin, register your config section as a subsection to this.
 	K8sPluginConfigSection = config.MustRegisterSubSection(k8sPluginConfigSectionKey, &defaultK8sConfig)
 )
 
@@ -40,7 +40,7 @@ type K8sPluginConfig struct {
 	// Currently we support simple resource based tolerations only
 	ResourceTolerations map[v1.ResourceName][]v1.Toleration `json:"resource-tolerations"  pflag:"-,Default tolerations to be applied for resource of type 'key'"`
 	// default cpu requests for a container
-	DefaultCpuRequest string `json:"default-cpus" pflag:",Defines a default value for cpu for containers if not specified."`
+	DefaultCPURequest string `json:"default-cpus" pflag:",Defines a default value for cpu for containers if not specified."`
 	// default memory requests for a container
 	DefaultMemoryRequest string `json:"default-memory" pflag:",Defines a default value for memory for containers if not specified."`
 }
@@ -51,8 +51,8 @@ func GetK8sPluginConfig() *K8sPluginConfig {
 	if pluginsConfig.DefaultMemoryRequest == "" {
 		pluginsConfig.DefaultMemoryRequest = defaultMemoryRequest
 	}
-	if pluginsConfig.DefaultCpuRequest == "" {
-		pluginsConfig.DefaultCpuRequest = defaultCpuRequest
+	if pluginsConfig.DefaultCPURequest == "" {
+		pluginsConfig.DefaultCPURequest = defaultCPURequest
 	}
 	return pluginsConfig
 }

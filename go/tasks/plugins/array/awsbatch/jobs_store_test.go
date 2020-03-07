@@ -174,7 +174,7 @@ func BenchmarkStore_Get(b *testing.B) {
 	s := newJobsStoreWithSize(b, nil, b.N)
 	assert.NotNil(b, s)
 	createName := func(i int) string {
-		return fmt.Sprintf("Id%v", i)
+		return fmt.Sprintf("Identifier%v", i)
 	}
 
 	for i := 0; i < n; i++ {

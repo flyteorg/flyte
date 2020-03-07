@@ -39,7 +39,7 @@ func (t Transition) String() string {
 	return fmt.Sprintf("%s,%s", t.ttype, t.info)
 }
 
-// Unknown/Undefined transition. To be returned when an error is observed
+// UnknownTransition is synonymous to UndefinedTransition. To be returned when an error is observed
 var UnknownTransition = Transition{TransitionTypeEphemeral, PhaseInfoUndefined}
 
 // Creates and returns a new Transition based on the PhaseInfo.Phase

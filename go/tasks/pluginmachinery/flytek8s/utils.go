@@ -12,5 +12,3 @@ func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
 	}
 	return envVars
 }
-
-

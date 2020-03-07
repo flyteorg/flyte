@@ -2,6 +2,7 @@ package hive
 
 import (
 	"context"
+
 	"github.com/lyft/flytestdlib/cache"
 
 	"github.com/lyft/flyteplugins/go/tasks/errors"
@@ -14,7 +15,7 @@ import (
 )
 
 // This is the name of this plugin effectively. In Flyte plugin configuration, use this string to enable this plugin.
-const quboleHiveExecutorId = "qubole-hive-executor"
+const quboleHiveExecutorID = "qubole-hive-executor"
 
 // Version of the custom state this plugin stores.  Useful for backwards compatibility if you one day need to update
 // the structure of the stored state
@@ -147,7 +148,7 @@ func NewQuboleHiveExecutor(ctx context.Context, cfg *config.Config, quboleClient
 	}
 
 	return QuboleHiveExecutor{
-		id:              quboleHiveExecutorId,
+		id:              quboleHiveExecutorID,
 		cfg:             cfg,
 		metrics:         getQuboleHiveExecutorMetrics(scope),
 		quboleClient:    quboleClient,
@@ -158,7 +159,7 @@ func NewQuboleHiveExecutor(ctx context.Context, cfg *config.Config, quboleClient
 func init() {
 	pluginMachinery.PluginRegistry().RegisterCorePlugin(
 		core.PluginEntry{
-			ID:                  quboleHiveExecutorId,
+			ID:                  quboleHiveExecutorID,
 			RegisteredTaskTypes: []core.TaskType{hiveTaskType},
 			LoadPlugin:          QuboleHiveExecutorLoader,
 			IsDefault:           false,

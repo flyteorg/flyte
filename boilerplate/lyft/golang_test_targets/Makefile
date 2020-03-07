@@ -26,7 +26,8 @@ mod_download: #download dependencies (including test deps) for the package
 install: download_tooling mod_download
 
 .PHONY: show
-show: go list -m all
+show:
+	go list -m all
 
 .PHONY: test_unit
 test_unit:

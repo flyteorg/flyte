@@ -51,7 +51,7 @@ type ExecutionState struct {
 	Phase ExecutionPhase
 
 	// This will store the command ID from Qubole
-	CommandId string `json:"command_id,omitempty"`
+	CommandID string `json:"command_id,omitempty"`
 	URI       string `json:"uri,omitempty"`
 
 	// This number keeps track of the number of failures within the sync function. Without this, what happens in
@@ -124,7 +124,7 @@ func MapExecutionStateToPhaseInfo(state ExecutionState, quboleClient client.Qubo
 
 func ConstructTaskLog(e ExecutionState) *idlCore.TaskLog {
 	return &idlCore.TaskLog{
-		Name:          fmt.Sprintf("Status: %s [%s]", e.Phase, e.CommandId),
+		Name:          fmt.Sprintf("Status: %s [%s]", e.Phase, e.CommandID),
 		MessageFormat: idlCore.TaskLog_UNKNOWN,
 		Uri:           e.URI,
 	}
@@ -133,7 +133,7 @@ func ConstructTaskLog(e ExecutionState) *idlCore.TaskLog {
 func ConstructTaskInfo(e ExecutionState) *core.TaskInfo {
 	logs := make([]*idlCore.TaskLog, 0, 1)
 	t := time.Now()
-	if e.CommandId != "" {
+	if e.CommandID != "" {
 		logs = append(logs, ConstructTaskLog(e))
 		return &core.TaskInfo{
 			Logs:       logs,
@@ -176,22 +176,22 @@ func createResourceConstraintsSpec(ctx context.Context, _ core.TaskExecutionCont
 
 func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, metric QuboleHiveExecutorMetrics) (ExecutionState, error) {
 	newState := ExecutionState{}
-	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	uniqueID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 
 	clusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx)
 	if err != nil {
-		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when requesting allocation token %s", uniqueId)
+		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when requesting allocation token %s", uniqueID)
 	}
 
 	resourceConstraintsSpec := createResourceConstraintsSpec(ctx, tCtx, clusterPrimaryLabel)
 
-	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, clusterPrimaryLabel, uniqueId, resourceConstraintsSpec)
+	allocationStatus, err := tCtx.ResourceManager().AllocateResource(ctx, clusterPrimaryLabel, uniqueID, resourceConstraintsSpec)
 	if err != nil {
 		logger.Errorf(ctx, "Resource manager failed for TaskExecId [%s] token [%s]. error %s",
-			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueId, err)
-		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error requesting allocation token %s", uniqueId)
+			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueID, err)
+		return newState, errors.Wrapf(errors.ResourceManagerFailure, err, "Error requesting allocation token %s", uniqueID)
 	}
-	logger.Infof(ctx, "Allocation result for [%s] is [%s]", uniqueId, allocationStatus)
+	logger.Infof(ctx, "Allocation result for [%s] is [%s]", uniqueID, allocationStatus)
 
 	// Emitting the duration this execution has been waiting for a token allocation
 	if currentState.AllocationTokenRequestStartTime.IsZero() {
@@ -210,7 +210,7 @@ func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext, cur
 		newState.Phase = PhaseNotStarted
 	} else {
 		return newState, errors.Errorf(errors.ResourceManagerFailure, "Got bad allocation result [%s] for token [%s]",
-			allocationStatus, uniqueId)
+			allocationStatus, uniqueID)
 	}
 
 	return newState, nil
@@ -283,9 +283,9 @@ func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label
 }
 
 func mapProjectDomainToDestinationClusterLabel(ctx context.Context, tCtx core.TaskExecutionContext, quboleCfg *config.Config) (string, bool) {
-	tExecId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	project := tExecId.NodeExecutionId.GetExecutionId().GetProject()
-	domain := tExecId.NodeExecutionId.GetExecutionId().GetDomain()
+	tExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	project := tExecID.NodeExecutionId.GetExecutionId().GetProject()
+	domain := tExecID.NodeExecutionId.GetExecutionId().GetDomain()
 	logger.Debugf(ctx, "No clusterLabelOverride. Finding the pre-defined cluster label for (project: %v, domain: %v)", project, domain)
 	// Using a linear search because N is small
 	for _, m := range quboleCfg.DestinationClusterConfigs {
@@ -322,7 +322,7 @@ func getClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext,
 func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, quboleClient client.QuboleClient,
 	cache cache.AutoRefresh, cfg *config.Config) (ExecutionState, error) {
 
-	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	uniqueID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	apiKey, err := tCtx.SecretManager().Get(ctx, cfg.TokenKey)
 	if err != nil {
 		return currentState, errors.Wrapf(errors.RuntimeFailure, err, "Failed to read token from secrets manager")
@@ -340,27 +340,27 @@ func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 	if err != nil {
 		// If we failed, we'll keep the NotStarted state
 		currentState.CreationFailureCount = currentState.CreationFailureCount + 1
-		logger.Warnf(ctx, "Error creating Qubole query for %s, failure counts %d. Error: %s", uniqueId, currentState.CreationFailureCount, err)
+		logger.Warnf(ctx, "Error creating Qubole query for %s, failure counts %d. Error: %s", uniqueID, currentState.CreationFailureCount, err)
 	} else {
 		// If we succeed, then store the command id returned from Qubole, and update our state. Also, add to the
 		// AutoRefreshCache so we start getting updates.
-		commandId := strconv.FormatInt(cmdDetails.ID, 10)
-		logger.Infof(ctx, "Created Qubole ID [%s] for token %s", commandId, uniqueId)
-		currentState.CommandId = commandId
+		commandID := strconv.FormatInt(cmdDetails.ID, 10)
+		logger.Infof(ctx, "Created Qubole ID [%s] for token %s", commandID, uniqueID)
+		currentState.CommandID = commandID
 		currentState.Phase = PhaseSubmitted
 		currentState.URI = cmdDetails.URI.String()
 
 		executionStateCacheItem := ExecutionStateCacheItem{
 			ExecutionState: currentState,
-			Id:             uniqueId,
+			Identifier:     uniqueID,
 		}
 
 		// The first time we put it in the cache, we know it won't have succeeded so we don't need to look at it
-		_, err := cache.GetOrCreate(uniqueId, executionStateCacheItem)
+		_, err := cache.GetOrCreate(uniqueID, executionStateCacheItem)
 		if err != nil {
 			// This means that our cache has fundamentally broken... return a system error
 			logger.Errorf(ctx, "Cache failed to GetOrCreate for execution [%s] cache key [%s], owner [%s]. Error %s",
-				tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueId,
+				tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueID,
 				tCtx.TaskExecutionMetadata().GetOwnerReference(), err)
 			return currentState, err
 		}
@@ -372,17 +372,17 @@ func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 func MonitorQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, cache cache.AutoRefresh) (
 	ExecutionState, error) {
 
-	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	uniqueID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	executionStateCacheItem := ExecutionStateCacheItem{
 		ExecutionState: currentState,
-		Id:             uniqueId,
+		Identifier:     uniqueID,
 	}
 
-	cachedItem, err := cache.GetOrCreate(uniqueId, executionStateCacheItem)
+	cachedItem, err := cache.GetOrCreate(uniqueID, executionStateCacheItem)
 	if err != nil {
 		// This means that our cache has fundamentally broken... return a system error
 		logger.Errorf(ctx, "Cache is broken on execution [%s] cache key [%s], owner [%s]. Error %s",
-			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueId,
+			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), uniqueID,
 			tCtx.TaskExecutionMetadata().GetOwnerReference(), err)
 		return currentState, errors.Wrapf(errors.CacheFailed, err, "Error when GetOrCreate while monitoring")
 	}
@@ -401,8 +401,8 @@ func MonitorQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 
 func Abort(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, qubole client.QuboleClient, apiKey string) error {
 	// Cancel Qubole query if non-terminal state
-	if !InTerminalState(currentState) && currentState.CommandId != "" {
-		err := qubole.KillCommand(ctx, currentState.CommandId, apiKey)
+	if !InTerminalState(currentState) && currentState.CommandID != "" {
+		err := qubole.KillCommand(ctx, currentState.CommandID, apiKey)
 		if err != nil {
 			logger.Errorf(ctx, "Error terminating Qubole command in Finalize [%s]", err)
 			return err
@@ -413,16 +413,16 @@ func Abort(ctx context.Context, tCtx core.TaskExecutionContext, currentState Exe
 
 func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, _ ExecutionState) error {
 	// Release allocation token
-	uniqueId := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	uniqueID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	clusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx)
 	if err != nil {
-		return errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when releasing allocation token %s", uniqueId)
+		return errors.Wrapf(errors.ResourceManagerFailure, err, "Error getting query info when releasing allocation token %s", uniqueID)
 	}
 
-	err = tCtx.ResourceManager().ReleaseResource(ctx, clusterPrimaryLabel, uniqueId)
+	err = tCtx.ResourceManager().ReleaseResource(ctx, clusterPrimaryLabel, uniqueID)
 
 	if err != nil {
-		logger.Errorf(ctx, "Error releasing allocation token [%s] in Finalize [%s]", uniqueId, err)
+		logger.Errorf(ctx, "Error releasing allocation token [%s] in Finalize [%s]", uniqueID, err)
 		return err
 	}
 	return nil

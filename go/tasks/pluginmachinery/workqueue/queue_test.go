@@ -133,7 +133,7 @@ func Test_workItemCache_Add(t *testing.T) {
 
 func Test_queue_Queue(t *testing.T) {
 	t.Run("Err when not started", func(t *testing.T) {
-		q, err := NewIndexedWorkQueue("test1", newSingleStatusProcessor("hello", WorkStatusSucceeded), Config{Workers: 1, MaxRetries: 0, IndexCacheMaxItems: 1}, promutils.NewTestScope())
+		q, err := NewIndexedWorkQueue("test1", newSingleStatusProcessor("hello", WorkStatusFailed), Config{Workers: 1, MaxRetries: 0, IndexCacheMaxItems: 1}, promutils.NewTestScope())
 		assert.NoError(t, err)
 		assert.Error(t, q.Queue(context.TODO(), "abc", "abc"))
 	})

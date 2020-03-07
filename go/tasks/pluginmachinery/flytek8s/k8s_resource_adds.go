@@ -40,19 +40,19 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 	}
 
 	// Execution level env variables.
-	nodeExecutionId := id.GetID().NodeExecutionId.ExecutionId
+	nodeExecutionID := id.GetID().NodeExecutionId.ExecutionId
 	envVars := []v1.EnvVar{
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_ID",
-			Value: nodeExecutionId.Name,
+			Value: nodeExecutionID.Name,
 		},
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_PROJECT",
-			Value: nodeExecutionId.Project,
+			Value: nodeExecutionID.Project,
 		},
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_DOMAIN",
-			Value: nodeExecutionId.Domain,
+			Value: nodeExecutionID.Domain,
 		},
 		// TODO: Fill in these
 		// {
@@ -67,42 +67,42 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 
 	// Task definition Level env variables.
 	if id.GetID().TaskId != nil {
-		taskId := id.GetID().TaskId
+		taskID := id.GetID().TaskId
 
 		envVars = append(envVars,
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_PROJECT",
-				Value: taskId.Project,
+				Value: taskID.Project,
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_DOMAIN",
-				Value: taskId.Domain,
+				Value: taskID.Domain,
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_NAME",
-				Value: taskId.Name,
+				Value: taskID.Name,
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_TASK_VERSION",
-				Value: taskId.Version,
+				Value: taskID.Version,
 			},
 			// Historic Task Definition Level env variables.
 			// Remove these once SDK is migrated to use the new ones.
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_PROJECT",
-				Value: taskId.Project,
+				Value: taskID.Project,
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_DOMAIN",
-				Value: taskId.Domain,
+				Value: taskID.Domain,
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_NAME",
-				Value: taskId.Name,
+				Value: taskID.Name,
 			},
 			v1.EnvVar{
 				Name:  "FLYTE_INTERNAL_VERSION",
-				Value: taskId.Version,
+				Value: taskID.Version,
 			})
 
 	}

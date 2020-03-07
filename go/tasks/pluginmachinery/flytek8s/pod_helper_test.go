@@ -2,9 +2,10 @@ package flytek8s
 
 import (
 	"context"
+	"testing"
+
 	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/mock"
-	"testing"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"

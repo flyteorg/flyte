@@ -98,7 +98,7 @@ func batchJobsForSync(_ context.Context, batchChunkSize int) cache.CreateBatches
 	}
 }
 
-func updateJob(ctx context.Context, source *batch.JobDetail, target *Job) (updated bool, err error) {
+func updateJob(ctx context.Context, source *batch.JobDetail, target *Job) (updated bool) {
 	msg := make([]string, 0, 2)
 	if source.Status == nil {
 		logger.Warnf(ctx, "No status received for job [%v]", *source.JobId)
@@ -179,7 +179,7 @@ func updateJob(ctx context.Context, source *batch.JobDetail, target *Job) (updat
 	msg = append(msg, lastStatusReason)
 
 	target.Status.Message = strings.Join(msg, " - ")
-	return updated, nil
+	return updated
 }
 
 func minInt(a, b int) int {
@@ -258,10 +258,7 @@ func syncBatches(_ context.Context, client Client, handler EventHandler, batchCh
 					continue
 				}
 
-				changed, err := updateJob(ctx, jobDetail, job)
-				if err != nil {
-					return nil, err
-				}
+				changed := updateJob(ctx, jobDetail, job)
 
 				if changed {
 					handler.Updated(ctx, Event{

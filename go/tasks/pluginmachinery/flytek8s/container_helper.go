@@ -40,7 +40,7 @@ func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequiremen
 		if _, limitSet := resources.Limits[v1.ResourceCPU]; limitSet {
 			resources.Requests[v1.ResourceCPU] = resources.Limits[v1.ResourceCPU]
 		} else {
-			resources.Requests[v1.ResourceCPU] = resource.MustParse(config.GetK8sPluginConfig().DefaultCpuRequest)
+			resources.Requests[v1.ResourceCPU] = resource.MustParse(config.GetK8sPluginConfig().DefaultCPURequest)
 		}
 	}
 

@@ -83,7 +83,6 @@ type ResourceManager interface {
 	ReleaseResource(ctx context.Context, namespace ResourceNamespace, allocationToken string) error
 }
 
-
 type ResourceConstraint struct {
 	Value int64
 }
@@ -95,7 +94,6 @@ type ResourceConstraint struct {
 // For example, a ResourceConstraintsSpec with nil ProjectScopeResourceConstraint and a non-nil NamespaceScopeResourceConstraint means
 // that it only poses a cap at the namespace level. A zero-value ResourceConstraintsSpec means there's no constraints posed at any level.
 type ResourceConstraintsSpec struct {
-	ProjectScopeResourceConstraint *ResourceConstraint
+	ProjectScopeResourceConstraint   *ResourceConstraint
 	NamespaceScopeResourceConstraint *ResourceConstraint
 }
-

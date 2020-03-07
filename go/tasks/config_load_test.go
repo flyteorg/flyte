@@ -67,7 +67,7 @@ func TestLoadConfig(t *testing.T) {
 
 		assert.Equal(t, []v1.Toleration{tolGPU}, k8sConfig.ResourceTolerations[v1.ResourceName("nvidia.com/gpu")])
 		assert.Equal(t, []v1.Toleration{tolStorage}, k8sConfig.ResourceTolerations[v1.ResourceStorage])
-		assert.Equal(t, "1000m", k8sConfig.DefaultCpuRequest)
+		assert.Equal(t, "1000m", k8sConfig.DefaultCPURequest)
 		assert.Equal(t, "1024Mi", k8sConfig.DefaultMemoryRequest)
 	})
 

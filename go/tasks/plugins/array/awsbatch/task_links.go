@@ -21,7 +21,7 @@ const (
 	JobFormatter       = "https://console.aws.amazon.com/batch/home?region=%v#/jobs/queue/arn:aws:batch:%v:%v:job-queue~2F%v/job/%v"
 )
 
-func GetJobUri(jobSize int, accountID, region, queue, jobID string) string {
+func GetJobURI(jobSize int, accountID, region, queue, jobID string) string {
 	if jobSize > 1 {
 		return fmt.Sprintf(ArrayJobFormatter, region, jobID)
 	}
@@ -32,7 +32,7 @@ func GetJobUri(jobSize int, accountID, region, queue, jobID string) string {
 func GetJobTaskLog(jobSize int, accountID, region, queue, jobID string) *idlCore.TaskLog {
 	return &idlCore.TaskLog{
 		Name: fmt.Sprintf("AWS Batch Job"),
-		Uri:  GetJobUri(jobSize, accountID, region, queue, jobID),
+		Uri:  GetJobURI(jobSize, accountID, region, queue, jobID),
 	}
 }
 

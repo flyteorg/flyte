@@ -118,7 +118,7 @@ func (p PhaseInfo) String() string {
 	return fmt.Sprintf("Phase<%s:%d %s Reason:%s>", p.phase, p.version, p.info, p.reason)
 }
 
-// Undefined entity, associated with an error
+// PhaseInfoUndefined should be used when the Phase is unknown usually associated with an error
 var PhaseInfoUndefined = PhaseInfo{phase: PhaseUndefined}
 
 func phaseInfo(p Phase, v uint32, err *core.ExecutionError, info *TaskInfo) PhaseInfo {

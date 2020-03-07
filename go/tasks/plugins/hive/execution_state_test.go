@@ -110,7 +110,7 @@ func TestConstructTaskLog(t *testing.T) {
 	expected := "https://wellness.qubole.com/v2/analyze?command_id=123"
 	u, err := url.Parse(expected)
 	assert.NoError(t, err)
-	taskLog := ConstructTaskLog(ExecutionState{CommandId: "123", URI: u.String()})
+	taskLog := ConstructTaskLog(ExecutionState{CommandID: "123", URI: u.String()})
 	assert.Equal(t, expected, taskLog.Uri)
 }
 
@@ -124,7 +124,7 @@ func TestConstructTaskInfo(t *testing.T) {
 
 	e := ExecutionState{
 		Phase:            PhaseQuerySucceeded,
-		CommandId:        "123",
+		CommandID:        "123",
 		SyncFailureCount: 0,
 		URI:              u.String(),
 	}
@@ -257,7 +257,7 @@ func TestAbort(t *testing.T) {
 			x = true
 		}).Return(nil)
 
-		err := Abort(ctx, GetMockTaskExecutionContext(), ExecutionState{Phase: PhaseSubmitted, CommandId: "123456"}, mockQubole, "fake-key")
+		err := Abort(ctx, GetMockTaskExecutionContext(), ExecutionState{Phase: PhaseSubmitted, CommandID: "123456"}, mockQubole, "fake-key")
 		assert.NoError(t, err)
 		assert.True(t, x)
 	})
@@ -271,7 +271,7 @@ func TestAbort(t *testing.T) {
 
 		err := Abort(ctx, GetMockTaskExecutionContext(), ExecutionState{
 			Phase:     PhaseQuerySucceeded,
-			CommandId: "123456",
+			CommandID: "123456",
 		}, mockQubole, "fake-key")
 		assert.NoError(t, err)
 		assert.False(t, x)
@@ -305,7 +305,7 @@ func TestMonitorQuery(t *testing.T) {
 	mockCache := &mocks2.AutoRefresh{}
 	mockCache.OnGetOrCreateMatch("my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name", mock.Anything).Return(ExecutionStateCacheItem{
 		ExecutionState: ExecutionState{Phase: PhaseQuerySucceeded},
-		Id:             "my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name",
+		Identifier:     "my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name",
 	}, nil).Run(func(_ mock.Arguments) {
 		getOrCreateCalled = true
 	})
@@ -341,7 +341,7 @@ func TestKickOffQuery(t *testing.T) {
 	newState, err := KickOffQuery(ctx, tCtx, state, mockQubole, mockCache, config.GetQuboleConfig())
 	assert.NoError(t, err)
 	assert.Equal(t, PhaseSubmitted, newState.Phase)
-	assert.Equal(t, "453298043", newState.CommandId)
+	assert.Equal(t, "453298043", newState.CommandID)
 	assert.True(t, getOrCreateCalled)
 	assert.True(t, quboleCalled)
 }
@@ -396,8 +396,8 @@ func Test_mapLabelToPrimaryLabel(t *testing.T) {
 
 func createMockTaskExecutionContextWithProjectDomain(project string, domain string) *mocks.TaskExecutionContext {
 	mockTaskExecutionContext := mocks.TaskExecutionContext{}
-	taskExecId := &pluginsCoreMocks.TaskExecutionID{}
-	taskExecId.OnGetID().Return(idlCore.TaskExecutionIdentifier{
+	taskExecID := &pluginsCoreMocks.TaskExecutionID{}
+	taskExecID.OnGetID().Return(idlCore.TaskExecutionIdentifier{
 		NodeExecutionId: &idlCore.NodeExecutionIdentifier{ExecutionId: &idlCore.WorkflowExecutionIdentifier{
 			Project: project,
 			Domain:  domain,
@@ -406,7 +406,7 @@ func createMockTaskExecutionContextWithProjectDomain(project string, domain stri
 	})
 
 	taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
-	taskMetadata.OnGetTaskExecutionID().Return(taskExecId)
+	taskMetadata.OnGetTaskExecutionID().Return(taskExecID)
 	mockTaskExecutionContext.On("TaskExecutionMetadata").Return(taskMetadata)
 	return &mockTaskExecutionContext
 }
