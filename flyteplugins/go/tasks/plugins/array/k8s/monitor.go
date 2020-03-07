@@ -140,7 +140,7 @@ func CheckPodStatus(ctx context.Context, client core.KubeClient, name k8sTypes.N
 			return core.PhaseInfoFailed(core.PhaseRetryableFailure, &idlCore.ExecutionError{
 				Code:    string(k8serrors.ReasonForError(err)),
 				Message: err.Error(),
-				Kind: idlCore.ExecutionError_SYSTEM,
+				Kind:    idlCore.ExecutionError_SYSTEM,
 			}, &core.TaskInfo{
 				OccurredAt: &now,
 			}), nil

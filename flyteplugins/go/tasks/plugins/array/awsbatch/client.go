@@ -56,7 +56,7 @@ type client struct {
 	getRateLimiter     utils.RateLimiter
 	defaultRateLimiter utils.RateLimiter
 	region             string
-	accountId          string
+	accountID          string
 }
 
 func (b client) GetRegion() string {
@@ -64,7 +64,7 @@ func (b client) GetRegion() string {
 }
 
 func (b client) GetAccountID() string {
-	return b.accountId
+	return b.accountID
 }
 
 // Registers a new job definition. There is no deduping on AWS side (even for the same name).
@@ -164,12 +164,12 @@ func NewBatchClient(awsClient aws.Client,
 		getRateLimiter, defaultRateLimiter)
 }
 
-func NewCustomBatchClient(batchClient BatchServiceClient, accountId, region string,
+func NewCustomBatchClient(batchClient BatchServiceClient, accountID, region string,
 	getRateLimiter utils.RateLimiter,
 	defaultRateLimiter utils.RateLimiter) Client {
 	return &client{
 		Batch:              batchClient,
-		accountId:          accountId,
+		accountID:          accountID,
 		region:             region,
 		getRateLimiter:     getRateLimiter,
 		defaultRateLimiter: defaultRateLimiter,

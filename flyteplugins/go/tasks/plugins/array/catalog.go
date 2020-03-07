@@ -233,7 +233,7 @@ func WriteToCatalog(ctx context.Context, ownerSignal core.SignalAsync, catalogCl
 	return false, nil
 }
 
-func ConstructCatalogUploadRequests(keyId idlCore.Identifier, taskExecId idlCore.TaskExecutionIdentifier,
+func ConstructCatalogUploadRequests(keyID idlCore.Identifier, taskExecID idlCore.TaskExecutionIdentifier,
 	cacheVersion string, taskInterface idlCore.TypedInterface, whichTasksToCache *bitarray.BitSet,
 	inputReaders []io.InputReader, outputReaders []io.OutputReader) ([]catalog.UploadRequest, error) {
 
@@ -251,14 +251,14 @@ func ConstructCatalogUploadRequests(keyId idlCore.Identifier, taskExecId idlCore
 
 		wi := catalog.UploadRequest{
 			Key: catalog.Key{
-				Identifier:     keyId,
+				Identifier:     keyID,
 				InputReader:    input,
 				CacheVersion:   cacheVersion,
 				TypedInterface: taskInterface,
 			},
 			ArtifactData: outputReaders[idx],
 			ArtifactMetadata: catalog.Metadata{
-				TaskExecutionIdentifier: &taskExecId,
+				TaskExecutionIdentifier: &taskExecID,
 			},
 		}
 
@@ -339,7 +339,7 @@ func ConstructCatalogReaderWorkItems(ctx context.Context, taskReader core.TaskRe
 	iface.Outputs = makeSingularTaskInterface(iface.Outputs)
 
 	for idx, inputReader := range inputs {
-		// TODO: Check if Id or Interface are empty and return err
+		// TODO: Check if Identifier or Interface are empty and return err
 		item := catalog.DownloadRequest{
 			Key: catalog.Key{
 				Identifier:     *t.Id,
