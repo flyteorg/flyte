@@ -70,6 +70,10 @@ func (w workflowBuilder) GetLaunchPlan(id c.LaunchPlanID) (wf c.InterfaceProvide
 	return
 }
 
+func (w workflowBuilder) UpdateSubWorkflow(id c.WorkflowID, compiledWorkflow *core.CompiledWorkflow) {
+	w.allSubWorkflows[id.String()] = compiledWorkflow
+}
+
 func (w workflowBuilder) GetSubWorkflow(id c.WorkflowID) (wf *core.CompiledWorkflow, found bool) {
 	wf, found = w.allSubWorkflows[id.String()]
 	return

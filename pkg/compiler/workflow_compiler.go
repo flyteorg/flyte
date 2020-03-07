@@ -280,7 +280,8 @@ func CompileWorkflow(primaryWf *core.WorkflowTemplate, subworkflows []*core.Work
 	}
 
 	// Validate overall requirements of the coreWorkflow.
-	wfIndex, ok := c.NewWorkflowIndex(toCompiledWorkflows(subworkflows...), errs.NewScope())
+	compiledSubWorkflows := toCompiledWorkflows(subworkflows...)
+	wfIndex, ok := c.NewWorkflowIndex(compiledSubWorkflows, errs.NewScope())
 	if !ok {
 		return nil, errs
 	}
@@ -301,8 +302,9 @@ func CompileWorkflow(primaryWf *core.WorkflowTemplate, subworkflows []*core.Work
 		}
 
 		return &core.CompiledWorkflowClosure{
-			Primary: validatedWf.GetCoreWorkflow(),
-			Tasks:   compiledTasks,
+			Primary:      validatedWf.GetCoreWorkflow(),
+			Tasks:        compiledTasks,
+			SubWorkflows: compiledSubWorkflows,
 		}, nil
 	}
 

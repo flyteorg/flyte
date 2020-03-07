@@ -143,7 +143,7 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 	primarySpec := buildFlyteWorkflowSpec(wfClosure.Primary, wfClosure.Tasks, errs.NewScope())
 	subwfs := make(map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec, len(wfClosure.SubWorkflows))
 	for _, subWf := range wfClosure.SubWorkflows {
-		spec := buildFlyteWorkflowSpec(wfClosure.Primary, wfClosure.Tasks, errs.NewScope())
+		spec := buildFlyteWorkflowSpec(subWf, wfClosure.Tasks, errs.NewScope())
 		subwfs[subWf.Template.Id.String()] = spec
 	}
 
