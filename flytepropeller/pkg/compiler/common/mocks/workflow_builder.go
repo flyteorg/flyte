@@ -464,6 +464,11 @@ func (_m *WorkflowBuilder) NewNodeBuilder(n *core.Node) common.NodeBuilder {
 	return r0
 }
 
+// UpdateSubWorkflow provides a mock function with given fields: id, compiledWorkflow
+func (_m *WorkflowBuilder) UpdateSubWorkflow(id core.Identifier, compiledWorkflow *core.CompiledWorkflow) {
+	_m.Called(id, compiledWorkflow)
+}
+
 type WorkflowBuilder_ValidateWorkflow struct {
 	*mock.Call
 }

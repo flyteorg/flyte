@@ -1,6 +1,7 @@
 # This is a sample configuration file.
 # Real configuration when running inside K8s (local or otherwise) lives in a ConfigMap
 propeller:
+  metadata-prefix: metadata/propeller/sandbox
   workers: 4
   workflow-reeval-duration: 10s
   downstream-eval-duration: 5s

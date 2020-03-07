@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flytestdlib/storage"
-	errors2 "github.com/pkg/errors"
-
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/lyft/flytestdlib/storage"
 )
 
 // TODO Add unit tests for subworkflow handler
@@ -31,7 +29,7 @@ func (s *subworkflowHandler) DoInlineSubWorkflow(ctx context.Context, nCtx handl
 
 	if state.HasFailed() {
 		if w.GetOnFailureNode() != nil {
-			// TODO ssignh: this is supposed to be failing
+			// TODO ssingh: this is supposed to be failing
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, state.Err.Error(), nil)), err
 		}
 
@@ -48,7 +46,7 @@ func (s *subworkflowHandler) DoInlineSubWorkflow(ctx context.Context, nCtx handl
 				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.SubWorkflowExecutionFailed, "No end node found in subworkflow.", nil)), err
 			}
 
-			sourcePath := v1alpha1.GetOutputsFile(endNodeStatus.GetDataDir())
+			sourcePath := v1alpha1.GetOutputsFile(endNodeStatus.GetOutputDir())
 			if metadata, err := store.Head(ctx, sourcePath); err == nil {
 				if !metadata.Exists() {
 					errMsg := fmt.Sprintf("Subworkflow is expected to produce outputs but no outputs file was written to %v.", sourcePath)
@@ -123,38 +121,21 @@ func (s *subworkflowHandler) StartSubWorkflow(ctx context.Context, nCtx handler.
 
 	// Before starting the subworkflow, lets set the inputs for the Workflow. The inputs for a SubWorkflow are essentially
 	// Copy of the inputs to the Node
-	nodeStatus := contextualSubWorkflow.GetNodeExecutionStatus(ctx, startNode.GetID())
-	if len(nodeStatus.GetDataDir()) == 0 {
-		dataDir, err := contextualSubWorkflow.GetExecutionStatus().ConstructNodeDataDir(ctx, startNode.GetID())
-		if err != nil {
-			err = errors2.Wrapf(err, "Failed to create metadata store key. Error [%v]", err)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
-		}
+	nodeInputs, err := nCtx.InputReader().Get(ctx)
+	if err != nil {
+		errMsg := fmt.Sprintf("Failed to read input. Error [%s]", err)
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, errMsg, nil)), nil
+	}
 
-		outputDir, err := nCtx.DataStore().ConstructReference(ctx, dataDir, "0")
-		if err != nil {
-			err = errors2.Wrapf(err, "Failed to create metadata store key. Error [%v]", err)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
-		}
+	startStatus, err := s.nodeExecutor.SetInputsForStartNode(ctx, contextualSubWorkflow, nodeInputs)
+	if err != nil {
+		// TODO we are considering an error when setting inputs are retryable
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
+	}
 
-		nodeStatus.SetDataDir(dataDir)
-		nodeStatus.SetOutputDir(outputDir)
-		nodeInputs, err := nCtx.InputReader().Get(ctx)
-		if err != nil {
-			errMsg := fmt.Sprintf("Failed to read input. Error [%s]", err)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, errMsg, nil)), nil
-		}
-
-		startStatus, err := s.nodeExecutor.SetInputsForStartNode(ctx, contextualSubWorkflow, nodeInputs)
-		if err != nil {
-			// TODO we are considering an error when setting inputs are retryable
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
-		}
-
-		if startStatus.HasFailed() {
-			errorCode, _ := errors.GetErrorCode(startStatus.Err)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errorCode, startStatus.Err.Error(), nil)), nil
-		}
+	if startStatus.HasFailed() {
+		errorCode, _ := errors.GetErrorCode(startStatus.Err)
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errorCode, startStatus.Err.Error(), nil)), nil
 	}
 
 	// assert startStatus.IsComplete() == true

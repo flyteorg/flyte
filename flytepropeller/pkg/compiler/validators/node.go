@@ -95,9 +95,13 @@ func ValidateNode(w c.WorkflowBuilder, n c.NodeBuilder, errs errors.CompileError
 	if n.GetBranchNode() != nil {
 		validateBranchNode(w, n, errs.NewScope())
 	} else if workflowN := n.GetWorkflowNode(); workflowN != nil && workflowN.GetSubWorkflowRef() != nil {
-		if wf, wfOk := w.GetSubWorkflow(*workflowN.GetSubWorkflowRef()); wfOk {
+		workflowID := *workflowN.GetSubWorkflowRef()
+		if wf, wfOk := w.GetSubWorkflow(workflowID); wfOk {
+			// This might lead to redundant errors if the same subWorkflow is invoked from multiple nodes in the main
+			// workflow.
 			if subWorkflow, workflowOk := w.ValidateWorkflow(wf, errs.NewScope()); workflowOk {
 				n.SetSubWorkflow(subWorkflow)
+				w.UpdateSubWorkflow(workflowID, subWorkflow.GetCoreWorkflow())
 			}
 		} else {
 			errs.Collect(errors.NewWorkflowReferenceNotFoundErr(n.GetId(), workflowN.GetSubWorkflowRef().String()))
