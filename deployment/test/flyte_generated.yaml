@@ -766,7 +766,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.2.0
+        image: docker.io/lyft/flytepropeller:v0.2.12
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
