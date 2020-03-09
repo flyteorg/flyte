@@ -131,7 +131,8 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 	_, err = targetCluster.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(namespace).Create(flyteWf)
 	if err != nil {
 		if !k8_api_err.IsAlreadyExists(err) {
-			logger.Debugf(ctx, "failed to create workflow [%+v[ in propeller %v", input.WfClosure.Primary.Template.Id, err)
+			logger.Debugf(ctx, "failed to create workflow [%+v] in cluster %s %v",
+				input.WfClosure.Primary.Template.Id, targetCluster.ID, err)
 			c.metrics.ExecutionCreationFailure.Inc()
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create workflow in propeller %v", err)
 		}
