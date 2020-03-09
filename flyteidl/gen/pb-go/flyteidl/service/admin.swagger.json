@@ -4975,6 +4975,10 @@
         "deprecated_error_message": {
           "type": "string",
           "description": "If set, this indicates that this task is deprecated.  This will enable owners of tasks to notify consumers\nof the ending of support for a given task."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "format": "boolean"
         }
       },
       "title": "Task Metadata"

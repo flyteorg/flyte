@@ -3413,6 +3413,13 @@ public final class Tasks {
      */
     com.google.protobuf.ByteString
         getDeprecatedErrorMessageBytes();
+
+    /**
+     * <code>bool interruptible = 8;</code>
+     */
+    boolean getInterruptible();
+
+    public flyteidl.core.Tasks.TaskMetadata.InterruptibleValueCase getInterruptibleValueCase();
   }
   /**
    * <pre>
@@ -3515,6 +3522,11 @@ public final class Tasks {
               deprecatedErrorMessage_ = s;
               break;
             }
+            case 64: {
+              interruptibleValueCase_ = 8;
+              interruptibleValue_ = input.readBool();
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -3545,6 +3557,42 @@ public final class Tasks {
       return flyteidl.core.Tasks.internal_static_flyteidl_core_TaskMetadata_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               flyteidl.core.Tasks.TaskMetadata.class, flyteidl.core.Tasks.TaskMetadata.Builder.class);
+    }
+
+    private int interruptibleValueCase_ = 0;
+    private java.lang.Object interruptibleValue_;
+    public enum InterruptibleValueCase
+        implements com.google.protobuf.Internal.EnumLite {
+      INTERRUPTIBLE(8),
+      INTERRUPTIBLEVALUE_NOT_SET(0);
+      private final int value;
+      private InterruptibleValueCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static InterruptibleValueCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static InterruptibleValueCase forNumber(int value) {
+        switch (value) {
+          case 8: return INTERRUPTIBLE;
+          case 0: return INTERRUPTIBLEVALUE_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public InterruptibleValueCase
+    getInterruptibleValueCase() {
+      return InterruptibleValueCase.forNumber(
+          interruptibleValueCase_);
     }
 
     public static final int DISCOVERABLE_FIELD_NUMBER = 1;
@@ -3745,6 +3793,17 @@ public final class Tasks {
       }
     }
 
+    public static final int INTERRUPTIBLE_FIELD_NUMBER = 8;
+    /**
+     * <code>bool interruptible = 8;</code>
+     */
+    public boolean getInterruptible() {
+      if (interruptibleValueCase_ == 8) {
+        return (java.lang.Boolean) interruptibleValue_;
+      }
+      return false;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3777,6 +3836,10 @@ public final class Tasks {
       if (!getDeprecatedErrorMessageBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 7, deprecatedErrorMessage_);
       }
+      if (interruptibleValueCase_ == 8) {
+        output.writeBool(
+            8, (boolean)((java.lang.Boolean) interruptibleValue_));
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3807,6 +3870,11 @@ public final class Tasks {
       }
       if (!getDeprecatedErrorMessageBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, deprecatedErrorMessage_);
+      }
+      if (interruptibleValueCase_ == 8) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(
+              8, (boolean)((java.lang.Boolean) interruptibleValue_));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3844,6 +3912,15 @@ public final class Tasks {
           .equals(other.getDiscoveryVersion())) return false;
       if (!getDeprecatedErrorMessage()
           .equals(other.getDeprecatedErrorMessage())) return false;
+      if (!getInterruptibleValueCase().equals(other.getInterruptibleValueCase())) return false;
+      switch (interruptibleValueCase_) {
+        case 8:
+          if (getInterruptible()
+              != other.getInterruptible()) return false;
+          break;
+        case 0:
+        default:
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3874,6 +3951,15 @@ public final class Tasks {
       hash = (53 * hash) + getDiscoveryVersion().hashCode();
       hash = (37 * hash) + DEPRECATED_ERROR_MESSAGE_FIELD_NUMBER;
       hash = (53 * hash) + getDeprecatedErrorMessage().hashCode();
+      switch (interruptibleValueCase_) {
+        case 8:
+          hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+              getInterruptible());
+          break;
+        case 0:
+        default:
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4035,6 +4121,8 @@ public final class Tasks {
 
         deprecatedErrorMessage_ = "";
 
+        interruptibleValueCase_ = 0;
+        interruptibleValue_ = null;
         return this;
       }
 
@@ -4079,6 +4167,10 @@ public final class Tasks {
         }
         result.discoveryVersion_ = discoveryVersion_;
         result.deprecatedErrorMessage_ = deprecatedErrorMessage_;
+        if (interruptibleValueCase_ == 8) {
+          result.interruptibleValue_ = interruptibleValue_;
+        }
+        result.interruptibleValueCase_ = interruptibleValueCase_;
         onBuilt();
         return result;
       }
@@ -4147,6 +4239,15 @@ public final class Tasks {
           deprecatedErrorMessage_ = other.deprecatedErrorMessage_;
           onChanged();
         }
+        switch (other.getInterruptibleValueCase()) {
+          case INTERRUPTIBLE: {
+            setInterruptible(other.getInterruptible());
+            break;
+          }
+          case INTERRUPTIBLEVALUE_NOT_SET: {
+            break;
+          }
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -4175,6 +4276,21 @@ public final class Tasks {
         }
         return this;
       }
+      private int interruptibleValueCase_ = 0;
+      private java.lang.Object interruptibleValue_;
+      public InterruptibleValueCase
+          getInterruptibleValueCase() {
+        return InterruptibleValueCase.forNumber(
+            interruptibleValueCase_);
+      }
+
+      public Builder clearInterruptibleValue() {
+        interruptibleValueCase_ = 0;
+        interruptibleValue_ = null;
+        onChanged();
+        return this;
+      }
+
 
       private boolean discoverable_ ;
       /**
@@ -4853,6 +4969,36 @@ public final class Tasks {
         
         deprecatedErrorMessage_ = value;
         onChanged();
+        return this;
+      }
+
+      /**
+       * <code>bool interruptible = 8;</code>
+       */
+      public boolean getInterruptible() {
+        if (interruptibleValueCase_ == 8) {
+          return (java.lang.Boolean) interruptibleValue_;
+        }
+        return false;
+      }
+      /**
+       * <code>bool interruptible = 8;</code>
+       */
+      public Builder setInterruptible(boolean value) {
+        interruptibleValueCase_ = 8;
+        interruptibleValue_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool interruptible = 8;</code>
+       */
+      public Builder clearInterruptible() {
+        if (interruptibleValueCase_ == 8) {
+          interruptibleValueCase_ = 0;
+          interruptibleValue_ = null;
+          onChanged();
+        }
         return this;
       }
       @java.lang.Override
@@ -10288,28 +10434,30 @@ public final class Tasks {
       "\020\004\"\225\001\n\017RuntimeMetadata\0228\n\004type\030\001 \001(\0162*.f" +
       "lyteidl.core.RuntimeMetadata.RuntimeType" +
       "\022\017\n\007version\030\002 \001(\t\022\016\n\006flavor\030\003 \001(\t\"\'\n\013Run" +
-      "timeType\022\t\n\005OTHER\020\000\022\r\n\tFLYTE_SDK\020\001\"\355\001\n\014T" +
+      "timeType\022\t\n\005OTHER\020\000\022\r\n\tFLYTE_SDK\020\001\"\235\002\n\014T" +
       "askMetadata\022\024\n\014discoverable\030\001 \001(\010\022/\n\007run" +
       "time\030\002 \001(\0132\036.flyteidl.core.RuntimeMetada" +
       "ta\022*\n\007timeout\030\004 \001(\0132\031.google.protobuf.Du" +
       "ration\022-\n\007retries\030\005 \001(\0132\034.flyteidl.core." +
       "RetryStrategy\022\031\n\021discovery_version\030\006 \001(\t" +
-      "\022 \n\030deprecated_error_message\030\007 \001(\t\"\206\002\n\014T" +
-      "askTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl.core." +
-      "Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010metadata\030\003 \001" +
-      "(\0132\033.flyteidl.core.TaskMetadata\0220\n\tinter" +
-      "face\030\004 \001(\0132\035.flyteidl.core.TypedInterfac" +
-      "e\022\'\n\006custom\030\005 \001(\0132\027.google.protobuf.Stru" +
-      "ct\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl.core.Co" +
-      "ntainerH\000B\010\n\006target\"\'\n\rContainerPort\022\026\n\016" +
-      "container_port\030\001 \001(\r\"\352\001\n\tContainer\022\r\n\005im" +
-      "age\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t" +
-      "\022+\n\tresources\030\004 \001(\0132\030.flyteidl.core.Reso" +
-      "urces\022(\n\003env\030\005 \003(\0132\033.flyteidl.core.KeyVa" +
-      "luePair\022+\n\006config\030\006 \003(\0132\033.flyteidl.core." +
-      "KeyValuePair\022+\n\005ports\030\007 \003(\0132\034.flyteidl.c" +
-      "ore.ContainerPortB2Z0github.com/lyft/fly" +
-      "teidl/gen/pb-go/flyteidl/coreb\006proto3"
+      "\022 \n\030deprecated_error_message\030\007 \001(\t\022\027\n\rin" +
+      "terruptible\030\010 \001(\010H\000B\025\n\023interruptible_val" +
+      "ue\"\206\002\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.flytei" +
+      "dl.core.Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010meta" +
+      "data\030\003 \001(\0132\033.flyteidl.core.TaskMetadata\022" +
+      "0\n\tinterface\030\004 \001(\0132\035.flyteidl.core.Typed" +
+      "Interface\022\'\n\006custom\030\005 \001(\0132\027.google.proto" +
+      "buf.Struct\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl" +
+      ".core.ContainerH\000B\010\n\006target\"\'\n\rContainer" +
+      "Port\022\026\n\016container_port\030\001 \001(\r\"\352\001\n\tContain" +
+      "er\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004ar" +
+      "gs\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.flyteidl.c" +
+      "ore.Resources\022(\n\003env\030\005 \003(\0132\033.flyteidl.co" +
+      "re.KeyValuePair\022+\n\006config\030\006 \003(\0132\033.flytei" +
+      "dl.core.KeyValuePair\022+\n\005ports\030\007 \003(\0132\034.fl" +
+      "yteidl.core.ContainerPortB2Z0github.com/" +
+      "lyft/flyteidl/gen/pb-go/flyteidl/coreb\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10351,7 +10499,7 @@ public final class Tasks {
     internal_static_flyteidl_core_TaskMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskMetadata_descriptor,
-        new java.lang.String[] { "Discoverable", "Runtime", "Timeout", "Retries", "DiscoveryVersion", "DeprecatedErrorMessage", });
+        new java.lang.String[] { "Discoverable", "Runtime", "Timeout", "Retries", "DiscoveryVersion", "DeprecatedErrorMessage", "Interruptible", "InterruptibleValue", });
     internal_static_flyteidl_core_TaskTemplate_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_core_TaskTemplate_fieldAccessorTable = new

@@ -45,6 +45,7 @@ class RuntimeMetadataDefaultTypeInternal {
 class TaskMetadataDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<TaskMetadata> _instance;
+  bool interruptible_;
 } _TaskMetadata_default_instance_;
 class TaskTemplateDefaultTypeInternal {
  public:
@@ -211,7 +212,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2ftasks_2eproto::of
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskMetadata, _internal_metadata_),
   ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskMetadata, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskMetadata, discoverable_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskMetadata, runtime_),
@@ -219,6 +220,8 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2ftasks_2eproto::of
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskMetadata, retries_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskMetadata, discovery_version_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskMetadata, deprecated_error_message_),
+  offsetof(::flyteidl::core::TaskMetadataDefaultTypeInternal, interruptible_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskMetadata, interruptible_value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskTemplate, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -255,9 +258,9 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 7, -1, sizeof(::flyteidl::core::Resources)},
   { 14, -1, sizeof(::flyteidl::core::RuntimeMetadata)},
   { 22, -1, sizeof(::flyteidl::core::TaskMetadata)},
-  { 33, -1, sizeof(::flyteidl::core::TaskTemplate)},
-  { 45, -1, sizeof(::flyteidl::core::ContainerPort)},
-  { 51, -1, sizeof(::flyteidl::core::Container)},
+  { 35, -1, sizeof(::flyteidl::core::TaskTemplate)},
+  { 47, -1, sizeof(::flyteidl::core::ContainerPort)},
+  { 53, -1, sizeof(::flyteidl::core::Container)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -292,33 +295,35 @@ const char descriptor_table_protodef_flyteidl_2fcore_2ftasks_2eproto[] =
   "\020\004\"\225\001\n\017RuntimeMetadata\0228\n\004type\030\001 \001(\0162*.f"
   "lyteidl.core.RuntimeMetadata.RuntimeType"
   "\022\017\n\007version\030\002 \001(\t\022\016\n\006flavor\030\003 \001(\t\"\'\n\013Run"
-  "timeType\022\t\n\005OTHER\020\000\022\r\n\tFLYTE_SDK\020\001\"\355\001\n\014T"
+  "timeType\022\t\n\005OTHER\020\000\022\r\n\tFLYTE_SDK\020\001\"\235\002\n\014T"
   "askMetadata\022\024\n\014discoverable\030\001 \001(\010\022/\n\007run"
   "time\030\002 \001(\0132\036.flyteidl.core.RuntimeMetada"
   "ta\022*\n\007timeout\030\004 \001(\0132\031.google.protobuf.Du"
   "ration\022-\n\007retries\030\005 \001(\0132\034.flyteidl.core."
   "RetryStrategy\022\031\n\021discovery_version\030\006 \001(\t"
-  "\022 \n\030deprecated_error_message\030\007 \001(\t\"\206\002\n\014T"
-  "askTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl.core."
-  "Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010metadata\030\003 \001"
-  "(\0132\033.flyteidl.core.TaskMetadata\0220\n\tinter"
-  "face\030\004 \001(\0132\035.flyteidl.core.TypedInterfac"
-  "e\022\'\n\006custom\030\005 \001(\0132\027.google.protobuf.Stru"
-  "ct\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl.core.Co"
-  "ntainerH\000B\010\n\006target\"\'\n\rContainerPort\022\026\n\016"
-  "container_port\030\001 \001(\r\"\352\001\n\tContainer\022\r\n\005im"
-  "age\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t"
-  "\022+\n\tresources\030\004 \001(\0132\030.flyteidl.core.Reso"
-  "urces\022(\n\003env\030\005 \003(\0132\033.flyteidl.core.KeyVa"
-  "luePair\022+\n\006config\030\006 \003(\0132\033.flyteidl.core."
-  "KeyValuePair\022+\n\005ports\030\007 \003(\0132\034.flyteidl.c"
-  "ore.ContainerPortB2Z0github.com/lyft/fly"
-  "teidl/gen/pb-go/flyteidl/coreb\006proto3"
+  "\022 \n\030deprecated_error_message\030\007 \001(\t\022\027\n\rin"
+  "terruptible\030\010 \001(\010H\000B\025\n\023interruptible_val"
+  "ue\"\206\002\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.flytei"
+  "dl.core.Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010meta"
+  "data\030\003 \001(\0132\033.flyteidl.core.TaskMetadata\022"
+  "0\n\tinterface\030\004 \001(\0132\035.flyteidl.core.Typed"
+  "Interface\022\'\n\006custom\030\005 \001(\0132\027.google.proto"
+  "buf.Struct\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl"
+  ".core.ContainerH\000B\010\n\006target\"\'\n\rContainer"
+  "Port\022\026\n\016container_port\030\001 \001(\r\"\352\001\n\tContain"
+  "er\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004ar"
+  "gs\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.flyteidl.c"
+  "ore.Resources\022(\n\003env\030\005 \003(\0132\033.flyteidl.co"
+  "re.KeyValuePair\022+\n\006config\030\006 \003(\0132\033.flytei"
+  "dl.core.KeyValuePair\022+\n\005ports\030\007 \003(\0132\034.fl"
+  "yteidl.core.ContainerPortB2Z0github.com/"
+  "lyft/flyteidl/gen/pb-go/flyteidl/coreb\006p"
+  "roto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2ftasks_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2ftasks_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2ftasks_2eproto,
-  "flyteidl/core/tasks.proto", &assign_descriptors_table_flyteidl_2fcore_2ftasks_2eproto, 1477,
+  "flyteidl/core/tasks.proto", &assign_descriptors_table_flyteidl_2fcore_2ftasks_2eproto, 1525,
 };
 
 void AddDescriptors_flyteidl_2fcore_2ftasks_2eproto() {
@@ -1498,6 +1503,7 @@ void TaskMetadata::InitAsDefaultInstance() {
       ::google::protobuf::Duration::internal_default_instance());
   ::flyteidl::core::_TaskMetadata_default_instance_._instance.get_mutable()->retries_ = const_cast< ::flyteidl::core::RetryStrategy*>(
       ::flyteidl::core::RetryStrategy::internal_default_instance());
+  ::flyteidl::core::_TaskMetadata_default_instance_.interruptible_ = false;
 }
 class TaskMetadata::HasBitSetters {
  public:
@@ -1537,6 +1543,7 @@ const int TaskMetadata::kTimeoutFieldNumber;
 const int TaskMetadata::kRetriesFieldNumber;
 const int TaskMetadata::kDiscoveryVersionFieldNumber;
 const int TaskMetadata::kDeprecatedErrorMessageFieldNumber;
+const int TaskMetadata::kInterruptibleFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 TaskMetadata::TaskMetadata()
@@ -1572,6 +1579,16 @@ TaskMetadata::TaskMetadata(const TaskMetadata& from)
     retries_ = nullptr;
   }
   discoverable_ = from.discoverable_;
+  clear_has_interruptible_value();
+  switch (from.interruptible_value_case()) {
+    case kInterruptible: {
+      set_interruptible(from.interruptible());
+      break;
+    }
+    case INTERRUPTIBLE_VALUE_NOT_SET: {
+      break;
+    }
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.TaskMetadata)
 }
 
@@ -1583,6 +1600,7 @@ void TaskMetadata::SharedCtor() {
   ::memset(&runtime_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&discoverable_) -
       reinterpret_cast<char*>(&runtime_)) + sizeof(discoverable_));
+  clear_has_interruptible_value();
 }
 
 TaskMetadata::~TaskMetadata() {
@@ -1596,6 +1614,9 @@ void TaskMetadata::SharedDtor() {
   if (this != internal_default_instance()) delete runtime_;
   if (this != internal_default_instance()) delete timeout_;
   if (this != internal_default_instance()) delete retries_;
+  if (has_interruptible_value()) {
+    clear_interruptible_value();
+  }
 }
 
 void TaskMetadata::SetCachedSize(int size) const {
@@ -1604,6 +1625,21 @@ void TaskMetadata::SetCachedSize(int size) const {
 const TaskMetadata& TaskMetadata::default_instance() {
   ::google::protobuf::internal::InitSCC(&::scc_info_TaskMetadata_flyteidl_2fcore_2ftasks_2eproto.base);
   return *internal_default_instance();
+}
+
+
+void TaskMetadata::clear_interruptible_value() {
+// @@protoc_insertion_point(one_of_clear_start:flyteidl.core.TaskMetadata)
+  switch (interruptible_value_case()) {
+    case kInterruptible: {
+      // No need to clear
+      break;
+    }
+    case INTERRUPTIBLE_VALUE_NOT_SET: {
+      break;
+    }
+  }
+  _oneof_case_[0] = INTERRUPTIBLE_VALUE_NOT_SET;
 }
 
 
@@ -1628,6 +1664,7 @@ void TaskMetadata::Clear() {
   }
   retries_ = nullptr;
   discoverable_ = false;
+  clear_interruptible_value();
   _internal_metadata_.Clear();
 }
 
@@ -1720,6 +1757,13 @@ const char* TaskMetadata::_InternalParse(const char* begin, const char* end, voi
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // bool interruptible = 8;
+      case 8: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 64) goto handle_unusual;
+        msg->set_interruptible(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -1832,6 +1876,20 @@ bool TaskMetadata::MergePartialFromCodedStream(
         break;
       }
 
+      // bool interruptible = 8;
+      case 8: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (64 & 0xFF)) {
+          clear_interruptible_value();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &interruptible_value_.interruptible_)));
+          set_has_interruptible();
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1902,6 +1960,11 @@ void TaskMetadata::SerializeWithCachedSizes(
       7, this->deprecated_error_message(), output);
   }
 
+  // bool interruptible = 8;
+  if (has_interruptible()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(8, this->interruptible(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1961,6 +2024,11 @@ void TaskMetadata::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         7, this->deprecated_error_message(), target);
+  }
+
+  // bool interruptible = 8;
+  if (has_interruptible()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(8, this->interruptible(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2024,6 +2092,16 @@ size_t TaskMetadata::ByteSizeLong() const {
     total_size += 1 + 1;
   }
 
+  switch (interruptible_value_case()) {
+    // bool interruptible = 8;
+    case kInterruptible: {
+      total_size += 1 + 1;
+      break;
+    }
+    case INTERRUPTIBLE_VALUE_NOT_SET: {
+      break;
+    }
+  }
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -2071,6 +2149,15 @@ void TaskMetadata::MergeFrom(const TaskMetadata& from) {
   if (from.discoverable() != 0) {
     set_discoverable(from.discoverable());
   }
+  switch (from.interruptible_value_case()) {
+    case kInterruptible: {
+      set_interruptible(from.interruptible());
+      break;
+    }
+    case INTERRUPTIBLE_VALUE_NOT_SET: {
+      break;
+    }
+  }
 }
 
 void TaskMetadata::CopyFrom(const ::google::protobuf::Message& from) {
@@ -2106,6 +2193,8 @@ void TaskMetadata::InternalSwap(TaskMetadata* other) {
   swap(timeout_, other->timeout_);
   swap(retries_, other->retries_);
   swap(discoverable_, other->discoverable_);
+  swap(interruptible_value_, other->interruptible_value_);
+  swap(_oneof_case_[0], other->_oneof_case_[0]);
 }
 
 ::google::protobuf::Metadata TaskMetadata::GetMetadata() const {
