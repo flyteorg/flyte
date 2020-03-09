@@ -181,7 +181,7 @@ func (c *nodeExecutor) isEligibleForRetry(nCtx *execContext, nodeStatus v1alpha1
 		return
 	}
 
-	currentAttempt = nodeStatus.GetAttempts() - nodeStatus.GetSystemFailures()
+	currentAttempt = (nodeStatus.GetAttempts() + 1) - nodeStatus.GetSystemFailures()
 	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil {
 		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
 	}
