@@ -19,7 +19,7 @@ import (
 
 var isAcceptableK8sName, _ = regexp.Compile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
 
-const resourceGPU = "GPU"
+const resourceGPU = "gpu"
 
 // ResourceNvidiaGPU is the name of the Nvidia GPU resource.
 // Copied from: k8s.io/autoscaler/cluster-autoscaler/utils/gpu/gpu.go

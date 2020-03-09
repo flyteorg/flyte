@@ -27,13 +27,16 @@
 			}],
 			"resources": {
 				"requests": {
+				    "gpu": {
+				    	"string": "2"
+				    },
 					"cpu": {
 						"string": "10"
 					}
 				},
 				"limits": {
 					"nvidia.com/gpu": {
-						"string": "2"
+						"string": "3"
 					},
 					"cpu": {
 						"string": "10"
