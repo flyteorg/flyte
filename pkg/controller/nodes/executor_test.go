@@ -741,7 +741,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 
 			{"(retryablefailure->running", v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseRunning, executors.NodePhasePending, func() (handler.Transition, error) {
 				return handler.UnknownTransition, fmt.Errorf("should not be invoked")
-			}, false, false, core.NodeExecution_RUNNING, 1},
+			}, false, false, core.NodeExecution_RUNNING, 0},
 
 			{"running->failing", v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, executors.NodePhasePending, func() (handler.Transition, error) {
 				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("code", "reason", nil)), nil
@@ -1210,6 +1210,7 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 	ns.On("GetQueuedAt").Return(queuedAtTime)
 	ns.On("GetLastAttemptStartedAt").Return(queuedAtTime)
 	ns.OnGetAttempts().Return(0)
+	ns.OnGetSystemFailures().Return(0)
 	ns.On("ClearLastAttemptStartedAt").Return()
 
 	for _, tt := range tests {
