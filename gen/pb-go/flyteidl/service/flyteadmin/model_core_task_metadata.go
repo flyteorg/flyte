@@ -22,4 +22,5 @@ type CoreTaskMetadata struct {
 	DiscoveryVersion string `json:"discovery_version,omitempty"`
 	// If set, this indicates that this task is deprecated.  This will enable owners of tasks to notify consumers of the ending of support for a given task.
 	DeprecatedErrorMessage string `json:"deprecated_error_message,omitempty"`
+	Interruptible bool `json:"interruptible,omitempty"`
 }

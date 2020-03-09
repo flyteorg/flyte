@@ -3427,6 +3427,9 @@ export namespace flyteidl {
 
             /** TaskMetadata deprecatedErrorMessage */
             deprecatedErrorMessage?: (string|null);
+
+            /** TaskMetadata interruptible */
+            interruptible?: (boolean|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -3455,6 +3458,12 @@ export namespace flyteidl {
 
             /** TaskMetadata deprecatedErrorMessage. */
             public deprecatedErrorMessage: string;
+
+            /** TaskMetadata interruptible. */
+            public interruptible: boolean;
+
+            /** TaskMetadata interruptibleValue. */
+            public interruptibleValue?: "interruptible";
 
             /**
              * Creates a new TaskMetadata instance using the specified properties.

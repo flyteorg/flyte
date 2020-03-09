@@ -632,6 +632,11 @@ class TaskMetadata final :
   }
   static const TaskMetadata& default_instance();
 
+  enum InterruptibleValueCase {
+    kInterruptible = 8,
+    INTERRUPTIBLE_VALUE_NOT_SET = 0,
+  };
+
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const TaskMetadata* internal_default_instance() {
     return reinterpret_cast<const TaskMetadata*>(
@@ -756,9 +761,24 @@ class TaskMetadata final :
   bool discoverable() const;
   void set_discoverable(bool value);
 
+  // bool interruptible = 8;
+  private:
+  bool has_interruptible() const;
+  public:
+  void clear_interruptible();
+  static const int kInterruptibleFieldNumber = 8;
+  bool interruptible() const;
+  void set_interruptible(bool value);
+
+  void clear_interruptible_value();
+  InterruptibleValueCase interruptible_value_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.core.TaskMetadata)
  private:
   class HasBitSetters;
+  void set_has_interruptible();
+
+  inline bool has_interruptible_value() const;
+  inline void clear_has_interruptible_value();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr discovery_version_;
@@ -767,7 +787,13 @@ class TaskMetadata final :
   ::google::protobuf::Duration* timeout_;
   ::flyteidl::core::RetryStrategy* retries_;
   bool discoverable_;
+  union InterruptibleValueUnion {
+    InterruptibleValueUnion() {}
+    bool interruptible_;
+  } interruptible_value_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  ::google::protobuf::uint32 _oneof_case_[1];
+
   friend struct ::TableStruct_flyteidl_2fcore_2ftasks_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1815,6 +1841,44 @@ inline void TaskMetadata::set_allocated_deprecated_error_message(::std::string* 
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskMetadata.deprecated_error_message)
 }
 
+// bool interruptible = 8;
+inline bool TaskMetadata::has_interruptible() const {
+  return interruptible_value_case() == kInterruptible;
+}
+inline void TaskMetadata::set_has_interruptible() {
+  _oneof_case_[0] = kInterruptible;
+}
+inline void TaskMetadata::clear_interruptible() {
+  if (has_interruptible()) {
+    interruptible_value_.interruptible_ = false;
+    clear_has_interruptible_value();
+  }
+}
+inline bool TaskMetadata::interruptible() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.TaskMetadata.interruptible)
+  if (has_interruptible()) {
+    return interruptible_value_.interruptible_;
+  }
+  return false;
+}
+inline void TaskMetadata::set_interruptible(bool value) {
+  if (!has_interruptible()) {
+    clear_interruptible_value();
+    set_has_interruptible();
+  }
+  interruptible_value_.interruptible_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.TaskMetadata.interruptible)
+}
+
+inline bool TaskMetadata::has_interruptible_value() const {
+  return interruptible_value_case() != INTERRUPTIBLE_VALUE_NOT_SET;
+}
+inline void TaskMetadata::clear_has_interruptible_value() {
+  _oneof_case_[0] = INTERRUPTIBLE_VALUE_NOT_SET;
+}
+inline TaskMetadata::InterruptibleValueCase TaskMetadata::interruptible_value_case() const {
+  return TaskMetadata::InterruptibleValueCase(_oneof_case_[0]);
+}
 // -------------------------------------------------------------------
 
 // TaskTemplate
