@@ -753,7 +753,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.2.12
+        app.kubernetes.io/version: 0.2.13
     spec:
       containers:
       - args:
@@ -766,7 +766,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.2.12
+        image: docker.io/lyft/flytepropeller:v0.2.13
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
