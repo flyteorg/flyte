@@ -245,6 +245,13 @@ func (m *TaskMetadata) Validate() error {
 
 	// no validation rules for DeprecatedErrorMessage
 
+	switch m.InterruptibleValue.(type) {
+
+	case *TaskMetadata_Interruptible:
+		// no validation rules for Interruptible
+
+	}
+
 	return nil
 }
 

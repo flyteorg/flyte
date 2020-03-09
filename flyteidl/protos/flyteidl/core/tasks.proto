@@ -78,6 +78,17 @@ message TaskMetadata {
     // If set, this indicates that this task is deprecated.  This will enable owners of tasks to notify consumers
     // of the ending of support for a given task.
     string deprecated_error_message = 7;
+
+    // For interruptible we will populate it at the node level but require it be part of TaskMetadata 
+    // for a user to set the value.
+    // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being 
+    // set by the user or defaulting to false.
+    // The logic of handling precedence will be done as part of flytepropeller.
+
+    // Identify whether task is interruptible
+    oneof interruptible_value {
+        bool interruptible = 8;
+    };
 }
 
 // A Task structure that uniquely identifies a task in the system

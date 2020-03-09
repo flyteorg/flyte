@@ -5156,6 +5156,7 @@ definitions:
                 version: "version"
               discovery_version: "discovery_version"
               deprecated_error_message: "deprecated_error_message"
+              interruptible: true
               timeout: "timeout"
             custom:
               fields:
@@ -5287,6 +5288,7 @@ definitions:
               version: "version"
             discovery_version: "discovery_version"
             deprecated_error_message: "deprecated_error_message"
+            interruptible: true
             timeout: "timeout"
           custom:
             fields:
@@ -5652,6 +5654,7 @@ definitions:
                   version: "version"
                 discovery_version: "discovery_version"
                 deprecated_error_message: "deprecated_error_message"
+                interruptible: true
                 timeout: "timeout"
               custom:
                 fields:
@@ -5776,6 +5779,7 @@ definitions:
                   version: "version"
                 discovery_version: "discovery_version"
                 deprecated_error_message: "deprecated_error_message"
+                interruptible: true
                 timeout: "timeout"
               custom:
                 fields:
@@ -7616,6 +7620,7 @@ definitions:
                   version: "version"
                 discovery_version: "discovery_version"
                 deprecated_error_message: "deprecated_error_message"
+                interruptible: true
                 timeout: "timeout"
               custom:
                 fields:
@@ -7731,6 +7736,7 @@ definitions:
                   version: "version"
                 discovery_version: "discovery_version"
                 deprecated_error_message: "deprecated_error_message"
+                interruptible: true
                 timeout: "timeout"
               custom:
                 fields:
@@ -10424,6 +10430,7 @@ definitions:
                 version: "version"
               discovery_version: "discovery_version"
               deprecated_error_message: "deprecated_error_message"
+              interruptible: true
               timeout: "timeout"
             custom:
               fields:
@@ -10539,6 +10546,7 @@ definitions:
                 version: "version"
               discovery_version: "discovery_version"
               deprecated_error_message: "deprecated_error_message"
+              interruptible: true
               timeout: "timeout"
             custom:
               fields:
@@ -13188,6 +13196,7 @@ definitions:
                     version: "version"
                   discovery_version: "discovery_version"
                   deprecated_error_message: "deprecated_error_message"
+                  interruptible: true
                   timeout: "timeout"
                 custom:
                   fields:
@@ -13303,6 +13312,7 @@ definitions:
                     version: "version"
                   discovery_version: "discovery_version"
                   deprecated_error_message: "deprecated_error_message"
+                  interruptible: true
                   timeout: "timeout"
                 custom:
                   fields:
@@ -15893,6 +15903,7 @@ definitions:
                     version: "version"
                   discovery_version: "discovery_version"
                   deprecated_error_message: "deprecated_error_message"
+                  interruptible: true
                   timeout: "timeout"
                 custom:
                   fields:
@@ -16008,6 +16019,7 @@ definitions:
                     version: "version"
                   discovery_version: "discovery_version"
                   deprecated_error_message: "deprecated_error_message"
+                  interruptible: true
                   timeout: "timeout"
                 custom:
                   fields:
@@ -17345,6 +17357,7 @@ definitions:
             version: "version"
           discovery_version: "discovery_version"
           deprecated_error_message: "deprecated_error_message"
+          interruptible: true
           timeout: "timeout"
         custom:
           fields:
@@ -19964,6 +19977,7 @@ definitions:
               version: "version"
             discovery_version: "discovery_version"
             deprecated_error_message: "deprecated_error_message"
+            interruptible: true
             timeout: "timeout"
           custom:
             fields:
@@ -20079,6 +20093,7 @@ definitions:
               version: "version"
             discovery_version: "discovery_version"
             deprecated_error_message: "deprecated_error_message"
+            interruptible: true
             timeout: "timeout"
           custom:
             fields:
@@ -22210,6 +22225,9 @@ definitions:
         description: "If set, this indicates that this task is deprecated.  This will\
           \ enable owners of tasks to notify consumers\nof the ending of support for\
           \ a given task."
+      interruptible:
+        type: "boolean"
+        format: "boolean"
     title: "Task Metadata"
     example:
       retries:
@@ -22221,6 +22239,7 @@ definitions:
         version: "version"
       discovery_version: "discovery_version"
       deprecated_error_message: "deprecated_error_message"
+      interruptible: true
       timeout: "timeout"
   coreTaskNode:
     type: "object"
@@ -22308,6 +22327,7 @@ definitions:
           version: "version"
         discovery_version: "discovery_version"
         deprecated_error_message: "deprecated_error_message"
+        interruptible: true
         timeout: "timeout"
       custom:
         fields:

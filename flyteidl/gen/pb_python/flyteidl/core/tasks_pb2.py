@@ -25,7 +25,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.core',
   syntax='proto3',
   serialized_options=_b('Z0github.com/lyft/flyteidl/gen/pb-go/flyteidl/core'),
-  serialized_pb=_b('\n\x19\x66lyteidl/core/tasks.proto\x12\rflyteidl.core\x1a\x1e\x66lyteidl/core/identifier.proto\x1a\x1d\x66lyteidl/core/interface.proto\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x9a\x02\n\tResources\x12\x38\n\x08requests\x18\x01 \x03(\x0b\x32&.flyteidl.core.Resources.ResourceEntry\x12\x36\n\x06limits\x18\x02 \x03(\x0b\x32&.flyteidl.core.Resources.ResourceEntry\x1aS\n\rResourceEntry\x12\x33\n\x04name\x18\x01 \x01(\x0e\x32%.flyteidl.core.Resources.ResourceName\x12\r\n\x05value\x18\x02 \x01(\t\"F\n\x0cResourceName\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x07\n\x03\x43PU\x10\x01\x12\x07\n\x03GPU\x10\x02\x12\n\n\x06MEMORY\x10\x03\x12\x0b\n\x07STORAGE\x10\x04\"\x95\x01\n\x0fRuntimeMetadata\x12\x38\n\x04type\x18\x01 \x01(\x0e\x32*.flyteidl.core.RuntimeMetadata.RuntimeType\x12\x0f\n\x07version\x18\x02 \x01(\t\x12\x0e\n\x06\x66lavor\x18\x03 \x01(\t\"\'\n\x0bRuntimeType\x12\t\n\x05OTHER\x10\x00\x12\r\n\tFLYTE_SDK\x10\x01\"\xed\x01\n\x0cTaskMetadata\x12\x14\n\x0c\x64iscoverable\x18\x01 \x01(\x08\x12/\n\x07runtime\x18\x02 \x01(\x0b\x32\x1e.flyteidl.core.RuntimeMetadata\x12*\n\x07timeout\x18\x04 \x01(\x0b\x32\x19.google.protobuf.Duration\x12-\n\x07retries\x18\x05 \x01(\x0b\x32\x1c.flyteidl.core.RetryStrategy\x12\x19\n\x11\x64iscovery_version\x18\x06 \x01(\t\x12 \n\x18\x64\x65precated_error_message\x18\x07 \x01(\t\"\x86\x02\n\x0cTaskTemplate\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12\x0c\n\x04type\x18\x02 \x01(\t\x12-\n\x08metadata\x18\x03 \x01(\x0b\x32\x1b.flyteidl.core.TaskMetadata\x12\x30\n\tinterface\x18\x04 \x01(\x0b\x32\x1d.flyteidl.core.TypedInterface\x12\'\n\x06\x63ustom\x18\x05 \x01(\x0b\x32\x17.google.protobuf.Struct\x12-\n\tcontainer\x18\x06 \x01(\x0b\x32\x18.flyteidl.core.ContainerH\x00\x42\x08\n\x06target\"\'\n\rContainerPort\x12\x16\n\x0e\x63ontainer_port\x18\x01 \x01(\r\"\xea\x01\n\tContainer\x12\r\n\x05image\x18\x01 \x01(\t\x12\x0f\n\x07\x63ommand\x18\x02 \x03(\t\x12\x0c\n\x04\x61rgs\x18\x03 \x03(\t\x12+\n\tresources\x18\x04 \x01(\x0b\x32\x18.flyteidl.core.Resources\x12(\n\x03\x65nv\x18\x05 \x03(\x0b\x32\x1b.flyteidl.core.KeyValuePair\x12+\n\x06\x63onfig\x18\x06 \x03(\x0b\x32\x1b.flyteidl.core.KeyValuePair\x12+\n\x05ports\x18\x07 \x03(\x0b\x32\x1c.flyteidl.core.ContainerPortB2Z0github.com/lyft/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
+  serialized_pb=_b('\n\x19\x66lyteidl/core/tasks.proto\x12\rflyteidl.core\x1a\x1e\x66lyteidl/core/identifier.proto\x1a\x1d\x66lyteidl/core/interface.proto\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x9a\x02\n\tResources\x12\x38\n\x08requests\x18\x01 \x03(\x0b\x32&.flyteidl.core.Resources.ResourceEntry\x12\x36\n\x06limits\x18\x02 \x03(\x0b\x32&.flyteidl.core.Resources.ResourceEntry\x1aS\n\rResourceEntry\x12\x33\n\x04name\x18\x01 \x01(\x0e\x32%.flyteidl.core.Resources.ResourceName\x12\r\n\x05value\x18\x02 \x01(\t\"F\n\x0cResourceName\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x07\n\x03\x43PU\x10\x01\x12\x07\n\x03GPU\x10\x02\x12\n\n\x06MEMORY\x10\x03\x12\x0b\n\x07STORAGE\x10\x04\"\x95\x01\n\x0fRuntimeMetadata\x12\x38\n\x04type\x18\x01 \x01(\x0e\x32*.flyteidl.core.RuntimeMetadata.RuntimeType\x12\x0f\n\x07version\x18\x02 \x01(\t\x12\x0e\n\x06\x66lavor\x18\x03 \x01(\t\"\'\n\x0bRuntimeType\x12\t\n\x05OTHER\x10\x00\x12\r\n\tFLYTE_SDK\x10\x01\"\x9d\x02\n\x0cTaskMetadata\x12\x14\n\x0c\x64iscoverable\x18\x01 \x01(\x08\x12/\n\x07runtime\x18\x02 \x01(\x0b\x32\x1e.flyteidl.core.RuntimeMetadata\x12*\n\x07timeout\x18\x04 \x01(\x0b\x32\x19.google.protobuf.Duration\x12-\n\x07retries\x18\x05 \x01(\x0b\x32\x1c.flyteidl.core.RetryStrategy\x12\x19\n\x11\x64iscovery_version\x18\x06 \x01(\t\x12 \n\x18\x64\x65precated_error_message\x18\x07 \x01(\t\x12\x17\n\rinterruptible\x18\x08 \x01(\x08H\x00\x42\x15\n\x13interruptible_value\"\x86\x02\n\x0cTaskTemplate\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\x12\x0c\n\x04type\x18\x02 \x01(\t\x12-\n\x08metadata\x18\x03 \x01(\x0b\x32\x1b.flyteidl.core.TaskMetadata\x12\x30\n\tinterface\x18\x04 \x01(\x0b\x32\x1d.flyteidl.core.TypedInterface\x12\'\n\x06\x63ustom\x18\x05 \x01(\x0b\x32\x17.google.protobuf.Struct\x12-\n\tcontainer\x18\x06 \x01(\x0b\x32\x18.flyteidl.core.ContainerH\x00\x42\x08\n\x06target\"\'\n\rContainerPort\x12\x16\n\x0e\x63ontainer_port\x18\x01 \x01(\r\"\xea\x01\n\tContainer\x12\r\n\x05image\x18\x01 \x01(\t\x12\x0f\n\x07\x63ommand\x18\x02 \x03(\t\x12\x0c\n\x04\x61rgs\x18\x03 \x03(\t\x12+\n\tresources\x18\x04 \x01(\x0b\x32\x18.flyteidl.core.Resources\x12(\n\x03\x65nv\x18\x05 \x03(\x0b\x32\x1b.flyteidl.core.KeyValuePair\x12+\n\x06\x63onfig\x18\x06 \x03(\x0b\x32\x1b.flyteidl.core.KeyValuePair\x12+\n\x05ports\x18\x07 \x03(\x0b\x32\x1c.flyteidl.core.ContainerPortB2Z0github.com/lyft/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
   ,
   dependencies=[flyteidl_dot_core_dot_identifier__pb2.DESCRIPTOR,flyteidl_dot_core_dot_interface__pb2.DESCRIPTOR,flyteidl_dot_core_dot_literals__pb2.DESCRIPTOR,google_dot_protobuf_dot_duration__pb2.DESCRIPTOR,google_dot_protobuf_dot_struct__pb2.DESCRIPTOR,])
 
@@ -259,6 +259,13 @@ _TASKMETADATA = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='interruptible', full_name='flyteidl.core.TaskMetadata.interruptible', index=6,
+      number=8, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -270,9 +277,12 @@ _TASKMETADATA = _descriptor.Descriptor(
   syntax='proto3',
   extension_ranges=[],
   oneofs=[
+    _descriptor.OneofDescriptor(
+      name='interruptible_value', full_name='flyteidl.core.TaskMetadata.interruptible_value',
+      index=0, containing_type=None, fields=[]),
   ],
   serialized_start=637,
-  serialized_end=874,
+  serialized_end=922,
 )
 
 
@@ -340,8 +350,8 @@ _TASKTEMPLATE = _descriptor.Descriptor(
       name='target', full_name='flyteidl.core.TaskTemplate.target',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=877,
-  serialized_end=1139,
+  serialized_start=925,
+  serialized_end=1187,
 )
 
 
@@ -371,8 +381,8 @@ _CONTAINERPORT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1141,
-  serialized_end=1180,
+  serialized_start=1189,
+  serialized_end=1228,
 )
 
 
@@ -444,8 +454,8 @@ _CONTAINER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1183,
-  serialized_end=1417,
+  serialized_start=1231,
+  serialized_end=1465,
 )
 
 _RESOURCES_RESOURCEENTRY.fields_by_name['name'].enum_type = _RESOURCES_RESOURCENAME
@@ -458,6 +468,9 @@ _RUNTIMEMETADATA_RUNTIMETYPE.containing_type = _RUNTIMEMETADATA
 _TASKMETADATA.fields_by_name['runtime'].message_type = _RUNTIMEMETADATA
 _TASKMETADATA.fields_by_name['timeout'].message_type = google_dot_protobuf_dot_duration__pb2._DURATION
 _TASKMETADATA.fields_by_name['retries'].message_type = flyteidl_dot_core_dot_literals__pb2._RETRYSTRATEGY
+_TASKMETADATA.oneofs_by_name['interruptible_value'].fields.append(
+  _TASKMETADATA.fields_by_name['interruptible'])
+_TASKMETADATA.fields_by_name['interruptible'].containing_oneof = _TASKMETADATA.oneofs_by_name['interruptible_value']
 _TASKTEMPLATE.fields_by_name['id'].message_type = flyteidl_dot_core_dot_identifier__pb2._IDENTIFIER
 _TASKTEMPLATE.fields_by_name['metadata'].message_type = _TASKMETADATA
 _TASKTEMPLATE.fields_by_name['interface'].message_type = flyteidl_dot_core_dot_interface__pb2._TYPEDINTERFACE

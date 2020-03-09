@@ -8222,6 +8222,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.IRetryStrategy|null} [retries] TaskMetadata retries
              * @property {string|null} [discoveryVersion] TaskMetadata discoveryVersion
              * @property {string|null} [deprecatedErrorMessage] TaskMetadata deprecatedErrorMessage
+             * @property {boolean|null} [interruptible] TaskMetadata interruptible
              */
 
             /**
@@ -8288,6 +8289,28 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskMetadata.prototype.deprecatedErrorMessage = "";
 
             /**
+             * TaskMetadata interruptible.
+             * @member {boolean} interruptible
+             * @memberof flyteidl.core.TaskMetadata
+             * @instance
+             */
+            TaskMetadata.prototype.interruptible = false;
+
+            // OneOf field names bound to virtual getters and setters
+            let $oneOfFields;
+
+            /**
+             * TaskMetadata interruptibleValue.
+             * @member {"interruptible"|undefined} interruptibleValue
+             * @memberof flyteidl.core.TaskMetadata
+             * @instance
+             */
+            Object.defineProperty(TaskMetadata.prototype, "interruptibleValue", {
+                get: $util.oneOfGetter($oneOfFields = ["interruptible"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
+            /**
              * Creates a new TaskMetadata instance using the specified properties.
              * @function create
              * @memberof flyteidl.core.TaskMetadata
@@ -8323,6 +8346,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 6, wireType 2 =*/50).string(message.discoveryVersion);
                 if (message.deprecatedErrorMessage != null && message.hasOwnProperty("deprecatedErrorMessage"))
                     writer.uint32(/* id 7, wireType 2 =*/58).string(message.deprecatedErrorMessage);
+                if (message.interruptible != null && message.hasOwnProperty("interruptible"))
+                    writer.uint32(/* id 8, wireType 0 =*/64).bool(message.interruptible);
                 return writer;
             };
 
@@ -8362,6 +8387,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 7:
                         message.deprecatedErrorMessage = reader.string();
                         break;
+                    case 8:
+                        message.interruptible = reader.bool();
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -8381,6 +8409,7 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskMetadata.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                let properties = {};
                 if (message.discoverable != null && message.hasOwnProperty("discoverable"))
                     if (typeof message.discoverable !== "boolean")
                         return "discoverable: boolean expected";
@@ -8405,6 +8434,11 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.deprecatedErrorMessage != null && message.hasOwnProperty("deprecatedErrorMessage"))
                     if (!$util.isString(message.deprecatedErrorMessage))
                         return "deprecatedErrorMessage: string expected";
+                if (message.interruptible != null && message.hasOwnProperty("interruptible")) {
+                    properties.interruptibleValue = 1;
+                    if (typeof message.interruptible !== "boolean")
+                        return "interruptible: boolean expected";
+                }
                 return null;
             };
 
