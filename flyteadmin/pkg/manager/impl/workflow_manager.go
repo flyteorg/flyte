@@ -65,7 +65,7 @@ func (w *WorkflowManager) setDefaults(request admin.WorkflowCreateRequest) (admi
 // TODO: Once the SDK sends subworkflows, pipe them through to calls to GetRequirements & CompileWorkflow.
 func (w *WorkflowManager) getCompiledWorkflow(
 	ctx context.Context, request admin.WorkflowCreateRequest) (admin.WorkflowClosure, error) {
-	reqs, err := w.compiler.GetRequirements(request.Spec.Template, nil)
+	reqs, err := w.compiler.GetRequirements(request.Spec.Template, request.Spec.SubWorkflows)
 	if err != nil {
 		w.metrics.CompilationFailures.Inc()
 		logger.Errorf(ctx, "Failed to get workflow requirements for template [%+v] with err %v",
@@ -103,7 +103,7 @@ func (w *WorkflowManager) getCompiledWorkflow(
 		launchPlans[idx] = launchPlanInterfaceProvider
 	}
 
-	closure, err := w.compiler.CompileWorkflow(request.Spec.Template, nil, tasks, launchPlans)
+	closure, err := w.compiler.CompileWorkflow(request.Spec.Template, request.Spec.SubWorkflows, tasks, launchPlans)
 	if err != nil {
 		w.metrics.CompilationFailures.Inc()
 		logger.Debugf(ctx, "Failed to compile workflow with id [%+v] with err %v", request.Id, err)
