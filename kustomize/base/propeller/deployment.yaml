@@ -15,7 +15,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.2.0
+        app.kubernetes.io/version: 0.2.12
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "10254"

@@ -753,7 +753,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.2.0
+        app.kubernetes.io/version: 0.2.12
     spec:
       containers:
       - args:
