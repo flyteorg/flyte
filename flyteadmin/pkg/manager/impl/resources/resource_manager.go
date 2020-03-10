@@ -17,10 +17,13 @@ import (
 	"github.com/lyft/flyteadmin/pkg/manager/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+
+	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
 )
 
 type ResourceManager struct {
-	db repositories.RepositoryInterface
+	db     repositories.RepositoryInterface
+	config runtimeInterfaces.ApplicationConfiguration
 }
 
 func (m *ResourceManager) GetResource(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
@@ -56,7 +59,7 @@ func (m *ResourceManager) UpdateWorkflowAttributes(
 	*admin.WorkflowAttributesUpdateResponse, error) {
 	var resource admin.MatchableResource
 	var err error
-	if resource, err = validation.ValidateWorkflowAttributesUpdateRequest(request); err != nil {
+	if resource, err = validation.ValidateWorkflowAttributesUpdateRequest(ctx, m.db, m.config, request); err != nil {
 		return nil, err
 	}
 
@@ -75,7 +78,7 @@ func (m *ResourceManager) UpdateWorkflowAttributes(
 func (m *ResourceManager) GetWorkflowAttributes(
 	ctx context.Context, request admin.WorkflowAttributesGetRequest) (
 	*admin.WorkflowAttributesGetResponse, error) {
-	if err := validation.ValidateWorkflowAttributesGetRequest(request); err != nil {
+	if err := validation.ValidateWorkflowAttributesGetRequest(ctx, m.db, m.config, request); err != nil {
 		return nil, err
 	}
 	workflowAttributesModel, err := m.db.ResourceRepo().Get(
@@ -94,7 +97,7 @@ func (m *ResourceManager) GetWorkflowAttributes(
 
 func (m *ResourceManager) DeleteWorkflowAttributes(ctx context.Context,
 	request admin.WorkflowAttributesDeleteRequest) (*admin.WorkflowAttributesDeleteResponse, error) {
-	if err := validation.ValidateWorkflowAttributesDeleteRequest(request); err != nil {
+	if err := validation.ValidateWorkflowAttributesDeleteRequest(ctx, m.db, m.config, request); err != nil {
 		return nil, err
 	}
 	if err := m.db.ResourceRepo().Delete(
@@ -111,7 +114,7 @@ func (m *ResourceManager) UpdateProjectDomainAttributes(
 	*admin.ProjectDomainAttributesUpdateResponse, error) {
 	var resource admin.MatchableResource
 	var err error
-	if resource, err = validation.ValidateProjectDomainAttributesUpdateRequest(request); err != nil {
+	if resource, err = validation.ValidateProjectDomainAttributesUpdateRequest(ctx, m.db, m.config, request); err != nil {
 		return nil, err
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Attributes.Project, request.Attributes.Domain)
@@ -130,7 +133,7 @@ func (m *ResourceManager) UpdateProjectDomainAttributes(
 func (m *ResourceManager) GetProjectDomainAttributes(
 	ctx context.Context, request admin.ProjectDomainAttributesGetRequest) (
 	*admin.ProjectDomainAttributesGetResponse, error) {
-	if err := validation.ValidateProjectDomainAttributesGetRequest(request); err != nil {
+	if err := validation.ValidateProjectDomainAttributesGetRequest(ctx, m.db, m.config, request); err != nil {
 		return nil, err
 	}
 	projectAttributesModel, err := m.db.ResourceRepo().Get(
@@ -149,7 +152,7 @@ func (m *ResourceManager) GetProjectDomainAttributes(
 
 func (m *ResourceManager) DeleteProjectDomainAttributes(ctx context.Context,
 	request admin.ProjectDomainAttributesDeleteRequest) (*admin.ProjectDomainAttributesDeleteResponse, error) {
-	if err := validation.ValidateProjectDomainAttributesDeleteRequest(request); err != nil {
+	if err := validation.ValidateProjectDomainAttributesDeleteRequest(ctx, m.db, m.config, request); err != nil {
 		return nil, err
 	}
 	if err := m.db.ResourceRepo().Delete(
@@ -183,8 +186,9 @@ func (m *ResourceManager) ListAll(ctx context.Context, request admin.ListMatchab
 	}, nil
 }
 
-func NewResourceManager(db repositories.RepositoryInterface) interfaces.ResourceInterface {
+func NewResourceManager(db repositories.RepositoryInterface, config runtimeInterfaces.ApplicationConfiguration) interfaces.ResourceInterface {
 	return &ResourceManager{
-		db: db,
+		db:     db,
+		config: config,
 	}
 }

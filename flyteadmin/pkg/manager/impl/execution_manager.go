@@ -262,9 +262,9 @@ func assignResourcesIfUnset(ctx context.Context, identifier *core.Identifier,
 // Note: The system will assign a system-default value for request but for limit it will deduce it from the request
 // itself => Limit := Min([Some-Multiplier X Request], System-Max). For now we are using a multiplier of 1. In
 // general we recommend the users to set limits close to requests for more predictability in the system.
-func setCompiledTaskDefaults(ctx context.Context, taskConfig runtimeInterfaces.TaskResourceConfiguration, task *core.CompiledTask,
-	db repositories.RepositoryInterface, workflowName string) {
-	resourceManager := resources.NewResourceManager(db)
+func setCompiledTaskDefaults(ctx context.Context, config runtimeInterfaces.Configuration,
+	task *core.CompiledTask, db repositories.RepositoryInterface, workflowName string) {
+	resourceManager := resources.NewResourceManager(db, config.ApplicationConfiguration())
 	if task == nil {
 		logger.Warningf(ctx, "Can't set default resources for nil task.")
 		return
@@ -291,7 +291,7 @@ func setCompiledTaskDefaults(ctx context.Context, taskConfig runtimeInterfaces.T
 		taskResourceSpec = resource.Attributes.GetTaskResourceAttributes().Defaults
 	}
 	task.Template.GetContainer().Resources.Requests = assignResourcesIfUnset(
-		ctx, task.Template.Id, taskConfig.GetDefaults(), task.Template.GetContainer().Resources.Requests,
+		ctx, task.Template.Id, config.TaskResourceConfiguration().GetDefaults(), task.Template.GetContainer().Resources.Requests,
 		taskResourceSpec)
 
 	logger.Debugf(ctx, "Assigning task resource limits for [%+v]", task.Template.Id)
@@ -361,7 +361,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	// Dynamically assign task resource defaults.
 	for _, task := range workflow.Closure.CompiledWorkflow.Tasks {
-		setCompiledTaskDefaults(ctx, m.config.TaskResourceConfiguration(), task, m.db, name)
+		setCompiledTaskDefaults(ctx, m.config, task, m.db, name)
 	}
 
 	// Dynamically assign execution queues.

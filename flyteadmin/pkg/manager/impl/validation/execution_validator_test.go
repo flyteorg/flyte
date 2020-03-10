@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var execConfig = testutils.GetApplicationConfigWithDefaultProjects()
+var execConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
 func TestValidateExecEmptyProject(t *testing.T) {
 	request := testutils.GetExecutionRequest()

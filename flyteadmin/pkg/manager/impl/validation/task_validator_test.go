@@ -26,7 +26,7 @@ func getMockTaskConfigProvider() runtimeInterfaces.TaskResourceConfiguration {
 }
 
 var mockWhitelistConfigProvider = runtimeMocks.NewMockWhitelistConfiguration()
-var taskApplicationConfigProvider = testutils.GetApplicationConfigWithDefaultProjects()
+var taskApplicationConfigProvider = testutils.GetApplicationConfigWithDefaultDomains()
 
 func TestValidateTaskEmptyProject(t *testing.T) {
 	request := testutils.GetValidTaskRequest()

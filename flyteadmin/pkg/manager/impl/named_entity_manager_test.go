@@ -35,7 +35,7 @@ func getMockRepositoryForNETest() repositories.RepositoryInterface {
 
 func getMockConfigForNETest() runtimeInterfaces.Configuration {
 	mockConfig := runtimeMocks.NewMockConfigurationProvider(
-		testutils.GetApplicationConfigWithDefaultProjects(), nil, nil, nil, nil, nil)
+		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
 	return mockConfig
 }
 

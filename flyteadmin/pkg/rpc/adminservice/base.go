@@ -163,7 +163,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		TaskExecutionManager: manager.NewTaskExecutionManager(
 			db, adminScope.NewSubScope("task_execution_manager"), urlData),
 		ProjectManager:  manager.NewProjectManager(db, configuration),
-		ResourceManager: resources.NewResourceManager(db),
+		ResourceManager: resources.NewResourceManager(db, configuration.ApplicationConfiguration()),
 		Metrics:         InitMetrics(adminScope),
 	}
 }

@@ -69,7 +69,7 @@ var workflowClosureBytes, _ = proto.Marshal(&workflowClosure)
 
 func getMockWorkflowConfigProvider() runtimeInterfaces.Configuration {
 	mockWorkflowConfigProvider := runtimeMocks.NewMockConfigurationProvider(
-		testutils.GetApplicationConfigWithDefaultProjects(), nil, nil, nil, nil, nil)
+		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
 	mockWorkflowConfigProvider.(*runtimeMocks.MockConfigurationProvider).AddRegistrationValidationConfiguration(
 		runtimeMocks.NewMockRegistrationValidationProvider())
 	return mockWorkflowConfigProvider

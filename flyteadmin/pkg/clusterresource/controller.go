@@ -431,7 +431,7 @@ func NewClusterResourceController(db repositories.RepositoryInterface, execution
 		db:               db,
 		config:           config,
 		executionCluster: executionCluster,
-		resourceManager:  resources.NewResourceManager(db),
+		resourceManager:  resources.NewResourceManager(db, config.ApplicationConfiguration()),
 		poller:           make(chan struct{}),
 		metrics:          newMetrics(scope),
 		appliedTemplates: make(map[string]map[string]time.Time),

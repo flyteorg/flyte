@@ -5,7 +5,7 @@ import (
 	runtimeMocks "github.com/lyft/flyteadmin/pkg/runtime/mocks"
 )
 
-func GetApplicationConfigWithDefaultProjects() runtimeInterfaces.ApplicationConfiguration {
+func GetApplicationConfigWithDefaultDomains() runtimeInterfaces.ApplicationConfiguration {
 	config := runtimeMocks.MockApplicationProvider{}
 	config.SetDomainsConfig(runtimeInterfaces.DomainsConfig{
 		{

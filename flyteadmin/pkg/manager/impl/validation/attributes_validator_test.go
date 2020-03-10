@@ -1,13 +1,19 @@
 package validation
 
 import (
+	"context"
 	"testing"
+
+	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
+	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
 
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 )
+
+var attributesApplicationConfigProvider = testutils.GetApplicationConfigWithDefaultDomains()
 
 func TestValidateMatchingAttributes(t *testing.T) {
 	testCases := []struct {
@@ -71,147 +77,204 @@ func TestValidateMatchingAttributes(t *testing.T) {
 }
 
 func TestValidateProjectDomainAttributesUpdateRequest(t *testing.T) {
-	_, err := ValidateProjectDomainAttributesUpdateRequest(admin.ProjectDomainAttributesUpdateRequest{})
+	_, err := ValidateProjectDomainAttributesUpdateRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.ProjectDomainAttributesUpdateRequest{})
 	assert.Equal(t, "missing attributes", err.Error())
 
-	_, err = ValidateProjectDomainAttributesUpdateRequest(admin.ProjectDomainAttributesUpdateRequest{
-		Attributes: &admin.ProjectDomainAttributes{}})
-	assert.Equal(t, "missing project", err.Error())
+	_, err = ValidateProjectDomainAttributesUpdateRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.ProjectDomainAttributesUpdateRequest{
+			Attributes: &admin.ProjectDomainAttributes{}})
+	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
-	_, err = ValidateProjectDomainAttributesUpdateRequest(admin.ProjectDomainAttributesUpdateRequest{
-		Attributes: &admin.ProjectDomainAttributes{
-			Project: "project",
-		}})
-	assert.Equal(t, "missing domain", err.Error())
+	_, err = ValidateProjectDomainAttributesUpdateRequest(context.Background(),
+		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")), attributesApplicationConfigProvider,
+		admin.ProjectDomainAttributesUpdateRequest{
+			Attributes: &admin.ProjectDomainAttributes{
+				Domain: "development",
+			}})
+	assert.Equal(t,
+		"failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		err.Error())
 
-	matchableResource, err := ValidateProjectDomainAttributesUpdateRequest(admin.ProjectDomainAttributesUpdateRequest{
-		Attributes: &admin.ProjectDomainAttributes{
-			Project: "project",
-			Domain:  "domain",
-			MatchingAttributes: &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ClusterResourceAttributes{
-					ClusterResourceAttributes: &admin.ClusterResourceAttributes{
-						Attributes: map[string]string{
-							"bar": "baz",
+	matchableResource, err := ValidateProjectDomainAttributesUpdateRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.ProjectDomainAttributesUpdateRequest{
+			Attributes: &admin.ProjectDomainAttributes{
+				Project: "project",
+				Domain:  "domain",
+				MatchingAttributes: &admin.MatchingAttributes{
+					Target: &admin.MatchingAttributes_ClusterResourceAttributes{
+						ClusterResourceAttributes: &admin.ClusterResourceAttributes{
+							Attributes: map[string]string{
+								"bar": "baz",
+							},
 						},
 					},
 				},
-			},
-		}})
+			}})
 	assert.Equal(t, admin.MatchableResource_CLUSTER_RESOURCE, matchableResource)
 	assert.Nil(t, err)
 }
 
 func TestValidateProjectDomainAttributesGetRequest(t *testing.T) {
-	err := ValidateProjectDomainAttributesGetRequest(admin.ProjectDomainAttributesGetRequest{})
-	assert.Equal(t, "missing project", err.Error())
+	err := ValidateProjectDomainAttributesGetRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.ProjectDomainAttributesGetRequest{})
+	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
-	err = ValidateProjectDomainAttributesGetRequest(admin.ProjectDomainAttributesGetRequest{
-		Project: "project",
-	})
-	assert.Equal(t, "missing domain", err.Error())
+	err = ValidateProjectDomainAttributesGetRequest(context.Background(),
+		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")),
+		attributesApplicationConfigProvider, admin.ProjectDomainAttributesGetRequest{
+			Domain: "development",
+		})
+	assert.Equal(t, "failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		err.Error())
 
-	assert.Nil(t, ValidateProjectDomainAttributesGetRequest(admin.ProjectDomainAttributesGetRequest{
-		Project: "project",
-		Domain:  "domain",
-	}))
+	assert.Nil(t, ValidateProjectDomainAttributesGetRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.ProjectDomainAttributesGetRequest{
+			Project: "project",
+			Domain:  "domain",
+		}))
 }
 
 func TestValidateProjectDomainAttributesDeleteRequest(t *testing.T) {
-	err := ValidateProjectDomainAttributesDeleteRequest(admin.ProjectDomainAttributesDeleteRequest{})
-	assert.Equal(t, "missing project", err.Error())
+	err := ValidateProjectDomainAttributesDeleteRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.ProjectDomainAttributesDeleteRequest{})
+	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
-	err = ValidateProjectDomainAttributesDeleteRequest(admin.ProjectDomainAttributesDeleteRequest{
-		Project: "project",
-	})
-	assert.Equal(t, "missing domain", err.Error())
+	err = ValidateProjectDomainAttributesDeleteRequest(context.Background(),
+		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")),
+		attributesApplicationConfigProvider, admin.ProjectDomainAttributesDeleteRequest{
+			Domain: "development",
+		})
+	assert.Equal(t,
+		"failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		err.Error())
 
-	assert.Nil(t, ValidateProjectDomainAttributesDeleteRequest(admin.ProjectDomainAttributesDeleteRequest{
-		Project: "project",
-		Domain:  "domain",
-	}))
+	assert.Nil(t, ValidateProjectDomainAttributesDeleteRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.ProjectDomainAttributesDeleteRequest{
+			Project: "project",
+			Domain:  "domain",
+		}))
 }
 
 func TestValidateWorkflowAttributesUpdateRequest(t *testing.T) {
-	_, err := ValidateWorkflowAttributesUpdateRequest(admin.WorkflowAttributesUpdateRequest{})
+	_, err := ValidateWorkflowAttributesUpdateRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.WorkflowAttributesUpdateRequest{})
 	assert.Equal(t, "missing attributes", err.Error())
 
-	_, err = ValidateWorkflowAttributesUpdateRequest(admin.WorkflowAttributesUpdateRequest{
-		Attributes: &admin.WorkflowAttributes{}})
-	assert.Equal(t, "missing project", err.Error())
+	_, err = ValidateWorkflowAttributesUpdateRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.WorkflowAttributesUpdateRequest{
+			Attributes: &admin.WorkflowAttributes{}})
+	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
-	_, err = ValidateWorkflowAttributesUpdateRequest(admin.WorkflowAttributesUpdateRequest{
-		Attributes: &admin.WorkflowAttributes{
-			Project: "project",
-		}})
-	assert.Equal(t, "missing domain", err.Error())
+	_, err = ValidateWorkflowAttributesUpdateRequest(context.Background(),
+		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")),
+		attributesApplicationConfigProvider, admin.WorkflowAttributesUpdateRequest{
+			Attributes: &admin.WorkflowAttributes{
+				Domain: "development",
+			}})
+	assert.Equal(t,
+		"failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		err.Error())
 
-	_, err = ValidateWorkflowAttributesUpdateRequest(admin.WorkflowAttributesUpdateRequest{
-		Attributes: &admin.WorkflowAttributes{
-			Project: "project",
-			Domain:  "domain",
-		}})
+	_, err = ValidateWorkflowAttributesUpdateRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.WorkflowAttributesUpdateRequest{
+			Attributes: &admin.WorkflowAttributes{
+				Project: "project",
+				Domain:  "domain",
+			}})
 	assert.Equal(t, "missing name", err.Error())
 
-	matchableResource, err := ValidateWorkflowAttributesUpdateRequest(admin.WorkflowAttributesUpdateRequest{
-		Attributes: &admin.WorkflowAttributes{
-			Project:  "project",
-			Domain:   "domain",
-			Workflow: "workflow",
-			MatchingAttributes: &admin.MatchingAttributes{
-				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
-					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
-						Tags: []string{"bar", "baz"},
+	matchableResource, err := ValidateWorkflowAttributesUpdateRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.WorkflowAttributesUpdateRequest{
+			Attributes: &admin.WorkflowAttributes{
+				Project:  "project",
+				Domain:   "domain",
+				Workflow: "workflow",
+				MatchingAttributes: &admin.MatchingAttributes{
+					Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
+						ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
+							Tags: []string{"bar", "baz"},
+						},
 					},
 				},
-			},
-		}})
+			}})
 	assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE, matchableResource)
 	assert.Nil(t, err)
 }
 
 func TestValidateWorkflowAttributesGetRequest(t *testing.T) {
-	err := ValidateWorkflowAttributesGetRequest(admin.WorkflowAttributesGetRequest{})
-	assert.Equal(t, "missing project", err.Error())
+	err := ValidateWorkflowAttributesGetRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.WorkflowAttributesGetRequest{})
+	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
-	err = ValidateWorkflowAttributesGetRequest(admin.WorkflowAttributesGetRequest{
-		Project: "project",
-	})
-	assert.Equal(t, "missing domain", err.Error())
+	err = ValidateWorkflowAttributesGetRequest(context.Background(),
+		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")),
+		attributesApplicationConfigProvider, admin.WorkflowAttributesGetRequest{
+			Domain: "development",
+		})
+	assert.Equal(t,
+		"failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		err.Error())
 
-	err = ValidateWorkflowAttributesGetRequest(admin.WorkflowAttributesGetRequest{
-		Project: "project",
-		Domain:  "domain",
-	})
+	err = ValidateWorkflowAttributesGetRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.WorkflowAttributesGetRequest{
+			Project: "project",
+			Domain:  "domain",
+		})
 	assert.Equal(t, "missing name", err.Error())
 
-	assert.Nil(t, ValidateWorkflowAttributesGetRequest(admin.WorkflowAttributesGetRequest{
-		Project:  "project",
-		Domain:   "domain",
-		Workflow: "workflow",
-	}))
+	assert.Nil(t, ValidateWorkflowAttributesGetRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.WorkflowAttributesGetRequest{
+			Project:  "project",
+			Domain:   "domain",
+			Workflow: "workflow",
+		}))
 }
 
 func TestValidateWorkflowAttributesDeleteRequest(t *testing.T) {
-	err := ValidateWorkflowAttributesDeleteRequest(admin.WorkflowAttributesDeleteRequest{})
-	assert.Equal(t, "missing project", err.Error())
+	err := ValidateWorkflowAttributesDeleteRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.WorkflowAttributesDeleteRequest{})
+	assert.Equal(t, "domain [] is unrecognized by system", err.Error())
 
-	err = ValidateWorkflowAttributesDeleteRequest(admin.WorkflowAttributesDeleteRequest{
-		Project: "project",
-	})
-	assert.Equal(t, "missing domain", err.Error())
+	err = ValidateWorkflowAttributesDeleteRequest(context.Background(),
+		testutils.GetRepoWithDefaultProjectAndErr(shared.GetMissingArgumentError("project")),
+		attributesApplicationConfigProvider, admin.WorkflowAttributesDeleteRequest{
+			Domain: "development",
+		})
+	assert.Equal(t,
+		"failed to validate that project [] and domain [development] are registered, err: [missing project]",
+		err.Error())
 
-	err = ValidateWorkflowAttributesDeleteRequest(admin.WorkflowAttributesDeleteRequest{
-		Project: "project",
-		Domain:  "domain",
-	})
+	err = ValidateWorkflowAttributesDeleteRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.WorkflowAttributesDeleteRequest{
+			Project: "project",
+			Domain:  "domain",
+		})
 	assert.Equal(t, "missing name", err.Error())
 
-	assert.Nil(t, ValidateWorkflowAttributesDeleteRequest(admin.WorkflowAttributesDeleteRequest{
-		Project:  "project",
-		Domain:   "domain",
-		Workflow: "workflow",
-	}))
+	assert.Nil(t, ValidateWorkflowAttributesDeleteRequest(context.Background(),
+		testutils.GetRepoWithDefaultProject(), attributesApplicationConfigProvider,
+		admin.WorkflowAttributesDeleteRequest{
+			Project:  "project",
+			Domain:   "domain",
+			Workflow: "workflow",
+		}))
 }
 
 func TestValidateListAllMatchableAttributesRequest(t *testing.T) {
