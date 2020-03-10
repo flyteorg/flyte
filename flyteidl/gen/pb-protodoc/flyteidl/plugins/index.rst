@@ -11,6 +11,7 @@ Plugins available in the Flyte system.
 	:name: pluginstoc
 
 	array_job.proto
+	presto.proto
 	qubole.proto
 	sidecar.proto
 	spark.proto
