@@ -87,7 +87,7 @@ func getRandomClusterSelectorForTest(t *testing.T) interfaces2.ClusterInterface 
 		return response, nil
 	}
 	configProvider := runtime.NewConfigurationProvider()
-	randomCluster, err := NewRandomClusterSelector(clusterScope, configProvider.ClusterConfiguration(), &mocks.MockExecutionTargetProvider{}, db)
+	randomCluster, err := NewRandomClusterSelector(clusterScope, configProvider, &mocks.MockExecutionTargetProvider{}, db)
 	assert.NoError(t, err)
 	return randomCluster
 }

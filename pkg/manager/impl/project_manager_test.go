@@ -16,7 +16,7 @@ import (
 )
 
 var mockProjectConfigProvider = runtimeMocks.NewMockConfigurationProvider(
-	testutils.GetApplicationConfigWithDefaultProjects(), nil, nil, nil, nil, nil)
+	testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, nil, nil, nil)
 
 var testDomainsForProjManager = []string{"domain", "development", "staging", "production"}
 

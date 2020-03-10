@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var lpApplicationConfig = testutils.GetApplicationConfigWithDefaultProjects()
+var lpApplicationConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
 func getWorkflowInterface() *core.TypedInterface {
 	return testutils.GetSampleWorkflowSpecForTest().Template.Interface

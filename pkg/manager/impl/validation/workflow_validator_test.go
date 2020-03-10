@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var workflowConfig = testutils.GetApplicationConfigWithDefaultProjects()
+var workflowConfig = testutils.GetApplicationConfigWithDefaultDomains()
 
 func TestValidateWorkflowEmptyProject(t *testing.T) {
 	request := testutils.GetWorkflowRequest()

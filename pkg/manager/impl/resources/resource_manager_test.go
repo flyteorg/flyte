@@ -41,7 +41,7 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 		createOrUpdateCalled = true
 		return nil
 	}
-	manager := NewResourceManager(db)
+	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
 	_, err := manager.UpdateWorkflowAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	assert.True(t, createOrUpdateCalled)
@@ -70,7 +70,7 @@ func TestGetWorkflowAttributes(t *testing.T) {
 			Attributes:   expectedSerializedAttrs,
 		}, nil
 	}
-	manager := NewResourceManager(db)
+	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
 	response, err := manager.GetWorkflowAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.WorkflowAttributesGetResponse{
@@ -99,7 +99,7 @@ func TestDeleteWorkflowAttributes(t *testing.T) {
 		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
 		return nil
 	}
-	manager := NewResourceManager(db)
+	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
 	_, err := manager.DeleteWorkflowAttributes(context.Background(), request)
 	assert.Nil(t, err)
 }
@@ -125,7 +125,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 		createOrUpdateCalled = true
 		return nil
 	}
-	manager := NewResourceManager(db)
+	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
 	_, err := manager.UpdateProjectDomainAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	assert.True(t, createOrUpdateCalled)
@@ -152,7 +152,7 @@ func TestGetProjectDomainAttributes(t *testing.T) {
 			Attributes:   expectedSerializedAttrs,
 		}, nil
 	}
-	manager := NewResourceManager(db)
+	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
 	response, err := manager.GetProjectDomainAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.ProjectDomainAttributesGetResponse{
@@ -178,7 +178,7 @@ func TestDeleteProjectDomainAttributes(t *testing.T) {
 		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
 		return nil
 	}
-	manager := NewResourceManager(db)
+	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
 	_, err := manager.DeleteProjectDomainAttributes(context.Background(), request)
 	assert.Nil(t, err)
 }
@@ -209,7 +209,7 @@ func TestGetResource(t *testing.T) {
 			Attributes:   expectedSerializedAttrs,
 		}, nil
 	}
-	manager := NewResourceManager(db)
+	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
 	response, err := manager.GetResource(context.Background(), request)
 	assert.Nil(t, err)
 	assert.Equal(t, request.Project, response.Project)
@@ -260,7 +260,7 @@ func TestListAllResources(t *testing.T) {
 			},
 		}, nil
 	}
-	manager := NewResourceManager(db)
+	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
 	response, err := manager.ListAll(context.Background(), admin.ListMatchableAttributesRequest{
 		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
 	})

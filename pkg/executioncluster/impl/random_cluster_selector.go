@@ -167,19 +167,19 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 	return &execTarget, nil
 }
 
-func NewRandomClusterSelector(scope promutils.Scope, clusterConfig runtime.ClusterConfiguration, executionTargetProvider interfaces.ExecutionTargetProvider, db repositories.RepositoryInterface) (interfaces.ClusterInterface, error) {
-	equalWeightedAllClusters, executionTargetMap, err := getExecutionTargets(context.Background(), scope, executionTargetProvider, clusterConfig)
+func NewRandomClusterSelector(scope promutils.Scope, config runtime.Configuration, executionTargetProvider interfaces.ExecutionTargetProvider, db repositories.RepositoryInterface) (interfaces.ClusterInterface, error) {
+	equalWeightedAllClusters, executionTargetMap, err := getExecutionTargets(context.Background(), scope, executionTargetProvider, config.ClusterConfiguration())
 	if err != nil {
 		return nil, err
 	}
-	labelWeightedRandomMap, err := getLabeledWeightedRandomForCluster(context.Background(), clusterConfig, executionTargetMap)
+	labelWeightedRandomMap, err := getLabeledWeightedRandomForCluster(context.Background(), config.ClusterConfiguration(), executionTargetMap)
 	if err != nil {
 		return nil, err
 	}
 	return &RandomClusterSelector{
 		labelWeightedRandomMap:   labelWeightedRandomMap,
 		executionTargetMap:       executionTargetMap,
-		resourceManager:          resources.NewResourceManager(db),
+		resourceManager:          resources.NewResourceManager(db, config.ApplicationConfiguration()),
 		equalWeightedAllClusters: equalWeightedAllClusters,
 	}, nil
 }

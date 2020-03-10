@@ -97,7 +97,7 @@ func getLegacyExecutionRequest() *admin.ExecutionCreateRequest {
 
 func getMockExecutionsConfigProvider() runtimeInterfaces.Configuration {
 	mockExecutionsConfigProvider := runtimeMocks.NewMockConfigurationProvider(
-		testutils.GetApplicationConfigWithDefaultProjects(),
+		testutils.GetApplicationConfigWithDefaultDomains(),
 		runtimeMocks.NewMockQueueConfigurationProvider(
 			[]runtimeInterfaces.ExecutionQueue{}, []runtimeInterfaces.WorkflowConfig{}),
 		nil, nil, nil, nil)
@@ -328,7 +328,7 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	configProvider := runtimeMocks.NewMockConfigurationProvider(
-		testutils.GetApplicationConfigWithDefaultProjects(),
+		testutils.GetApplicationConfigWithDefaultDomains(),
 		runtimeMocks.NewMockQueueConfigurationProvider([]runtimeInterfaces.ExecutionQueue{
 			{
 				Dynamic:    "dynamic Q",
@@ -2417,7 +2417,10 @@ func TestSetDefaults(t *testing.T) {
 		GPU:    "8",
 		Memory: "500Gi",
 	}
-	setCompiledTaskDefaults(context.Background(), &taskConfig, task, repositoryMocks.NewMockRepository(), "workflow")
+	mockConfig := runtimeMocks.NewMockConfigurationProvider(
+		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, &taskConfig,
+		runtimeMocks.NewMockWhitelistConfiguration(), nil)
+	setCompiledTaskDefaults(context.Background(), mockConfig, task, repositoryMocks.NewMockRepository(), "workflow")
 	assert.True(t, proto.Equal(
 		&core.Container{
 			Resources: &core.Resources{
@@ -2480,7 +2483,10 @@ func TestSetDefaults_MissingDefaults(t *testing.T) {
 		CPU: "300m",
 		GPU: "8",
 	}
-	setCompiledTaskDefaults(context.Background(), &taskConfig, task, repositoryMocks.NewMockRepository(), "workflow")
+	mockConfig := runtimeMocks.NewMockConfigurationProvider(
+		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, &taskConfig,
+		runtimeMocks.NewMockWhitelistConfiguration(), nil)
+	setCompiledTaskDefaults(context.Background(), mockConfig, task, repositoryMocks.NewMockRepository(), "workflow")
 	assert.True(t, proto.Equal(
 		&core.Container{
 			Resources: &core.Resources{

@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
+
 	"github.com/lyft/flyteadmin/pkg/manager/impl/resources"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 
@@ -173,7 +175,7 @@ func TestGetCustomTemplateValues(t *testing.T) {
 	}
 	testController := controller{
 		db:              mockRepository,
-		resourceManager: resources.NewResourceManager(mockRepository),
+		resourceManager: resources.NewResourceManager(mockRepository, testutils.GetApplicationConfigWithDefaultDomains()),
 	}
 	domainTemplateValues := templateValuesType{
 		"{{ var1 }}": "i'm getting overwritten",
@@ -195,7 +197,7 @@ func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
 	mockRepository := repositoryMocks.NewMockRepository()
 	testController := controller{
 		db:              mockRepository,
-		resourceManager: resources.NewResourceManager(mockRepository),
+		resourceManager: resources.NewResourceManager(mockRepository, testutils.GetApplicationConfigWithDefaultDomains()),
 	}
 	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), "project-foo", "domain-bar", templateValuesType{
 		"{{ var1 }}": "val1",
@@ -218,7 +220,7 @@ func TestGetCustomTemplateValues_InvalidDBModel(t *testing.T) {
 	}
 	testController := controller{
 		db:              mockRepository,
-		resourceManager: resources.NewResourceManager(mockRepository),
+		resourceManager: resources.NewResourceManager(mockRepository, testutils.GetApplicationConfigWithDefaultDomains()),
 	}
 	_, err := testController.getCustomTemplateValues(context.Background(), "project-foo", "domain-bar", templateValuesType{
 		"{{ var1 }}": "val1",

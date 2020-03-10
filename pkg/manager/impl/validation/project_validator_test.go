@@ -109,7 +109,7 @@ func TestValidateProjectAndDomain(t *testing.T) {
 		assert.Equal(t, projectID, "flyte-project-id")
 		return models.Project{}, nil
 	}
-	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultProjects(),
+	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
 		"flyte-project-id", "domain")
 	assert.Nil(t, err)
 
@@ -118,7 +118,7 @@ func TestValidateProjectAndDomain(t *testing.T) {
 		return models.Project{}, errors.New("foo")
 	}
 
-	err = ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultProjects(),
+	err = ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
 		"flyte-project-id", "domain")
 	assert.EqualError(t, err,
 		"failed to validate that project [flyte-project-id] and domain [domain] are registered, err: [foo]")
