@@ -2562,6 +2562,8 @@ definitions:
             project: "project"
           scheduled_at: "2000-01-23T04:56:07.000+00:00"
           nesting: 0
+          system_metadata:
+            execution_cluster: "execution_cluster"
         disable_all: true
         inputs:
           literals: {}
@@ -2856,6 +2858,8 @@ definitions:
               project: "project"
             scheduled_at: "2000-01-23T04:56:07.000+00:00"
             nesting: 0
+            system_metadata:
+              execution_cluster: "execution_cluster"
           disable_all: true
           inputs:
             literals: {}
@@ -2981,6 +2985,8 @@ definitions:
               project: "project"
             scheduled_at: "2000-01-23T04:56:07.000+00:00"
             nesting: 0
+            system_metadata:
+              execution_cluster: "execution_cluster"
           disable_all: true
           inputs:
             literals: {}
@@ -3053,6 +3059,10 @@ definitions:
         description: "Optional, a reference workflow execution related to this execution.\n\
           In the case of a relaunch, this references the original workflow execution."
         $ref: "#/definitions/coreWorkflowExecutionIdentifier"
+      system_metadata:
+        description: "Optional, platform-specific metadata about the execution.\n\
+          In this the future this may be gated behind an ACL or some sort of authorization."
+        $ref: "#/definitions/adminSystemMetadata"
     description: "Represents attributes about an execution which are not required\
       \ to launch the execution but are useful to record.\nThese attributes are assigned\
       \ at launch time and do not change."
@@ -3071,6 +3081,8 @@ definitions:
         project: "project"
       scheduled_at: "2000-01-23T04:56:07.000+00:00"
       nesting: 0
+      system_metadata:
+        execution_cluster: "execution_cluster"
   adminExecutionQueueAttributes:
     type: "object"
     properties:
@@ -3149,6 +3161,8 @@ definitions:
           project: "project"
         scheduled_at: "2000-01-23T04:56:07.000+00:00"
         nesting: 0
+        system_metadata:
+          execution_cluster: "execution_cluster"
       disable_all: true
       inputs:
         literals: {}
@@ -5089,6 +5103,15 @@ definitions:
         title: "Indicates the direction to apply sort key for response values.\n+optional"
         $ref: "#/definitions/SortDirection"
     description: "Species sort ordering in a list request."
+  adminSystemMetadata:
+    type: "object"
+    properties:
+      execution_cluster:
+        type: "string"
+        description: "Which execution cluster this execution ran on."
+    description: "Represents system rather than user-facing metadata about an execution."
+    example:
+      execution_cluster: "execution_cluster"
   adminTask:
     type: "object"
     properties:
