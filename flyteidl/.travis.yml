@@ -14,8 +14,3 @@ jobs:
       name: unit tests
       install: make install
       script: make test_unit
-    - if: tag IS present AND fork = false
-      stage: release
-      name: release Python package
-      install: skip
-      script: make release
