@@ -48,7 +48,7 @@ struct TableStruct_flyteidl_2fadmin_2fexecution_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[16]
+  static const ::google::protobuf::internal::ParseTable schema[17]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -96,6 +96,9 @@ extern LiteralMapBlobDefaultTypeInternal _LiteralMapBlob_default_instance_;
 class NotificationList;
 class NotificationListDefaultTypeInternal;
 extern NotificationListDefaultTypeInternal _NotificationList_default_instance_;
+class SystemMetadata;
+class SystemMetadataDefaultTypeInternal;
+extern SystemMetadataDefaultTypeInternal _SystemMetadata_default_instance_;
 class WorkflowExecutionGetDataRequest;
 class WorkflowExecutionGetDataRequestDefaultTypeInternal;
 extern WorkflowExecutionGetDataRequestDefaultTypeInternal _WorkflowExecutionGetDataRequest_default_instance_;
@@ -122,6 +125,7 @@ template<> ::flyteidl::admin::ExecutionTerminateRequest* Arena::CreateMaybeMessa
 template<> ::flyteidl::admin::ExecutionTerminateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ExecutionTerminateResponse>(Arena*);
 template<> ::flyteidl::admin::LiteralMapBlob* Arena::CreateMaybeMessage<::flyteidl::admin::LiteralMapBlob>(Arena*);
 template<> ::flyteidl::admin::NotificationList* Arena::CreateMaybeMessage<::flyteidl::admin::NotificationList>(Arena*);
+template<> ::flyteidl::admin::SystemMetadata* Arena::CreateMaybeMessage<::flyteidl::admin::SystemMetadata>(Arena*);
 template<> ::flyteidl::admin::WorkflowExecutionGetDataRequest* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowExecutionGetDataRequest>(Arena*);
 template<> ::flyteidl::admin::WorkflowExecutionGetDataResponse* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowExecutionGetDataResponse>(Arena*);
 template<> ::flyteidl::admin::WorkflowExecutionGetRequest* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowExecutionGetRequest>(Arena*);
@@ -1495,6 +1499,126 @@ class ExecutionClosure final :
 };
 // -------------------------------------------------------------------
 
+class SystemMetadata final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.SystemMetadata) */ {
+ public:
+  SystemMetadata();
+  virtual ~SystemMetadata();
+
+  SystemMetadata(const SystemMetadata& from);
+
+  inline SystemMetadata& operator=(const SystemMetadata& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  SystemMetadata(SystemMetadata&& from) noexcept
+    : SystemMetadata() {
+    *this = ::std::move(from);
+  }
+
+  inline SystemMetadata& operator=(SystemMetadata&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const SystemMetadata& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const SystemMetadata* internal_default_instance() {
+    return reinterpret_cast<const SystemMetadata*>(
+               &_SystemMetadata_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  void Swap(SystemMetadata* other);
+  friend void swap(SystemMetadata& a, SystemMetadata& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline SystemMetadata* New() const final {
+    return CreateMaybeMessage<SystemMetadata>(nullptr);
+  }
+
+  SystemMetadata* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<SystemMetadata>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const SystemMetadata& from);
+  void MergeFrom(const SystemMetadata& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(SystemMetadata* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string execution_cluster = 1;
+  void clear_execution_cluster();
+  static const int kExecutionClusterFieldNumber = 1;
+  const ::std::string& execution_cluster() const;
+  void set_execution_cluster(const ::std::string& value);
+  #if LANG_CXX11
+  void set_execution_cluster(::std::string&& value);
+  #endif
+  void set_execution_cluster(const char* value);
+  void set_execution_cluster(const char* value, size_t size);
+  ::std::string* mutable_execution_cluster();
+  ::std::string* release_execution_cluster();
+  void set_allocated_execution_cluster(::std::string* execution_cluster);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.SystemMetadata)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr execution_cluster_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fexecution_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ExecutionMetadata final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ExecutionMetadata) */ {
  public:
@@ -1533,7 +1657,7 @@ class ExecutionMetadata final :
                &_ExecutionMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(ExecutionMetadata* other);
   friend void swap(ExecutionMetadata& a, ExecutionMetadata& b) {
@@ -1663,6 +1787,15 @@ class ExecutionMetadata final :
   ::flyteidl::core::WorkflowExecutionIdentifier* mutable_reference_execution();
   void set_allocated_reference_execution(::flyteidl::core::WorkflowExecutionIdentifier* reference_execution);
 
+  // .flyteidl.admin.SystemMetadata system_metadata = 17;
+  bool has_system_metadata() const;
+  void clear_system_metadata();
+  static const int kSystemMetadataFieldNumber = 17;
+  const ::flyteidl::admin::SystemMetadata& system_metadata() const;
+  ::flyteidl::admin::SystemMetadata* release_system_metadata();
+  ::flyteidl::admin::SystemMetadata* mutable_system_metadata();
+  void set_allocated_system_metadata(::flyteidl::admin::SystemMetadata* system_metadata);
+
   // .flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;
   void clear_mode();
   static const int kModeFieldNumber = 1;
@@ -1684,6 +1817,7 @@ class ExecutionMetadata final :
   ::google::protobuf::Timestamp* scheduled_at_;
   ::flyteidl::core::NodeExecutionIdentifier* parent_node_execution_;
   ::flyteidl::core::WorkflowExecutionIdentifier* reference_execution_;
+  ::flyteidl::admin::SystemMetadata* system_metadata_;
   int mode_;
   ::google::protobuf::uint32 nesting_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -1729,7 +1863,7 @@ class NotificationList final :
                &_NotificationList_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(NotificationList* other);
   friend void swap(NotificationList& a, NotificationList& b) {
@@ -1853,7 +1987,7 @@ class ExecutionSpec final :
                &_ExecutionSpec_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(ExecutionSpec* other);
   friend void swap(ExecutionSpec& a, ExecutionSpec& b) {
@@ -2040,7 +2174,7 @@ class ExecutionTerminateRequest final :
                &_ExecutionTerminateRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(ExecutionTerminateRequest* other);
   friend void swap(ExecutionTerminateRequest& a, ExecutionTerminateRequest& b) {
@@ -2170,7 +2304,7 @@ class ExecutionTerminateResponse final :
                &_ExecutionTerminateResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   void Swap(ExecutionTerminateResponse* other);
   friend void swap(ExecutionTerminateResponse& a, ExecutionTerminateResponse& b) {
@@ -2275,7 +2409,7 @@ class WorkflowExecutionGetDataRequest final :
                &_WorkflowExecutionGetDataRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(WorkflowExecutionGetDataRequest* other);
   friend void swap(WorkflowExecutionGetDataRequest& a, WorkflowExecutionGetDataRequest& b) {
@@ -2390,7 +2524,7 @@ class WorkflowExecutionGetDataResponse final :
                &_WorkflowExecutionGetDataResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   void Swap(WorkflowExecutionGetDataResponse* other);
   friend void swap(WorkflowExecutionGetDataResponse& a, WorkflowExecutionGetDataResponse& b) {
@@ -3968,6 +4102,63 @@ inline ExecutionClosure::OutputResultCase ExecutionClosure::output_result_case()
 }
 // -------------------------------------------------------------------
 
+// SystemMetadata
+
+// string execution_cluster = 1;
+inline void SystemMetadata::clear_execution_cluster() {
+  execution_cluster_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& SystemMetadata::execution_cluster() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.SystemMetadata.execution_cluster)
+  return execution_cluster_.GetNoArena();
+}
+inline void SystemMetadata::set_execution_cluster(const ::std::string& value) {
+  
+  execution_cluster_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.SystemMetadata.execution_cluster)
+}
+#if LANG_CXX11
+inline void SystemMetadata::set_execution_cluster(::std::string&& value) {
+  
+  execution_cluster_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.SystemMetadata.execution_cluster)
+}
+#endif
+inline void SystemMetadata::set_execution_cluster(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  execution_cluster_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.SystemMetadata.execution_cluster)
+}
+inline void SystemMetadata::set_execution_cluster(const char* value, size_t size) {
+  
+  execution_cluster_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.SystemMetadata.execution_cluster)
+}
+inline ::std::string* SystemMetadata::mutable_execution_cluster() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.SystemMetadata.execution_cluster)
+  return execution_cluster_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* SystemMetadata::release_execution_cluster() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.SystemMetadata.execution_cluster)
+  
+  return execution_cluster_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void SystemMetadata::set_allocated_execution_cluster(::std::string* execution_cluster) {
+  if (execution_cluster != nullptr) {
+    
+  } else {
+    
+  }
+  execution_cluster_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), execution_cluster);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.SystemMetadata.execution_cluster)
+}
+
+// -------------------------------------------------------------------
+
 // ExecutionMetadata
 
 // .flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;
@@ -4185,6 +4376,57 @@ inline void ExecutionMetadata::set_allocated_reference_execution(::flyteidl::cor
   }
   reference_execution_ = reference_execution;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionMetadata.reference_execution)
+}
+
+// .flyteidl.admin.SystemMetadata system_metadata = 17;
+inline bool ExecutionMetadata::has_system_metadata() const {
+  return this != internal_default_instance() && system_metadata_ != nullptr;
+}
+inline void ExecutionMetadata::clear_system_metadata() {
+  if (GetArenaNoVirtual() == nullptr && system_metadata_ != nullptr) {
+    delete system_metadata_;
+  }
+  system_metadata_ = nullptr;
+}
+inline const ::flyteidl::admin::SystemMetadata& ExecutionMetadata::system_metadata() const {
+  const ::flyteidl::admin::SystemMetadata* p = system_metadata_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionMetadata.system_metadata)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::SystemMetadata*>(
+      &::flyteidl::admin::_SystemMetadata_default_instance_);
+}
+inline ::flyteidl::admin::SystemMetadata* ExecutionMetadata::release_system_metadata() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionMetadata.system_metadata)
+  
+  ::flyteidl::admin::SystemMetadata* temp = system_metadata_;
+  system_metadata_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::SystemMetadata* ExecutionMetadata::mutable_system_metadata() {
+  
+  if (system_metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::SystemMetadata>(GetArenaNoVirtual());
+    system_metadata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionMetadata.system_metadata)
+  return system_metadata_;
+}
+inline void ExecutionMetadata::set_allocated_system_metadata(::flyteidl::admin::SystemMetadata* system_metadata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete system_metadata_;
+  }
+  if (system_metadata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      system_metadata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, system_metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  system_metadata_ = system_metadata;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionMetadata.system_metadata)
 }
 
 // -------------------------------------------------------------------
@@ -4784,6 +5026,8 @@ inline void WorkflowExecutionGetDataResponse::set_allocated_inputs(::flyteidl::a
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -136,6 +136,7 @@ Class | Method | HTTP request | Description
  - [AdminSchedule](docs/AdminSchedule.md)
  - [AdminSlackNotification](docs/AdminSlackNotification.md)
  - [AdminSort](docs/AdminSort.md)
+ - [AdminSystemMetadata](docs/AdminSystemMetadata.md)
  - [AdminTask](docs/AdminTask.md)
  - [AdminTaskClosure](docs/AdminTaskClosure.md)
  - [AdminTaskCreateRequest](docs/AdminTaskCreateRequest.md)
