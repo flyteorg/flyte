@@ -393,12 +393,35 @@ workflow_id
   
 
 
+.. _api_msg_flyteidl.admin.SystemMetadata:
+
+flyteidl.admin.SystemMetadata
+-----------------------------
+
+`[flyteidl.admin.SystemMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L146>`_
+
+Represents system rather than user-facing metadata about an execution.
+
+.. code-block:: json
+
+  {
+    "execution_cluster": "..."
+  }
+
+.. _api_field_flyteidl.admin.SystemMetadata.execution_cluster:
+
+execution_cluster
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Which execution cluster this execution ran on.
+  
+  
+
+
 .. _api_msg_flyteidl.admin.ExecutionMetadata:
 
 flyteidl.admin.ExecutionMetadata
 --------------------------------
 
-`[flyteidl.admin.ExecutionMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L147>`_
+`[flyteidl.admin.ExecutionMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L154>`_
 
 Represents attributes about an execution which are not required to launch the execution but are useful to record.
 These attributes are assigned at launch time and do not change.
@@ -411,7 +434,8 @@ These attributes are assigned at launch time and do not change.
     "nesting": "...",
     "scheduled_at": "{...}",
     "parent_node_execution": "{...}",
-    "reference_execution": "{...}"
+    "reference_execution": "{...}",
+    "system_metadata": "{...}"
   }
 
 .. _api_field_flyteidl.admin.ExecutionMetadata.mode:
@@ -456,13 +480,20 @@ reference_execution
   In the case of a relaunch, this references the original workflow execution.
   
   
+.. _api_field_flyteidl.admin.ExecutionMetadata.system_metadata:
+
+system_metadata
+  (:ref:`flyteidl.admin.SystemMetadata <api_msg_flyteidl.admin.SystemMetadata>`) Optional, platform-specific metadata about the execution.
+  In this the future this may be gated behind an ACL or some sort of authorization.
+  
+  
 
 .. _api_enum_flyteidl.admin.ExecutionMetadata.ExecutionMode:
 
 Enum flyteidl.admin.ExecutionMetadata.ExecutionMode
 ---------------------------------------------------
 
-`[flyteidl.admin.ExecutionMetadata.ExecutionMode proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L149>`_
+`[flyteidl.admin.ExecutionMetadata.ExecutionMode proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L156>`_
 
 The method by which this execution was launched.
 
@@ -502,7 +533,7 @@ CHILD_WORKFLOW
 flyteidl.admin.NotificationList
 -------------------------------
 
-`[flyteidl.admin.NotificationList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L191>`_
+`[flyteidl.admin.NotificationList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L201>`_
 
 
 .. code-block:: json
@@ -523,7 +554,7 @@ notifications
 flyteidl.admin.ExecutionSpec
 ----------------------------
 
-`[flyteidl.admin.ExecutionSpec proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L197>`_
+`[flyteidl.admin.ExecutionSpec proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L207>`_
 
 An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime
 of an execution as it progresses across phase changes..
@@ -597,7 +628,7 @@ annotations
 flyteidl.admin.ExecutionTerminateRequest
 ----------------------------------------
 
-`[flyteidl.admin.ExecutionTerminateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L233>`_
+`[flyteidl.admin.ExecutionTerminateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L243>`_
 
 Request to terminate an in-progress execution.  This action is irreversible.
 If an execution is already terminated, this request will simply be a no-op.
@@ -631,7 +662,7 @@ cause
 flyteidl.admin.ExecutionTerminateResponse
 -----------------------------------------
 
-`[flyteidl.admin.ExecutionTerminateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L241>`_
+`[flyteidl.admin.ExecutionTerminateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L251>`_
 
 
 .. code-block:: json
@@ -646,7 +677,7 @@ flyteidl.admin.ExecutionTerminateResponse
 flyteidl.admin.WorkflowExecutionGetDataRequest
 ----------------------------------------------
 
-`[flyteidl.admin.WorkflowExecutionGetDataRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L246>`_
+`[flyteidl.admin.WorkflowExecutionGetDataRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L256>`_
 
 Request structure to fetch inputs and output urls for an execution.
 
@@ -669,7 +700,7 @@ id
 flyteidl.admin.WorkflowExecutionGetDataResponse
 -----------------------------------------------
 
-`[flyteidl.admin.WorkflowExecutionGetDataResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L252>`_
+`[flyteidl.admin.WorkflowExecutionGetDataResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L262>`_
 
 Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution.
 

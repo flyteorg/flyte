@@ -87,6 +87,7 @@ from flyteadmin.models.admin_projects import AdminProjects
 from flyteadmin.models.admin_schedule import AdminSchedule
 from flyteadmin.models.admin_slack_notification import AdminSlackNotification
 from flyteadmin.models.admin_sort import AdminSort
+from flyteadmin.models.admin_system_metadata import AdminSystemMetadata
 from flyteadmin.models.admin_task import AdminTask
 from flyteadmin.models.admin_task_closure import AdminTaskClosure
 from flyteadmin.models.admin_task_create_request import AdminTaskCreateRequest
