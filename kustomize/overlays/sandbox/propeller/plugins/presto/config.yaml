@@ -1,0 +1,17 @@
+plugins:
+  presto:
+    environment: ""
+    defaultRoutingGroup: "adhoc"
+    workers: 25
+    lruCacheSize: 2000
+    awsS3ShardFormatter: ""
+    awsS3ShardCount: 2
+    routingGroupConfigs:
+      - name: "adhoc"
+        limit: 250
+        projectScopeQuotaProportionCap: 0.7
+        namespaceScopeQuotaProportionCap: 0.7
+      - name: "etl"
+        limit: 250
+        projectScopeQuotaProportionCap: 0.7
+        namespaceScopeQuotaProportionCap: 0.7

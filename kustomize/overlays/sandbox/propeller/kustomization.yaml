@@ -22,6 +22,9 @@ configMapGenerator:
 - name: flyte-qubole-config
   files: 
     - plugins/qubole/config.yaml
+- name: flyte-presto-config
+  files:
+    - plugins/presto/config.yaml
 
 patches:
 - propeller.yaml
@@ -29,3 +32,4 @@ patches:
 - plugins/spark/propeller-patch.yaml
 - plugins/container/propeller-patch.yaml
 - plugins/qubole/propeller-patch.yaml
+- plugins/presto/propeller-patch.yaml
