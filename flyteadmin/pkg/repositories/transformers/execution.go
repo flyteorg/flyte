@@ -36,11 +36,14 @@ type CreateExecutionModelInput struct {
 // Transforms a ExecutionCreateRequest to a Execution model
 func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, error) {
 	requestSpec := input.RequestSpec
+	if requestSpec.Metadata == nil {
+		requestSpec.Metadata = &admin.ExecutionMetadata{}
+	}
 	if len(input.Principal) > 0 {
-		if requestSpec.Metadata == nil {
-			requestSpec.Metadata = &admin.ExecutionMetadata{}
-		}
 		requestSpec.Metadata.Principal = input.Principal
+	}
+	requestSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
+		ExecutionCluster: input.Cluster,
 	}
 	spec, err := proto.Marshal(requestSpec)
 	if err != nil {

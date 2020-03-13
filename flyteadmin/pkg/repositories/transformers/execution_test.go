@@ -53,6 +53,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	}
 
 	principal := "principal"
+	cluster := "cluster"
 	execution, err := CreateExecutionModel(CreateExecutionModelInput{
 		WorkflowExecutionID: core.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -67,6 +68,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		WorkflowIdentifier:    workflowIdentifier,
 		ParentNodeExecutionID: nodeID,
 		Principal:             principal,
+		Cluster:               cluster,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, "project", execution.Project)
@@ -80,6 +82,9 @@ func TestCreateExecutionModel(t *testing.T) {
 	assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
 	expectedSpec := execRequest.Spec
 	expectedSpec.Metadata.Principal = principal
+	expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
+		ExecutionCluster: cluster,
+	}
 	expectedSpecBytes, _ := proto.Marshal(expectedSpec)
 	assert.Equal(t, expectedSpecBytes, execution.Spec)
 
