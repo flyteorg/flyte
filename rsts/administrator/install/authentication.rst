@@ -1,4 +1,4 @@
-.. _install-authentication
+.. _install-authentication:
 
 #################
 Authentication
@@ -19,11 +19,9 @@ Principal amongst these is the Flyte CLI. This is the command-line entrypoint to
 The IDP application corresponding to the CLI will need to support PKCE.
 
 
-IDL Client
-==========
-The gRPC client provided by the Flyte IDL, or direct calls to the HTTP endpoints on Admin from within a running script, comprise the primary client calls that Flyte Admin handles. These calls are often direct
-
-In both cases they are generally made from within a running workflow itself. For instance, a Flyte task can fetch the definition for a launch plan associated with a completely different workflow, and then wait for its execution 
+Direct Client Access
+====================
+The gRPC client provided by the Flyte IDL, or direct calls to the HTTP endpoints on Admin from within a running script are ways that we have seen users hit the control plane directly.  We generally discourage this behavior as it leads to a possible self-imposed DOS vector, as they are generally made from within a running workflow itself. For instance, a Flyte task can fetch the definition for a launch plan associated with a completely different workflow, and then launch an execution of it. This is not the correct way to launch one workflow from another but for the time being remains possible.
 
 
 ******
@@ -50,21 +48,41 @@ Flyte Admin will require that the application in your identity provider be confi
 
 Flyte Admin Configuration
 =========================
-.. TODO : 
-Please refer to the inline documentation on the ``Config`` object in the ``auth`` package for a discussion on the settings required.
+Please refer to the `inline documentation <https://github.com/lyft/flyteadmin/blob/eaca2fb0e6018a2e261e9e2da8998906477cadb5/pkg/auth/config/config.go>`_ on the ``Config`` object in the ``auth`` package for a discussion on the settings required.
 
+******
+CI
+******
 
+If your organization does any automated registration, then you'll need to authenticate with the `basic authentication <https://tools.ietf.org/html/rfc2617>`_ flow (username and password effectively) as CI systems are generally not suitable OAuth resource owners. After retrieving an access token from the IDP, you can send it along to Flyte Admin as usual.
 
-CI Integration
-==============
-If your organization does any automated registration, then 
+Flytekit configuration variables are automatically designed to look up values from relevant environment variables. To aid with continuous integration use-cases however, Flytekit configuration can also reference other environment variables.  For instance, if your CI system is not capable of setting custom environment variables like ``FLYTE_CREDENTIALS_CLIENT_SECRET`` but does set the necessary settings under a different variable, you may use ``export FLYTE_CREDENTIALS_CLIENT_SECRET_FROM_ENV_VAR=OTHER_ENV_VARIABLE`` to redirect the lookup. A ``FLYTE_CREDENTIALS_CLIENT_SECRET_FROM_FILE`` redirect is available as well, where the value should be the full path to the file containing the value for the configuration setting, in this case, the client secret. We found this redirect behavior necessary when setting up registration within our own CI pipelines.
+
+The following is a listing of the Flytekit configuration values we set in CI, along with a brief explanation where relevant.
+
+* ``FLYTE_CREDENTIALS_CLIENT_ID`` and ``FLYTE_CREDENTIALS_CLIENT_SECRET``
+  When using basic authentication, this is the username and password
+* ``export FLYTE_CREDENTIALS_AUTH_MODE=basic``
+  This tells the SDK to use basic authentication. If not set, Flytekit will assume you want to use the standard OAuth based three-legged flow.
+* ``export FLYTE_CREDENTIALS_AUTHORIZATION_METADATA_KEY=text``
+  At Lyft, we set this to conform to this `header config <https://github.com/lyft/flyteadmin/blob/eaca2fb0e6018a2e261e9e2da8998906477cadb5/pkg/auth/config/config.go#L53>`_ on the Admin side.
+* ``export FLYTE_CREDENTIALS_SCOPE=text``
+  When using basic authentication, you'll need to specify a scope to the IDP (instead of ``openid``, as that's only for OAuth). Set that here.
+* ``export FLYTE_PLATFORM_AUTH=True``
+  Set this to force Flytekit to use authentication, even if not required by Admin. This is useful as you're rolling out the requirement.
+
 
 **********
 References
 **********
 
 RFCs
+======
 This collection of RFCs may be helpful to those who wish to investigate the implementation in more depth.
 
+* `OAuth2 RFC 6749 <https://tools.ietf.org/html/rfc6749>`_
+* `OAuth Discovery RFC 8414 <https://tools.ietf.org/html/rfc8414>`_
+* `PKCE RFC 7636 <https://tools.ietf.org/html/rfc7636>`_
+* `JWT RFC 7519 <https://tools.ietf.org/html/rfc7519>`_
 
 
