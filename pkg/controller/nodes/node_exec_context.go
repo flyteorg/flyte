@@ -20,6 +20,7 @@ const TaskNameLabel = "task-name"
 
 type execMetadata struct {
 	v1alpha1.WorkflowMeta
+	nodeLabels map[string]string
 }
 
 func (e execMetadata) GetK8sServiceAccount() string {
@@ -28,6 +29,10 @@ func (e execMetadata) GetK8sServiceAccount() string {
 
 func (e execMetadata) GetOwnerID() types.NamespacedName {
 	return types.NamespacedName{Name: e.GetName(), Namespace: e.GetNamespace()}
+}
+
+func (e execMetadata) GetLabels() map[string]string {
+	return e.nodeLabels
 }
 
 type execContext struct {
@@ -42,7 +47,6 @@ type execContext struct {
 	nsm                 *nodeStateManager
 	enqueueOwner        func() error
 	w                   v1alpha1.ExecutableWorkflow
-	nodeLabels          map[string]string
 }
 
 func (e execContext) EnqueueOwnerFunc() func() error {
@@ -101,10 +105,6 @@ func (e execContext) MaxDatasetSizeBytes() int64 {
 	return e.maxDatasetSizeBytes
 }
 
-func (e execContext) GetLabels() map[string]string {
-	return e.nodeLabels
-}
-
 func newNodeExecContext(_ context.Context, store *storage.DataStore, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, maxDatasetSize int64, er events.TaskEventRecorder, tr handler.TaskReader, nsm *nodeStateManager, enqueueOwner func() error) *execContext {
 	md := execMetadata{WorkflowMeta: w}
 
@@ -117,6 +117,7 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, w v1alpha1.
 	if tr != nil && tr.GetTaskID() != nil {
 		nodeLabels[TaskNameLabel] = utils.SanitizeLabelValue(tr.GetTaskID().Name)
 	}
+	md.nodeLabels = nodeLabels
 
 	return &execContext{
 		md:                  md,
@@ -130,7 +131,6 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, w v1alpha1.
 		nsm:                 nsm,
 		enqueueOwner:        enqueueOwner,
 		w:                   w,
-		nodeLabels:          nodeLabels,
 	}
 }
 
