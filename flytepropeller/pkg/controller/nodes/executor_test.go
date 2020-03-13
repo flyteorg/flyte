@@ -739,9 +739,9 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				},
 				false, true, core.NodeExecution_FAILED, 0},
 
-			{"(retryablefailure->running", v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseRunning, executors.NodePhasePending, func() (handler.Transition, error) {
+			{"retryablefailure->running", v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseRunning, executors.NodePhasePending, func() (handler.Transition, error) {
 				return handler.UnknownTransition, fmt.Errorf("should not be invoked")
-			}, false, false, core.NodeExecution_RUNNING, 0},
+			}, false, false, core.NodeExecution_RUNNING, 1},
 
 			{"running->failing", v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, executors.NodePhasePending, func() (handler.Transition, error) {
 				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("code", "reason", nil)), nil

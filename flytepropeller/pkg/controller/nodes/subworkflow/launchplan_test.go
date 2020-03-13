@@ -10,16 +10,17 @@ import (
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/storage"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	mocks2 "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
 	"github.com/lyft/flytepropeller/pkg/utils"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func createInmemoryStore(t testing.TB) *storage.DataStore {
@@ -614,7 +615,6 @@ func TestLaunchPlanHandler_HandleAbort(t *testing.T) {
 
 	t.Run("abort-success", func(t *testing.T) {
 		mockLPExec := &mocks.Executor{}
-		//mockStore := storage.NewCompositeDataStore(storage.URLPathConstructor{}, storage.NewDefaultProtobufStore(utils.FailingRawStore{}, promutils.NewTestScope()))
 		mockLPExec.On("Kill",
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
@@ -626,14 +626,13 @@ func TestLaunchPlanHandler_HandleAbort(t *testing.T) {
 		h := launchPlanHandler{
 			launchPlan: mockLPExec,
 		}
-		err := h.HandleAbort(ctx, mockWf, mockNode)
+		err := h.HandleAbort(ctx, mockWf, mockNode, "some reason")
 		assert.NoError(t, err)
 	})
 
 	t.Run("abort-fail", func(t *testing.T) {
 		expectedErr := fmt.Errorf("fail")
 		mockLPExec := &mocks.Executor{}
-		// mockStore := storage.NewCompositeDataStore(storage.URLPathConstructor{}, storage.NewDefaultProtobufStore(utils.FailingRawStore{}, promutils.NewTestScope()))
 		mockLPExec.On("Kill",
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
@@ -645,7 +644,7 @@ func TestLaunchPlanHandler_HandleAbort(t *testing.T) {
 		h := launchPlanHandler{
 			launchPlan: mockLPExec,
 		}
-		err := h.HandleAbort(ctx, mockWf, mockNode)
+		err := h.HandleAbort(ctx, mockWf, mockNode, "reason")
 		assert.Error(t, err)
 		assert.Equal(t, err, expectedErr)
 	})
