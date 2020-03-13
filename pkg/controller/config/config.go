@@ -15,6 +15,7 @@ var (
 	configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 
 	defaultConfig = &Config{
+		MaxWorkflowRetries:  5,
 		MaxDatasetSizeBytes: 10 * 1024 * 1024,
 		Queue: CompositeQueueConfig{
 			Type: CompositeQueueSimple,

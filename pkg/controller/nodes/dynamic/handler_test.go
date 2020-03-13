@@ -455,6 +455,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		sr := &nodeMocks.NodeStateReader{}
 		sr.OnGetDynamicNodeState().Return(s)
 		nCtx.OnNodeStateReader().Return(sr)
+		nCtx.OnCurrentAttempt().Return(0)
 
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalize(ctx, nCtx).Return(nil)

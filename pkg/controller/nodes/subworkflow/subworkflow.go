@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/lyft/flytestdlib/storage"
+
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/lyft/flytestdlib/storage"
 )
 
 // TODO Add unit tests for subworkflow handler
@@ -174,7 +175,7 @@ func (s *subworkflowHandler) HandleSubWorkflowFailingNode(ctx context.Context, n
 	return s.DoInFailureHandling(ctx, nCtx, contextualSubWorkflow)
 }
 
-func (s *subworkflowHandler) HandleAbort(ctx context.Context, nCtx handler.NodeExecutionContext, w v1alpha1.ExecutableWorkflow, workflowID v1alpha1.WorkflowID) error {
+func (s *subworkflowHandler) HandleAbort(ctx context.Context, nCtx handler.NodeExecutionContext, w v1alpha1.ExecutableWorkflow, workflowID v1alpha1.WorkflowID, reason string) error {
 	subWorkflow := w.FindSubWorkflow(workflowID)
 	if subWorkflow == nil {
 		return fmt.Errorf("no sub workflow [%s] found in node [%s]", workflowID, nCtx.NodeID())
@@ -183,12 +184,12 @@ func (s *subworkflowHandler) HandleAbort(ctx context.Context, nCtx handler.NodeE
 	nodeStatus := w.GetNodeExecutionStatus(ctx, nCtx.NodeID())
 	contextualSubWorkflow := executors.NewSubContextualWorkflow(w, subWorkflow, nodeStatus)
 
-	startNode := w.StartNode()
+	startNode := contextualSubWorkflow.StartNode()
 	if startNode == nil {
 		return fmt.Errorf("no sub workflow [%s] found in node [%s]", workflowID, nCtx.NodeID())
 	}
 
-	return s.nodeExecutor.AbortHandler(ctx, contextualSubWorkflow, startNode, "")
+	return s.nodeExecutor.AbortHandler(ctx, contextualSubWorkflow, startNode, reason)
 }
 
 func newSubworkflowHandler(nodeExecutor executors.Node) subworkflowHandler {

@@ -149,7 +149,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 }
 
-func (l *launchPlanHandler) HandleAbort(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode) error {
+func (l *launchPlanHandler) HandleAbort(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, reason string) error {
 	nodeStatus := w.GetNodeExecutionStatus(ctx, node.GetID())
 	childID, err := GetChildWorkflowExecutionID(
 		w.GetExecutionID().WorkflowExecutionIdentifier,
@@ -160,5 +160,5 @@ func (l *launchPlanHandler) HandleAbort(ctx context.Context, w v1alpha1.Executab
 		// THIS SHOULD NEVER HAPPEN
 		return err
 	}
-	return l.launchPlan.Kill(ctx, childID, fmt.Sprintf("parent execution id [%s] aborted", w.GetName()))
+	return l.launchPlan.Kill(ctx, childID, fmt.Sprintf("parent execution id [%s] aborted, reason [%s]", w.GetName(), reason))
 }

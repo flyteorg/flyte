@@ -171,7 +171,7 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.Node
 	case v1alpha1.DynamicNodePhaseFailing:
 		fallthrough
 	case v1alpha1.DynamicNodePhaseExecuting:
-		logger.Infof(ctx, "Aborting dynamic workflow.")
+		logger.Infof(ctx, "Aborting dynamic workflow at RetryAttempt [%d]", nCtx.CurrentAttempt())
 		dynamicWF, isDynamic, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		if err != nil {
 			return err
@@ -183,7 +183,7 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.Node
 
 		return d.nodeExecutor.AbortHandler(ctx, dynamicWF, dynamicWF.StartNode(), reason)
 	default:
-		logger.Infof(ctx, "Aborting regular node.")
+		logger.Infof(ctx, "Aborting regular node RetryAttempt [%d]", nCtx.CurrentAttempt())
 		// The parent node has not yet completed, so we will abort the parent node
 		return d.TaskNodeHandler.Abort(ctx, nCtx, reason)
 	}
@@ -195,7 +195,7 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.N
 
 	ds := nCtx.NodeStateReader().GetDynamicNodeState()
 	if ds.Phase == v1alpha1.DynamicNodePhaseFailing || ds.Phase == v1alpha1.DynamicNodePhaseExecuting {
-		logger.Infof(ctx, "Finalizing dynamic workflow")
+		logger.Infof(ctx, "Finalizing dynamic workflow RetryAttempt [%d]", nCtx.CurrentAttempt())
 		dynamicWF, isDynamic, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		if err != nil {
 			errs = append(errs, err)
@@ -212,7 +212,7 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.N
 	// We should always finalize the parent node success or failure.
 	// If we use the phase to decide when to finalize in the case where Dynamic node is in phase Executiing
 	// (i.e. child nodes are now being executed) and Finalize is invoked, we will never invoke the finalizer for the parent.
-	logger.Infof(ctx, "Finalizing Parent node")
+	logger.Infof(ctx, "Finalizing Parent node RetryAttempt [%d]", nCtx.CurrentAttempt())
 	if err := d.TaskNodeHandler.Finalize(ctx, nCtx); err != nil {
 		logger.Errorf(ctx, "Failed to finalize Dynamic Nodes Parent.")
 		errs = append(errs, err)
