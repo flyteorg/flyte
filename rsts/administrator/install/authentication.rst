@@ -24,19 +24,28 @@ Direct Client Access
 The gRPC client provided by the Flyte IDL, or direct calls to the HTTP endpoints on Admin from within a running script are ways that we have seen users hit the control plane directly.  We generally discourage this behavior as it leads to a possible self-imposed DOS vector, as they are generally made from within a running workflow itself. For instance, a Flyte task can fetch the definition for a launch plan associated with a completely different workflow, and then launch an execution of it. This is not the correct way to launch one workflow from another but for the time being remains possible.
 
 
-******
-Flow
-******
+*****************
+Swimlane Diagrams
+*****************
 
 Flyte Admin authentication is implemented using the authorization code flow.
 
 Flyte UI Flow
+=============
 https://swimlanes.io/d/OmV4ybCkx
-https://static.swimlanes.io/fd751baba1152f38f40744fc06a67b1f.png
+
+.. image:: flyte_ui_flow.png
+   :width: 600
+   :alt: Flyte UI Swimlane
+
 
 Flyte CLI Flow
+==============
 https://swimlanes.io/d/q64OxuoxT
-https://static.swimlanes.io/3f0fa54e2cc52d4a07666be1cda3ccd3.png
+
+.. image:: flyte_cli_flow.png
+  :width: 600
+  :alt: Flyte CLI Swimlane
 
 *************
 Configuration
