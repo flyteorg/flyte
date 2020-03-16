@@ -40,6 +40,7 @@ require (
 	google.golang.org/genproto v0.0.0-20200312145019-da6875a35672 // indirect
 	google.golang.org/grpc v1.28.0
 	gopkg.in/gormigrate.v1 v1.6.0
+	k8s.io/api v0.17.3
 	k8s.io/apimachinery v0.17.3
 	k8s.io/client-go v11.0.0+incompatible
 	sigs.k8s.io/controller-runtime v0.5.1
