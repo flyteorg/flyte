@@ -17,7 +17,7 @@ spec:
           'until pg_isready -h postgres -p 5432;
           do echo waiting for database; sleep 2; done;']
       - name: run-migrations
-        image: docker.io/lyft/flyteadmin:v0.1.6
+        image: docker.io/lyft/flyteadmin:v0.2.3
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
                   "migrate", "run"]
@@ -25,15 +25,15 @@ spec:
         - name: config-volume
           mountPath: /etc/flyte/config
       - name: seed-projects
-        image: docker.io/lyft/flyteadmin:v0.1.6
+        image: docker.io/lyft/flyteadmin:v0.2.3
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                  "migrate", "seed-projects", "flytesnacks", "flytetester"]
+                  "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
       - name: sync-cluster-resources
-        image: docker.io/lyft/flyteadmin:v0.1.6
+        image: docker.io/lyft/flyteadmin:v0.2.3
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
         volumeMounts:

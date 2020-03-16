@@ -53,3 +53,4 @@ tasks:
     enabled-plugins:
       - container
       - sidecar
+      - k8s-array
