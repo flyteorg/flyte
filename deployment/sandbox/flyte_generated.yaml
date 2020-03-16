@@ -643,6 +643,33 @@ metadata:
 apiVersion: v1
 data:
   config.yaml: |
+    plugins:
+      presto:
+        environment: ""
+        defaultRoutingGroup: "adhoc"
+        routingGroupConfigs:
+          - name: "adhoc"
+            limit: 250
+            projectScopeQuotaProportionCap: 0.7
+            namespaceScopeQuotaProportionCap: 0.7
+          - name: "etl"
+            limit: 100
+            projectScopeQuotaProportionCap: 0.7
+            namespaceScopeQuotaProportionCap: 0.7
+        rateLimiter:
+          name: "presto"
+          syncPeriod: 3s
+          workers: 15
+          lruCacheSize: 2000
+          metricScope: "presto"
+kind: ConfigMap
+metadata:
+  name: flyte-presto-config-khhggb6558
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  config.yaml: |
     propeller:
       metadata-prefix: metadata/propeller
       workers: 4
@@ -1147,6 +1174,8 @@ spec:
             ephemeral-storage: 100Mi
             memory: 100Mi
         volumeMounts:
+        - mountPath: /etc/flyte/config-presto
+          name: presto-config-volume
         - mountPath: /etc/flyte/config-qubole
           name: qubole-config-volume
         - mountPath: /etc/flyte/config-container
@@ -1159,6 +1188,9 @@ spec:
           name: plugin-config-volume
       serviceAccountName: flytepropeller
       volumes:
+      - configMap:
+          name: flyte-presto-config-khhggb6558
+        name: presto-config-volume
       - configMap:
           name: flyte-qubole-config-9tcd8mk2c2
         name: qubole-config-volume
