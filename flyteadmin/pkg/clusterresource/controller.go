@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	v1 "k8s.io/api/rbac/v1"
+
 	"github.com/lyft/flyteadmin/pkg/manager/impl/resources"
 	managerinterfaces "github.com/lyft/flyteadmin/pkg/manager/interfaces"
 
@@ -84,6 +86,18 @@ var descCreatedAtSortParam, _ = common.NewSortParameter(admin.Sort{
 	Direction: admin.Sort_DESCENDING,
 	Key:       "created_at",
 })
+
+// Use a strategic-merge-patch to mimic `kubectl apply` behavior for serviceaccounts.
+// Kubectl defaults to using the StrategicMergePatch strategy.
+// However the controller-runtime only has an implementation for MergePatch which we were formerly
+// using but failed to actually always merge resources in the Patch call.
+// INTERESTINGLY Patch doesn't actually appear to update the majority of resources. We default to using Update but
+// whitelist the specific set of resources that require a Patch to work instead.
+// If you use update with a ServiceAccount - *every* call to Update results in a new corresponding secret being created
+// which has the (not so) fun side-effect of overwhelming API server when this Sync script is run as a cron.
+var strategicPatchTypes = map[string]bool{
+	v1.ServiceAccountKind: true,
+}
 
 func (c *controller) templateAlreadyApplied(namespace NamespaceName, templateFile os.FileInfo) bool {
 	namespacedAppliedTemplates, ok := c.appliedTemplates[namespace]
@@ -292,11 +306,13 @@ func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName,
 					logger.Debugf(ctx, "Type [%+v] in namespace [%s] already exists - attempting update instead",
 						k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
 					c.metrics.AppliedTemplateExists.Inc()
-					// Use a strategic-merge-patch to mimic `kubectl apply` behavior.
-					// Kubectl defaults to using the StrategicMergePatch strategy.
-					// However the controller-runtime only has an implementation for MergePatch which we were formerly
-					// using but failed to actually always merge resources in the Patch call.
-					err = target.Client.Patch(ctx, k8sObjCopy, StrategicMergeFrom(k8sObjCopy))
+
+					if ok := strategicPatchTypes[k8sObjCopy.GetObjectKind().GroupVersionKind().Kind]; ok {
+						err = target.Client.Patch(ctx, k8sObjCopy, StrategicMergeFrom(k8sObjCopy))
+					} else {
+						err = target.Client.Update(ctx, k8sObjCopy)
+					}
+
 					if err != nil {
 						c.metrics.TemplateUpdateErrors.Inc()
 						logger.Infof(ctx, "Failed to update resource [%+v] in namespace [%s] with err :%v",
