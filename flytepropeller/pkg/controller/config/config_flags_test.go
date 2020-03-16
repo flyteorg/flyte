@@ -891,10 +891,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_default-deadlines.node-execution-deadline", func(t *testing.T) {
+	t.Run("Test_node-config.default-deadlines.node-execution-deadline", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("default-deadlines.node-execution-deadline"); err == nil {
+			if vString, err := cmdFlags.GetString("node-config.default-deadlines.node-execution-deadline"); err == nil {
 				assert.Equal(t, string(defaultConfig.NodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -904,8 +904,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := defaultConfig.NodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.String()
 
-			cmdFlags.Set("default-deadlines.node-execution-deadline", testValue)
-			if vString, err := cmdFlags.GetString("default-deadlines.node-execution-deadline"); err == nil {
+			cmdFlags.Set("node-config.default-deadlines.node-execution-deadline", testValue)
+			if vString, err := cmdFlags.GetString("node-config.default-deadlines.node-execution-deadline"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline)
 
 			} else {
@@ -913,10 +913,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_default-deadlines.node-active-deadline", func(t *testing.T) {
+	t.Run("Test_node-config.default-deadlines.node-active-deadline", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("default-deadlines.node-active-deadline"); err == nil {
+			if vString, err := cmdFlags.GetString("node-config.default-deadlines.node-active-deadline"); err == nil {
 				assert.Equal(t, string(defaultConfig.NodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -926,8 +926,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := defaultConfig.NodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.String()
 
-			cmdFlags.Set("default-deadlines.node-active-deadline", testValue)
-			if vString, err := cmdFlags.GetString("default-deadlines.node-active-deadline"); err == nil {
+			cmdFlags.Set("node-config.default-deadlines.node-active-deadline", testValue)
+			if vString, err := cmdFlags.GetString("node-config.default-deadlines.node-active-deadline"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline)
 
 			} else {
@@ -935,10 +935,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_default-deadlines.workflow-active-deadline", func(t *testing.T) {
+	t.Run("Test_node-config.default-deadlines.workflow-active-deadline", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("default-deadlines.workflow-active-deadline"); err == nil {
+			if vString, err := cmdFlags.GetString("node-config.default-deadlines.workflow-active-deadline"); err == nil {
 				assert.Equal(t, string(defaultConfig.NodeConfig.DefaultDeadlines.DefaultWorkflowActiveDeadline.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -948,9 +948,31 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := defaultConfig.NodeConfig.DefaultDeadlines.DefaultWorkflowActiveDeadline.String()
 
-			cmdFlags.Set("default-deadlines.workflow-active-deadline", testValue)
-			if vString, err := cmdFlags.GetString("default-deadlines.workflow-active-deadline"); err == nil {
+			cmdFlags.Set("node-config.default-deadlines.workflow-active-deadline", testValue)
+			if vString, err := cmdFlags.GetString("node-config.default-deadlines.workflow-active-deadline"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NodeConfig.DefaultDeadlines.DefaultWorkflowActiveDeadline)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_node-config.max-node-retries-system-failures", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt64, err := cmdFlags.GetInt64("node-config.max-node-retries-system-failures"); err == nil {
+				assert.Equal(t, int64(defaultConfig.NodeConfig.MaxNodeRetriesForSystemFailures), vInt64)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("node-config.max-node-retries-system-failures", testValue)
+			if vInt64, err := cmdFlags.GetInt64("node-config.max-node-retries-system-failures"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.NodeConfig.MaxNodeRetriesForSystemFailures)
 
 			} else {
 				assert.FailNow(t, err.Error())
