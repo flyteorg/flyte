@@ -15,6 +15,7 @@ Container Entrypoint
 **********************
 Any workflow repository that will be the target of an end-to-end test will need to have the ``end2end_test`` Make target available.  This is the common entrypoint that the tooling in this repository will call.
 
+
 Background
 ***********
 End-to-end testing was initally going to be implemented with K8s Jobs.  We thought that we'd have somewhere on the order of 100 jobs.  In implementing tests, we quickly realized that managing that number of jobs would be a lot of work - keeping track of timeouts, failures, partial pod failures like ImagePullBackoff issues, retries, etc.  What we'd end up writing for that would look very much like a higher level Jobs controller.  That would be way too much work.
