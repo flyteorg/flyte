@@ -160,11 +160,12 @@
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_datetime</span>
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">literals_pb2</span> <span class="k">as</span> <span class="n">_literals_pb2</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.clients.helpers</span> <span class="k">import</span> <span class="n">iterate_node_executions</span> <span class="k">as</span> <span class="n">_iterate_node_executions</span><span class="p">,</span> <span class="n">iterate_task_executions</span> <span class="k">as</span> \
-    <span class="n">_iterate_task_executions</span>
 <span class="kn">from</span> <span class="nn">flytekit</span> <span class="k">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">_api_version</span>
 <span class="kn">from</span> <span class="nn">flytekit.clients.friendly</span> <span class="k">import</span> <span class="n">SynchronousFlyteClient</span> <span class="k">as</span> <span class="n">_SynchronousFlyteClient</span>
+<span class="kn">from</span> <span class="nn">flytekit.clients.helpers</span> <span class="k">import</span> <span class="n">iterate_node_executions</span> <span class="k">as</span> <span class="n">_iterate_node_executions</span><span class="p">,</span> <span class="n">iterate_task_executions</span> <span class="k">as</span> \
+    <span class="n">_iterate_task_executions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">_common_utils</span><span class="p">,</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span><span class="p">,</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">platform</span> <span class="k">as</span> <span class="n">_platform_config</span><span class="p">,</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span><span class="p">,</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
@@ -173,9 +174,8 @@
 <span class="kn">from</span> <span class="nn">flytekit.interfaces.stats.taggable</span> <span class="k">import</span> <span class="n">get_stats</span> <span class="k">as</span> <span class="n">_get_stats</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span><span class="p">,</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_execution_models</span><span class="p">,</span> \
     <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span><span class="p">,</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.admin</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.admin</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span><span class="p">,</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">errors</span> <span class="k">as</span> <span class="n">_error_models</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
-<span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">literals_pb2</span> <span class="k">as</span> <span class="n">_literals_pb2</span>
 
 
 <span class="k">class</span> <span class="nc">_FlyteClientManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -186,7 +186,8 @@
         <span class="c1"># TODO: React to changing configs.  For now this is frozen for the lifetime of the process, which covers most</span>
         <span class="c1"># TODO: use cases.</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_CLIENT</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_CLIENT</span> <span class="o">=</span> <span class="n">_SynchronousFlyteClient</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">_SynchronousFlyteClient</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_CLIENT</span> <span class="o">=</span> <span class="n">c</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -260,6 +261,21 @@
             <span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
             <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="p">)</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FlyteEngineFactory.fetch_latest_task"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_latest_task">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_latest_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">named_task</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetches the latest task</span>
+<span class="sd">        :param flytekit.models.common.NamedEntityIdentifier named_task: NamedEntityIdentifier to fetch</span>
+<span class="sd">        :rtype: flytekit.models.task.Task</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">task_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_FlyteClientManager</span><span class="p">(</span>
+            <span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">list_tasks_paginated</span><span class="p">(</span>
+            <span class="n">named_task</span><span class="p">,</span>
+            <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">sort_by</span><span class="o">=</span><span class="n">_common</span><span class="o">.</span><span class="n">Sort</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">,</span> <span class="n">_common</span><span class="o">.</span><span class="n">Sort</span><span class="o">.</span><span class="n">Direction</span><span class="o">.</span><span class="n">DESCENDING</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">task_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">task_list</span> <span class="k">else</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="FlyteEngineFactory.fetch_launch_plan"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_launch_plan">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">launch_plan_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -653,7 +669,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

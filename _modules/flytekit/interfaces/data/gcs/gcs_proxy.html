@@ -253,7 +253,12 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not an GS Key. Please use FQN (GS ARN) of the format gs://...&quot;</span><span class="p">)</span>
 
         <span class="n">GCSProxy</span><span class="o">.</span><span class="n">_check_binary</span><span class="p">()</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">GCSProxy</span><span class="o">.</span><span class="n">_GS_UTIL_CLI</span><span class="p">,</span> <span class="s2">&quot;cp&quot;</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">_amend_path</span><span class="p">(</span><span class="n">local_path</span><span class="p">),</span> <span class="n">remote_path</span><span class="p">]</span>
+
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">GCSProxy</span><span class="o">.</span><span class="n">_GS_UTIL_CLI</span><span class="p">,</span>
+               <span class="s2">&quot;cp&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
+               <span class="n">_amend_path</span><span class="p">(</span><span class="n">local_path</span><span class="p">),</span>
+               <span class="n">remote_path</span> <span class="k">if</span> <span class="n">remote_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">remote_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">_update_cmd_config_and_execute</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GCSProxy.get_random_path"><a class="viewcode-back" href="../../../../../flytekit/flytekit.interfaces.data.gcs.html#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.get_random_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -280,7 +285,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

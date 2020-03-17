@@ -214,6 +214,14 @@
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This object should be implemented to satisfy the basic engine interface.</p>
 <dl class="method">
+<dt id="flytekit.engines.common.BaseExecutionEngineFactory.fetch_latest_task">
+<em class="property">abstract </em><code class="sig-name descname">fetch_latest_task</code><span class="sig-paren">(</span><em class="sig-param">named_task</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/common.html#BaseExecutionEngineFactory.fetch_latest_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.common.BaseExecutionEngineFactory.fetch_latest_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the latest task
+:param flytekit.models.common.NamedEntityIdentifier named_task: NamedEntityIdentifier to fetch
+:rtype: flytekit.models.task.Task</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.engines.common.BaseExecutionEngineFactory.fetch_launch_plan">
 <em class="property">abstract </em><code class="sig-name descname">fetch_launch_plan</code><span class="sig-paren">(</span><em class="sig-param">launch_plan_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/common.html#BaseExecutionEngineFactory.fetch_launch_plan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.common.BaseExecutionEngineFactory.fetch_launch_plan" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -760,7 +768,7 @@ FlyteKit SDK.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

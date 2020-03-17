@@ -153,17 +153,92 @@
             
   <h1>Source code for flytekit.clients.raw</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
 <span class="kn">from</span> <span class="nn">grpc</span> <span class="k">import</span> <span class="n">insecure_channel</span> <span class="k">as</span> <span class="n">_insecure_channel</span><span class="p">,</span> <span class="n">secure_channel</span> <span class="k">as</span> <span class="n">_secure_channel</span><span class="p">,</span> <span class="n">RpcError</span> <span class="k">as</span> <span class="n">_RpcError</span><span class="p">,</span> \
     <span class="n">StatusCode</span> <span class="k">as</span> <span class="n">_GrpcStatusCode</span><span class="p">,</span> <span class="n">ssl_channel_credentials</span> <span class="k">as</span> <span class="n">_ssl_channel_credentials</span>
 <span class="kn">from</span> <span class="nn">flyteidl.service</span> <span class="k">import</span> <span class="n">admin_pb2_grpc</span> <span class="k">as</span> <span class="n">_admin_service</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration.platform</span> <span class="k">import</span> <span class="n">AUTH</span> <span class="k">as</span> <span class="n">_AUTH</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration.creds</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">CLIENT_ID</span> <span class="k">as</span> <span class="n">_CLIENT_ID</span><span class="p">,</span>
+    <span class="n">CLIENT_CREDENTIALS_SCOPE</span> <span class="k">as</span> <span class="n">_SCOPE</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container</span> <span class="k">import</span> <span class="n">basic_auth</span> <span class="k">as</span> <span class="n">_basic_auth</span>
+<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">creds</span> <span class="k">as</span> <span class="n">_creds_config</span><span class="p">,</span> <span class="n">platform</span> <span class="k">as</span> <span class="n">_platform_config</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.clis.auth</span> <span class="k">import</span> <span class="n">credentials</span> <span class="k">as</span> <span class="n">_credentials_access</span>
+
+
+<span class="k">def</span> <span class="nf">_refresh_credentials_standard</span><span class="p">(</span><span class="n">flyte_client</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is used when the configuration value for AUTH_MODE is set to &#39;standard&#39;.</span>
+<span class="sd">    This either fetches the existing access token or initiates the flow to request a valid access token and store it.</span>
+<span class="sd">    :param flyte_client: RawSynchronousFlyteClient</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_credentials_access</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span><span class="o">.</span><span class="n">refresh_access_token</span><span class="p">()</span>
+    <span class="n">flyte_client</span><span class="o">.</span><span class="n">set_access_token</span><span class="p">(</span><span class="n">_credentials_access</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span><span class="o">.</span><span class="n">credentials</span><span class="o">.</span><span class="n">access_token</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_refresh_credentials_basic</span><span class="p">(</span><span class="n">flyte_client</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is used by the _handle_rpc_error decorator, depending on the AUTH_MODE config object. This handler</span>
+<span class="sd">    is meant for SDK use-cases of auth (like pyflyte, or when users call SDK functions that require access to Admin,</span>
+<span class="sd">    like when waiting for another workflow to complete from within a task). This function uses basic auth, which means</span>
+<span class="sd">    the credentials for basic auth must be present from wherever this code is running.</span>
+
+<span class="sd">    :param flyte_client: RawSynchronousFlyteClient</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">auth_endpoints</span> <span class="o">=</span> <span class="n">_credentials_access</span><span class="o">.</span><span class="n">get_authorization_endpoints</span><span class="p">()</span>
+    <span class="n">token_endpoint</span> <span class="o">=</span> <span class="n">auth_endpoints</span><span class="o">.</span><span class="n">token_endpoint</span>
+    <span class="n">client_secret</span> <span class="o">=</span> <span class="n">_basic_auth</span><span class="o">.</span><span class="n">get_secret</span><span class="p">()</span>
+    <span class="n">_logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Basic authorization flow with client id </span><span class="si">{}</span><span class="s1"> scope </span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">_CLIENT_ID</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">_SCOPE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+    <span class="n">authorization_header</span> <span class="o">=</span> <span class="n">_basic_auth</span><span class="o">.</span><span class="n">get_basic_authorization_header</span><span class="p">(</span><span class="n">_CLIENT_ID</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">client_secret</span><span class="p">)</span>
+    <span class="n">token</span><span class="p">,</span> <span class="n">expires_in</span> <span class="o">=</span> <span class="n">_basic_auth</span><span class="o">.</span><span class="n">get_token</span><span class="p">(</span><span class="n">token_endpoint</span><span class="p">,</span> <span class="n">authorization_header</span><span class="p">,</span> <span class="n">_SCOPE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+    <span class="n">_logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Retrieved new token, expires in </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expires_in</span><span class="p">))</span>
+    <span class="n">flyte_client</span><span class="o">.</span><span class="n">set_access_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_refresh_credentials_noop</span><span class="p">(</span><span class="n">flyte_client</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">_get_refresh_handler</span><span class="p">(</span><span class="n">auth_mode</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">auth_mode</span> <span class="o">==</span> <span class="s2">&quot;standard&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_refresh_credentials_standard</span>
+    <span class="k">elif</span> <span class="n">auth_mode</span> <span class="o">==</span> <span class="s2">&quot;basic&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_refresh_credentials_basic</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid auth mode [</span><span class="si">{}</span><span class="s2">] specified. Please update the creds config to use a valid value&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">auth_mode</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_handle_rpc_error</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wraps rpc errors as Flyte exceptions and handles authentication the client.</span>
+<span class="sd">        :param args:</span>
+<span class="sd">        :param kwargs:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">retries</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">retries</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">_RpcError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">_GrpcStatusCode</span><span class="o">.</span><span class="n">UNAUTHENTICATED</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="p">(</span><span class="n">retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                            <span class="c1"># Exit the loop and wrap the authentication error.</span>
+                            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAuthenticationException</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                        <span class="n">refresh_handler_fn</span> <span class="o">=</span> <span class="n">_get_refresh_handler</span><span class="p">(</span><span class="n">_creds_config</span><span class="o">.</span><span class="n">AUTH_MODE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                        <span class="n">refresh_handler_fn</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span>
         <span class="k">except</span> <span class="n">_RpcError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">_GrpcStatusCode</span><span class="o">.</span><span class="n">ALREADY_EXISTS</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteEntityAlreadyExistsException</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
@@ -189,10 +264,11 @@
 <span class="sd">        :param Text credentials: [Optional] If provided, a secure channel will be opened with the Flyte Admin Service.</span>
 <span class="sd">        :param dict[Text, Text] options: [Optional] A dict of key-value string pairs for configuring the gRPC core</span>
 <span class="sd">            runtime.</span>
+<span class="sd">        :param list[(Text,Text)] metadata: [Optional] metadata pairs to be transmitted to the</span>
+<span class="sd">            service-side of the RPC.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="c1"># TODO: Revert all the for loops below</span>
         <span class="k">if</span> <span class="n">insecure</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span> <span class="o">=</span> <span class="n">_insecure_channel</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">((</span><span class="n">options</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -202,6 +278,18 @@
                 <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">((</span><span class="n">options</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span> <span class="o">=</span> <span class="n">_admin_service</span><span class="o">.</span><span class="n">AdminServiceStub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">_AUTH</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">force_auth_flow</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RawSynchronousFlyteClient.set_access_token"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.set_access_token">[docs]</a>    <span class="k">def</span> <span class="nf">set_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">access_token</span><span class="p">):</span>
+        <span class="c1"># Always set the header to lower-case regardless of what the config is. The grpc libraries that Admin uses</span>
+        <span class="c1"># to parse the metadata don&#39;t change the metadata, but they do automatically lower the key you&#39;re looking for.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="p">[(</span><span class="n">_creds_config</span><span class="o">.</span><span class="n">AUTHORIZATION_METADATA_KEY</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="s2">&quot;Bearer </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">access_token</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="RawSynchronousFlyteClient.force_auth_flow"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.force_auth_flow">[docs]</a>    <span class="k">def</span> <span class="nf">force_auth_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">refresh_handler_fn</span> <span class="o">=</span> <span class="n">_get_refresh_handler</span><span class="p">(</span><span class="n">_creds_config</span><span class="o">.</span><span class="n">AUTH_MODE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="n">refresh_handler_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>
@@ -228,7 +316,7 @@
 <span class="sd">            task is already registered.</span>
 <span class="sd">        :raises grpc.RpcError:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">CreateTask</span><span class="p">(</span><span class="n">task_create_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">CreateTask</span><span class="p">(</span><span class="n">task_create_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.list_task_ids_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_task_ids_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">list_task_ids_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier_list_request</span><span class="p">):</span>
@@ -254,7 +342,7 @@
 <span class="sd">        :rtype: flyteidl.admin.common_pb2.NamedEntityIdentifierList</span>
 <span class="sd">        :raises: TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListTaskIds</span><span class="p">(</span><span class="n">identifier_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListTaskIds</span><span class="p">(</span><span class="n">identifier_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.list_tasks_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_tasks_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">list_tasks_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_list_request</span><span class="p">):</span>
@@ -276,7 +364,7 @@
 <span class="sd">        :rtype: flyteidl.admin.task_pb2.TaskList</span>
 <span class="sd">        :raises: TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListTasks</span><span class="p">(</span><span class="n">resource_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListTasks</span><span class="p">(</span><span class="n">resource_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.get_task"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_task">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_object_request</span><span class="p">):</span>
@@ -287,7 +375,7 @@
 <span class="sd">        :rtype: flyteidl.admin.task_pb2.Task</span>
 <span class="sd">        :raises: TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetTask</span><span class="p">(</span><span class="n">get_object_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetTask</span><span class="p">(</span><span class="n">get_object_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>
@@ -314,7 +402,7 @@
 <span class="sd">            identical workflow is already registered.</span>
 <span class="sd">        :raises grpc.RpcError:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">CreateWorkflow</span><span class="p">(</span><span class="n">workflow_create_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">CreateWorkflow</span><span class="p">(</span><span class="n">workflow_create_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.list_workflow_ids_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_workflow_ids_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">list_workflow_ids_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier_list_request</span><span class="p">):</span>
@@ -340,7 +428,7 @@
 <span class="sd">        :rtype: flyteidl.admin.common_pb2.NamedEntityIdentifierList</span>
 <span class="sd">        :raises: TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListWorkflowIds</span><span class="p">(</span><span class="n">identifier_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListWorkflowIds</span><span class="p">(</span><span class="n">identifier_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.list_workflows_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_workflows_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">list_workflows_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_list_request</span><span class="p">):</span>
@@ -362,7 +450,7 @@
 <span class="sd">        :rtype: flyteidl.admin.workflow_pb2.WorkflowList</span>
 <span class="sd">        :raises: TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListWorkflows</span><span class="p">(</span><span class="n">resource_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListWorkflows</span><span class="p">(</span><span class="n">resource_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.get_workflow"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_workflow">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">get_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_object_request</span><span class="p">):</span>
@@ -373,7 +461,7 @@
 <span class="sd">        :rtype: flyteidl.admin.workflow_pb2.Workflow</span>
 <span class="sd">        :raises: TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetWorkflow</span><span class="p">(</span><span class="n">get_object_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetWorkflow</span><span class="p">(</span><span class="n">get_object_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>
@@ -401,7 +489,7 @@
 <span class="sd">            the identical launch plan is already registered.</span>
 <span class="sd">        :raises grpc.RpcError:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">CreateLaunchPlan</span><span class="p">(</span><span class="n">launch_plan_create_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">CreateLaunchPlan</span><span class="p">(</span><span class="n">launch_plan_create_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
     <span class="c1"># TODO: List endpoints when they come in</span>
 
@@ -413,7 +501,7 @@
 <span class="sd">        :param flyteidl.admin.common_pb2.ObjectGetRequest object_get_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.launch_plan_pb2.LaunchPlan</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetLaunchPlan</span><span class="p">(</span><span class="n">object_get_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetLaunchPlan</span><span class="p">(</span><span class="n">object_get_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.get_active_launch_plan"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_active_launch_plan">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">get_active_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">active_launch_plan_request</span><span class="p">):</span>
@@ -423,7 +511,7 @@
 <span class="sd">        :param flyteidl.admin.common_pb2.ActiveLaunchPlanRequest active_launch_plan_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.launch_plan_pb2.LaunchPlan</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetActiveLaunchPlan</span><span class="p">(</span><span class="n">active_launch_plan_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetActiveLaunchPlan</span><span class="p">(</span><span class="n">active_launch_plan_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.update_launch_plan"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.update_launch_plan">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">update_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_request</span><span class="p">):</span>
@@ -434,7 +522,7 @@
 <span class="sd">        :param flyteidl.admin.launch_plan_pb2.LaunchPlanUpdateRequest update_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.launch_plan_pb2.LaunchPlanUpdateResponse</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">UpdateLaunchPlan</span><span class="p">(</span><span class="n">update_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">UpdateLaunchPlan</span><span class="p">(</span><span class="n">update_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.list_launch_plan_ids_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_launch_plan_ids_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">list_launch_plan_ids_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier_list_request</span><span class="p">):</span>
@@ -444,7 +532,7 @@
 <span class="sd">        :param: flyteidl.admin.common_pb2.NamedEntityIdentifierListRequest identifier_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.common_pb2.NamedEntityIdentifierList</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListLaunchPlanIds</span><span class="p">(</span><span class="n">identifier_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListLaunchPlanIds</span><span class="p">(</span><span class="n">identifier_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.list_launch_plans_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_launch_plans_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">list_launch_plans_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_list_request</span><span class="p">):</span>
@@ -454,7 +542,7 @@
 <span class="sd">        :param: flyteidl.admin.common_pb2.ResourceListRequest resource_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.launch_plan_pb2.LaunchPlanList</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListLaunchPlans</span><span class="p">(</span><span class="n">resource_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListLaunchPlans</span><span class="p">(</span><span class="n">resource_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.list_active_launch_plans_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_active_launch_plans_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">list_active_launch_plans_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">active_launch_plan_list_request</span><span class="p">):</span>
@@ -464,7 +552,7 @@
 <span class="sd">        :param: flyteidl.admin.common_pb2.ActiveLaunchPlanListRequest active_launch_plan_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.launch_plan_pb2.LaunchPlanList</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListActiveLaunchPlans</span><span class="p">(</span><span class="n">active_launch_plan_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListActiveLaunchPlans</span><span class="p">(</span><span class="n">active_launch_plan_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>
@@ -479,7 +567,7 @@
 <span class="sd">        :param flyteidl.admin.execution_pb2.ExecutionCreateRequest create_execution_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.execution_pb2.ExecutionCreateResponse</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">CreateExecution</span><span class="p">(</span><span class="n">create_execution_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">CreateExecution</span><span class="p">(</span><span class="n">create_execution_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.get_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_execution">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">get_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_object_request</span><span class="p">):</span>
@@ -489,7 +577,7 @@
 <span class="sd">        :param flyteidl.admin.execution_pb2.WorkflowExecutionGetRequest get_object_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.execution_pb2.Execution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetExecution</span><span class="p">(</span><span class="n">get_object_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetExecution</span><span class="p">(</span><span class="n">get_object_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.get_execution_data"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_execution_data">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">get_execution_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_execution_data_request</span><span class="p">):</span>
@@ -509,7 +597,7 @@
 <span class="sd">        :param flyteidl.admin.common_pb2.ResourceListRequest resource_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.execution_pb2.ExecutionList</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListExecutions</span><span class="p">(</span><span class="n">resource_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListExecutions</span><span class="p">(</span><span class="n">resource_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.terminate_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.terminate_execution">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">terminate_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">terminate_execution_request</span><span class="p">):</span>
@@ -517,7 +605,7 @@
 <span class="sd">        :param flyteidl.admin.execution_pb2.TerminateExecutionRequest terminate_execution_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.execution_pb2.TerminateExecutionResponse</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">TerminateExecution</span><span class="p">(</span><span class="n">terminate_execution_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">TerminateExecution</span><span class="p">(</span><span class="n">terminate_execution_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.relaunch_execution"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.relaunch_execution">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">relaunch_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relaunch_execution_request</span><span class="p">):</span>
@@ -539,7 +627,7 @@
 <span class="sd">        :param flyteidl.admin.node_execution_pb2.NodeExecutionGetRequest node_execution_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.node_execution_pb2.NodeExecution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetNodeExecution</span><span class="p">(</span><span class="n">node_execution_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetNodeExecution</span><span class="p">(</span><span class="n">node_execution_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.get_node_execution_data"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_node_execution_data">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">get_node_execution_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_node_execution_data_request</span><span class="p">):</span>
@@ -557,7 +645,7 @@
 <span class="sd">        :param flyteidl.admin.node_execution_pb2.NodeExecutionListRequest node_execution_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.node_execution_pb2.NodeExecutionList</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListNodeExecutions</span><span class="p">(</span><span class="n">node_execution_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListNodeExecutions</span><span class="p">(</span><span class="n">node_execution_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.list_node_executions_for_task_paginated"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_node_executions_for_task_paginated">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">list_node_executions_for_task_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_execution_for_task_list_request</span><span class="p">):</span>
@@ -565,7 +653,7 @@
 <span class="sd">        :param flyteidl.admin.node_execution_pb2.NodeExecutionListRequest node_execution_for_task_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.node_execution_pb2.NodeExecutionList</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListNodeExecutionsForTask</span><span class="p">(</span><span class="n">node_execution_for_task_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListNodeExecutionsForTask</span><span class="p">(</span><span class="n">node_execution_for_task_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>
@@ -579,7 +667,7 @@
 <span class="sd">        :param flyteidl.admin.task_execution_pb2.TaskExecutionGetRequest task_execution_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.task_execution_pb2.TaskExecution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetTaskExecution</span><span class="p">(</span><span class="n">task_execution_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetTaskExecution</span><span class="p">(</span><span class="n">task_execution_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.get_task_execution_data"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_task_execution_data">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">get_task_execution_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_task_execution_data_request</span><span class="p">):</span>
@@ -597,7 +685,7 @@
 <span class="sd">        :param flyteidl.admin.task_execution_pb2.TaskExecutionListRequest task_execution_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.task_execution_pb2.TaskExecutionList</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListTaskExecutions</span><span class="p">(</span><span class="n">task_execution_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListTaskExecutions</span><span class="p">(</span><span class="n">task_execution_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>
@@ -612,7 +700,7 @@
 <span class="sd">        :param flyteidl.admin.project_pb2.ProjectListRequest project_list_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.project_pb2.Projects</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListProjects</span><span class="p">(</span><span class="n">project_list_request</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListProjects</span><span class="p">(</span><span class="n">project_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.register_project"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.register_project">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">register_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_register_request</span><span class="p">):</span>
@@ -621,7 +709,7 @@
 <span class="sd">        :param flyteidl.admin.project_pb2.ProjectRegisterRequest project_register_request:</span>
 <span class="sd">        :rtype: flyteidl.admin.project_pb2.ProjectRegisterResponse</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">RegisterProject</span><span class="p">(</span><span class="n">project_register_request</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">RegisterProject</span><span class="p">(</span><span class="n">project_register_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div></div>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>
@@ -643,7 +731,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

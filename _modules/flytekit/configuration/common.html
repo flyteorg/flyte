@@ -274,6 +274,20 @@
             <span class="k">del</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">env_var</span><span class="p">]</span>
 
 
+<span class="k">def</span> <span class="nf">_get_file_contents</span><span class="p">(</span><span class="n">location</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This reads an input file, and returns the string contents, and should be used for reading credentials.</span>
+<span class="sd">    This function will also strip newlines.</span>
+
+<span class="sd">    :param Text location: The file path holding the client id or secret</span>
+<span class="sd">    :rtype: Text</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">location</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
 <span class="k">class</span> <span class="nc">_FlyteConfigurationEntry</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -293,6 +307,37 @@
     <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">retrieve_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The logic in this function changes the lookup behavior for all configuration objects before hitting the</span>
+<span class="sd">        configuration file.</span>
+
+<span class="sd">        For a given configuration object (&#39;mysection&#39;, &#39;mysetting&#39;), it will now look at this waterfall:</span>
+
+<span class="sd">            i.) The environment variable named &#39;FLYTE_MYSECTION_MYSETTING&#39;</span>
+
+<span class="sd">            ii.) The value of the environment variable that is named the value of the environment variable named</span>
+<span class="sd">                 &#39;FLYTE_MYSECTION_MYSETTING&#39;. That is if os.environ[&#39;FLYTE_MYSECTION_MYSETTING&#39;] = &#39;AAA&#39; and</span>
+<span class="sd">                  os.environ[&#39;AA&#39;] = &#39;abc&#39;, then &#39;abc&#39; will be the final value.</span>
+
+<span class="sd">            iii.) The contents of the file pointed to by the environment variable named &#39;FLYTE_MYSECTION_MYSETTING&#39;,</span>
+<span class="sd">                  assuming the value is a file.</span>
+
+<span class="sd">        While it is helpful, this pattern does interrupt the manually specified fallback logic, by effective injecting</span>
+<span class="sd">        two more fallbacks behind the scenes. Just keep this in mind as you are using/creating configuration objects.</span>
+<span class="sd">        :rtype: Text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">referenced_env_var</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_FROM_ENV_VAR&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">referenced_env_var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">referenced_env_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">referenced_file</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_FROM_FILE&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">referenced_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">_get_file_contents</span><span class="p">(</span><span class="n">referenced_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">val</span>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getter</span><span class="p">()</span>
@@ -334,7 +379,7 @@
 
 <div class="viewcode-block" id="FlyteStringConfigurationEntry"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteStringConfigurationEntry">[docs]</a><span class="k">class</span> <span class="nc">FlyteStringConfigurationEntry</span><span class="p">(</span><span class="n">_FlyteConfigurationEntry</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_default</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">val</span></div>
@@ -342,7 +387,7 @@
 
 <div class="viewcode-block" id="FlyteIntegerConfigurationEntry"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteIntegerConfigurationEntry">[docs]</a><span class="k">class</span> <span class="nc">FlyteIntegerConfigurationEntry</span><span class="p">(</span><span class="n">_FlyteConfigurationEntry</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_default</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -352,7 +397,7 @@
 
 <div class="viewcode-block" id="FlyteBoolConfigurationEntry"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteBoolConfigurationEntry">[docs]</a><span class="k">class</span> <span class="nc">FlyteBoolConfigurationEntry</span><span class="p">(</span><span class="n">_FlyteConfigurationEntry</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_value</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_default</span><span class="p">)</span>
@@ -365,7 +410,7 @@
 
 <div class="viewcode-block" id="FlyteStringListConfigurationEntry"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteStringListConfigurationEntry">[docs]</a><span class="k">class</span> <span class="nc">FlyteStringListConfigurationEntry</span><span class="p">(</span><span class="n">_FlyteConfigurationEntry</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -375,7 +420,7 @@
 
 <div class="viewcode-block" id="FlyteRequiredStringConfigurationEntry"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteRequiredStringConfigurationEntry">[docs]</a><span class="k">class</span> <span class="nc">FlyteRequiredStringConfigurationEntry</span><span class="p">(</span><span class="n">_FlyteRequiredConfigurationEntry</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_default</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">val</span></div>
@@ -383,7 +428,7 @@
 
 <div class="viewcode-block" id="FlyteRequiredIntegerConfigurationEntry"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteRequiredIntegerConfigurationEntry">[docs]</a><span class="k">class</span> <span class="nc">FlyteRequiredIntegerConfigurationEntry</span><span class="p">(</span><span class="n">_FlyteRequiredConfigurationEntry</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_default</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
@@ -391,7 +436,7 @@
 
 <div class="viewcode-block" id="FlyteRequiredBoolConfigurationEntry"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteRequiredBoolConfigurationEntry">[docs]</a><span class="k">class</span> <span class="nc">FlyteRequiredBoolConfigurationEntry</span><span class="p">(</span><span class="n">_FlyteRequiredConfigurationEntry</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_default</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
@@ -399,7 +444,7 @@
 
 <div class="viewcode-block" id="FlyteRequiredStringListConfigurationEntry"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteRequiredStringListConfigurationEntry">[docs]</a><span class="k">class</span> <span class="nc">FlyteRequiredStringListConfigurationEntry</span><span class="p">(</span><span class="n">_FlyteRequiredConfigurationEntry</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">val</span> <span class="o">=</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -420,7 +465,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

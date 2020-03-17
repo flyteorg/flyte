@@ -180,14 +180,15 @@
 <p>The easiest way to author a Flyte Workflow is using the provided python SDK called “FlyteKit”.</p>
 <p>You can save some effort by cloning the <code class="docutils literal notranslate"><span class="pre">flytesnacks</span></code> repo, and re-initializing it as a new git repository</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">lyft</span><span class="o">/</span><span class="n">flytesnacks</span><span class="o">.</span><span class="n">git</span> <span class="n">myflyteproject</span>
-<span class="n">cd</span> <span class="n">myworkflow</span>
+<span class="n">cd</span> <span class="n">myflyteproject</span>
 <span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="o">.</span><span class="n">git</span>
 <span class="n">git</span> <span class="n">init</span>
+<span class="n">cd</span> <span class="n">python</span>
 </pre></div>
 </div>
 <p>now open the “Makefile” and change the first line to <code class="docutils literal notranslate"><span class="pre">IMAGE_NAME=myflyteproject</span></code></p>
 <p>Let’s also remove the existing python task so we can write one from scratch.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="n">workflows</span><span class="o">/</span><span class="n">edges</span><span class="o">.</span><span class="n">py</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="n">single_step</span><span class="o">/</span><span class="n">edges</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <div class="section" id="creating-a-project">
@@ -202,7 +203,8 @@
 <h2>Writing a Task<a class="headerlink" href="#writing-a-task" title="Permalink to this headline">¶</a></h2>
 <p>The most basic Flyte primitive is a “task”. Flyte Tasks are units of work that can be composed in a workflow. The simplest way to write a Flyte task is using the FlyteSDK.</p>
 <p>Start by creating a new file</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">touch</span> <span class="n">workflows</span><span class="o">/</span><span class="n">first</span><span class="o">.</span><span class="n">py</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="n">workflows</span>
+<span class="n">touch</span> <span class="n">workflows</span><span class="o">/</span><span class="n">first</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <p>This directory has been marked in the <a class="reference external" href="https://github.com/lyft/flytesnacks/blob/764b82aca5701137ebc0eda4e818466e5acc9219/sandbox.config#L2">configuration file</a> as the location to look for workflows and tasks.  Begin by importing some of the libraries that we’ll need for this example.</p>
@@ -266,7 +268,7 @@
 </div>
 <p>If you have the flyte sandbox installed on your local machine, the image will be accessible to to your Flyte system. If you’re running a remote Flyte instance, you’ll need to upload this image to a remote registry such as Dockerhub, Amazon ECR, or Google Container Registry, so that it can be used by the Flyte system.</p>
 <p>To upload to a remote registry, use</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DOCKER_REGISRY_USERNAME</span><span class="o">=</span><span class="p">{</span><span class="n">username</span><span class="p">}</span> <span class="n">DOCKER_REGISTRY_PASSWORD</span><span class="o">=</span><span class="p">{</span><span class="k">pass</span><span class="p">}</span> <span class="n">REGISTRY</span><span class="o">=</span><span class="n">docker</span><span class="o">.</span><span class="n">io</span> <span class="n">make</span> <span class="n">docker_build</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DOCKER_REGISTRY_USERNAME</span><span class="o">=</span><span class="p">{</span><span class="n">username</span><span class="p">}</span> <span class="n">DOCKER_REGISTRY_PASSWORD</span><span class="o">=</span><span class="p">{</span><span class="k">pass</span><span class="p">}</span> <span class="n">REGISTRY</span><span class="o">=</span><span class="n">docker</span><span class="o">.</span><span class="n">io</span> <span class="n">make</span> <span class="n">docker_build</span>
 </pre></div>
 </div>
 <p>Replace the values above with your registry username, password, and registry endpoint.</p>
@@ -299,7 +301,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

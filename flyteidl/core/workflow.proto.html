@@ -112,6 +112,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-alias">flyteidl.core.Alias</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-node">flyteidl.core.Node</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-workflowmetadata">flyteidl.core.WorkflowMetadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-workflowmetadatadefaults">flyteidl.core.WorkflowMetadataDefaults</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-workflowtemplate">flyteidl.core.WorkflowTemplate</a></li>
 </ul>
 </li>
@@ -304,7 +305,8 @@ runtime based on a series of conditions that get evaluated on various parameters
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;timeout&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;retries&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;retries&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;interruptible&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -320,10 +322,15 @@ runtime based on a series of conditions that get evaluated on various parameters
 <dt>retries</dt><dd><p>(<a class="reference internal" href="literals.proto.html#api-msg-flyteidl-core-retrystrategy"><span class="std std-ref">flyteidl.core.RetryStrategy</span></a>) Number of retries per task.</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-core-nodemetadata-interruptible">
+<dt>interruptible</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">bool</a>)
+Identify whether node is interruptible</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-core-alias">
 <span id="api-msg-flyteidl-core-alias"></span><h2>flyteidl.core.Alias<a class="headerlink" href="#flyteidl-core-alias" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L78">[flyteidl.core.Alias proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L83">[flyteidl.core.Alias proto]</a></p>
 <p>Links a variable to an alias.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;var&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -342,7 +349,7 @@ runtime based on a series of conditions that get evaluated on various parameters
 </div>
 <div class="section" id="flyteidl-core-node">
 <span id="api-msg-flyteidl-core-node"></span><h2>flyteidl.core.Node<a class="headerlink" href="#flyteidl-core-node" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L88">[flyteidl.core.Node proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L93">[flyteidl.core.Node proto]</a></p>
 <p>A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch
 node.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -404,16 +411,32 @@ nodes outputs using the alias if one’s specified.</p>
 </div>
 <div class="section" id="flyteidl-core-workflowmetadata">
 <span id="api-msg-flyteidl-core-workflowmetadata"></span><h2>flyteidl.core.WorkflowMetadata<a class="headerlink" href="#flyteidl-core-workflowmetadata" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L125">[flyteidl.core.WorkflowMetadata proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L130">[flyteidl.core.WorkflowMetadata proto]</a></p>
 <p>Metadata for the entire workflow.
 To be used in the future.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
 </pre></div>
 </div>
 </div>
+<div class="section" id="flyteidl-core-workflowmetadatadefaults">
+<span id="api-msg-flyteidl-core-workflowmetadatadefaults"></span><h2>flyteidl.core.WorkflowMetadataDefaults<a class="headerlink" href="#flyteidl-core-workflowmetadatadefaults" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L135">[flyteidl.core.WorkflowMetadataDefaults proto]</a></p>
+<p>Default Workflow Metadata for the entire workflow.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;interruptible&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="simple" id="api-field-flyteidl-core-workflowmetadatadefaults-interruptible">
+<dt>interruptible</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">bool</a>) Identify whether workflow is interruptible.
+The value set at the workflow level will be the defualt value used for nodes
+unless explicitly set at the node level.</p>
+</dd>
+</dl>
+</div>
 <div class="section" id="flyteidl-core-workflowtemplate">
 <span id="api-msg-flyteidl-core-workflowtemplate"></span><h2>flyteidl.core.WorkflowTemplate<a class="headerlink" href="#flyteidl-core-workflowtemplate" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L130">[flyteidl.core.WorkflowTemplate proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L144">[flyteidl.core.WorkflowTemplate proto]</a></p>
 <p>Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,
 directed acyclic graph.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -422,7 +445,8 @@ directed acyclic graph.</p>
   <span class="nt">&quot;interface&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;nodes&quot;</span><span class="p">:</span> <span class="p">[],</span>
   <span class="nt">&quot;outputs&quot;</span><span class="p">:</span> <span class="p">[],</span>
-  <span class="nt">&quot;failure_node&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;failure_node&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;metadata_defaults&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -458,6 +482,10 @@ The interface of this node must match the Workflow interface with an additional 
 pb.lyft.flyte.core.Error.</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-core-workflowtemplate-metadata-defaults">
+<dt>metadata_defaults</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-core-workflowmetadatadefaults"><span class="std std-ref">flyteidl.core.WorkflowMetadataDefaults</span></a>) workflow defaults</p>
+</dd>
+</dl>
 </div>
 </div>
 
@@ -481,7 +509,7 @@ pb.lyft.flyte.core.Error.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

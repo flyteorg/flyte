@@ -104,6 +104,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-taskexecution">flyteidl.core.TaskExecution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-core-taskexecution-phase">Enum flyteidl.core.TaskExecution.Phase</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-executionerror">flyteidl.core.ExecutionError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-core-executionerror-errorkind">Enum flyteidl.core.ExecutionError.ErrorKind</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-tasklog">flyteidl.core.TaskLog</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-core-tasklog-messageformat">Enum flyteidl.core.TaskLog.MessageFormat</a></li>
 </ul>
@@ -333,7 +334,8 @@ but this is the cumulative list that customers may want to know about for their 
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;error_uri&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+  <span class="nt">&quot;error_uri&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -350,10 +352,31 @@ More Info: &lt;Link&gt;</p>
 <dt>error_uri</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) Full error contents accessible via a URI</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-core-executionerror-kind">
+<dt>kind</dt><dd><p>(<a class="reference internal" href="#api-enum-flyteidl-core-executionerror-errorkind"><span class="std std-ref">flyteidl.core.ExecutionError.ErrorKind</span></a>)</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="enum-flyteidl-core-executionerror-errorkind">
+<span id="api-enum-flyteidl-core-executionerror-errorkind"></span><h2>Enum flyteidl.core.ExecutionError.ErrorKind<a class="headerlink" href="#enum-flyteidl-core-executionerror-errorkind" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L62">[flyteidl.core.ExecutionError.ErrorKind proto]</a></p>
+<p>Error type: System or User</p>
+<dl class="simple" id="api-enum-value-flyteidl-core-executionerror-errorkind-unknown">
+<dt>UNKNOWN</dt><dd><p><em>(DEFAULT)</em> ⁣</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-executionerror-errorkind-user">
+<dt>USER</dt><dd><p>⁣</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-executionerror-errorkind-system">
+<dt>SYSTEM</dt><dd><p>⁣</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-core-tasklog">
 <span id="api-msg-flyteidl-core-tasklog"></span><h2>flyteidl.core.TaskLog<a class="headerlink" href="#flyteidl-core-tasklog" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L65">[flyteidl.core.TaskLog proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L72">[flyteidl.core.TaskLog proto]</a></p>
 <p>Log information for the task that is specific to a log sink
 When our log story is flushed out, we may have more metadata here like log link expiry</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -383,7 +406,7 @@ When our log story is flushed out, we may have more metadata here like log link 
 </div>
 <div class="section" id="enum-flyteidl-core-tasklog-messageformat">
 <span id="api-enum-flyteidl-core-tasklog-messageformat"></span><h2>Enum flyteidl.core.TaskLog.MessageFormat<a class="headerlink" href="#enum-flyteidl-core-tasklog-messageformat" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L67">[flyteidl.core.TaskLog.MessageFormat proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L74">[flyteidl.core.TaskLog.MessageFormat proto]</a></p>
 <dl class="simple" id="api-enum-value-flyteidl-core-tasklog-messageformat-unknown">
 <dt>UNKNOWN</dt><dd><p><em>(DEFAULT)</em> ⁣</p>
 </dd>
@@ -419,7 +442,7 @@ When our log story is flushed out, we may have more metadata here like log link 
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

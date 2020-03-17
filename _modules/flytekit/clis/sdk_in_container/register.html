@@ -194,9 +194,9 @@
         <span class="n">name</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">fqdn</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">resource_type</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">test</span><span class="p">:</span>
-            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s2">&quot;Would register task </span><span class="si">{:20}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">entity_type_text</span><span class="p">),</span> <span class="n">name</span><span class="p">))</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s2">&quot;Would register task </span><span class="si">{:20}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">entity_type_text</span><span class="p">),</span> <span class="n">name</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s2">&quot;Registering task </span><span class="si">{:20}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">entity_type_text</span><span class="p">),</span> <span class="n">name</span><span class="p">))</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s2">&quot;Registering task </span><span class="si">{:20}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">entity_type_text</span><span class="p">),</span> <span class="n">name</span><span class="p">))</span>
             <span class="n">t</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span></div>
 
 <span class="nd">@click</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;register&#39;</span><span class="p">)</span>
@@ -265,7 +265,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

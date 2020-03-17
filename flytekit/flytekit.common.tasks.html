@@ -773,6 +773,16 @@ the wrapped function.
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.common.tasks.task.SdkTask.fetch_latest">
+<em class="property">classmethod </em><code class="sig-name descname">fetch_latest</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/task.html#SdkTask.fetch_latest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.fetch_latest" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function uses the engine loader to call create a latest hydrated task from Admin.
+:param Text project:
+:param Text domain:
+:param Text name:
+:rtype: SdkTask</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.common.tasks.task.SdkTask.interface">
 <em class="property">property </em><code class="sig-name descname">interface</code><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.interface" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -857,7 +867,7 @@ the wrapped function.
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

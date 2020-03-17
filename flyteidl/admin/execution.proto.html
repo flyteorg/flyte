@@ -101,7 +101,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-execution">flyteidl.admin.Execution</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-executionlist">flyteidl.admin.ExecutionList</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-literalmapblob">flyteidl.admin.LiteralMapBlob</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-abortmetadata">flyteidl.admin.AbortMetadata</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-executionclosure">flyteidl.admin.ExecutionClosure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-systemmetadata">flyteidl.admin.SystemMetadata</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-executionmetadata">flyteidl.admin.ExecutionMetadata</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-admin-executionmetadata-executionmode">Enum flyteidl.admin.ExecutionMetadata.ExecutionMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-notificationlist">flyteidl.admin.NotificationList</a></li>
@@ -113,6 +115,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="launch_plan.proto.html">launch_plan.proto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchable_resource.proto.html">matchable_resource.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="node_execution.proto.html">node_execution.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="notification.proto.html">notification.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="project.proto.html">project.proto</a></li>
@@ -121,6 +124,7 @@
 <li class="toctree-l3"><a class="reference internal" href="task.proto.html">task.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="task_execution.proto.html">task_execution.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="workflow.proto.html">workflow.proto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflow_attributes.proto.html">workflow_attributes.proto</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../core/index.html">Core Flyte language specification</a></li>
@@ -355,14 +359,33 @@ in a query. If there are no more results, this value will be empty.</p>
 </dd>
 </dl>
 </div>
+<div class="section" id="flyteidl-admin-abortmetadata">
+<span id="api-msg-flyteidl-admin-abortmetadata"></span><h2>flyteidl.admin.AbortMetadata<a class="headerlink" href="#flyteidl-admin-abortmetadata" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L91">[flyteidl.admin.AbortMetadata proto]</a></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;cause&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;principal&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="simple" id="api-field-flyteidl-admin-abortmetadata-cause">
+<dt>cause</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) In the case of a user-specified abort, this will pass along the user-supplied cause.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-admin-abortmetadata-principal">
+<dt>principal</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) Identifies the entity (if any) responsible for terminating the execution</p>
+</dd>
+</dl>
+</div>
 <div class="section" id="flyteidl-admin-executionclosure">
 <span id="api-msg-flyteidl-admin-executionclosure"></span><h2>flyteidl.admin.ExecutionClosure<a class="headerlink" href="#flyteidl-admin-executionclosure" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L92">[flyteidl.admin.ExecutionClosure proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L100">[flyteidl.admin.ExecutionClosure proto]</a></p>
 <p>Encapsulates the results of the Execution</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;abort_cause&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;abort_metadata&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;computed_inputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;phase&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;started_at&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
@@ -378,21 +401,28 @@ in a query. If there are no more results, this value will be empty.</p>
 <dt>outputs</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-admin-literalmapblob"><span class="std std-ref">flyteidl.admin.LiteralMapBlob</span></a>) A map of outputs in the case of a successful execution.</p>
 <p>A result produced by a terminated execution.
 A pending (non-terminal) execution will not have any output result.</p>
-<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-outputs"><span class="std std-ref">outputs</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-error"><span class="std std-ref">error</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-cause"><span class="std std-ref">abort_cause</span></a> may be set.</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-outputs"><span class="std std-ref">outputs</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-error"><span class="std std-ref">error</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-cause"><span class="std std-ref">abort_cause</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-metadata"><span class="std std-ref">abort_metadata</span></a> may be set.</p>
 </dd>
 </dl>
 <dl id="api-field-flyteidl-admin-executionclosure-error">
 <dt>error</dt><dd><p>(<a class="reference internal" href="../core/execution.proto.html#api-msg-flyteidl-core-executionerror"><span class="std std-ref">flyteidl.core.ExecutionError</span></a>) Error information in the case of a failed execution.</p>
 <p>A result produced by a terminated execution.
 A pending (non-terminal) execution will not have any output result.</p>
-<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-outputs"><span class="std std-ref">outputs</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-error"><span class="std std-ref">error</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-cause"><span class="std std-ref">abort_cause</span></a> may be set.</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-outputs"><span class="std std-ref">outputs</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-error"><span class="std std-ref">error</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-cause"><span class="std std-ref">abort_cause</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-metadata"><span class="std std-ref">abort_metadata</span></a> may be set.</p>
 </dd>
 </dl>
 <dl id="api-field-flyteidl-admin-executionclosure-abort-cause">
 <dt>abort_cause</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) In the case of a user-specified abort, this will pass along the user-supplied cause.</p>
 <p>A result produced by a terminated execution.
 A pending (non-terminal) execution will not have any output result.</p>
-<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-outputs"><span class="std std-ref">outputs</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-error"><span class="std std-ref">error</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-cause"><span class="std std-ref">abort_cause</span></a> may be set.</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-outputs"><span class="std std-ref">outputs</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-error"><span class="std std-ref">error</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-cause"><span class="std std-ref">abort_cause</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-metadata"><span class="std std-ref">abort_metadata</span></a> may be set.</p>
+</dd>
+</dl>
+<dl id="api-field-flyteidl-admin-executionclosure-abort-metadata">
+<dt>abort_metadata</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-admin-abortmetadata"><span class="std std-ref">flyteidl.admin.AbortMetadata</span></a>) In the case of a user-specified abort, this will pass along the user and their supplied cause.</p>
+<p>A result produced by a terminated execution.
+A pending (non-terminal) execution will not have any output result.</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-outputs"><span class="std std-ref">outputs</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-error"><span class="std std-ref">error</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-cause"><span class="std std-ref">abort_cause</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-executionclosure-abort-metadata"><span class="std std-ref">abort_metadata</span></a> may be set.</p>
 </dd>
 </dl>
 <dl class="simple" id="api-field-flyteidl-admin-executionclosure-computed-inputs">
@@ -431,9 +461,23 @@ to notifications defined statically in a launch plan.</p>
 </dd>
 </dl>
 </div>
+<div class="section" id="flyteidl-admin-systemmetadata">
+<span id="api-msg-flyteidl-admin-systemmetadata"></span><h2>flyteidl.admin.SystemMetadata<a class="headerlink" href="#flyteidl-admin-systemmetadata" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L146">[flyteidl.admin.SystemMetadata proto]</a></p>
+<p>Represents system rather than user-facing metadata about an execution.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;execution_cluster&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="simple" id="api-field-flyteidl-admin-systemmetadata-execution-cluster">
+<dt>execution_cluster</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) Which execution cluster this execution ran on.</p>
+</dd>
+</dl>
+</div>
 <div class="section" id="flyteidl-admin-executionmetadata">
 <span id="api-msg-flyteidl-admin-executionmetadata"></span><h2>flyteidl.admin.ExecutionMetadata<a class="headerlink" href="#flyteidl-admin-executionmetadata" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L136">[flyteidl.admin.ExecutionMetadata proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L154">[flyteidl.admin.ExecutionMetadata proto]</a></p>
 <p>Represents attributes about an execution which are not required to launch the execution but are useful to record.
 These attributes are assigned at launch time and do not change.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -442,7 +486,8 @@ These attributes are assigned at launch time and do not change.</p>
   <span class="nt">&quot;nesting&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;scheduled_at&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;parent_node_execution&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;reference_execution&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;reference_execution&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;system_metadata&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -451,7 +496,9 @@ These attributes are assigned at launch time and do not change.</p>
 </dd>
 </dl>
 <dl class="simple" id="api-field-flyteidl-admin-executionmetadata-principal">
-<dt>principal</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) Identifier of the entity that triggered this execution.</p>
+<dt>principal</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) Identifier of the entity that triggered this execution.
+For systems using back-end authentication any value set here will be discarded in favor of the
+authenticated user context.</p>
 </dd>
 </dl>
 <dl class="simple" id="api-field-flyteidl-admin-executionmetadata-nesting">
@@ -475,10 +522,15 @@ nesting = k + 1.</p>
 In the case of a relaunch, this references the original workflow execution.</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-admin-executionmetadata-system-metadata">
+<dt>system_metadata</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-admin-systemmetadata"><span class="std std-ref">flyteidl.admin.SystemMetadata</span></a>) Optional, platform-specific metadata about the execution.
+In this the future this may be gated behind an ACL or some sort of authorization.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="enum-flyteidl-admin-executionmetadata-executionmode">
 <span id="api-enum-flyteidl-admin-executionmetadata-executionmode"></span><h2>Enum flyteidl.admin.ExecutionMetadata.ExecutionMode<a class="headerlink" href="#enum-flyteidl-admin-executionmetadata-executionmode" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L138">[flyteidl.admin.ExecutionMetadata.ExecutionMode proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L156">[flyteidl.admin.ExecutionMetadata.ExecutionMode proto]</a></p>
 <p>The method by which this execution was launched.</p>
 <dl class="simple" id="api-enum-value-flyteidl-admin-executionmetadata-executionmode-manual">
 <dt>MANUAL</dt><dd><p><em>(DEFAULT)</em> ⁣The default execution mode, MANUAL implies that an execution was launched by an individual.</p>
@@ -503,7 +555,7 @@ In the case of a relaunch, this references the original workflow execution.</p>
 </div>
 <div class="section" id="flyteidl-admin-notificationlist">
 <span id="api-msg-flyteidl-admin-notificationlist"></span><h2>flyteidl.admin.NotificationList<a class="headerlink" href="#flyteidl-admin-notificationlist" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L177">[flyteidl.admin.NotificationList proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L201">[flyteidl.admin.NotificationList proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;notifications&quot;</span><span class="p">:</span> <span class="p">[]</span>
 <span class="p">}</span>
@@ -516,7 +568,7 @@ In the case of a relaunch, this references the original workflow execution.</p>
 </div>
 <div class="section" id="flyteidl-admin-executionspec">
 <span id="api-msg-flyteidl-admin-executionspec"></span><h2>flyteidl.admin.ExecutionSpec<a class="headerlink" href="#flyteidl-admin-executionspec" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L183">[flyteidl.admin.ExecutionSpec proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L207">[flyteidl.admin.ExecutionSpec proto]</a></p>
 <p>An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime
 of an execution as it progresses across phase changes..</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -565,7 +617,7 @@ When this list is empty, the notifications defined for the launch plan will be a
 </div>
 <div class="section" id="flyteidl-admin-executionterminaterequest">
 <span id="api-msg-flyteidl-admin-executionterminaterequest"></span><h2>flyteidl.admin.ExecutionTerminateRequest<a class="headerlink" href="#flyteidl-admin-executionterminaterequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L218">[flyteidl.admin.ExecutionTerminateRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L243">[flyteidl.admin.ExecutionTerminateRequest proto]</a></p>
 <p>Request to terminate an in-progress execution.  This action is irreversible.
 If an execution is already terminated, this request will simply be a no-op.
 This request will fail if it references a non-existent execution.
@@ -588,14 +640,14 @@ with the optional cause added to the output_result.</p>
 </div>
 <div class="section" id="flyteidl-admin-executionterminateresponse">
 <span id="api-msg-flyteidl-admin-executionterminateresponse"></span><h2>flyteidl.admin.ExecutionTerminateResponse<a class="headerlink" href="#flyteidl-admin-executionterminateresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L226">[flyteidl.admin.ExecutionTerminateResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L251">[flyteidl.admin.ExecutionTerminateResponse proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="flyteidl-admin-workflowexecutiongetdatarequest">
 <span id="api-msg-flyteidl-admin-workflowexecutiongetdatarequest"></span><h2>flyteidl.admin.WorkflowExecutionGetDataRequest<a class="headerlink" href="#flyteidl-admin-workflowexecutiongetdatarequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L231">[flyteidl.admin.WorkflowExecutionGetDataRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L256">[flyteidl.admin.WorkflowExecutionGetDataRequest proto]</a></p>
 <p>Request structure to fetch inputs and output urls for an execution.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
@@ -609,7 +661,7 @@ with the optional cause added to the output_result.</p>
 </div>
 <div class="section" id="flyteidl-admin-workflowexecutiongetdataresponse">
 <span id="api-msg-flyteidl-admin-workflowexecutiongetdataresponse"></span><h2>flyteidl.admin.WorkflowExecutionGetDataResponse<a class="headerlink" href="#flyteidl-admin-workflowexecutiongetdataresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L237">[flyteidl.admin.WorkflowExecutionGetDataResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L262">[flyteidl.admin.WorkflowExecutionGetDataResponse proto]</a></p>
 <p>Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
@@ -648,7 +700,7 @@ with the optional cause added to the output_result.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

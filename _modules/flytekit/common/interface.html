@@ -272,7 +272,9 @@
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">):</span>
             <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">map_of_bindings</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;Input was not specified for: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
+                    <span class="s2">&quot;Input was not specified for: </span><span class="si">{}</span><span class="s2"> of type </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">var</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                <span class="p">)</span>
 
             <span class="n">binding_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">BindingData</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span>
                 <span class="n">var</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
@@ -322,7 +324,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

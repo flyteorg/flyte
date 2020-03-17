@@ -153,6 +153,9 @@
             
   <h1>Source code for flytekit.clients.helpers</h1><div class="highlight"><pre>
 <span></span>
+<span class="kn">from</span> <span class="nn">flytekit.clis.auth</span> <span class="k">import</span> <span class="n">credentials</span> <span class="k">as</span> <span class="n">_credentials_access</span>
+
+
 
 <div class="viewcode-block" id="iterate_node_executions"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.helpers.iterate_node_executions">[docs]</a><span class="k">def</span> <span class="nf">iterate_node_executions</span><span class="p">(</span>
     <span class="n">client</span><span class="p">,</span>
@@ -229,6 +232,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">next_token</span><span class="p">:</span>
             <span class="k">break</span>
         <span class="n">token</span> <span class="o">=</span> <span class="n">next_token</span></div>
+
 </pre></div>
 
            </div>
@@ -241,7 +245,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

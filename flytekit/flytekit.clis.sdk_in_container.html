@@ -188,6 +188,45 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-flytekit.clis.sdk_in_container.basic_auth">
+<span id="flytekit-clis-sdk-in-container-basic-auth-module"></span><h2>flytekit.clis.sdk_in_container.basic_auth module<a class="headerlink" href="#module-flytekit.clis.sdk_in_container.basic_auth" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="flytekit.clis.sdk_in_container.basic_auth.get_basic_authorization_header">
+<code class="sig-prename descclassname">flytekit.clis.sdk_in_container.basic_auth.</code><code class="sig-name descname">get_basic_authorization_header</code><span class="sig-paren">(</span><em class="sig-param">client_id</em>, <em class="sig-param">client_secret</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clis/sdk_in_container/basic_auth.html#get_basic_authorization_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clis.sdk_in_container.basic_auth.get_basic_authorization_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function transforms the client id and the client secret into a header that conforms with http basic auth.
+It joins the id and the secret with a : then base64 encodes it, then adds the appropriate text.
+:param Text client_id:
+:param Text client_secret:
+:rtype: Text</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="flytekit.clis.sdk_in_container.basic_auth.get_secret">
+<code class="sig-prename descclassname">flytekit.clis.sdk_in_container.basic_auth.</code><code class="sig-name descname">get_secret</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clis/sdk_in_container/basic_auth.html#get_secret"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clis.sdk_in_container.basic_auth.get_secret" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will either read in the password from the file path given by the CLIENT_CREDENTIALS_SECRET_LOCATION
+config object, or from the environment variable using the CLIENT_CREDENTIALS_SECRET config object.
+:rtype: Text</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="flytekit.clis.sdk_in_container.basic_auth.get_token">
+<code class="sig-prename descclassname">flytekit.clis.sdk_in_container.basic_auth.</code><code class="sig-name descname">get_token</code><span class="sig-paren">(</span><em class="sig-param">token_endpoint</em>, <em class="sig-param">authorization_header</em>, <em class="sig-param">scope</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clis/sdk_in_container/basic_auth.html#get_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clis.sdk_in_container.basic_auth.get_token" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token_endpoint</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>authorization_header</strong> (<em>Text</em>) – This is the value for the “Authorization” key. (eg ‘Bearer abc123’)</p></li>
+<li><p><strong>scope</strong> (<em>Text</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(Text,Int) The first element is the access token retrieved from the IDP, the second is the expiration
+in seconds</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="module-flytekit.clis.sdk_in_container.constants">
 <span id="flytekit-clis-sdk-in-container-constants-module"></span><h2>flytekit.clis.sdk_in_container.constants module<a class="headerlink" href="#module-flytekit.clis.sdk_in_container.constants" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -293,7 +332,7 @@ at the base of the repository.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>
