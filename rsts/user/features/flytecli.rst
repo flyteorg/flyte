@@ -1,12 +1,12 @@
 .. _features-flytecli:
 
-========
-FlyteCLI
-========
+#########
+Flyte CLI
+#########
 
----------------------------------------------------
+***************************************************
 A command-line interface for interacting with Flyte
----------------------------------------------------
+***************************************************
 
 The FlyteCLI is a command-line tool that allows users to perform administrative
 tasks on their Flyte workflows and executions. It is an independent module but
@@ -134,18 +134,31 @@ have versions. The URN of an execution, therefore, is in the form of
 
 ------
 
-Getting help
-============
+Flyte CLI User Configuration
+==============================
+The ``flyte-cli`` command line utility also supports default user-level configuration settings if the Admin service it accesses supports authentication.  To get started either create or activate a Python 3 virtual environment ::
 
-FlyteCLI uses subcommands. Whenever you feel unsure about the usage or
-the arguments of a command or a subcommand, get help by running
-``flyte-cli --help`` or ``flyte-cli <subcommand> --help``
+    $ python3 -m venv ~/envs/flyte
+    $ source ~/envs/flyte/bin/activate
 
+In general, we recommend installing and using Flyte CLI inside a virtualenv.  Install ``flytekit`` (which installs ``flyte-cli``) as follows ::
+
+    $ pip install wheel flytekit
+
+Use the setup-config command to create yourself a default config file.  This will pull the necessary settings from Flyte's oauth metadata endpoint. ::
+
+    (flyte) username:~ $ flyte-cli setup-config -h flyte.company.net
 
 ------
 
 Commands
 ========
 
-For information on available commands in FlyteCLI, refer to FlyteCLI's
-help message.
+For information on available commands in FlyteCLI, refer to FlyteCLI's help message.
+
+Subcommand Help
+---------------
+
+FlyteCLI uses subcommands. Whenever you feel unsure about the usage or
+the arguments of a command or a subcommand, get help by running
+``flyte-cli --help`` or ``flyte-cli <subcommand> --help``

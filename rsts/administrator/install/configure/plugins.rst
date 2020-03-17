@@ -67,7 +67,3 @@ Spark
 Qubole
 
 .. literalinclude:: ../../../../kustomize/overlays/sandbox/propeller/plugins/qubole/config.yaml
-
-Waitable
-
-.. literalinclude:: ../../../../kustomize/overlays/sandbox/propeller/plugins/waitable/config.yaml

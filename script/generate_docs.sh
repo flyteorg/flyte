@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Note that this file is meant to be run on OSX by a user with the necessary GitHub privileges
 
 set -ex
 

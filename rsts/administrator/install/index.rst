@@ -15,3 +15,4 @@ This doc explains how to install Flyte, starting with the simplest method, and e
    optional_components
    managing_customizable_resources
    configure/index
+   authentication
