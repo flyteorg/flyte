@@ -193,7 +193,11 @@
             
   <div class="section" id="tasks-proto">
 <span id="api-file-flyteidl-core-tasks-proto"></span><h1>tasks.proto<a class="headerlink" href="#tasks-proto" title="Permalink to this headline">¶</a></h1>
-<p>—————– First class Plugins</p>
+<p>For interruptible we will populate it at the node level but require it be part of TaskMetadata
+for a user to set the value.
+We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
+set by the user or defaulting to false.
+The logic of handling precedence will be done as part of flytepropeller.</p>
 <div class="section" id="flyteidl-core-resources">
 <span id="api-msg-flyteidl-core-resources"></span><h2>flyteidl.core.Resources<a class="headerlink" href="#flyteidl-core-resources" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L14">[flyteidl.core.Resources proto]</a></p>
@@ -307,7 +311,8 @@ checks to ensure tighter validation or setting expectations.</p>
   <span class="nt">&quot;timeout&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;retries&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;discovery_version&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;deprecated_error_message&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+  <span class="nt">&quot;deprecated_error_message&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;interruptible&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -336,10 +341,15 @@ checks to ensure tighter validation or setting expectations.</p>
 of the ending of support for a given task.</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-core-taskmetadata-interruptible">
+<dt>interruptible</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">bool</a>)
+Identify whether task is interruptible</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-core-tasktemplate">
 <span id="api-msg-flyteidl-core-tasktemplate"></span><h2>flyteidl.core.TaskTemplate<a class="headerlink" href="#flyteidl-core-tasktemplate" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L84">[flyteidl.core.TaskTemplate proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L95">[flyteidl.core.TaskTemplate proto]</a></p>
 <p>A Task structure that uniquely identifies a task in the system
 Tasks are registered as a first step in the system.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -385,7 +395,7 @@ handlers.</p>
 </div>
 <div class="section" id="flyteidl-core-containerport">
 <span id="api-msg-flyteidl-core-containerport"></span><h2>flyteidl.core.ContainerPort<a class="headerlink" href="#flyteidl-core-containerport" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L114">[flyteidl.core.ContainerPort proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L125">[flyteidl.core.ContainerPort proto]</a></p>
 <p>Defines port properties for a container.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;container_port&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
@@ -400,7 +410,7 @@ This must be a valid port number, 0 &lt; x &lt; 65536.</p>
 </div>
 <div class="section" id="flyteidl-core-container">
 <span id="api-msg-flyteidl-core-container"></span><h2>flyteidl.core.Container<a class="headerlink" href="#flyteidl-core-container" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L120">[flyteidl.core.Container proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L131">[flyteidl.core.Container proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="p">[],</span>
@@ -467,7 +477,7 @@ not supported on AWS Batch)</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

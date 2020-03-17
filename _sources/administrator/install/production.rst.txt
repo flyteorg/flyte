@@ -67,7 +67,7 @@ Since the ``base`` files are not in your local copy, you'll need to make some sl
 
   find . -name kustomization.yaml -print0 | xargs -0 sed -i.bak 's~../../../base~github.com/lyft/flyte/kustomize/base~'
   find . -name kustomization.yaml -print0 | xargs -0 sed -i.bak 's~../../../dependencies~github.com/lyft/flyte/kustomize/dependencies~'
-  find . -name *.bak | xargs rm
+  find . -name '*.bak' | xargs rm
 
 You should now be able to run kustomize against the ``flyte`` directory ::
 

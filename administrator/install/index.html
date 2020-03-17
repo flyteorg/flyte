@@ -92,7 +92,9 @@
 <li class="toctree-l3"><a class="reference internal" href="multi_cluster.html">Scaling Beyond Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="optional_components.html">Optional Components</a></li>
 <li class="toctree-l3"><a class="reference internal" href="optional_components.html#data-catalog">Data Catalog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managing_customizable_resources.html">Configuring customizable resources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="configure/index.html">Configure Flyte backend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authentication.html">Authentication</a></li>
 </ul>
 </li>
 </ul>
@@ -199,6 +201,21 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="optional_components.html#data-catalog">Data Catalog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing_customizable_resources.html">Configuring customizable resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="managing_customizable_resources.html#configurable-resource-types">Configurable Resource Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="managing_customizable_resources.html#task-resources">Task Resources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managing_customizable_resources.html#cluster-resources">Cluster Resources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managing_customizable_resources.html#execution-queues">Execution Queues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managing_customizable_resources.html#execution-cluster-label">Execution Cluster Label</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="managing_customizable_resources.html#hierarchy">Hierarchy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="managing_customizable_resources.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="managing_customizable_resources.html#debugging">Debugging</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="configure/index.html">Configure Flyte backend</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="configure/common.html">Common configuration across all backend components</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="configure/common.html#logger-configuration">Logger Configuration</a></li>
@@ -235,6 +252,29 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="authentication.html">Authentication</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html#components">Components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="authentication.html#flyte-cli">Flyte CLI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authentication.html#direct-client-access">Direct Client Access</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html#swimlane-diagrams">Swimlane Diagrams</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="authentication.html#flyte-ui-flow">Flyte UI Flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authentication.html#flyte-cli-flow">Flyte CLI Flow</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="authentication.html#idp-configuration">IDP Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authentication.html#flyte-admin-configuration">Flyte Admin Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html#ci">CI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authentication.html#references">References</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="authentication.html#rfcs">RFCs</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -259,7 +299,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

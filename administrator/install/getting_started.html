@@ -96,7 +96,9 @@
 <li class="toctree-l3"><a class="reference internal" href="multi_cluster.html">Scaling Beyond Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="optional_components.html">Optional Components</a></li>
 <li class="toctree-l3"><a class="reference internal" href="optional_components.html#data-catalog">Data Catalog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managing_customizable_resources.html">Configuring customizable resources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="configure/index.html">Configure Flyte backend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authentication.html">Authentication</a></li>
 </ul>
 </li>
 </ul>
@@ -204,6 +206,7 @@
 <p>This deployment uses a kubernetes <a class="reference external" href="https://kubernetes.io/docs/concepts/services-networking/service/#nodeport">NodePort</a> for Flyte ingress.
 Once deployed, you can access the Flyte console on any kubernetes node at <code class="docutils literal notranslate"><span class="pre">http://{{</span> <span class="pre">any</span> <span class="pre">kubernetes</span> <span class="pre">node</span> <span class="pre">}}:30081/console</span></code> (note that it will take a moment to deploy).</p>
 <p>For local deployments, this endpoint is typically <a class="reference external" href="http://localhost:30081/console">http://localhost:30081/console</a>.</p>
+<p>(for Minikube deployment, you need to run <code class="docutils literal notranslate"><span class="pre">minikube</span> <span class="pre">tunnel</span></code> and use the ip that Minikube tunnel outputs)</p>
 <dl class="simple">
 <dt>WARNING:</dt><dd><p>The sandbox deployment is not well suited for production use.
 Most importantly, Flyte needs access to an object store, and a PostgreSQL database.
@@ -235,7 +238,7 @@ Read on to learn how to configure Flyte for production.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

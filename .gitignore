@@ -1,0 +1,11 @@
+.idea/
+_build/
+build/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+_repos/
+_rsts/
+rsts_tmp/
+.doctrees/

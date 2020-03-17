@@ -90,6 +90,8 @@
 <li class="toctree-l3"><a class="reference internal" href="workflows_nodes.html">Workflows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="workflows_nodes.html#nodes">Nodes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="executions.html">Overview of the Execution of a Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="launchplans_schedules.html">Launch plans</a></li>
+<li class="toctree-l3"><a class="reference internal" href="launchplans_schedules.html#schedules">Schedules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="projects.html">Projects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="domains.html">Domains</a></li>
 <li class="toctree-l3"><a class="reference internal" href="registration.html">Understanding Registration process</a></li>
@@ -179,7 +181,7 @@ to deeper dives.</p>
 <p><a class="reference internal" href="tasks.html#concepts-tasks"><span class="std std-ref">Tasks</span></a> are at the core of Flyte. A Task is any independent unit of
 processing. Tasks can be pure functions or functions with side-effects. Tasks also have
 configuration and requirements specification associated with each definition of the task.</p>
-<p><a class="reference internal" href="workflows_nodes.html#concepts-workflows"><span class="std std-ref">Workflows</span></a> are programs that are guranteed to reach a terminal
+<p><a class="reference internal" href="workflows_nodes.html#concepts-workflows"><span class="std std-ref">Workflows</span></a> are programs that are guaranteed to reach a terminal
 state eventually. They are represented as Directed Acyclic Graphs (DAGs) expressed in protobuf.
 The Flyte specification language expresses DAGs with branches, parallel steps and nested
 Workflows. Workflow can optionally specify typed inputs and produce typed outputs, which
@@ -228,6 +230,16 @@ the registered entities.</p>
 <li class="toctree-l2"><a class="reference internal" href="executions.html#typical-flow-using-flyte-cli">Typical flow using flyte-cli</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="launchplans_schedules.html">Launch plans</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="launchplans_schedules.html#what-do-launch-plans-provide">What do launch plans provide?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launchplans_schedules.html#launch-plan-inputs">Launch plan inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="launchplans_schedules.html#schedules">Schedules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="launchplans_schedules.html#cron-expression">Cron Expression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launchplans_schedules.html#rate-unit">Rate Unit</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="projects.html">Projects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="domains.html">Domains</a></li>
 <li class="toctree-l1"><a class="reference internal" href="registration.html">Understanding Registration process</a><ul>
@@ -260,7 +272,7 @@ the registered entities.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

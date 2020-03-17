@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+   flytekit.clis.auth
    flytekit.clis.flyte_cli
    flytekit.clis.sdk_in_container
 

@@ -38,6 +38,8 @@ Once deployed, you can access the Flyte console on any kubernetes node at ``http
 
 For local deployments, this endpoint is typically http://localhost:30081/console.
 
+(for Minikube deployment, you need to run ``minikube tunnel`` and use the ip that Minikube tunnel outputs)
+
 WARNING:
   The sandbox deployment is not well suited for production use.
   Most importantly, Flyte needs access to an object store, and a PostgreSQL database.

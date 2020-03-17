@@ -486,6 +486,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
+<div class="viewcode-block" id="BaseExecutionEngineFactory.fetch_latest_task"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseExecutionEngineFactory.fetch_latest_task">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">fetch_latest_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">named_task</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetches the latest task</span>
+<span class="sd">        :param flytekit.models.common.NamedEntityIdentifier named_task: NamedEntityIdentifier to fetch</span>
+<span class="sd">        :rtype: flytekit.models.task.Task</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
 <div class="viewcode-block" id="BaseExecutionEngineFactory.fetch_launch_plan"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseExecutionEngineFactory.fetch_launch_plan">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">fetch_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">launch_plan_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -559,7 +568,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>FlyteCLI &mdash; Flyte 0.0.1 documentation</title>
+  <title>Flyte CLI &mdash; Flyte 0.0.1 documentation</title>
   
 
   
@@ -87,7 +87,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../getting_started/index.html">Getting Started</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../concepts/index.html">Flyte Concepts</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Flyte Features</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">FlyteCLI</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Flyte CLI</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#a-command-line-interface-for-interacting-with-flyte">A command-line interface for interacting with Flyte</a></li>
 </ul>
 </li>
@@ -157,7 +157,7 @@
         
           <li><a href="index.html">Flyte Features</a> &raquo;</li>
         
-      <li>FlyteCLI</li>
+      <li>Flyte CLI</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -176,8 +176,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="flytecli">
-<span id="features-flytecli"></span><h1>FlyteCLI<a class="headerlink" href="#flytecli" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="flyte-cli">
+<span id="features-flytecli"></span><h1>Flyte CLI<a class="headerlink" href="#flyte-cli" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="a-command-line-interface-for-interacting-with-flyte">
 <h2>A command-line interface for interacting with Flyte<a class="headerlink" href="#a-command-line-interface-for-interacting-with-flyte" title="Permalink to this headline">¶</a></h2>
 <p>The FlyteCLI is a command-line tool that allows users to perform administrative
@@ -286,17 +286,32 @@ have versions. The URN of an execution, therefore, is in the form of
 </div>
 </div>
 <hr class="docutils" />
-<div class="section" id="getting-help">
-<h3>Getting help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h3>
-<p>FlyteCLI uses subcommands. Whenever you feel unsure about the usage or
-the arguments of a command or a subcommand, get help by running
-<code class="docutils literal notranslate"><span class="pre">flyte-cli</span> <span class="pre">--help</span></code> or <code class="docutils literal notranslate"><span class="pre">flyte-cli</span> <span class="pre">&lt;subcommand&gt;</span> <span class="pre">--help</span></code></p>
+<div class="section" id="flyte-cli-user-configuration">
+<h3>Flyte CLI User Configuration<a class="headerlink" href="#flyte-cli-user-configuration" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">flyte-cli</span></code> command line utility also supports default user-level configuration settings if the Admin service it accesses supports authentication.  To get started either create or activate a Python 3 virtual environment</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 -m venv ~/envs/flyte
+$ source ~/envs/flyte/bin/activate
+</pre></div>
+</div>
+<p>In general, we recommend installing and using Flyte CLI inside a virtualenv.  Install <code class="docutils literal notranslate"><span class="pre">flytekit</span></code> (which installs <code class="docutils literal notranslate"><span class="pre">flyte-cli</span></code>) as follows</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install wheel flytekit
+</pre></div>
+</div>
+<p>Use the setup-config command to create yourself a default config file.  This will pull the necessary settings from Flyte’s oauth metadata endpoint.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(flyte) username:~ $ flyte-cli setup-config -h flyte.company.net
+</pre></div>
+</div>
 </div>
 <hr class="docutils" />
 <div class="section" id="commands">
 <h3>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h3>
-<p>For information on available commands in FlyteCLI, refer to FlyteCLI’s
-help message.</p>
+<p>For information on available commands in FlyteCLI, refer to FlyteCLI’s help message.</p>
+<div class="section" id="subcommand-help">
+<h4>Subcommand Help<a class="headerlink" href="#subcommand-help" title="Permalink to this headline">¶</a></h4>
+<p>FlyteCLI uses subcommands. Whenever you feel unsure about the usage or
+the arguments of a command or a subcommand, get help by running
+<code class="docutils literal notranslate"><span class="pre">flyte-cli</span> <span class="pre">--help</span></code> or <code class="docutils literal notranslate"><span class="pre">flyte-cli</span> <span class="pre">&lt;subcommand&gt;</span> <span class="pre">--help</span></code></p>
+</div>
 </div>
 </div>
 </div>
@@ -321,7 +336,7 @@ help message.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

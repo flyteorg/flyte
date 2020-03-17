@@ -101,7 +101,9 @@
 <li class="toctree-l3"><a class="reference internal" href="multi_cluster.html">Scaling Beyond Kubernetes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="optional_components.html">Optional Components</a></li>
 <li class="toctree-l3"><a class="reference internal" href="optional_components.html#data-catalog">Data Catalog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managing_customizable_resources.html">Configuring customizable resources</a></li>
 <li class="toctree-l3"><a class="reference internal" href="configure/index.html">Configure Flyte backend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="authentication.html">Authentication</a></li>
 </ul>
 </li>
 </ul>
@@ -232,7 +234,7 @@ The <a class="reference external" href="https://github.com/lyft/flyte/blob/maste
 <p>Since the <code class="docutils literal notranslate"><span class="pre">base</span></code> files are not in your local copy, you’ll need to make some slight modifications to reference the <code class="docutils literal notranslate"><span class="pre">base</span></code> files from our GitHub repository.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">find</span> <span class="o">.</span> <span class="o">-</span><span class="n">name</span> <span class="n">kustomization</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">print0</span> <span class="o">|</span> <span class="n">xargs</span> <span class="o">-</span><span class="mi">0</span> <span class="n">sed</span> <span class="o">-</span><span class="n">i</span><span class="o">.</span><span class="n">bak</span> <span class="s1">&#39;s~../../../base~github.com/lyft/flyte/kustomize/base~&#39;</span>
 <span class="n">find</span> <span class="o">.</span> <span class="o">-</span><span class="n">name</span> <span class="n">kustomization</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">print0</span> <span class="o">|</span> <span class="n">xargs</span> <span class="o">-</span><span class="mi">0</span> <span class="n">sed</span> <span class="o">-</span><span class="n">i</span><span class="o">.</span><span class="n">bak</span> <span class="s1">&#39;s~../../../dependencies~github.com/lyft/flyte/kustomize/dependencies~&#39;</span>
-<span class="n">find</span> <span class="o">.</span> <span class="o">-</span><span class="n">name</span> <span class="o">*.</span><span class="n">bak</span> <span class="o">|</span> <span class="n">xargs</span> <span class="n">rm</span>
+<span class="n">find</span> <span class="o">.</span> <span class="o">-</span><span class="n">name</span> <span class="s1">&#39;*.bak&#39;</span> <span class="o">|</span> <span class="n">xargs</span> <span class="n">rm</span>
 </pre></div>
 </div>
 <p>You should now be able to run kustomize against the <code class="docutils literal notranslate"><span class="pre">flyte</span></code> directory</p>
@@ -336,7 +338,7 @@ be registered and executed under the new project.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

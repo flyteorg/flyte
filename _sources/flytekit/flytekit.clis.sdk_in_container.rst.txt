@@ -4,6 +4,14 @@ flytekit.clis.sdk\_in\_container package
 Submodules
 ----------
 
+flytekit.clis.sdk\_in\_container.basic\_auth module
+---------------------------------------------------
+
+.. automodule:: flytekit.clis.sdk_in_container.basic_auth
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 flytekit.clis.sdk\_in\_container.constants module
 -------------------------------------------------
 

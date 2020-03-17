@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Core Flyte language specification" href="../core/index.html" />
+    <link rel="next" title="workflow_attributes.proto" href="workflow_attributes.proto.html" />
     <link rel="prev" title="task_execution.proto" href="task_execution.proto.html" /> 
 </head>
 
@@ -95,6 +95,7 @@
 <li class="toctree-l3"><a class="reference internal" href="event.proto.html">event.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="execution.proto.html">execution.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="launch_plan.proto.html">launch_plan.proto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="matchable_resource.proto.html">matchable_resource.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="node_execution.proto.html">node_execution.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="notification.proto.html">notification.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="project.proto.html">project.proto</a></li>
@@ -111,6 +112,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-workflowclosure">flyteidl.admin.WorkflowClosure</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="workflow_attributes.proto.html">workflow_attributes.proto</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../core/index.html">Core Flyte language specification</a></li>
@@ -262,7 +264,8 @@ in a query. If there are no more results, this value will be empty.</p>
 <p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/workflow.proto#L46">[flyteidl.admin.WorkflowSpec proto]</a></p>
 <p>Represents a structure that encapsulates the specification of the workflow.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-  <span class="nt">&quot;template&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;template&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;sub_workflows&quot;</span><span class="p">:</span> <span class="p">[]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -270,10 +273,16 @@ in a query. If there are no more results, this value will be empty.</p>
 <dt>template</dt><dd><p>(<a class="reference internal" href="../core/workflow.proto.html#api-msg-flyteidl-core-workflowtemplate"><span class="std std-ref">flyteidl.core.WorkflowTemplate</span></a>) Template of the task that encapsulates all the metadata of the workflow.</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-admin-workflowspec-sub-workflows">
+<dt>sub_workflows</dt><dd><p>(<a class="reference internal" href="../core/workflow.proto.html#api-msg-flyteidl-core-workflowtemplate"><span class="std std-ref">flyteidl.core.WorkflowTemplate</span></a>) Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+propeller compiler (since the compiler doesn’t have any knowledge of other workflows - ie, it doesn’t reach out
+to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-admin-workflowclosure">
 <span id="api-msg-flyteidl-admin-workflowclosure"></span><h2>flyteidl.admin.WorkflowClosure<a class="headerlink" href="#flyteidl-admin-workflowclosure" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/workflow.proto#L52">[flyteidl.admin.WorkflowClosure proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/workflow.proto#L57">[flyteidl.admin.WorkflowClosure proto]</a></p>
 <p>A container holding the compiled workflow produced from the WorkflowSpec and additional metadata.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;compiled_workflow&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
@@ -300,7 +309,7 @@ in a query. If there are no more results, this value will be empty.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../core/index.html" class="btn btn-neutral float-right" title="Core Flyte language specification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="workflow_attributes.proto.html" class="btn btn-neutral float-right" title="workflow_attributes.proto" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="task_execution.proto.html" class="btn btn-neutral float-left" title="task_execution.proto" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -312,7 +321,7 @@ in a query. If there are no more results, this value will be empty.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>

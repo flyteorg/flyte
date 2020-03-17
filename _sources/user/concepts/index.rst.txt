@@ -9,7 +9,7 @@ to deeper dives.
 processing. Tasks can be pure functions or functions with side-effects. Tasks also have
 configuration and requirements specification associated with each definition of the task.
 
-:ref:`Workflows <concepts-workflows>` are programs that are guranteed to reach a terminal
+:ref:`Workflows <concepts-workflows>` are programs that are guaranteed to reach a terminal
 state eventually. They are represented as Directed Acyclic Graphs (DAGs) expressed in protobuf.
 The Flyte specification language expresses DAGs with branches, parallel steps and nested
 Workflows. Workflow can optionally specify typed inputs and produce typed outputs, which
@@ -43,7 +43,7 @@ the registered entities.
     tasks
     workflows_nodes
     executions
-    lanuchplans_schedules
+    launchplans_schedules
     projects
     domains
     registration

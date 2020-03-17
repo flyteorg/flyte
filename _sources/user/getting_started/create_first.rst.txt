@@ -9,15 +9,16 @@ The easiest way to author a Flyte Workflow is using the provided python SDK call
 You can save some effort by cloning the ``flytesnacks`` repo, and re-initializing it as a new git repository ::
 
   git clone git@github.com:lyft/flytesnacks.git myflyteproject
-  cd myworkflow
+  cd myflyteproject
   rm -rf .git
   git init
+  cd python
 
 now open the "Makefile" and change the first line to ``IMAGE_NAME=myflyteproject``
 
 Let's also remove the existing python task so we can write one from scratch. ::
 
-  rm workflows/edges.py
+  rm single_step/edges.py
 
 Creating a Project
 ******************
@@ -36,6 +37,7 @@ The most basic Flyte primitive is a "task". Flyte Tasks are units of work that c
 
 Start by creating a new file ::
 
+   mkdir -p workflows
    touch workflows/first.py
 
 This directory has been marked in the `configuration file <https://github.com/lyft/flytesnacks/blob/764b82aca5701137ebc0eda4e818466e5acc9219/sandbox.config#L2>`_ as the location to look for workflows and tasks.  Begin by importing some of the libraries that we'll need for this example.
@@ -109,7 +111,7 @@ If you have the flyte sandbox installed on your local machine, the image will be
 
 To upload to a remote registry, use ::
 
-  DOCKER_REGISRY_USERNAME={username} DOCKER_REGISTRY_PASSWORD={pass} REGISTRY=docker.io make docker_build
+  DOCKER_REGISTRY_USERNAME={username} DOCKER_REGISTRY_PASSWORD={pass} REGISTRY=docker.io make docker_build
 
 Replace the values above with your registry username, password, and registry endpoint.
 

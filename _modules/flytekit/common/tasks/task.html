@@ -164,7 +164,7 @@
 <span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span><span class="p">,</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_model</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_model</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
 
 
@@ -315,6 +315,24 @@
         <span class="n">sdk_task</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">task_id</span>
         <span class="k">return</span> <span class="n">sdk_task</span></div>
 
+<div class="viewcode-block" id="SdkTask.fetch_latest"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.fetch_latest">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+    <span class="k">def</span> <span class="nf">fetch_latest</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function uses the engine loader to call create a latest hydrated task from Admin.</span>
+<span class="sd">        :param Text project:</span>
+<span class="sd">        :param Text domain:</span>
+<span class="sd">        :param Text name:</span>
+<span class="sd">        :rtype: SdkTask</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">named_task</span> <span class="o">=</span> <span class="n">_common_model</span><span class="o">.</span><span class="n">NamedEntityIdentifier</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">admin_task</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">fetch_latest_task</span><span class="p">(</span><span class="n">named_task</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">admin_task</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteEntityNotExistException</span><span class="p">(</span><span class="s2">&quot;Named task </span><span class="si">{}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">named_task</span><span class="p">))</span>
+        <span class="n">sdk_task</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">admin_task</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">compiled_task</span><span class="o">.</span><span class="n">template</span><span class="p">)</span>
+        <span class="n">sdk_task</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">admin_task</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">return</span> <span class="n">sdk_task</span></div>
+
 <div class="viewcode-block" id="SdkTask.validate"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.validate">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
@@ -395,7 +413,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Flyte Authors
+        &copy; Copyright 2020, Flyte Authors
 
     </p>
   </div>
