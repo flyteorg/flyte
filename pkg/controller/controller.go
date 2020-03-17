@@ -225,7 +225,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create EventSink [%v], error %v", events.GetConfig(ctx).Type, err)
 	}
-	gc, err := NewGarbageCollector(cfg, scope, clock.RealClock{}, kubeclientset.CoreV1().Namespaces(), flytepropellerClientset.FlyteworkflowV1alpha1(), cfg.LimitNamespace)
+	gc, err := NewGarbageCollector(cfg, scope, clock.RealClock{}, kubeclientset.CoreV1().Namespaces(), flytepropellerClientset.FlyteworkflowV1alpha1())
 	if err != nil {
 		logger.Errorf(ctx, "failed to initialize GC for workflows")
 		return nil, errors.Wrapf(err, "failed to initialize WF GC")
