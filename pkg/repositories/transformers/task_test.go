@@ -27,6 +27,7 @@ func TestCreateTask(t *testing.T) {
 	assert.Equal(t, "version", task.Version)
 	assert.Equal(t, testutils.GetTaskClosureBytes(), task.Closure)
 	assert.Equal(t, taskDigest, task.Digest)
+	assert.Equal(t, "type", task.Type)
 }
 
 func TestFromTaskModel(t *testing.T) {
