@@ -159,4 +159,14 @@ var Migrations = []*gormigrate.Migration{
 			return tx.DropTable("resources").Error
 		},
 	},
+	// Add Type to Task model.
+	{
+		ID: "2020-03-17-task-type",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.Task{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Exec("ALTER TABLE tasks DROP COLUMN IF EXISTS type").Error
+		},
+	},
 }

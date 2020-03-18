@@ -20,6 +20,10 @@ func CreateTaskModel(
 	if err != nil {
 		return models.Task{}, errors.NewFlyteAdminError(codes.Internal, "Failed to serialize task closure")
 	}
+	var taskType string
+	if taskClosure.CompiledTask != nil && taskClosure.CompiledTask.Template != nil {
+		taskType = taskClosure.CompiledTask.Template.Type
+	}
 	return models.Task{
 		TaskKey: models.TaskKey{
 			Project: request.Id.Project,
@@ -29,6 +33,7 @@ func CreateTaskModel(
 		},
 		Closure: closureBytes,
 		Digest:  digest,
+		Type:    taskType,
 	}, nil
 }
 

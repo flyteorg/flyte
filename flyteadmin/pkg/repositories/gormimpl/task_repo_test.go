@@ -16,6 +16,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const pythonTestTaskType = "python-task"
+
 func TestCreateTask(t *testing.T) {
 	taskRepo := NewTaskRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	err := taskRepo.Create(context.Background(), models.Task{
@@ -26,6 +28,7 @@ func TestCreateTask(t *testing.T) {
 			Version: version,
 		},
 		Closure: []byte{1, 2},
+		Type:    pythonTestTaskType,
 	})
 	assert.NoError(t, err)
 }
@@ -37,6 +40,7 @@ func getMockTaskResponseFromDb(version string, spec []byte) map[string]interface
 	task["name"] = name
 	task["version"] = version
 	task["closure"] = spec
+	task["type"] = pythonTestTaskType
 	return task
 }
 
@@ -66,6 +70,7 @@ func TestGetTask(t *testing.T) {
 	assert.Equal(t, name, output.Name)
 	assert.Equal(t, version, output.Version)
 	assert.Equal(t, []byte{1, 2}, output.Closure)
+	assert.Equal(t, pythonTestTaskType, output.Type)
 }
 
 func TestListTasks(t *testing.T) {
@@ -100,6 +105,7 @@ func TestListTasks(t *testing.T) {
 		assert.Equal(t, name, task.Name)
 		assert.Contains(t, versions, task.Version)
 		assert.Equal(t, spec, task.Closure)
+		assert.Equal(t, pythonTestTaskType, task.Type)
 	}
 }
 
@@ -135,6 +141,7 @@ func TestListTasks_Pagination(t *testing.T) {
 		assert.Equal(t, name, task.Name)
 		assert.Equal(t, versions[idx], task.Version)
 		assert.Equal(t, spec, task.Closure)
+		assert.Equal(t, pythonTestTaskType, task.Type)
 	}
 }
 
@@ -167,6 +174,7 @@ func TestListTasks_Filters(t *testing.T) {
 	assert.Equal(t, name, collection.Tasks[0].Name)
 	assert.Equal(t, "ABC", collection.Tasks[0].Version)
 	assert.Equal(t, []byte{1, 2}, collection.Tasks[0].Closure)
+	assert.Equal(t, pythonTestTaskType, collection.Tasks[0].Type)
 }
 
 func TestListTasks_Order(t *testing.T) {
@@ -246,6 +254,7 @@ func TestListTaskIds(t *testing.T) {
 		assert.Equal(t, name, task.Name)
 		assert.Equal(t, versions[idx], task.Version)
 		assert.Equal(t, spec, task.Closure)
+		assert.Equal(t, pythonTestTaskType, task.Type)
 	}
 }
 
