@@ -2,6 +2,7 @@ plugins:
   presto:
     environment: ""
     defaultRoutingGroup: "adhoc"
+    defaultUser: "flyte-default-user@lyft.com"
     routingGroupConfigs:
       - name: "adhoc"
         limit: 250
@@ -13,7 +14,7 @@ plugins:
         namespaceScopeQuotaProportionCap: 0.7
     rateLimiter:
       name: "presto"
-      syncPeriod: 3s
+      syncPeriod: 5s
       workers: 15
       lruCacheSize: 2000
       metricScope: "presto"

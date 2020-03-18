@@ -647,6 +647,7 @@ data:
       presto:
         environment: ""
         defaultRoutingGroup: "adhoc"
+        defaultUser: "flyte-default-user@lyft.com"
         routingGroupConfigs:
           - name: "adhoc"
             limit: 250
@@ -658,13 +659,13 @@ data:
             namespaceScopeQuotaProportionCap: 0.7
         rateLimiter:
           name: "presto"
-          syncPeriod: 3s
+          syncPeriod: 5s
           workers: 15
           lruCacheSize: 2000
           metricScope: "presto"
 kind: ConfigMap
 metadata:
-  name: flyte-presto-config-khhggb6558
+  name: flyte-presto-config-485b9gg2kt
   namespace: flyte
 ---
 apiVersion: v1
@@ -1189,7 +1190,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-presto-config-khhggb6558
+          name: flyte-presto-config-485b9gg2kt
         name: presto-config-volume
       - configMap:
           name: flyte-qubole-config-9tcd8mk2c2
