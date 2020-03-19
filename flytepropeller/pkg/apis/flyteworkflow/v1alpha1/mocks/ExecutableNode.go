@@ -453,6 +453,40 @@ func (_m *ExecutableNode) IsEndNode() bool {
 	return r0
 }
 
+type ExecutableNode_IsInterruptible struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_IsInterruptible) Return(_a0 *bool) *ExecutableNode_IsInterruptible {
+	return &ExecutableNode_IsInterruptible{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnIsInterruptible() *ExecutableNode_IsInterruptible {
+	c := _m.On("IsInterruptible")
+	return &ExecutableNode_IsInterruptible{Call: c}
+}
+
+func (_m *ExecutableNode) OnIsInterruptibleMatch(matchers ...interface{}) *ExecutableNode_IsInterruptible {
+	c := _m.On("IsInterruptible", matchers...)
+	return &ExecutableNode_IsInterruptible{Call: c}
+}
+
+// IsInterruptible provides a mock function with given fields:
+func (_m *ExecutableNode) IsInterruptible() *bool {
+	ret := _m.Called()
+
+	var r0 *bool
+	if rf, ok := ret.Get(0).(func() *bool); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*bool)
+		}
+	}
+
+	return r0
+}
+
 type ExecutableNode_IsStartNode struct {
 	*mock.Call
 }

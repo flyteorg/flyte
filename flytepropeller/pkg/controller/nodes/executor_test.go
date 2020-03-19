@@ -529,6 +529,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockNode.On("IsEndNode").Return(false)
 			mockNode.On("GetTaskID").Return(&taskID)
 			mockNode.On("GetInputBindings").Return([]*v1alpha1.Binding{})
+			mockNode.On("IsInterruptible").Return(nil)
 
 			mockNodeN0 := &mocks.ExecutableNode{}
 			mockNodeN0.On("GetID").Return(nodeN0)
@@ -537,6 +538,8 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockNodeN0.On("IsStartNode").Return(false)
 			mockNodeN0.On("IsEndNode").Return(false)
 			mockNodeN0.On("GetTaskID").Return(&taskID0)
+			mockNodeN0.On("IsInterruptible").Return(nil)
+
 			mockN0Status := &mocks.ExecutableNodeStatus{}
 			mockN0Status.On("GetPhase").Return(n0Phase)
 			mockN0Status.On("GetAttempts").Return(uint32(0))
@@ -563,6 +566,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockWf.On("GetTask", taskID0).Return(tk, nil)
 			mockWf.On("GetTask", taskID).Return(tk, nil)
 			mockWf.On("GetLabels").Return(make(map[string]string))
+			mockWf.On("IsInterruptible").Return(false)
 			mockWfStatus.On("GetDataDir").Return(storage.DataReference("x"))
 			mockWfStatus.On("ConstructNodeDataDir", mock.Anything, mock.Anything, mock.Anything).Return(storage.DataReference("x"), nil)
 			return mockWf, mockN2Status

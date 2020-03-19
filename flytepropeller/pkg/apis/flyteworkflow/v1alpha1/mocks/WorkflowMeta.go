@@ -307,3 +307,35 @@ func (_m *WorkflowMeta) GetServiceAccountName() string {
 
 	return r0
 }
+
+type WorkflowMeta_IsInterruptible struct {
+	*mock.Call
+}
+
+func (_m WorkflowMeta_IsInterruptible) Return(_a0 bool) *WorkflowMeta_IsInterruptible {
+	return &WorkflowMeta_IsInterruptible{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *WorkflowMeta) OnIsInterruptible() *WorkflowMeta_IsInterruptible {
+	c := _m.On("IsInterruptible")
+	return &WorkflowMeta_IsInterruptible{Call: c}
+}
+
+func (_m *WorkflowMeta) OnIsInterruptibleMatch(matchers ...interface{}) *WorkflowMeta_IsInterruptible {
+	c := _m.On("IsInterruptible", matchers...)
+	return &WorkflowMeta_IsInterruptible{Call: c}
+}
+
+// IsInterruptible provides a mock function with given fields:
+func (_m *WorkflowMeta) IsInterruptible() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}

@@ -318,6 +318,7 @@ type ExecutableNode interface {
 	GetRetryStrategy() *RetryStrategy
 	GetExecutionDeadline() *time.Duration
 	GetActiveDeadline() *time.Duration
+	IsInterruptible() *bool
 }
 
 // Interface for the Workflow p. This is the mutable portion for a Workflow
@@ -376,6 +377,7 @@ type WorkflowMeta interface {
 	GetLabels() map[string]string
 	GetName() string
 	GetServiceAccountName() string
+	IsInterruptible() bool
 }
 
 type TaskDetailsGetter interface {

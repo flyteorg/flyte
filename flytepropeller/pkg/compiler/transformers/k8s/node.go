@@ -56,6 +56,13 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		errs.Collect(errors.NewSyntaxError(n.GetId(), "node:metadata:timeout", nil))
 		return nil, !errs.HasErrors()
 	}
+
+	var interruptible *bool
+	if n.GetMetadata() != nil && n.GetMetadata().GetInterruptibleValue() != nil {
+		interruptVal := n.GetMetadata().GetInterruptible()
+		interruptible = &interruptVal
+	}
+
 	nodeSpec := &v1alpha1.NodeSpec{
 		ID:                n.GetId(),
 		RetryStrategy:     computeRetryStrategy(n, task),
@@ -64,6 +71,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		OutputAliases:     toAliasValueArray(n.GetOutputAliases()),
 		InputBindings:     toBindingValueArray(n.GetInputs()),
 		ActiveDeadline:    activeDeadline,
+		Interruptibe:      interruptible,
 	}
 
 	switch v := n.GetTarget().(type) {
