@@ -68,6 +68,7 @@ func GetMockTaskExecutionMetadata() core.TaskExecutionMetadata {
 		Kind: "node",
 		Name: "blah",
 	})
+	taskMetadata.On("IsInterruptible").Return(true)
 	taskMetadata.On("GetK8sServiceAccount").Return("service-account")
 	taskMetadata.On("GetOwnerID").Return(types.NamespacedName{
 		Namespace: "test-namespace",

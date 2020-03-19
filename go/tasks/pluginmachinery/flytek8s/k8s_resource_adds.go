@@ -124,7 +124,8 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, id pluginsCore.Ta
 	return envVars
 }
 
-func GetTolerationsForResources(resourceRequirements ...v1.ResourceRequirements) []v1.Toleration {
+func GetPodTolerations(interruptible bool, resourceRequirements ...v1.ResourceRequirements) []v1.Toleration {
+	// 1. Get the tolerations for the resources requested
 	var tolerations []v1.Toleration
 	resourceNames := sets.NewString()
 	for _, resources := range resourceRequirements {
@@ -141,5 +142,11 @@ func GetTolerationsForResources(resourceRequirements ...v1.ResourceRequirements)
 			tolerations = append(tolerations, v...)
 		}
 	}
+
+	// 2. Get the tolerations for interruptible pods
+	if interruptible && len(config.GetK8sPluginConfig().InterruptibleTolerations) > 0 {
+		tolerations = append(tolerations, config.GetK8sPluginConfig().InterruptibleTolerations...)
+	}
+
 	return tolerations
 }

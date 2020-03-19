@@ -14,11 +14,6 @@ type ResourceRegistrar struct {
 	mock.Mock
 }
 
-// RegisterResourceNamespaceQuotaProportionCap provides a mock function with given fields: ctx, proportionCap
-func (_m *ResourceRegistrar) RegisterResourceNamespaceQuotaProportionCap(ctx context.Context, proportionCap float64) {
-	_m.Called(ctx, proportionCap)
-}
-
 type ResourceRegistrar_RegisterResourceQuota struct {
 	*mock.Call
 }

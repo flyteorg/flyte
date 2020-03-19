@@ -8,6 +8,7 @@ import (
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 
 	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
@@ -60,7 +61,11 @@ func validateAndFinalizeContainers(
 
 	}
 	pod.Spec.Containers = finalizedContainers
-	pod.Spec.Tolerations = flytek8s.GetTolerationsForResources(resReqs...)
+	pod.Spec.Tolerations = flytek8s.GetPodTolerations(taskCtx.TaskExecutionMetadata().IsInterruptible(), resReqs...)
+	if taskCtx.TaskExecutionMetadata().IsInterruptible() && len(config.GetK8sPluginConfig().InterruptibleNodeSelector) > 0 {
+		pod.Spec.NodeSelector = config.GetK8sPluginConfig().InterruptibleNodeSelector
+	}
+
 	return &pod, nil
 }
 
