@@ -961,7 +961,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vInt64, err := cmdFlags.GetInt64("node-config.max-node-retries-system-failures"); err == nil {
-				assert.Equal(t, int64(defaultConfig.NodeConfig.MaxNodeRetriesForSystemFailures), vInt64)
+				assert.Equal(t, int64(defaultConfig.NodeConfig.MaxNodeRetriesOnSystemFailures), vInt64)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -972,11 +972,20 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("node-config.max-node-retries-system-failures", testValue)
 			if vInt64, err := cmdFlags.GetInt64("node-config.max-node-retries-system-failures"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.NodeConfig.MaxNodeRetriesForSystemFailures)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.NodeConfig.MaxNodeRetriesOnSystemFailures)
 
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
+	})
+
+	t.Run("Test_node-config.interruptible-failure-threshold", func(t *testing.T) {
+		// Test that default value is set properly
+		if vInt64, err := cmdFlags.GetInt64("node-config.interruptible-failure-threshold"); err == nil {
+			assert.Equal(t, int64(defaultConfig.NodeConfig.InterruptibleFailureThreshold), vInt64)
+		} else {
+			assert.FailNow(t, err.Error())
+		}
 	})
 }

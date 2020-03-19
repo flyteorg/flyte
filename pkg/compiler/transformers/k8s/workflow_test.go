@@ -51,6 +51,9 @@ func createSampleMockWorkflow() *mockWorkflow {
 						Id: common.StartNodeID,
 					},
 				},
+				MetadataDefaults: &core.WorkflowMetadataDefaults{
+					Interruptible: true,
+				},
 			},
 			Connections: &core.ConnectionSet{
 				Downstream: map[string]*core.ConnectionSet_IdList{
@@ -106,6 +109,9 @@ func TestBuildFlyteWorkflow(t *testing.T) {
 			},
 		},
 		nil, nil, "")
+	assert.Equal(t, true, wf.NodeDefaults.Interruptible)
+	assert.True(t, *wf.WorkflowSpec.Nodes["n_1"].Interruptibe)
+	assert.Nil(t, wf.WorkflowSpec.Nodes[common.StartNodeID].Interruptibe)
 	assert.Equal(t, "wf-1", wf.Labels[WorkflowNameLabel])
 	assert.NoError(t, err)
 	assert.NotNil(t, wf)

@@ -416,3 +416,35 @@ func (_m *WorkflowMetaExtended) GetTask(id string) (v1alpha1.ExecutableTask, err
 
 	return r0, r1
 }
+
+type WorkflowMetaExtended_IsInterruptible struct {
+	*mock.Call
+}
+
+func (_m WorkflowMetaExtended_IsInterruptible) Return(_a0 bool) *WorkflowMetaExtended_IsInterruptible {
+	return &WorkflowMetaExtended_IsInterruptible{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *WorkflowMetaExtended) OnIsInterruptible() *WorkflowMetaExtended_IsInterruptible {
+	c := _m.On("IsInterruptible")
+	return &WorkflowMetaExtended_IsInterruptible{Call: c}
+}
+
+func (_m *WorkflowMetaExtended) OnIsInterruptibleMatch(matchers ...interface{}) *WorkflowMetaExtended_IsInterruptible {
+	c := _m.On("IsInterruptible", matchers...)
+	return &WorkflowMetaExtended_IsInterruptible{Call: c}
+}
+
+// IsInterruptible provides a mock function with given fields:
+func (_m *WorkflowMetaExtended) IsInterruptible() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}

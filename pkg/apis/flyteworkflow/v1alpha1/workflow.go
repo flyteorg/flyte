@@ -34,6 +34,8 @@ type FlyteWorkflow struct {
 	// Value must be a positive integer.
 	// +optional
 	ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty"`
+	// Defaults value of parameters to be used for nodes if not set by the node.
+	NodeDefaults NodeDefaults `json:"node-defaults,omitempty"`
 	// Specifies the time when the workflow has been accepted into the system.
 	AcceptedAt *metav1.Time `json:"acceptedAt,omitempty"`
 	// ServiceAccountName is the name of the ServiceAccount to use to run this pod.
@@ -45,6 +47,11 @@ type FlyteWorkflow struct {
 
 	// non-Serialized fields
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
+}
+
+type NodeDefaults struct {
+	// Default behaviour for Interruptible for nodes unless explicitly set at the node level.
+	Interruptible bool `json:"interruptible,omitempty"`
 }
 
 var FlyteWorkflowGVK = SchemeGroupVersion.WithKind(FlyteWorkflowKind)
@@ -97,6 +104,10 @@ func (in *FlyteWorkflow) GetNodeExecutionStatus(ctx context.Context, id NodeID) 
 
 func (in *FlyteWorkflow) GetServiceAccountName() string {
 	return in.ServiceAccountName
+}
+
+func (in *FlyteWorkflow) IsInterruptible() bool {
+	return in.NodeDefaults.Interruptible
 }
 
 type Inputs struct {

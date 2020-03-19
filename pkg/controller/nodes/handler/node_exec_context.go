@@ -35,6 +35,7 @@ type NodeExecutionMetadata interface {
 	GetLabels() map[string]string
 	GetAnnotations() map[string]string
 	GetK8sServiceAccount() string
+	IsInterruptible() bool
 }
 
 type NodeExecutionContext interface {

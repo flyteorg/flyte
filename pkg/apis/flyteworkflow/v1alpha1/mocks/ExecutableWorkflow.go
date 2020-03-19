@@ -737,6 +737,38 @@ func (_m *ExecutableWorkflow) GetTask(id string) (v1alpha1.ExecutableTask, error
 	return r0, r1
 }
 
+type ExecutableWorkflow_IsInterruptible struct {
+	*mock.Call
+}
+
+func (_m ExecutableWorkflow_IsInterruptible) Return(_a0 bool) *ExecutableWorkflow_IsInterruptible {
+	return &ExecutableWorkflow_IsInterruptible{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableWorkflow) OnIsInterruptible() *ExecutableWorkflow_IsInterruptible {
+	c := _m.On("IsInterruptible")
+	return &ExecutableWorkflow_IsInterruptible{Call: c}
+}
+
+func (_m *ExecutableWorkflow) OnIsInterruptibleMatch(matchers ...interface{}) *ExecutableWorkflow_IsInterruptible {
+	c := _m.On("IsInterruptible", matchers...)
+	return &ExecutableWorkflow_IsInterruptible{Call: c}
+}
+
+// IsInterruptible provides a mock function with given fields:
+func (_m *ExecutableWorkflow) IsInterruptible() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 type ExecutableWorkflow_StartNode struct {
 	*mock.Call
 }

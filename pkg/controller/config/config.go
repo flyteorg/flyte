@@ -44,7 +44,8 @@ var (
 				DefaultNodeActiveDeadline:     config.Duration{Duration: time.Hour * 48},
 				DefaultWorkflowActiveDeadline: config.Duration{Duration: time.Hour * 72},
 			},
-			MaxNodeRetriesForSystemFailures: 3,
+			MaxNodeRetriesOnSystemFailures: 3,
+			InterruptibleFailureThreshold:  1,
 		},
 	}
 )
@@ -121,8 +122,9 @@ type WorkqueueConfig struct {
 
 // configuration for a node
 type NodeConfig struct {
-	DefaultDeadlines                DefaultDeadlines `json:"default-deadlines,omitempty" pflag:",Default value for timeouts"`
-	MaxNodeRetriesForSystemFailures int64            `json:"max-node-retries-system-failures" pflag:"2,Maximum number of retries per node for node failure due to infra issues"`
+	DefaultDeadlines               DefaultDeadlines `json:"default-deadlines,omitempty" pflag:",Default value for timeouts"`
+	MaxNodeRetriesOnSystemFailures int64            `json:"max-node-retries-system-failures" pflag:"2,Maximum number of retries per node for node failure due to infra issues"`
+	InterruptibleFailureThreshold  int64            `json:"interruptible-failure-threshold" pflag:"1,number of failures for a node to be still considered interruptible'"`
 }
 
 // Contains default values for timeouts

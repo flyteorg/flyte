@@ -26,6 +26,7 @@ type dummyBaseWorkflow struct {
 	GetNodeCb      func(nodeId v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool)
 	Status         map[v1alpha1.NodeID]*v1alpha1.NodeStatus
 	DataStore      *storage.DataStore
+	Interruptible  bool
 }
 
 func (d *dummyBaseWorkflow) GetOutputBindings() []*v1alpha1.Binding {
@@ -80,6 +81,10 @@ func (d *dummyBaseWorkflow) GetAnnotations() map[string]string {
 
 func (d *dummyBaseWorkflow) GetLabels() map[string]string {
 	return map[string]string{}
+}
+
+func (d *dummyBaseWorkflow) IsInterruptible() bool {
+	return d.Interruptible
 }
 
 func (d *dummyBaseWorkflow) GetName() string {

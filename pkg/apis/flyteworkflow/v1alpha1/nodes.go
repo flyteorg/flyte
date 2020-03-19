@@ -140,8 +140,9 @@ type NodeSpec struct {
 	// Value must be a positive integer. This includes time spent waiting in the queue.
 	// +optional
 	ActiveDeadline *v1.Duration `json:"activeDeadline,omitempty"`
-	// TODO 12-10-2019: For backward compatibility, remove it in future release
-	ActiveDeadlineSeconds *int64 `json:"activeDeadlineSeconds,omitempty"`
+	// The value set to True means task is OK with getting interrupted
+	// +optional
+	Interruptibe *bool `json:"interruptible,omitempty"`
 }
 
 func (in *NodeSpec) GetRetryStrategy() *RetryStrategy {
@@ -160,6 +161,10 @@ func (in *NodeSpec) GetActiveDeadline() *time.Duration {
 		return &in.ActiveDeadline.Duration
 	}
 	return nil
+}
+
+func (in *NodeSpec) IsInterruptible() *bool {
+	return in.Interruptibe
 }
 
 func (in *NodeSpec) GetConfig() *typesv1.ConfigMap {
