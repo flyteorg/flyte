@@ -279,3 +279,35 @@ func (_m *TaskExecutionMetadata) GetTaskExecutionID() core.TaskExecutionID {
 
 	return r0
 }
+
+type TaskExecutionMetadata_IsInterruptible struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionMetadata_IsInterruptible) Return(_a0 bool) *TaskExecutionMetadata_IsInterruptible {
+	return &TaskExecutionMetadata_IsInterruptible{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionMetadata) OnIsInterruptible() *TaskExecutionMetadata_IsInterruptible {
+	c := _m.On("IsInterruptible")
+	return &TaskExecutionMetadata_IsInterruptible{Call: c}
+}
+
+func (_m *TaskExecutionMetadata) OnIsInterruptibleMatch(matchers ...interface{}) *TaskExecutionMetadata_IsInterruptible {
+	c := _m.On("IsInterruptible", matchers...)
+	return &TaskExecutionMetadata_IsInterruptible{Call: c}
+}
+
+// IsInterruptible provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) IsInterruptible() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}

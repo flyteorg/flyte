@@ -5,7 +5,6 @@ plugins:
     - container
   # All k8s plugins default configuration
   k8s:
-    inject-finalizer: true
     default-annotations:
       - annotationKey1: annotationValue1
       - annotationKey2: annotationValue2
@@ -36,22 +35,3 @@ plugins:
       - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
       - FLYTE_AWS_ACCESS_KEY_ID: minio
       - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
-  # Spark Plugin configuration
-  spark:
-    spark-config-default:
-      - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
-      - spark.kubernetes.allocation.batch.size: "50"
-      - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-      - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-      - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-      - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-      - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-      - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-      - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-      - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
-      - spark.blacklist.enabled: "true"
-      - spark.blacklist.timeout: "5m"
-  # Logging configuration
-  logs:
-    kubernetes-enabled: true
-    kubernetes-url: "http://localhost:30082"

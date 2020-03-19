@@ -251,7 +251,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExec
 		Kind: "node",
 		Name: "blah",
 	})
-
+	taskExecutionMetadata.On("IsInterruptible").Return(true)
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
 }

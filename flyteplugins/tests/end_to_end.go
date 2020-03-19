@@ -158,6 +158,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.OnGetNamespace().Return("fake-development")
 	tMeta.OnGetLabels().Return(map[string]string{})
 	tMeta.OnGetAnnotations().Return(map[string]string{})
+	tMeta.OnIsInterruptible().Return(true)
 	tMeta.OnGetOwnerReference().Return(v12.OwnerReference{})
 	tMeta.OnGetOwnerID().Return(types.NamespacedName{
 		Namespace: "fake-development",
