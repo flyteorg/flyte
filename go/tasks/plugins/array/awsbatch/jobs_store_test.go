@@ -286,3 +286,62 @@ func Test_toRanges(t *testing.T) {
 		})
 	}
 }
+
+func Test_updateJob(t *testing.T) {
+	ctx := context.Background()
+	withDefaults := func(source *batch.JobDetail) *batch.JobDetail {
+		source.JobId = refStr("job-1")
+		source.Status = refStr(batch.JobStatusRunning)
+		return source
+	}
+
+	t.Run("Current attempt", func(t *testing.T) {
+		j := Job{}
+		updated := updateJob(ctx, withDefaults(&batch.JobDetail{
+			Container: &batch.ContainerDetail{
+				LogStreamName: refStr("stream://log2"),
+			},
+		}), &j)
+
+		assert.True(t, updated)
+		assert.Len(t, j.Attempts, 1)
+	})
+
+	t.Run("Current attempt, 1 already failed", func(t *testing.T) {
+		j := Job{}
+		updated := updateJob(ctx, withDefaults(&batch.JobDetail{
+			Container: &batch.ContainerDetail{
+				LogStreamName: refStr("stream://log2"),
+			},
+			Attempts: []*batch.AttemptDetail{
+				{
+					Container: &batch.AttemptContainerDetail{
+						LogStreamName: refStr("stream://log1"),
+					},
+				},
+			},
+		}), &j)
+
+		assert.True(t, updated)
+		assert.Len(t, j.Attempts, 2)
+	})
+
+	t.Run("No current attempt, 1 already failed", func(t *testing.T) {
+		j := Job{}
+		updated := updateJob(ctx, withDefaults(&batch.JobDetail{
+			Container: &batch.ContainerDetail{
+				LogStreamName: refStr("stream://log1"),
+			},
+			Attempts: []*batch.AttemptDetail{
+				{
+					Container: &batch.AttemptContainerDetail{
+						LogStreamName: refStr("stream://log1"),
+					},
+				},
+			},
+		}), &j)
+
+		assert.True(t, updated)
+		assert.Len(t, j.Attempts, 1)
+	})
+}
