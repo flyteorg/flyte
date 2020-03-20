@@ -14,6 +14,7 @@ type Counter struct {
 	*prometheus.CounterVec
 
 	prometheus.Counter
+	additionalLabels []contextutils.Key
 }
 
 // Inc increments the counter by 1. Use Add to increment it by arbitrary non-negative values. The data point will be
@@ -33,7 +34,7 @@ func (c Counter) Inc(ctx context.Context) {
 // Add adds the given value to the counter. It panics if the value is < 0.. The data point will be labeled with values
 // from context. See labeled.SetMetricsKeys for information about to configure that.
 func (c Counter) Add(ctx context.Context, v float64) {
-	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, metricKeys...))
+	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, c.additionalLabels...)...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -51,14 +52,19 @@ func NewCounter(name, description string, scope promutils.Scope, opts ...MetricO
 		panic(ErrNeverSet)
 	}
 
-	c := Counter{
-		CounterVec: scope.MustNewCounterVec(name, description, metricStringKeys...),
-	}
+	c := Counter{}
 
 	for _, opt := range opts {
 		if _, emitUnlabeledMetric := opt.(EmitUnlabeledMetricOption); emitUnlabeledMetric {
 			c.Counter = scope.MustNewCounter(GetUnlabeledMetricName(name), description)
+		} else if additionalLabels, casted := opt.(AdditionalLabelsOption); casted {
+			c.CounterVec = scope.MustNewCounterVec(name, description, append(metricStringKeys, additionalLabels.Labels...)...)
+			c.additionalLabels = contextutils.MetricKeysFromStrings(additionalLabels.Labels)
 		}
+	}
+
+	if c.CounterVec == nil {
+		c.CounterVec = scope.MustNewCounterVec(name, description, metricStringKeys...)
 	}
 
 	return c

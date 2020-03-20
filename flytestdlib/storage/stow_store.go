@@ -5,9 +5,11 @@ import (
 	"io"
 	"time"
 
-	"github.com/lyft/flytestdlib/errors"
+	"github.com/lyft/flytestdlib/contextutils"
 
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
+	"github.com/lyft/flytestdlib/errors"
 
 	"github.com/lyft/flytestdlib/promutils"
 
@@ -15,18 +17,22 @@ import (
 	errs "github.com/pkg/errors"
 )
 
+const (
+	FailureTypeLabel contextutils.Key = "failure_type"
+)
+
 type stowMetrics struct {
-	BadReference prometheus.Counter
-	BadContainer prometheus.Counter
+	BadReference labeled.Counter
+	BadContainer labeled.Counter
 
-	HeadFailure prometheus.Counter
-	HeadLatency promutils.StopWatch
+	HeadFailure labeled.Counter
+	HeadLatency labeled.StopWatch
 
-	ReadFailure     prometheus.Counter
-	ReadOpenLatency promutils.StopWatch
+	ReadFailure     labeled.Counter
+	ReadOpenLatency labeled.StopWatch
 
-	WriteFailure prometheus.Counter
-	WriteLatency promutils.StopWatch
+	WriteFailure labeled.Counter
+	WriteLatency labeled.StopWatch
 }
 
 // Implements DataStore to talk to stow location store.
@@ -50,9 +56,9 @@ func (s StowMetadata) Exists() bool {
 	return s.exists
 }
 
-func (s *StowStore) getContainer(container string) (c stow.Container, err error) {
+func (s *StowStore) getContainer(ctx context.Context, container string) (c stow.Container, err error) {
 	if s.Container.Name() != container {
-		s.metrics.BadContainer.Inc()
+		s.metrics.BadContainer.Inc(ctx)
 		return nil, errs.Wrapf(stow.ErrNotFound, "Conf container:%v != Passed Container:%v", s.Container.Name(), container)
 	}
 
@@ -62,16 +68,16 @@ func (s *StowStore) getContainer(container string) (c stow.Container, err error)
 func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
 	_, c, k, err := reference.Split()
 	if err != nil {
-		s.metrics.BadReference.Inc()
+		s.metrics.BadReference.Inc(ctx)
 		return nil, err
 	}
 
-	container, err := s.getContainer(c)
+	container, err := s.getContainer(ctx, c)
 	if err != nil {
 		return nil, err
 	}
 
-	t := s.metrics.HeadLatency.Start()
+	t := s.metrics.HeadLatency.Start(ctx)
 	item, err := container.Item(k)
 	if err == nil {
 		if _, err = item.Metadata(); err == nil {
@@ -85,29 +91,31 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 			}
 		}
 	}
-	s.metrics.HeadFailure.Inc()
+
 	if IsNotFound(err) {
 		return StowMetadata{exists: false}, nil
 	}
+
+	incFailureCounterForError(ctx, s.metrics.HeadFailure, err)
 	return StowMetadata{exists: false}, errs.Wrapf(err, "path:%v", k)
 }
 
 func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
 	_, c, k, err := reference.Split()
 	if err != nil {
-		s.metrics.BadReference.Inc()
+		s.metrics.BadReference.Inc(ctx)
 		return nil, err
 	}
 
-	container, err := s.getContainer(c)
+	container, err := s.getContainer(ctx, c)
 	if err != nil {
 		return nil, err
 	}
 
-	t := s.metrics.ReadOpenLatency.Start()
+	t := s.metrics.ReadOpenLatency.Start(ctx)
 	item, err := container.Item(k)
 	if err != nil {
-		s.metrics.ReadFailure.Inc()
+		incFailureCounterForError(ctx, s.metrics.ReadFailure, err)
 		return nil, err
 	}
 	t.Stop()
@@ -127,21 +135,22 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
 	_, c, k, err := reference.Split()
 	if err != nil {
-		s.metrics.BadReference.Inc()
+		s.metrics.BadReference.Inc(ctx)
 		return err
 	}
 
-	container, err := s.getContainer(c)
+	container, err := s.getContainer(ctx, c)
 	if err != nil {
 		return err
 	}
 
-	t := s.metrics.WriteLatency.Start()
+	t := s.metrics.WriteLatency.Start(ctx)
 	_, err = container.Put(k, raw, size, opts.Metadata)
 	if err != nil {
-		s.metrics.WriteFailure.Inc()
+		incFailureCounterForError(ctx, s.metrics.WriteFailure, err)
 		return errs.Wrapf(err, "Failed to write data [%vb] to path [%v].", size, k)
 	}
+
 	t.Stop()
 
 	return nil
@@ -152,21 +161,22 @@ func (s *StowStore) GetBaseContainerFQN(ctx context.Context) DataReference {
 }
 
 func NewStowRawStore(containerBaseFQN DataReference, container stow.Container, metricsScope promutils.Scope) (*StowStore, error) {
+	failureTypeOption := labeled.AdditionalLabelsOption{Labels: []string{FailureTypeLabel.String()}}
 	self := &StowStore{
 		Container:        container,
 		containerBaseFQN: containerBaseFQN,
 		metrics: &stowMetrics{
-			BadReference: metricsScope.MustNewCounter("bad_key", "Indicates the provided storage reference/key is incorrectly formatted"),
-			BadContainer: metricsScope.MustNewCounter("bad_container", "Indicates request for a container that has not been initialized"),
+			BadReference: labeled.NewCounter("bad_key", "Indicates the provided storage reference/key is incorrectly formatted", metricsScope, labeled.EmitUnlabeledMetric),
+			BadContainer: labeled.NewCounter("bad_container", "Indicates request for a container that has not been initialized", metricsScope, labeled.EmitUnlabeledMetric),
 
-			HeadFailure: metricsScope.MustNewCounter("head_failure", "Indicates failure in HEAD for a given reference"),
-			HeadLatency: metricsScope.MustNewStopWatch("head", "Indicates time to fetch metadata using the Head API", time.Millisecond),
+			HeadFailure: labeled.NewCounter("head_failure", "Indicates failure in HEAD for a given reference", metricsScope, labeled.EmitUnlabeledMetric),
+			HeadLatency: labeled.NewStopWatch("head", "Indicates time to fetch metadata using the Head API", time.Millisecond, metricsScope, labeled.EmitUnlabeledMetric),
 
-			ReadFailure:     metricsScope.MustNewCounter("read_failure", "Indicates failure in GET for a given reference"),
-			ReadOpenLatency: metricsScope.MustNewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond),
+			ReadFailure:     labeled.NewCounter("read_failure", "Indicates failure in GET for a given reference", metricsScope, labeled.EmitUnlabeledMetric, failureTypeOption),
+			ReadOpenLatency: labeled.NewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond, metricsScope, labeled.EmitUnlabeledMetric),
 
-			WriteFailure: metricsScope.MustNewCounter("write_failure", "Indicates failure in storing/PUT for a given reference"),
-			WriteLatency: metricsScope.MustNewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond),
+			WriteFailure: labeled.NewCounter("write_failure", "Indicates failure in storing/PUT for a given reference", metricsScope, labeled.EmitUnlabeledMetric, failureTypeOption),
+			WriteLatency: labeled.NewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond, metricsScope, labeled.EmitUnlabeledMetric),
 		},
 	}
 

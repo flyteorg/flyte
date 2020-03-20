@@ -16,6 +16,8 @@ type StopWatch struct {
 	// through a flag in the constructor, we initialize this additional untagged stopwatch to compute percentiles
 	// across tags.
 	promutils.StopWatch
+
+	additionalLabels []contextutils.Key
 }
 
 // Start creates a new Instance of the StopWatch called a Timer that is closeable/stoppable.
@@ -46,7 +48,7 @@ func (c StopWatch) Start(ctx context.Context) Timer {
 // Observes specified duration between the start and end time. The data point will be labeled with values from context.
 // See labeled.SetMetricsKeys for information about to configure that.
 func (c StopWatch) Observe(ctx context.Context, start, end time.Time) {
-	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, metricKeys...))
+	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, c.additionalLabels...)...))
 	if err != nil {
 		panic(err.Error())
 	}
@@ -73,14 +75,20 @@ func NewStopWatch(name, description string, scale time.Duration, scope promutils
 		panic(ErrNeverSet)
 	}
 
-	sw := StopWatch{
-		StopWatchVec: scope.MustNewStopWatchVec(name, description, scale, metricStringKeys...),
-	}
+	sw := StopWatch{}
 
 	for _, opt := range opts {
 		if _, emitUnableMetric := opt.(EmitUnlabeledMetricOption); emitUnableMetric {
 			sw.StopWatch = scope.MustNewStopWatch(GetUnlabeledMetricName(name), description, scale)
+		} else if additionalLabels, casted := opt.(AdditionalLabelsOption); casted {
+			sw.StopWatchVec = scope.MustNewStopWatchVec(name, description, scale,
+				append(metricStringKeys, additionalLabels.Labels...)...)
+			sw.additionalLabels = contextutils.MetricKeysFromStrings(additionalLabels.Labels)
 		}
+	}
+
+	if sw.StopWatchVec == nil {
+		sw.StopWatchVec = scope.MustNewStopWatchVec(name, description, scale, metricStringKeys...)
 	}
 
 	return sw
