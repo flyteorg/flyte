@@ -1,17 +1,23 @@
 package storage
 
 import (
+	"context"
 	"os"
 
-	errors2 "github.com/lyft/flytestdlib/errors"
+	stdErrs "github.com/lyft/flytestdlib/errors"
+	"github.com/lyft/flytestdlib/promutils/labeled"
 
 	"github.com/graymeta/stow"
 	"github.com/pkg/errors"
 )
 
 var (
-	ErrExceedsLimit       errors2.ErrorCode = "LIMIT_EXCEEDED"
-	ErrFailedToWriteCache errors2.ErrorCode = "CACHE_WRITE_FAILED"
+	ErrExceedsLimit       stdErrs.ErrorCode = "LIMIT_EXCEEDED"
+	ErrFailedToWriteCache stdErrs.ErrorCode = "CACHE_WRITE_FAILED"
+)
+
+const (
+	genericFailureTypeLabel = "Generic"
 )
 
 // Gets a value indicating whether the underlying error is a Not Found error.
@@ -20,7 +26,7 @@ func IsNotFound(err error) bool {
 		return true
 	}
 
-	if errors2.IsCausedByError(err, stow.ErrNotFound) {
+	if stdErrs.IsCausedByError(err, stow.ErrNotFound) {
 		return true
 	}
 
@@ -38,11 +44,11 @@ func IsExists(err error) bool {
 
 // Gets a value indicating whether the root cause of error is a "limit exceeded" error.
 func IsExceedsLimit(err error) bool {
-	return errors2.IsCausedBy(err, ErrExceedsLimit)
+	return stdErrs.IsCausedBy(err, ErrExceedsLimit)
 }
 
 func IsFailedWriteToCache(err error) bool {
-	return errors2.IsCausedBy(err, ErrFailedToWriteCache)
+	return stdErrs.IsCausedBy(err, ErrFailedToWriteCache)
 }
 
 func MapStrings(mapper func(string) string, strings ...string) []string {
@@ -55,4 +61,13 @@ func MapStrings(mapper func(string) string, strings ...string) []string {
 	}
 
 	return strings
+}
+
+func incFailureCounterForError(ctx context.Context, counter labeled.Counter, err error) {
+	errCode, found := stdErrs.GetErrorCode(err)
+	if found {
+		counter.Inc(context.WithValue(ctx, FailureTypeLabel, errCode))
+	} else {
+		counter.Inc(context.WithValue(ctx, FailureTypeLabel, genericFailureTypeLabel))
+	}
 }

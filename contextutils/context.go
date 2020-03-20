@@ -44,6 +44,17 @@ var logKeys = []Key{
 	ResourceVersionKey,
 }
 
+// MetricKeysFromStrings is a convenience method to convert a slice of strings into a slice of Keys
+func MetricKeysFromStrings(keys []string) []Key {
+	res := make([]Key, 0, len(keys))
+
+	for _, k := range keys {
+		res = append(res, Key(k))
+	}
+
+	return res
+}
+
 // Gets a new context with the resource version set.
 func WithResourceVersion(ctx context.Context, resourceVersion string) context.Context {
 	return context.WithValue(ctx, ResourceVersionKey, resourceVersion)
