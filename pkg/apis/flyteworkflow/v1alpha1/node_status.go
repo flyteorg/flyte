@@ -403,6 +403,9 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 		if in.StartedAt == nil {
 			in.StartedAt = &n
 		}
+		if in.LastAttemptStartedAt == nil {
+			in.LastAttemptStartedAt = &n
+		}
 
 		in.StoppedAt = &n
 	}
