@@ -407,7 +407,7 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 		return executors.NodeStatusUndefined, err
 	}
 	execErr := p.GetErr()
-	if execErr != nil && p.GetPhase() == handler.EPhaseRetryableFailure {
+	if execErr != nil && p.GetPhase() == handler.EPhaseRetryableFailure && nodeStatus.GetLastAttemptStartedAt() != nil {
 		if execErr.GetKind() == core.ExecutionError_SYSTEM {
 			nodeStatus.IncrementSystemFailures()
 			c.metrics.SystemErrorDuration.Observe(ctx, nodeStatus.GetLastAttemptStartedAt().Time, time.Now())
