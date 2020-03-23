@@ -32,12 +32,15 @@ import (
 )
 
 type nodeMetrics struct {
-	Scope              promutils.Scope
-	FailureDuration    labeled.StopWatch
-	SuccessDuration    labeled.StopWatch
-	ResolutionFailure  labeled.Counter
-	InputsWriteFailure labeled.Counter
-	TimedOutFailure    labeled.Counter
+	Scope                promutils.Scope
+	FailureDuration      labeled.StopWatch
+	SuccessDuration      labeled.StopWatch
+	UserErrorDuration    labeled.StopWatch
+	SystemErrorDuration  labeled.StopWatch
+	UnknownErrorDuration labeled.StopWatch
+	ResolutionFailure    labeled.Counter
+	InputsWriteFailure   labeled.Counter
+	TimedOutFailure      labeled.Counter
 
 	InterruptedThresholdHit labeled.Counter
 
@@ -403,10 +406,15 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 		logger.Errorf(ctx, "failed Execute for node. Error: %s", err.Error())
 		return executors.NodeStatusUndefined, err
 	}
-
-	if p.GetPhase() == handler.EPhaseRetryableFailure {
-		if p.GetErr() != nil && p.GetErr().GetKind() == core.ExecutionError_SYSTEM {
+	execErr := p.GetErr()
+	if execErr != nil && p.GetPhase() == handler.EPhaseRetryableFailure {
+		if execErr.GetKind() == core.ExecutionError_SYSTEM {
 			nodeStatus.IncrementSystemFailures()
+			c.metrics.SystemErrorDuration.Observe(ctx, nodeStatus.GetLastAttemptStartedAt().Time, time.Now())
+		} else if execErr.GetKind() == core.ExecutionError_USER {
+			c.metrics.UserErrorDuration.Observe(ctx, nodeStatus.GetLastAttemptStartedAt().Time, time.Now())
+		} else {
+			c.metrics.UnknownErrorDuration.Observe(ctx, nodeStatus.GetLastAttemptStartedAt().Time, time.Now())
 		}
 	}
 
@@ -726,6 +734,9 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 			Scope:                   nodeScope,
 			FailureDuration:         labeled.NewStopWatch("failure_duration", "Indicates the total execution time of a failed workflow.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
 			SuccessDuration:         labeled.NewStopWatch("success_duration", "Indicates the total execution time of a successful workflow.", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+			UserErrorDuration:       labeled.NewStopWatch("user_error_duration", "Indicates the total execution time before user error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+			SystemErrorDuration:     labeled.NewStopWatch("system_error_duration", "Indicates the total execution time before system error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
+			UnknownErrorDuration:    labeled.NewStopWatch("unknown_error_duration", "Indicates the total execution time before unknown error", time.Millisecond, nodeScope, labeled.EmitUnlabeledMetric),
 			InputsWriteFailure:      labeled.NewCounter("inputs_write_fail", "Indicates failure in writing node inputs to metastore", nodeScope),
 			TimedOutFailure:         labeled.NewCounter("timeout_fail", "Indicates failure due to timeout", nodeScope),
 			InterruptedThresholdHit: labeled.NewCounter("interrupted_threshold", "Indicates the node interruptible disabled because it hit max failure count", nodeScope),
