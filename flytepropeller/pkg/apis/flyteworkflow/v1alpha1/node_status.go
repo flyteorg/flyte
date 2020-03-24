@@ -81,9 +81,14 @@ func (in *BranchNodeStatus) Equals(other *BranchNodeStatus) bool {
 type DynamicNodePhase int
 
 const (
+	// This is the default phase for a Dynamic Node execution. This also implies that the parent node is being executed
 	DynamicNodePhaseNone DynamicNodePhase = iota
+	// This phase implies that all the sub-nodes are being executed
 	DynamicNodePhaseExecuting
+	// This implies that the dynamic sub-nodes have failed and failure is being handled
 	DynamicNodePhaseFailing
+	// This Phase implies that the Parent node is done but it needs to be finalized before progressing to the sub-nodes (or dynamically yielded nodes)
+	DynamicNodePhaseParentFinalizing
 )
 
 type DynamicNodeStatus struct {
