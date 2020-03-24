@@ -11,7 +11,7 @@ require (
 	github.com/golang/protobuf v1.3.3
 	github.com/googleapis/gnostic v0.4.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.4
-	github.com/lyft/flyteidl v0.17.6
+	github.com/lyft/flyteidl v0.17.9
 	github.com/lyft/flytestdlib v0.3.3
 	github.com/magiconair/properties v1.8.1
 	github.com/mitchellh/mapstructure v1.1.2
