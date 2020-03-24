@@ -151,7 +151,7 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 		{"running-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(i))}, want{p: handler.EPhaseRunning, info: i}},
 		{"retryfailure-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("x", "y", i))}, want{p: handler.EPhaseRetryableFailure, info: i}},
 		{"failure-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("x", "y", i))}, want{p: handler.EPhaseFailed, info: i}},
-		{"success-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil))}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
+		{"success-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil))}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseParentFinalizing}},
 		{"running-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(i))}, want{p: handler.EPhaseRunning, info: i}},
 		{"retryfailure-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("x", "y", i))}, want{p: handler.EPhaseRetryableFailure, info: i}},
 		{"failure-non-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("x", "y", i))}, want{p: handler.EPhaseFailed, info: i}},
@@ -160,7 +160,7 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			nCtx := createNodeContext("test")
 			s := &dynamicNodeStateHolder{}
-			nCtx.On("NodeStateWriter").Return(s)
+			nCtx.OnNodeStateWriter().Return(s)
 			if tt.args.isDynamic {
 				f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
 				assert.NoError(t, err)
@@ -170,9 +170,9 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 			h := &mocks.TaskNodeHandler{}
 			n := &executorMocks.Node{}
 			if tt.args.isErr {
-				h.On("Handle", mock.Anything, mock.Anything).Return(handler.UnknownTransition, fmt.Errorf("error"))
+				h.OnHandleMatch(mock.Anything, mock.Anything).Return(handler.UnknownTransition, fmt.Errorf("error"))
 			} else {
-				h.On("Handle", mock.Anything, mock.Anything).Return(tt.args.trns, nil)
+				h.OnHandleMatch(mock.Anything, mock.Anything).Return(tt.args.trns, nil)
 			}
 			d := New(h, n, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)
@@ -187,6 +187,127 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 			}
 		})
 	}
+
+}
+
+func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
+	createNodeContext := func(ttype string) *nodeMocks.NodeExecutionContext {
+		wfExecID := &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		}
+
+		nm := &nodeMocks.NodeExecutionMetadata{}
+		nm.On("GetAnnotations").Return(map[string]string{})
+		nm.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
+			WorkflowExecutionIdentifier: wfExecID,
+		})
+		nm.On("GetK8sServiceAccount").Return("service-account")
+		nm.On("GetLabels").Return(map[string]string{})
+		nm.On("GetNamespace").Return("namespace")
+		nm.On("GetOwnerID").Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+		nm.On("GetOwnerReference").Return(v1.OwnerReference{
+			Kind: "sample",
+			Name: "name",
+		})
+
+		taskID := &core.Identifier{}
+		tk := &core.TaskTemplate{
+			Id:   taskID,
+			Type: "test",
+			Metadata: &core.TaskMetadata{
+				Discoverable: true,
+			},
+			Interface: &core.TypedInterface{
+				Outputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"x": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_BOOLEAN,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		tr := &nodeMocks.TaskReader{}
+		tr.On("GetTaskID").Return(taskID)
+		tr.On("GetTaskType").Return(ttype)
+		tr.On("Read", mock.Anything).Return(tk, nil)
+
+		ns := &flyteMocks.ExecutableNodeStatus{}
+		ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
+		ns.On("GetOutputDir").Return(storage.DataReference("data-dir"))
+
+		res := &v12.ResourceRequirements{}
+		n := &flyteMocks.ExecutableNode{}
+		n.On("GetResources").Return(res)
+
+		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		assert.NoError(t, err)
+
+		ir := &ioMocks.InputReader{}
+		nCtx := &nodeMocks.NodeExecutionContext{}
+		nCtx.On("NodeExecutionMetadata").Return(nm)
+		nCtx.On("Node").Return(n)
+		nCtx.On("InputReader").Return(ir)
+		nCtx.On("DataReferenceConstructor").Return(storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope()))
+		nCtx.On("CurrentAttempt").Return(uint32(1))
+		nCtx.On("TaskReader").Return(tr)
+		nCtx.On("MaxDatasetSizeBytes").Return(int64(1))
+		nCtx.On("NodeStatus").Return(ns)
+		nCtx.On("NodeID").Return("n1")
+		nCtx.On("EnqueueOwner").Return(nil)
+		nCtx.OnDataStore().Return(dataStore)
+
+		r := &nodeMocks.NodeStateReader{}
+		r.On("GetDynamicNodeState").Return(handler.DynamicNodeState{
+			Phase: v1alpha1.DynamicNodePhaseParentFinalizing,
+		})
+		nCtx.OnNodeStateReader().Return(r)
+
+		return nCtx
+	}
+
+	t.Run("parent-finalize-success", func(t *testing.T) {
+		nCtx := createNodeContext("test")
+		s := &dynamicNodeStateHolder{
+			s: handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseParentFinalizing},
+		}
+		nCtx.OnNodeStateWriter().Return(s)
+		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
+		assert.NoError(t, err)
+		dj := &core.DynamicJobSpec{}
+		n := &executorMocks.Node{}
+		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
+		h := &mocks.TaskNodeHandler{}
+		h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
+		d := New(h, n, promutils.NewTestScope())
+		got, err := d.Handle(context.TODO(), nCtx)
+		assert.NoError(t, err)
+		assert.Equal(t, handler.EPhaseRunning.String(), got.Info().GetPhase().String())
+	})
+
+	t.Run("parent-finalize-error", func(t *testing.T) {
+		nCtx := createNodeContext("test")
+		s := &dynamicNodeStateHolder{
+			s: handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseParentFinalizing},
+		}
+		nCtx.OnNodeStateWriter().Return(s)
+		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
+		assert.NoError(t, err)
+		dj := &core.DynamicJobSpec{}
+		n := &executorMocks.Node{}
+		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
+		h := &mocks.TaskNodeHandler{}
+		h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
+		d := New(h, n, promutils.NewTestScope())
+		_, err = d.Handle(context.TODO(), nCtx)
+		assert.Error(t, err)
+	})
 }
 
 func createDynamicJobSpec() *core.DynamicJobSpec {

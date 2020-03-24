@@ -84,7 +84,7 @@ func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevSt
 			// directly to progress the dynamically generated workflow.
 			logger.Infof(ctx, "future file detected, assuming dynamic node")
 			// There is a futures file, so we need to continue running the node with the modified state
-			return trns.WithInfo(handler.PhaseInfoRunning(trns.Info().GetInfo())), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseExecuting}, nil
+			return trns.WithInfo(handler.PhaseInfoRunning(trns.Info().GetInfo())), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseParentFinalizing}, nil
 		}
 	}
 
@@ -129,6 +129,11 @@ func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, n
 	return trns, newState, nil
 }
 
+// The State machine for a dynamic node is as follows
+// DynamicNodePhaseNone: The parent node is being handled
+// DynamicNodePhaseParentFinalizing: The parent node has completes successfully and sub-nodes exist (futures file found). Parent node is being finalized.
+// DynamicNodePhaseExecuting: The parent node has completed and finalized successfully, the sub-nodes are being handled
+// DynamicNodePhaseFailing: one or more of sub-nodes have failed and the failure is being handled
 func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
 	ds := nCtx.NodeStateReader().GetDynamicNodeState()
 	var err error
@@ -150,6 +155,12 @@ func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx handler.Nod
 		}
 
 		trns = handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("DynamicNodeFailed", ds.Reason, nil))
+	case v1alpha1.DynamicNodePhaseParentFinalizing:
+		if err := d.finalizeParentNode(ctx, nCtx); err != nil {
+			return handler.UnknownTransition, err
+		}
+		newState = handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseExecuting}
+		trns = handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(trns.Info().GetInfo()))
 	default:
 		trns, newState, err = d.handleParentNode(ctx, ds, nCtx)
 		if err != nil {
@@ -189,6 +200,15 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.Node
 	}
 }
 
+func (d dynamicNodeTaskNodeHandler) finalizeParentNode(ctx context.Context, nCtx handler.NodeExecutionContext) error {
+	logger.Infof(ctx, "Finalizing Parent node RetryAttempt [%d]", nCtx.CurrentAttempt())
+	if err := d.TaskNodeHandler.Finalize(ctx, nCtx); err != nil {
+		logger.Errorf(ctx, "Failed to finalize Dynamic Nodes Parent.")
+		return err
+	}
+	return nil
+}
+
 // This is a weird method. We should always finalize before we set the dynamic parent node phase as complete?
 func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext) error {
 	errs := make([]error, 0, 2)
@@ -212,9 +232,7 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.N
 	// We should always finalize the parent node success or failure.
 	// If we use the phase to decide when to finalize in the case where Dynamic node is in phase Executiing
 	// (i.e. child nodes are now being executed) and Finalize is invoked, we will never invoke the finalizer for the parent.
-	logger.Infof(ctx, "Finalizing Parent node RetryAttempt [%d]", nCtx.CurrentAttempt())
-	if err := d.TaskNodeHandler.Finalize(ctx, nCtx); err != nil {
-		logger.Errorf(ctx, "Failed to finalize Dynamic Nodes Parent.")
+	if err := d.finalizeParentNode(ctx, nCtx); err != nil {
 		errs = append(errs, err)
 	}
 
