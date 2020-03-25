@@ -88,6 +88,7 @@ func Test_assembleOutputsWorker_Process(t *testing.T) {
 	ow := &mocks2.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("/bucket/prefix")
 	ow.OnGetOutputPath().Return("/bucket/prefix/outputs.pb")
+	ow.OnGetRawOutputPrefix().Return("/bucket/sandbox/")
 
 	// Setup the input phases that inform outputs worker about which tasks failed/succeeded.
 	phases := arrayCore.NewPhasesCompactArray(4)
@@ -361,6 +362,7 @@ func Test_assembleErrorsWorker_Process(t *testing.T) {
 
 	// Setup the expected data to be written to outputWriter.
 	ow := &mocks2.OutputWriter{}
+	ow.OnGetRawOutputPrefix().Return("/bucket/sandbox/")
 	ow.OnGetOutputPrefixPath().Return("/bucket/prefix")
 	ow.OnGetErrorPath().Return("/bucket/prefix/error.pb")
 	ow.On("Put", mock.Anything, mock.Anything).Return(func(ctx context.Context, reader io.OutputReader) error {

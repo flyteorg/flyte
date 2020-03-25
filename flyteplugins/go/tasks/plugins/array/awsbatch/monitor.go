@@ -4,10 +4,11 @@ import (
 	"context"
 
 	core2 "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/storage"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/lyft/flyteplugins/go/tasks/plugins/array"
-	"github.com/lyft/flytestdlib/storage"
 
 	"github.com/lyft/flytestdlib/logger"
 
@@ -33,7 +34,7 @@ func createSubJobList(count int) []*Job {
 	return res
 }
 
-func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata, outputPrefix storage.DataReference, jobStore *JobStore,
+func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata, outputPrefix, baseOutputSandbox storage.DataReference, jobStore *JobStore,
 	dataStore *storage.DataStore, cfg *config.Config, currentState *State) (newState *State, err error) {
 
 	newState = currentState
@@ -72,7 +73,7 @@ func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata
 				// If the service reported an error but there is no error.pb written, write one with the
 				// service-provided error message.
 				msg.Collect(childIdx, subJob.Status.Message)
-				or, err := array.ConstructOutputReader(ctx, dataStore, outputPrefix, originalIdx)
+				or, err := array.ConstructOutputReader(ctx, dataStore, outputPrefix, baseOutputSandbox, originalIdx)
 				if err != nil {
 					return nil, err
 				}
@@ -81,7 +82,7 @@ func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata
 					return nil, err
 				} else if !hasErr {
 					// The subtask has not produced an error.pb, write one.
-					ow, err := array.ConstructOutputWriter(ctx, dataStore, outputPrefix, originalIdx)
+					ow, err := array.ConstructOutputWriter(ctx, dataStore, outputPrefix, baseOutputSandbox, originalIdx)
 					if err != nil {
 						return nil, err
 					}
@@ -101,7 +102,7 @@ func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata
 				msg.Collect(childIdx, "Job failed")
 			}
 		} else if subJob.Status.Phase.IsSuccess() {
-			actualPhase, err = array.CheckTaskOutput(ctx, dataStore, outputPrefix, childIdx, originalIdx)
+			actualPhase, err = array.CheckTaskOutput(ctx, dataStore, outputPrefix, baseOutputSandbox, childIdx, originalIdx)
 			if err != nil {
 				return nil, err
 			}

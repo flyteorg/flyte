@@ -45,6 +45,10 @@ type dummyOutputPaths struct {
 	outputPath storage.DataReference
 }
 
+func (d dummyOutputPaths) GetRawOutputPrefix() storage.DataReference {
+	panic("should not be called")
+}
+
 func (d dummyOutputPaths) GetOutputPrefixPath() storage.DataReference {
 	return d.outputPath
 }
