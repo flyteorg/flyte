@@ -7,14 +7,15 @@ import (
 
 	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
 
+	"github.com/lyft/flytestdlib/bitarray"
+	"github.com/lyft/flytestdlib/logger"
+	"github.com/lyft/flytestdlib/storage"
+
 	"github.com/lyft/flyteplugins/go/tasks/errors"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/lyft/flytestdlib/bitarray"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/storage"
 
 	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -63,7 +64,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	}
 
 	// build output writers
-	outputWriters, err := ConstructOutputWriters(ctx, tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), int(arrayJob.Size))
+	outputWriters, err := ConstructOutputWriters(ctx, tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), int(arrayJob.Size))
 	if err != nil {
 		return state, err
 	}
@@ -163,7 +164,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 	}
 
 	// output reader
-	outputReaders, err := ConstructOutputReaders(ctx, tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), int(arrayJob.Size))
+	outputReaders, err := ConstructOutputReaders(ctx, tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), int(arrayJob.Size))
 	if err != nil {
 		return nil, err
 	}
@@ -372,13 +373,17 @@ func ConstructInputReaders(ctx context.Context, dataStore *storage.DataStore, in
 	return inputReaders, nil
 }
 
-func ConstructOutputWriters(ctx context.Context, dataStore *storage.DataStore, outputPrefix storage.DataReference,
+func ConstructOutputWriters(ctx context.Context, dataStore *storage.DataStore, outputPrefix, baseOutputSandbox storage.DataReference,
 	size int) ([]io.OutputWriter, error) {
 
 	outputWriters := make([]io.OutputWriter, 0, size)
 
 	for i := 0; i < size; i++ {
-		ow, err := ConstructOutputWriter(ctx, dataStore, outputPrefix, i)
+		outputSandbox, err := dataStore.ConstructReference(ctx, baseOutputSandbox, strconv.Itoa(i))
+		if err != nil {
+			return nil, err
+		}
+		ow, err := ConstructOutputWriter(ctx, dataStore, outputPrefix, outputSandbox, i)
 		if err != nil {
 			return outputWriters, err
 		}
@@ -389,23 +394,24 @@ func ConstructOutputWriters(ctx context.Context, dataStore *storage.DataStore, o
 	return outputWriters, nil
 }
 
-func ConstructOutputWriter(ctx context.Context, dataStore *storage.DataStore, outputPrefix storage.DataReference,
+func ConstructOutputWriter(ctx context.Context, dataStore *storage.DataStore, outputPrefix, outputSandbox storage.DataReference,
 	index int) (io.OutputWriter, error) {
 	dataReference, err := dataStore.ConstructReference(ctx, outputPrefix, strconv.Itoa(index))
 	if err != nil {
 		return nil, err
 	}
 
-	return ioutils.NewRemoteFileOutputWriter(ctx, dataStore, ioutils.NewRemoteFileOutputPaths(ctx, dataStore, dataReference)), nil
+	p := ioutils.NewRemoteFileOutputPaths(ctx, dataStore, dataReference, ioutils.NewRawOutputPaths(ctx, outputSandbox))
+	return ioutils.NewRemoteFileOutputWriter(ctx, dataStore, p), nil
 }
 
-func ConstructOutputReaders(ctx context.Context, dataStore *storage.DataStore, outputPrefix storage.DataReference,
+func ConstructOutputReaders(ctx context.Context, dataStore *storage.DataStore, outputPrefix, baseOutputSandbox storage.DataReference,
 	size int) ([]io.OutputReader, error) {
 
 	outputReaders := make([]io.OutputReader, 0, size)
 
 	for i := 0; i < size; i++ {
-		reader, err := ConstructOutputReader(ctx, dataStore, outputPrefix, i)
+		reader, err := ConstructOutputReader(ctx, dataStore, outputPrefix, baseOutputSandbox, i)
 		if err != nil {
 			return nil, err
 		}
@@ -416,13 +422,19 @@ func ConstructOutputReaders(ctx context.Context, dataStore *storage.DataStore, o
 	return outputReaders, nil
 }
 
-func ConstructOutputReader(ctx context.Context, dataStore *storage.DataStore, outputPrefix storage.DataReference,
+func ConstructOutputReader(ctx context.Context, dataStore *storage.DataStore, outputPrefix, baseOutputSandbox storage.DataReference,
 	index int) (io.OutputReader, error) {
-	dataReference, err := dataStore.ConstructReference(ctx, outputPrefix, strconv.Itoa(index))
+	strIndex := strconv.Itoa(index)
+	dataReference, err := dataStore.ConstructReference(ctx, outputPrefix, strIndex)
 	if err != nil {
 		return nil, err
 	}
 
-	outputPath := ioutils.NewRemoteFileOutputPaths(ctx, dataStore, dataReference)
+	outputSandbox, err := dataStore.ConstructReference(ctx, baseOutputSandbox, strIndex)
+	if err != nil {
+		return nil, err
+	}
+
+	outputPath := ioutils.NewRemoteFileOutputPaths(ctx, dataStore, dataReference, ioutils.NewRawOutputPaths(ctx, outputSandbox))
 	return ioutils.NewRemoteFileOutputReader(ctx, dataStore, outputPath, int64(999999999)), nil
 }

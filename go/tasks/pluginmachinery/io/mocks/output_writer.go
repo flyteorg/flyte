@@ -112,6 +112,38 @@ func (_m *OutputWriter) GetOutputPrefixPath() storage.DataReference {
 	return r0
 }
 
+type OutputWriter_GetRawOutputPrefix struct {
+	*mock.Call
+}
+
+func (_m OutputWriter_GetRawOutputPrefix) Return(_a0 storage.DataReference) *OutputWriter_GetRawOutputPrefix {
+	return &OutputWriter_GetRawOutputPrefix{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *OutputWriter) OnGetRawOutputPrefix() *OutputWriter_GetRawOutputPrefix {
+	c := _m.On("GetRawOutputPrefix")
+	return &OutputWriter_GetRawOutputPrefix{Call: c}
+}
+
+func (_m *OutputWriter) OnGetRawOutputPrefixMatch(matchers ...interface{}) *OutputWriter_GetRawOutputPrefix {
+	c := _m.On("GetRawOutputPrefix", matchers...)
+	return &OutputWriter_GetRawOutputPrefix{Call: c}
+}
+
+// GetRawOutputPrefix provides a mock function with given fields:
+func (_m *OutputWriter) GetRawOutputPrefix() storage.DataReference {
+	ret := _m.Called()
+
+	var r0 storage.DataReference
+	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
+
 type OutputWriter_Put struct {
 	*mock.Call
 }

@@ -13,9 +13,10 @@ import (
 
 	"github.com/lyft/flytestdlib/logger"
 
-	"github.com/lyft/flyteplugins/go/tasks/aws"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/utils"
+
+	"github.com/lyft/flyteplugins/go/tasks/aws"
 
 	"github.com/lyft/flyteplugins/go/tasks/errors"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
@@ -76,7 +77,8 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 		pluginState, err = LaunchSubTasks(ctx, tCtx, e.jobStore, pluginConfig, pluginState)
 
 	case arrayCore.PhaseCheckingSubTaskExecutions:
-		pluginState, err = CheckSubTasksState(ctx, tCtx.TaskExecutionMetadata(), tCtx.OutputWriter().GetOutputPrefixPath(),
+		pluginState, err = CheckSubTasksState(ctx, tCtx.TaskExecutionMetadata(),
+			tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(),
 			e.jobStore, tCtx.DataStore(), pluginConfig, pluginState)
 
 	case arrayCore.PhaseAssembleFinalOutput:

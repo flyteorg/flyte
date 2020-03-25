@@ -56,7 +56,7 @@ type assembleOutputsWorker struct {
 func (w assembleOutputsWorker) Process(ctx context.Context, workItem workqueue.WorkItem) (workqueue.WorkStatus, error) {
 	i := workItem.(*outputAssembleItem)
 
-	outputReaders, err := ConstructOutputReaders(ctx, i.dataStore, i.outputPaths.GetOutputPrefixPath(), int(i.finalPhases.ItemsCount))
+	outputReaders, err := ConstructOutputReaders(ctx, i.dataStore, i.outputPaths.GetOutputPrefixPath(), i.outputPaths.GetRawOutputPrefix(), int(i.finalPhases.ItemsCount))
 	if err != nil {
 		logger.Warnf(ctx, "Failed to construct output readers. Error: %v", err)
 		return workqueue.WorkStatusFailed, err
@@ -256,7 +256,7 @@ type assembleErrorsWorker struct {
 
 func (a assembleErrorsWorker) Process(ctx context.Context, workItem workqueue.WorkItem) (workqueue.WorkStatus, error) {
 	w := workItem.(*outputAssembleItem)
-	outputReaders, err := ConstructOutputReaders(ctx, w.dataStore, w.outputPaths.GetOutputPrefixPath(), int(w.finalPhases.ItemsCount))
+	outputReaders, err := ConstructOutputReaders(ctx, w.dataStore, w.outputPaths.GetOutputPrefixPath(), w.outputPaths.GetRawOutputPrefix(), int(w.finalPhases.ItemsCount))
 	if err != nil {
 		return workqueue.WorkStatusNotDone, err
 	}

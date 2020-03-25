@@ -5,21 +5,24 @@ import (
 	"errors"
 	"testing"
 
-	pluginErrors "github.com/lyft/flyteplugins/go/tasks/errors"
 	stdErrors "github.com/lyft/flytestdlib/errors"
 
-	core2 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginErrors "github.com/lyft/flyteplugins/go/tasks/errors"
+
 	"github.com/lyft/flytestdlib/bitarray"
+
+	core2 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
 
-	catalogMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
-	ioMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	catalogMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 
@@ -66,6 +69,7 @@ func runDetermineDiscoverabilityTest(t testing.TB, taskTemplate *core.TaskTempla
 
 	ow := &ioMocks.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("/prefix/")
+	ow.OnGetRawOutputPrefix().Return("/sandbox/")
 	ow.OnGetOutputPath().Return("/prefix/outputs.pb")
 	ow.On("Put", mock.Anything, mock.Anything).Return(func(ctx context.Context, or io.OutputReader) error {
 		m, ee, err := or.Read(ctx)

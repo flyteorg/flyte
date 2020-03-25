@@ -13,8 +13,8 @@ const (
 	ErrSystem errors.ErrorCode = "SYSTEM_ERROR"
 )
 
-func CheckTaskOutput(ctx context.Context, dataStore *storage.DataStore, outputPrefix storage.DataReference, childIdx, originalIdx int) (core.Phase, error) {
-	or, err := ConstructOutputReader(ctx, dataStore, outputPrefix, originalIdx)
+func CheckTaskOutput(ctx context.Context, dataStore *storage.DataStore, outputPrefix, baseOutputSandbox storage.DataReference, childIdx, originalIdx int) (core.Phase, error) {
+	or, err := ConstructOutputReader(ctx, dataStore, outputPrefix, baseOutputSandbox, originalIdx)
 	if err != nil {
 		return core.PhaseUndefined, errors.Wrapf(ErrSystem, err, "Failed to build output reader for sub task [%v] with original index [%v].", childIdx, originalIdx)
 	}
