@@ -389,7 +389,6 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 		nodeStatus.ClearTaskStatus()
 		nodeStatus.ClearWorkflowStatus()
 		nodeStatus.ClearDynamicNodeStatus()
-		nodeStatus.ClearLastAttemptStartedAt()
 		return executors.NodeStatusPending, nil
 	}
 
@@ -398,7 +397,11 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 		return executors.NodeStatusFailed(fmt.Errorf(nodeStatus.GetMessage())), nil
 	}
 
-	// case v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseRetryableFailure:
+	// Since we reset node status inside execute for retryable failure, we use lastAttemptStartTime to carry that information
+	// across execute which is used to emit metrics
+	lastAttemptStartTime := nodeStatus.GetLastAttemptStartedAt()
+
+	// case v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning:
 	logger.Debugf(ctx, "node executing, current phase [%s]", currentPhase)
 	defer logger.Debugf(ctx, "node execution completed")
 	p, err := c.execute(ctx, h, nCtx, nodeStatus)
@@ -406,15 +409,25 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 		logger.Errorf(ctx, "failed Execute for node. Error: %s", err.Error())
 		return executors.NodeStatusUndefined, err
 	}
+
+	// execErr in phase-info 'p' is only available if node has failed to execute, and the current phase at that time
+	// will be v1alpha1.NodePhaseRunning
 	execErr := p.GetErr()
-	if execErr != nil && p.GetPhase() == handler.EPhaseRetryableFailure && nodeStatus.GetLastAttemptStartedAt() != nil {
+	if execErr != nil && currentPhase == v1alpha1.NodePhaseRunning {
+
+		endTime := time.Now()
+		startTime := endTime
+		if lastAttemptStartTime != nil {
+			startTime = lastAttemptStartTime.Time
+		}
+
 		if execErr.GetKind() == core.ExecutionError_SYSTEM {
 			nodeStatus.IncrementSystemFailures()
-			c.metrics.SystemErrorDuration.Observe(ctx, nodeStatus.GetLastAttemptStartedAt().Time, time.Now())
+			c.metrics.SystemErrorDuration.Observe(ctx, startTime, endTime)
 		} else if execErr.GetKind() == core.ExecutionError_USER {
-			c.metrics.UserErrorDuration.Observe(ctx, nodeStatus.GetLastAttemptStartedAt().Time, time.Now())
+			c.metrics.UserErrorDuration.Observe(ctx, startTime, endTime)
 		} else {
-			c.metrics.UnknownErrorDuration.Observe(ctx, nodeStatus.GetLastAttemptStartedAt().Time, time.Now())
+			c.metrics.UnknownErrorDuration.Observe(ctx, startTime, endTime)
 		}
 	}
 
@@ -461,9 +474,10 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 			return executors.NodeStatusUndefined, errors.Wrapf(errors.EventRecordingFailed, node.GetID(), err, "failed to record node event")
 		}
 
+		// We reach here only when transitioning from Queued to Running. In this case, the startedAt is not set.
 		if np == v1alpha1.NodePhaseRunning {
-			if nodeStatus.GetQueuedAt() != nil && nodeStatus.GetStartedAt() != nil {
-				c.metrics.QueuingLatency.Observe(ctx, nodeStatus.GetQueuedAt().Time, nodeStatus.GetStartedAt().Time)
+			if nodeStatus.GetQueuedAt() != nil {
+				c.metrics.QueuingLatency.Observe(ctx, nodeStatus.GetQueuedAt().Time, time.Now())
 			}
 		}
 	}
