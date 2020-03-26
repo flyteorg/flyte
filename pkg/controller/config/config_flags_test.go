@@ -275,6 +275,28 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_rawoutput-prefix", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("rawoutput-prefix"); err == nil {
+				assert.Equal(t, string(defaultConfig.DefaultRawOutputPrefix), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("rawoutput-prefix", testValue)
+			if vString, err := cmdFlags.GetString("rawoutput-prefix"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultRawOutputPrefix)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_queue.type", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
@@ -979,13 +1001,26 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-
 	t.Run("Test_node-config.interruptible-failure-threshold", func(t *testing.T) {
-		// Test that default value is set properly
-		if vInt64, err := cmdFlags.GetInt64("node-config.interruptible-failure-threshold"); err == nil {
-			assert.Equal(t, int64(defaultConfig.NodeConfig.InterruptibleFailureThreshold), vInt64)
-		} else {
-			assert.FailNow(t, err.Error())
-		}
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt64, err := cmdFlags.GetInt64("node-config.interruptible-failure-threshold"); err == nil {
+				assert.Equal(t, int64(defaultConfig.NodeConfig.InterruptibleFailureThreshold), vInt64)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("node-config.interruptible-failure-threshold", testValue)
+			if vInt64, err := cmdFlags.GetInt64("node-config.interruptible-failure-threshold"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.NodeConfig.InterruptibleFailureThreshold)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
 	})
 }
