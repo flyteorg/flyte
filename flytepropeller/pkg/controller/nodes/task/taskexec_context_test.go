@@ -8,6 +8,7 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
 	ioMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
@@ -82,6 +83,8 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 		PluginState: st.Bytes(),
 	})
 	nCtx.On("NodeStateReader").Return(nr)
+	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
+	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
 	noopRm := CreateNoopResourceManager(context.TODO(), promutils.NewTestScope())
 

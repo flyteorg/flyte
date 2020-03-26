@@ -3,8 +3,9 @@ package controller
 import (
 	"context"
 
-	errors3 "github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	stdErrs "github.com/lyft/flytestdlib/errors"
+
+	errors3 "github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog"
@@ -297,7 +298,8 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 		return nil, stdErrs.Wrapf(errors3.CausedByError, err, "failed to initialize workflow store")
 	}
 
-	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink, wfLauncher, cfg.MaxDatasetSizeBytes, kubeClient, catalogClient, scope)
+	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink, wfLauncher, cfg.MaxDatasetSizeBytes,
+		storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient, catalogClient, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}
