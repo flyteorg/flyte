@@ -218,7 +218,7 @@ interruptible
 flyteidl.core.Alias
 -------------------
 
-`[flyteidl.core.Alias proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L83>`_
+`[flyteidl.core.Alias proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L84>`_
 
 Links a variable to an alias.
 
@@ -248,7 +248,7 @@ alias
 flyteidl.core.Node
 ------------------
 
-`[flyteidl.core.Node proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L93>`_
+`[flyteidl.core.Node proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L94>`_
 
 A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch
 node.
@@ -339,16 +339,23 @@ branch_node
 flyteidl.core.WorkflowMetadata
 ------------------------------
 
-`[flyteidl.core.WorkflowMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L130>`_
+`[flyteidl.core.WorkflowMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L131>`_
 
 Metadata for the entire workflow.
 To be used in the future.
 
 .. code-block:: json
 
-  {}
+  {
+    "queuing_budget": "{...}"
+  }
 
+.. _api_field_flyteidl.core.WorkflowMetadata.queuing_budget:
 
+queuing_budget
+  (:ref:`google.protobuf.Duration <api_msg_google.protobuf.Duration>`) Total wait time a workflow can be delayed by queueing.
+  
+  
 
 
 .. _api_msg_flyteidl.core.WorkflowMetadataDefaults:
@@ -356,7 +363,7 @@ To be used in the future.
 flyteidl.core.WorkflowMetadataDefaults
 --------------------------------------
 
-`[flyteidl.core.WorkflowMetadataDefaults proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L135>`_
+`[flyteidl.core.WorkflowMetadataDefaults proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L137>`_
 
 Default Workflow Metadata for the entire workflow.
 
@@ -381,7 +388,7 @@ interruptible
 flyteidl.core.WorkflowTemplate
 ------------------------------
 
-`[flyteidl.core.WorkflowTemplate proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L144>`_
+`[flyteidl.core.WorkflowTemplate proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L146>`_
 
 Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,
 directed acyclic graph.

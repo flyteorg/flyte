@@ -6061,7 +6061,8 @@ definitions:
                     - null
                   map:
                     bindings: {}
-              metadata: {}
+              metadata:
+                queuing_budget: "queuing_budget"
               failure_node:
                 branch_node:
                   if_else:
@@ -6882,7 +6883,8 @@ definitions:
                     - null
                   map:
                     bindings: {}
-              metadata: {}
+              metadata:
+                queuing_budget: "queuing_budget"
               failure_node:
                 branch_node:
                   if_else:
@@ -7937,7 +7939,8 @@ definitions:
                     - null
                   map:
                     bindings: {}
-              metadata: {}
+              metadata:
+                queuing_budget: "queuing_budget"
               failure_node:
                 branch_node:
                   if_else:
@@ -8871,7 +8874,8 @@ definitions:
                   - null
                 map:
                   bindings: {}
-            metadata: {}
+            metadata:
+              queuing_budget: "queuing_budget"
             failure_node:
               branch_node:
                 if_else:
@@ -9692,7 +9696,8 @@ definitions:
                   - null
                 map:
                   bindings: {}
-            metadata: {}
+            metadata:
+              queuing_budget: "queuing_budget"
             failure_node:
               branch_node:
                 if_else:
@@ -10747,7 +10752,8 @@ definitions:
                   - null
                 map:
                   bindings: {}
-            metadata: {}
+            metadata:
+              queuing_budget: "queuing_budget"
             failure_node:
               branch_node:
                 if_else:
@@ -11637,7 +11643,8 @@ definitions:
                       - null
                     map:
                       bindings: {}
-                metadata: {}
+                metadata:
+                  queuing_budget: "queuing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -12458,7 +12465,8 @@ definitions:
                       - null
                     map:
                       bindings: {}
-                metadata: {}
+                metadata:
+                  queuing_budget: "queuing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -13513,7 +13521,8 @@ definitions:
                       - null
                     map:
                       bindings: {}
-                metadata: {}
+                metadata:
+                  queuing_budget: "queuing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -14344,7 +14353,8 @@ definitions:
                       - null
                     map:
                       bindings: {}
-                metadata: {}
+                metadata:
+                  queuing_budget: "queuing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -15165,7 +15175,8 @@ definitions:
                       - null
                     map:
                       bindings: {}
-                metadata: {}
+                metadata:
+                  queuing_budget: "queuing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -16220,7 +16231,8 @@ definitions:
                       - null
                     map:
                       bindings: {}
-                metadata: {}
+                metadata:
+                  queuing_budget: "queuing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -17570,7 +17582,8 @@ definitions:
               - null
             map:
               bindings: {}
-        metadata: {}
+        metadata:
+          queuing_budget: "queuing_budget"
         failure_node:
           branch_node:
             if_else:
@@ -18418,7 +18431,8 @@ definitions:
                 - null
               map:
                 bindings: {}
-          metadata: {}
+          metadata:
+            queuing_budget: "queuing_budget"
           failure_node:
             branch_node:
               if_else:
@@ -19239,7 +19253,8 @@ definitions:
                 - null
               map:
                 bindings: {}
-          metadata: {}
+          metadata:
+            queuing_budget: "queuing_budget"
           failure_node:
             branch_node:
               if_else:
@@ -20294,7 +20309,8 @@ definitions:
                 - null
               map:
                 bindings: {}
-          metadata: {}
+          metadata:
+            queuing_budget: "queuing_budget"
           failure_node:
             branch_node:
               if_else:
@@ -22591,7 +22607,13 @@ definitions:
     default: "UNDEFINED"
   coreWorkflowMetadata:
     type: "object"
+    properties:
+      queuing_budget:
+        type: "string"
+        description: "Total wait time a workflow can be delayed by queueing."
     description: "Metadata for the entire workflow.\nTo be used in the future."
+    example:
+      queuing_budget: "queuing_budget"
   coreWorkflowMetadataDefaults:
     type: "object"
     properties:
@@ -22775,7 +22797,8 @@ definitions:
             - null
           map:
             bindings: {}
-      metadata: {}
+      metadata:
+        queuing_budget: "queuing_budget"
       failure_node:
         branch_node:
           if_else:
