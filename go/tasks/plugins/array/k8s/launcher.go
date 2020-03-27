@@ -52,6 +52,22 @@ func ApplyPodPolicies(_ context.Context, cfg *Config, pod *corev1.Pod) *corev1.P
 	return pod
 }
 
+func applyNodeSelectorLabels(_ context.Context, cfg *Config, pod *corev1.Pod) *corev1.Pod {
+	if len(cfg.NodeSelector) != 0 {
+		pod.Spec.NodeSelector = cfg.NodeSelector
+	}
+
+	return pod
+}
+
+func applyPodTolerations(_ context.Context, cfg *Config, pod *corev1.Pod) *corev1.Pod {
+	if len(cfg.Tolerations) != 0 {
+		pod.Spec.Tolerations = cfg.Tolerations
+	}
+
+	return pod
+}
+
 // Launches subtasks
 func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient,
 	config *Config, currentState *arrayCore.State) (newState *arrayCore.State, err error) {
@@ -93,6 +109,8 @@ func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kubeCli
 		}
 
 		pod = ApplyPodPolicies(ctx, config, pod)
+		pod = applyNodeSelectorLabels(ctx, config, pod)
+		pod = applyPodTolerations(ctx, config, pod)
 
 		err = kubeClient.GetClient().Create(ctx, pod)
 		if err != nil && !k8serrors.IsAlreadyExists(err) {
