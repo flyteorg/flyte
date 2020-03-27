@@ -28,10 +28,6 @@ The following are various input configurations that can be passed to a Presto qu
 * Text catalog: The catalog to set for the given Presto query
 * Text schema: The schema to set for the given Presto query
 * dict[Text,flytekit.common.types.base_sdk_types.FlyteSdkType] task_inputs: Optional inputs to the Presto task
-* bool discoverable: <check_with_luis>
-* Text discovery_version: String describing the version for task discovery purposes
-* int retries: Number of retries to attempt
-* datetime.timedelta timeout: Specify the time out
 
 
 #######
