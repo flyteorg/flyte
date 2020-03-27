@@ -801,6 +801,16 @@ func (m *WorkflowMetadata) Validate() error {
 		return nil
 	}
 
+	if v, ok := interface{}(m.GetQueuingBudget()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowMetadataValidationError{
+				field:  "QueuingBudget",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

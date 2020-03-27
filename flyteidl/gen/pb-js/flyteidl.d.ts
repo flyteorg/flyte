@@ -821,6 +821,9 @@ export namespace flyteidl {
 
         /** Properties of a WorkflowMetadata. */
         interface IWorkflowMetadata {
+
+            /** WorkflowMetadata queuingBudget */
+            queuingBudget?: (google.protobuf.IDuration|null);
         }
 
         /** Represents a WorkflowMetadata. */
@@ -831,6 +834,9 @@ export namespace flyteidl {
              * @param [properties] Properties to set
              */
             constructor(properties?: flyteidl.core.IWorkflowMetadata);
+
+            /** WorkflowMetadata queuingBudget. */
+            public queuingBudget?: (google.protobuf.IDuration|null);
 
             /**
              * Creates a new WorkflowMetadata instance using the specified properties.

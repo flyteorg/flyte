@@ -1416,11 +1416,21 @@ class WorkflowMetadata final :
 
   // accessors -------------------------------------------------------
 
+  // .google.protobuf.Duration queuing_budget = 1;
+  bool has_queuing_budget() const;
+  void clear_queuing_budget();
+  static const int kQueuingBudgetFieldNumber = 1;
+  const ::google::protobuf::Duration& queuing_budget() const;
+  ::google::protobuf::Duration* release_queuing_budget();
+  ::google::protobuf::Duration* mutable_queuing_budget();
+  void set_allocated_queuing_budget(::google::protobuf::Duration* queuing_budget);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.WorkflowMetadata)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::Duration* queuing_budget_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fworkflow_2eproto;
 };
@@ -2845,6 +2855,52 @@ inline Node::TargetCase Node::target_case() const {
 // -------------------------------------------------------------------
 
 // WorkflowMetadata
+
+// .google.protobuf.Duration queuing_budget = 1;
+inline bool WorkflowMetadata::has_queuing_budget() const {
+  return this != internal_default_instance() && queuing_budget_ != nullptr;
+}
+inline const ::google::protobuf::Duration& WorkflowMetadata::queuing_budget() const {
+  const ::google::protobuf::Duration* p = queuing_budget_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.WorkflowMetadata.queuing_budget)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Duration*>(
+      &::google::protobuf::_Duration_default_instance_);
+}
+inline ::google::protobuf::Duration* WorkflowMetadata::release_queuing_budget() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.WorkflowMetadata.queuing_budget)
+  
+  ::google::protobuf::Duration* temp = queuing_budget_;
+  queuing_budget_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Duration* WorkflowMetadata::mutable_queuing_budget() {
+  
+  if (queuing_budget_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Duration>(GetArenaNoVirtual());
+    queuing_budget_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.WorkflowMetadata.queuing_budget)
+  return queuing_budget_;
+}
+inline void WorkflowMetadata::set_allocated_queuing_budget(::google::protobuf::Duration* queuing_budget) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(queuing_budget_);
+  }
+  if (queuing_budget) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(queuing_budget)->GetArena();
+    if (message_arena != submessage_arena) {
+      queuing_budget = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, queuing_budget, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  queuing_budget_ = queuing_budget;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.WorkflowMetadata.queuing_budget)
+}
 
 // -------------------------------------------------------------------
 
