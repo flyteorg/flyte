@@ -2046,6 +2046,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * Properties of a WorkflowMetadata.
              * @memberof flyteidl.core
              * @interface IWorkflowMetadata
+             * @property {google.protobuf.IDuration|null} [queuingBudget] WorkflowMetadata queuingBudget
              */
 
             /**
@@ -2062,6 +2063,14 @@ export const flyteidl = $root.flyteidl = (() => {
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
+
+            /**
+             * WorkflowMetadata queuingBudget.
+             * @member {google.protobuf.IDuration|null|undefined} queuingBudget
+             * @memberof flyteidl.core.WorkflowMetadata
+             * @instance
+             */
+            WorkflowMetadata.prototype.queuingBudget = null;
 
             /**
              * Creates a new WorkflowMetadata instance using the specified properties.
@@ -2087,6 +2096,8 @@ export const flyteidl = $root.flyteidl = (() => {
             WorkflowMetadata.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
+                if (message.queuingBudget != null && message.hasOwnProperty("queuingBudget"))
+                    $root.google.protobuf.Duration.encode(message.queuingBudget, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                 return writer;
             };
 
@@ -2108,6 +2119,9 @@ export const flyteidl = $root.flyteidl = (() => {
                 while (reader.pos < end) {
                     let tag = reader.uint32();
                     switch (tag >>> 3) {
+                    case 1:
+                        message.queuingBudget = $root.google.protobuf.Duration.decode(reader, reader.uint32());
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -2127,6 +2141,11 @@ export const flyteidl = $root.flyteidl = (() => {
             WorkflowMetadata.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (message.queuingBudget != null && message.hasOwnProperty("queuingBudget")) {
+                    let error = $root.google.protobuf.Duration.verify(message.queuingBudget);
+                    if (error)
+                        return "queuingBudget." + error;
+                }
                 return null;
             };
 

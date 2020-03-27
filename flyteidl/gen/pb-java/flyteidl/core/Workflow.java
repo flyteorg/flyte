@@ -10198,6 +10198,31 @@ public final class Workflow {
   public interface WorkflowMetadataOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.WorkflowMetadata)
       com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Total wait time a workflow can be delayed by queueing.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+     */
+    boolean hasQueuingBudget();
+    /**
+     * <pre>
+     * Total wait time a workflow can be delayed by queueing.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+     */
+    com.google.protobuf.Duration getQueuingBudget();
+    /**
+     * <pre>
+     * Total wait time a workflow can be delayed by queueing.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+     */
+    com.google.protobuf.DurationOrBuilder getQueuingBudgetOrBuilder();
   }
   /**
    * <pre>
@@ -10232,6 +10257,7 @@ public final class Workflow {
       if (extensionRegistry == null) {
         throw new java.lang.NullPointerException();
       }
+      int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -10242,6 +10268,19 @@ public final class Workflow {
             case 0:
               done = true;
               break;
+            case 10: {
+              com.google.protobuf.Duration.Builder subBuilder = null;
+              if (queuingBudget_ != null) {
+                subBuilder = queuingBudget_.toBuilder();
+              }
+              queuingBudget_ = input.readMessage(com.google.protobuf.Duration.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(queuingBudget_);
+                queuingBudget_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -10274,6 +10313,39 @@ public final class Workflow {
               flyteidl.core.Workflow.WorkflowMetadata.class, flyteidl.core.Workflow.WorkflowMetadata.Builder.class);
     }
 
+    public static final int QUEUING_BUDGET_FIELD_NUMBER = 1;
+    private com.google.protobuf.Duration queuingBudget_;
+    /**
+     * <pre>
+     * Total wait time a workflow can be delayed by queueing.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+     */
+    public boolean hasQueuingBudget() {
+      return queuingBudget_ != null;
+    }
+    /**
+     * <pre>
+     * Total wait time a workflow can be delayed by queueing.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+     */
+    public com.google.protobuf.Duration getQueuingBudget() {
+      return queuingBudget_ == null ? com.google.protobuf.Duration.getDefaultInstance() : queuingBudget_;
+    }
+    /**
+     * <pre>
+     * Total wait time a workflow can be delayed by queueing.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+     */
+    public com.google.protobuf.DurationOrBuilder getQueuingBudgetOrBuilder() {
+      return getQueuingBudget();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -10288,6 +10360,9 @@ public final class Workflow {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (queuingBudget_ != null) {
+        output.writeMessage(1, getQueuingBudget());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -10297,6 +10372,10 @@ public final class Workflow {
       if (size != -1) return size;
 
       size = 0;
+      if (queuingBudget_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getQueuingBudget());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -10312,6 +10391,11 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.WorkflowMetadata other = (flyteidl.core.Workflow.WorkflowMetadata) obj;
 
+      if (hasQueuingBudget() != other.hasQueuingBudget()) return false;
+      if (hasQueuingBudget()) {
+        if (!getQueuingBudget()
+            .equals(other.getQueuingBudget())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -10323,6 +10407,10 @@ public final class Workflow {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasQueuingBudget()) {
+        hash = (37 * hash) + QUEUING_BUDGET_FIELD_NUMBER;
+        hash = (53 * hash) + getQueuingBudget().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -10461,6 +10549,12 @@ public final class Workflow {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        if (queuingBudgetBuilder_ == null) {
+          queuingBudget_ = null;
+        } else {
+          queuingBudget_ = null;
+          queuingBudgetBuilder_ = null;
+        }
         return this;
       }
 
@@ -10487,6 +10581,11 @@ public final class Workflow {
       @java.lang.Override
       public flyteidl.core.Workflow.WorkflowMetadata buildPartial() {
         flyteidl.core.Workflow.WorkflowMetadata result = new flyteidl.core.Workflow.WorkflowMetadata(this);
+        if (queuingBudgetBuilder_ == null) {
+          result.queuingBudget_ = queuingBudget_;
+        } else {
+          result.queuingBudget_ = queuingBudgetBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -10535,6 +10634,9 @@ public final class Workflow {
 
       public Builder mergeFrom(flyteidl.core.Workflow.WorkflowMetadata other) {
         if (other == flyteidl.core.Workflow.WorkflowMetadata.getDefaultInstance()) return this;
+        if (other.hasQueuingBudget()) {
+          mergeQueuingBudget(other.getQueuingBudget());
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -10562,6 +10664,159 @@ public final class Workflow {
           }
         }
         return this;
+      }
+
+      private com.google.protobuf.Duration queuingBudget_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> queuingBudgetBuilder_;
+      /**
+       * <pre>
+       * Total wait time a workflow can be delayed by queueing.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+       */
+      public boolean hasQueuingBudget() {
+        return queuingBudgetBuilder_ != null || queuingBudget_ != null;
+      }
+      /**
+       * <pre>
+       * Total wait time a workflow can be delayed by queueing.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+       */
+      public com.google.protobuf.Duration getQueuingBudget() {
+        if (queuingBudgetBuilder_ == null) {
+          return queuingBudget_ == null ? com.google.protobuf.Duration.getDefaultInstance() : queuingBudget_;
+        } else {
+          return queuingBudgetBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Total wait time a workflow can be delayed by queueing.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+       */
+      public Builder setQueuingBudget(com.google.protobuf.Duration value) {
+        if (queuingBudgetBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          queuingBudget_ = value;
+          onChanged();
+        } else {
+          queuingBudgetBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Total wait time a workflow can be delayed by queueing.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+       */
+      public Builder setQueuingBudget(
+          com.google.protobuf.Duration.Builder builderForValue) {
+        if (queuingBudgetBuilder_ == null) {
+          queuingBudget_ = builderForValue.build();
+          onChanged();
+        } else {
+          queuingBudgetBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Total wait time a workflow can be delayed by queueing.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+       */
+      public Builder mergeQueuingBudget(com.google.protobuf.Duration value) {
+        if (queuingBudgetBuilder_ == null) {
+          if (queuingBudget_ != null) {
+            queuingBudget_ =
+              com.google.protobuf.Duration.newBuilder(queuingBudget_).mergeFrom(value).buildPartial();
+          } else {
+            queuingBudget_ = value;
+          }
+          onChanged();
+        } else {
+          queuingBudgetBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Total wait time a workflow can be delayed by queueing.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+       */
+      public Builder clearQueuingBudget() {
+        if (queuingBudgetBuilder_ == null) {
+          queuingBudget_ = null;
+          onChanged();
+        } else {
+          queuingBudget_ = null;
+          queuingBudgetBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Total wait time a workflow can be delayed by queueing.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+       */
+      public com.google.protobuf.Duration.Builder getQueuingBudgetBuilder() {
+        
+        onChanged();
+        return getQueuingBudgetFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Total wait time a workflow can be delayed by queueing.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+       */
+      public com.google.protobuf.DurationOrBuilder getQueuingBudgetOrBuilder() {
+        if (queuingBudgetBuilder_ != null) {
+          return queuingBudgetBuilder_.getMessageOrBuilder();
+        } else {
+          return queuingBudget_ == null ?
+              com.google.protobuf.Duration.getDefaultInstance() : queuingBudget_;
+        }
+      }
+      /**
+       * <pre>
+       * Total wait time a workflow can be delayed by queueing.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queuing_budget = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> 
+          getQueuingBudgetFieldBuilder() {
+        if (queuingBudgetBuilder_ == null) {
+          queuingBudgetBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder>(
+                  getQueuingBudget(),
+                  getParentForChildren(),
+                  isClean());
+          queuingBudget_ = null;
+        }
+        return queuingBudgetBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -14079,19 +14334,20 @@ public final class Workflow {
       "flyteidl.core.TaskNodeH\000\0224\n\rworkflow_nod" +
       "e\030\007 \001(\0132\033.flyteidl.core.WorkflowNodeH\000\0220" +
       "\n\013branch_node\030\010 \001(\0132\031.flyteidl.core.Bran" +
-      "chNodeH\000B\010\n\006target\"\022\n\020WorkflowMetadata\"1" +
-      "\n\030WorkflowMetadataDefaults\022\025\n\rinterrupti" +
-      "ble\030\001 \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002id\030\001 \001" +
-      "(\0132\031.flyteidl.core.Identifier\0221\n\010metadat" +
-      "a\030\002 \001(\0132\037.flyteidl.core.WorkflowMetadata" +
-      "\0220\n\tinterface\030\003 \001(\0132\035.flyteidl.core.Type" +
-      "dInterface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl.cor" +
-      "e.Node\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.core." +
-      "Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyteidl" +
-      ".core.Node\022B\n\021metadata_defaults\030\007 \001(\0132\'." +
-      "flyteidl.core.WorkflowMetadataDefaultsB2" +
-      "Z0github.com/lyft/flyteidl/gen/pb-go/fly" +
-      "teidl/coreb\006proto3"
+      "chNodeH\000B\010\n\006target\"E\n\020WorkflowMetadata\0221" +
+      "\n\016queuing_budget\030\001 \001(\0132\031.google.protobuf" +
+      ".Duration\"1\n\030WorkflowMetadataDefaults\022\025\n" +
+      "\rinterruptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplat" +
+      "e\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identifier" +
+      "\0221\n\010metadata\030\002 \001(\0132\037.flyteidl.core.Workf" +
+      "lowMetadata\0220\n\tinterface\030\003 \001(\0132\035.flyteid" +
+      "l.core.TypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.f" +
+      "lyteidl.core.Node\022\'\n\007outputs\030\005 \003(\0132\026.fly" +
+      "teidl.core.Binding\022)\n\014failure_node\030\006 \001(\013" +
+      "2\023.flyteidl.core.Node\022B\n\021metadata_defaul" +
+      "ts\030\007 \001(\0132\'.flyteidl.core.WorkflowMetadat" +
+      "aDefaultsB2Z0github.com/lyft/flyteidl/ge" +
+      "n/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14164,7 +14420,7 @@ public final class Workflow {
     internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_WorkflowMetadata_descriptor,
-        new java.lang.String[] { });
+        new java.lang.String[] { "QueuingBudget", });
     internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_core_WorkflowMetadataDefaults_fieldAccessorTable = new

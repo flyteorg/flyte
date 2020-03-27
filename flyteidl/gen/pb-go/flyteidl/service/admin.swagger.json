@@ -5114,6 +5114,12 @@
     },
     "coreWorkflowMetadata": {
       "type": "object",
+      "properties": {
+        "queuing_budget": {
+          "type": "string",
+          "description": "Total wait time a workflow can be delayed by queueing."
+        }
+      },
       "description": "Metadata for the entire workflow.\nTo be used in the future."
     },
     "coreWorkflowMetadataDefaults": {
