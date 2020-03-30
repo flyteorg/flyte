@@ -883,6 +883,8 @@ spec:
         prometheus.io/scrape: "true"
       labels:
         app: datacatalog
+        app.kubernetes.io/name: datacatalog
+        app.kubernetes.io/version: 0.2.1
     spec:
       containers:
       - command:
@@ -891,7 +893,7 @@ spec:
         - --config
         - /etc/datacatalog/config/datacatalog_config.yaml
         - serve
-        image: docker.io/lyft/datacatalog:v0.1.2
+        image: docker.io/lyft/datacatalog:v0.2.1
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -923,7 +925,7 @@ spec:
         - /etc/datacatalog/config/datacatalog_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/datacatalog:v0.1.2
+        image: docker.io/lyft/datacatalog:v0.2.1
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -1076,6 +1078,8 @@ spec:
   selector:
     matchLabels:
       app: flyteconsole
+      app.kubernetes.io/name: flyteconsole
+      app.kubernetes.io/version: 0.4.0
   template:
     metadata:
       labels:
@@ -1085,7 +1089,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: docker.io/lyft/flyteconsole:v0.3.2
+        image: docker.io/lyft/flyteconsole:v0.4.0
         name: flyteconsole
         ports:
         - containerPort: 8080
