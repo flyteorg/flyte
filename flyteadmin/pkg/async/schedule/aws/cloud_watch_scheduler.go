@@ -37,7 +37,7 @@ var timeValue = "$.time"
 
 const scheduleNameInputsFormat = "%s:%s:%s"
 const scheduleDescriptionFormat = "Schedule for Project:%s Domain:%s Name:%s launch plan"
-const scheduleNameFormat = "flyte_%d"
+const scheduleNameFormat = "%s_%d"
 
 // Container for initialized metrics objects
 type cloudWatchSchedulerMetrics struct {
@@ -68,9 +68,12 @@ type cloudWatchScheduler struct {
 	metrics cloudWatchSchedulerMetrics
 }
 
-func getScheduleName(identifier admin.NamedEntityIdentifier) string {
+func getScheduleName(scheduleNamePrefix string, identifier admin.NamedEntityIdentifier) string {
 	hashedIdentifier := hashIdentifier(identifier)
-	return fmt.Sprintf(scheduleNameFormat, hashedIdentifier)
+	if len(scheduleNamePrefix) > 0 {
+		return fmt.Sprintf(scheduleNameFormat, scheduleNamePrefix, hashedIdentifier)
+	}
+	return fmt.Sprintf("%d", hashedIdentifier)
 }
 
 func getScheduleDescription(identifier admin.NamedEntityIdentifier) string {
@@ -115,7 +118,7 @@ func (s *cloudWatchScheduler) AddSchedule(ctx context.Context, input scheduleInt
 		s.metrics.InvalidSchedules.Inc()
 		return err
 	}
-	scheduleName := getScheduleName(input.Identifier)
+	scheduleName := getScheduleName(input.ScheduleNamePrefix, input.Identifier)
 	scheduleDescription := getScheduleDescription(input.Identifier)
 	// First define a rule which gets triggered on a schedule.
 	requestInput := cloudwatchevents.PutRuleInput{
@@ -175,8 +178,8 @@ func isResourceNotFoundException(err error) bool {
 	return false
 }
 
-func (s *cloudWatchScheduler) RemoveSchedule(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
-	name := getScheduleName(identifier)
+func (s *cloudWatchScheduler) RemoveSchedule(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
+	name := getScheduleName(input.ScheduleNamePrefix, input.Identifier)
 	// All outbound targets for a rule must be deleted before the rule itself can be deleted.
 	output, err := s.cloudWatchEventClient.RemoveTargets(&cloudwatchevents.RemoveTargetsInput{
 		Ids: []*string{
@@ -219,7 +222,7 @@ func (s *cloudWatchScheduler) RemoveSchedule(ctx context.Context, identifier adm
 	}
 	s.metrics.RemovedSchedules.Inc()
 	s.metrics.ActiveSchedules.Dec()
-	logger.Debugf(ctx, "Removed schedule %s for identifier [%+v]", name, identifier)
+	logger.Debugf(ctx, "Removed schedule %s for identifier [%+v]", name, input.Identifier)
 	return nil
 }
 

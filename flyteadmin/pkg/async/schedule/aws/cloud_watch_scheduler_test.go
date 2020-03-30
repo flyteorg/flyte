@@ -38,9 +38,16 @@ var scope = promutils.NewScope("test_scheduler")
 
 var testCloudWatchSchedulerMetrics = newCloudWatchSchedulerMetrics(scope)
 
+const testScheduleNamePrefix = "flyte"
+
 func TestGetScheduleName(t *testing.T) {
-	scheduleName := getScheduleName(testSchedulerIdentifier)
+	scheduleName := getScheduleName(testScheduleNamePrefix, testSchedulerIdentifier)
 	assert.Equal(t, "flyte_16301494360130577061", scheduleName)
+}
+
+func TestGetScheduleName_NoSystemPrefix(t *testing.T) {
+	scheduleName := getScheduleName("", testSchedulerIdentifier)
+	assert.Equal(t, "16301494360130577061", scheduleName)
 }
 
 func TestGetScheduleDescription(t *testing.T) {
@@ -135,7 +142,8 @@ func TestAddSchedule(t *testing.T) {
 					},
 				},
 			},
-			Payload: &testSerializedPayload,
+			Payload:            &testSerializedPayload,
+			ScheduleNamePrefix: testScheduleNamePrefix,
 		}))
 }
 
@@ -216,7 +224,10 @@ func TestRemoveSchedule(t *testing.T) {
 		return &cloudwatchevents.DeleteRuleOutput{}, nil
 	})
 	scheduler := getCloudWatchSchedulerForTest(mockCloudWatchEventClient)
-	assert.Nil(t, scheduler.RemoveSchedule(context.Background(), testSchedulerIdentifier))
+	assert.Nil(t, scheduler.RemoveSchedule(context.Background(), scheduleInterfaces.RemoveScheduleInput{
+		Identifier:         testSchedulerIdentifier,
+		ScheduleNamePrefix: testScheduleNamePrefix,
+	}))
 }
 
 func TestRemoveSchedule_RemoveTargetsError(t *testing.T) {
@@ -226,7 +237,10 @@ func TestRemoveSchedule_RemoveTargetsError(t *testing.T) {
 		return nil, expectedError
 	})
 	scheduler := getCloudWatchSchedulerForTest(mockCloudWatchEventClient)
-	err := scheduler.RemoveSchedule(context.Background(), testSchedulerIdentifier)
+	err := scheduler.RemoveSchedule(context.Background(), scheduleInterfaces.RemoveScheduleInput{
+		Identifier:         testSchedulerIdentifier,
+		ScheduleNamePrefix: testScheduleNamePrefix,
+	})
 	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 }
 
@@ -237,7 +251,10 @@ func TestRemoveSchedule_InvalidTarget(t *testing.T) {
 		return nil, awserr.New(cloudwatchevents.ErrCodeResourceNotFoundException, "foo", expectedError)
 	})
 	scheduler := getCloudWatchSchedulerForTest(mockCloudWatchEventClient)
-	err := scheduler.RemoveSchedule(context.Background(), testSchedulerIdentifier)
+	err := scheduler.RemoveSchedule(context.Background(), scheduleInterfaces.RemoveScheduleInput{
+		Identifier:         testSchedulerIdentifier,
+		ScheduleNamePrefix: testScheduleNamePrefix,
+	})
 	assert.Nil(t, err)
 }
 
@@ -252,7 +269,10 @@ func TestRemoveSchedule_DeleteRuleError(t *testing.T) {
 		return nil, expectedError
 	})
 	scheduler := getCloudWatchSchedulerForTest(mockCloudWatchEventClient)
-	err := scheduler.RemoveSchedule(context.Background(), testSchedulerIdentifier)
+	err := scheduler.RemoveSchedule(context.Background(), scheduleInterfaces.RemoveScheduleInput{
+		Identifier:         testSchedulerIdentifier,
+		ScheduleNamePrefix: testScheduleNamePrefix,
+	})
 	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 }
 
@@ -267,6 +287,9 @@ func TestRemoveSchedule_InvalidRule(t *testing.T) {
 		return nil, awserr.New(cloudwatchevents.ErrCodeResourceNotFoundException, "foo", expectedError)
 	})
 	scheduler := getCloudWatchSchedulerForTest(mockCloudWatchEventClient)
-	err := scheduler.RemoveSchedule(context.Background(), testSchedulerIdentifier)
+	err := scheduler.RemoveSchedule(context.Background(), scheduleInterfaces.RemoveScheduleInput{
+		Identifier:         testSchedulerIdentifier,
+		ScheduleNamePrefix: testScheduleNamePrefix,
+	})
 	assert.Nil(t, err)
 }

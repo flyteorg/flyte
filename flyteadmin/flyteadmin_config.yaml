@@ -52,6 +52,7 @@ scheduler:
     region: "my-region"
     scheduleRole: "arn:aws:iam::abc123:role/my-iam-role"
     targetName: "arn:aws:sqs:my-region:abc123:my-queue"
+    scheduleNamePrefix: "flyte"
   workflowExecutor:
     scheme: local
     region: "my-region"
