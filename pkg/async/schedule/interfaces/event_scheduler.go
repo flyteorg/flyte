@@ -14,6 +14,15 @@ type AddScheduleInput struct {
 	ScheduleExpression admin.Schedule
 	// Message payload encoded as an CloudWatch event rule InputTemplate.
 	Payload *string
+	// Optional: The application-wide prefix to be applied for schedule names.
+	ScheduleNamePrefix string
+}
+
+type RemoveScheduleInput struct {
+	// Defines the unique identifier associated with the schedule
+	Identifier admin.NamedEntityIdentifier
+	// Optional: The application-wide prefix to be applied for schedule names.
+	ScheduleNamePrefix string
 }
 
 type EventScheduler interface {
@@ -21,5 +30,5 @@ type EventScheduler interface {
 	AddSchedule(ctx context.Context, input AddScheduleInput) error
 
 	// Removes an existing schedule.
-	RemoveSchedule(ctx context.Context, identifier admin.NamedEntityIdentifier) error
+	RemoveSchedule(ctx context.Context, input RemoveScheduleInput) error
 }

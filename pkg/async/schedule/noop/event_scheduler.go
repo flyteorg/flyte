@@ -6,8 +6,6 @@ import (
 
 	"github.com/lyft/flyteadmin/pkg/async/schedule/interfaces"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-
 	"github.com/lyft/flytestdlib/logger"
 )
 
@@ -19,8 +17,8 @@ func (s *EventScheduler) AddSchedule(ctx context.Context, input interfaces.AddSc
 	return nil
 }
 
-func (s *EventScheduler) RemoveSchedule(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
-	logger.Debugf(ctx, "Received call to remove schedule [%+v]", identifier)
+func (s *EventScheduler) RemoveSchedule(ctx context.Context, input interfaces.RemoveScheduleInput) error {
+	logger.Debugf(ctx, "Received call to remove schedule [%+v]", input.Identifier)
 	logger.Debug(ctx, "Not scheduling anything")
 	return nil
 }

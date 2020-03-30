@@ -437,8 +437,8 @@ func TestDisableSchedule(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	mockScheduler := mocks.NewMockEventScheduler()
 	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
-		func(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
-			assert.True(t, proto.Equal(&launchPlanNamedIdentifier, &identifier))
+		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
+			assert.True(t, proto.Equal(&launchPlanNamedIdentifier, &input.Identifier))
 			return nil
 		})
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
@@ -452,7 +452,7 @@ func TestDisableSchedule_Error(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	mockScheduler := mocks.NewMockEventScheduler()
 	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
-		func(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
+		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			return expectedErr
 		})
 	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
@@ -489,8 +489,8 @@ func TestUpdateSchedules(t *testing.T) {
 	mockScheduler := mocks.NewMockEventScheduler()
 	var removeCalled bool
 	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
-		func(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
-			assert.True(t, proto.Equal(&launchPlanNamedIdentifier, &identifier))
+		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
+			assert.True(t, proto.Equal(&launchPlanNamedIdentifier, &input.Identifier))
 			removeCalled = true
 			return nil
 		})
@@ -607,12 +607,12 @@ func TestUpdateSchedules_NothingToEnable(t *testing.T) {
 	mockScheduler := mocks.NewMockEventScheduler()
 	var removeCalled bool
 	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
-		func(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
+		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			assert.True(t, proto.Equal(&admin.NamedEntityIdentifier{
 				Project: project,
 				Domain:  domain,
 				Name:    name,
-			}, &identifier))
+			}, &input.Identifier))
 			removeCalled = true
 			return nil
 		})
@@ -653,7 +653,7 @@ func TestUpdateSchedules_NothingToDo(t *testing.T) {
 	mockScheduler := mocks.NewMockEventScheduler()
 	var removeCalled bool
 	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
-		func(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
+		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			removeCalled = true
 			return nil
 		})
@@ -710,7 +710,7 @@ func TestUpdateSchedules_EnableNoSchedule(t *testing.T) {
 	mockScheduler := mocks.NewMockEventScheduler()
 	var removeCalled bool
 	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
-		func(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
+		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
 			removeCalled = true
 			return nil
 		})
@@ -795,8 +795,8 @@ func TestDisableLaunchPlan(t *testing.T) {
 	var removeScheduleFuncCalled bool
 	mockScheduler := mocks.NewMockEventScheduler()
 	mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
-		func(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
-			assert.True(t, proto.Equal(&launchPlanNamedIdentifier, &identifier))
+		func(ctx context.Context, input scheduleInterfaces.RemoveScheduleInput) error {
+			assert.True(t, proto.Equal(&launchPlanNamedIdentifier, &input.Identifier))
 			removeScheduleFuncCalled = true
 			return nil
 		})

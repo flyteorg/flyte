@@ -172,13 +172,17 @@ func (m *LaunchPlanManager) enableSchedule(ctx context.Context, launchPlanIdenti
 		Identifier:         launchPlanIdentifier,
 		ScheduleExpression: *launchPlanSpec.EntityMetadata.Schedule,
 		Payload:            payload,
+		ScheduleNamePrefix: m.config.ApplicationConfiguration().GetSchedulerConfig().EventSchedulerConfig.ScheduleNamePrefix,
 	}
 	return m.scheduler.AddSchedule(ctx, addScheduleInput)
 }
 
 func (m *LaunchPlanManager) disableSchedule(
 	ctx context.Context, launchPlanIdentifier admin.NamedEntityIdentifier) error {
-	return m.scheduler.RemoveSchedule(ctx, launchPlanIdentifier)
+	return m.scheduler.RemoveSchedule(ctx, scheduleInterfaces.RemoveScheduleInput{
+		Identifier:         launchPlanIdentifier,
+		ScheduleNamePrefix: m.config.ApplicationConfiguration().GetSchedulerConfig().EventSchedulerConfig.ScheduleNamePrefix,
+	})
 }
 
 func (m *LaunchPlanManager) updateSchedules(
