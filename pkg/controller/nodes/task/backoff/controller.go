@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	stdAtomic "github.com/lyft/flytestdlib/atomic"
+
 	"github.com/lyft/flytestdlib/logger"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
@@ -24,8 +26,8 @@ func (m *Controller) GetOrCreateHandler(ctx context.Context, key string, backOff
 		SimpleBackOffBlocker: &SimpleBackOffBlocker{
 			Clock:              m.Clock,
 			BackOffBaseSecond:  backOffBaseSecond,
-			BackOffExponent:    0,
-			NextEligibleTime:   m.Clock.Now(),
+			BackOffExponent:    stdAtomic.NewUint32(0),
+			NextEligibleTime:   NewAtomicTime(m.Clock.Now()),
 			MaxBackOffDuration: maxBackOffDuration,
 		}, ComputeResourceCeilings: &ComputeResourceCeilings{
 			computeResourceCeilings: v1.ResourceList{},
@@ -37,33 +39,16 @@ func (m *Controller) GetOrCreateHandler(ctx context.Context, key string, backOff
 	} else {
 		logger.Infof(ctx, "The back-off handler for [%v] has been created.\n", key)
 	}
+
 	if ret, casted := h.(*ComputeResourceAwareBackOffHandler); casted {
 		return ret
 	}
+
 	return nil
 }
 
 func (m *Controller) GetBackOffHandler(key string) (*ComputeResourceAwareBackOffHandler, bool) {
 	return m.backOffHandlerMap.Get(key)
-}
-
-func (m *Controller) CreateBackOffHandler(ctx context.Context, key string, backOffBaseSecond int, maxBackOffDuration time.Duration) *ComputeResourceAwareBackOffHandler {
-	m.backOffHandlerMap.Set(key, &ComputeResourceAwareBackOffHandler{
-		SimpleBackOffBlocker: &SimpleBackOffBlocker{
-			Clock:              m.Clock,
-			BackOffBaseSecond:  backOffBaseSecond,
-			BackOffExponent:    0,
-			NextEligibleTime:   m.Clock.Now(),
-			MaxBackOffDuration: maxBackOffDuration,
-		},
-		ComputeResourceCeilings: &ComputeResourceCeilings{
-			computeResourceCeilings: v1.ResourceList{},
-		},
-	})
-	h, _ := m.backOffHandlerMap.Get(key)
-	h.reset()
-	logger.Infof(ctx, "The back-off handler for [%v] has been created.\n", key)
-	return h
 }
 
 func ComposeResourceKey(o k8s.Resource) string {
