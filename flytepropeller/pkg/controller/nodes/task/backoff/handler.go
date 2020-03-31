@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/lyft/flyteplugins/go/tasks/errors"
+	stdAtomic "github.com/lyft/flytestdlib/atomic"
 	stdErrors "github.com/lyft/flytestdlib/errors"
 	"github.com/lyft/flytestdlib/logger"
 	v1 "k8s.io/api/core/v1"
@@ -24,33 +25,40 @@ var (
 type SimpleBackOffBlocker struct {
 	Clock              clock.Clock
 	BackOffBaseSecond  int
-	BackOffExponent    int
-	NextEligibleTime   time.Time
 	MaxBackOffDuration time.Duration
+
+	// Mutable fields
+	BackOffExponent  stdAtomic.Uint32
+	NextEligibleTime AtomicTime
 }
 
 func (b *SimpleBackOffBlocker) isBlocking(t time.Time) bool {
-	return !b.NextEligibleTime.Before(t)
+	return !b.NextEligibleTime.Load().Before(t)
 }
 
 func (b *SimpleBackOffBlocker) getBlockExpirationTime() time.Time {
-	return b.NextEligibleTime
+	return b.NextEligibleTime.Load()
 }
 
 func (b *SimpleBackOffBlocker) reset() {
-	b.BackOffExponent = 0
-	b.NextEligibleTime = b.Clock.Now()
+	b.BackOffExponent.Store(0)
+	b.NextEligibleTime.Store(b.Clock.Now())
 }
 
-func (b *SimpleBackOffBlocker) backOff() time.Duration {
-	backOffDuration := time.Duration(time.Second.Nanoseconds() * int64(math.Pow(float64(b.BackOffBaseSecond), float64(b.BackOffExponent))))
+func (b *SimpleBackOffBlocker) backOff(ctx context.Context) time.Duration {
+	logger.Debug(ctx, "BackOff params [BackOffBaseSecond: %v] [BackOffExponent: %v] [MaxBackOffDuration: %v]",
+		b.BackOffBaseSecond, b.BackOffExponent, b.MaxBackOffDuration)
+
+	backOffDuration := time.Duration(time.Second.Nanoseconds() * int64(math.Pow(float64(b.BackOffBaseSecond),
+		float64(b.BackOffExponent.Load()))))
 
 	if backOffDuration > b.MaxBackOffDuration {
 		backOffDuration = b.MaxBackOffDuration
+	} else {
+		b.BackOffExponent.Inc()
 	}
 
-	b.NextEligibleTime = b.Clock.Now().Add(backOffDuration)
-	b.BackOffExponent++
+	b.NextEligibleTime.Store(b.Clock.Now().Add(backOffDuration))
 	return backOffDuration
 }
 
@@ -142,7 +150,7 @@ func (h *ComputeResourceAwareBackOffHandler) Handle(ctx context.Context, operati
 				// if the backOffBlocker is not blocking and we are still encountering insufficient resource issue,
 				// we should increase the exponent in the backoff and update the NextEligibleTime
 
-				backOffDuration := h.SimpleBackOffBlocker.backOff()
+				backOffDuration := h.SimpleBackOffBlocker.backOff(ctx)
 				logger.Infof(ctx, "The operation was attempted because the back-off handler is not blocking, but failed due to "+
 					"insufficient resource (backing off for a duration of [%v] to timestamp [%v])\n", backOffDuration, h.SimpleBackOffBlocker.NextEligibleTime)
 			} else {

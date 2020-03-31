@@ -343,7 +343,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		refKey := backoff.ComposeResourceKey(referenceResource)
 		podBackOffHandler, found := backOffController.GetBackOffHandler(refKey)
 		assert.True(t, found)
-		assert.Equal(t, 1, podBackOffHandler.BackOffExponent)
+		assert.Equal(t, uint32(1), podBackOffHandler.BackOffExponent.Load())
 	})
 }
 
