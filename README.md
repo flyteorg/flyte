@@ -1,4 +1,12 @@
 # Flyte
+[![Current Release](https://img.shields.io/github/release/lyft/flyte.svg)](https://github.com/lyft/flyte/releases/latest)
+[![Build Status](https://travis-ci.org/lyft/flyte.svg?branch=master)](https://travis-ci.org/lyft/flyte)
+[![GoDoc](https://godoc.org/github.com/lyft/flyte?status.svg)](https://godoc.org/github.com/lyft/flyte)
+[![License](https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![CodeCoverage](https://img.shields.io/codecov/c/github/lyft/flyte.svg)](https://codecov.io/gh/lyft/flyte)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lyft/flyte)](https://goreportcard.com/report/github.com/lyft/flyte)
+![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic)
+![Commit since last release](https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic)
 
 Flyte is an open source, K8s-native extensible orchestration engine that manages the core machine learning pipelines at Lyft: ETAs, pricing, incentives, mapping, vision, and more. 
 
