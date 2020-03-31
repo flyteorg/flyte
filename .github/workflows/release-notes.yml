@@ -1,4 +1,0 @@
-name: release-notes-generator-action
-uses: Decathlon/release-notes-generator-action@v2.0.0
-on: push
-
