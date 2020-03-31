@@ -626,6 +626,8 @@ spec:
         prometheus.io/scrape: "true"
       labels:
         app: flyteadmin
+        app.kubernetes.io/name: flyteadmin
+        app.kubernetes.io/version: 0.2.4
     spec:
       containers:
       - command:

@@ -11,12 +11,12 @@ spec:
   selector:
     matchLabels:
       app: flyteconsole
-      app.kubernetes.io/name: flyteconsole
-      app.kubernetes.io/version: 0.4.0
   template:
     metadata:
       labels:
         app: flyteconsole
+        app.kubernetes.io/name: flyteconsole
+        app.kubernetes.io/version: 0.4.0
     spec:
       volumes:
       - name: shared-data
