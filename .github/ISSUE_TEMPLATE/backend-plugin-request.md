@@ -2,7 +2,7 @@
 name: Backend Plugin request
 about: This issue is used to request for and track addition of new backend plugins
   in Flyte
-title: ''
+title: "[Backend][Plugin]"
 labels: untriaged
 assignees: ''
 
