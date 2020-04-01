@@ -29,4 +29,4 @@ Flytekit (SDK improvements)
 - Three-legged OAuth and basic authentication support
 - Fetch the latest version of a task instead of having to specify a version
 
-And ofcourse Bug fixes throughout!
+And of course Bug fixes throughout!
