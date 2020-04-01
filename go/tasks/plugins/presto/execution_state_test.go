@@ -296,8 +296,7 @@ func TestKickOffQuery(t *testing.T) {
 	var prestoCalled = false
 
 	prestoExecuteResponse := client.PrestoExecuteResponse{
-		ID:     "1234567",
-		Status: client.PrestoStatusWaiting,
+		ID: "1234567",
 	}
 	mockPresto := &prestoMocks.PrestoClient{}
 	mockPresto.OnExecuteCommandMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything,

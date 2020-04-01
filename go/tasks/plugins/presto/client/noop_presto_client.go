@@ -32,7 +32,7 @@ func (p noopPrestoClient) KillCommand(ctx context.Context, commandID string) err
 }
 
 func (p noopPrestoClient) GetCommandStatus(ctx context.Context, commandID string) (PrestoStatus, error) {
-	return NewPrestoStatus(ctx, "UNKNOWN"), nil
+	return PrestoStatusUnknown, nil
 }
 
 func NewNoopPrestoClient(cfg *config.Config) PrestoClient {
