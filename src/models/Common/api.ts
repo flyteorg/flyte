@@ -9,16 +9,22 @@ import {
     RequestConfig
 } from 'models/AdminEntity';
 
+import { env } from 'common/env';
 import { log } from 'common/log';
 import { createCorsProxyURL } from 'common/utils';
 import { transformRequestError } from 'models/AdminEntity/transformRequestError';
-import { defaultAxiosConfig, identifierPrefixes } from './constants';
+import {
+    defaultAxiosConfig,
+    defaultSystemStatus,
+    identifierPrefixes
+} from './constants';
 import {
     IdentifierScope,
     LiteralMap,
     NamedEntity,
     NamedEntityIdentifier,
     ResourceType,
+    SystemStatus,
     UserProfile
 } from './types';
 import { makeIdentifierPath, makeNamedEntityPath } from './utils';
@@ -123,6 +129,29 @@ export const getUserProfile = async () => {
     } catch (e) {
         const { message } = transformRequestError(e, path);
         log.error(`Failed to fetch user profile: ${message}`);
+        return null;
+    }
+};
+
+/** If env.STATUS_URL is set, will issue a fetch to retrieve the current system
+ * status. If not, will resolve immediately with a default value indicating
+ * normal system status.
+ */
+export const getSystemStatus = async () => {
+    if (!env.STATUS_URL) {
+        return defaultSystemStatus;
+    }
+    const path = env.STATUS_URL;
+
+    try {
+        const { data } = await axios.get<SystemStatus>(
+            path,
+            defaultAxiosConfig
+        );
+        return data;
+    } catch (e) {
+        const { message } = transformRequestError(e, path);
+        log.error(`Failed to fetch system status: ${message}`);
         return null;
     }
 };
