@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: datacatalog
+        app.kubernetes.io/name: datacatalog
+        app.kubernetes.io/version: 0.2.1
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "10254"
@@ -28,7 +30,7 @@ spec:
           name: datacatalog-config
       initContainers:
       - name: run-migrations
-        image: docker.io/lyft/datacatalog:v0.1.2
+        image: docker.io/lyft/datacatalog:v0.2.1
         imagePullPolicy: IfNotPresent
         command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/datacatalog_config.yaml", "migrate", "run"]
         volumeMounts:
@@ -36,7 +38,7 @@ spec:
           mountPath: /etc/datacatalog/config
       containers:
       - name: datacatalog
-        image: docker.io/lyft/datacatalog:v0.1.2
+        image: docker.io/lyft/datacatalog:v0.2.1
         imagePullPolicy: IfNotPresent
         command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/datacatalog_config.yaml", "serve"]
         ports:

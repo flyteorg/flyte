@@ -23,4 +23,3 @@ jobs:
         go-version: ${{ matrix.go-version }}
     - name: Run end-to-end tests
       run: make end2end
-
