@@ -1,7 +1,8 @@
-#Flyte V0.2.0
+# Flyte V0.2.0
 
-Changes since v0.1.0
+## Changes since v0.1.0
 
+### Core Platform
 - Go Mod support
 - Go 1.13 upgrade
 - OAuth Support (CLI, UI, Admin)
@@ -23,10 +24,10 @@ Changes since v0.1.0
 - Configuration improvements throughout - You can configure Flyte for your environment
 - Multi Cluster placement manager
 
-Flytekit (SDK improvements)
+### Flytekit (SDK improvements)
 - Subworkflow support
 - Collaboration of Workflows support (Workflow fetch)
 - Three-legged OAuth and basic authentication support
 - Fetch the latest version of a task instead of having to specify a version
 
-And of course Bug fixes throughout!
+### And of course Bug fixes throughout!
