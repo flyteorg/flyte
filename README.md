@@ -43,13 +43,23 @@ python, making it perfect for modern Machine Learning and Data processing pipeli
   * Array Tasks (map some function over a large dataset, controlled execution of 1000's of containers)
   * Dynamic Workflow creation and execution - with runtime type safety
   * Container side plugins with first class support in python
+ - Maintain an inventory of tasks and workflows
+ - Record history of all executions and executions (as long as they follow convention) are completely repeatable
  - Multi Cloud support (AWS, GCP and others)
+ - Extensible core
+ - Modularized
+ - Automated notifications to Slack, Email, Pagerduty
  - Deep observability
  - Multi K8s cluster support
  - Comes with many system supported out of the box on K8s like Spark etc.
  - Snappy Console
  - Python CLI
  - Written in Golang and optimized for performance
+
+## Coming Soon
+ - Single Task Execution support
+ - Reactive pipelines
+ - More integrations
 
 # Current Usage 
 - Lyft Rideshare
