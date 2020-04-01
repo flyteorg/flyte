@@ -76,6 +76,9 @@ python, making it perfect for modern Machine Learning and Data processing pipeli
 - Lyft L5 autonomous
 - Juno
 
+# Changelogs
+[Changelogs](CHANGELOG/README.md)
+
 # Component Repos 
 Repo | Language | Purpose
 --- | --- | ---
