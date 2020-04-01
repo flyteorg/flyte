@@ -2,8 +2,6 @@ package client
 
 import "context"
 
-type PrestoStatus string
-
 // Contains information needed to execute a Presto query
 type PrestoExecuteArgs struct {
 	RoutingGroup string `json:"routingGroup,omitempty"`
@@ -15,9 +13,8 @@ type PrestoExecuteArgs struct {
 
 // Representation of a response after submitting a query to Presto
 type PrestoExecuteResponse struct {
-	ID      string       `json:"id,omitempty"`
-	Status  PrestoStatus `json:"status,omitempty"`
-	NextURI string       `json:"nextUri,omitempty"`
+	ID      string `json:"id,omitempty"`
+	NextURI string `json:"nextUri,omitempty"`
 }
 
 //go:generate mockery -all -case=snake
