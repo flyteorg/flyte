@@ -61,6 +61,16 @@ python, making it perfect for modern Machine Learning and Data processing pipeli
  - Reactive pipelines
  - More integrations
 
+
+# Available Plugins
+ - Containers
+ - K8s Pods
+ - AWS Batch Arrays
+ - K8s Pod arrays
+ - K8s Spark (native pyspark and java/scala)
+ - Qubole Hive
+ - Presto Queries
+
 # Current Usage 
 - Lyft Rideshare
 - Lyft L5 autonomous
