@@ -42,7 +42,7 @@ func TestInTerminalState(t *testing.T) {
 
 	for _, tt := range stateTests {
 		t.Run(tt.phase.String(), func(t *testing.T) {
-			e := ExecutionState{Phase: tt.phase}
+			e := ExecutionState{CurrentPhase: tt.phase}
 			res := InTerminalState(e)
 			assert.Equal(t, tt.isTerminal, res)
 		})
@@ -63,7 +63,7 @@ func TestIsNotYetSubmitted(t *testing.T) {
 
 	for _, tt := range stateTests {
 		t.Run(tt.phase.String(), func(t *testing.T) {
-			e := ExecutionState{Phase: tt.phase}
+			e := ExecutionState{CurrentPhase: tt.phase}
 			res := IsNotYetSubmitted(e)
 			assert.Equal(t, tt.isNotYetSubmitted, res)
 		})
@@ -98,7 +98,7 @@ func TestConstructTaskInfo(t *testing.T) {
 	assert.NoError(t, err)
 
 	e := ExecutionState{
-		Phase:            PhaseQuerySucceeded,
+		CurrentPhase:     PhaseQuerySucceeded,
 		CommandID:        "123",
 		SyncFailureCount: 0,
 		URI:              u.String(),
@@ -111,7 +111,7 @@ func TestConstructTaskInfo(t *testing.T) {
 func TestMapExecutionStateToPhaseInfo(t *testing.T) {
 	t.Run("NotStarted", func(t *testing.T) {
 		e := ExecutionState{
-			Phase: PhaseNotStarted,
+			CurrentPhase: PhaseNotStarted,
 		}
 		phaseInfo := MapExecutionStateToPhaseInfo(e)
 		assert.Equal(t, core.PhaseNotReady, phaseInfo.Phase())
@@ -119,14 +119,14 @@ func TestMapExecutionStateToPhaseInfo(t *testing.T) {
 
 	t.Run("Queued", func(t *testing.T) {
 		e := ExecutionState{
-			Phase:                PhaseQueued,
+			CurrentPhase:         PhaseQueued,
 			CreationFailureCount: 0,
 		}
 		phaseInfo := MapExecutionStateToPhaseInfo(e)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
 
 		e = ExecutionState{
-			Phase:                PhaseQueued,
+			CurrentPhase:         PhaseQueued,
 			CreationFailureCount: 100,
 		}
 		phaseInfo = MapExecutionStateToPhaseInfo(e)
@@ -136,7 +136,7 @@ func TestMapExecutionStateToPhaseInfo(t *testing.T) {
 
 	t.Run("Submitted", func(t *testing.T) {
 		e := ExecutionState{
-			Phase: PhaseSubmitted,
+			CurrentPhase: PhaseSubmitted,
 		}
 		phaseInfo := MapExecutionStateToPhaseInfo(e)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
@@ -157,7 +157,7 @@ func TestGetAllocationToken(t *testing.T) {
 		mockMetrics := getPrestoExecutorMetrics(promutils.NewTestScope())
 		state, err := GetAllocationToken(ctx, tCtx, mockCurrentState, mockMetrics)
 		assert.NoError(t, err)
-		assert.Equal(t, PhaseQueued, state.Phase)
+		assert.Equal(t, PhaseQueued, state.CurrentPhase)
 	})
 
 	t.Run("exhausted", func(t *testing.T) {
@@ -171,7 +171,7 @@ func TestGetAllocationToken(t *testing.T) {
 		mockMetrics := getPrestoExecutorMetrics(promutils.NewTestScope())
 		state, err := GetAllocationToken(ctx, tCtx, mockCurrentState, mockMetrics)
 		assert.NoError(t, err)
-		assert.Equal(t, PhaseNotStarted, state.Phase)
+		assert.Equal(t, PhaseNotStarted, state.CurrentPhase)
 	})
 
 	t.Run("namespace exhausted", func(t *testing.T) {
@@ -185,7 +185,7 @@ func TestGetAllocationToken(t *testing.T) {
 		mockMetrics := getPrestoExecutorMetrics(promutils.NewTestScope())
 		state, err := GetAllocationToken(ctx, tCtx, mockCurrentState, mockMetrics)
 		assert.NoError(t, err)
-		assert.Equal(t, PhaseNotStarted, state.Phase)
+		assert.Equal(t, PhaseNotStarted, state.CurrentPhase)
 	})
 
 	t.Run("Request start time, if empty in current state, should be set", func(t *testing.T) {
@@ -232,7 +232,7 @@ func TestAbort(t *testing.T) {
 			x = true
 		}).Return(nil)
 
-		err := Abort(ctx, ExecutionState{Phase: PhaseSubmitted, CommandID: "123456"}, mockPresto)
+		err := Abort(ctx, ExecutionState{CurrentPhase: PhaseSubmitted, CommandID: "123456"}, mockPresto)
 		assert.NoError(t, err)
 		assert.True(t, x)
 	})
@@ -245,7 +245,7 @@ func TestAbort(t *testing.T) {
 			x = true
 		}).Return(nil)
 
-		err := Abort(ctx, ExecutionState{Phase: PhaseQuerySucceeded, CommandID: "123456"}, mockPresto)
+		err := Abort(ctx, ExecutionState{CurrentPhase: PhaseQuerySucceeded, CommandID: "123456"}, mockPresto)
 		assert.NoError(t, err)
 		assert.False(t, x)
 	})
@@ -272,12 +272,12 @@ func TestMonitorQuery(t *testing.T) {
 	ctx := context.Background()
 	tCtx := GetMockTaskExecutionContext()
 	state := ExecutionState{
-		Phase: PhaseSubmitted,
+		CurrentPhase: PhaseSubmitted,
 	}
 	var getOrCreateCalled = false
 	mockCache := &mocks2.AutoRefresh{}
 	mockCache.OnGetOrCreateMatch(mock.AnythingOfType("string"), mock.Anything).Return(ExecutionStateCacheItem{
-		ExecutionState: ExecutionState{Phase: PhaseQuerySucceeded},
+		ExecutionState: ExecutionState{CurrentPhase: PhaseQuerySucceeded},
 		Identifier:     "my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name",
 	}, nil).Run(func(_ mock.Arguments) {
 		getOrCreateCalled = true
@@ -286,7 +286,7 @@ func TestMonitorQuery(t *testing.T) {
 	newState, err := MonitorQuery(ctx, tCtx, state, mockCache)
 	assert.NoError(t, err)
 	assert.True(t, getOrCreateCalled)
-	assert.Equal(t, PhaseQuerySucceeded, newState.Phase)
+	assert.Equal(t, PhaseQuerySucceeded, newState.CurrentPhase)
 }
 
 func TestKickOffQuery(t *testing.T) {
@@ -312,7 +312,7 @@ func TestKickOffQuery(t *testing.T) {
 	state := ExecutionState{}
 	newState, err := KickOffQuery(ctx, tCtx, state, mockPresto, mockCache)
 	assert.NoError(t, err)
-	assert.Equal(t, PhaseSubmitted, newState.Phase)
+	assert.Equal(t, PhaseSubmitted, newState.CurrentPhase)
 	assert.Equal(t, "1234567", newState.CommandID)
 	assert.True(t, getOrCreateCalled)
 	assert.True(t, prestoCalled)
