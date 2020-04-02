@@ -34,7 +34,7 @@ func TestPrestoExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		}
 
 		state := ExecutionState{
-			Phase: PhaseQuerySucceeded,
+			CurrentPhase: PhaseQuerySucceeded,
 		}
 		cacheItem := ExecutionStateCacheItem{
 			ExecutionState: state,
@@ -67,8 +67,8 @@ func TestPrestoExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		}
 
 		state := ExecutionState{
-			CommandID: "123456",
-			Phase:     PhaseSubmitted,
+			CommandID:    "123456",
+			CurrentPhase: PhaseSubmitted,
 		}
 		cacheItem := ExecutionStateCacheItem{
 			ExecutionState: state,
@@ -86,6 +86,6 @@ func TestPrestoExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		newExecutionState := newCacheItem[0].Item.(ExecutionStateCacheItem)
 		assert.NoError(t, err)
 		assert.Equal(t, cache.Update, newCacheItem[0].Action)
-		assert.Equal(t, PhaseQuerySucceeded, newExecutionState.Phase)
+		assert.Equal(t, PhaseQuerySucceeded, newExecutionState.CurrentPhase)
 	})
 }

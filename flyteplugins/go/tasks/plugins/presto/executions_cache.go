@@ -123,11 +123,12 @@ func (p *ExecutionsCache) SyncPrestoQuery(ctx context.Context, batch cache.Batch
 			return nil, err
 		}
 
-		if newExecutionPhase > executionStateCacheItem.Phase {
+		if newExecutionPhase > executionStateCacheItem.CurrentPhase {
 			logger.Infof(ctx, "Moving ExecutionPhase for %s %s from %s to %s", executionStateCacheItem.CommandID,
-				executionStateCacheItem.Identifier, executionStateCacheItem.Phase, newExecutionPhase)
+				executionStateCacheItem.Identifier, executionStateCacheItem.CurrentPhase, newExecutionPhase)
 
-			executionStateCacheItem.Phase = newExecutionPhase
+			executionStateCacheItem.PreviousPhase = executionStateCacheItem.CurrentPhase
+			executionStateCacheItem.CurrentPhase = newExecutionPhase
 
 			resp = append(resp, cache.ItemSyncResponse{
 				ID:     query.GetID(),
