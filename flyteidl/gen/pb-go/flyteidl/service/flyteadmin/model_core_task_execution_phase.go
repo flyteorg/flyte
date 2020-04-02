@@ -19,4 +19,6 @@ const (
 	CoreTaskExecutionPhaseSUCCEEDED CoreTaskExecutionPhase = "SUCCEEDED"
 	CoreTaskExecutionPhaseABORTED CoreTaskExecutionPhase = "ABORTED"
 	CoreTaskExecutionPhaseFAILED CoreTaskExecutionPhase = "FAILED"
+	CoreTaskExecutionPhaseINITIALIZING CoreTaskExecutionPhase = "INITIALIZING"
+	CoreTaskExecutionPhaseWAITING_FOR_RESOURCES CoreTaskExecutionPhase = "WAITING_FOR_RESOURCES"
 )

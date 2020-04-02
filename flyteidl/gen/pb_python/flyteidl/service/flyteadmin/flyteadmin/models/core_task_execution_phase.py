@@ -32,6 +32,8 @@ class CoreTaskExecutionPhase(object):
     SUCCEEDED = "SUCCEEDED"
     ABORTED = "ABORTED"
     FAILED = "FAILED"
+    INITIALIZING = "INITIALIZING"
+    WAITING_FOR_RESOURCES = "WAITING_FOR_RESOURCES"
 
     """
     Attributes:

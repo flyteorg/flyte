@@ -191,25 +191,26 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fexecution_2eproto[] =
   "odeExecution\"\200\001\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n"
   "\006QUEUED\020\001\022\013\n\007RUNNING\020\002\022\r\n\tSUCCEEDED\020\003\022\013\n"
   "\007FAILING\020\004\022\n\n\006FAILED\020\005\022\013\n\007ABORTED\020\006\022\013\n\007S"
-  "KIPPED\020\007\022\r\n\tTIMED_OUT\020\010\"h\n\rTaskExecution"
-  "\"W\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n\006QUEUED\020\001\022\013\n\007"
-  "RUNNING\020\002\022\r\n\tSUCCEEDED\020\003\022\013\n\007ABORTED\020\004\022\n\n"
-  "\006FAILED\020\005\"\251\001\n\016ExecutionError\022\014\n\004code\030\001 \001"
-  "(\t\022\017\n\007message\030\002 \001(\t\022\021\n\terror_uri\030\003 \001(\t\0225"
-  "\n\004kind\030\004 \001(\0162\'.flyteidl.core.ExecutionEr"
-  "ror.ErrorKind\".\n\tErrorKind\022\013\n\007UNKNOWN\020\000\022"
-  "\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\273\001\n\007TaskLog\022\013\n\003uri"
-  "\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\016message_format\030\003"
-  " \001(\0162$.flyteidl.core.TaskLog.MessageForm"
-  "at\022&\n\003ttl\030\004 \001(\0132\031.google.protobuf.Durati"
-  "on\"/\n\rMessageFormat\022\013\n\007UNKNOWN\020\000\022\007\n\003CSV\020"
-  "\001\022\010\n\004JSON\020\002B2Z0github.com/lyft/flyteidl/"
-  "gen/pb-go/flyteidl/coreb\006proto3"
+  "KIPPED\020\007\022\r\n\tTIMED_OUT\020\010\"\226\001\n\rTaskExecutio"
+  "n\"\204\001\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n\006QUEUED\020\001\022\013"
+  "\n\007RUNNING\020\002\022\r\n\tSUCCEEDED\020\003\022\013\n\007ABORTED\020\004\022"
+  "\n\n\006FAILED\020\005\022\020\n\014INITIALIZING\020\006\022\031\n\025WAITING"
+  "_FOR_RESOURCES\020\007\"\251\001\n\016ExecutionError\022\014\n\004c"
+  "ode\030\001 \001(\t\022\017\n\007message\030\002 \001(\t\022\021\n\terror_uri\030"
+  "\003 \001(\t\0225\n\004kind\030\004 \001(\0162\'.flyteidl.core.Exec"
+  "utionError.ErrorKind\".\n\tErrorKind\022\013\n\007UNK"
+  "NOWN\020\000\022\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\273\001\n\007TaskLog"
+  "\022\013\n\003uri\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\016message_f"
+  "ormat\030\003 \001(\0162$.flyteidl.core.TaskLog.Mess"
+  "ageFormat\022&\n\003ttl\030\004 \001(\0132\031.google.protobuf"
+  ".Duration\"/\n\rMessageFormat\022\013\n\007UNKNOWN\020\000\022"
+  "\007\n\003CSV\020\001\022\010\n\004JSON\020\002B2Z0github.com/lyft/fl"
+  "yteidl/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fexecution_2eproto,
-  "flyteidl/core/execution.proto", &assign_descriptors_table_flyteidl_2fcore_2fexecution_2eproto, 911,
+  "flyteidl/core/execution.proto", &assign_descriptors_table_flyteidl_2fcore_2fexecution_2eproto, 958,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fexecution_2eproto() {
@@ -306,6 +307,8 @@ bool TaskExecution_Phase_IsValid(int value) {
     case 3:
     case 4:
     case 5:
+    case 6:
+    case 7:
       return true;
     default:
       return false;
@@ -319,6 +322,8 @@ const TaskExecution_Phase TaskExecution::RUNNING;
 const TaskExecution_Phase TaskExecution::SUCCEEDED;
 const TaskExecution_Phase TaskExecution::ABORTED;
 const TaskExecution_Phase TaskExecution::FAILED;
+const TaskExecution_Phase TaskExecution::INITIALIZING;
+const TaskExecution_Phase TaskExecution::WAITING_FOR_RESOURCES;
 const TaskExecution_Phase TaskExecution::Phase_MIN;
 const TaskExecution_Phase TaskExecution::Phase_MAX;
 const int TaskExecution::Phase_ARRAYSIZE;

@@ -1282,6 +1282,22 @@ public final class Execution {
        * <code>FAILED = 5;</code>
        */
       FAILED(5),
+      /**
+       * <pre>
+       * To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing
+       * </pre>
+       *
+       * <code>INITIALIZING = 6;</code>
+       */
+      INITIALIZING(6),
+      /**
+       * <pre>
+       * To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
+       * </pre>
+       *
+       * <code>WAITING_FOR_RESOURCES = 7;</code>
+       */
+      WAITING_FOR_RESOURCES(7),
       UNRECOGNIZED(-1),
       ;
 
@@ -1309,6 +1325,22 @@ public final class Execution {
        * <code>FAILED = 5;</code>
        */
       public static final int FAILED_VALUE = 5;
+      /**
+       * <pre>
+       * To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing
+       * </pre>
+       *
+       * <code>INITIALIZING = 6;</code>
+       */
+      public static final int INITIALIZING_VALUE = 6;
+      /**
+       * <pre>
+       * To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
+       * </pre>
+       *
+       * <code>WAITING_FOR_RESOURCES = 7;</code>
+       */
+      public static final int WAITING_FOR_RESOURCES_VALUE = 7;
 
 
       public final int getNumber() {
@@ -1335,6 +1367,8 @@ public final class Execution {
           case 3: return SUCCEEDED;
           case 4: return ABORTED;
           case 5: return FAILED;
+          case 6: return INITIALIZING;
+          case 7: return WAITING_FOR_RESOURCES;
           default: return null;
         }
       }
@@ -4016,20 +4050,21 @@ public final class Execution {
       "odeExecution\"\200\001\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n" +
       "\006QUEUED\020\001\022\013\n\007RUNNING\020\002\022\r\n\tSUCCEEDED\020\003\022\013\n" +
       "\007FAILING\020\004\022\n\n\006FAILED\020\005\022\013\n\007ABORTED\020\006\022\013\n\007S" +
-      "KIPPED\020\007\022\r\n\tTIMED_OUT\020\010\"h\n\rTaskExecution" +
-      "\"W\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n\006QUEUED\020\001\022\013\n\007" +
-      "RUNNING\020\002\022\r\n\tSUCCEEDED\020\003\022\013\n\007ABORTED\020\004\022\n\n" +
-      "\006FAILED\020\005\"\251\001\n\016ExecutionError\022\014\n\004code\030\001 \001" +
-      "(\t\022\017\n\007message\030\002 \001(\t\022\021\n\terror_uri\030\003 \001(\t\0225" +
-      "\n\004kind\030\004 \001(\0162\'.flyteidl.core.ExecutionEr" +
-      "ror.ErrorKind\".\n\tErrorKind\022\013\n\007UNKNOWN\020\000\022" +
-      "\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\273\001\n\007TaskLog\022\013\n\003uri" +
-      "\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\016message_format\030\003" +
-      " \001(\0162$.flyteidl.core.TaskLog.MessageForm" +
-      "at\022&\n\003ttl\030\004 \001(\0132\031.google.protobuf.Durati" +
-      "on\"/\n\rMessageFormat\022\013\n\007UNKNOWN\020\000\022\007\n\003CSV\020" +
-      "\001\022\010\n\004JSON\020\002B2Z0github.com/lyft/flyteidl/" +
-      "gen/pb-go/flyteidl/coreb\006proto3"
+      "KIPPED\020\007\022\r\n\tTIMED_OUT\020\010\"\226\001\n\rTaskExecutio" +
+      "n\"\204\001\n\005Phase\022\r\n\tUNDEFINED\020\000\022\n\n\006QUEUED\020\001\022\013" +
+      "\n\007RUNNING\020\002\022\r\n\tSUCCEEDED\020\003\022\013\n\007ABORTED\020\004\022" +
+      "\n\n\006FAILED\020\005\022\020\n\014INITIALIZING\020\006\022\031\n\025WAITING" +
+      "_FOR_RESOURCES\020\007\"\251\001\n\016ExecutionError\022\014\n\004c" +
+      "ode\030\001 \001(\t\022\017\n\007message\030\002 \001(\t\022\021\n\terror_uri\030" +
+      "\003 \001(\t\0225\n\004kind\030\004 \001(\0162\'.flyteidl.core.Exec" +
+      "utionError.ErrorKind\".\n\tErrorKind\022\013\n\007UNK" +
+      "NOWN\020\000\022\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\273\001\n\007TaskLog" +
+      "\022\013\n\003uri\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\016message_f" +
+      "ormat\030\003 \001(\0162$.flyteidl.core.TaskLog.Mess" +
+      "ageFormat\022&\n\003ttl\030\004 \001(\0132\031.google.protobuf" +
+      ".Duration\"/\n\rMessageFormat\022\013\n\007UNKNOWN\020\000\022" +
+      "\007\n\003CSV\020\001\022\010\n\004JSON\020\002B2Z0github.com/lyft/fl" +
+      "yteidl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

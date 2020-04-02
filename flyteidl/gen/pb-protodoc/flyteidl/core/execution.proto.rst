@@ -195,13 +195,25 @@ ABORTED
 FAILED
   ⁣
   
+.. _api_enum_value_flyteidl.core.TaskExecution.Phase.INITIALIZING:
+
+INITIALIZING
+  ⁣To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing
+  
+  
+.. _api_enum_value_flyteidl.core.TaskExecution.Phase.WAITING_FOR_RESOURCES:
+
+WAITING_FOR_RESOURCES
+  ⁣To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
+  
+  
 
 .. _api_msg_flyteidl.core.ExecutionError:
 
 flyteidl.core.ExecutionError
 ----------------------------
 
-`[flyteidl.core.ExecutionError proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L53>`_
+`[flyteidl.core.ExecutionError proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L57>`_
 
 Represents the error message from the execution.
 
@@ -244,7 +256,7 @@ kind
 Enum flyteidl.core.ExecutionError.ErrorKind
 -------------------------------------------
 
-`[flyteidl.core.ExecutionError.ErrorKind proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L62>`_
+`[flyteidl.core.ExecutionError.ErrorKind proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L66>`_
 
 Error type: System or User
 
@@ -269,7 +281,7 @@ SYSTEM
 flyteidl.core.TaskLog
 ---------------------
 
-`[flyteidl.core.TaskLog proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L72>`_
+`[flyteidl.core.TaskLog proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L76>`_
 
 Log information for the task that is specific to a log sink
 When our log story is flushed out, we may have more metadata here like log link expiry
@@ -309,7 +321,7 @@ ttl
 Enum flyteidl.core.TaskLog.MessageFormat
 ----------------------------------------
 
-`[flyteidl.core.TaskLog.MessageFormat proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L74>`_
+`[flyteidl.core.TaskLog.MessageFormat proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L78>`_
 
 
 .. _api_enum_value_flyteidl.core.TaskLog.MessageFormat.UNKNOWN:

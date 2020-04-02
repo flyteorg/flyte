@@ -144,12 +144,14 @@ enum TaskExecution_Phase {
   TaskExecution_Phase_SUCCEEDED = 3,
   TaskExecution_Phase_ABORTED = 4,
   TaskExecution_Phase_FAILED = 5,
+  TaskExecution_Phase_INITIALIZING = 6,
+  TaskExecution_Phase_WAITING_FOR_RESOURCES = 7,
   TaskExecution_Phase_TaskExecution_Phase_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   TaskExecution_Phase_TaskExecution_Phase_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool TaskExecution_Phase_IsValid(int value);
 const TaskExecution_Phase TaskExecution_Phase_Phase_MIN = TaskExecution_Phase_UNDEFINED;
-const TaskExecution_Phase TaskExecution_Phase_Phase_MAX = TaskExecution_Phase_FAILED;
+const TaskExecution_Phase TaskExecution_Phase_Phase_MAX = TaskExecution_Phase_WAITING_FOR_RESOURCES;
 const int TaskExecution_Phase_Phase_ARRAYSIZE = TaskExecution_Phase_Phase_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* TaskExecution_Phase_descriptor();
@@ -604,6 +606,10 @@ class TaskExecution final :
     TaskExecution_Phase_ABORTED;
   static const Phase FAILED =
     TaskExecution_Phase_FAILED;
+  static const Phase INITIALIZING =
+    TaskExecution_Phase_INITIALIZING;
+  static const Phase WAITING_FOR_RESOURCES =
+    TaskExecution_Phase_WAITING_FOR_RESOURCES;
   static inline bool Phase_IsValid(int value) {
     return TaskExecution_Phase_IsValid(value);
   }
