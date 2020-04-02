@@ -9892,6 +9892,8 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {number} SUCCEEDED=3 SUCCEEDED value
              * @property {number} ABORTED=4 ABORTED value
              * @property {number} FAILED=5 FAILED value
+             * @property {number} INITIALIZING=6 INITIALIZING value
+             * @property {number} WAITING_FOR_RESOURCES=7 WAITING_FOR_RESOURCES value
              */
             TaskExecution.Phase = (function() {
                 const valuesById = {}, values = Object.create(valuesById);
@@ -9901,6 +9903,8 @@ export const flyteidl = $root.flyteidl = (() => {
                 values[valuesById[3] = "SUCCEEDED"] = 3;
                 values[valuesById[4] = "ABORTED"] = 4;
                 values[valuesById[5] = "FAILED"] = 5;
+                values[valuesById[6] = "INITIALIZING"] = 6;
+                values[valuesById[7] = "WAITING_FOR_RESOURCES"] = 7;
                 return values;
             })();
 
@@ -11486,6 +11490,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 3:
                     case 4:
                     case 5:
+                    case 6:
+                    case 7:
                         break;
                     }
                 if (message.producerId != null && message.hasOwnProperty("producerId"))
@@ -26161,6 +26167,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 3:
                     case 4:
                     case 5:
+                    case 6:
+                    case 7:
                         break;
                     }
                 if (message.logs != null && message.hasOwnProperty("logs")) {
