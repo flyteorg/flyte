@@ -13,4 +13,5 @@ type WorkflowInterface interface {
 	ListWorkflows(ctx context.Context, request admin.ResourceListRequest) (*admin.WorkflowList, error)
 	ListWorkflowIdentifiers(ctx context.Context, request admin.NamedEntityIdentifierListRequest) (
 		*admin.NamedEntityIdentifierList, error)
+	UpdateWorkflow(ctx context.Context, request admin.WorkflowUpdateRequest) (*admin.WorkflowUpdateResponse, error)
 }

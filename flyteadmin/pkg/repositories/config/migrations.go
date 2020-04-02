@@ -169,4 +169,24 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Exec("ALTER TABLE tasks DROP COLUMN IF EXISTS type").Error
 		},
 	},
+	// Add state to workflow model
+	{
+		ID: "2020-04-01-workflow-state",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.Workflow{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Table("workflows").DropColumn("state").Error
+		},
+	},
+	// Set default state value for workflow model
+	{
+		ID: "2020-04-01-workflow-state-default",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Exec("UPDATE workflows SET state = 0").Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Exec("UPDATE workflows set state = NULL").Error
+		},
+	},
 }

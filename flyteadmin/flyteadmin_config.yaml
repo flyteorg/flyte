@@ -105,7 +105,7 @@ queues:
     - dynamic: "default"
       attributes:
         - defaultclusters
-  workflowConfigs
+  workflowConfigs:
     - project: "my_queue_1"
       domain: "production"
       workflowName: "my_workflow_1"

@@ -337,6 +337,26 @@ func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request a
 
 }
 
+func (w *WorkflowManager) UpdateWorkflow(ctx context.Context, request admin.WorkflowUpdateRequest) (
+	*admin.WorkflowUpdateResponse, error) {
+	if err := validation.ValidateIdentifier(request.Id, common.Workflow); err != nil {
+		logger.Debugf(ctx, "invalid identifier [%+v]: %v", request.Id, err)
+		return nil, err
+	}
+	ctx = getWorkflowContext(ctx, request.Id)
+	workflowModel, err := util.GetWorkflowModel(ctx, w.db, *request.Id)
+	if err != nil {
+		return nil, err
+	}
+	stateInt := int32(request.State)
+	workflowModel.State = &stateInt
+	err = w.db.WorkflowRepo().Update(ctx, workflowModel)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.WorkflowUpdateResponse{}, nil
+}
+
 func NewWorkflowManager(
 	db repositories.RepositoryInterface,
 	config runtimeInterfaces.Configuration,

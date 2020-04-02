@@ -9,10 +9,14 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/lyft/flyteadmin/pkg/repositories"
+	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
+
 	"github.com/golang/protobuf/proto"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -307,4 +311,58 @@ func testListWorkflow_FiltersHTTP(t *testing.T) {
 		Name:         "name_a",
 		Version:      "123",
 	}, workflow.Id))
+}
+
+func TestUpdateWorkflow(t *testing.T) {
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+	truncateAllTablesForTestingOnly()
+
+	identifier := core.Identifier{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Project:      "admintests",
+		Domain:       "development",
+		Name:         "name",
+		Version:      "version",
+	}
+	createReq := admin.WorkflowCreateRequest{
+		Id: &identifier,
+		Spec: &admin.WorkflowSpec{
+			Template: &core.WorkflowTemplate{
+				Id:        &identifier,
+				Interface: &core.TypedInterface{},
+			},
+		},
+	}
+
+	_, err := client.CreateWorkflow(ctx, &createReq)
+	assert.Nil(t, err)
+
+	testScope := promutils.NewScope("UpdateWorkflow")
+	db := repositories.GetRepository(
+		repositories.POSTGRES, getDbConfig(), testScope.NewSubScope("database"))
+	workflow, err := db.WorkflowRepo().Get(ctx, interfaces.GetResourceInput{
+		Project: "admintests",
+		Domain:  "development",
+		Name:    "name",
+		Version: "version",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, admin.WorkflowState_WORKFLOW_ACTIVE, admin.WorkflowState(*workflow.State))
+
+	updateReq := admin.WorkflowUpdateRequest{
+		Id:    &identifier,
+		State: admin.WorkflowState_WORKFLOW_ARCHIVED,
+	}
+	_, err = client.UpdateWorkflow(ctx, &updateReq)
+	assert.Nil(t, err)
+	workflow, err = db.WorkflowRepo().Get(ctx, interfaces.GetResourceInput{
+		Project: "admintests",
+		Domain:  "development",
+		Name:    "name",
+		Version: "version",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, admin.WorkflowState_WORKFLOW_ARCHIVED, admin.WorkflowState(*workflow.State))
 }

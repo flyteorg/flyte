@@ -120,6 +120,16 @@ func (r *WorkflowRepo) ListIdentifiers(ctx context.Context, input interfaces.Lis
 	}, nil
 }
 
+func (r *WorkflowRepo) Update(ctx context.Context, input models.Workflow) error {
+	timer := r.metrics.UpdateDuration.Start()
+	tx := r.db.Model(&input).Updates(input)
+	timer.Stop()
+	if err := tx.Error; err != nil {
+		return r.errorTransformer.ToFlyteAdminError(err)
+	}
+	return nil
+}
+
 // Returns an instance of WorkflowRepoInterface
 func NewWorkflowRepo(
 	db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.WorkflowRepoInterface {
