@@ -16,6 +16,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const workflowState = "workflow_state"
+
 func (m *AdminService) CreateWorkflow(
 	ctx context.Context,
 	request *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
@@ -123,5 +125,38 @@ func (m *AdminService) ListWorkflows(ctx context.Context, request *admin.Resourc
 		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowEndpointMetrics.list)
 	}
 	m.Metrics.workflowEndpointMetrics.list.Success()
+	return response, nil
+}
+
+func (m *AdminService) UpdateWorkflow(ctx context.Context, request *admin.WorkflowUpdateRequest) (
+	*admin.WorkflowUpdateResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	// NOTE: When the Get HTTP endpoint is called the resource type is implicit (from the URL) so we must add it
+	// to the request.
+	if request.Id != nil && request.Id.ResourceType == core.ResourceType_UNSPECIFIED {
+		logger.Info(ctx, "Adding resource type for unspecified value in request: [%+v]", request)
+		request.Id.ResourceType = core.ResourceType_WORKFLOW
+	}
+	var response *admin.WorkflowUpdateResponse
+	var err error
+	m.Metrics.workflowEndpointMetrics.update.Time(func() {
+		response, err = m.WorkflowManager.UpdateWorkflow(ctx, *request)
+	})
+	requestParameters := audit.ParametersFromIdentifier(request.Id)
+	requestParameters[workflowState] = request.State.String()
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"UpdateWorkflow",
+		requestParameters,
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowEndpointMetrics.update)
+	}
+	m.Metrics.workflowEndpointMetrics.update.Success()
 	return response, nil
 }

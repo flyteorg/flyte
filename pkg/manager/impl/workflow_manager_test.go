@@ -573,3 +573,40 @@ func TestWorkflowManager_ListWorkflowIdentifiers(t *testing.T) {
 		assert.Equal(t, nameValue, entity.Name)
 	}
 }
+
+func TestUpdateWorkflow(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	workflowGetFunc := func(input interfaces.GetResourceInput) (models.Workflow, error) {
+		return models.Workflow{
+			BaseModel: models.BaseModel{
+				CreatedAt: testutils.MockCreatedAtValue,
+			},
+			WorkflowKey: models.WorkflowKey{
+				Project: input.Project,
+				Domain:  input.Domain,
+				Name:    input.Name,
+				Version: input.Version,
+			},
+			TypedInterface:          testutils.GetWorkflowRequestInterfaceBytes(),
+			RemoteClosureIdentifier: remoteClosureIdentifier,
+		}, nil
+	}
+	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
+
+	updateFuncCalled := false
+	workflowUpdatefunc := func(input models.Workflow) error {
+		updateFuncCalled = true
+		assert.Equal(t, admin.WorkflowState_WORKFLOW_ARCHIVED, admin.WorkflowState(*input.State))
+		return nil
+	}
+	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetUpdateCallback(workflowUpdatefunc)
+	workflowManager := NewWorkflowManager(
+		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), commonMocks.GetMockStorageClient(), storagePrefix,
+		mockScope.NewTestScope())
+	_, err := workflowManager.UpdateWorkflow(context.Background(), admin.WorkflowUpdateRequest{
+		Id:    &workflowIdentifier,
+		State: admin.WorkflowState_WORKFLOW_ARCHIVED,
+	})
+	assert.NoError(t, err)
+	assert.True(t, updateFuncCalled)
+}

@@ -90,6 +90,7 @@ type workflowEndpointMetrics struct {
 	get     util.RequestMetrics
 	list    util.RequestMetrics
 	listIds util.RequestMetrics
+	update  util.RequestMetrics
 }
 
 type AdminMetrics struct {
@@ -197,6 +198,7 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			get:     util.NewRequestMetrics(adminScope, "get_workflow"),
 			list:    util.NewRequestMetrics(adminScope, "list_workflow"),
 			listIds: util.NewRequestMetrics(adminScope, "list_workflow_ids"),
+			update:  util.NewRequestMetrics(adminScope, "update_workflow"),
 		},
 	}
 }

@@ -18,4 +18,6 @@ type Workflow struct {
 	Executions              []Execution
 	// Hash of the compiled workflow closure
 	Digest []byte
+	// GORM doesn't save the zero value for ints, so we use a pointer for the State field
+	State *int32 `gorm:"default:0"`
 }
