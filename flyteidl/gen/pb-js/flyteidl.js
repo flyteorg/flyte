@@ -27208,6 +27208,247 @@ export const flyteidl = $root.flyteidl = (() => {
             return WorkflowClosure;
         })();
 
+        /**
+         * WorkflowState enum.
+         * @name flyteidl.admin.WorkflowState
+         * @enum {string}
+         * @property {number} WORKFLOW_ACTIVE=0 WORKFLOW_ACTIVE value
+         * @property {number} WORKFLOW_ARCHIVED=1 WORKFLOW_ARCHIVED value
+         */
+        admin.WorkflowState = (function() {
+            const valuesById = {}, values = Object.create(valuesById);
+            values[valuesById[0] = "WORKFLOW_ACTIVE"] = 0;
+            values[valuesById[1] = "WORKFLOW_ARCHIVED"] = 1;
+            return values;
+        })();
+
+        admin.WorkflowUpdateRequest = (function() {
+
+            /**
+             * Properties of a WorkflowUpdateRequest.
+             * @memberof flyteidl.admin
+             * @interface IWorkflowUpdateRequest
+             * @property {flyteidl.core.IIdentifier|null} [id] WorkflowUpdateRequest id
+             * @property {flyteidl.admin.WorkflowState|null} [state] WorkflowUpdateRequest state
+             */
+
+            /**
+             * Constructs a new WorkflowUpdateRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a WorkflowUpdateRequest.
+             * @implements IWorkflowUpdateRequest
+             * @constructor
+             * @param {flyteidl.admin.IWorkflowUpdateRequest=} [properties] Properties to set
+             */
+            function WorkflowUpdateRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * WorkflowUpdateRequest id.
+             * @member {flyteidl.core.IIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.WorkflowUpdateRequest
+             * @instance
+             */
+            WorkflowUpdateRequest.prototype.id = null;
+
+            /**
+             * WorkflowUpdateRequest state.
+             * @member {flyteidl.admin.WorkflowState} state
+             * @memberof flyteidl.admin.WorkflowUpdateRequest
+             * @instance
+             */
+            WorkflowUpdateRequest.prototype.state = 0;
+
+            /**
+             * Creates a new WorkflowUpdateRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.WorkflowUpdateRequest
+             * @static
+             * @param {flyteidl.admin.IWorkflowUpdateRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.WorkflowUpdateRequest} WorkflowUpdateRequest instance
+             */
+            WorkflowUpdateRequest.create = function create(properties) {
+                return new WorkflowUpdateRequest(properties);
+            };
+
+            /**
+             * Encodes the specified WorkflowUpdateRequest message. Does not implicitly {@link flyteidl.admin.WorkflowUpdateRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.WorkflowUpdateRequest
+             * @static
+             * @param {flyteidl.admin.IWorkflowUpdateRequest} message WorkflowUpdateRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            WorkflowUpdateRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.state != null && message.hasOwnProperty("state"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.state);
+                return writer;
+            };
+
+            /**
+             * Decodes a WorkflowUpdateRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.WorkflowUpdateRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.WorkflowUpdateRequest} WorkflowUpdateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            WorkflowUpdateRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowUpdateRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.state = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a WorkflowUpdateRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.WorkflowUpdateRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            WorkflowUpdateRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.core.Identifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                if (message.state != null && message.hasOwnProperty("state"))
+                    switch (message.state) {
+                    default:
+                        return "state: enum value expected";
+                    case 0:
+                    case 1:
+                        break;
+                    }
+                return null;
+            };
+
+            return WorkflowUpdateRequest;
+        })();
+
+        admin.WorkflowUpdateResponse = (function() {
+
+            /**
+             * Properties of a WorkflowUpdateResponse.
+             * @memberof flyteidl.admin
+             * @interface IWorkflowUpdateResponse
+             */
+
+            /**
+             * Constructs a new WorkflowUpdateResponse.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a WorkflowUpdateResponse.
+             * @implements IWorkflowUpdateResponse
+             * @constructor
+             * @param {flyteidl.admin.IWorkflowUpdateResponse=} [properties] Properties to set
+             */
+            function WorkflowUpdateResponse(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Creates a new WorkflowUpdateResponse instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.WorkflowUpdateResponse
+             * @static
+             * @param {flyteidl.admin.IWorkflowUpdateResponse=} [properties] Properties to set
+             * @returns {flyteidl.admin.WorkflowUpdateResponse} WorkflowUpdateResponse instance
+             */
+            WorkflowUpdateResponse.create = function create(properties) {
+                return new WorkflowUpdateResponse(properties);
+            };
+
+            /**
+             * Encodes the specified WorkflowUpdateResponse message. Does not implicitly {@link flyteidl.admin.WorkflowUpdateResponse.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.WorkflowUpdateResponse
+             * @static
+             * @param {flyteidl.admin.IWorkflowUpdateResponse} message WorkflowUpdateResponse message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            WorkflowUpdateResponse.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                return writer;
+            };
+
+            /**
+             * Decodes a WorkflowUpdateResponse message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.WorkflowUpdateResponse
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.WorkflowUpdateResponse} WorkflowUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            WorkflowUpdateResponse.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowUpdateResponse();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a WorkflowUpdateResponse message.
+             * @function verify
+             * @memberof flyteidl.admin.WorkflowUpdateResponse
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            WorkflowUpdateResponse.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                return null;
+            };
+
+            return WorkflowUpdateResponse;
+        })();
+
         admin.WorkflowAttributes = (function() {
 
             /**
@@ -28422,6 +28663,39 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
              * @returns {Promise<flyteidl.admin.WorkflowList>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#updateWorkflow}.
+             * @memberof flyteidl.service.AdminService
+             * @typedef UpdateWorkflowCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.WorkflowUpdateResponse} [response] WorkflowUpdateResponse
+             */
+
+            /**
+             * Calls UpdateWorkflow.
+             * @function updateWorkflow
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.IWorkflowUpdateRequest} request WorkflowUpdateRequest message or plain object
+             * @param {flyteidl.service.AdminService.UpdateWorkflowCallback} callback Node-style callback called with the error, if any, and WorkflowUpdateResponse
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(AdminService.prototype.updateWorkflow = function updateWorkflow(request, callback) {
+                return this.rpcCall(updateWorkflow, $root.flyteidl.admin.WorkflowUpdateRequest, $root.flyteidl.admin.WorkflowUpdateResponse, request, callback);
+            }, "name", { value: "UpdateWorkflow" });
+
+            /**
+             * Calls UpdateWorkflow.
+             * @function updateWorkflow
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.IWorkflowUpdateRequest} request WorkflowUpdateRequest message or plain object
+             * @returns {Promise<flyteidl.admin.WorkflowUpdateResponse>} Promise
              * @variation 2
              */
 

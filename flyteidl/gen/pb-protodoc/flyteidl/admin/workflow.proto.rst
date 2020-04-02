@@ -172,3 +172,70 @@ created_at
   
   
 
+
+.. _api_msg_flyteidl.admin.WorkflowUpdateRequest:
+
+flyteidl.admin.WorkflowUpdateRequest
+------------------------------------
+
+`[flyteidl.admin.WorkflowUpdateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/workflow.proto#L75>`_
+
+Request to set the referenced workflow state to the configured value.
+
+.. code-block:: json
+
+  {
+    "id": "{...}",
+    "state": "..."
+  }
+
+.. _api_field_flyteidl.admin.WorkflowUpdateRequest.id:
+
+id
+  (:ref:`flyteidl.core.Identifier <api_msg_flyteidl.core.Identifier>`) Identifier of workflow for which to change state.
+  
+  
+.. _api_field_flyteidl.admin.WorkflowUpdateRequest.state:
+
+state
+  (:ref:`flyteidl.admin.WorkflowState <api_enum_flyteidl.admin.WorkflowState>`) Desired state to apply to the workflow.
+  
+  
+
+
+.. _api_msg_flyteidl.admin.WorkflowUpdateResponse:
+
+flyteidl.admin.WorkflowUpdateResponse
+-------------------------------------
+
+`[flyteidl.admin.WorkflowUpdateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/workflow.proto#L84>`_
+
+Purposefully empty, may be populated in the future.
+
+.. code-block:: json
+
+  {}
+
+
+
+.. _api_enum_flyteidl.admin.WorkflowState:
+
+Enum flyteidl.admin.WorkflowState
+---------------------------------
+
+`[flyteidl.admin.WorkflowState proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/workflow.proto#L66>`_
+
+The status of the workflow is used to control its visibility in the UI.
+
+.. _api_enum_value_flyteidl.admin.WorkflowState.WORKFLOW_ACTIVE:
+
+WORKFLOW_ACTIVE
+  *(DEFAULT)* ⁣By default, all workflows are considered active and under development.
+  
+  
+.. _api_enum_value_flyteidl.admin.WorkflowState.WORKFLOW_ARCHIVED:
+
+WORKFLOW_ARCHIVED
+  ⁣Archived workflows are no longer visible in the UI.
+  
+  
