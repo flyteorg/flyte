@@ -530,3 +530,149 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WorkflowClosureValidationError{}
+
+// Validate checks the field values on WorkflowUpdateRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *WorkflowUpdateRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowUpdateRequestValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for State
+
+	return nil
+}
+
+// WorkflowUpdateRequestValidationError is the validation error returned by
+// WorkflowUpdateRequest.Validate if the designated constraints aren't met.
+type WorkflowUpdateRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowUpdateRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowUpdateRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowUpdateRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowUpdateRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowUpdateRequestValidationError) ErrorName() string {
+	return "WorkflowUpdateRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowUpdateRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowUpdateRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowUpdateRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowUpdateRequestValidationError{}
+
+// Validate checks the field values on WorkflowUpdateResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *WorkflowUpdateResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// WorkflowUpdateResponseValidationError is the validation error returned by
+// WorkflowUpdateResponse.Validate if the designated constraints aren't met.
+type WorkflowUpdateResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowUpdateResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowUpdateResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowUpdateResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowUpdateResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowUpdateResponseValidationError) ErrorName() string {
+	return "WorkflowUpdateResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowUpdateResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowUpdateResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowUpdateResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowUpdateResponseValidationError{}

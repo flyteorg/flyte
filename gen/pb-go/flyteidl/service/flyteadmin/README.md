@@ -66,6 +66,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**UpdateLaunchPlan**](docs/AdminServiceApi.md#updatelaunchplan) | **Put** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | 
 *AdminServiceApi* | [**UpdateNamedEntity**](docs/AdminServiceApi.md#updatenamedentity) | **Put** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**UpdateProjectDomainAttributes**](docs/AdminServiceApi.md#updateprojectdomainattributes) | **Put** /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain} | 
+*AdminServiceApi* | [**UpdateWorkflow**](docs/AdminServiceApi.md#updateworkflow) | **Put** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | 
 *AdminServiceApi* | [**UpdateWorkflowAttributes**](docs/AdminServiceApi.md#updateworkflowattributes) | **Put** /api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow} | 
 
 
@@ -166,6 +167,9 @@ Class | Method | HTTP request | Description
  - [AdminWorkflowExecutionGetDataResponse](docs/AdminWorkflowExecutionGetDataResponse.md)
  - [AdminWorkflowList](docs/AdminWorkflowList.md)
  - [AdminWorkflowSpec](docs/AdminWorkflowSpec.md)
+ - [AdminWorkflowState](docs/AdminWorkflowState.md)
+ - [AdminWorkflowUpdateRequest](docs/AdminWorkflowUpdateRequest.md)
+ - [AdminWorkflowUpdateResponse](docs/AdminWorkflowUpdateResponse.md)
  - [BlobTypeBlobDimensionality](docs/BlobTypeBlobDimensionality.md)
  - [ComparisonExpressionOperator](docs/ComparisonExpressionOperator.md)
  - [ConjunctionExpressionLogicalOperator](docs/ConjunctionExpressionLogicalOperator.md)

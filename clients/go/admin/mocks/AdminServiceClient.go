@@ -2033,6 +2033,54 @@ func (_m *AdminServiceClient) UpdateProjectDomainAttributes(ctx context.Context,
 	return r0, r1
 }
 
+type AdminServiceClient_UpdateWorkflow struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_UpdateWorkflow) Return(_a0 *admin.WorkflowUpdateResponse, _a1 error) *AdminServiceClient_UpdateWorkflow {
+	return &AdminServiceClient_UpdateWorkflow{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnUpdateWorkflow(ctx context.Context, in *admin.WorkflowUpdateRequest, opts ...grpc.CallOption) *AdminServiceClient_UpdateWorkflow {
+	c := _m.On("UpdateWorkflow", ctx, in, opts)
+	return &AdminServiceClient_UpdateWorkflow{Call: c}
+}
+
+func (_m *AdminServiceClient) OnUpdateWorkflowMatch(matchers ...interface{}) *AdminServiceClient_UpdateWorkflow {
+	c := _m.On("UpdateWorkflow", matchers...)
+	return &AdminServiceClient_UpdateWorkflow{Call: c}
+}
+
+// UpdateWorkflow provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) UpdateWorkflow(ctx context.Context, in *admin.WorkflowUpdateRequest, opts ...grpc.CallOption) (*admin.WorkflowUpdateResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.WorkflowUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowUpdateRequest, ...grpc.CallOption) *admin.WorkflowUpdateResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.WorkflowUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowUpdateRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_UpdateWorkflowAttributes struct {
 	*mock.Call
 }
