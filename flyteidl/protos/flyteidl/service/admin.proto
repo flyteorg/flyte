@@ -125,6 +125,16 @@ service AdminService {
     };
   }
 
+  rpc UpdateWorkflow (flyteidl.admin.WorkflowUpdateRequest) returns (flyteidl.admin.WorkflowUpdateResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      description: "Update the state of an existing workflow definition."
+    };
+  }
+
   rpc CreateLaunchPlan (flyteidl.admin.LaunchPlanCreateRequest) returns (flyteidl.admin.LaunchPlanCreateResponse) {
     option (google.api.http) = {
       post: "/api/v1/launch_plans"

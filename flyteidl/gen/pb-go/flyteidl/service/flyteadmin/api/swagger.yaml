@@ -2256,6 +2256,48 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminWorkflow"
+    put:
+      tags:
+      - "AdminService"
+      description: "Update the state of an existing workflow definition."
+      operationId: "UpdateWorkflow"
+      parameters:
+      - name: "id.project"
+        in: "path"
+        description: "Name of the project the resource belongs to."
+        required: true
+        type: "string"
+        x-exportParamName: "IdProject"
+      - name: "id.domain"
+        in: "path"
+        description: "Name of the domain the resource belongs to.\nA domain can be\
+          \ considered as a subset within a specific project."
+        required: true
+        type: "string"
+        x-exportParamName: "IdDomain"
+      - name: "id.name"
+        in: "path"
+        description: "User provided value for the resource."
+        required: true
+        type: "string"
+        x-exportParamName: "IdName"
+      - name: "id.version"
+        in: "path"
+        description: "Specific version of the resource."
+        required: true
+        type: "string"
+        x-exportParamName: "IdVersion"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminWorkflowUpdateRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminWorkflowUpdateResponse"
 definitions:
   BlobTypeBlobDimensionality:
     type: "string"
@@ -16969,6 +17011,29 @@ definitions:
           $ref: "#/definitions/coreWorkflowTemplate"
     description: "Represents a structure that encapsulates the specification of the\
       \ workflow."
+  adminWorkflowState:
+    type: "string"
+    description: "The status of the workflow is used to control its visibility in\
+      \ the UI.\n\n - WORKFLOW_ACTIVE: By default, all workflows are considered active\
+      \ and under development.\n - WORKFLOW_ARCHIVED: Archived workflows are no longer\
+      \ visible in the UI."
+    enum:
+    - "WORKFLOW_ACTIVE"
+    - "WORKFLOW_ARCHIVED"
+    default: "WORKFLOW_ACTIVE"
+  adminWorkflowUpdateRequest:
+    type: "object"
+    properties:
+      id:
+        description: "Identifier of workflow for which to change state."
+        $ref: "#/definitions/coreIdentifier"
+      state:
+        description: "Desired state to apply to the workflow."
+        $ref: "#/definitions/adminWorkflowState"
+    description: "Request to set the referenced workflow state to the configured value."
+  adminWorkflowUpdateResponse:
+    type: "object"
+    description: "Purposefully empty, may be populated in the future."
   coreAlias:
     type: "object"
     properties:
