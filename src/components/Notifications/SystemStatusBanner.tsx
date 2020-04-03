@@ -112,6 +112,10 @@ const RenderSystemStatusBanner: React.FC<{
     );
 };
 
+/** Fetches and renders the system status returned by issuing a GET to
+ * `env.STATUS_URL`. If the status includes a message, a dismissable toast
+ * will be rendered. Otherwise, nothing will be rendered.
+ */
 export const SystemStatusBanner: React.FC<{}> = () => {
     const systemStatus = useSystemStatus();
     const [dismissed, setDismissed] = React.useState(false);
