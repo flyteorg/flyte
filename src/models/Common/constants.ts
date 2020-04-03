@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, AxiosTransformer } from 'axios';
 import * as camelcaseKeys from 'camelcase-keys';
 import * as snakecaseKeys from 'snakecase-keys';
 import { isObject } from 'util';
-import { LiteralMapBlob, ResourceType } from './types';
+import { LiteralMapBlob, ResourceType, SystemStatus } from './types';
 
 export const endpointPrefixes = {
     execution: '/executions',
@@ -44,3 +44,5 @@ export const defaultAxiosConfig: AxiosRequestConfig = {
     ],
     withCredentials: true
 };
+
+export const defaultSystemStatus: SystemStatus = { status: 'normal' };
