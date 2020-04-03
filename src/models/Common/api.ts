@@ -151,8 +151,7 @@ export const getSystemStatus = async () => {
         return data;
     } catch (e) {
         const { message } = transformRequestError(e, path);
-        log.error(`Failed to fetch system status: ${message}`);
-        return null;
+        throw new Error(`Failed to fetch system status: ${message}`);
     }
 };
 

@@ -4,6 +4,7 @@ import { env } from 'common/env';
 import { debug, debugPrefix } from 'common/log';
 import { APIContext, useAPIState } from 'components/data/apiContext';
 import { LoginExpiredHandler } from 'components/Errors/LoginExpiredHandler';
+import { SystemStatusBanner } from 'components/Notifications/SystemStatusBanner';
 import { skeletonColor, skeletonHighlightColor } from 'components/Theme';
 import { muiTheme } from 'components/Theme/muiTheme';
 import * as React from 'react';
@@ -41,6 +42,7 @@ export const AppComponent: React.StatelessComponent<{}> = () => {
                             <LoginExpiredHandler />
                         </ErrorBoundary>
                     </Router>
+                    <SystemStatusBanner />
                 </SkeletonTheme>
             </APIContext.Provider>
         </ThemeProvider>
