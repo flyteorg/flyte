@@ -63,24 +63,3 @@ message WorkflowClosure {
     google.protobuf.Timestamp created_at           = 2;
 }
 
-// The status of the workflow is used to control its visibility in the UI.
-enum WorkflowState {
-    // By default, all workflows are considered active and under development.
-    WORKFLOW_ACTIVE = 0;
-
-    // Archived workflows are no longer visible in the UI.
-    WORKFLOW_ARCHIVED = 1;
-}
-
-// Request to set the referenced workflow state to the configured value.
-message WorkflowUpdateRequest {
-    // Identifier of workflow for which to change state.
-    core.Identifier id                   = 1;
-
-    // Desired state to apply to the workflow.
-    WorkflowState state                = 2;
-}
-
-// Purposefully empty, may be populated in the future.
-message WorkflowUpdateResponse {
-}

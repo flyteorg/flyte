@@ -2616,59 +2616,6 @@
         "tags": [
           "AdminService"
         ]
-      },
-      "put": {
-        "description": "Update the state of an existing workflow definition.",
-        "operationId": "UpdateWorkflow",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminWorkflowUpdateResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "description": "User provided value for the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.version",
-            "description": "Specific version of the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/adminWorkflowUpdateRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
       }
     }
   },
@@ -3483,8 +3430,21 @@
         "description": {
           "type": "string",
           "title": "Common description across all versions of the entity\n+optional"
+        },
+        "state": {
+          "$ref": "#/definitions/adminNamedEntityState",
+          "description": "Shared state across all version of the entity\nAt this point in time, only workflow entities can have their state archived."
         }
       }
+    },
+    "adminNamedEntityState": {
+      "type": "string",
+      "enum": [
+        "NAMED_ENTITY_ACTIVE",
+        "NAMED_ENTITY_ARCHIVED"
+      ],
+      "default": "NAMED_ENTITY_ACTIVE",
+      "description": "The status of the named entity is used to control its visibility in the UI.\n\n - NAMED_ENTITY_ACTIVE: By default, all named entities are considered active and under development.\n - NAMED_ENTITY_ARCHIVED: Archived named entities are no longer visible in the UI."
     },
     "adminNamedEntityUpdateRequest": {
       "type": "object",
@@ -4185,33 +4145,6 @@
         }
       },
       "description": "Represents a structure that encapsulates the specification of the workflow."
-    },
-    "adminWorkflowState": {
-      "type": "string",
-      "enum": [
-        "WORKFLOW_ACTIVE",
-        "WORKFLOW_ARCHIVED"
-      ],
-      "default": "WORKFLOW_ACTIVE",
-      "description": "The status of the workflow is used to control its visibility in the UI.\n\n - WORKFLOW_ACTIVE: By default, all workflows are considered active and under development.\n - WORKFLOW_ARCHIVED: Archived workflows are no longer visible in the UI."
-    },
-    "adminWorkflowUpdateRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/coreIdentifier",
-          "description": "Identifier of workflow for which to change state."
-        },
-        "state": {
-          "$ref": "#/definitions/adminWorkflowState",
-          "description": "Desired state to apply to the workflow."
-        }
-      },
-      "description": "Request to set the referenced workflow state to the configured value."
-    },
-    "adminWorkflowUpdateResponse": {
-      "type": "object",
-      "description": "Purposefully empty, may be populated in the future."
     },
     "coreAlias": {
       "type": "object",

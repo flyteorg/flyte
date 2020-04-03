@@ -299,12 +299,6 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
-    def test_update_workflow(self):
-        """Test case for update_workflow
-
-        """
-        pass
-
     def test_update_workflow_attributes(self):
         """Test case for update_workflow_attributes
 
