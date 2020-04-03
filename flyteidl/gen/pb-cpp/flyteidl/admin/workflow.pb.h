@@ -30,7 +30,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/compiler.pb.h"
 #include "flyteidl/core/identifier.pb.h"
@@ -47,7 +46,7 @@ struct TableStruct_flyteidl_2fadmin_2fworkflow_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[8]
+  static const ::google::protobuf::internal::ParseTable schema[6]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -74,12 +73,6 @@ extern WorkflowListDefaultTypeInternal _WorkflowList_default_instance_;
 class WorkflowSpec;
 class WorkflowSpecDefaultTypeInternal;
 extern WorkflowSpecDefaultTypeInternal _WorkflowSpec_default_instance_;
-class WorkflowUpdateRequest;
-class WorkflowUpdateRequestDefaultTypeInternal;
-extern WorkflowUpdateRequestDefaultTypeInternal _WorkflowUpdateRequest_default_instance_;
-class WorkflowUpdateResponse;
-class WorkflowUpdateResponseDefaultTypeInternal;
-extern WorkflowUpdateResponseDefaultTypeInternal _WorkflowUpdateResponse_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
 namespace google {
@@ -90,34 +83,11 @@ template<> ::flyteidl::admin::WorkflowCreateRequest* Arena::CreateMaybeMessage<:
 template<> ::flyteidl::admin::WorkflowCreateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowCreateResponse>(Arena*);
 template<> ::flyteidl::admin::WorkflowList* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowList>(Arena*);
 template<> ::flyteidl::admin::WorkflowSpec* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowSpec>(Arena*);
-template<> ::flyteidl::admin::WorkflowUpdateRequest* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowUpdateRequest>(Arena*);
-template<> ::flyteidl::admin::WorkflowUpdateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowUpdateResponse>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
 namespace admin {
 
-enum WorkflowState {
-  WORKFLOW_ACTIVE = 0,
-  WORKFLOW_ARCHIVED = 1,
-  WorkflowState_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
-  WorkflowState_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
-};
-bool WorkflowState_IsValid(int value);
-const WorkflowState WorkflowState_MIN = WORKFLOW_ACTIVE;
-const WorkflowState WorkflowState_MAX = WORKFLOW_ARCHIVED;
-const int WorkflowState_ARRAYSIZE = WorkflowState_MAX + 1;
-
-const ::google::protobuf::EnumDescriptor* WorkflowState_descriptor();
-inline const ::std::string& WorkflowState_Name(WorkflowState value) {
-  return ::google::protobuf::internal::NameOfEnum(
-    WorkflowState_descriptor(), value);
-}
-inline bool WorkflowState_Parse(
-    const ::std::string& name, WorkflowState* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<WorkflowState>(
-    WorkflowState_descriptor(), name, value);
-}
 // ===================================================================
 
 class WorkflowCreateRequest final :
@@ -859,233 +829,6 @@ class WorkflowClosure final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_2eproto;
 };
-// -------------------------------------------------------------------
-
-class WorkflowUpdateRequest final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.WorkflowUpdateRequest) */ {
- public:
-  WorkflowUpdateRequest();
-  virtual ~WorkflowUpdateRequest();
-
-  WorkflowUpdateRequest(const WorkflowUpdateRequest& from);
-
-  inline WorkflowUpdateRequest& operator=(const WorkflowUpdateRequest& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  WorkflowUpdateRequest(WorkflowUpdateRequest&& from) noexcept
-    : WorkflowUpdateRequest() {
-    *this = ::std::move(from);
-  }
-
-  inline WorkflowUpdateRequest& operator=(WorkflowUpdateRequest&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const WorkflowUpdateRequest& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const WorkflowUpdateRequest* internal_default_instance() {
-    return reinterpret_cast<const WorkflowUpdateRequest*>(
-               &_WorkflowUpdateRequest_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    6;
-
-  void Swap(WorkflowUpdateRequest* other);
-  friend void swap(WorkflowUpdateRequest& a, WorkflowUpdateRequest& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline WorkflowUpdateRequest* New() const final {
-    return CreateMaybeMessage<WorkflowUpdateRequest>(nullptr);
-  }
-
-  WorkflowUpdateRequest* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<WorkflowUpdateRequest>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const WorkflowUpdateRequest& from);
-  void MergeFrom(const WorkflowUpdateRequest& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(WorkflowUpdateRequest* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // .flyteidl.core.Identifier id = 1;
-  bool has_id() const;
-  void clear_id();
-  static const int kIdFieldNumber = 1;
-  const ::flyteidl::core::Identifier& id() const;
-  ::flyteidl::core::Identifier* release_id();
-  ::flyteidl::core::Identifier* mutable_id();
-  void set_allocated_id(::flyteidl::core::Identifier* id);
-
-  // .flyteidl.admin.WorkflowState state = 2;
-  void clear_state();
-  static const int kStateFieldNumber = 2;
-  ::flyteidl::admin::WorkflowState state() const;
-  void set_state(::flyteidl::admin::WorkflowState value);
-
-  // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowUpdateRequest)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::flyteidl::core::Identifier* id_;
-  int state_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_2eproto;
-};
-// -------------------------------------------------------------------
-
-class WorkflowUpdateResponse final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.WorkflowUpdateResponse) */ {
- public:
-  WorkflowUpdateResponse();
-  virtual ~WorkflowUpdateResponse();
-
-  WorkflowUpdateResponse(const WorkflowUpdateResponse& from);
-
-  inline WorkflowUpdateResponse& operator=(const WorkflowUpdateResponse& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  WorkflowUpdateResponse(WorkflowUpdateResponse&& from) noexcept
-    : WorkflowUpdateResponse() {
-    *this = ::std::move(from);
-  }
-
-  inline WorkflowUpdateResponse& operator=(WorkflowUpdateResponse&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const WorkflowUpdateResponse& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const WorkflowUpdateResponse* internal_default_instance() {
-    return reinterpret_cast<const WorkflowUpdateResponse*>(
-               &_WorkflowUpdateResponse_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    7;
-
-  void Swap(WorkflowUpdateResponse* other);
-  friend void swap(WorkflowUpdateResponse& a, WorkflowUpdateResponse& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline WorkflowUpdateResponse* New() const final {
-    return CreateMaybeMessage<WorkflowUpdateResponse>(nullptr);
-  }
-
-  WorkflowUpdateResponse* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<WorkflowUpdateResponse>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const WorkflowUpdateResponse& from);
-  void MergeFrom(const WorkflowUpdateResponse& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(WorkflowUpdateResponse* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowUpdateResponse)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_2eproto;
-};
 // ===================================================================
 
 
@@ -1555,80 +1298,9 @@ inline void WorkflowClosure::set_allocated_created_at(::google::protobuf::Timest
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowClosure.created_at)
 }
 
-// -------------------------------------------------------------------
-
-// WorkflowUpdateRequest
-
-// .flyteidl.core.Identifier id = 1;
-inline bool WorkflowUpdateRequest::has_id() const {
-  return this != internal_default_instance() && id_ != nullptr;
-}
-inline const ::flyteidl::core::Identifier& WorkflowUpdateRequest::id() const {
-  const ::flyteidl::core::Identifier* p = id_;
-  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowUpdateRequest.id)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Identifier*>(
-      &::flyteidl::core::_Identifier_default_instance_);
-}
-inline ::flyteidl::core::Identifier* WorkflowUpdateRequest::release_id() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowUpdateRequest.id)
-  
-  ::flyteidl::core::Identifier* temp = id_;
-  id_ = nullptr;
-  return temp;
-}
-inline ::flyteidl::core::Identifier* WorkflowUpdateRequest::mutable_id() {
-  
-  if (id_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::Identifier>(GetArenaNoVirtual());
-    id_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowUpdateRequest.id)
-  return id_;
-}
-inline void WorkflowUpdateRequest::set_allocated_id(::flyteidl::core::Identifier* id) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(id_);
-  }
-  if (id) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      id = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, id, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  id_ = id;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowUpdateRequest.id)
-}
-
-// .flyteidl.admin.WorkflowState state = 2;
-inline void WorkflowUpdateRequest::clear_state() {
-  state_ = 0;
-}
-inline ::flyteidl::admin::WorkflowState WorkflowUpdateRequest::state() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowUpdateRequest.state)
-  return static_cast< ::flyteidl::admin::WorkflowState >(state_);
-}
-inline void WorkflowUpdateRequest::set_state(::flyteidl::admin::WorkflowState value) {
-  
-  state_ = value;
-  // @@protoc_insertion_point(field_set:flyteidl.admin.WorkflowUpdateRequest.state)
-}
-
-// -------------------------------------------------------------------
-
-// WorkflowUpdateResponse
-
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -1644,18 +1316,6 @@ inline void WorkflowUpdateRequest::set_state(::flyteidl::admin::WorkflowState va
 
 }  // namespace admin
 }  // namespace flyteidl
-
-namespace google {
-namespace protobuf {
-
-template <> struct is_proto_enum< ::flyteidl::admin::WorkflowState> : ::std::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::admin::WorkflowState>() {
-  return ::flyteidl::admin::WorkflowState_descriptor();
-}
-
-}  // namespace protobuf
-}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
 

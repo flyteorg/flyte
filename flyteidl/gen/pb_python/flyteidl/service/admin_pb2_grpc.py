@@ -66,11 +66,6 @@ class AdminServiceStub(object):
         request_serializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
         response_deserializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowList.FromString,
         )
-    self.UpdateWorkflow = channel.unary_unary(
-        '/flyteidl.service.AdminService/UpdateWorkflow',
-        request_serializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowUpdateRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowUpdateResponse.FromString,
-        )
     self.CreateLaunchPlan = channel.unary_unary(
         '/flyteidl.service.AdminService/CreateLaunchPlan',
         request_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanCreateRequest.SerializeToString,
@@ -303,13 +298,6 @@ class AdminServiceServicer(object):
     raise NotImplementedError('Method not implemented!')
 
   def ListWorkflows(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
-    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-    context.set_details('Method not implemented!')
-    raise NotImplementedError('Method not implemented!')
-
-  def UpdateWorkflow(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -603,11 +591,6 @@ def add_AdminServiceServicer_to_server(servicer, server):
           servicer.ListWorkflows,
           request_deserializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.FromString,
           response_serializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowList.SerializeToString,
-      ),
-      'UpdateWorkflow': grpc.unary_unary_rpc_method_handler(
-          servicer.UpdateWorkflow,
-          request_deserializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowUpdateRequest.FromString,
-          response_serializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowUpdateResponse.SerializeToString,
       ),
       'CreateLaunchPlan': grpc.unary_unary_rpc_method_handler(
           servicer.CreateLaunchPlan,
