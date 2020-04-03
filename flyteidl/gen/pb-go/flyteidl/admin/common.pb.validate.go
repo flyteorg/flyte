@@ -371,6 +371,8 @@ func (m *NamedEntityIdentifierListRequest) Validate() error {
 		}
 	}
 
+	// no validation rules for Filters
+
 	return nil
 }
 
@@ -458,6 +460,8 @@ func (m *NamedEntityListRequest) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for Filters
 
 	return nil
 }

@@ -801,6 +801,13 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1335,6 +1342,13 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1880,6 +1894,13 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2353,6 +2374,13 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
