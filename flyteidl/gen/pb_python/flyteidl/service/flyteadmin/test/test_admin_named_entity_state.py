@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import flyteadmin
-from flyteadmin.models.admin_workflow_state import AdminWorkflowState  # noqa: E501
+from flyteadmin.models.admin_named_entity_state import AdminNamedEntityState  # noqa: E501
 from flyteadmin.rest import ApiException
 
 
-class TestAdminWorkflowState(unittest.TestCase):
-    """AdminWorkflowState unit test stubs"""
+class TestAdminNamedEntityState(unittest.TestCase):
+    """AdminNamedEntityState unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestAdminWorkflowState(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testAdminWorkflowState(self):
-        """Test AdminWorkflowState"""
+    def testAdminNamedEntityState(self):
+        """Test AdminNamedEntityState"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = flyteadmin.models.admin_workflow_state.AdminWorkflowState()  # noqa: E501
+        # model = flyteadmin.models.admin_named_entity_state.AdminNamedEntityState()  # noqa: E501
         pass
 
 

@@ -129,6 +129,8 @@ func (m *NamedEntityMetadata) Validate() error {
 
 	// no validation rules for Description
 
+	// no validation rules for State
+
 	return nil
 }
 

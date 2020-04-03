@@ -14,6 +14,124 @@ public final class Common {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+  /**
+   * <pre>
+   * The status of the named entity is used to control its visibility in the UI.
+   * </pre>
+   *
+   * Protobuf enum {@code flyteidl.admin.NamedEntityState}
+   */
+  public enum NamedEntityState
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <pre>
+     * By default, all named entities are considered active and under development.
+     * </pre>
+     *
+     * <code>NAMED_ENTITY_ACTIVE = 0;</code>
+     */
+    NAMED_ENTITY_ACTIVE(0),
+    /**
+     * <pre>
+     * Archived named entities are no longer visible in the UI.
+     * </pre>
+     *
+     * <code>NAMED_ENTITY_ARCHIVED = 1;</code>
+     */
+    NAMED_ENTITY_ARCHIVED(1),
+    UNRECOGNIZED(-1),
+    ;
+
+    /**
+     * <pre>
+     * By default, all named entities are considered active and under development.
+     * </pre>
+     *
+     * <code>NAMED_ENTITY_ACTIVE = 0;</code>
+     */
+    public static final int NAMED_ENTITY_ACTIVE_VALUE = 0;
+    /**
+     * <pre>
+     * Archived named entities are no longer visible in the UI.
+     * </pre>
+     *
+     * <code>NAMED_ENTITY_ARCHIVED = 1;</code>
+     */
+    public static final int NAMED_ENTITY_ARCHIVED_VALUE = 1;
+
+
+    public final int getNumber() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalArgumentException(
+            "Can't get the number of an unknown enum value.");
+      }
+      return value;
+    }
+
+    /**
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static NamedEntityState valueOf(int value) {
+      return forNumber(value);
+    }
+
+    public static NamedEntityState forNumber(int value) {
+      switch (value) {
+        case 0: return NAMED_ENTITY_ACTIVE;
+        case 1: return NAMED_ENTITY_ARCHIVED;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<NamedEntityState>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        NamedEntityState> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<NamedEntityState>() {
+            public NamedEntityState findValueByNumber(int number) {
+              return NamedEntityState.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return flyteidl.admin.Common.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final NamedEntityState[] VALUES = values();
+
+    public static NamedEntityState valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      if (desc.getIndex() == -1) {
+        return UNRECOGNIZED;
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private NamedEntityState(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:flyteidl.admin.NamedEntityState)
+  }
+
   public interface NamedEntityIdentifierOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.NamedEntityIdentifier)
       com.google.protobuf.MessageOrBuilder {
@@ -1005,6 +1123,25 @@ public final class Common {
      */
     com.google.protobuf.ByteString
         getDescriptionBytes();
+
+    /**
+     * <pre>
+     * Shared state across all version of the entity
+     * At this point in time, only workflow entities can have their state archived.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.NamedEntityState state = 2;</code>
+     */
+    int getStateValue();
+    /**
+     * <pre>
+     * Shared state across all version of the entity
+     * At this point in time, only workflow entities can have their state archived.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.NamedEntityState state = 2;</code>
+     */
+    flyteidl.admin.Common.NamedEntityState getState();
   }
   /**
    * Protobuf type {@code flyteidl.admin.NamedEntityMetadata}
@@ -1020,6 +1157,7 @@ public final class Common {
     }
     private NamedEntityMetadata() {
       description_ = "";
+      state_ = 0;
     }
 
     @java.lang.Override
@@ -1050,6 +1188,12 @@ public final class Common {
               java.lang.String s = input.readStringRequireUtf8();
 
               description_ = s;
+              break;
+            }
+            case 16: {
+              int rawValue = input.readEnum();
+
+              state_ = rawValue;
               break;
             }
             default: {
@@ -1128,6 +1272,33 @@ public final class Common {
       }
     }
 
+    public static final int STATE_FIELD_NUMBER = 2;
+    private int state_;
+    /**
+     * <pre>
+     * Shared state across all version of the entity
+     * At this point in time, only workflow entities can have their state archived.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.NamedEntityState state = 2;</code>
+     */
+    public int getStateValue() {
+      return state_;
+    }
+    /**
+     * <pre>
+     * Shared state across all version of the entity
+     * At this point in time, only workflow entities can have their state archived.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.NamedEntityState state = 2;</code>
+     */
+    public flyteidl.admin.Common.NamedEntityState getState() {
+      @SuppressWarnings("deprecation")
+      flyteidl.admin.Common.NamedEntityState result = flyteidl.admin.Common.NamedEntityState.valueOf(state_);
+      return result == null ? flyteidl.admin.Common.NamedEntityState.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1145,6 +1316,9 @@ public final class Common {
       if (!getDescriptionBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, description_);
       }
+      if (state_ != flyteidl.admin.Common.NamedEntityState.NAMED_ENTITY_ACTIVE.getNumber()) {
+        output.writeEnum(2, state_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1156,6 +1330,10 @@ public final class Common {
       size = 0;
       if (!getDescriptionBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, description_);
+      }
+      if (state_ != flyteidl.admin.Common.NamedEntityState.NAMED_ENTITY_ACTIVE.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(2, state_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1174,6 +1352,7 @@ public final class Common {
 
       if (!getDescription()
           .equals(other.getDescription())) return false;
+      if (state_ != other.state_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1187,6 +1366,8 @@ public final class Common {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + DESCRIPTION_FIELD_NUMBER;
       hash = (53 * hash) + getDescription().hashCode();
+      hash = (37 * hash) + STATE_FIELD_NUMBER;
+      hash = (53 * hash) + state_;
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1322,6 +1503,8 @@ public final class Common {
         super.clear();
         description_ = "";
 
+        state_ = 0;
+
         return this;
       }
 
@@ -1349,6 +1532,7 @@ public final class Common {
       public flyteidl.admin.Common.NamedEntityMetadata buildPartial() {
         flyteidl.admin.Common.NamedEntityMetadata result = new flyteidl.admin.Common.NamedEntityMetadata(this);
         result.description_ = description_;
+        result.state_ = state_;
         onBuilt();
         return result;
       }
@@ -1400,6 +1584,9 @@ public final class Common {
         if (!other.getDescription().isEmpty()) {
           description_ = other.description_;
           onChanged();
+        }
+        if (other.state_ != 0) {
+          setStateValue(other.getStateValue());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1520,6 +1707,76 @@ public final class Common {
   checkByteStringIsUtf8(value);
         
         description_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int state_ = 0;
+      /**
+       * <pre>
+       * Shared state across all version of the entity
+       * At this point in time, only workflow entities can have their state archived.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NamedEntityState state = 2;</code>
+       */
+      public int getStateValue() {
+        return state_;
+      }
+      /**
+       * <pre>
+       * Shared state across all version of the entity
+       * At this point in time, only workflow entities can have their state archived.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NamedEntityState state = 2;</code>
+       */
+      public Builder setStateValue(int value) {
+        state_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Shared state across all version of the entity
+       * At this point in time, only workflow entities can have their state archived.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NamedEntityState state = 2;</code>
+       */
+      public flyteidl.admin.Common.NamedEntityState getState() {
+        @SuppressWarnings("deprecation")
+        flyteidl.admin.Common.NamedEntityState result = flyteidl.admin.Common.NamedEntityState.valueOf(state_);
+        return result == null ? flyteidl.admin.Common.NamedEntityState.UNRECOGNIZED : result;
+      }
+      /**
+       * <pre>
+       * Shared state across all version of the entity
+       * At this point in time, only workflow entities can have their state archived.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NamedEntityState state = 2;</code>
+       */
+      public Builder setState(flyteidl.admin.Common.NamedEntityState value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        state_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Shared state across all version of the entity
+       * At this point in time, only workflow entities can have their state archived.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.NamedEntityState state = 2;</code>
+       */
+      public Builder clearState() {
+        
+        state_ = 0;
         onChanged();
         return this;
       }
@@ -18426,60 +18683,63 @@ public final class Common {
       "admin\032\035flyteidl/core/execution.proto\032\036fl" +
       "yteidl/core/identifier.proto\"F\n\025NamedEnt" +
       "ityIdentifier\022\017\n\007project\030\001 \001(\t\022\016\n\006domain" +
-      "\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\"*\n\023NamedEntityMetad" +
-      "ata\022\023\n\013description\030\001 \001(\t\"\253\001\n\013NamedEntity" +
-      "\0222\n\rresource_type\030\001 \001(\0162\033.flyteidl.core." +
-      "ResourceType\0221\n\002id\030\002 \001(\0132%.flyteidl.admi" +
-      "n.NamedEntityIdentifier\0225\n\010metadata\030\003 \001(" +
-      "\0132#.flyteidl.admin.NamedEntityMetadata\"r" +
-      "\n\004Sort\022\013\n\003key\030\001 \001(\t\0221\n\tdirection\030\002 \001(\0162\036" +
-      ".flyteidl.admin.Sort.Direction\"*\n\tDirect" +
-      "ion\022\016\n\nDESCENDING\020\000\022\r\n\tASCENDING\020\001\"\210\001\n N" +
-      "amedEntityIdentifierListRequest\022\017\n\007proje" +
-      "ct\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022" +
-      "\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flytei" +
-      "dl.admin.Sort\"\262\001\n\026NamedEntityListRequest" +
-      "\0222\n\rresource_type\030\001 \001(\0162\033.flyteidl.core." +
-      "ResourceType\022\017\n\007project\030\002 \001(\t\022\016\n\006domain\030" +
-      "\003 \001(\t\022\r\n\005limit\030\004 \001(\r\022\r\n\005token\030\005 \001(\t\022%\n\007s" +
-      "ort_by\030\006 \001(\0132\024.flyteidl.admin.Sort\"c\n\031Na" +
-      "medEntityIdentifierList\0227\n\010entities\030\001 \003(" +
-      "\0132%.flyteidl.admin.NamedEntityIdentifier" +
-      "\022\r\n\005token\030\002 \001(\t\"O\n\017NamedEntityList\022-\n\010en" +
-      "tities\030\001 \003(\0132\033.flyteidl.admin.NamedEntit" +
-      "y\022\r\n\005token\030\002 \001(\t\"~\n\025NamedEntityGetReques" +
-      "t\0222\n\rresource_type\030\001 \001(\0162\033.flyteidl.core" +
-      ".ResourceType\0221\n\002id\030\002 \001(\0132%.flyteidl.adm" +
-      "in.NamedEntityIdentifier\"\270\001\n\030NamedEntity" +
-      "UpdateRequest\0222\n\rresource_type\030\001 \001(\0162\033.f" +
-      "lyteidl.core.ResourceType\0221\n\002id\030\002 \001(\0132%." +
-      "flyteidl.admin.NamedEntityIdentifier\0225\n\010" +
-      "metadata\030\003 \001(\0132#.flyteidl.admin.NamedEnt" +
-      "ityMetadata\"\033\n\031NamedEntityUpdateResponse" +
-      "\"9\n\020ObjectGetRequest\022%\n\002id\030\001 \001(\0132\031.flyte" +
-      "idl.core.Identifier\"\236\001\n\023ResourceListRequ" +
-      "est\0221\n\002id\030\001 \001(\0132%.flyteidl.admin.NamedEn" +
-      "tityIdentifier\022\r\n\005limit\030\002 \001(\r\022\r\n\005token\030\003" +
-      " \001(\t\022\017\n\007filters\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024" +
-      ".flyteidl.admin.Sort\"-\n\021EmailNotificatio" +
-      "n\022\030\n\020recipients_email\030\001 \003(\t\"1\n\025PagerDuty" +
-      "Notification\022\030\n\020recipients_email\030\001 \003(\t\"-" +
-      "\n\021SlackNotification\022\030\n\020recipients_email\030" +
-      "\001 \003(\t\"\363\001\n\014Notification\0226\n\006phases\030\001 \003(\0162&" +
-      ".flyteidl.core.WorkflowExecution.Phase\0222" +
-      "\n\005email\030\002 \001(\0132!.flyteidl.admin.EmailNoti" +
-      "ficationH\000\022;\n\npager_duty\030\003 \001(\0132%.flyteid" +
-      "l.admin.PagerDutyNotificationH\000\0222\n\005slack" +
-      "\030\004 \001(\0132!.flyteidl.admin.SlackNotificatio" +
-      "nH\000B\006\n\004type\"%\n\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r\n\005b" +
-      "ytes\030\002 \001(\003\"k\n\006Labels\0222\n\006values\030\001 \003(\0132\".f" +
-      "lyteidl.admin.Labels.ValuesEntry\032-\n\013Valu" +
-      "esEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"" +
-      "u\n\013Annotations\0227\n\006values\030\001 \003(\0132\'.flyteid" +
-      "l.admin.Annotations.ValuesEntry\032-\n\013Value" +
-      "sEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B3" +
-      "Z1github.com/lyft/flyteidl/gen/pb-go/fly" +
-      "teidl/adminb\006proto3"
+      "\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\"[\n\023NamedEntityMetad" +
+      "ata\022\023\n\013description\030\001 \001(\t\022/\n\005state\030\002 \001(\0162" +
+      " .flyteidl.admin.NamedEntityState\"\253\001\n\013Na" +
+      "medEntity\0222\n\rresource_type\030\001 \001(\0162\033.flyte" +
+      "idl.core.ResourceType\0221\n\002id\030\002 \001(\0132%.flyt" +
+      "eidl.admin.NamedEntityIdentifier\0225\n\010meta" +
+      "data\030\003 \001(\0132#.flyteidl.admin.NamedEntityM" +
+      "etadata\"r\n\004Sort\022\013\n\003key\030\001 \001(\t\0221\n\tdirectio" +
+      "n\030\002 \001(\0162\036.flyteidl.admin.Sort.Direction\"" +
+      "*\n\tDirection\022\016\n\nDESCENDING\020\000\022\r\n\tASCENDIN" +
+      "G\020\001\"\210\001\n NamedEntityIdentifierListRequest" +
+      "\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005lim" +
+      "it\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\013" +
+      "2\024.flyteidl.admin.Sort\"\262\001\n\026NamedEntityLi" +
+      "stRequest\0222\n\rresource_type\030\001 \001(\0162\033.flyte" +
+      "idl.core.ResourceType\022\017\n\007project\030\002 \001(\t\022\016" +
+      "\n\006domain\030\003 \001(\t\022\r\n\005limit\030\004 \001(\r\022\r\n\005token\030\005" +
+      " \001(\t\022%\n\007sort_by\030\006 \001(\0132\024.flyteidl.admin.S" +
+      "ort\"c\n\031NamedEntityIdentifierList\0227\n\010enti" +
+      "ties\030\001 \003(\0132%.flyteidl.admin.NamedEntityI" +
+      "dentifier\022\r\n\005token\030\002 \001(\t\"O\n\017NamedEntityL" +
+      "ist\022-\n\010entities\030\001 \003(\0132\033.flyteidl.admin.N" +
+      "amedEntity\022\r\n\005token\030\002 \001(\t\"~\n\025NamedEntity" +
+      "GetRequest\0222\n\rresource_type\030\001 \001(\0162\033.flyt" +
+      "eidl.core.ResourceType\0221\n\002id\030\002 \001(\0132%.fly" +
+      "teidl.admin.NamedEntityIdentifier\"\270\001\n\030Na" +
+      "medEntityUpdateRequest\0222\n\rresource_type\030" +
+      "\001 \001(\0162\033.flyteidl.core.ResourceType\0221\n\002id" +
+      "\030\002 \001(\0132%.flyteidl.admin.NamedEntityIdent" +
+      "ifier\0225\n\010metadata\030\003 \001(\0132#.flyteidl.admin" +
+      ".NamedEntityMetadata\"\033\n\031NamedEntityUpdat" +
+      "eResponse\"9\n\020ObjectGetRequest\022%\n\002id\030\001 \001(" +
+      "\0132\031.flyteidl.core.Identifier\"\236\001\n\023Resourc" +
+      "eListRequest\0221\n\002id\030\001 \001(\0132%.flyteidl.admi" +
+      "n.NamedEntityIdentifier\022\r\n\005limit\030\002 \001(\r\022\r" +
+      "\n\005token\030\003 \001(\t\022\017\n\007filters\030\004 \001(\t\022%\n\007sort_b" +
+      "y\030\005 \001(\0132\024.flyteidl.admin.Sort\"-\n\021EmailNo" +
+      "tification\022\030\n\020recipients_email\030\001 \003(\t\"1\n\025" +
+      "PagerDutyNotification\022\030\n\020recipients_emai" +
+      "l\030\001 \003(\t\"-\n\021SlackNotification\022\030\n\020recipien" +
+      "ts_email\030\001 \003(\t\"\363\001\n\014Notification\0226\n\006phase" +
+      "s\030\001 \003(\0162&.flyteidl.core.WorkflowExecutio" +
+      "n.Phase\0222\n\005email\030\002 \001(\0132!.flyteidl.admin." +
+      "EmailNotificationH\000\022;\n\npager_duty\030\003 \001(\0132" +
+      "%.flyteidl.admin.PagerDutyNotificationH\000" +
+      "\0222\n\005slack\030\004 \001(\0132!.flyteidl.admin.SlackNo" +
+      "tificationH\000B\006\n\004type\"%\n\007UrlBlob\022\013\n\003url\030\001" +
+      " \001(\t\022\r\n\005bytes\030\002 \001(\003\"k\n\006Labels\0222\n\006values\030" +
+      "\001 \003(\0132\".flyteidl.admin.Labels.ValuesEntr" +
+      "y\032-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002" +
+      " \001(\t:\0028\001\"u\n\013Annotations\0227\n\006values\030\001 \003(\0132" +
+      "\'.flyteidl.admin.Annotations.ValuesEntry" +
+      "\032-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 " +
+      "\001(\t:\0028\001*F\n\020NamedEntityState\022\027\n\023NAMED_ENT" +
+      "ITY_ACTIVE\020\000\022\031\n\025NAMED_ENTITY_ARCHIVED\020\001B" +
+      "3Z1github.com/lyft/flyteidl/gen/pb-go/fl" +
+      "yteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18506,7 +18766,7 @@ public final class Common {
     internal_static_flyteidl_admin_NamedEntityMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NamedEntityMetadata_descriptor,
-        new java.lang.String[] { "Description", });
+        new java.lang.String[] { "Description", "State", });
     internal_static_flyteidl_admin_NamedEntity_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_admin_NamedEntity_fieldAccessorTable = new

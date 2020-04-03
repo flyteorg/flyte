@@ -174,6 +174,27 @@ inline bool Sort_Direction_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<Sort_Direction>(
     Sort_Direction_descriptor(), name, value);
 }
+enum NamedEntityState {
+  NAMED_ENTITY_ACTIVE = 0,
+  NAMED_ENTITY_ARCHIVED = 1,
+  NamedEntityState_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  NamedEntityState_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool NamedEntityState_IsValid(int value);
+const NamedEntityState NamedEntityState_MIN = NAMED_ENTITY_ACTIVE;
+const NamedEntityState NamedEntityState_MAX = NAMED_ENTITY_ARCHIVED;
+const int NamedEntityState_ARRAYSIZE = NamedEntityState_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* NamedEntityState_descriptor();
+inline const ::std::string& NamedEntityState_Name(NamedEntityState value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    NamedEntityState_descriptor(), value);
+}
+inline bool NamedEntityState_Parse(
+    const ::std::string& name, NamedEntityState* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<NamedEntityState>(
+    NamedEntityState_descriptor(), name, value);
+}
 // ===================================================================
 
 class NamedEntityIdentifier final :
@@ -435,12 +456,19 @@ class NamedEntityMetadata final :
   ::std::string* release_description();
   void set_allocated_description(::std::string* description);
 
+  // .flyteidl.admin.NamedEntityState state = 2;
+  void clear_state();
+  static const int kStateFieldNumber = 2;
+  ::flyteidl::admin::NamedEntityState state() const;
+  void set_state(::flyteidl::admin::NamedEntityState value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.NamedEntityMetadata)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr description_;
+  int state_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
 };
@@ -3167,6 +3195,20 @@ inline void NamedEntityMetadata::set_allocated_description(::std::string* descri
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityMetadata.description)
 }
 
+// .flyteidl.admin.NamedEntityState state = 2;
+inline void NamedEntityMetadata::clear_state() {
+  state_ = 0;
+}
+inline ::flyteidl::admin::NamedEntityState NamedEntityMetadata::state() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityMetadata.state)
+  return static_cast< ::flyteidl::admin::NamedEntityState >(state_);
+}
+inline void NamedEntityMetadata::set_state(::flyteidl::admin::NamedEntityState value) {
+  
+  state_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityMetadata.state)
+}
+
 // -------------------------------------------------------------------
 
 // NamedEntity
@@ -5032,6 +5074,11 @@ template <> struct is_proto_enum< ::flyteidl::admin::Sort_Direction> : ::std::tr
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::admin::Sort_Direction>() {
   return ::flyteidl::admin::Sort_Direction_descriptor();
+}
+template <> struct is_proto_enum< ::flyteidl::admin::NamedEntityState> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::admin::NamedEntityState>() {
+  return ::flyteidl::admin::NamedEntityState_descriptor();
 }
 
 }  // namespace protobuf

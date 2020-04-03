@@ -4821,11 +4821,20 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** NamedEntityState enum. */
+        enum NamedEntityState {
+            NAMED_ENTITY_ACTIVE = 0,
+            NAMED_ENTITY_ARCHIVED = 1
+        }
+
         /** Properties of a NamedEntityMetadata. */
         interface INamedEntityMetadata {
 
             /** NamedEntityMetadata description */
             description?: (string|null);
+
+            /** NamedEntityMetadata state */
+            state?: (flyteidl.admin.NamedEntityState|null);
         }
 
         /** Represents a NamedEntityMetadata. */
@@ -4839,6 +4848,9 @@ export namespace flyteidl {
 
             /** NamedEntityMetadata description. */
             public description: string;
+
+            /** NamedEntityMetadata state. */
+            public state: flyteidl.admin.NamedEntityState;
 
             /**
              * Creates a new NamedEntityMetadata instance using the specified properties.
@@ -11480,116 +11492,6 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** WorkflowState enum. */
-        enum WorkflowState {
-            WORKFLOW_ACTIVE = 0,
-            WORKFLOW_ARCHIVED = 1
-        }
-
-        /** Properties of a WorkflowUpdateRequest. */
-        interface IWorkflowUpdateRequest {
-
-            /** WorkflowUpdateRequest id */
-            id?: (flyteidl.core.IIdentifier|null);
-
-            /** WorkflowUpdateRequest state */
-            state?: (flyteidl.admin.WorkflowState|null);
-        }
-
-        /** Represents a WorkflowUpdateRequest. */
-        class WorkflowUpdateRequest implements IWorkflowUpdateRequest {
-
-            /**
-             * Constructs a new WorkflowUpdateRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflowUpdateRequest);
-
-            /** WorkflowUpdateRequest id. */
-            public id?: (flyteidl.core.IIdentifier|null);
-
-            /** WorkflowUpdateRequest state. */
-            public state: flyteidl.admin.WorkflowState;
-
-            /**
-             * Creates a new WorkflowUpdateRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowUpdateRequest instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflowUpdateRequest): flyteidl.admin.WorkflowUpdateRequest;
-
-            /**
-             * Encodes the specified WorkflowUpdateRequest message. Does not implicitly {@link flyteidl.admin.WorkflowUpdateRequest.verify|verify} messages.
-             * @param message WorkflowUpdateRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflowUpdateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowUpdateRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowUpdateRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowUpdateRequest;
-
-            /**
-             * Verifies a WorkflowUpdateRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a WorkflowUpdateResponse. */
-        interface IWorkflowUpdateResponse {
-        }
-
-        /** Represents a WorkflowUpdateResponse. */
-        class WorkflowUpdateResponse implements IWorkflowUpdateResponse {
-
-            /**
-             * Constructs a new WorkflowUpdateResponse.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflowUpdateResponse);
-
-            /**
-             * Creates a new WorkflowUpdateResponse instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowUpdateResponse instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflowUpdateResponse): flyteidl.admin.WorkflowUpdateResponse;
-
-            /**
-             * Encodes the specified WorkflowUpdateResponse message. Does not implicitly {@link flyteidl.admin.WorkflowUpdateResponse.verify|verify} messages.
-             * @param message WorkflowUpdateResponse message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflowUpdateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowUpdateResponse message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowUpdateResponse
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowUpdateResponse;
-
-            /**
-             * Verifies a WorkflowUpdateResponse message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
         /** Properties of a WorkflowAttributes. */
         interface IWorkflowAttributes {
 
@@ -12131,20 +12033,6 @@ export namespace flyteidl {
              * @returns Promise
              */
             public listWorkflows(request: flyteidl.admin.IResourceListRequest): Promise<flyteidl.admin.WorkflowList>;
-
-            /**
-             * Calls UpdateWorkflow.
-             * @param request WorkflowUpdateRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and WorkflowUpdateResponse
-             */
-            public updateWorkflow(request: flyteidl.admin.IWorkflowUpdateRequest, callback: flyteidl.service.AdminService.UpdateWorkflowCallback): void;
-
-            /**
-             * Calls UpdateWorkflow.
-             * @param request WorkflowUpdateRequest message or plain object
-             * @returns Promise
-             */
-            public updateWorkflow(request: flyteidl.admin.IWorkflowUpdateRequest): Promise<flyteidl.admin.WorkflowUpdateResponse>;
 
             /**
              * Calls CreateLaunchPlan.
@@ -12694,13 +12582,6 @@ export namespace flyteidl {
              * @param [response] WorkflowList
              */
             type ListWorkflowsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowList) => void;
-
-            /**
-             * Callback as used by {@link flyteidl.service.AdminService#updateWorkflow}.
-             * @param error Error, if any
-             * @param [response] WorkflowUpdateResponse
-             */
-            type UpdateWorkflowCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowUpdateResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#createLaunchPlan}.

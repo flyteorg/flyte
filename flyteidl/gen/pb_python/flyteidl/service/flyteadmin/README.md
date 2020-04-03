@@ -114,7 +114,6 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**update_launch_plan**](docs/AdminServiceApi.md#update_launch_plan) | **PUT** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | 
 *AdminServiceApi* | [**update_named_entity**](docs/AdminServiceApi.md#update_named_entity) | **PUT** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**update_project_domain_attributes**](docs/AdminServiceApi.md#update_project_domain_attributes) | **PUT** /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain} | 
-*AdminServiceApi* | [**update_workflow**](docs/AdminServiceApi.md#update_workflow) | **PUT** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | 
 *AdminServiceApi* | [**update_workflow_attributes**](docs/AdminServiceApi.md#update_workflow_attributes) | **PUT** /api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow} | 
 
 
@@ -161,6 +160,7 @@ Class | Method | HTTP request | Description
  - [AdminNamedEntityIdentifierList](docs/AdminNamedEntityIdentifierList.md)
  - [AdminNamedEntityList](docs/AdminNamedEntityList.md)
  - [AdminNamedEntityMetadata](docs/AdminNamedEntityMetadata.md)
+ - [AdminNamedEntityState](docs/AdminNamedEntityState.md)
  - [AdminNamedEntityUpdateRequest](docs/AdminNamedEntityUpdateRequest.md)
  - [AdminNamedEntityUpdateResponse](docs/AdminNamedEntityUpdateResponse.md)
  - [AdminNodeExecutionClosure](docs/AdminNodeExecutionClosure.md)
@@ -215,9 +215,6 @@ Class | Method | HTTP request | Description
  - [AdminWorkflowExecutionGetDataResponse](docs/AdminWorkflowExecutionGetDataResponse.md)
  - [AdminWorkflowList](docs/AdminWorkflowList.md)
  - [AdminWorkflowSpec](docs/AdminWorkflowSpec.md)
- - [AdminWorkflowState](docs/AdminWorkflowState.md)
- - [AdminWorkflowUpdateRequest](docs/AdminWorkflowUpdateRequest.md)
- - [AdminWorkflowUpdateResponse](docs/AdminWorkflowUpdateResponse.md)
  - [BlobTypeBlobDimensionality](docs/BlobTypeBlobDimensionality.md)
  - [ComparisonExpressionOperator](docs/ComparisonExpressionOperator.md)
  - [ConjunctionExpressionLogicalOperator](docs/ConjunctionExpressionLogicalOperator.md)
