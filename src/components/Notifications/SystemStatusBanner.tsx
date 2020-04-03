@@ -125,12 +125,12 @@ export const SystemStatusBanner: React.FC<{}> = () => {
     }
     return (
         <WaitForData {...systemStatus}>
-            {systemStatus.value.message && (
+            {systemStatus.value.message ? (
                 <RenderSystemStatusBanner
                     systemStatus={systemStatus.value}
                     onClose={onClose}
                 />
-            )}
+            ) : null}
         </WaitForData>
     );
 };
