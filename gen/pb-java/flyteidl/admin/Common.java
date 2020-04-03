@@ -3674,6 +3674,26 @@ public final class Common {
      * <code>.flyteidl.admin.Sort sort_by = 5;</code>
      */
     flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder();
+
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 6;</code>
+     */
+    java.lang.String getFilters();
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getFiltersBytes();
   }
   /**
    * <pre>
@@ -3695,6 +3715,7 @@ public final class Common {
       project_ = "";
       domain_ = "";
       token_ = "";
+      filters_ = "";
     }
 
     @java.lang.Override
@@ -3755,6 +3776,12 @@ public final class Common {
                 sortBy_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              filters_ = s;
               break;
             }
             default: {
@@ -3968,6 +3995,50 @@ public final class Common {
       return getSortBy();
     }
 
+    public static final int FILTERS_FIELD_NUMBER = 6;
+    private volatile java.lang.Object filters_;
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 6;</code>
+     */
+    public java.lang.String getFilters() {
+      java.lang.Object ref = filters_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        filters_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFiltersBytes() {
+      java.lang.Object ref = filters_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        filters_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3997,6 +4068,9 @@ public final class Common {
       if (sortBy_ != null) {
         output.writeMessage(5, getSortBy());
       }
+      if (!getFiltersBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, filters_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -4022,6 +4096,9 @@ public final class Common {
       if (sortBy_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, getSortBy());
+      }
+      if (!getFiltersBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, filters_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -4051,6 +4128,8 @@ public final class Common {
         if (!getSortBy()
             .equals(other.getSortBy())) return false;
       }
+      if (!getFilters()
+          .equals(other.getFilters())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -4074,6 +4153,8 @@ public final class Common {
         hash = (37 * hash) + SORT_BY_FIELD_NUMBER;
         hash = (53 * hash) + getSortBy().hashCode();
       }
+      hash = (37 * hash) + FILTERS_FIELD_NUMBER;
+      hash = (53 * hash) + getFilters().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4225,6 +4306,8 @@ public final class Common {
           sortBy_ = null;
           sortByBuilder_ = null;
         }
+        filters_ = "";
+
         return this;
       }
 
@@ -4260,6 +4343,7 @@ public final class Common {
         } else {
           result.sortBy_ = sortByBuilder_.build();
         }
+        result.filters_ = filters_;
         onBuilt();
         return result;
       }
@@ -4325,6 +4409,10 @@ public final class Common {
         }
         if (other.hasSortBy()) {
           mergeSortBy(other.getSortBy());
+        }
+        if (!other.getFilters().isEmpty()) {
+          filters_ = other.filters_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -4831,6 +4919,100 @@ public final class Common {
         }
         return sortByBuilder_;
       }
+
+      private java.lang.Object filters_ = "";
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 6;</code>
+       */
+      public java.lang.String getFilters() {
+        java.lang.Object ref = filters_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          filters_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getFiltersBytes() {
+        java.lang.Object ref = filters_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          filters_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 6;</code>
+       */
+      public Builder setFilters(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        filters_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 6;</code>
+       */
+      public Builder clearFilters() {
+        
+        filters_ = getDefaultInstance().getFilters();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 6;</code>
+       */
+      public Builder setFiltersBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        filters_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -4991,6 +5173,26 @@ public final class Common {
      * <code>.flyteidl.admin.Sort sort_by = 6;</code>
      */
     flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder();
+
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 7;</code>
+     */
+    java.lang.String getFilters();
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 7;</code>
+     */
+    com.google.protobuf.ByteString
+        getFiltersBytes();
   }
   /**
    * <pre>
@@ -5013,6 +5215,7 @@ public final class Common {
       project_ = "";
       domain_ = "";
       token_ = "";
+      filters_ = "";
     }
 
     @java.lang.Override
@@ -5079,6 +5282,12 @@ public final class Common {
                 sortBy_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 58: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              filters_ = s;
               break;
             }
             default: {
@@ -5309,6 +5518,50 @@ public final class Common {
       return getSortBy();
     }
 
+    public static final int FILTERS_FIELD_NUMBER = 7;
+    private volatile java.lang.Object filters_;
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 7;</code>
+     */
+    public java.lang.String getFilters() {
+      java.lang.Object ref = filters_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        filters_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFiltersBytes() {
+      java.lang.Object ref = filters_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        filters_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5341,6 +5594,9 @@ public final class Common {
       if (sortBy_ != null) {
         output.writeMessage(6, getSortBy());
       }
+      if (!getFiltersBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, filters_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5371,6 +5627,9 @@ public final class Common {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, getSortBy());
       }
+      if (!getFiltersBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, filters_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -5400,6 +5659,8 @@ public final class Common {
         if (!getSortBy()
             .equals(other.getSortBy())) return false;
       }
+      if (!getFilters()
+          .equals(other.getFilters())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5425,6 +5686,8 @@ public final class Common {
         hash = (37 * hash) + SORT_BY_FIELD_NUMBER;
         hash = (53 * hash) + getSortBy().hashCode();
       }
+      hash = (37 * hash) + FILTERS_FIELD_NUMBER;
+      hash = (53 * hash) + getFilters().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5578,6 +5841,8 @@ public final class Common {
           sortBy_ = null;
           sortByBuilder_ = null;
         }
+        filters_ = "";
+
         return this;
       }
 
@@ -5614,6 +5879,7 @@ public final class Common {
         } else {
           result.sortBy_ = sortByBuilder_.build();
         }
+        result.filters_ = filters_;
         onBuilt();
         return result;
       }
@@ -5682,6 +5948,10 @@ public final class Common {
         }
         if (other.hasSortBy()) {
           mergeSortBy(other.getSortBy());
+        }
+        if (!other.getFilters().isEmpty()) {
+          filters_ = other.filters_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -6232,6 +6502,100 @@ public final class Common {
           sortBy_ = null;
         }
         return sortByBuilder_;
+      }
+
+      private java.lang.Object filters_ = "";
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 7;</code>
+       */
+      public java.lang.String getFilters() {
+        java.lang.Object ref = filters_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          filters_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 7;</code>
+       */
+      public com.google.protobuf.ByteString
+          getFiltersBytes() {
+        java.lang.Object ref = filters_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          filters_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 7;</code>
+       */
+      public Builder setFilters(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        filters_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 7;</code>
+       */
+      public Builder clearFilters() {
+        
+        filters_ = getDefaultInstance().getFilters();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 7;</code>
+       */
+      public Builder setFiltersBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        filters_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -18693,53 +19057,54 @@ public final class Common {
       "etadata\"r\n\004Sort\022\013\n\003key\030\001 \001(\t\0221\n\tdirectio" +
       "n\030\002 \001(\0162\036.flyteidl.admin.Sort.Direction\"" +
       "*\n\tDirection\022\016\n\nDESCENDING\020\000\022\r\n\tASCENDIN" +
-      "G\020\001\"\210\001\n NamedEntityIdentifierListRequest" +
+      "G\020\001\"\231\001\n NamedEntityIdentifierListRequest" +
       "\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005lim" +
       "it\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\013" +
-      "2\024.flyteidl.admin.Sort\"\262\001\n\026NamedEntityLi" +
-      "stRequest\0222\n\rresource_type\030\001 \001(\0162\033.flyte" +
-      "idl.core.ResourceType\022\017\n\007project\030\002 \001(\t\022\016" +
-      "\n\006domain\030\003 \001(\t\022\r\n\005limit\030\004 \001(\r\022\r\n\005token\030\005" +
-      " \001(\t\022%\n\007sort_by\030\006 \001(\0132\024.flyteidl.admin.S" +
-      "ort\"c\n\031NamedEntityIdentifierList\0227\n\010enti" +
-      "ties\030\001 \003(\0132%.flyteidl.admin.NamedEntityI" +
-      "dentifier\022\r\n\005token\030\002 \001(\t\"O\n\017NamedEntityL" +
-      "ist\022-\n\010entities\030\001 \003(\0132\033.flyteidl.admin.N" +
-      "amedEntity\022\r\n\005token\030\002 \001(\t\"~\n\025NamedEntity" +
-      "GetRequest\0222\n\rresource_type\030\001 \001(\0162\033.flyt" +
-      "eidl.core.ResourceType\0221\n\002id\030\002 \001(\0132%.fly" +
-      "teidl.admin.NamedEntityIdentifier\"\270\001\n\030Na" +
-      "medEntityUpdateRequest\0222\n\rresource_type\030" +
-      "\001 \001(\0162\033.flyteidl.core.ResourceType\0221\n\002id" +
-      "\030\002 \001(\0132%.flyteidl.admin.NamedEntityIdent" +
-      "ifier\0225\n\010metadata\030\003 \001(\0132#.flyteidl.admin" +
-      ".NamedEntityMetadata\"\033\n\031NamedEntityUpdat" +
-      "eResponse\"9\n\020ObjectGetRequest\022%\n\002id\030\001 \001(" +
-      "\0132\031.flyteidl.core.Identifier\"\236\001\n\023Resourc" +
-      "eListRequest\0221\n\002id\030\001 \001(\0132%.flyteidl.admi" +
-      "n.NamedEntityIdentifier\022\r\n\005limit\030\002 \001(\r\022\r" +
-      "\n\005token\030\003 \001(\t\022\017\n\007filters\030\004 \001(\t\022%\n\007sort_b" +
-      "y\030\005 \001(\0132\024.flyteidl.admin.Sort\"-\n\021EmailNo" +
-      "tification\022\030\n\020recipients_email\030\001 \003(\t\"1\n\025" +
-      "PagerDutyNotification\022\030\n\020recipients_emai" +
-      "l\030\001 \003(\t\"-\n\021SlackNotification\022\030\n\020recipien" +
-      "ts_email\030\001 \003(\t\"\363\001\n\014Notification\0226\n\006phase" +
-      "s\030\001 \003(\0162&.flyteidl.core.WorkflowExecutio" +
-      "n.Phase\0222\n\005email\030\002 \001(\0132!.flyteidl.admin." +
-      "EmailNotificationH\000\022;\n\npager_duty\030\003 \001(\0132" +
-      "%.flyteidl.admin.PagerDutyNotificationH\000" +
-      "\0222\n\005slack\030\004 \001(\0132!.flyteidl.admin.SlackNo" +
-      "tificationH\000B\006\n\004type\"%\n\007UrlBlob\022\013\n\003url\030\001" +
-      " \001(\t\022\r\n\005bytes\030\002 \001(\003\"k\n\006Labels\0222\n\006values\030" +
-      "\001 \003(\0132\".flyteidl.admin.Labels.ValuesEntr" +
-      "y\032-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002" +
-      " \001(\t:\0028\001\"u\n\013Annotations\0227\n\006values\030\001 \003(\0132" +
-      "\'.flyteidl.admin.Annotations.ValuesEntry" +
-      "\032-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 " +
-      "\001(\t:\0028\001*F\n\020NamedEntityState\022\027\n\023NAMED_ENT" +
-      "ITY_ACTIVE\020\000\022\031\n\025NAMED_ENTITY_ARCHIVED\020\001B" +
-      "3Z1github.com/lyft/flyteidl/gen/pb-go/fl" +
-      "yteidl/adminb\006proto3"
+      "2\024.flyteidl.admin.Sort\022\017\n\007filters\030\006 \001(\t\"" +
+      "\303\001\n\026NamedEntityListRequest\0222\n\rresource_t" +
+      "ype\030\001 \001(\0162\033.flyteidl.core.ResourceType\022\017" +
+      "\n\007project\030\002 \001(\t\022\016\n\006domain\030\003 \001(\t\022\r\n\005limit" +
+      "\030\004 \001(\r\022\r\n\005token\030\005 \001(\t\022%\n\007sort_by\030\006 \001(\0132\024" +
+      ".flyteidl.admin.Sort\022\017\n\007filters\030\007 \001(\t\"c\n" +
+      "\031NamedEntityIdentifierList\0227\n\010entities\030\001" +
+      " \003(\0132%.flyteidl.admin.NamedEntityIdentif" +
+      "ier\022\r\n\005token\030\002 \001(\t\"O\n\017NamedEntityList\022-\n" +
+      "\010entities\030\001 \003(\0132\033.flyteidl.admin.NamedEn" +
+      "tity\022\r\n\005token\030\002 \001(\t\"~\n\025NamedEntityGetReq" +
+      "uest\0222\n\rresource_type\030\001 \001(\0162\033.flyteidl.c" +
+      "ore.ResourceType\0221\n\002id\030\002 \001(\0132%.flyteidl." +
+      "admin.NamedEntityIdentifier\"\270\001\n\030NamedEnt" +
+      "ityUpdateRequest\0222\n\rresource_type\030\001 \001(\0162" +
+      "\033.flyteidl.core.ResourceType\0221\n\002id\030\002 \001(\013" +
+      "2%.flyteidl.admin.NamedEntityIdentifier\022" +
+      "5\n\010metadata\030\003 \001(\0132#.flyteidl.admin.Named" +
+      "EntityMetadata\"\033\n\031NamedEntityUpdateRespo" +
+      "nse\"9\n\020ObjectGetRequest\022%\n\002id\030\001 \001(\0132\031.fl" +
+      "yteidl.core.Identifier\"\236\001\n\023ResourceListR" +
+      "equest\0221\n\002id\030\001 \001(\0132%.flyteidl.admin.Name" +
+      "dEntityIdentifier\022\r\n\005limit\030\002 \001(\r\022\r\n\005toke" +
+      "n\030\003 \001(\t\022\017\n\007filters\030\004 \001(\t\022%\n\007sort_by\030\005 \001(" +
+      "\0132\024.flyteidl.admin.Sort\"-\n\021EmailNotifica" +
+      "tion\022\030\n\020recipients_email\030\001 \003(\t\"1\n\025PagerD" +
+      "utyNotification\022\030\n\020recipients_email\030\001 \003(" +
+      "\t\"-\n\021SlackNotification\022\030\n\020recipients_ema" +
+      "il\030\001 \003(\t\"\363\001\n\014Notification\0226\n\006phases\030\001 \003(" +
+      "\0162&.flyteidl.core.WorkflowExecution.Phas" +
+      "e\0222\n\005email\030\002 \001(\0132!.flyteidl.admin.EmailN" +
+      "otificationH\000\022;\n\npager_duty\030\003 \001(\0132%.flyt" +
+      "eidl.admin.PagerDutyNotificationH\000\0222\n\005sl" +
+      "ack\030\004 \001(\0132!.flyteidl.admin.SlackNotifica" +
+      "tionH\000B\006\n\004type\"%\n\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r" +
+      "\n\005bytes\030\002 \001(\003\"k\n\006Labels\0222\n\006values\030\001 \003(\0132" +
+      "\".flyteidl.admin.Labels.ValuesEntry\032-\n\013V" +
+      "aluesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\002" +
+      "8\001\"u\n\013Annotations\0227\n\006values\030\001 \003(\0132\'.flyt" +
+      "eidl.admin.Annotations.ValuesEntry\032-\n\013Va" +
+      "luesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028" +
+      "\001*F\n\020NamedEntityState\022\027\n\023NAMED_ENTITY_AC" +
+      "TIVE\020\000\022\031\n\025NAMED_ENTITY_ARCHIVED\020\001B3Z1git" +
+      "hub.com/lyft/flyteidl/gen/pb-go/flyteidl" +
+      "/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18784,13 +19149,13 @@ public final class Common {
     internal_static_flyteidl_admin_NamedEntityIdentifierListRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NamedEntityIdentifierListRequest_descriptor,
-        new java.lang.String[] { "Project", "Domain", "Limit", "Token", "SortBy", });
+        new java.lang.String[] { "Project", "Domain", "Limit", "Token", "SortBy", "Filters", });
     internal_static_flyteidl_admin_NamedEntityListRequest_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_NamedEntityListRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NamedEntityListRequest_descriptor,
-        new java.lang.String[] { "ResourceType", "Project", "Domain", "Limit", "Token", "SortBy", });
+        new java.lang.String[] { "ResourceType", "Project", "Domain", "Limit", "Token", "SortBy", "Filters", });
     internal_static_flyteidl_admin_NamedEntityIdentifierList_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_NamedEntityIdentifierList_fieldAccessorTable = new

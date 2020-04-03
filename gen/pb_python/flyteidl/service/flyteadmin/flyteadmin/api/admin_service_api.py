@@ -2893,6 +2893,7 @@ class AdminServiceApi(object):
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2920,12 +2921,13 @@ class AdminServiceApi(object):
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params = ['project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction', 'filters']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -2966,6 +2968,8 @@ class AdminServiceApi(object):
             query_params.append(('sort_by.key', params['sort_by_key']))  # noqa: E501
         if 'sort_by_direction' in params:
             query_params.append(('sort_by.direction', params['sort_by_direction']))  # noqa: E501
+        if 'filters' in params:
+            query_params.append(('filters', params['filters']))  # noqa: E501
 
         header_params = {}
 
@@ -3378,6 +3382,7 @@ class AdminServiceApi(object):
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3406,12 +3411,13 @@ class AdminServiceApi(object):
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityList
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['resource_type', 'project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params = ['resource_type', 'project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction', 'filters']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -3458,6 +3464,8 @@ class AdminServiceApi(object):
             query_params.append(('sort_by.key', params['sort_by_key']))  # noqa: E501
         if 'sort_by_direction' in params:
             query_params.append(('sort_by.direction', params['sort_by_direction']))  # noqa: E501
+        if 'filters' in params:
+            query_params.append(('filters', params['filters']))  # noqa: E501
 
         header_params = {}
 
@@ -4064,6 +4072,7 @@ class AdminServiceApi(object):
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4091,12 +4100,13 @@ class AdminServiceApi(object):
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params = ['project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction', 'filters']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -4137,6 +4147,8 @@ class AdminServiceApi(object):
             query_params.append(('sort_by.key', params['sort_by_key']))  # noqa: E501
         if 'sort_by_direction' in params:
             query_params.append(('sort_by.direction', params['sort_by_direction']))  # noqa: E501
+        if 'filters' in params:
+            query_params.append(('filters', params['filters']))  # noqa: E501
 
         header_params = {}
 
@@ -4453,6 +4465,7 @@ class AdminServiceApi(object):
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4480,12 +4493,13 @@ class AdminServiceApi(object):
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params = ['project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction', 'filters']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -4526,6 +4540,8 @@ class AdminServiceApi(object):
             query_params.append(('sort_by.key', params['sort_by_key']))  # noqa: E501
         if 'sort_by_direction' in params:
             query_params.append(('sort_by.direction', params['sort_by_direction']))  # noqa: E501
+        if 'filters' in params:
+            query_params.append(('filters', params['filters']))  # noqa: E501
 
         header_params = {}
 

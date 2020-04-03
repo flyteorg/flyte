@@ -670,6 +670,13 @@ paths:
         - "ASCENDING"
         x-exportParamName: "SortByDirection"
         x-optionalDataType: "String"
+      - name: "filters"
+        in: "query"
+        description: "Indicates a list of filters passed as string.\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Filters"
+        x-optionalDataType: "String"
       responses:
         200:
           description: "A successful response."
@@ -1143,6 +1150,13 @@ paths:
         - "ASCENDING"
         x-exportParamName: "SortByDirection"
         x-optionalDataType: "String"
+      - name: "filters"
+        in: "query"
+        description: "Indicates a list of filters passed as string.\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Filters"
+        x-optionalDataType: "String"
       responses:
         200:
           description: "A successful response."
@@ -1607,6 +1621,13 @@ paths:
         - "ASCENDING"
         x-exportParamName: "SortByDirection"
         x-optionalDataType: "String"
+      - name: "filters"
+        in: "query"
+        description: "Indicates a list of filters passed as string.\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Filters"
+        x-optionalDataType: "String"
       responses:
         200:
           description: "A successful response."
@@ -2019,6 +2040,13 @@ paths:
         - "DESCENDING"
         - "ASCENDING"
         x-exportParamName: "SortByDirection"
+        x-optionalDataType: "String"
+      - name: "filters"
+        in: "query"
+        description: "Indicates a list of filters passed as string.\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Filters"
         x-optionalDataType: "String"
       responses:
         200:
