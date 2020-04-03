@@ -177,7 +177,9 @@ export interface UserProfile {
     picture: string;
 }
 
+export type StatusString = 'normal' | 'degraded' | 'down';
+
 export interface SystemStatus {
     message?: string;
-    status: 'normal' | 'degraded' | 'down';
+    status: StatusString;
 }
