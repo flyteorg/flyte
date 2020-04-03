@@ -896,6 +896,20 @@ class NamedEntityIdentifierListRequest final :
   ::std::string* release_token();
   void set_allocated_token(::std::string* token);
 
+  // string filters = 6;
+  void clear_filters();
+  static const int kFiltersFieldNumber = 6;
+  const ::std::string& filters() const;
+  void set_filters(const ::std::string& value);
+  #if LANG_CXX11
+  void set_filters(::std::string&& value);
+  #endif
+  void set_filters(const char* value);
+  void set_filters(const char* value, size_t size);
+  ::std::string* mutable_filters();
+  ::std::string* release_filters();
+  void set_allocated_filters(::std::string* filters);
+
   // .flyteidl.admin.Sort sort_by = 5;
   bool has_sort_by() const;
   void clear_sort_by();
@@ -919,6 +933,7 @@ class NamedEntityIdentifierListRequest final :
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr token_;
+  ::google::protobuf::internal::ArenaStringPtr filters_;
   ::flyteidl::admin::Sort* sort_by_;
   ::google::protobuf::uint32 limit_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -1063,6 +1078,20 @@ class NamedEntityListRequest final :
   ::std::string* release_token();
   void set_allocated_token(::std::string* token);
 
+  // string filters = 7;
+  void clear_filters();
+  static const int kFiltersFieldNumber = 7;
+  const ::std::string& filters() const;
+  void set_filters(const ::std::string& value);
+  #if LANG_CXX11
+  void set_filters(::std::string&& value);
+  #endif
+  void set_filters(const char* value);
+  void set_filters(const char* value, size_t size);
+  ::std::string* mutable_filters();
+  ::std::string* release_filters();
+  void set_allocated_filters(::std::string* filters);
+
   // .flyteidl.admin.Sort sort_by = 6;
   bool has_sort_by() const;
   void clear_sort_by();
@@ -1092,6 +1121,7 @@ class NamedEntityListRequest final :
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr token_;
+  ::google::protobuf::internal::ArenaStringPtr filters_;
   ::flyteidl::admin::Sort* sort_by_;
   int resource_type_;
   ::google::protobuf::uint32 limit_;
@@ -3628,6 +3658,59 @@ inline void NamedEntityIdentifierListRequest::set_allocated_sort_by(::flyteidl::
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityIdentifierListRequest.sort_by)
 }
 
+// string filters = 6;
+inline void NamedEntityIdentifierListRequest::clear_filters() {
+  filters_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NamedEntityIdentifierListRequest::filters() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityIdentifierListRequest.filters)
+  return filters_.GetNoArena();
+}
+inline void NamedEntityIdentifierListRequest::set_filters(const ::std::string& value) {
+  
+  filters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityIdentifierListRequest.filters)
+}
+#if LANG_CXX11
+inline void NamedEntityIdentifierListRequest::set_filters(::std::string&& value) {
+  
+  filters_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NamedEntityIdentifierListRequest.filters)
+}
+#endif
+inline void NamedEntityIdentifierListRequest::set_filters(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  filters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NamedEntityIdentifierListRequest.filters)
+}
+inline void NamedEntityIdentifierListRequest::set_filters(const char* value, size_t size) {
+  
+  filters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NamedEntityIdentifierListRequest.filters)
+}
+inline ::std::string* NamedEntityIdentifierListRequest::mutable_filters() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityIdentifierListRequest.filters)
+  return filters_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NamedEntityIdentifierListRequest::release_filters() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityIdentifierListRequest.filters)
+  
+  return filters_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NamedEntityIdentifierListRequest::set_allocated_filters(::std::string* filters) {
+  if (filters != nullptr) {
+    
+  } else {
+    
+  }
+  filters_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), filters);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityIdentifierListRequest.filters)
+}
+
 // -------------------------------------------------------------------
 
 // NamedEntityListRequest
@@ -3868,6 +3951,59 @@ inline void NamedEntityListRequest::set_allocated_sort_by(::flyteidl::admin::Sor
   }
   sort_by_ = sort_by;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityListRequest.sort_by)
+}
+
+// string filters = 7;
+inline void NamedEntityListRequest::clear_filters() {
+  filters_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NamedEntityListRequest::filters() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityListRequest.filters)
+  return filters_.GetNoArena();
+}
+inline void NamedEntityListRequest::set_filters(const ::std::string& value) {
+  
+  filters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityListRequest.filters)
+}
+#if LANG_CXX11
+inline void NamedEntityListRequest::set_filters(::std::string&& value) {
+  
+  filters_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NamedEntityListRequest.filters)
+}
+#endif
+inline void NamedEntityListRequest::set_filters(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  filters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NamedEntityListRequest.filters)
+}
+inline void NamedEntityListRequest::set_filters(const char* value, size_t size) {
+  
+  filters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NamedEntityListRequest.filters)
+}
+inline ::std::string* NamedEntityListRequest::mutable_filters() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityListRequest.filters)
+  return filters_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NamedEntityListRequest::release_filters() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityListRequest.filters)
+  
+  return filters_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NamedEntityListRequest::set_allocated_filters(::std::string* filters) {
+  if (filters != nullptr) {
+    
+  } else {
+    
+  }
+  filters_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), filters);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityListRequest.filters)
 }
 
 // -------------------------------------------------------------------

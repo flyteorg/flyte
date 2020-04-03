@@ -2478,6 +2478,7 @@ Fetch existing launch plan definition identifiers matching input filters.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
      * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
      * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
 
 @return AdminNamedEntityIdentifierList
 */
@@ -2487,6 +2488,7 @@ type ListLaunchPlanIdsOpts struct {
 	Token optional.String
 	SortByKey optional.String
 	SortByDirection optional.String
+	Filters optional.String
 }
 
 func (a *AdminServiceApiService) ListLaunchPlanIds(ctx context.Context, project string, domain string, localVarOptionals *ListLaunchPlanIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
@@ -2518,6 +2520,9 @@ func (a *AdminServiceApiService) ListLaunchPlanIds(ctx context.Context, project 
 	}
 	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
 		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
@@ -2941,6 +2946,7 @@ Retrieve a list of NamedEntity objects sharing a common resource type, project, 
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
      * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
      * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
 
 @return AdminNamedEntityList
 */
@@ -2950,6 +2956,7 @@ type ListNamedEntitiesOpts struct {
 	Token optional.String
 	SortByKey optional.String
 	SortByDirection optional.String
+	Filters optional.String
 }
 
 func (a *AdminServiceApiService) ListNamedEntities(ctx context.Context, resourceType string, project string, domain string, localVarOptionals *ListNamedEntitiesOpts) (AdminNamedEntityList, *http.Response, error) {
@@ -2982,6 +2989,9 @@ func (a *AdminServiceApiService) ListNamedEntities(ctx context.Context, resource
 	}
 	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
 		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
@@ -3533,6 +3543,7 @@ Fetch existing task definition identifiers matching input filters.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
      * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
      * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
 
 @return AdminNamedEntityIdentifierList
 */
@@ -3542,6 +3553,7 @@ type ListTaskIdsOpts struct {
 	Token optional.String
 	SortByKey optional.String
 	SortByDirection optional.String
+	Filters optional.String
 }
 
 func (a *AdminServiceApiService) ListTaskIds(ctx context.Context, project string, domain string, localVarOptionals *ListTaskIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
@@ -3573,6 +3585,9 @@ func (a *AdminServiceApiService) ListTaskIds(ctx context.Context, project string
 	}
 	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
 		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
@@ -3898,6 +3913,7 @@ Fetch an existing workflow definition identifiers matching input filters.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
      * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
      * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
 
 @return AdminNamedEntityIdentifierList
 */
@@ -3907,6 +3923,7 @@ type ListWorkflowIdsOpts struct {
 	Token optional.String
 	SortByKey optional.String
 	SortByDirection optional.String
+	Filters optional.String
 }
 
 func (a *AdminServiceApiService) ListWorkflowIds(ctx context.Context, project string, domain string, localVarOptionals *ListWorkflowIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
@@ -3938,6 +3955,9 @@ func (a *AdminServiceApiService) ListWorkflowIds(ctx context.Context, project st
 	}
 	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
 		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}

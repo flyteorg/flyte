@@ -79,6 +79,10 @@ message NamedEntityIdentifierListRequest {
     // Sort ordering.
     // +optional
     Sort sort_by      = 5;
+
+    // Indicates a list of filters passed as string.
+    // +optional
+    string filters    = 6;
 }
 
 // Represents a request structure to list NamedEntity objects
@@ -98,6 +102,11 @@ message NamedEntityListRequest {
     // Sort ordering.
     // +optional
     Sort sort_by                             = 6;
+
+    // Indicates a list of filters passed as string.
+    // +optional
+    string filters                           = 7;
+
 }
 
 // Represents a list of NamedEntityIdentifiers.

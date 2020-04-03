@@ -5033,6 +5033,9 @@ export namespace flyteidl {
 
             /** NamedEntityIdentifierListRequest sortBy */
             sortBy?: (flyteidl.admin.ISort|null);
+
+            /** NamedEntityIdentifierListRequest filters */
+            filters?: (string|null);
         }
 
         /** Represents a NamedEntityIdentifierListRequest. */
@@ -5058,6 +5061,9 @@ export namespace flyteidl {
 
             /** NamedEntityIdentifierListRequest sortBy. */
             public sortBy?: (flyteidl.admin.ISort|null);
+
+            /** NamedEntityIdentifierListRequest filters. */
+            public filters: string;
 
             /**
              * Creates a new NamedEntityIdentifierListRequest instance using the specified properties.
@@ -5112,6 +5118,9 @@ export namespace flyteidl {
 
             /** NamedEntityListRequest sortBy */
             sortBy?: (flyteidl.admin.ISort|null);
+
+            /** NamedEntityListRequest filters */
+            filters?: (string|null);
         }
 
         /** Represents a NamedEntityListRequest. */
@@ -5140,6 +5149,9 @@ export namespace flyteidl {
 
             /** NamedEntityListRequest sortBy. */
             public sortBy?: (flyteidl.admin.ISort|null);
+
+            /** NamedEntityListRequest filters. */
+            public filters: string;
 
             /**
              * Creates a new NamedEntityListRequest instance using the specified properties.

@@ -12157,6 +12157,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {number|null} [limit] NamedEntityIdentifierListRequest limit
              * @property {string|null} [token] NamedEntityIdentifierListRequest token
              * @property {flyteidl.admin.ISort|null} [sortBy] NamedEntityIdentifierListRequest sortBy
+             * @property {string|null} [filters] NamedEntityIdentifierListRequest filters
              */
 
             /**
@@ -12215,6 +12216,14 @@ export const flyteidl = $root.flyteidl = (() => {
             NamedEntityIdentifierListRequest.prototype.sortBy = null;
 
             /**
+             * NamedEntityIdentifierListRequest filters.
+             * @member {string} filters
+             * @memberof flyteidl.admin.NamedEntityIdentifierListRequest
+             * @instance
+             */
+            NamedEntityIdentifierListRequest.prototype.filters = "";
+
+            /**
              * Creates a new NamedEntityIdentifierListRequest instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.NamedEntityIdentifierListRequest
@@ -12248,6 +12257,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 4, wireType 2 =*/34).string(message.token);
                 if (message.sortBy != null && message.hasOwnProperty("sortBy"))
                     $root.flyteidl.admin.Sort.encode(message.sortBy, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                if (message.filters != null && message.hasOwnProperty("filters"))
+                    writer.uint32(/* id 6, wireType 2 =*/50).string(message.filters);
                 return writer;
             };
 
@@ -12283,6 +12294,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 5:
                         message.sortBy = $root.flyteidl.admin.Sort.decode(reader, reader.uint32());
+                        break;
+                    case 6:
+                        message.filters = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -12320,6 +12334,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "sortBy." + error;
                 }
+                if (message.filters != null && message.hasOwnProperty("filters"))
+                    if (!$util.isString(message.filters))
+                        return "filters: string expected";
                 return null;
             };
 
@@ -12338,6 +12355,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {number|null} [limit] NamedEntityListRequest limit
              * @property {string|null} [token] NamedEntityListRequest token
              * @property {flyteidl.admin.ISort|null} [sortBy] NamedEntityListRequest sortBy
+             * @property {string|null} [filters] NamedEntityListRequest filters
              */
 
             /**
@@ -12404,6 +12422,14 @@ export const flyteidl = $root.flyteidl = (() => {
             NamedEntityListRequest.prototype.sortBy = null;
 
             /**
+             * NamedEntityListRequest filters.
+             * @member {string} filters
+             * @memberof flyteidl.admin.NamedEntityListRequest
+             * @instance
+             */
+            NamedEntityListRequest.prototype.filters = "";
+
+            /**
              * Creates a new NamedEntityListRequest instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.NamedEntityListRequest
@@ -12439,6 +12465,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 5, wireType 2 =*/42).string(message.token);
                 if (message.sortBy != null && message.hasOwnProperty("sortBy"))
                     $root.flyteidl.admin.Sort.encode(message.sortBy, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                if (message.filters != null && message.hasOwnProperty("filters"))
+                    writer.uint32(/* id 7, wireType 2 =*/58).string(message.filters);
                 return writer;
             };
 
@@ -12477,6 +12505,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 6:
                         message.sortBy = $root.flyteidl.admin.Sort.decode(reader, reader.uint32());
+                        break;
+                    case 7:
+                        message.filters = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -12524,6 +12555,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "sortBy." + error;
                 }
+                if (message.filters != null && message.hasOwnProperty("filters"))
+                    if (!$util.isString(message.filters))
+                        return "filters: string expected";
                 return null;
             };
 
