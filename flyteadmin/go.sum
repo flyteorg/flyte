@@ -468,6 +468,8 @@ github.com/lyft/flyteidl v0.17.20/go.mod h1:/zQXxuHO11u/saxTTZc8oYExIGEShXB+xCB1
 github.com/lyft/flyteidl v0.17.23-0.20200401223233-5fcbfe070fad h1:T5lJx1on3Qy981L19GdMwHHiAuMCWXLxHQCFk+JW4B0=
 github.com/lyft/flyteidl v0.17.23-0.20200401223233-5fcbfe070fad/go.mod h1:/zQXxuHO11u/saxTTZc8oYExIGEShXB+xCB1/F1Cu20=
 github.com/lyft/flyteidl v0.17.23/go.mod h1:/zQXxuHO11u/saxTTZc8oYExIGEShXB+xCB1/F1Cu20=
+github.com/lyft/flyteidl v0.17.24 h1:N5mmk2/0062VjbIeUXLHWVZwkxGW20RdZtshaea2nL0=
+github.com/lyft/flyteidl v0.17.24/go.mod h1:/zQXxuHO11u/saxTTZc8oYExIGEShXB+xCB1/F1Cu20=
 github.com/lyft/flyteplugins v0.3.10/go.mod h1:FOSo04q4EheU6lm0oZFvfYAWgjrum/BDUK+mUT7qDFA=
 github.com/lyft/flyteplugins v0.3.11/go.mod h1:FOSo04q4EheU6lm0oZFvfYAWgjrum/BDUK+mUT7qDFA=
 github.com/lyft/flytepropeller v0.1.30 h1:g55bD3aMMba4WDiBE7SLFEElutPdkEtoFQkgN59OX+M=
