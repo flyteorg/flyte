@@ -30,6 +30,16 @@ describe('linkify/getLinkifiedTextChunks', () => {
         [
             'A link at the end to http://example.com',
             [text('A link at the end to '), link('http://example.com')]
+        ],
+        [
+            'A link to http://example.com and another link to https://flyte.org in the middle.',
+            [
+                text('A link to '),
+                link('http://example.com'),
+                text(' and another link to '),
+                link('https://flyte.org'),
+                text(' in the middle.')
+            ]
         ]
     ];
     testCases.forEach(([input, expected]) =>
