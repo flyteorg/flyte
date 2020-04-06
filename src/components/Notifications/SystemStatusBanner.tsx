@@ -63,25 +63,23 @@ interface StatusConstantValues {
     IconComponent: typeof SvgIcon;
 }
 
-const statusConstants: Record<StatusString, StatusConstantValues> = {
-    normal: {
-        color: infoIconColor,
-        IconComponent: Info
-    },
-    degraded: {
-        color: warningIconColor,
-        IconComponent: Warning
-    },
-    down: {
-        color: warningIconColor,
-        IconComponent: Warning
-    }
+const InfoIcon = () => (
+    <Info data-testid="info-icon" htmlColor={infoIconColor} />
+);
+
+const WarningIcon = () => (
+    <Warning data-testid="warning-icon" htmlColor={warningIconColor} />
+);
+
+const statusIcons: Record<StatusString, React.ComponentType> = {
+    normal: InfoIcon,
+    degraded: WarningIcon,
+    down: WarningIcon
 };
 
 const StatusIcon: React.FC<{ status: StatusString }> = ({ status }) => {
-    const { color, IconComponent } =
-        statusConstants[status] || statusConstants.normal;
-    return <IconComponent htmlColor={color} />;
+    const IconComponent = statusIcons[status] || statusIcons.normal;
+    return <IconComponent />;
 };
 
 const RenderSystemStatusBanner: React.FC<{
@@ -90,7 +88,12 @@ const RenderSystemStatusBanner: React.FC<{
 }> = ({ systemStatus: { message, status }, onClose }) => {
     const styles = useStyles();
     return (
-        <Paper className={styles.statusPaper} elevation={1} square={true}>
+        <Paper
+            role="banner"
+            className={styles.statusPaper}
+            elevation={1}
+            square={true}
+        >
             <div className={styles.statusIcon}>
                 <StatusIcon status={status} />
             </div>
