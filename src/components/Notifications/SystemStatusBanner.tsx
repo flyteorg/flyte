@@ -5,6 +5,7 @@ import Close from '@material-ui/icons/Close';
 import Info from '@material-ui/icons/Info';
 import Warning from '@material-ui/icons/Warning';
 import { WaitForData } from 'components/common';
+import { LinkifiedText } from 'components/common/LinkifiedText';
 import {
     infoIconColor,
     mutedButtonColor,
@@ -16,6 +17,18 @@ import * as React from 'react';
 import { useSystemStatus } from './useSystemStatus';
 
 const useStyles = makeStyles((theme: Theme) => ({
+    container: {
+        bottom: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        left: 0,
+        // The parent container extends the full width of the page.
+        // We don't want it intercepting pointer events for visible items below it.
+        pointerEvents: 'none',
+        position: 'fixed',
+        padding: theme.spacing(2),
+        right: 0
+    },
     closeButton: {
         alignItems: 'center',
         color: mutedButtonColor,
@@ -26,12 +39,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         height: theme.spacing(3)
     },
     statusPaper: {
-        bottom: theme.spacing(2),
         display: 'flex',
-        left: '50%',
         padding: theme.spacing(2),
-        position: 'fixed',
-        transform: 'translateX(-50%)'
+        pointerEvents: 'initial'
     },
     statusContentContainer: {
         alignItems: 'flex-start',
@@ -63,25 +73,23 @@ interface StatusConstantValues {
     IconComponent: typeof SvgIcon;
 }
 
-const statusConstants: Record<StatusString, StatusConstantValues> = {
-    normal: {
-        color: infoIconColor,
-        IconComponent: Info
-    },
-    degraded: {
-        color: warningIconColor,
-        IconComponent: Warning
-    },
-    down: {
-        color: warningIconColor,
-        IconComponent: Warning
-    }
+const InfoIcon = () => (
+    <Info data-testid="info-icon" htmlColor={infoIconColor} />
+);
+
+const WarningIcon = () => (
+    <Warning data-testid="warning-icon" htmlColor={warningIconColor} />
+);
+
+const statusIcons: Record<StatusString, React.ComponentType> = {
+    normal: InfoIcon,
+    degraded: WarningIcon,
+    down: WarningIcon
 };
 
 const StatusIcon: React.FC<{ status: StatusString }> = ({ status }) => {
-    const { color, IconComponent } =
-        statusConstants[status] || statusConstants.normal;
-    return <IconComponent htmlColor={color} />;
+    const IconComponent = statusIcons[status] || statusIcons.normal;
+    return <IconComponent />;
 };
 
 const RenderSystemStatusBanner: React.FC<{
@@ -90,25 +98,32 @@ const RenderSystemStatusBanner: React.FC<{
 }> = ({ systemStatus: { message, status }, onClose }) => {
     const styles = useStyles();
     return (
-        <Paper className={styles.statusPaper} elevation={1} square={true}>
-            <div className={styles.statusIcon}>
-                <StatusIcon status={status} />
-            </div>
-            <div className={styles.statusContentContainer}>
-                <Typography variant="h6" className={styles.statusMessage}>
-                    {message}
-                </Typography>
-            </div>
-            <div className={styles.statusClose}>
-                <ButtonBase
-                    aria-label="Close"
-                    className={styles.closeButton}
-                    onClick={onClose}
-                >
-                    <Close fontSize="small" />
-                </ButtonBase>
-            </div>
-        </Paper>
+        <div className={styles.container}>
+            <Paper
+                role="banner"
+                className={styles.statusPaper}
+                elevation={1}
+                square={true}
+            >
+                <div className={styles.statusIcon}>
+                    <StatusIcon status={status} />
+                </div>
+                <div className={styles.statusContentContainer}>
+                    <Typography variant="h6" className={styles.statusMessage}>
+                        <LinkifiedText text={message} />
+                    </Typography>
+                </div>
+                <div className={styles.statusClose}>
+                    <ButtonBase
+                        aria-label="Close"
+                        className={styles.closeButton}
+                        onClick={onClose}
+                    >
+                        <Close fontSize="small" />
+                    </ButtonBase>
+                </div>
+            </Paper>
+        </div>
     );
 };
 
@@ -125,12 +140,12 @@ export const SystemStatusBanner: React.FC<{}> = () => {
     }
     return (
         <WaitForData {...systemStatus}>
-            {systemStatus.value.message && (
+            {systemStatus.value.message ? (
                 <RenderSystemStatusBanner
                     systemStatus={systemStatus.value}
                     onClose={onClose}
                 />
-            )}
+            ) : null}
         </WaitForData>
     );
 };
