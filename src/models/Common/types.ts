@@ -176,3 +176,10 @@ export interface UserProfile {
     email: string;
     picture: string;
 }
+
+export type StatusString = 'normal' | 'degraded' | 'down';
+
+export interface SystemStatus {
+    message?: string;
+    status: StatusString;
+}

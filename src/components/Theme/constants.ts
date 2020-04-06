@@ -38,9 +38,14 @@ export const nestedListColor = COLOR_SPECTRUM.gray0.color;
 export const buttonHoverColor = COLOR_SPECTRUM.gray0.color;
 export const inputFocusBorderColor = COLOR_SPECTRUM.blue60.color;
 
+export const warningIconColor = COLOR_SPECTRUM.sunset60.color;
+export const infoIconColor = COLOR_SPECTRUM.blue40.color;
+
 export const dangerousButtonBorderColor = COLOR_SPECTRUM.red20.color;
 export const dangerousButtonColor = COLOR_SPECTRUM.red30.color;
 export const dangerousButtonHoverColor = COLOR_SPECTRUM.red40.color;
+export const mutedButtonColor = COLOR_SPECTRUM.gray30.color;
+export const mutedButtonHoverColor = COLOR_SPECTRUM.gray60.color;
 
 export const errorBackgroundColor = '#FBFBFC';
 
