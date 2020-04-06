@@ -893,7 +893,7 @@ spec:
         - --config
         - /etc/datacatalog/config/datacatalog_config.yaml
         - serve
-        image: docker.io/lyft/datacatalog:v0.2.1
+        image: docker.io/lyft/datacatalog:0.2.1
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -925,7 +925,7 @@ spec:
         - /etc/datacatalog/config/datacatalog_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/datacatalog:v0.2.1
+        image: docker.io/lyft/datacatalog:0.2.1
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
