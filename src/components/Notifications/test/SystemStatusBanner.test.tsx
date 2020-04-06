@@ -35,7 +35,7 @@ describe('SystemStatusBanner', () => {
         expect(getByTestId('info-icon')).toBeInTheDocument();
     });
 
-    it('should display a waring icon for degraded status', async () => {
+    it('should display a warning icon for degraded status', async () => {
         systemStatus.status = 'degraded';
         const { getByTestId } = renderStatusBanner();
         await wait();

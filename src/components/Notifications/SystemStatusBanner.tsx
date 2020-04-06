@@ -22,6 +22,8 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         justifyContent: 'center',
         left: 0,
+        // The parent container extends the full width of the page.
+        // We don't want it intercepting pointer events for visible items below it.
         pointerEvents: 'none',
         position: 'fixed',
         padding: theme.spacing(2),
