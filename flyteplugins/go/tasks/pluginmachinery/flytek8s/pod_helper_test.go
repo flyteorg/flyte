@@ -2,6 +2,9 @@ package flytek8s
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
+	"path/filepath"
 	"testing"
 
 	config1 "github.com/lyft/flytestdlib/config"
@@ -442,4 +445,40 @@ func TestConvertPodFailureToError(t *testing.T) {
 		})
 		assert.Equal(t, code, "OOMKilled")
 	})
+}
+
+func TestDemystifyPending_testcases(t *testing.T) {
+
+	tests := []struct {
+		name     string
+		filename string
+		isErr    bool
+		errCode  string
+		message  string
+	}{
+		{"ImagePullBackOff", "imagepull-failurepod.json", false, "ContainersNotReady|ImagePullBackOff", "containers with unready status: [fdf98e4ed2b524dc3bf7-get-flyte-id-task-0]|Back-off pulling image \"image\""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testFile := filepath.Join("testdata", tt.filename)
+			data, err := ioutil.ReadFile(testFile)
+			assert.NoError(t, err, "failed to read file %s", testFile)
+			pod := &v1.Pod{}
+			if assert.NoError(t, json.Unmarshal(data, pod), "failed to unmarshal json in %s. Expected of type v1.Pod", testFile) {
+				p, err := DemystifyPending(pod.Status)
+				if tt.isErr {
+					assert.Error(t, err, "Error expected from method")
+				} else {
+					assert.NoError(t, err, "Error not expected")
+					assert.NotNil(t, p)
+					assert.Equal(t, p.Phase(), pluginsCore.PhaseRetryableFailure)
+					if assert.NotNil(t, p.Err()) {
+						assert.Equal(t, p.Err().Code, tt.errCode)
+						assert.Equal(t, p.Err().Message, tt.message)
+					}
+				}
+			}
+		})
+	}
 }

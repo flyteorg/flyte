@@ -138,6 +138,8 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 							// There are a variety of reasons that can cause a pod to be in this waiting state.
 							// Waiting state may be legitimate when the container is being downloaded, started or init containers are running
 							reason := containerStatus.State.Waiting.Reason
+							finalReason := fmt.Sprintf("%s|%s", c.Reason, reason)
+							finalMessage := fmt.Sprintf("%s|%s", c.Message, containerStatus.State.Waiting.Message)
 							switch reason {
 							case "ErrImagePull", "ContainerCreating", "PodInitializing":
 								// But, there are only two "reasons" when a pod is successfully being created and hence it is in
@@ -149,12 +151,12 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// ErrImagePull -> Transitionary phase to ImagePullBackOff
 								// ContainerCreating -> Image is being downloaded
 								// PodInitializing -> Init containers are running
-								return pluginsCore.PhaseInfoInitializing(c.LastTransitionTime.Time, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), nil
+								return pluginsCore.PhaseInfoInitializing(c.LastTransitionTime.Time, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage)), nil
 
 							case "CreateContainerError":
 								// This happens if for instance the command to the container is incorrect, ie doesn't run
 								t := c.LastTransitionTime.Time
-								return pluginsCore.PhaseInfoFailure(c.Reason, c.Message, &pluginsCore.TaskInfo{
+								return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
 								}), nil
 
@@ -168,7 +170,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// So be default if the container is not waiting with the PodInitializing/ContainerCreating
 								// reasons, then we will assume a failure reason, and fail instantly
 								t := c.LastTransitionTime.Time
-								return pluginsCore.PhaseInfoSystemRetryableFailure(c.Reason, c.Message, &pluginsCore.TaskInfo{
+								return pluginsCore.PhaseInfoSystemRetryableFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
 								}), nil
 							}
