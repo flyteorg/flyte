@@ -2,6 +2,9 @@ import * as React from 'react';
 import { NewTargetLink } from './NewTargetLink';
 import { useLinkifiedChunks } from './useLinkifiedChunks';
 
+/** Renders the given text with any inline valid URLs rendered as
+ * `NewTargetLink`s.
+ */
 export const LinkifiedText: React.FC<{ text?: string }> = ({ text = '' }) => {
     const chunks = useLinkifiedChunks(text);
     return (

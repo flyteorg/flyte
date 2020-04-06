@@ -8,6 +8,10 @@ export interface LinkifiedTextChunk {
     url?: string;
 }
 
+/** Detects any links in the given text and splits the string on the
+ * link boundaries, returning an array of text/link entries for each
+ * portion of the string.
+ */
 export function getLinkifiedTextChunks(text: string): LinkifiedTextChunk[] {
     const matches = linkify.match(text);
     if (matches === null) {
