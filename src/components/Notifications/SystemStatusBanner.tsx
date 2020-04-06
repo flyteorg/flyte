@@ -5,6 +5,7 @@ import Close from '@material-ui/icons/Close';
 import Info from '@material-ui/icons/Info';
 import Warning from '@material-ui/icons/Warning';
 import { WaitForData } from 'components/common';
+import { LinkifiedText } from 'components/common/LinkifiedText';
 import {
     infoIconColor,
     mutedButtonColor,
@@ -16,6 +17,15 @@ import * as React from 'react';
 import { useSystemStatus } from './useSystemStatus';
 
 const useStyles = makeStyles((theme: Theme) => ({
+    container: {
+        bottom: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        left: 0,
+        position: 'fixed',
+        padding: theme.spacing(2),
+        right: 0
+    },
     closeButton: {
         alignItems: 'center',
         color: mutedButtonColor,
@@ -26,12 +36,8 @@ const useStyles = makeStyles((theme: Theme) => ({
         height: theme.spacing(3)
     },
     statusPaper: {
-        bottom: theme.spacing(2),
         display: 'flex',
-        left: '50%',
-        padding: theme.spacing(2),
-        position: 'fixed',
-        transform: 'translateX(-50%)'
+        padding: theme.spacing(2)
     },
     statusContentContainer: {
         alignItems: 'flex-start',
@@ -88,30 +94,32 @@ const RenderSystemStatusBanner: React.FC<{
 }> = ({ systemStatus: { message, status }, onClose }) => {
     const styles = useStyles();
     return (
-        <Paper
-            role="banner"
-            className={styles.statusPaper}
-            elevation={1}
-            square={true}
-        >
-            <div className={styles.statusIcon}>
-                <StatusIcon status={status} />
-            </div>
-            <div className={styles.statusContentContainer}>
-                <Typography variant="h6" className={styles.statusMessage}>
-                    {message}
-                </Typography>
-            </div>
-            <div className={styles.statusClose}>
-                <ButtonBase
-                    aria-label="Close"
-                    className={styles.closeButton}
-                    onClick={onClose}
-                >
-                    <Close fontSize="small" />
-                </ButtonBase>
-            </div>
-        </Paper>
+        <div className={styles.container}>
+            <Paper
+                role="banner"
+                className={styles.statusPaper}
+                elevation={1}
+                square={true}
+            >
+                <div className={styles.statusIcon}>
+                    <StatusIcon status={status} />
+                </div>
+                <div className={styles.statusContentContainer}>
+                    <Typography variant="h6" className={styles.statusMessage}>
+                        <LinkifiedText text={message} />
+                    </Typography>
+                </div>
+                <div className={styles.statusClose}>
+                    <ButtonBase
+                        aria-label="Close"
+                        className={styles.closeButton}
+                        onClick={onClose}
+                    >
+                        <Close fontSize="small" />
+                    </ButtonBase>
+                </div>
+            </Paper>
+        </div>
     );
 };
 

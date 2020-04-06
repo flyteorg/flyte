@@ -78,4 +78,14 @@ describe('SystemStatusBanner', () => {
 
         expect(queryByRole('banner')).toBeNull();
     });
+
+    it('should render inline urls as links', async () => {
+        systemStatus.message = 'Check out http://flyte.org for more info';
+        const { getByText } = renderStatusBanner();
+        await wait();
+        expect(getByText('http://flyte.org').closest('a')).toHaveAttribute(
+            'href',
+            'http://flyte.org'
+        );
+    });
 });
