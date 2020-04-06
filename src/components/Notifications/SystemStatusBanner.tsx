@@ -22,6 +22,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         justifyContent: 'center',
         left: 0,
+        pointerEvents: 'none',
         position: 'fixed',
         padding: theme.spacing(2),
         right: 0
@@ -37,7 +38,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     statusPaper: {
         display: 'flex',
-        padding: theme.spacing(2)
+        padding: theme.spacing(2),
+        pointerEvents: 'initial'
     },
     statusContentContainer: {
         alignItems: 'flex-start',
