@@ -1,8 +1,11 @@
 package validation
 
 import (
+	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"google.golang.org/grpc/codes"
 )
 
 func ValidateNamedEntityGetRequest(request admin.NamedEntityGetRequest) error {
@@ -24,6 +27,13 @@ func ValidateNamedEntityUpdateRequest(request admin.NamedEntityUpdateRequest) er
 	}
 	if request.Metadata == nil {
 		return shared.GetMissingArgumentError(shared.Metadata)
+	}
+
+	// Anything but the default state is only permitted for workflow resources.
+	if request.Metadata.State != admin.NamedEntityState_NAMED_ENTITY_ACTIVE &&
+		request.ResourceType != core.ResourceType_WORKFLOW {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"Only workflow name entities can have their state updated")
 	}
 	return nil
 }

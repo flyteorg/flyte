@@ -44,7 +44,9 @@ var resourceTypeToMetadataJoin = map[core.ResourceType]string{
 }
 
 func getGroupByForNamedEntity(tableName string) string {
-	return fmt.Sprintf("%s.%s, %s.%s, %s.%s, %s.%s", tableName, Project, tableName, Domain, tableName, Name, namedEntityMetadataTableName, Description)
+	return fmt.Sprintf("%s.%s, %s.%s, %s.%s, %s.%s, %s.%s",
+		tableName, Project, tableName, Domain, tableName, Name, namedEntityMetadataTableName, Description,
+		namedEntityMetadataTableName, State)
 }
 
 func getSelectForNamedEntity(tableName string, resourceType core.ResourceType) []string {
@@ -54,6 +56,7 @@ func getSelectForNamedEntity(tableName string, resourceType core.ResourceType) [
 		fmt.Sprintf("%s.%s", tableName, Name),
 		fmt.Sprintf("'%d' AS %s", resourceType, ResourceType),
 		fmt.Sprintf("%s.%s", namedEntityMetadataTableName, Description),
+		fmt.Sprintf("%s.%s", namedEntityMetadataTableName, State),
 	}
 }
 
@@ -116,7 +119,7 @@ func (r *NamedEntityRepo) Get(ctx context.Context, input interfaces.GetNamedEnti
 	tableName, tableFound := resourceTypeToTableName[input.ResourceType]
 	joinString, joinFound := resourceTypeToMetadataJoin[input.ResourceType]
 	if !tableFound || !joinFound {
-		return models.NamedEntity{}, adminErrors.NewFlyteAdminErrorf(codes.InvalidArgument, "Cannot get NamedEntity for resource type: %v", input.ResourceType)
+		return models.NamedEntity{}, adminErrors.NewFlyteAdminErrorf(codes.InvalidArgument, "Cannot get NamedEntityMetadata for resource type: %v", input.ResourceType)
 	}
 
 	tx := r.db.Table(tableName).Joins(joinString)

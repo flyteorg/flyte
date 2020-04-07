@@ -6,6 +6,7 @@ import (
 )
 
 func CreateNamedEntityModel(request *admin.NamedEntityUpdateRequest) models.NamedEntity {
+	stateInt := int32(request.Metadata.State)
 	return models.NamedEntity{
 		NamedEntityKey: models.NamedEntityKey{
 			ResourceType: request.ResourceType,
@@ -15,6 +16,7 @@ func CreateNamedEntityModel(request *admin.NamedEntityUpdateRequest) models.Name
 		},
 		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
 			Description: request.Metadata.Description,
+			State:       &stateInt,
 		},
 	}
 }

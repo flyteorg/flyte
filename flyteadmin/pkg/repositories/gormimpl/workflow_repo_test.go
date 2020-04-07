@@ -18,8 +18,6 @@ var typedInterface = []byte{1, 2, 3}
 
 const remoteSpecIdentifier = "remote spec id"
 
-var archived = int32(admin.WorkflowState_WORKFLOW_ARCHIVED)
-
 func TestCreateWorkflow(t *testing.T) {
 	workflowRepo := NewWorkflowRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	err := workflowRepo.Create(context.Background(), models.Workflow{
@@ -267,30 +265,4 @@ func TestListWorkflowIds_MissingParameters(t *testing.T) {
 	})
 
 	assert.Equal(t, err.Error(), "missing and/or invalid parameters: limit")
-}
-
-func TestSetWorkflowInactive(t *testing.T) {
-	workflowRepo := NewWorkflowRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-	GlobalMock := mocket.Catcher.Reset()
-	GlobalMock.Logging = true
-	mockDb := GlobalMock.NewMock()
-
-	mockDb.WithQuery(`UPDATE "workflows" SET "domain" = ?, "id" = ?, "name" = ?, "project" = ?, "state" = ?, ` +
-		`"updated_at" = ?, "version" = ?  WHERE "workflows"."deleted_at" IS NULL AND "workflows"."project" = ? AND ` +
-		`"workflows"."domain" = ? AND "workflows"."name" = ? AND "workflows"."version" = ?`)
-
-	err := workflowRepo.Update(context.Background(), models.Workflow{
-		BaseModel: models.BaseModel{
-			ID: 1,
-		},
-		WorkflowKey: models.WorkflowKey{
-			Project: project,
-			Domain:  domain,
-			Name:    name,
-			Version: version,
-		},
-		State: &archived,
-	})
-	assert.NoError(t, err)
-	assert.True(t, mockDb.Triggered)
 }

@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"strconv"
+	"strings"
 
 	"github.com/lyft/flytestdlib/contextutils"
 
@@ -21,6 +22,8 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils"
 )
+
+const state = "state"
 
 type NamedEntityMetrics struct {
 	Scope promutils.Scope
@@ -65,6 +68,31 @@ func (m *NamedEntityManager) GetNamedEntity(ctx context.Context, request admin.N
 	return util.GetNamedEntity(ctx, m.db, request.ResourceType, *request.Id)
 }
 
+func (m *NamedEntityManager) updateQueryFilters(identityFilters []common.InlineFilter, requestFilters string) (
+	[]common.InlineFilter, error) {
+	if len(requestFilters) == 0 {
+		return identityFilters, nil
+	}
+	additionalFilters, err := util.ParseFilters(requestFilters, common.NamedEntityMetadata)
+	if err != nil {
+		return nil, err
+	}
+	var finalizedFilters = identityFilters
+	for _, filter := range additionalFilters {
+		if strings.Contains(filter.GetField(), state) {
+			filterWithDefaultValue, err := common.NewWithDefaultValueFilter(
+				strconv.Itoa(int(admin.NamedEntityState_NAMED_ENTITY_ACTIVE)), filter)
+			if err != nil {
+				return nil, err
+			}
+			finalizedFilters = append(finalizedFilters, filterWithDefaultValue)
+		} else {
+			finalizedFilters = append(finalizedFilters, filter)
+		}
+	}
+	return finalizedFilters, nil
+}
+
 func (m *NamedEntityManager) ListNamedEntities(ctx context.Context, request admin.NamedEntityListRequest) (
 	*admin.NamedEntityList, error) {
 	if err := validation.ValidateNamedEntityListRequest(request); err != nil {
@@ -73,10 +101,17 @@ func (m *NamedEntityManager) ListNamedEntities(ctx context.Context, request admi
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 
-	filters, err := util.GetDbFilters(util.FilterSpec{
+	identifierFilters, err := util.GetDbFilters(util.FilterSpec{
 		Project: request.Project,
 		Domain:  request.Domain,
 	}, common.ResourceTypeToEntity[request.ResourceType])
+	if err != nil {
+		return nil, err
+	}
+	// HACK: In order to filter by state (if requested) - we need to amend the filter to use COALESCE
+	// e.g. eq(state, 1) becomes 'WHERE (COALESCE(state, 0) = '1')' since not every NamedEntity necessarily
+	// has an entry, and therefore the default state value '0' (active), should be assumed.
+	filters, err := m.updateQueryFilters(identifierFilters, request.Filters)
 	if err != nil {
 		return nil, err
 	}

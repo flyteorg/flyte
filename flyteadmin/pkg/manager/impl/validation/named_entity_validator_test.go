@@ -3,6 +3,9 @@ package validation
 import (
 	"testing"
 
+	"github.com/lyft/flyteadmin/pkg/errors"
+	"google.golang.org/grpc/codes"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
@@ -103,6 +106,28 @@ func TestValidateNamedEntityUpdateRequest(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+		},
+	}))
+	assert.Equal(t, codes.InvalidArgument, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+		ResourceType: core.ResourceType_LAUNCH_PLAN,
+		Id: &admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Metadata: &admin.NamedEntityMetadata{
+			State: admin.NamedEntityState_NAMED_ENTITY_ARCHIVED,
+		},
+	}).(errors.FlyteAdminError).Code())
+	assert.Nil(t, ValidateNamedEntityUpdateRequest(admin.NamedEntityUpdateRequest{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Id: &admin.NamedEntityIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+		Metadata: &admin.NamedEntityMetadata{
+			State: admin.NamedEntityState_NAMED_ENTITY_ARCHIVED,
 		},
 	}))
 }

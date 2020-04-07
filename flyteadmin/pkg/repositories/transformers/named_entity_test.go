@@ -11,7 +11,7 @@ import (
 )
 
 func TestCreateNamedEntityModel(t *testing.T) {
-
+	state := int32(admin.NamedEntityState_NAMED_ENTITY_ACTIVE)
 	model := CreateNamedEntityModel(&admin.NamedEntityUpdateRequest{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Id: &admin.NamedEntityIdentifier{
@@ -21,6 +21,7 @@ func TestCreateNamedEntityModel(t *testing.T) {
 		},
 		Metadata: &admin.NamedEntityMetadata{
 			Description: "description",
+			State:       admin.NamedEntityState_NAMED_ENTITY_ACTIVE,
 		},
 	})
 
@@ -33,6 +34,7 @@ func TestCreateNamedEntityModel(t *testing.T) {
 		},
 		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
 			Description: "description",
+			State:       &state,
 		},
 	}, model)
 }
