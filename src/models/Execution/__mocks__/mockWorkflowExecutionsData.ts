@@ -72,6 +72,7 @@ export const createMockWorkflowExecutionsListResponse = (length: number) => ({
             execution.closure.error = {
                 code: 'user_error',
                 errorUri: '',
+                kind: Core.ExecutionError.ErrorKind.USER,
                 message: sampleError
             };
         }

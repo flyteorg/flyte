@@ -1,6 +1,6 @@
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Admin, Core } from 'flyteidl';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, random } from 'lodash';
 import { NodeExecutionPhase, TaskExecutionPhase } from '../enums';
 import { TaskExecution } from '../types';
 import { sampleError } from './sampleExecutionError';
@@ -51,10 +51,7 @@ export const createMockTaskExecutionsListResponse = (length: number) => {
             const startedAt = dateToTimestamp(
                 new Date(Date.now() - 1000 * 60 * (idx + 1))
             );
-            const phase =
-                idx < length - 1
-                    ? TaskExecutionPhase.FAILED
-                    : TaskExecutionPhase.SUCCEEDED;
+            const phase = random(Object.keys(TaskExecutionPhase).length - 1);
 
             // random duration between 0-90 minutes
             const duration = millisecondsToDuration(
@@ -62,7 +59,7 @@ export const createMockTaskExecutionsListResponse = (length: number) => {
             );
 
             const error =
-                phase === NodeExecutionPhase.FAILED
+                phase === TaskExecutionPhase.FAILED
                     ? {
                           code: 'user_error',
                           errorUri: '',

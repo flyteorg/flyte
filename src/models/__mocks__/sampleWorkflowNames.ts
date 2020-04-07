@@ -1,4 +1,4 @@
-import { Core } from 'flyteidl';
+import { Admin, Core } from 'flyteidl';
 import { NamedEntity, NamedEntityIdentifier } from 'models/Common';
 
 export const sampleWorkflowIds: NamedEntityIdentifier[] = [
@@ -33,6 +33,7 @@ export const sampleWorkflowNames: NamedEntity[] = sampleWorkflowIds.map(id => ({
     id,
     resourceType: Core.ResourceType.WORKFLOW,
     metadata: {
-        description: `A description for ${id.name}`
+        description: `A description for ${id.name}`,
+        state: Admin.NamedEntityState.NAMED_ENTITY_ACTIVE
     }
 }));
