@@ -298,3 +298,69 @@ func TestUpdateNamedEntity(t *testing.T) {
 		assert.Equal(t, "updated description", entity.Metadata.Description)
 	}
 }
+
+func TestUpdateNamedEntityState(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	client, conn := GetTestAdminServiceClient()
+	ctx := context.Background()
+
+	defer conn.Close()
+	insertWorkflowsForTests(t, client)
+
+	result, err := client.ListNamedEntities(ctx, &admin.NamedEntityListRequest{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Project:      "admintests",
+		Domain:       "development",
+		Limit:        20,
+		SortBy: &admin.Sort{
+			Direction: admin.Sort_ASCENDING,
+			Key:       "name",
+		},
+		Filters: fmt.Sprintf("eq(named_entity_metadata.state, %v)", int(admin.NamedEntityState_NAMED_ENTITY_ACTIVE)),
+	})
+	assert.NoError(t, err)
+	assert.Len(t, result.Entities, 3)
+
+	identifier := admin.NamedEntityIdentifier{
+		Project: "admintests",
+		Domain:  "development",
+		Name:    "name_a",
+	}
+	_, err = client.UpdateNamedEntity(ctx, &admin.NamedEntityUpdateRequest{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Id:           &identifier,
+		Metadata: &admin.NamedEntityMetadata{
+			Description: "updated description",
+			State:       admin.NamedEntityState_NAMED_ENTITY_ARCHIVED,
+		},
+	})
+	assert.NoError(t, err)
+
+	result, err = client.ListNamedEntities(ctx, &admin.NamedEntityListRequest{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Project:      "admintests",
+		Domain:       "development",
+		Limit:        20,
+		SortBy: &admin.Sort{
+			Direction: admin.Sort_ASCENDING,
+			Key:       "name",
+		},
+		Filters: fmt.Sprintf("eq(named_entity_metadata.state, %v)", int(admin.NamedEntityState_NAMED_ENTITY_ACTIVE)),
+	})
+	assert.NoError(t, err)
+	assert.Len(t, result.Entities, 2)
+
+	result, err = client.ListNamedEntities(ctx, &admin.NamedEntityListRequest{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Project:      "admintests",
+		Domain:       "development",
+		Limit:        20,
+		SortBy: &admin.Sort{
+			Direction: admin.Sort_ASCENDING,
+			Key:       "name",
+		},
+		Filters: fmt.Sprintf("eq(named_entity_metadata.state, %v)", int(admin.NamedEntityState_NAMED_ENTITY_ARCHIVED)),
+	})
+	assert.NoError(t, err)
+	assert.Len(t, result.Entities, 1)
+}

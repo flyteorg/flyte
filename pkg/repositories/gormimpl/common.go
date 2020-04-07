@@ -8,7 +8,6 @@ import (
 	adminErrors "github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	"google.golang.org/grpc/codes"
 )
 
@@ -19,6 +18,7 @@ const Version = "version"
 const Closure = "closure"
 const Description = "description"
 const ResourceType = "resource_type"
+const State = "state"
 
 const ProjectID = "project_id"
 const ProjectName = "project_name"
@@ -37,14 +37,15 @@ const filters = "filters"
 
 var identifierGroupBy = fmt.Sprintf("%s, %s, %s", Project, Domain, Name)
 
-var entityToModel = map[common.Entity]interface{}{
-	common.Execution:          models.Execution{},
-	common.LaunchPlan:         models.LaunchPlan{},
-	common.NodeExecution:      models.NodeExecution{},
-	common.NodeExecutionEvent: models.NodeExecutionEvent{},
-	common.Task:               models.Task{},
-	common.TaskExecution:      models.TaskExecution{},
-	common.Workflow:           models.Workflow{},
+var entityToTableName = map[common.Entity]string{
+	common.Execution:           "executions",
+	common.LaunchPlan:          "launch_plans",
+	common.NodeExecution:       "node_executions",
+	common.NodeExecutionEvent:  "node_execution_events",
+	common.Task:                "tasks",
+	common.TaskExecution:       "task_executions",
+	common.Workflow:            "workflows",
+	common.NamedEntityMetadata: "named_entity_metadata",
 }
 
 var innerJoinNodeExecToNodeEvents = fmt.Sprintf(
@@ -99,12 +100,11 @@ func applyFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters [
 
 func applyScopedFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
 	for _, filter := range inlineFilters {
-		entityModel, ok := entityToModel[filter.GetEntity()]
+		tableName, ok := entityToTableName[filter.GetEntity()]
 		if !ok {
 			return nil, adminErrors.NewFlyteAdminErrorf(codes.InvalidArgument,
 				"unrecognized entity in filter expression: %v", filter.GetEntity())
 		}
-		tableName := tx.NewScope(entityModel).TableName()
 		gormQueryExpr, err := filter.GetGormJoinTableQueryExpr(tableName)
 		if err != nil {
 			return nil, err

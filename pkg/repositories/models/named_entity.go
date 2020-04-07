@@ -15,6 +15,8 @@ type NamedEntityMetadataKey struct {
 // Fields to be composed into any named entity
 type NamedEntityMetadataFields struct {
 	Description string `gorm:"type:varchar(300)"`
+	// GORM doesn't save the zero value for ints, so we use a pointer for the State field
+	State *int32 `gorm:"default:0"`
 }
 
 // Database model to encapsulate metadata associated with a NamedEntity

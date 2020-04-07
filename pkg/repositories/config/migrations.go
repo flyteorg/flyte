@@ -169,24 +169,34 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Exec("ALTER TABLE tasks DROP COLUMN IF EXISTS type").Error
 		},
 	},
-	// Add state to workflow model
+	// Add state to name entity model
 	{
-		ID: "2020-04-01-workflow-state",
+		ID: "2020-04-03-named-entity-state",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.AutoMigrate(&models.Workflow{}).Error
+			return tx.AutoMigrate(&models.NamedEntityMetadata{}).Error
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Table("workflows").DropColumn("state").Error
+			return tx.Table("named_entity_metadata").DropColumn("state").Error
 		},
 	},
 	// Set default state value for workflow model
 	{
-		ID: "2020-04-01-workflow-state-default",
+		ID: "2020-04-03-named-entity-state-default",
 		Migrate: func(tx *gorm.DB) error {
-			return tx.Exec("UPDATE workflows SET state = 0").Error
+			return tx.Exec("UPDATE named_entity_metadata SET state = 0").Error
 		},
 		Rollback: func(tx *gorm.DB) error {
-			return tx.Exec("UPDATE workflows set state = NULL").Error
+			return tx.Exec("UPDATE named_entity_metadata set state = NULL").Error
+		},
+	},
+	// Modify the workflows table, if necessary
+	{
+		ID: "2020-04-03-workflow-state",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Exec("ALTER TABLE workflows DROP COLUMN IF EXISTS state").Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Exec("ALTER TABLE workflows ADD COLUMN IF NOT EXISTS state integer;").Error
 		},
 	},
 }

@@ -7,13 +7,14 @@ import (
 type Entity = string
 
 const (
-	Execution          = "e"
-	LaunchPlan         = "l"
-	NodeExecution      = "ne"
-	NodeExecutionEvent = "nee"
-	Task               = "t"
-	TaskExecution      = "te"
-	Workflow           = "w"
+	Execution           = "e"
+	LaunchPlan          = "l"
+	NodeExecution       = "ne"
+	NodeExecutionEvent  = "nee"
+	Task                = "t"
+	TaskExecution       = "te"
+	Workflow            = "w"
+	NamedEntityMetadata = "nem"
 )
 
 // ResourceTypeToEntity maps a resource type to an entity suitable for use with Database filters

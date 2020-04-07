@@ -5,9 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flytestdlib/logger"
-
 	"github.com/lyft/flyteadmin/pkg/errors"
+	"github.com/lyft/flytestdlib/logger"
 	"google.golang.org/grpc/codes"
 )
 
@@ -132,6 +131,8 @@ func GetInvalidRepeatedValueFilterErr(expression FilterExpression) error {
 type InlineFilter interface {
 	// Returns the entity for which this filter should be applied.
 	GetEntity() Entity
+	// Returns the column filtered on.
+	GetField() string
 	// Generates fields necessary to add a filter to a gorm database query.
 	GetGormQueryExpr() (GormQueryExpr, error)
 	// Generates fields necessary to add a filter on a gorm database join query.
@@ -153,7 +154,11 @@ func (f *inlineFilterImpl) GetEntity() Entity {
 	return f.entity
 }
 
-func (f *inlineFilterImpl) GetGormQueryExpr() (GormQueryExpr, error) {
+func (f *inlineFilterImpl) GetField() string {
+	return f.field
+}
+
+func (f *inlineFilterImpl) getGormQueryExpr(formattedField string) (GormQueryExpr, error) {
 
 	// ValueIn is special because it uses repeating values.
 	if f.function == ValueIn {
@@ -168,44 +173,44 @@ func (f *inlineFilterImpl) GetGormQueryExpr() (GormQueryExpr, error) {
 	case Contains:
 		return GormQueryExpr{
 			// WHERE field LIKE %value%
-			Query: fmt.Sprintf(containsQuery, f.field),
+			Query: fmt.Sprintf(containsQuery, formattedField),
 			// args renders to something like: "%value%"
 			Args: fmt.Sprintf(containsArgs, f.value),
 		}, nil
 	case GreaterThan:
 		return GormQueryExpr{
 			// WHERE field > value
-			Query: fmt.Sprintf(greaterThanQuery, f.field),
+			Query: fmt.Sprintf(greaterThanQuery, formattedField),
 			Args:  f.value,
 		}, nil
 	case GreaterThanOrEqual:
 		return GormQueryExpr{
 			// WHERE field >= value
-			Query: fmt.Sprintf(greaterThanOrEqualQuery, f.field),
+			Query: fmt.Sprintf(greaterThanOrEqualQuery, formattedField),
 			Args:  f.value,
 		}, nil
 	case LessThan:
 		return GormQueryExpr{
 			// WHERE field < value
-			Query: fmt.Sprintf(lessThanQuery, f.field),
+			Query: fmt.Sprintf(lessThanQuery, formattedField),
 			Args:  f.value,
 		}, nil
 	case LessThanOrEqual:
 		return GormQueryExpr{
 			// WHERE field <= value
-			Query: fmt.Sprintf(lessThanOrEqualQuery, f.field),
+			Query: fmt.Sprintf(lessThanOrEqualQuery, formattedField),
 			Args:  f.value,
 		}, nil
 	case Equal:
 		return GormQueryExpr{
 			// WHERE field = value
-			Query: fmt.Sprintf(equalQuery, f.field),
+			Query: fmt.Sprintf(equalQuery, formattedField),
 			Args:  f.value,
 		}, nil
 	case NotEqual:
 		return GormQueryExpr{
 			// WHERE field <> value
-			Query: fmt.Sprintf(notEqualQuery, f.field),
+			Query: fmt.Sprintf(notEqualQuery, formattedField),
 			Args:  f.value,
 		}, nil
 	}
@@ -213,9 +218,13 @@ func (f *inlineFilterImpl) GetGormQueryExpr() (GormQueryExpr, error) {
 	return GormQueryExpr{}, GetUnsupportedFilterExpressionErr(f.function)
 }
 
+func (f *inlineFilterImpl) GetGormQueryExpr() (GormQueryExpr, error) {
+	return f.getGormQueryExpr(f.field)
+}
+
 func (f *inlineFilterImpl) GetGormJoinTableQueryExpr(tableName string) (GormQueryExpr, error) {
-	f.field = fmt.Sprintf(joinArgsFormat, tableName, f.field)
-	return f.GetGormQueryExpr()
+	formattedField := fmt.Sprintf(joinArgsFormat, tableName, f.field)
+	return f.getGormQueryExpr(formattedField)
 }
 
 func customizeField(field string, entity Entity) string {
@@ -283,4 +292,34 @@ func NewMapFilter(filter map[string]interface{}) MapFilter {
 	return &mapFilterImpl{
 		filter: filter,
 	}
+}
+
+const queryWithDefaultFmt = "COALESCE(%s, %v)"
+
+type withDefaultValueFilter struct {
+	inlineFilterImpl
+	defaultValue interface{}
+}
+
+func (f *withDefaultValueFilter) GetGormQueryExpr() (GormQueryExpr, error) {
+	formattedField := fmt.Sprintf(queryWithDefaultFmt, f.GetField(), f.defaultValue)
+	return f.getGormQueryExpr(formattedField)
+}
+
+func (f *withDefaultValueFilter) GetGormJoinTableQueryExpr(tableName string) (GormQueryExpr, error) {
+	formattedField := fmt.Sprintf(queryWithDefaultFmt, fmt.Sprintf(joinArgsFormat, tableName, f.GetField()), f.defaultValue)
+	return f.getGormQueryExpr(formattedField)
+}
+
+func NewWithDefaultValueFilter(defaultValue interface{}, filter InlineFilter) (InlineFilter, error) {
+	inlineFilter, ok := filter.(*inlineFilterImpl)
+	if !ok {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
+			"Unable to create default value filter for [%s] because the system encountered an unknown filter type",
+			filter.GetField())
+	}
+	return &withDefaultValueFilter{
+		inlineFilterImpl: *inlineFilter,
+		defaultValue:     defaultValue,
+	}, nil
 }

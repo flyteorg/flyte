@@ -39,8 +39,3 @@ func (r *MockWorkflowManager) ListWorkflowIdentifiers(ctx context.Context, reque
 	*admin.NamedEntityIdentifierList, error) {
 	return nil, nil
 }
-
-func (r *MockWorkflowManager) UpdateWorkflow(ctx context.Context, request admin.WorkflowUpdateRequest) (
-	*admin.WorkflowUpdateResponse, error) {
-	return nil, nil
-}

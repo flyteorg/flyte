@@ -129,3 +129,22 @@ func TestMapFilter(t *testing.T) {
 	}
 	assert.EqualValues(t, mapFilterValue, NewMapFilter(mapFilterValue).GetFilter())
 }
+
+func TestWithDefaultValueFilter(t *testing.T) {
+	filter, err := NewSingleValueFilter(NamedEntityMetadata, Equal, "state", 1)
+	assert.NoError(t, err)
+
+	filterWithDefaultValue, err := NewWithDefaultValueFilter(0, filter)
+	assert.NoError(t, err)
+
+	queryExpression, err := filterWithDefaultValue.GetGormQueryExpr()
+	assert.NoError(t, err)
+	assert.Equal(t, "COALESCE(state, 0) = ?", queryExpression.Query)
+	assert.Equal(t, 1, queryExpression.Args)
+
+	queryExpression, err = filterWithDefaultValue.GetGormJoinTableQueryExpr(
+		"named_entity_metadata")
+	assert.NoError(t, err)
+	assert.Equal(t, "COALESCE(named_entity_metadata.state, 0) = ?", queryExpression.Query)
+	assert.Equal(t, 1, queryExpression.Args)
+}
