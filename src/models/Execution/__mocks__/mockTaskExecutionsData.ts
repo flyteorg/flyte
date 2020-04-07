@@ -62,7 +62,7 @@ export const createMockTaskExecutionsListResponse = (length: number) => {
             );
 
             const error =
-                phase === NodeExecutionPhase.FAILED
+                phase === TaskExecutionPhase.FAILED
                     ? {
                           code: 'user_error',
                           errorUri: '',

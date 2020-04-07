@@ -131,9 +131,19 @@ export const taskExecutionPhaseConstants: {
         text: 'Failed',
         textColor: negativeTextColor
     },
+    [TaskExecutionPhase.WAITING_FOR_RESOURCES]: {
+        badgeColor: statusColors.RUNNING,
+        text: 'Waiting',
+        textColor: secondaryTextColor
+    },
     [TaskExecutionPhase.QUEUED]: {
         badgeColor: statusColors.RUNNING,
         text: 'Queued',
+        textColor: secondaryTextColor
+    },
+    [TaskExecutionPhase.INITIALIZING]: {
+        badgeColor: statusColors.RUNNING,
+        text: 'Initializing',
         textColor: secondaryTextColor
     },
     [TaskExecutionPhase.RUNNING]: {

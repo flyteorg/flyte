@@ -69,7 +69,7 @@
     "@babel/preset-react": "^7.8.3",
     "@babel/preset-typescript": "^7.8.3",
     "@date-io/moment": "1.3.9",
-    "@lyft/flyteidl": "^0.16.1",
+    "@lyft/flyteidl": "^0.17.27",
     "@material-ui/core": "^4.0.0",
     "@material-ui/icons": "^4.0.0",
     "@material-ui/pickers": "^3.2.2",

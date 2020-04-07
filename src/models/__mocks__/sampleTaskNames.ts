@@ -1,4 +1,4 @@
-import { Core } from 'flyteidl';
+import { Admin, Core } from 'flyteidl';
 import { NamedEntity, NamedEntityIdentifier } from 'models/Common';
 
 export const sampleTaskIds: NamedEntityIdentifier[] = [
@@ -52,6 +52,7 @@ export const sampleTaskNames: NamedEntity[] = sampleTaskIds.map(id => ({
     id,
     resourceType: Core.ResourceType.TASK,
     metadata: {
-        description: `A description for ${id.name}`
+        description: `A description for ${id.name}`,
+        state: Admin.NamedEntityState.NAMED_ENTITY_ACTIVE
     }
 }));
