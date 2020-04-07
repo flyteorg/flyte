@@ -22,11 +22,9 @@ func ToTaskEventPhase(p pluginCore.Phase) core.TaskExecution_Phase {
 	case pluginCore.PhaseQueued:
 		return core.TaskExecution_QUEUED
 	case pluginCore.PhaseInitializing:
-		// TODO add initializing phase
-		return core.TaskExecution_QUEUED
+		return core.TaskExecution_INITIALIZING
 	case pluginCore.PhaseWaitingForResources:
-		// TODO add waiting for resources
-		return core.TaskExecution_QUEUED
+		return core.TaskExecution_WAITING_FOR_RESOURCES
 	case pluginCore.PhaseRunning:
 		return core.TaskExecution_RUNNING
 	case pluginCore.PhaseSuccess:
