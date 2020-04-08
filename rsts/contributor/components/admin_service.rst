@@ -117,9 +117,6 @@ Permitted attribute operations:
 Using the Admin Service
 =======================
 
-Making Requests to FlyteAdmin
------------------------------
-
 Adding request filters	
 ++++++++++++++++++++++	
 
