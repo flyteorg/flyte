@@ -62,4 +62,4 @@ domains:
     name: domain
 cluster_resources:
   templatePath: "/etc/flyte/clusterresource/templates"
-  refresh: 5m
+  refresh: 10s

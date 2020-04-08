@@ -600,10 +600,10 @@ data:
         name: domain
     cluster_resources:
       templatePath: "/etc/flyte/clusterresource/templates"
-      refresh: 5m
+      refresh: 10s
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-4k466cfctf
+  name: flyte-admin-config-h889md4bc8
   namespace: flyte
 ---
 apiVersion: v1
@@ -965,6 +965,21 @@ spec:
       containers:
       - command:
         - flyteadmin
+        - --logger.mute
+        - --config
+        - /etc/flyte/config/flyteadmin_config.yaml
+        - clusterresource
+        - run
+        image: docker.io/lyft/flyteadmin:v0.2.4
+        imagePullPolicy: IfNotPresent
+        name: run-cluster-resources
+        volumeMounts:
+        - mountPath: /etc/flyte/clusterresource/templates
+          name: resource-templates
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      - command:
+        - flyteadmin
         - --logtostderr
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
@@ -1042,21 +1057,6 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
-      - command:
-        - flyteadmin
-        - --logtostderr
-        - --config
-        - /etc/flyte/config/flyteadmin_config.yaml
-        - clusterresource
-        - sync
-        image: docker.io/lyft/flyteadmin:v0.2.4
-        imagePullPolicy: IfNotPresent
-        name: sync-cluster-resources
-        volumeMounts:
-        - mountPath: /etc/flyte/clusterresource/templates
-          name: resource-templates
-        - mountPath: /etc/flyte/config
-          name: config-volume
       serviceAccountName: flyteadmin
       volumes:
       - configMap:
@@ -1065,7 +1065,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-4k466cfctf
+          name: flyte-admin-config-h889md4bc8
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1462,7 +1462,7 @@ spec:
               name: clusterresource-template-dgc9fcm2kh
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-4k466cfctf
+              name: flyte-admin-config-h889md4bc8
             name: config-volume
   schedule: '*/1 * * * *'
 ---
