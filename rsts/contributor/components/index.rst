@@ -9,6 +9,5 @@ These sections provide implementation details about specific flyte components. T
    :name: componentstoc
 
    admin
-   admin_service
    catalog
    console

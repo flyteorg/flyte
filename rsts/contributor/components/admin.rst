@@ -22,6 +22,8 @@ service `definition <https://github.com/lyft/flyteidl/blob/master/protos/flyteid
 RPC handlers are a thin shim that enforce some request structure validation and call out to appropriate :ref:`manager <components-admin-manager>`.
 methods to process requests.
 
+A detailed explanation of the service can be found in the :ref:`admin service <components-admin-service>` page.
+
 .. _components-admin-manager:
 
 Managers
