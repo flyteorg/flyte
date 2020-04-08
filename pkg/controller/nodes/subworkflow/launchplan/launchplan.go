@@ -34,3 +34,13 @@ type Executor interface {
 	// Initializes Executor.
 	Initialize(ctx context.Context) error
 }
+
+type Reader interface {
+	// Get the definition of a launch plan. This is primarily used to ensure all the TypedInterfaces match up before actually executing.
+	GetLaunchPlan(ctx context.Context, launchPlanRef *core.Identifier) (*admin.LaunchPlan, error)
+}
+
+type FlyteAdmin interface {
+	Executor
+	Reader
+}

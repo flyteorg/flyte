@@ -97,6 +97,26 @@ func (a *adminLaunchPlanExecutor) GetStatus(ctx context.Context, executionID *co
 	return item.ExecutionClosure, item.SyncError
 }
 
+func (a *adminLaunchPlanExecutor) GetLaunchPlan(ctx context.Context, launchPlanRef *core.Identifier) (*admin.LaunchPlan, error) {
+	if launchPlanRef == nil {
+		return nil, fmt.Errorf("launch plan reference is nil")
+	}
+	logger.Debugf(ctx, "Retrieving launch plan %s", *launchPlanRef)
+	getObjectRequest := admin.ObjectGetRequest{
+		Id: launchPlanRef,
+	}
+
+	lp, err := a.adminClient.GetLaunchPlan(ctx, &getObjectRequest)
+	if err != nil {
+		return nil, errors.Wrapf(RemoteErrorSystem, err, "Could not fetch launch plan definition from Admin")
+	}
+	if lp == nil {
+		return nil, errors.Wrapf(RemoteErrorSystem, err, "No launch plan retrieved from Admin")
+	}
+
+	return lp, nil
+}
+
 func (a *adminLaunchPlanExecutor) Kill(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, reason string) error {
 	req := &admin.ExecutionTerminateRequest{
 		Id:    executionID,
@@ -161,7 +181,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 }
 
 func NewAdminLaunchPlanExecutor(_ context.Context, client service.AdminServiceClient,
-	syncPeriod time.Duration, cfg *AdminConfig, scope promutils.Scope) (Executor, error) {
+	syncPeriod time.Duration, cfg *AdminConfig, scope promutils.Scope) (FlyteAdmin, error) {
 	exec := &adminLaunchPlanExecutor{
 		adminClient: client,
 	}

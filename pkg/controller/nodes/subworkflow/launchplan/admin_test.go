@@ -275,3 +275,40 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 		assert.False(t, IsNotFound(err))
 	})
 }
+
+func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
+	ctx := context.TODO()
+	id := &core.Identifier{
+		ResourceType: core.ResourceType_LAUNCH_PLAN,
+		Name:         "n",
+		Domain:       "d",
+		Project:      "p",
+		Version:      "v",
+	}
+
+	t.Run("launch plan found", func(t *testing.T) {
+		mockClient := &mocks.AdminServiceClient{}
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope())
+		assert.NoError(t, err)
+		mockClient.OnGetLaunchPlanMatch(
+			ctx,
+			mock.MatchedBy(func(o *admin.ObjectGetRequest) bool { return true }),
+		).Return(&admin.LaunchPlan{Id: id}, nil)
+		lp, err := exec.GetLaunchPlan(ctx, id)
+		assert.NoError(t, err)
+		assert.Equal(t, lp.Id, id)
+	})
+
+	t.Run("launch plan not found", func(t *testing.T) {
+		mockClient := &mocks.AdminServiceClient{}
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope())
+		assert.NoError(t, err)
+		mockClient.OnGetLaunchPlanMatch(
+			ctx,
+			mock.MatchedBy(func(o *admin.ObjectGetRequest) bool { return true }),
+		).Return(nil, status.Error(codes.NotFound, ""))
+		lp, err := exec.GetLaunchPlan(ctx, id)
+		assert.Nil(t, lp)
+		assert.Error(t, err)
+	})
+}

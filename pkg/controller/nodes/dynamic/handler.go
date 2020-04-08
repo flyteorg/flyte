@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
@@ -60,6 +62,7 @@ type dynamicNodeTaskNodeHandler struct {
 	TaskNodeHandler
 	metrics      metrics
 	nodeExecutor executors.Node
+	lpReader     launchplan.Reader
 }
 
 func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevState handler.DynamicNodeState, nCtx handler.NodeExecutionContext) (handler.Transition, handler.DynamicNodeState, error) {
@@ -377,8 +380,23 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 		return nil, true, err
 	}
 
-	// TODO: This will currently fail if the WF references any launch plans
-	closure, err = compiler.CompileWorkflow(wf, djSpec.Subworkflows, compiledTasks, []common2.InterfaceProvider{})
+	// Get the requirements, that is, a list of all the task IDs and the launch plan IDs that will be called as part of this dynamic task.
+	// The definition of these will need to be fetched from Admin (in order to get the interface).
+	requirements, err := compiler.GetRequirements(wf, djSpec.Subworkflows)
+	if err != nil {
+		return nil, true, err
+	}
+
+	launchPlanInterfaces, err := d.getLaunchPlanInterfaces(ctx, requirements.GetRequiredLaunchPlanIds())
+	if err != nil {
+		return nil, true, err
+	}
+
+	// TODO: In addition to querying Admin for launch plans, we also need to get all the tasks that are missing from the dynamic job spec.
+	// 	 	 The reason they might be missing is because if a user yields a task that is SdkTask.fetch'ed, it should not be included
+	// 	     See https://github.com/lyft/flyte/issues/219 for more information.
+
+	closure, err = compiler.CompileWorkflow(wf, djSpec.Subworkflows, compiledTasks, launchPlanInterfaces)
 	if err != nil {
 		return nil, true, err
 	}
@@ -393,6 +411,22 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 	}
 
 	return newContextualWorkflow(nCtx.Workflow(), subwf, nStatus, subwf.Tasks, subwf.SubWorkflows, nCtx.DataStore()), true, nil
+}
+
+func (d dynamicNodeTaskNodeHandler) getLaunchPlanInterfaces(ctx context.Context, launchPlanIDs []compiler.LaunchPlanRefIdentifier) (
+	[]common2.InterfaceProvider, error) {
+
+	var launchPlanInterfaces = make([]common2.InterfaceProvider, len(launchPlanIDs))
+	for idx, id := range launchPlanIDs {
+		lp, err := d.lpReader.GetLaunchPlan(ctx, &id)
+		if err != nil {
+			logger.Debugf(ctx, "Error fetching launch plan definition from admin")
+			return nil, err
+		}
+		launchPlanInterfaces[idx] = compiler.NewLaunchPlanInterfaceProvider(*lp)
+	}
+
+	return launchPlanInterfaces, nil
 }
 
 func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context, dynamicWorkflow v1alpha1.ExecutableWorkflow,
@@ -470,11 +504,12 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), prevState, nil
 }
 
-func New(underlying TaskNodeHandler, nodeExecutor executors.Node, scope promutils.Scope) handler.Node {
+func New(underlying TaskNodeHandler, nodeExecutor executors.Node, launchPlanReader launchplan.Reader, scope promutils.Scope) handler.Node {
 
 	return &dynamicNodeTaskNodeHandler{
 		TaskNodeHandler: underlying,
 		metrics:         newMetrics(scope),
 		nodeExecutor:    nodeExecutor,
+		lpReader:        launchPlanReader,
 	}
 }
