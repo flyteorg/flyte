@@ -15,11 +15,13 @@ Static entities
 +++++++++++++++
 
 These include:
+
 - Workflows
 - Tasks
 - Launch Plans
 
 Permitted operations:
+
 - Create
 - Get
 - List
@@ -37,14 +39,16 @@ Static entities metadata (Named Entities
 +++++++++++++++++++++++++++++++++++++++++
 A `named entity <https://github.com/lyft/flyteidl/blob/c12816cf3f0bde54a67fa77e71c0158a64151ea3/protos/flyteidl/admin/common.proto#L45>`_ includes metadata for one of the above entities
 (workflow, task or launch plan) across versions. A named entity includes a resource type (workflow, task or launch plan) and an
-`identifier <https://github.com/lyft/flyteidl/blob/c12816cf3f0bde54a67fa77e71c0158a64151ea3/protos/flyteidl/admin/common.proto#L12>`_ which is composed of project, domain and name.
+`id <https://github.com/lyft/flyteidl/blob/c12816cf3f0bde54a67fa77e71c0158a64151ea3/protos/flyteidl/admin/common.proto#L12>`_ which is composed of project, domain and name.
 A named entity also includes metadata, which are mutable attributes about the referenced entity.
 
 This metadata includes:
+
 - Description: a human readable description for the Named Entity collection
 - State (workflows only): this determines whether the workflow is shown on the overview list of workflows scoped by project and domain
 
 Permitted operations:
+
 - Create
 - Update
 - Get
@@ -55,11 +59,13 @@ Execution entities
 ++++++++++++++++++
 
 These include:
+
 - (Workflow) executions
 - Node executions
 - Task executions
 
 Permitted operations:
+
 - Create
 - Get
 - List
@@ -67,6 +73,7 @@ Permitted operations:
 After an execution begins, flyte propeller monitors the execution and sends events which admin uses to update the above executions. 
 
 These `events <https://github.com/lyft/flyteidl/blob/793b09d190148236f41ad8160b5cec9a3325c16f/protos/flyteidl/event/event.proto>`_ include
+
 - WorkflowExecutionEvent
 - NodeExecutionEvent
 - TaskExecutionEvent
@@ -86,20 +93,23 @@ Platform entities
 Projects: like named entities, project have mutable metadata such as human-readable names and descriptions, in addition to their unique string ids.
 
 Permitted project operations:
+
 - Register
 - List
 
 Matchable resources
-A thorough background on :ref: `matchable resources <managing_customizable_resources>` explains their purpose and application logic. As a summary, these are used to override system level defaults
+A thorough background on :ref:`matchable resources <managing_customizable_resources>` explains their purpose and application logic. As a summary, these are used to override system level defaults
 for kubernetes cluster resource management, default execution values, and more all across different levels of specificity.
 
 These entities consist of:
+
 - ProjectDomainAttributes
 - WorkflowAttributes
 
 Where ProjectDomainAttributes configure customizable overrides at the project and domain level and WorkflowAttributes configure customizable overrides at the project, domain and workflow level.
 
 Permitted attribute operations:
+
 - Update (implicitly creates if there is no existing override)
 - Get
 - Delete
