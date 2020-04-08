@@ -3,21 +3,26 @@ import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext, APIContextValue } from 'components/data/apiContext';
 import { StatusString, SystemStatus } from 'models';
 import * as React from 'react';
+import { pendingPromise } from 'test/utils';
 import { SystemStatusBanner } from '../SystemStatusBanner';
 
 describe('SystemStatusBanner', () => {
     let systemStatus: SystemStatus;
     let apiContext: APIContextValue;
+    let getSystemStatus: jest.Mock<ReturnType<
+        APIContextValue['getSystemStatus']
+    >>;
 
     beforeEach(() => {
         systemStatus = {
             status: 'normal',
             message: 'Everything is fine.'
         };
+        getSystemStatus = jest
+            .fn()
+            .mockImplementation(() => Promise.resolve(systemStatus));
         apiContext = mockAPIContextValue({
-            getSystemStatus: jest
-                .fn()
-                .mockImplementation(() => Promise.resolve(systemStatus))
+            getSystemStatus
         });
     });
 
@@ -87,5 +92,19 @@ describe('SystemStatusBanner', () => {
             'href',
             'http://flyte.org'
         );
+    });
+
+    it('should render no content while loading', async () => {
+        getSystemStatus.mockImplementation(() => pendingPromise());
+        const { container } = renderStatusBanner();
+        await wait();
+        expect(container.hasChildNodes()).toBe(false);
+    });
+
+    it('should render no content on error', async () => {
+        getSystemStatus.mockRejectedValue('Failed');
+        const { container } = renderStatusBanner();
+        await wait();
+        expect(container.hasChildNodes()).toBe(false);
     });
 });
