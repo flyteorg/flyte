@@ -5,6 +5,7 @@ import Close from '@material-ui/icons/Close';
 import Info from '@material-ui/icons/Info';
 import Warning from '@material-ui/icons/Warning';
 import { WaitForData } from 'components/common';
+import { Empty } from 'components/common/Empty';
 import { LinkifiedText } from 'components/common/LinkifiedText';
 import {
     infoIconColor,
@@ -139,7 +140,11 @@ export const SystemStatusBanner: React.FC<{}> = () => {
         return null;
     }
     return (
-        <WaitForData {...systemStatus}>
+        <WaitForData
+            {...systemStatus}
+            loadingComponent={Empty}
+            errorComponent={Empty}
+        >
             {systemStatus.value.message ? (
                 <RenderSystemStatusBanner
                     systemStatus={systemStatus.value}
