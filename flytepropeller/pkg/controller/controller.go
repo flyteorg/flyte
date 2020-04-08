@@ -199,26 +199,26 @@ func newK8sEventRecorder(ctx context.Context, kubeclientset kubernetes.Interface
 func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Interface, flytepropellerClientset clientset.Interface,
 	flyteworkflowInformerFactory informers.SharedInformerFactory, kubeClient executors.Client, scope promutils.Scope) (*Controller, error) {
 
-	var wfLauncher launchplan.Executor
+	var launchPlanActor launchplan.FlyteAdmin
 	if cfg.EnableAdminLauncher {
 		adminClient, err := admin.InitializeAdminClientFromConfig(ctx)
 		if err != nil {
 			logger.Errorf(ctx, "failed to initialize Admin client, err :%s", err.Error())
 			return nil, err
 		}
-		wfLauncher, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, cfg.DownstreamEval.Duration,
+		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, cfg.DownstreamEval.Duration,
 			launchplan.GetAdminConfig(), scope.NewSubScope("admin_launcher"))
 		if err != nil {
 			logger.Errorf(ctx, "failed to create Admin workflow Launcher, err: %v", err.Error())
 			return nil, err
 		}
 
-		if err := wfLauncher.Initialize(ctx); err != nil {
+		if err := launchPlanActor.Initialize(ctx); err != nil {
 			logger.Errorf(ctx, "failed to initialize Admin workflow Launcher, err: %v", err.Error())
 			return nil, err
 		}
 	} else {
-		wfLauncher = launchplan.NewFailFastLaunchPlanExecutor()
+		launchPlanActor = launchplan.NewFailFastLaunchPlanExecutor()
 	}
 
 	logger.Info(ctx, "Setting up event sink and recorder")
@@ -298,7 +298,8 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 		return nil, stdErrs.Wrapf(errors3.CausedByError, err, "failed to initialize workflow store")
 	}
 
-	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink, wfLauncher, cfg.MaxDatasetSizeBytes,
+	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
+		launchPlanActor, launchPlanActor, cfg.MaxDatasetSizeBytes,
 		storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient, catalogClient, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")

@@ -471,7 +471,7 @@ func TestValidateUnderlyingInterface(parentT *testing.T) {
 		}
 	}
 
-	g := newWorfklowBuilder(
+	g := newWorkflowBuilder(
 		&core.CompiledWorkflow{Template: inputWorkflow},
 		mustBuildWorkflowIndex(inputWorkflow),
 		common.NewTaskIndex(compiledTasks...),
