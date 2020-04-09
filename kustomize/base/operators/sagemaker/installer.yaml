@@ -1,3 +1,5 @@
+# The content of this file, except for these comment lines, is a direct copy from https://raw.githubusercontent.com/aws/amazon-sagemaker-operator-for-k8s/24853d92a8b2c282d62aafac06b8a0df5f138039/release/rolebased/installer.yaml.
+# The commit we pull from points to the v1.1 release of the SageMaker operator
 apiVersion: v1
 kind: Namespace
 metadata:
