@@ -18,8 +18,10 @@ REPOS_DIR=`mktemp -d "${BASEDIR}/_repos/XXXXXXXXX"`
 
 function clone_repos()
 {
-    git clone https://github.com/lyft/flytekit.git ${REPOS_DIR}/flytekit
-    git clone https://github.com/lyft/flyteidl.git ${REPOS_DIR}/flyteidl
+    REPOS=`cat ${DIR}/dependent_repos.txt`
+    for REPO in ${REPOS}; do
+      git clone https://${REPO}.git ${REPOS_DIR}/flytekit
+    done
 }
 
 # Clone all repos
