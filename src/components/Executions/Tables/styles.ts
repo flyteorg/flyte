@@ -1,9 +1,9 @@
 import { makeStyles, Theme } from '@material-ui/core';
 import { headerGridHeight } from 'components';
 import {
-    bodyFontSize,
     headerFontFamily,
     listhoverColor,
+    smallFontSize,
     tableHeaderColor,
     tablePlaceholderColor
 } from 'components/Theme';
@@ -50,7 +50,7 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
         color: tableHeaderColor,
         display: 'flex',
         fontFamily: headerFontFamily,
-        fontSize: bodyFontSize,
+        fontSize: smallFontSize,
         fontWeight: 'bold',
         flexDirection: 'row',
         height: theme.spacing(headerGridHeight),
