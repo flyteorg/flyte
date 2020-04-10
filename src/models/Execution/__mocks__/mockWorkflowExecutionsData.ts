@@ -62,9 +62,13 @@ export const createMockWorkflowExecutionsListResponse = (length: number) => ({
     executions: Array.from({ length }, (_, idx) => {
         const execution = cloneDeep(mockExecution);
         const startedAtDate = new Date(Date.now() - 1000 * 60 * (idx + 1));
+        const createdAtDate = new Date(
+            startedAtDate.getTime() - 1000 * 30 * 5 * (idx + 1)
+        );
         const phase = random(Object.keys(WorkflowExecutionPhase).length - 1);
         // random duration between 0-90 minutes
         const durationMS = Math.random() * 1000 * 60 * 90;
+        execution.closure.createdAt = dateToTimestamp(createdAtDate);
         execution.closure.startedAt = dateToTimestamp(startedAtDate);
         execution.closure.duration = millisecondsToDuration(durationMS);
         execution.closure.phase = phase;

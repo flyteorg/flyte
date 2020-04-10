@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import * as classnames from 'classnames';
@@ -5,6 +6,7 @@ import { noExecutionsFoundString } from 'common/constants';
 import {
     dateFromNow,
     formatDateUTC,
+    millisecondsToHMS,
     protobufDurationToHMS
 } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
@@ -17,6 +19,7 @@ import * as React from 'react';
 import { ListRowRenderer } from 'react-virtualized';
 import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
+import { getWorkflowExecutionTimingMS } from '../utils';
 import { workflowExecutionsTableColumnWidths } from './constants';
 import { ExecutionsTableHeader } from './ExecutionsTableHeader';
 import { ExpandableExecutionError } from './ExpandableExecutionError';
@@ -73,7 +76,8 @@ type WorkflowExecutionColumnDefinition = ColumnDefinition<
 >;
 
 function generateColumns(
-    styles: ReturnType<typeof useStyles>
+    styles: ReturnType<typeof useStyles>,
+    commonStyles: ReturnType<typeof useCommonStyles>
 ): WorkflowExecutionColumnDefinition[] {
     return [
         {
@@ -115,13 +119,37 @@ function generateColumns(
             label: 'start time'
         },
         {
-            cellRenderer: ({ execution: { closure } }) => {
-                const { duration } = closure;
-                return duration ? protobufDurationToHMS(duration!) : '';
+            // TODO: Calculate queued time, show duration as a body1, QT as a body2
+            cellRenderer: ({ execution }) => {
+                const timing = getWorkflowExecutionTimingMS(execution);
+                if (timing === null) {
+                    return '';
+                }
+                return (
+                    <>
+                        <div>{millisecondsToHMS(timing.duration)}</div>
+                        <Typography variant="subtitle1" color="textSecondary">
+                            {millisecondsToHMS(timing.queued)}
+                        </Typography>
+                    </>
+                );
             },
             className: styles.columnDuration,
             key: 'duration',
-            label: 'duration'
+            label: () => (
+                <>
+                    <Typography component="div" variant="overline">
+                        duration
+                    </Typography>
+                    <Typography
+                        component="div"
+                        variant="subtitle1"
+                        color="textSecondary"
+                    >
+                        Queued Time
+                    </Typography>
+                </>
+            )
         },
         {
             cellRenderer: ({ execution, state }) => {
@@ -152,7 +180,10 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
     const tableStyles = useExecutionTableStyles();
     const listRef = React.useRef<DataListRef>(null);
     // Memoizing columns so they won't be re-generated unless the styles change
-    const columns = React.useMemo(() => generateColumns(styles), [styles]);
+    const columns = React.useMemo(() => generateColumns(styles, commonStyles), [
+        styles,
+        commonStyles
+    ]);
 
     const retry = () => props.fetch();
     const onCloseIOModal = () => state.setSelectedIOExecution(null);

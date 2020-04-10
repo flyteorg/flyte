@@ -1,4 +1,3 @@
-export const executionsTableRowHeight = 56;
 export const workflowExecutionsTableColumnWidths = {
     duration: 100,
     inputsOutputs: 140,

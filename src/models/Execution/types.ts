@@ -20,7 +20,15 @@ export type WorkflowExecutionIdentifier = RequiredNonNullable<
 >;
 export type ExecutionError = RequiredNonNullable<Core.IExecutionError>;
 
+export interface BaseExecutionClosure {
+    createdAt: Protobuf.ITimestamp;
+    duration?: Protobuf.Duration;
+    error?: ExecutionError;
+    startedAt?: Protobuf.ITimestamp;
+}
+
 export interface ExecutionClosure extends Admin.IExecutionClosure {
+    createdAt: Protobuf.ITimestamp;
     computedInputs: LiteralMap;
     duration?: Protobuf.Duration;
     error?: ExecutionError;
