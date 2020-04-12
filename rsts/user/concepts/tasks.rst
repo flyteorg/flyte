@@ -56,7 +56,7 @@ When deciding whether a unit of execution conistitutes a Flyte Task or not. Cons
   but opt to using a system-provided clock as the seed. 
 
 - Is it a pure function? i.e. does it have side effects that are not known to the system (e.g. calls a web-service). It's strongly
-  advisable to avoid side-effects in tasks. When side-effects are required, ensure that those operations are idempotent_.
+  advisable to avoid side-effects in tasks. When side-effects are required, ensure that those operations are idempotent.
 
 Types
 -----

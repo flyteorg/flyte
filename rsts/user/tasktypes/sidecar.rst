@@ -1,10 +1,12 @@
 .. _sidecar-task-type:
 
+#############
 Sidecar Tasks
-=============
+#############
 
 Sidecar tasks can be used to bring up multiple containers within a single task. Sidecar tasks are defined using a Kubernetes `pod spec <https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.14/#podspec-v1-core>`_ but differ slightly in that the plugin task executor solely monitors the status of a user-specified primary container over the task lifecycle.
 
+************
 Installation
 ************
 If you haven't already, install the sidecar extra from flytekit like so:
@@ -21,19 +23,20 @@ And assert that you have a dependency in your project on
    k8s-proto>=0.0.2
 
 
+*****
 Usage
-#####
+*****
 
 Sidecar accept all arguments that ordinary :ref:`container tasks <container-task-type>` accept. However, sidecar tasks require two additional arguments, ``pod_spec`` and ``primary_container_name``
 
 Pod Spec
-********
+========
 
 Using the `generated python protobuf code in flyteproto <https://github.com/lyft/flyteproto>`_, a task can define a completely kubernetes-native pod spec that will be deployed as part of the sidecar task execution.
 
 
 Primary container
-*****************
+========
 
 This is a required name you use to distinguish your primary container. The code in the body of the task definition will be injected in the primary container. The pod spec you pass to the task definition does not necessarily need to include a container definition with the primary container, but if you'd like to modify the primary container by setting a shared volume mount for example, you can do so in the pod spec.
 
