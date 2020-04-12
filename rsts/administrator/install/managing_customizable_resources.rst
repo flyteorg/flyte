@@ -4,20 +4,32 @@
 Configuring customizable resources
 ##################################
 
-As the complexity of your user-base grows, you may find yourself tweaking resource assignments based on specific projects, domains and workflows.
-This document walks through how to use MatchableResource attributes to customize your workflow execution environment.
+As the complexity of your user base grows, you may find yourself tweaking resource assignments based on specific projects, domains and workflows. This document walks through how and in what ways you can configure your Flyte deployment.
 
-Flyteadmin allows for overrides of task resource request and limit defaults, kubernetes cluster resource configuration,
-dynamic task execution queues and specifying executions on specific kubernetes clusters. These can all be overriden for specific combinations
-of domain; domain and project; domain, project and workflow (name); and domain, project, workflow (name), and launch plan.
 
 ***************************
 Configurable Resource Types
 ***************************
 
-The proto definition is the definitive source of
+Flyte allows these custom settings along the following combination of dimensions
+
+- domain
+- project and domain
+- project, domain, and name (must be either a workflow name or a launch plan name)
+
+Please see the :ref:`concepts` document for more information on projects and domains. Along these dimensions, the following settings are configurable. Note that not all three of the combinations above are valid for each of these settings.
+
+- Defaults for task resource requests and limits (when not specified by the author of the task).
+- Settings for the cluster resource configuration that feeds into Admin's cluster resource manager.
+- Execution queues that are used for Dynamic Tasks. Read more about execution queues here, but effectively they're meant to be used with constructs like AWS Batch.
+- Determining how workflow executions get assigned to clusters in a multi=cluster Flyte deployment.
+
+The proto definition is the definitive source of which
 `matchable attributes <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto>`_
-which can be customized. See below for a detailed explanation
+can be customized.
+
+Each of the four above settings are discussed below.  Also, since the flyte-cli tool does not yet hit these endpoints, we are including some sample ``curl`` commands for administrators to reference.
+
 
 Task Resources
 ==============
@@ -25,15 +37,12 @@ Task Resources
 This includes setting default value for task resource requests and limits for the following resources:
 
 - cpu
-
 - gpu
-
 - memory
-
 - storage
 
 In the absence of an override the global
-`default values <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L124,L134>`_
+`default values <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L124,L134>`__
 in the flyteadmin config are used.
 
 The override values from the database are assigned at execution time.
@@ -42,11 +51,20 @@ The override values from the database are assigned at execution time.
 Cluster Resources
 =================
 
-These are free-form key-value pairs which are used when creating project-domain based resources on Flyte kubernetes clusters.
+These are free-form key-value pairs which are used when filling in the templates that Admin feeds into its cluster manager. The keys represent templatized variables in `clusterresource template yaml <https://github.com/lyft/flyteadmin/tree/master/sampleresourcetemplates>`__ and the values are what you want to see filled in.
 
-The keys represent templatized variables in `clusterresource template yaml <https://github.com/lyft/flyteadmin/tree/master/sampleresourcetemplates>`_
+In the absence of custom override values, templateData from the `flyteadmin config <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L154,L159>`__ is used as a default.
 
-In the absence of custom override values, templateData from the `flyteadmin config <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L154,L159>`_ is used as a default.
+Note that these settings can only take on domain, or a project and domain specificity. Project & domain together in Flyte form Kubernetes namespaces. Since Flyte has not tied in the notion of a workflow or a launch plan to any Kubernetes constructs, specifying a workflow or launch plan name doesn't make any sense.
+
+
+Command
+-------
+Running the following, will make it so that when Admin fills in cluster resource templates, the K8s namespace ``projectname-staging`` will have a resource quota of 1000 CPU cores and 5TB of memory.
+
+.. code-block:: console
+
+    curl --request PUT 'https://flyte.company.net/api/v1/project_domain_attributes/projectname/staging' --header 'Content-Type: application/json' --data-raw '{"attributes":{"matchingAttributes":{"clusterResourceAttributes":{"attributes":{"projectQuotaCpu": "1000", "projectQuotaMemory": "5000Gi"}}}}}'
 
 
 Execution Queues
@@ -55,7 +73,7 @@ Execution Queues
 Execution queues are use to determine where dynamic tasks run.
 
 Execution queues themselves are currently defined in the
-`flyteadmin config <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L97,L106>`_.
+`flyteadmin config <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L97,L106>`__.
 
 The **attributes** associated with an execution queue must match the **tags** for workflow executions. The tags are associated with configurable resources
 stored in the admin database.
