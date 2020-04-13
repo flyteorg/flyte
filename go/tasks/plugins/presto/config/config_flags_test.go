@@ -253,4 +253,92 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_readRateLimiterConfig.rate", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt64, err := cmdFlags.GetInt64("readRateLimiterConfig.rate"); err == nil {
+				assert.Equal(t, int64(defaultConfig.ReadRateLimiterConfig.Rate), vInt64)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("readRateLimiterConfig.rate", testValue)
+			if vInt64, err := cmdFlags.GetInt64("readRateLimiterConfig.rate"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.ReadRateLimiterConfig.Rate)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_readRateLimiterConfig.burst", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt, err := cmdFlags.GetInt("readRateLimiterConfig.burst"); err == nil {
+				assert.Equal(t, int(defaultConfig.ReadRateLimiterConfig.Burst), vInt)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("readRateLimiterConfig.burst", testValue)
+			if vInt, err := cmdFlags.GetInt("readRateLimiterConfig.burst"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.ReadRateLimiterConfig.Burst)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_writeRateLimiterConfig.rate", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt64, err := cmdFlags.GetInt64("writeRateLimiterConfig.rate"); err == nil {
+				assert.Equal(t, int64(defaultConfig.WriteRateLimiterConfig.Rate), vInt64)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("writeRateLimiterConfig.rate", testValue)
+			if vInt64, err := cmdFlags.GetInt64("writeRateLimiterConfig.rate"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.WriteRateLimiterConfig.Rate)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_writeRateLimiterConfig.burst", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt, err := cmdFlags.GetInt("writeRateLimiterConfig.burst"); err == nil {
+				assert.Equal(t, int(defaultConfig.WriteRateLimiterConfig.Burst), vInt)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("writeRateLimiterConfig.burst", testValue)
+			if vInt, err := cmdFlags.GetInt("writeRateLimiterConfig.burst"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WriteRateLimiterConfig.Burst)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

@@ -165,4 +165,26 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_scheduler-name", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("scheduler-name"); err == nil {
+				assert.Equal(t, string(*new(string)), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("scheduler-name", testValue)
+			if vString, err := cmdFlags.GetString("scheduler-name"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vString), &actual.SchedulerName)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

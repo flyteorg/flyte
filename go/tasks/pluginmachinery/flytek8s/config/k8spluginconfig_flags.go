@@ -44,5 +44,6 @@ func (cfg K8sPluginConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "inject-finalizer"), *new(bool), "Instructs the plugin to inject a finalizer on startTask and remove it on task termination.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-cpus"), *new(string), "Defines a default value for cpu for containers if not specified.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-memory"), *new(string), "Defines a default value for memory for containers if not specified.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "scheduler-name"), *new(string), "Defines scheduler name.")
 	return cmdFlags
 }
