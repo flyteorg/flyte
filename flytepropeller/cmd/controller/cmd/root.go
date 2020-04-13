@@ -94,11 +94,13 @@ func init() {
 	rootCmd.AddCommand(viper.GetConfigCommand())
 }
 
-func initConfig(_ *cobra.Command, _ []string) error {
+func initConfig(cmd *cobra.Command, _ []string) error {
 	configAccessor = viper.NewAccessor(config.Options{
 		StrictMode:  true,
 		SearchPaths: []string{cfgFile},
 	})
+
+	configAccessor.InitializePflags(cmd.Flags())
 
 	err := configAccessor.UpdateConfig(context.TODO())
 	if err != nil {
