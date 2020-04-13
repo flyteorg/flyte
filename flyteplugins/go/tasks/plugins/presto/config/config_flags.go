@@ -48,5 +48,9 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "refreshCacheConfig.syncPeriod"), defaultConfig.RefreshCacheConfig.SyncPeriod.String(), "The duration to wait before the cache is refreshed again")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "refreshCacheConfig.workers"), defaultConfig.RefreshCacheConfig.Workers, "Number of parallel workers to refresh the cache")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "refreshCacheConfig.lruCacheSize"), defaultConfig.RefreshCacheConfig.LruCacheSize, "Size of the cache")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "readRateLimiterConfig.rate"), defaultConfig.ReadRateLimiterConfig.Rate, "Allowed rate of calls per second.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "readRateLimiterConfig.burst"), defaultConfig.ReadRateLimiterConfig.Burst, "Allowed burst rate of calls per second.")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "writeRateLimiterConfig.rate"), defaultConfig.WriteRateLimiterConfig.Rate, "Allowed rate of calls per second.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "writeRateLimiterConfig.burst"), defaultConfig.WriteRateLimiterConfig.Burst, "Allowed burst rate of calls per second.")
 	return cmdFlags
 }

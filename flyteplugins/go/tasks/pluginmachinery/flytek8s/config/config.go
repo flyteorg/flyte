@@ -49,6 +49,8 @@ type K8sPluginConfig struct {
 	// Node Selector Labels for interruptible pods: Similar to InterruptibleTolerations, these node selector labels are added for pods that can tolerate
 	// eviction.
 	InterruptibleNodeSelector map[string]string `json:"interruptible-node-selector" pflag:"-,Defines a set of node selector labels to add to the interruptible pods."`
+	// Scheduler name.
+	SchedulerName string `json:"scheduler-name" pflag:",Defines scheduler name."`
 }
 
 // Retrieves the current k8s plugin config or default.
