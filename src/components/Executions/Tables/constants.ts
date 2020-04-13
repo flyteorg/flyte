@@ -2,7 +2,7 @@ export const workflowExecutionsTableColumnWidths = {
     duration: 100,
     inputsOutputs: 140,
     lastRun: 130,
-    name: 185,
+    name: 270,
     phase: 120,
     startedAt: 200
 };

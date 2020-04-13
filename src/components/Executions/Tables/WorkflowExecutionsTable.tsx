@@ -81,8 +81,22 @@ function generateColumns(
 ): WorkflowExecutionColumnDefinition[] {
     return [
         {
-            cellRenderer: ({ execution: { id } }) => (
-                <WorkflowExecutionLink className={styles.cellName} id={id} />
+            cellRenderer: ({
+                execution: {
+                    id,
+                    closure: { startedAt }
+                }
+            }) => (
+                <>
+                    <WorkflowExecutionLink id={id} />
+                    <Typography variant="subtitle1" color="textSecondary">
+                        {startedAt
+                            ? `Last run ${dateFromNow(
+                                  timestampToDate(startedAt)
+                              )}`
+                            : ''}
+                    </Typography>
+                </>
             ),
             className: styles.columnName,
             key: 'name',
@@ -97,15 +111,6 @@ function generateColumns(
             className: styles.columnStatus,
             key: 'phase',
             label: 'status'
-        },
-        {
-            cellRenderer: ({ execution: { closure } }) => {
-                const { startedAt } = closure;
-                return startedAt ? dateFromNow(timestampToDate(startedAt)) : '';
-            },
-            className: styles.columnLastRun,
-            key: 'lastRun',
-            label: 'last run'
         },
         {
             cellRenderer: ({ execution: { closure } }) => {
