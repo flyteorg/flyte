@@ -16,3 +16,7 @@ jobs:
     install: make install
     name: lint
     script: make lint
+  - stage: test
+    name: unit tests
+    install: make install
+    script: make test_unit_codecov
