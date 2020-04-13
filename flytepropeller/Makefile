@@ -43,11 +43,6 @@ golden:
 	go test ./cmd/kubectl-flyte/cmd -update
 	go test ./pkg/compiler/test -update
 
-.PHONY: test_unit_codecov
-test_unit_codecov:
-	go test ./... -race -coverprofile=coverage.txt -covermode=atomic
-	curl -s https://codecov.io/bash > codecov_bash.sh && bash codecov_bash.sh
-
 .PHONY: generate
 generate: download_tooling
 	@go generate ./...
