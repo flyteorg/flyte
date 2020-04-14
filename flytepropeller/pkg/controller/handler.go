@@ -115,6 +115,7 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 				if r := recover(); r != nil {
 					stack := debug.Stack()
 					err = fmt.Errorf("panic when aborting workflow, Stack: [%s]", string(stack))
+					logger.Errorf(ctx, err.Error())
 					p.metrics.PanicObserved.Inc(ctx)
 				}
 			}()
@@ -143,6 +144,7 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 					if r := recover(); r != nil {
 						stack := debug.Stack()
 						err = fmt.Errorf("panic when reconciling workflow, Stack: [%s]", string(stack))
+						logger.Errorf(ctx, err.Error())
 						p.metrics.PanicObserved.Inc(ctx)
 					}
 				}()
