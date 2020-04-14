@@ -9,12 +9,12 @@ import (
 
 	stdAtomic "github.com/lyft/flytestdlib/atomic"
 
-	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/assert"
 
 	taskErrors "github.com/lyft/flyteplugins/go/tasks/errors"
 	stdlibErrors "github.com/lyft/flytestdlib/errors"
 	v1 "k8s.io/api/core/v1"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/clock"
@@ -25,7 +25,7 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 
 	operWithErr := func() error {
 		callCount++
-		return k8serrors.NewForbidden(
+		return apiErrors.NewForbidden(
 			schema.GroupResource{}, "", errors.New("is forbidden: "+
 				"exceeded quota: project-quota, requested: limits.memory=1Gi, "+
 				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi"))
@@ -351,17 +351,17 @@ func TestGetComputeResourceAndQuantityRequested(t *testing.T) {
 		args args
 		want v1.ResourceList
 	}{
-		{name: "Memory request", args: args{err: k8serrors.NewForbidden(
+		{name: "Memory request", args: args{err: apiErrors.NewForbidden(
 			schema.GroupResource{}, "", errors.New("is forbidden: "+
 				"exceeded quota: project-quota, requested: limits.memory=3Gi, "+
 				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi"))},
 			want: v1.ResourceList{v1.ResourceMemory: resource.MustParse("3Gi")}},
-		{name: "CPU request", args: args{err: k8serrors.NewForbidden(
+		{name: "CPU request", args: args{err: apiErrors.NewForbidden(
 			schema.GroupResource{}, "", errors.New("is forbidden: "+
 				"exceeded quota: project-quota, requested: limits.cpu=3640m, "+
 				"used: limits.cpu=6000m, limited: limits.cpu=8000m"))},
 			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("3640m")}},
-		{name: "Multiple resources ", args: args{err: k8serrors.NewForbidden(
+		{name: "Multiple resources ", args: args{err: apiErrors.NewForbidden(
 			schema.GroupResource{}, "", errors.New("is forbidden: "+
 				"exceeded quota: project-quota, requested: limits.cpu=7,limits.memory=64Gi, used: limits.cpu=249,limits.memory=2012730Mi, limited: limits.cpu=250,limits.memory=2000Gi"))},
 			want: v1.ResourceList{v1.ResourceCPU: resource.MustParse("7"), v1.ResourceMemory: resource.MustParse("64Gi")}},
@@ -406,12 +406,12 @@ func TestIsResourceQuotaExceeded(t *testing.T) {
 		args args
 		want bool
 	}{
-		{name: "True ResourceQuotaExceeded error msg", args: args{err: k8serrors.NewForbidden(
+		{name: "True ResourceQuotaExceeded error msg", args: args{err: apiErrors.NewForbidden(
 			schema.GroupResource{}, "", errors.New("is forbidden: "+
 				"exceeded quota: project-quota, requested: limits.memory=3Gi, "+
 				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi"))},
 			want: true},
-		{name: "False ResourceQuotaExceeded error msg", args: args{err: k8serrors.NewForbidden(
+		{name: "False ResourceQuotaExceeded error msg", args: args{err: apiErrors.NewForbidden(
 			schema.GroupResource{}, "", errors.New("is forbidden: "+
 				"exxxceed quota: project-quota, requested: limits.memory=3Gi, "+
 				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi"))},
@@ -491,5 +491,28 @@ func TestSimpleBackOffBlocker_backOff(t *testing.T) {
 			assert.Equal(t, maxBackOffDuration, backOffDuration)
 			assert.Equal(t, uint32(10), b.BackOffExponent.Load())
 		}
+	})
+}
+
+func TestErrorTypes(t *testing.T) {
+	t.Run("too many requests", func(t *testing.T) {
+		err := apiErrors.NewTooManyRequestsError("test")
+		res := IsBackOffError(err)
+		assert.True(t, res)
+	})
+
+	t.Run("server timeout", func(t *testing.T) {
+		err := apiErrors.NewServerTimeout(schema.GroupResource{}, "test op", 1)
+		res := IsBackOffError(err)
+		assert.True(t, res)
+	})
+
+	t.Run("resource exceeded", func(t *testing.T) {
+		err := apiErrors.NewForbidden(
+			schema.GroupResource{}, "", errors.New("is forbidden: "+
+				"exceeded quota: project-quota, requested: limits.memory=1Gi, "+
+				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi"))
+		res := IsBackOffError(err)
+		assert.True(t, res)
 	})
 }
