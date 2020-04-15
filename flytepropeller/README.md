@@ -2,7 +2,7 @@ Flyte Propeller
 ===============
 [![Current Release](https://img.shields.io/github/release/lyft/flytepropeller.svg)](https://github.com/lyft/flytepropeller/releases/latest)
 [![Build Status](https://travis-ci.org/lyft/flytepropeller.svg?branch=master)](https://travis-ci.org/lyft/flytepropeller)
-[![GoDoc](https://godoc.org/github.com/lyft/flytepropeller?status.svg)](https://godoc.org/github.com/lyft/flytepropeller)
+[![GoDoc](https://godoc.org/github.com/lyft/flytepropeller?status.svg)](https://pkg.go.dev/mod/github.com/lyft/flytepropeller)
 [![License](https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![CodeCoverage](https://img.shields.io/codecov/c/github/lyft/flytepropeller.svg)](https://codecov.io/gh/lyft/flytepropeller)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lyft/flytepropeller)](https://goreportcard.com/report/github.com/lyft/flytepropeller)
