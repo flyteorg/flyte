@@ -1,10 +1,15 @@
 #############
 Flyte Console
 #############
-[![Current Release](https://img.shields.io/github/release/lyft/flyteconsole.svg)](https://github.com/lyft/flyteconsole/releases/latest)
-[![Build Status](https://travis-ci.org/lyft/flyteconsole.svg?branch=master)](https://travis-ci.org/lyft/flyteconsole)
-[![License](https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![CodeCoverage](https://img.shields.io/codecov/c/github/lyft/flyteconsole.svg)](https://codecov.io/gh/lyft/flyteconsole)
+
+.. |Current Release| image:: https://img.shields.io/github/release/lyft/flyteconsole.svg
+        :target: https://github.com/lyft/flyteconsole/releases/latest
+.. |Build Status| image:: https://travis-ci.org/lyft/flyteconsole.svg?branch=master
+        :target: https://travis-ci.org/lyft/flyteconsole
+.. |License| image:: https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg
+        :target: http://www.apache.org/licenses/LICENSE-2.0.html
+.. |CodeCoverage| image:: https://img.shields.io/codecov/c/github/lyft/flyteconsole.svg
+        :target: https://codecov.io/gh/lyft/flyteconsole
 
 This is the web UI for the Flyte platform.
 
