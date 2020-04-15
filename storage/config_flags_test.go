@@ -341,4 +341,26 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_defaultHttpClient.timeout", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("defaultHttpClient.timeout"); err == nil {
+				assert.Equal(t, string(defaultConfig.DefaultHTTPClient.Timeout.String()), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.DefaultHTTPClient.Timeout.String()
+
+			cmdFlags.Set("defaultHttpClient.timeout", testValue)
+			if vString, err := cmdFlags.GetString("defaultHttpClient.timeout"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DefaultHTTPClient.Timeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

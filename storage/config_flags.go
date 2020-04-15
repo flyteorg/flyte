@@ -52,5 +52,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cache.max_size_mbs"), defaultConfig.Cache.MaxSizeMegabytes, "Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0,  cache is not used")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cache.target_gc_percent"), defaultConfig.Cache.TargetGCPercent, "Sets the garbage collection target percentage.")
 	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "limits.maxDownloadMBs"), defaultConfig.Limits.GetLimitMegabytes, "Maximum allowed download size (in MBs) per call.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultHttpClient.timeout"), defaultConfig.DefaultHTTPClient.Timeout.String(), "Sets time out on the http client.")
 	return cmdFlags
 }

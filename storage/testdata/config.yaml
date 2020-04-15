@@ -9,6 +9,9 @@ connection:
   region: us-east-1
   secret-key: miniostorage
 container: ""
+defaultHttpClient:
+  headers: null
+  timeout: 0s
 limits:
   maxDownloadMBs: 0
 type: s3

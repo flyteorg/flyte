@@ -78,7 +78,7 @@ func TestNewGenerator(t *testing.T) {
 
 	goldenOutput, err := ioutil.ReadFile(filepath.Clean(goldenFilePath))
 	assert.NoError(t, err)
-	assert.Equal(t, goldenOutput, codeBytes)
+	assert.Equal(t, string(goldenOutput), string(codeBytes))
 
 	goldenTestOutput, err := ioutil.ReadFile(filepath.Clean(goldenTestFilePath))
 	assert.NoError(t, err)

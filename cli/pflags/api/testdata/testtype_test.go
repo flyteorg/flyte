@@ -495,6 +495,28 @@ func TestTestType_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_storage.defaultHttpClient.timeout", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("storage.defaultHttpClient.timeout"); err == nil {
+				assert.Equal(t, string(DefaultTestType.StorageConfig.DefaultHTTPClient.Timeout.String()), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := DefaultTestType.StorageConfig.DefaultHTTPClient.Timeout.String()
+
+			cmdFlags.Set("storage.defaultHttpClient.timeout", testValue)
+			if vString, err := cmdFlags.GetString("storage.defaultHttpClient.timeout"); err == nil {
+				testDecodeJson_TestType(t, fmt.Sprintf("%v", vString), &actual.StorageConfig.DefaultHTTPClient.Timeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_i", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
