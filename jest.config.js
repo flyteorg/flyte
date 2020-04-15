@@ -32,7 +32,7 @@ module.exports = {
         '<rootDir>/.eslintrc.js',
         '\\.config.js$'
     ],
-    coverageReporters: ['text'],
+    coverageReporters: ['text', 'html'],
     clearMocks: true,
     setupFiles: ['<rootDir>/node_modules/regenerator-runtime/runtime'],
     setupFilesAfterEnv: ['<rootDir>/src/test/setupTests.ts'],
