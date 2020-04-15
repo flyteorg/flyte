@@ -11,6 +11,7 @@
     "build:prod": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' NODE_ENV=production webpack --config webpack.config.ts --mode=production",
     "build": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' webpack --config webpack.config.ts --mode=development",
     "clean": "rm -rf dist",
+    "codecov": "codecov -f .coverage/coverage-final.json",
     "lint": "tslint --project .",
     "lint-fix": "tslint --fix --project . && prettier --write './**/*.{js,json}'",
     "lint:hooks": "eslint \"src/**/*.{ts,tsx}\"",
@@ -20,7 +21,8 @@
     "start": "node -r dotenv/config index.js",
     "storybook": "start-storybook -p 9001 -c .storybook",
     "tdd": "yarn run test --watch --verbose false",
-    "test": "NODE_ENV=test jest --coverage --config=jest.config.js"
+    "test": "NODE_ENV=test jest --config=jest.config.js",
+    "test:coverage": "NODE_ENV=test jest --coverage --config=jest.config.js"
   },
   "keywords": [
     "react",
@@ -125,6 +127,7 @@
     "babel-loader": "^8.0.0-beta.2",
     "camelcase-keys": "^6.1.1",
     "classnames": "^2.2.6",
+    "codecov": "^3.6.5",
     "compression-webpack-plugin": "^3.0.1",
     "contrast": "^1.0.1",
     "copy-to-clipboard": "^3.0.8",
