@@ -59,6 +59,7 @@ func (cfg TestType) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "storage.cache.max_size_mbs"), DefaultTestType.StorageConfig.Cache.MaxSizeMegabytes, "Maximum size of the cache where the Blob store data is cached in-memory. If not specified or set to 0,  cache is not used")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "storage.cache.target_gc_percent"), DefaultTestType.StorageConfig.Cache.TargetGCPercent, "Sets the garbage collection target percentage.")
 	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "storage.limits.maxDownloadMBs"), DefaultTestType.StorageConfig.Limits.GetLimitMegabytes, "Maximum allowed download size (in MBs) per call.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.defaultHttpClient.timeout"), DefaultTestType.StorageConfig.DefaultHTTPClient.Timeout.String(), "Sets time out on the http client.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "i"), DefaultTestType.elemValueOrNil(DefaultTestType.IntValue).(int), "")
 	return cmdFlags
 }

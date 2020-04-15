@@ -83,10 +83,12 @@ func newStowRawStore(cfg *Config, metricsScope promutils.Scope) (RawStore, error
 	if !ok {
 		return nil, errors.Errorf("unsupported stow.kind [%s], add support in flytestdlib?", kind)
 	}
+
 	loc, err := stow.Dial(kind, cfgMap)
 	if err != nil {
 		return emptyStore, fmt.Errorf("unable to configure the storage for %s. Error: %v", kind, err)
 	}
+
 	c, err := loc.Container(cfg.InitContainer)
 	if err != nil {
 		if IsNotFound(err) || awsBucketIsNotFound(err) {
@@ -97,8 +99,10 @@ func newStowRawStore(cfg *Config, metricsScope promutils.Scope) (RawStore, error
 			}
 			return NewStowRawStore(fn(c.Name()), c, metricsScope)
 		}
+
 		return emptyStore, err
 	}
+
 	return NewStowRawStore(fn(c.Name()), c, metricsScope)
 }
 
