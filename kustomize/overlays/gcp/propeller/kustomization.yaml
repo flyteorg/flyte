@@ -17,3 +17,6 @@ configMapGenerator:
 patches:
 - deployment.yaml
 # add the volumemount for each plugin configmap
+
+resources:
+- service.yaml

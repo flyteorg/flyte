@@ -414,6 +414,23 @@ kind: Service
 metadata:
   annotations:
     cloud.google.com/load-balancer-type: Internal
+  name: datacatalog-metrics
+  namespace: flyte
+spec:
+  ports:
+  - name: http-metrics
+    port: 10254
+    protocol: TCP
+    targetPort: 10254
+  selector:
+    app: datacatalog
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/load-balancer-type: Internal
     contour.heptio.com/upstream-protocol.h2c: grpc
   name: flyteadmin
   namespace: flyte
@@ -453,6 +470,23 @@ spec:
     targetPort: 8080
   selector:
     app: flyteconsole
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/load-balancer-type: Internal
+  name: flytepropeller
+  namespace: flyte
+spec:
+  ports:
+  - name: http-metrics
+    port: 10254
+    protocol: TCP
+    targetPort: 10254
+  selector:
+    app: flytepropeller
   type: LoadBalancer
 ---
 apiVersion: apps/v1

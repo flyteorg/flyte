@@ -10,3 +10,6 @@ configMapGenerator:
 
 patches:
 - deployment.yaml
+
+resources:
+- service.yaml

@@ -44,7 +44,7 @@ For storage layer, a few things needs to be done:
 For CORS to work properly, one needs to use real origin in
 [admin/flyteadmin_config.yaml](admin/flyteadmin_config.yaml) `server -> security -> allowedOrigins`.
 
-flyteadmin is exposed as a service using [internal load
+flyteadmin (including metrics endpoint) is exposed as a service using [internal load
 balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
 
 ## flyteconsole
@@ -73,6 +73,9 @@ By default, three plugins are enabled:
 * k8s-array
 * sidecar
 
+flytepropeller metrics endpoint is exposed as a service using [internal load
+balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
+
 ## datacatalog
 
 datacatalog configuration is kept as similar as [sandbox](../sandbox) overlay, with only
@@ -85,6 +88,10 @@ For storage layer, a few things needs to be done:
 * Create a GCS bucket named as `flyte` in a GCP project (skip this if already done)
 * Replace `<project-id>` in [datacatalog/datacatalog_config.yaml](propeller/config.yaml) with the
   GCP project ID
+
+datacatalog metrics endpoint is exposed as a service using [internal load
+balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
+
 
 ## Now ship it
 
