@@ -57,8 +57,7 @@
     "react-responsive": "^4.1.0",
     "react-transition-group": "^2.3.1",
     "serve-static": "^1.12.3",
-    "tslib": "^1.9.0",
-    "yarn": "^1.22.4"
+    "tslib": "^1.9.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
