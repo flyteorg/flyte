@@ -1,3 +1,0 @@
-github.com/lyft/flytekit
-github.com/lyft/flyteidl
-

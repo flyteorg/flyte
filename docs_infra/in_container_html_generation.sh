@@ -13,6 +13,7 @@ set -x
 
 # We're generating documentation for flytekit, which references flyteidl.  autodoc complains if the python libraries
 # referenced are not installed, so let's install them
-pip install -U flytekit[all]
+echo "Installing flytekit==${FLYTEKIT_VERSION}"
+pip install -U flytekit[all]==${FLYTEKIT_VERSION}
 
 sphinx-build -Q -b html -c /rsts /rsts /docs/

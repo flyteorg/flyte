@@ -20,3 +20,7 @@ Welcome to the documentation hub for Flyte.
    :name: sourcecodedocstoc
 
    Flyte Language Specification <https://github.com/lyft/flyteidl>
+   FlytePropeller <https://pkg.go.dev/mod/github.com/lyft/flytepropeller>
+   FlyteAdmin <https://pkg.go.dev/mod/github.com/lyft/flyteadmin>
+   FlytePlugins <https://pkg.go.dev/mod/github.com/lyft/flyteplugins>
+   DataCatalog <https://pkg.go.dev/mod/github.com/lyft/datacatalog>

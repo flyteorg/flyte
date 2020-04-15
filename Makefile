@@ -22,11 +22,11 @@ generate-local-docs:
 	@docker run -t -v `pwd`:/base lyft/docbuilder:v2.2.0 sphinx-build -E -b html /base/rsts/. /base/_build
 
 # Builds the entire doc tree. Assumes update_ref_docs has run and that all externals rsts are in _rsts/ dir
-.PHONY: generate-dependent-repo-docs, generate-docs
-generate-docs:
-	@./script/generate_docs.sh
+.PHONY: generate-docs
+generate-docs: generate-dependent-repo-docs
+	@FLYTEKIT_VERSION=0.6.2 ./script/generate_docs.sh
 
 # updates referenced docs from other repositories (e.g. flyteidl, flytekit)
 .PHONY: generate-dependent-repo-docs
 generate-dependent-repo-docs:
-	@./script/update_ref_docs.sh
+	@FLYTEKIT_VERSION=0.6.2 FLYTEIDL_VERSION=0.17.27 ./script/update_ref_docs.sh

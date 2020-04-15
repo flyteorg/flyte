@@ -16,19 +16,14 @@ BASEDIR="${DIR}/.."
 mkdir ${BASEDIR}/_repos || true
 REPOS_DIR=`mktemp -d "${BASEDIR}/_repos/XXXXXXXXX"`
 
-function clone_repos()
-{
-    REPOS=`cat ${DIR}/dependent_repos.txt`
-    for REPO in ${REPOS}; do
-      git clone https://${REPO}.git ${REPOS_DIR}/flytekit
-    done
-}
-
 # Clone all repos
-$(clone_repos)
+echo "Cloning Flyteidl"
+git clone https://github.com/lyft/flyteidl.git --single-branch --branch v${FLYTEIDL_VERSION} ${REPOS_DIR}/flyteidl
+echo "Cloning Flytekit"
+git clone https://github.com/lyft/flytekit.git --single-branch --branch v${FLYTEKIT_VERSION} ${REPOS_DIR}/flytekit
 
 # Generate documentation by running script inside the generation container
-docker run -t -v ${BASEDIR}:/base -v ${REPOS_DIR}:/repos -v ${BASEDIR}/_rsts:/_rsts lyft/docbuilder:v2.2.0 /base/docs_infra/in_container_rst_generation.sh
+docker run --rm -t -e FLYTEKIT_VERSION=${FLYTEKIT_VERSION} -v ${BASEDIR}:/base -v ${REPOS_DIR}:/repos -v ${BASEDIR}/_rsts:/_rsts lyft/docbuilder:v2.2.0 /base/docs_infra/in_container_rst_generation.sh
 
 # Cleanup
 rm -rf ${REPOS_DIR}/* || true
