@@ -19,6 +19,7 @@ module.exports = {
         '^.+\\.(j|t)sx?$': 'ts-jest'
     },
     transformIgnorePatterns: ['<rootDir>/node_modules/(?!@lyft/flyteidl)'],
+    collectCoverage: true,
     coverageDirectory: '.coverage',
     collectCoverageFrom: ['**/*.{ts,tsx}'],
     coveragePathIgnorePatterns: [
@@ -31,7 +32,7 @@ module.exports = {
         '<rootDir>/.eslintrc.js',
         '\\.config.js$'
     ],
-    coverageReporters: ['text'],
+    coverageReporters: ['text', 'json'],
     clearMocks: true,
     setupFiles: ['<rootDir>/node_modules/regenerator-runtime/runtime'],
     setupFilesAfterEnv: ['<rootDir>/src/test/setupTests.ts'],

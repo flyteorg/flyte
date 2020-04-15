@@ -31,3 +31,8 @@ server:
 .PHONY: clean
 clean:
 	yarn run clean
+
+.PHONY: test_unit_codecov
+test_unit_codecov: test_unit
+	npm install codecov -g
+	codecov -f .coverage/coverage-final.json
