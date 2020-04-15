@@ -31,3 +31,8 @@ server:
 .PHONY: clean
 clean:
 	yarn run clean
+
+.PHONY: test_unit_codecov
+test_unit_codecov:
+	npm install codecov -g
+	codecov

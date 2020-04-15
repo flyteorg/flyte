@@ -20,7 +20,7 @@
     "start": "node -r dotenv/config index.js",
     "storybook": "start-storybook -p 9001 -c .storybook",
     "tdd": "yarn run test --watch --verbose false",
-    "test": "NODE_ENV=test jest --config=jest.config.js"
+    "test": "NODE_ENV=test jest --coverage --config=jest.config.js"
   },
   "keywords": [
     "react",
@@ -57,7 +57,8 @@
     "react-responsive": "^4.1.0",
     "react-transition-group": "^2.3.1",
     "serve-static": "^1.12.3",
-    "tslib": "^1.9.0"
+    "tslib": "^1.9.0",
+    "yarn": "^1.22.4"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
