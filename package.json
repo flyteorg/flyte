@@ -127,7 +127,6 @@
     "babel-loader": "^8.0.0-beta.2",
     "camelcase-keys": "^6.1.1",
     "classnames": "^2.2.6",
-    "codecov": "^3.6.5",
     "compression-webpack-plugin": "^3.0.1",
     "contrast": "^1.0.1",
     "copy-to-clipboard": "^3.0.8",
