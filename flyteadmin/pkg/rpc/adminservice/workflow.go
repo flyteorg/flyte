@@ -30,7 +30,7 @@ func (m *AdminService) CreateWorkflow(
 		response, err = m.WorkflowManager.CreateWorkflow(ctx, *request)
 	})
 	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
-		"CreateTask",
+		"CreateWorkflow",
 		audit.ParametersFromIdentifier(request.Id),
 		audit.ReadWrite,
 		requestedAt,
