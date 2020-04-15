@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
           - name: sync-cluster-resources
-            image: docker.io/lyft/flyteadmin:v0.1.4
+            image: docker.io/lyft/flyteadmin:v0.2.5
             imagePullPolicy: IfNotPresent
             command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
             volumeMounts:

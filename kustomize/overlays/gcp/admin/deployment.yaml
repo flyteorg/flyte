@@ -17,19 +17,18 @@ spec:
         volumeMounts:
         - name: db-user-pass
           mountPath: /etc/gcp
-      # uncomment to seed (pre-create) a few projects into flyteadmin
-      # - name: seed-projects
-      #   image: docker.io/lyft/flyteadmin:v0.2.1
-      #   imagePullPolicy: IfNotPresent
-      #   command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-      #             "migrate", "seed-projects", "flytesnacks", "flytetester"]
-      #   volumeMounts:
-      #   - name: config-volume
-      #     mountPath: /etc/flyte/config
-      #   - name: db-user-pass
-      #     mountPath: /etc/gcp
+      - name: seed-projects
+        image: docker.io/lyft/flyteadmin:v0.2.5
+        imagePullPolicy: IfNotPresent
+        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                  "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/flyte/config
+        - name: db-user-pass
+          mountPath: /etc/gcp
       - name: sync-cluster-resources
-        image: docker.io/lyft/flyteadmin:v0.2.1
+        image: docker.io/lyft/flyteadmin:v0.2.5
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
         volumeMounts:

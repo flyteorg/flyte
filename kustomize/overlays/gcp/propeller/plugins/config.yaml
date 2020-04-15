@@ -11,7 +11,8 @@ plugins:
     kubernetes-enabled: false
     # #2 GCP stackdriver
     stackdriver-enabled: true
-    gcp-project: gcp-flyte-test
+    # TODO: replace <project-id> with the GCP project ID
+    gcp-project: <project-id>
     stackdriver-logresourcename: k8s_container
   k8s:
     default-annotations:
@@ -19,4 +20,4 @@ plugins:
       - flyte.lyft.net/deployment: gke
     # Example Environment variables that will be applied to every container executed on k8s
     default-env-vars:
-      - FLYTE_CLOUD_PLATFORM: google
+      - FLYTE_CLOUD_PLATFORM: gcp

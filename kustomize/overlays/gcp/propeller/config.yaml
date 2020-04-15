@@ -37,7 +37,8 @@ storage:
     kind: google
     config:
       json: ""
-      project_id: gcp-flyte-test
+      # TODO: replace <project-id> with the GCP project ID
+      project_id: <project-id>
       scopes: https://www.googleapis.com/auth/devstorage.read_write
   container: "flyte"
 event:

@@ -17,8 +17,10 @@ spec:
     spec:
       containers:
         - name: cloudsql-proxy
-          image: gcr.io/cloudsql-docker/gce-proxy:1.14
+          image: gcr.io/cloudsql-docker/gce-proxy:1.16
           imagePullPolicy: IfNotPresent
-          command: ["/cloud_sql_proxy", "-instances=gcp-flyte-test:europe-west1:flyte=tcp:0.0.0.0:5432"]
+          # TODO: replace <project-id> with the GCP project ID and <region> with the region where
+          # Cloud SQL runs
+          command: ["/cloud_sql_proxy", "-instances=<project-id>:<region>:flyte=tcp:0.0.0.0:5432"]
           ports:
             - containerPort: 5432

@@ -14,13 +14,11 @@ spec:
           'until pg_isready -h cloudsqlproxy -p 5432;
           do echo waiting for database; sleep 2; done;']
       - name: run-migrations
-        image: docker.io/lyft/datacatalog:v0.1.2
         volumeMounts:
         - name: db-user-pass
           mountPath: /etc/gcp
       containers:
       - name: datacatalog
-        image: docker.io/lyft/datacatalog:v0.1.2
         resources:
           limits:
             memory: "200Mi"
