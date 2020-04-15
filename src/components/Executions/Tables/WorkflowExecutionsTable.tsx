@@ -5,9 +5,9 @@ import * as classnames from 'classnames';
 import { noExecutionsFoundString } from 'common/constants';
 import {
     dateFromNow,
+    formatDateLocalTimezone,
     formatDateUTC,
-    millisecondsToHMS,
-    protobufDurationToHMS
+    millisecondsToHMS
 } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { DataList, DataListRef } from 'components';
@@ -48,8 +48,11 @@ const useStyles = makeStyles((theme: Theme) => ({
         textAlign: 'right'
     },
     columnInputsOutputs: {
+        alignItems: 'flex-start',
+        display: 'flex',
         flexGrow: 1,
         flexBasis: workflowExecutionsTableColumnWidths.inputsOutputs,
+        height: '100%',
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
         textAlign: 'left'
@@ -76,8 +79,7 @@ type WorkflowExecutionColumnDefinition = ColumnDefinition<
 >;
 
 function generateColumns(
-    styles: ReturnType<typeof useStyles>,
-    commonStyles: ReturnType<typeof useCommonStyles>
+    styles: ReturnType<typeof useStyles>
 ): WorkflowExecutionColumnDefinition[] {
     return [
         {
@@ -115,16 +117,24 @@ function generateColumns(
         {
             cellRenderer: ({ execution: { closure } }) => {
                 const { startedAt } = closure;
-                return startedAt
-                    ? formatDateUTC(timestampToDate(startedAt))
-                    : '';
+                if (!startedAt) {
+                    return '';
+                }
+                const startedAtDate = timestampToDate(startedAt);
+                return (
+                    <>
+                        <div>{formatDateUTC(startedAtDate)}</div>
+                        <Typography variant="subtitle1" color="textSecondary">
+                            {formatDateLocalTimezone(startedAtDate)}
+                        </Typography>
+                    </>
+                );
             },
             className: styles.columnStartedAt,
             key: 'startedAt',
             label: 'start time'
         },
         {
-            // TODO: Calculate queued time, show duration as a body1, QT as a body2
             cellRenderer: ({ execution }) => {
                 const timing = getWorkflowExecutionTimingMS(execution);
                 if (timing === null) {
@@ -185,7 +195,7 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
     const tableStyles = useExecutionTableStyles();
     const listRef = React.useRef<DataListRef>(null);
     // Memoizing columns so they won't be re-generated unless the styles change
-    const columns = React.useMemo(() => generateColumns(styles, commonStyles), [
+    const columns = React.useMemo(() => generateColumns(styles), [
         styles,
         commonStyles
     ]);

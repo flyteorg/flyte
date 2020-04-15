@@ -1,9 +1,10 @@
 import cronstrue from 'cronstrue';
-import * as moment from 'moment';
-
 import { Admin, Protobuf } from 'flyteidl';
+import * as moment from 'moment-timezone';
 import { unknownValueString } from './constants';
 import { durationToMilliseconds, isValidDate } from './utils';
+
+const currentTimeZone = moment.tz.guess();
 
 /** Formats a date into a standard string with a moment-style "from now" hint
  * ex. 12/21/2017 8:19:36 PM (18 days ago)
@@ -42,6 +43,14 @@ export function formatDate(input: Date) {
 export function formatDateUTC(input: Date) {
     return isValidDate(input)
         ? `${moment.utc(input).format('l LTS')} UTC`
+        : unknownValueString;
+}
+
+export function formatDateLocalTimezone(input: Date) {
+    return isValidDate(input)
+        ? moment(input)
+              .tz(currentTimeZone)
+              .format('l LTS z')
         : unknownValueString;
 }
 
