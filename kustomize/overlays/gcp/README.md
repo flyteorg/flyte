@@ -1,8 +1,8 @@
 # Google Cloud Platform Overlay
 
-This overlay gives minimal example how to set up Flyte on Google Cloud Platform (GCP). It is not
+This overlay serves as an example to bootstrap Flyte setup on Google Cloud Platform (GCP). It is not
 designed to work out of the box due to the need of GCP resources. Please follow the instruction
-below to set it up.
+below to further configure.
 
 _Hint_: searching `TODO:` through this directory would help to understand what needs to be done.
 
@@ -57,9 +57,7 @@ balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-b
 ## flytepropeller
 
 flytepropeller configuration is kept as similar as [sandbox](../sandbox) overlay, with only
-necessary modifications such as database and storage.
-
-If one has followed [Cloud SQL](#cloud-sql) section, there is nothing to be done for database.
+necessary modifications such as storage.
 
 For storage layer, a few things needs to be done:
 
@@ -87,3 +85,10 @@ For storage layer, a few things needs to be done:
 * Create a GCS bucket named as `flyte` in a GCP project (skip this if already done)
 * Replace `<project-id>` in [datacatalog/datacatalog_config.yaml](propeller/config.yaml) with the
   GCP project ID
+
+## Now ship it
+
+``` shell
+make
+kubectl apply -f deployment/gcp/flyte_generated.yaml
+```
