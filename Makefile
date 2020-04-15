@@ -9,6 +9,10 @@ update_boilerplate:
 install: #installs dependencies
 	yarn
 
+.PHONY: install_ci
+install_ci: install
+	yarn add codecov
+
 .PHONY: lint
 lint: #lints the package for common code smells
 	yarn run lint
@@ -32,7 +36,8 @@ server:
 clean:
 	yarn run clean
 
+# test_unit_codecov runs unit tests with code coverage turned on and
+# submits the coverage to codecov.io
 .PHONY: test_unit_codecov
-test_unit_codecov: test_unit
-	npm install codecov -g
-	codecov -f .coverage/coverage-final.json
+test_unit_codecov:
+	yarn run test:coverage && yarn run codecov

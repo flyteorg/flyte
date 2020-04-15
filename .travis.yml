@@ -12,7 +12,7 @@ jobs:
 #     script: make dockerhub_push
   - stage: test
     name: unit tests
-    install: make install
+    install: make install_ci
     script: make test_unit_codecov
   - stage: test
     install: make install
