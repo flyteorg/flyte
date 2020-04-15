@@ -11,7 +11,7 @@ install: #installs dependencies
 
 .PHONY: install_ci
 install_ci: install
-    yarn add codecov
+	yarn add codecov
 
 .PHONY: lint
 lint: #lints the package for common code smells
