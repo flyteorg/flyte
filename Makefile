@@ -35,4 +35,4 @@ clean:
 .PHONY: test_unit_codecov
 test_unit_codecov: test_unit
 	npm install codecov -g
-	codecov
+	codecov -f .coverage/coverage-final.json
