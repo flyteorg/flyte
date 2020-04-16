@@ -55,7 +55,7 @@ These are free-form key-value pairs which are used when filling in the templates
 
 In the absence of custom override values, templateData from the `flyteadmin config <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L154,L159>`__ is used as a default.
 
-Note that these settings can only take on domain, or a project and domain specificity. Project & domain together in Flyte form Kubernetes namespaces. Since Flyte has not tied in the notion of a workflow or a launch plan to any Kubernetes constructs, specifying a workflow or launch plan name doesn't make any sense.
+Note that these settings can only take on domain, or a project and domain specificity. Since Flyte has not tied in the notion of a workflow or a launch plan to any Kubernetes constructs, specifying a workflow or launch plan name doesn't make any sense.
 
 
 Command
