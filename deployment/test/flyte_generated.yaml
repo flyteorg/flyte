@@ -367,12 +367,12 @@ data:
     spec:
       finalizers:
       - kubernetes
-  ab_resource_quotas.yaml: "apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name:
-    project-quota\n  namespace: {{ namespace }} \nspec:\n  hard:\n    limits.cpu:
+  ab_project-resource-quota.yaml: "apiVersion: v1\nkind: ResourceQuota\nmetadata:\n
+    \ name: project-quota\n  namespace: {{ namespace }} \nspec:\n  hard:\n    limits.cpu:
     {{ projectQuotaCpu }} \n    limits.memory: {{ projectQuotaMemory }}\n\n"
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-gfd5k8mdh9
+  name: clusterresource-template-m2kccc465f
   namespace: flyte
 ---
 apiVersion: v1
@@ -746,7 +746,7 @@ spec:
       serviceAccountName: flyteadmin
       volumes:
       - configMap:
-          name: clusterresource-template-gfd5k8mdh9
+          name: clusterresource-template-m2kccc465f
         name: resource-templates
       - emptyDir: {}
         name: shared-data
@@ -1045,7 +1045,7 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-gfd5k8mdh9
+              name: clusterresource-template-m2kccc465f
             name: resource-templates
           - configMap:
               name: flyte-admin-config-htgtk9k78c
