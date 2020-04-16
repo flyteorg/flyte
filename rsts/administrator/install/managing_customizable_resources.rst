@@ -22,7 +22,7 @@ Please see the :ref:`concepts` document for more information on projects and dom
 - Defaults for task resource requests and limits (when not specified by the author of the task).
 - Settings for the cluster resource configuration that feeds into Admin's cluster resource manager.
 - Execution queues that are used for Dynamic Tasks. Read more about execution queues here, but effectively they're meant to be used with constructs like AWS Batch.
-- Determining how workflow executions get assigned to clusters in a multi=cluster Flyte deployment.
+- Determining how workflow executions get assigned to clusters in a multi-cluster Flyte deployment.
 
 The proto definition is the definitive source of which
 `matchable attributes <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto>`_
@@ -83,7 +83,7 @@ Command
 
 .. code-block:: console
 
-    curl --request PUT 'https://flyte.lyft.net/api/v1/workflow_attributes/project/domain/YourWorkflowName' --header 'Content-Type: application/json' --data-raw '{"attributes":{"matchingAttributes":{"executionQueueAttributes":{"tags":["my_queue"]}}}}'
+    curl --request PUT 'https://flyte.company.net/api/v1/workflow_attributes/project/domain/YourWorkflowName' --header 'Content-Type: application/json' --data-raw '{"attributes":{"matchingAttributes":{"executionQueueAttributes":{"tags":["my_queue"]}}}}'
 
 
 Execution Cluster Label

@@ -35,7 +35,7 @@ At most one launch plan version across a shared project, domain and name specifi
 An inactive launch plan can still be used to launch individual executions. However, only an active launch plan runs on a schedule (if it has a schedule defined).
 
 
-Static entities metadata (Named Entities
+Static entities metadata (Named Entities)
 +++++++++++++++++++++++++++++++++++++++++
 A `named entity <https://github.com/lyft/flyteidl/blob/c12816cf3f0bde54a67fa77e71c0158a64151ea3/protos/flyteidl/admin/common.proto#L45>`__ includes metadata for one of the above entities
 (workflow, task or launch plan) across versions. A named entity includes a resource type (workflow, task or launch plan) and an
