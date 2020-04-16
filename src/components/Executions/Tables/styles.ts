@@ -97,6 +97,7 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
     rowColumn: {
         flexGrow: 0,
         flexShrink: 0,
+        height: '100%',
         marginRight: theme.spacing(1),
         minWidth: 0,
         paddingBottom: theme.spacing(2),

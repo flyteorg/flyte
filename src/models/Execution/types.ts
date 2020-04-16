@@ -75,6 +75,7 @@ export interface NodeExecution extends Admin.INodeExecution {
     closure: NodeExecutionClosure;
 }
 export interface NodeExecutionClosure extends Admin.INodeExecutionClosure {
+    createdAt: Protobuf.ITimestamp;
     duration?: Protobuf.Duration;
     error?: ExecutionError;
     outputUri: string;

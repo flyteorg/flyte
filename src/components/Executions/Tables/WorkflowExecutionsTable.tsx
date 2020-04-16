@@ -48,11 +48,8 @@ const useStyles = makeStyles((theme: Theme) => ({
         textAlign: 'right'
     },
     columnInputsOutputs: {
-        alignItems: 'flex-start',
-        display: 'flex',
         flexGrow: 1,
         flexBasis: workflowExecutionsTableColumnWidths.inputsOutputs,
-        height: '100%',
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
         textAlign: 'left'
@@ -79,7 +76,8 @@ type WorkflowExecutionColumnDefinition = ColumnDefinition<
 >;
 
 function generateColumns(
-    styles: ReturnType<typeof useStyles>
+    styles: ReturnType<typeof useStyles>,
+    tableStyles: ReturnType<typeof useExecutionTableStyles>
 ): WorkflowExecutionColumnDefinition[] {
     return [
         {
@@ -123,7 +121,9 @@ function generateColumns(
                 const startedAtDate = timestampToDate(startedAt);
                 return (
                     <>
-                        <div>{formatDateUTC(startedAtDate)}</div>
+                        <Typography variant="body1">
+                            {formatDateUTC(startedAtDate)}
+                        </Typography>
                         <Typography variant="subtitle1" color="textSecondary">
                             {formatDateLocalTimezone(startedAtDate)}
                         </Typography>
@@ -137,34 +137,17 @@ function generateColumns(
         {
             cellRenderer: ({ execution }) => {
                 const timing = getWorkflowExecutionTimingMS(execution);
-                if (timing === null) {
-                    return '';
-                }
                 return (
-                    <>
-                        <div>{millisecondsToHMS(timing.duration)}</div>
-                        <Typography variant="subtitle1" color="textSecondary">
-                            {millisecondsToHMS(timing.queued)}
-                        </Typography>
-                    </>
+                    <Typography variant="body1">
+                        {timing !== null
+                            ? millisecondsToHMS(timing.duration)
+                            : ''}
+                    </Typography>
                 );
             },
             className: styles.columnDuration,
             key: 'duration',
-            label: () => (
-                <>
-                    <Typography component="div" variant="overline">
-                        duration
-                    </Typography>
-                    <Typography
-                        component="div"
-                        variant="subtitle1"
-                        color="textSecondary"
-                    >
-                        Queued Time
-                    </Typography>
-                </>
-            )
+            label: 'duration'
         },
         {
             cellRenderer: ({ execution, state }) => {
@@ -195,7 +178,7 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
     const tableStyles = useExecutionTableStyles();
     const listRef = React.useRef<DataListRef>(null);
     // Memoizing columns so they won't be re-generated unless the styles change
-    const columns = React.useMemo(() => generateColumns(styles), [
+    const columns = React.useMemo(() => generateColumns(styles, tableStyles), [
         styles,
         commonStyles
     ]);

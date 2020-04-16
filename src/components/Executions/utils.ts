@@ -216,6 +216,7 @@ interface GetExecutionTimingMSResult {
     queued: number;
 }
 
+/** Computes timing information for an execution based on its create/start times and duration. */
 function getExecutionTimingMS({
     closure: { duration, createdAt, startedAt },
     isTerminal
@@ -235,8 +236,23 @@ function getExecutionTimingMS({
     return { duration: durationMS, queued: queuedMS };
 }
 
+/** Returns timing information (duration, queue time, ...) for a WorkflowExecution */
 export function getWorkflowExecutionTimingMS(execution: Execution) {
     const { closure } = execution;
     const isTerminal = executionIsTerminal(execution);
+    return getExecutionTimingMS({ closure, isTerminal });
+}
+
+/** Returns timing information (duration, queue time, ...) for a NodeExecution */
+export function getNodeExecutionTimingMS(execution: NodeExecution) {
+    const { closure } = execution;
+    const isTerminal = nodeExecutionIsTerminal(execution);
+    return getExecutionTimingMS({ closure, isTerminal });
+}
+
+/** Returns timing information (duration, queue time, ...) for a TaskExecution */
+export function getTaskExecutionTimingMS(execution: TaskExecution) {
+    const { closure } = execution;
+    const isTerminal = taskExecutionIsTerminal(execution);
     return getExecutionTimingMS({ closure, isTerminal });
 }

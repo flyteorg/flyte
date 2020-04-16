@@ -1,7 +1,11 @@
 import cronstrue from 'cronstrue';
 import { Admin, Protobuf } from 'flyteidl';
 import * as moment from 'moment-timezone';
-import { unknownValueString } from './constants';
+import {
+    subSecondString,
+    unknownValueString,
+    zeroSecondsString
+} from './constants';
 import { durationToMilliseconds, isValidDate } from './utils';
 
 const currentTimeZone = moment.tz.guess();
@@ -56,6 +60,18 @@ export function formatDateLocalTimezone(input: Date) {
 
 /** Outputs a value in milliseconds in (H M S) format (ex. 2h 3m 30s) */
 export function millisecondsToHMS(valueMS: number): string {
+    if (valueMS < 0) {
+        return unknownValueString;
+    }
+
+    if (valueMS === 0) {
+        return zeroSecondsString;
+    }
+
+    if (valueMS < 1000) {
+        return subSecondString;
+    }
+
     const duration = moment.duration(valueMS);
     const parts = [];
 

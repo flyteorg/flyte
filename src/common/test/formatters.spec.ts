@@ -2,10 +2,15 @@ import {
     dateDiffString,
     dateWithFromNow,
     ensureUrlWithProtocol,
-    formatDate
+    formatDate,
+    millisecondsToHMS
 } from '../formatters';
 
-import { unknownValueString } from '../constants';
+import {
+    subSecondString,
+    unknownValueString,
+    zeroSecondsString
+} from '../constants';
 
 const invalidDates = ['abc', -200, 0];
 // Matches strings in the form 01/01/2000 01:01:00 PM  (5 minutes ago)
@@ -40,6 +45,23 @@ describe('formatDate', () => {
     });
 });
 
+const millisecondToHMSTestCases: [number, string][] = [
+    [-1, unknownValueString],
+    [0, zeroSecondsString],
+    [1, subSecondString],
+    [999, subSecondString],
+    [1000, '1s'],
+    [60000, '1m'],
+    [61000, '1m 1s'],
+    [60 * 60000, '1h'],
+    [60 * 60000 + 1000, '1h 1s'],
+    [60 * 60000 + 60000, '1h 1m'],
+    [60 * 60000 + 61000, '1h 1m 1s'],
+    // For values greater than a day, we just use the hour value
+    [24 * 60 * 60000, '24h'],
+    [24 * 60 * 60000 + 61000, '24h 1m 1s']
+];
+
 describe('dateDiffString', () => {
     invalidDates.forEach(v =>
         it(`returns a constant string for invalid date on left side: ${v}`, () => {
@@ -57,26 +79,19 @@ describe('dateDiffString', () => {
         })
     );
 
-    // Values are offset in milliseconds and expected string value
-    const cases: [number, string][] = [
-        [5, unknownValueString], // values less than 1s are invalid (for now)
-        [1000, '1s'],
-        [60000, '1m'],
-        [61000, '1m 1s'],
-        [60 * 60000, '1h'],
-        [60 * 60000 + 1000, '1h 1s'],
-        [60 * 60000 + 60000, '1h 1m'],
-        [60 * 60000 + 61000, '1h 1m 1s'],
-        // For values greater than a day, we just use the hour value
-        [24 * 60 * 60000, '24h'],
-        [24 * 60 * 60000 + 61000, '24h 1m 1s']
-    ];
-
-    cases.forEach(([offset, expected]) =>
+    millisecondToHMSTestCases.forEach(([offset, expected]) =>
         it(`should return ${expected} for an offset of ${offset}`, () => {
             const now = new Date();
             const later = new Date(now.getTime() + offset);
             expect(dateDiffString(now, later)).toEqual(expected);
+        })
+    );
+});
+
+describe('millisecondsToHMS', () => {
+    millisecondToHMSTestCases.forEach(([ms, expected]) =>
+        it(`should convert ${ms}ms to ${expected}`, () => {
+            expect(millisecondsToHMS(ms)).toBe(expected);
         })
     );
 });
