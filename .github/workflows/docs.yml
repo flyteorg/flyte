@@ -1,0 +1,16 @@
+name: docs
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+jobs:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build docs
+      run: make generate-docs
