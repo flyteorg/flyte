@@ -22,11 +22,16 @@ var testScope = promutils.NewScope("test")
 type dummyBaseWorkflow struct {
 	DummyStartNode v1alpha1.ExecutableNode
 	ID             v1alpha1.WorkflowID
+	ToNodeCb       func(name v1alpha1.NodeID) ([]v1alpha1.NodeID, error)
 	FromNodeCb     func(name v1alpha1.NodeID) ([]v1alpha1.NodeID, error)
 	GetNodeCb      func(nodeId v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool)
 	Status         map[v1alpha1.NodeID]*v1alpha1.NodeStatus
 	DataStore      *storage.DataStore
 	Interruptible  bool
+}
+
+func (d *dummyBaseWorkflow) ToNode(name v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
+	return d.ToNodeCb(name)
 }
 
 func (d *dummyBaseWorkflow) GetOutputBindings() []*v1alpha1.Binding {

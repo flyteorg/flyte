@@ -8,6 +8,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 )
 
@@ -37,36 +38,36 @@ func (p PredicatePhase) String() string {
 	return "undefined"
 }
 
-func CanExecute(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.BaseNode) (PredicatePhase, error) {
+func CanExecute(ctx context.Context, dag executors.DAGStructure, nl executors.NodeLookup, node v1alpha1.BaseNode) (PredicatePhase, error) {
 	nodeID := node.GetID()
 	if nodeID == v1alpha1.StartNodeID {
 		logger.Debugf(ctx, "Start Node id is assumed to be ready.")
 		return PredicatePhaseReady, nil
 	}
 
-	nodeStatus := w.GetNodeExecutionStatus(ctx, nodeID)
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, nodeID)
 	parentNodeID := nodeStatus.GetParentNodeID()
-	upstreamNodes, ok := w.GetConnections().UpstreamEdges[nodeID]
-	if !ok {
+	upstreamNodes, err := dag.ToNode(nodeID)
+	if err != nil {
 		return PredicatePhaseUndefined, errors.Errorf(errors.BadSpecificationError, nodeID, "Unable to find upstream nodes for Node")
 	}
 
 	skipped := false
 	for _, upstreamNodeID := range upstreamNodes {
-		upstreamNodeStatus := w.GetNodeExecutionStatus(ctx, upstreamNodeID)
+		upstreamNodeStatus := nl.GetNodeExecutionStatus(ctx, upstreamNodeID)
 
 		if upstreamNodeStatus.IsDirty() {
 			return PredicatePhaseNotReady, nil
 		}
 
 		if parentNodeID != nil && *parentNodeID == upstreamNodeID {
-			upstreamNode, ok := w.GetNode(upstreamNodeID)
+			upstreamNode, ok := nl.GetNode(upstreamNodeID)
 			if !ok {
 				return PredicatePhaseUndefined, errors.Errorf(errors.BadSpecificationError, nodeID, "Upstream node [%v] of node [%v] not defined", upstreamNodeID, nodeID)
 			}
 
 			// This only happens if current node is the child node of a branch node
-			if upstreamNode.GetBranchNode() == nil || upstreamNodeStatus.GetOrCreateBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
+			if upstreamNode.GetBranchNode() == nil || upstreamNodeStatus.GetBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
 				logger.Debugf(ctx, "Branch sub node is expected to have parent branch node in succeeded state")
 				return PredicatePhaseUndefined, errors.Errorf(errors.IllegalStateError, nodeID, "Upstream node [%v] is set as parent, but is not a branch node of [%v] or in illegal state.", upstreamNodeID, nodeID)
 			}
@@ -88,7 +89,7 @@ func CanExecute(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha
 	return PredicatePhaseReady, nil
 }
 
-func GetParentNodeMaxEndTime(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.BaseNode) (t v1.Time, err error) {
+func GetParentNodeMaxEndTime(ctx context.Context, dag executors.DAGStructure, nl executors.NodeLookup, node v1alpha1.BaseNode) (t v1.Time, err error) {
 	zeroTime := v1.NewTime(time.Time{})
 	nodeID := node.GetID()
 	if nodeID == v1alpha1.StartNodeID {
@@ -96,24 +97,24 @@ func GetParentNodeMaxEndTime(ctx context.Context, w v1alpha1.ExecutableWorkflow,
 		return zeroTime, nil
 	}
 
-	nodeStatus := w.GetNodeExecutionStatus(ctx, node.GetID())
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, node.GetID())
 	parentNodeID := nodeStatus.GetParentNodeID()
-	upstreamNodes, ok := w.GetConnections().UpstreamEdges[nodeID]
-	if !ok {
+	upstreamNodes, err := dag.ToNode(nodeID)
+	if err != nil {
 		return zeroTime, errors.Errorf(errors.BadSpecificationError, nodeID, "Unable to find upstream nodes for Node")
 	}
 
 	var latest v1.Time
 	for _, upstreamNodeID := range upstreamNodes {
-		upstreamNodeStatus := w.GetNodeExecutionStatus(ctx, upstreamNodeID)
+		upstreamNodeStatus := nl.GetNodeExecutionStatus(ctx, upstreamNodeID)
 		if parentNodeID != nil && *parentNodeID == upstreamNodeID {
-			upstreamNode, ok := w.GetNode(upstreamNodeID)
+			upstreamNode, ok := nl.GetNode(upstreamNodeID)
 			if !ok {
 				return zeroTime, errors.Errorf(errors.BadSpecificationError, nodeID, "Upstream node [%v] of node [%v] not defined", upstreamNodeID, nodeID)
 			}
 
 			// This only happens if current node is the child node of a branch node
-			if upstreamNode.GetBranchNode() == nil || upstreamNodeStatus.GetOrCreateBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
+			if upstreamNode.GetBranchNode() == nil || upstreamNodeStatus.GetBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
 				logger.Debugf(ctx, "Branch sub node is expected to have parent branch node in succeeded state")
 				return zeroTime, errors.Errorf(errors.IllegalStateError, nodeID, "Upstream node [%v] is set as parent, but is not a branch node of [%v] or in illegal state.", upstreamNodeID, nodeID)
 			}

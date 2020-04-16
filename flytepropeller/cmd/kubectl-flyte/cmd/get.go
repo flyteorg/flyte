@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	gotree "github.com/DiSiqueira/GoTree"
+	"github.com/lyft/flytestdlib/storage"
 	"github.com/spf13/cobra"
 	v12 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -64,6 +65,7 @@ func (g *GetOpts) getWorkflow(ctx context.Context, name string) error {
 	}
 	wp := printers.WorkflowPrinter{}
 	tree := gotree.New("Workflow")
+	w.DataReferenceConstructor = storage.URLPathConstructor{}
 	if err := wp.Print(ctx, tree, w); err != nil {
 		return err
 	}

@@ -20,19 +20,11 @@ import (
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	mocks2 "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
+	execMocks "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
 )
-
-type recursiveNodeHandlerFn func(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error)
-type abortNodeHandlerCbFn func(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) error
-
-type mockNodeExecutor struct {
-	executors.Node
-	RecursiveNodeHandlerCB recursiveNodeHandlerFn
-	AbortNodeHandlerCB     abortNodeHandlerCbFn
-}
 
 type branchNodeStateHolder struct {
 	s handler.BranchNodeState
@@ -55,18 +47,9 @@ func (t branchNodeStateHolder) PutDynamicNodeState(s handler.DynamicNodeState) e
 	panic("not implemented")
 }
 
-func (m *mockNodeExecutor) RecursiveNodeHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
-	return m.RecursiveNodeHandlerCB(ctx, w, currentNode)
-}
-
-func (m *mockNodeExecutor) AbortHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode, reason string) error {
-	return m.AbortNodeHandlerCB(ctx, w, currentNode)
-}
-
-func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.NodeID, w v1alpha1.ExecutableWorkflow, n v1alpha1.ExecutableNode, inputs *core.LiteralMap) *mocks.NodeExecutionContext {
-	nodeID := "nodeID"
+func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.NodeID, n v1alpha1.ExecutableNode, inputs *core.LiteralMap, nl executors.NodeLookup) (*mocks.NodeExecutionContext, *branchNodeStateHolder) {
 	branchNodeState := handler.BranchNodeState{
-		FinalizedNodeID: &nodeID,
+		FinalizedNodeID: childNodeID,
 		Phase:           phase,
 	}
 	s := &branchNodeStateHolder{s: branchNodeState}
@@ -78,106 +61,124 @@ func createNodeContext(phase v1alpha1.BranchNodePhase, childNodeID *v1alpha1.Nod
 	}
 
 	nm := &mocks.NodeExecutionMetadata{}
-	nm.On("GetAnnotations").Return(map[string]string{})
-	nm.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
-		WorkflowExecutionIdentifier: wfExecID,
+	nm.OnGetAnnotations().Return(map[string]string{})
+	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+		ExecutionId: wfExecID,
+		NodeId:      n.GetID(),
 	})
-	nm.On("GetK8sServiceAccount").Return("service-account")
-	nm.On("GetLabels").Return(map[string]string{})
-	nm.On("GetNamespace").Return("namespace")
-	nm.On("GetOwnerID").Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-	nm.On("GetOwnerReference").Return(v1.OwnerReference{
+	nm.OnGetK8sServiceAccount().Return("service-account")
+	nm.OnGetLabels().Return(map[string]string{})
+	nm.OnGetNamespace().Return("namespace")
+	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nm.OnGetOwnerReference().Return(v1.OwnerReference{
 		Kind: "sample",
 		Name: "name",
 	})
 
 	ns := &mocks2.ExecutableNodeStatus{}
-	ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
-	ns.On("GetPhase").Return(v1alpha1.NodePhaseNotYetStarted)
+	ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
+	ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
 
 	ir := &mocks3.InputReader{}
-	ir.On("Get", mock.Anything).Return(inputs, nil)
+	ir.OnGetMatch(mock.Anything).Return(inputs, nil)
 
 	nCtx := &mocks.NodeExecutionContext{}
-	nCtx.On("NodeExecutionMetadata").Return(nm)
-	nCtx.On("Node").Return(n)
-	nCtx.On("InputReader").Return(ir)
-	nCtx.On("DataStore").Return(storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope()))
-	nCtx.On("CurrentAttempt").Return(uint32(1))
-	nCtx.On("MaxDatasetSizeBytes").Return(int64(1))
-	nCtx.On("NodeStatus").Return(ns)
+	nCtx.OnNodeExecutionMetadata().Return(nm)
+	nCtx.OnNode().Return(n)
+	nCtx.OnInputReader().Return(ir)
+	tmpDataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	nCtx.OnDataStore().Return(tmpDataStore)
+	nCtx.OnCurrentAttempt().Return(uint32(1))
+	nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
+	nCtx.OnNodeStatus().Return(ns)
 
-	nCtx.On("NodeID").Return("n1")
-	nCtx.On("EnqueueOwner").Return(nil)
-	nCtx.On("Workflow").Return(w)
+	nCtx.OnNodeID().Return("n1")
+	nCtx.OnEnqueueOwnerFunc().Return(nil)
 
 	nr := &mocks.NodeStateReader{}
-	nr.On("GetBranchNode").Return(handler.BranchNodeState{
+	nr.OnGetBranchNode().Return(handler.BranchNodeState{
 		FinalizedNodeID: childNodeID,
 		Phase:           phase,
 	})
-	nCtx.On("NodeStateReader").Return(nr)
-	nCtx.On("NodeStateWriter").Return(s)
-	return nCtx
+	nCtx.OnNodeStateReader().Return(nr)
+	nCtx.OnNodeStateWriter().Return(s)
+
+	eCtx := &execMocks.ExecutionContext{}
+	nCtx.OnExecutionContext().Return(eCtx)
+
+	nCtx.OnContextualNodeLookup().Return(nl)
+	return nCtx, s
 }
 
 func TestBranchHandler_RecurseDownstream(t *testing.T) {
 	ctx := context.TODO()
-	m := &mockNodeExecutor{}
 
-	branch := New(m, promutils.NewTestScope()).(*branchHandler)
 	childNodeID := "child"
-	childDatadir := v1alpha1.DataReference("test")
-
-	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
-	assert.NoError(t, err)
-	w := &v1alpha1.FlyteWorkflow{
-		Status: v1alpha1.WorkflowStatus{
-			NodeStatus: map[v1alpha1.NodeID]*v1alpha1.NodeStatus{
-				childNodeID: {
-					DataDir: childDatadir,
-				},
-			},
-		},
-		DataReferenceConstructor: dataStore,
-	}
+	nodeID := "n1"
 
 	res := &v12.ResourceRequirements{}
 	n := &mocks2.ExecutableNode{}
-	n.On("GetResources").Return(res)
+	n.OnGetResources().Return(res)
+	n.OnGetID().Return(nodeID)
 
 	expectedError := fmt.Errorf("error")
-	recursiveNodeHandlerFnArchetype := func(status executors.NodeStatus, err error) recursiveNodeHandlerFn {
-		return func(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
-			return status, err
-		}
-	}
+	bn := &mocks2.ExecutableNode{}
+	bn.OnGetID().Return(childNodeID)
 
 	tests := []struct {
-		name                   string
-		recursiveNodeHandlerFn recursiveNodeHandlerFn
-		nodeStatus             v1alpha1.ExecutableNodeStatus
-		branchTakenNode        v1alpha1.ExecutableNode
-		isErr                  bool
-		expectedPhase          handler.EPhase
-		childPhase             v1alpha1.NodePhase
+		name            string
+		ns              executors.NodeStatus
+		err             error
+		nodeStatus      *mocks2.ExecutableNodeStatus
+		branchTakenNode v1alpha1.ExecutableNode
+		isErr           bool
+		expectedPhase   handler.EPhase
+		childPhase      v1alpha1.NodePhase
+		nl              *execMocks.NodeLookup
 	}{
-		{"childNodeError", recursiveNodeHandlerFnArchetype(executors.NodeStatusUndefined, expectedError),
-			nil, &v1alpha1.NodeSpec{}, true, handler.EPhaseUndefined, v1alpha1.NodePhaseFailed},
-		{"childPending", recursiveNodeHandlerFnArchetype(executors.NodeStatusPending, nil),
-			nil, &v1alpha1.NodeSpec{}, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued},
-		{"childStillRunning", recursiveNodeHandlerFnArchetype(executors.NodeStatusRunning, nil),
-			nil, &v1alpha1.NodeSpec{}, false, handler.EPhaseRunning, v1alpha1.NodePhaseRunning},
-		{"childFailure", recursiveNodeHandlerFnArchetype(executors.NodeStatusFailed(expectedError), nil),
-			nil, &v1alpha1.NodeSpec{}, false, handler.EPhaseFailed, v1alpha1.NodePhaseFailed},
-		{"childComplete", recursiveNodeHandlerFnArchetype(executors.NodeStatusComplete, nil),
-			&v1alpha1.NodeStatus{}, &v1alpha1.NodeSpec{ID: childNodeID}, false, handler.EPhaseSuccess, v1alpha1.NodePhaseSucceeded},
+		{"childNodeError", executors.NodeStatusUndefined, expectedError,
+			nil, bn, true, handler.EPhaseUndefined, v1alpha1.NodePhaseFailed, nil},
+		{"childPending", executors.NodeStatusPending, nil,
+			nil, bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued, nil},
+		{"childStillRunning", executors.NodeStatusRunning, nil,
+			nil, bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseRunning, nil},
+		{"childFailure", executors.NodeStatusFailed(expectedError), nil,
+			nil, bn, false, handler.EPhaseFailed, v1alpha1.NodePhaseFailed, nil},
+		{"childComplete", executors.NodeStatusComplete, nil,
+			&mocks2.ExecutableNodeStatus{}, bn, false, handler.EPhaseSuccess, v1alpha1.NodePhaseSucceeded, &execMocks.NodeLookup{}},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			m.RecursiveNodeHandlerCB = test.recursiveNodeHandlerFn
+			nCtx, _ := createNodeContext(v1alpha1.BranchNodeNotYetEvaluated, &childNodeID, n, nil, test.nl)
+			mockNodeExecutor := &execMocks.Node{}
+			mockNodeExecutor.OnRecursiveNodeHandlerMatch(
+				mock.Anything, // ctx
+				mock.MatchedBy(func(e executors.ExecutionContext) bool { return assert.Equal(t, e, nCtx.ExecutionContext()) }),
+				mock.MatchedBy(func(d executors.DAGStructure) bool {
+					if assert.NotNil(t, d) {
+						fList, err1 := d.FromNode("x")
+						dList, err2 := d.ToNode(childNodeID)
+						b := assert.NoError(t, err1)
+						b = b && assert.Equal(t, fList, []v1alpha1.NodeID{})
+						b = b && assert.NoError(t, err2)
+						b = b && assert.Equal(t, dList, []v1alpha1.NodeID{nodeID})
+						return b
+					}
+					return false
+				}),
+				mock.MatchedBy(func(lookup executors.NodeLookup) bool { return assert.Equal(t, lookup, test.nl) }),
+				mock.MatchedBy(func(n v1alpha1.ExecutableNode) bool { return assert.Equal(t, n.GetID(), childNodeID) }),
+			).Return(test.ns, test.err)
 
-			nCtx := createNodeContext(v1alpha1.BranchNodeNotYetEvaluated, &childNodeID, w, n, nil)
+			childNodeStatus := &mocks2.ExecutableNodeStatus{}
+			if test.nl != nil {
+				childNodeStatus.OnGetDataDir().Return("child-data-dir")
+				childNodeStatus.OnGetOutputDir().Return("child-output-dir")
+				test.nl.OnGetNodeExecutionStatus(ctx, childNodeID).Return(childNodeStatus)
+				test.nodeStatus.On("SetDataDir", storage.DataReference("child-data-dir")).Once()
+				test.nodeStatus.On("SetOutputDir", storage.DataReference("child-output-dir")).Once()
+			}
+			branch := New(mockNodeExecutor, promutils.NewTestScope()).(*branchHandler)
 			h, err := branch.recurseDownstream(ctx, nCtx, test.nodeStatus, test.branchTakenNode)
 			if test.isErr {
 				assert.Error(t, err)
@@ -185,17 +186,12 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			assert.Equal(t, test.expectedPhase, h.Info().GetPhase())
-			if test.nodeStatus != nil {
-				assert.Equal(t, w.GetNodeExecutionStatus(ctx, test.branchTakenNode.GetID()).GetDataDir(), test.nodeStatus.GetDataDir())
-			}
 		})
 	}
 }
 
 func TestBranchHandler_AbortNode(t *testing.T) {
 	ctx := context.TODO()
-	m := &mockNodeExecutor{}
-	branch := New(m, promutils.NewTestScope())
 	b1 := "b1"
 	n1 := "n1"
 	n2 := "n2"
@@ -253,21 +249,25 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 			},
 		},
 	}
+	assert.NotNil(t, w)
 
 	t.Run("NoBranchNode", func(t *testing.T) {
-		nCtx := createNodeContext(v1alpha1.BranchNodeError, nil, w, n, nil)
+		mockNodeExecutor := &execMocks.Node{}
+		mockNodeExecutor.OnAbortHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
+		nCtx, _ := createNodeContext(v1alpha1.BranchNodeError, nil, n, nil, nil)
+		branch := New(mockNodeExecutor, promutils.NewTestScope())
 		err := branch.Abort(ctx, nCtx, "")
 		assert.Error(t, err)
 		assert.True(t, errors.Matches(err, errors.UserProvidedError))
 	})
 
 	t.Run("BranchNodeSuccess", func(t *testing.T) {
-
-		nCtx := createNodeContext(v1alpha1.BranchNodeSuccess, &n1, w, n, nil)
-		m.AbortNodeHandlerCB = func(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) error {
-			assert.Equal(t, n1, currentNode.GetID())
-			return nil
-		}
+		mockNodeExecutor := &execMocks.Node{}
+		mockNodeExecutor.OnAbortHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		nl := &execMocks.NodeLookup{}
+		nCtx, s := createNodeContext(v1alpha1.BranchNodeSuccess, &n1, n, nil, nl)
+		nl.OnGetNode(*s.s.FinalizedNodeID).Return(n, true)
+		branch := New(mockNodeExecutor, promutils.NewTestScope())
 		err := branch.Abort(ctx, nCtx, "")
 		assert.NoError(t, err)
 	})
@@ -275,16 +275,16 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 
 func TestBranchHandler_Initialize(t *testing.T) {
 	ctx := context.TODO()
-	m := &mockNodeExecutor{}
-	branch := New(m, promutils.NewTestScope())
+	mockNodeExecutor := &execMocks.Node{}
+	branch := New(mockNodeExecutor, promutils.NewTestScope())
 	assert.NoError(t, branch.Setup(ctx, nil))
 }
 
 // TODO incomplete test suite, add more
 func TestBranchHandler_HandleNode(t *testing.T) {
 	ctx := context.TODO()
-	m := &mockNodeExecutor{}
-	branch := New(m, promutils.NewTestScope())
+	mockNodeExecutor := &execMocks.Node{}
+	branch := New(mockNodeExecutor, promutils.NewTestScope())
 	childNodeID := "child"
 	childDatadir := v1alpha1.DataReference("test")
 	w := &v1alpha1.FlyteWorkflow{
@@ -299,6 +299,8 @@ func TestBranchHandler_HandleNode(t *testing.T) {
 			},
 		},
 	}
+	assert.NotNil(t, w)
+
 	_, inputs := getComparisonExpression(1, core.ComparisonExpression_NEQ, 1)
 
 	tests := []struct {
@@ -313,9 +315,10 @@ func TestBranchHandler_HandleNode(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			res := &v12.ResourceRequirements{}
 			n := &mocks2.ExecutableNode{}
-			n.On("GetResources").Return(res)
-			n.On("GetBranchNode").Return(nil)
-			nCtx := createNodeContext(v1alpha1.BranchNodeSuccess, &childNodeID, w, n, inputs)
+			n.OnGetResources().Return(res)
+			n.OnGetBranchNode().Return(nil)
+			n.OnGetID().Return("n1")
+			nCtx, _ := createNodeContext(v1alpha1.BranchNodeSuccess, &childNodeID, n, inputs, nil)
 
 			s, err := branch.Handle(ctx, nCtx)
 			if test.isErr {

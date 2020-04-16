@@ -8,6 +8,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 
 	regErrors "github.com/pkg/errors"
@@ -88,9 +89,9 @@ func EvaluateIfBlock(block v1alpha1.ExecutableIfBlock, nodeInputs *core.LiteralM
 }
 
 // Decides the branch to be taken, returns the nodeId of the selected node or an error
-// The branchnode is marked as success. This is used by downstream node to determine if it can be executed
+// The branchNode is marked as success. This is used by downstream node to determine if it can be executed
 // All downstream nodes are marked as skipped
-func DecideBranch(ctx context.Context, w v1alpha1.BaseWorkflowWithStatus, nodeID v1alpha1.NodeID, node v1alpha1.ExecutableBranchNode, nodeInputs *core.LiteralMap) (*v1alpha1.NodeID, error) {
+func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.NodeID, node v1alpha1.ExecutableBranchNode, nodeInputs *core.LiteralMap) (*v1alpha1.NodeID, error) {
 	var selectedNodeID *v1alpha1.NodeID
 	var skippedNodeIds []*v1alpha1.NodeID
 	var err error
@@ -119,11 +120,11 @@ func DecideBranch(ctx context.Context, w v1alpha1.BaseWorkflowWithStatus, nodeID
 	}
 	for _, nodeIDPtr := range skippedNodeIds {
 		skippedNodeID := *nodeIDPtr
-		n, ok := w.GetNode(skippedNodeID)
+		n, ok := nl.GetNode(skippedNodeID)
 		if !ok {
 			return nil, errors.Errorf(errors.DownstreamNodeNotFoundError, nodeID, "Downstream node [%v] not found", skippedNodeID)
 		}
-		nStatus := w.GetNodeExecutionStatus(ctx, n.GetID())
+		nStatus := nl.GetNodeExecutionStatus(ctx, n.GetID())
 		logger.Infof(ctx, "Branch Setting Node[%v] status to Skipped!", skippedNodeID)
 		nStatus.UpdatePhase(v1alpha1.NodePhaseSkipped, v1.Now(), "Branch evaluated to false")
 	}

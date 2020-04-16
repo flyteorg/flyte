@@ -23,7 +23,7 @@ func NewNodeVisitor(nodes []v1alpha1.NodeID) NodeVisitor {
 	return v
 }
 
-func tsortHelper(g v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode, visited NodeVisitor, reverseSortedNodes *[]v1alpha1.ExecutableNode) error {
+func tsortHelper(g v1alpha1.ExecutableSubWorkflow, currentNode v1alpha1.ExecutableNode, visited NodeVisitor, reverseSortedNodes *[]v1alpha1.ExecutableNode) error {
 	if visited[currentNode.GetID()] == NotVisited {
 		visited[currentNode.GetID()] = Visited
 		defer func() {
@@ -62,7 +62,7 @@ func reverseSlice(sl []v1alpha1.ExecutableNode) []v1alpha1.ExecutableNode {
 	return sl
 }
 
-func TopologicalSort(g v1alpha1.ExecutableWorkflow) ([]v1alpha1.ExecutableNode, error) {
+func TopologicalSort(g v1alpha1.ExecutableSubWorkflow) ([]v1alpha1.ExecutableNode, error) {
 	reverseSortedNodes := make([]v1alpha1.ExecutableNode, 0, 25)
 	visited := NewNodeVisitor(g.GetNodes())
 	if err := tsortHelper(g, g.StartNode(), visited, &reverseSortedNodes); err != nil {

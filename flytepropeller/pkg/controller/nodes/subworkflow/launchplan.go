@@ -25,12 +25,9 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, errMsg, nil)), nil
 	}
 
-	w := nCtx.Workflow()
-	nodeStatus := w.GetNodeExecutionStatus(ctx, nCtx.NodeID())
 	childID, err := GetChildWorkflowExecutionID(
-		w.GetExecutionID().WorkflowExecutionIdentifier,
-		nCtx.NodeID(),
-		nodeStatus.GetAttempts(),
+		nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+		nCtx.CurrentAttempt(),
 	)
 	if err != nil {
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, "failed to create unique ID", nil)), nil
@@ -38,12 +35,9 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 
 	launchCtx := launchplan.LaunchContext{
 		// TODO we need to add principal and nestinglevel as annotations or labels?
-		Principal:    "unknown",
-		NestingLevel: 0,
-		ParentNodeExecution: &core.NodeExecutionIdentifier{
-			NodeId:      nCtx.NodeID(),
-			ExecutionId: w.GetExecutionID().WorkflowExecutionIdentifier,
-		},
+		Principal:           "unknown",
+		NestingLevel:        0,
+		ParentNodeExecution: nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
 	}
 	err = l.launchPlan.Launch(ctx, launchCtx, childID, nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID().Identifier, nodeInputs)
 	if err != nil {
@@ -68,12 +62,9 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
 
 	// Handle launch plan
-	w := nCtx.Workflow()
-	nodeStatus := w.GetNodeExecutionStatus(ctx, nCtx.NodeID())
 	childID, err := GetChildWorkflowExecutionID(
-		w.GetExecutionID().WorkflowExecutionIdentifier,
-		nCtx.NodeID(),
-		nodeStatus.GetAttempts(),
+		nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+		nCtx.CurrentAttempt(),
 	)
 
 	if err != nil {
@@ -123,7 +114,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 		// nCtx.Node().GetOutputAlias()
 		var oInfo *handler.OutputInfo
 		if wfStatusClosure.GetOutputs() != nil {
-			outputFile := v1alpha1.GetOutputsFile(nodeStatus.GetOutputDir())
+			outputFile := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
 			if wfStatusClosure.GetOutputs().GetUri() != "" {
 				uri := wfStatusClosure.GetOutputs().GetUri()
 				store := nCtx.DataStore()
@@ -149,16 +140,14 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 }
 
-func (l *launchPlanHandler) HandleAbort(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, reason string) error {
-	nodeStatus := w.GetNodeExecutionStatus(ctx, node.GetID())
+func (l *launchPlanHandler) HandleAbort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
 	childID, err := GetChildWorkflowExecutionID(
-		w.GetExecutionID().WorkflowExecutionIdentifier,
-		node.GetID(),
-		nodeStatus.GetAttempts(),
+		nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+		nCtx.CurrentAttempt(),
 	)
 	if err != nil {
 		// THIS SHOULD NEVER HAPPEN
 		return err
 	}
-	return l.launchPlan.Kill(ctx, childID, fmt.Sprintf("parent execution id [%s] aborted, reason [%s]", w.GetName(), reason))
+	return l.launchPlan.Kill(ctx, childID, fmt.Sprintf("cascading abort as parent execution id [%s] aborted, reason [%s]", nCtx.ExecutionContext().GetName(), reason))
 }

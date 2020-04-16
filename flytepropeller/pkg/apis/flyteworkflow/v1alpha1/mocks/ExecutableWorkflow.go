@@ -802,3 +802,44 @@ func (_m *ExecutableWorkflow) StartNode() v1alpha1.ExecutableNode {
 
 	return r0
 }
+
+type ExecutableWorkflow_ToNode struct {
+	*mock.Call
+}
+
+func (_m ExecutableWorkflow_ToNode) Return(_a0 []string, _a1 error) *ExecutableWorkflow_ToNode {
+	return &ExecutableWorkflow_ToNode{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ExecutableWorkflow) OnToNode(name string) *ExecutableWorkflow_ToNode {
+	c := _m.On("ToNode", name)
+	return &ExecutableWorkflow_ToNode{Call: c}
+}
+
+func (_m *ExecutableWorkflow) OnToNodeMatch(matchers ...interface{}) *ExecutableWorkflow_ToNode {
+	c := _m.On("ToNode", matchers...)
+	return &ExecutableWorkflow_ToNode{Call: c}
+}
+
+// ToNode provides a mock function with given fields: name
+func (_m *ExecutableWorkflow) ToNode(name string) ([]string, error) {
+	ret := _m.Called(name)
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func(string) []string); ok {
+		r0 = rf(name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

@@ -96,13 +96,13 @@ func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevSt
 }
 
 func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, nCtx handler.NodeExecutionContext, prevState handler.DynamicNodeState) (handler.Transition, handler.DynamicNodeState, error) {
-	dynamicWF, _, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
+	execContext, dynamicWF, nl, _, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 	if err != nil {
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(
 			"DynamicWorkflowBuildFailed", err.Error(), nil)), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error()}, nil
 	}
 
-	trns, newState, err := d.progressDynamicWorkflow(ctx, dynamicWF, nCtx, prevState)
+	trns, newState, err := d.progressDynamicWorkflow(ctx, execContext, dynamicWF, nl, nCtx, prevState)
 	if err != nil {
 		return handler.UnknownTransition, prevState, err
 	}
@@ -188,7 +188,7 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.Node
 		fallthrough
 	case v1alpha1.DynamicNodePhaseExecuting:
 		logger.Infof(ctx, "Aborting dynamic workflow at RetryAttempt [%d]", nCtx.CurrentAttempt())
-		dynamicWF, isDynamic, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
+		execContext, dynamicWF, nl, isDynamic, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		if err != nil {
 			return err
 		}
@@ -197,7 +197,7 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.Node
 			return nil
 		}
 
-		return d.nodeExecutor.AbortHandler(ctx, dynamicWF, dynamicWF.StartNode(), reason)
+		return d.nodeExecutor.AbortHandler(ctx, execContext, dynamicWF, nl, dynamicWF.StartNode(), reason)
 	default:
 		logger.Infof(ctx, "Aborting regular node RetryAttempt [%d]", nCtx.CurrentAttempt())
 		// The parent node has not yet completed, so we will abort the parent node
@@ -221,12 +221,12 @@ func (d dynamicNodeTaskNodeHandler) Finalize(ctx context.Context, nCtx handler.N
 	ds := nCtx.NodeStateReader().GetDynamicNodeState()
 	if ds.Phase == v1alpha1.DynamicNodePhaseFailing || ds.Phase == v1alpha1.DynamicNodePhaseExecuting {
 		logger.Infof(ctx, "Finalizing dynamic workflow RetryAttempt [%d]", nCtx.CurrentAttempt())
-		dynamicWF, isDynamic, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
+		execContext, dynamicWF, nl, isDynamic, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		if err != nil {
 			errs = append(errs, err)
 		} else {
 			if isDynamic {
-				if err := d.nodeExecutor.FinalizeHandler(ctx, dynamicWF, dynamicWF.StartNode()); err != nil {
+				if err := d.nodeExecutor.FinalizeHandler(ctx, execContext, dynamicWF, nl, dynamicWF.StartNode()); err != nil {
 					logger.Errorf(ctx, "failed to finalize dynamic workflow, err: %s", err)
 					errs = append(errs, err)
 				}
@@ -316,8 +316,8 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Con
 
 	return &core.WorkflowTemplate{
 		Id: &core.Identifier{
-			Project:      nCtx.NodeExecutionMetadata().GetExecutionID().Project,
-			Domain:       nCtx.NodeExecutionMetadata().GetExecutionID().Domain,
+			Project:      nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId().Project,
+			Domain:       nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId().Domain,
 			Version:      rand.String(10),
 			Name:         rand.String(10),
 			ResourceType: core.ResourceType_WORKFLOW,
@@ -328,22 +328,21 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Con
 	}, nil
 }
 
-func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext) (dynamicWf v1alpha1.ExecutableWorkflow, isDynamic bool, err error) {
+func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.Context, nCtx handler.NodeExecutionContext) (execContext executors.ExecutionContext, subwf v1alpha1.ExecutableWorkflow, nodeLookup executors.NodeLookup, isDynamic bool, err error) {
 
 	t := d.metrics.buildDynamicWorkflow.Start(ctx)
 	defer t.Stop()
-
 	f, err := task.NewRemoteFutureFileReader(ctx, nCtx.NodeStatus().GetOutputDir(), nCtx.DataStore())
 	if err != nil {
-		return nil, false, err
+		return
 	}
 
 	// TODO: This is a hack to set parent task execution id, we should move to node-node relationship.
 	execID := task.GetTaskExecutionIdentifier(nCtx)
-	nStatus := nCtx.NodeStatus().GetNodeExecutionStatus(ctx, dynamicNodeID)
-	nStatus.SetDataDir(nCtx.NodeStatus().GetDataDir())
-	nStatus.SetOutputDir(nCtx.NodeStatus().GetOutputDir())
-	nStatus.SetParentTaskID(execID)
+	dynamicNodeStatus := nCtx.NodeStatus().GetNodeExecutionStatus(ctx, dynamicNodeID)
+	dynamicNodeStatus.SetDataDir(nCtx.NodeStatus().GetDataDir())
+	dynamicNodeStatus.SetOutputDir(nCtx.NodeStatus().GetOutputDir())
+	dynamicNodeStatus.SetParentTaskID(execID)
 
 	// cacheHitStopWatch := d.metrics.CacheHit.Start(ctx)
 	// Check if we have compiled the workflow before:
@@ -359,37 +358,39 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 	//		d.metrics.CacheError.Inc(ctx)
 	//	} else {
 	//		cacheHitStopWatch.Stop()
-	//		return newContextualWorkflow(nCtx.Workflow(), compiledWf, nStatus, compiledWf.Tasks, compiledWf.SubWorkflows), true, nil
+	//		return newContextualWorkflow(nCtx.Workflow(), compiledWf, dynamicNodeStatus, compiledWf.Tasks, compiledWf.SubWorkflows), true, nil
 	//	}
 	// }
 
 	// We know for sure that futures file was generated. Lets read it
 	djSpec, err := f.Read(ctx)
 	if err != nil {
-		return nil, false, errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "unable to read futures file, maybe corrupted")
+		err = errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "unable to read futures file, maybe corrupted")
+		return
 	}
 
 	var closure *core.CompiledWorkflowClosure
-	wf, err := d.buildDynamicWorkflowTemplate(ctx, djSpec, nCtx, nStatus)
+	wf, err := d.buildDynamicWorkflowTemplate(ctx, djSpec, nCtx, dynamicNodeStatus)
+	isDynamic = true
 	if err != nil {
-		return nil, true, err
+		return
 	}
 
 	compiledTasks, err := compileTasks(ctx, djSpec.Tasks)
 	if err != nil {
-		return nil, true, err
+		return
 	}
 
 	// Get the requirements, that is, a list of all the task IDs and the launch plan IDs that will be called as part of this dynamic task.
 	// The definition of these will need to be fetched from Admin (in order to get the interface).
 	requirements, err := compiler.GetRequirements(wf, djSpec.Subworkflows)
 	if err != nil {
-		return nil, true, err
+		return
 	}
 
 	launchPlanInterfaces, err := d.getLaunchPlanInterfaces(ctx, requirements.GetRequiredLaunchPlanIds())
 	if err != nil {
-		return nil, true, err
+		return
 	}
 
 	// TODO: In addition to querying Admin for launch plans, we also need to get all the tasks that are missing from the dynamic job spec.
@@ -398,19 +399,22 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 
 	closure, err = compiler.CompileWorkflow(wf, djSpec.Subworkflows, compiledTasks, launchPlanInterfaces)
 	if err != nil {
-		return nil, true, err
+		return
 	}
 
-	subwf, err := k8s.BuildFlyteWorkflow(closure, &core.LiteralMap{}, nil, "")
+	dynamicWf, err := k8s.BuildFlyteWorkflow(closure, &core.LiteralMap{}, nil, "")
 	if err != nil {
-		return nil, true, err
+		return
 	}
 
-	if err := f.Cache(ctx, subwf); err != nil {
+	if err := f.Cache(ctx, dynamicWf); err != nil {
 		logger.Errorf(ctx, "Failed to cache Dynamic workflow [%s]", err.Error())
 	}
 
-	return newContextualWorkflow(nCtx.Workflow(), subwf, nStatus, subwf.Tasks, subwf.SubWorkflows, nCtx.DataStore()), true, nil
+	subwf = dynamicWf
+	execContext = executors.NewExecutionContext(nCtx.ExecutionContext(), subwf, subwf)
+	nodeLookup = executors.NewNodeLookup(subwf, dynamicNodeStatus)
+	return execContext, subwf, nodeLookup, true, nil
 }
 
 func (d dynamicNodeTaskNodeHandler) getLaunchPlanInterfaces(ctx context.Context, launchPlanIDs []compiler.LaunchPlanRefIdentifier) (
@@ -429,10 +433,10 @@ func (d dynamicNodeTaskNodeHandler) getLaunchPlanInterfaces(ctx context.Context,
 	return launchPlanInterfaces, nil
 }
 
-func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context, dynamicWorkflow v1alpha1.ExecutableWorkflow,
+func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context, execContext executors.ExecutionContext, dynamicWorkflow v1alpha1.ExecutableWorkflow, nl executors.NodeLookup,
 	nCtx handler.NodeExecutionContext, prevState handler.DynamicNodeState) (handler.Transition, handler.DynamicNodeState, error) {
 
-	state, err := d.nodeExecutor.RecursiveNodeHandler(ctx, dynamicWorkflow, dynamicWorkflow.StartNode())
+	state, err := d.nodeExecutor.RecursiveNodeHandler(ctx, execContext, dynamicWorkflow, nl, dynamicWorkflow.StartNode())
 	if err != nil {
 		return handler.UnknownTransition, prevState, err
 	}
@@ -461,7 +465,8 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 		var o *handler.OutputInfo
 		// If the WF interface has outputs, validate that the outputs file was written.
 		if outputBindings := dynamicWorkflow.GetOutputBindings(); len(outputBindings) > 0 {
-			endNodeStatus := dynamicWorkflow.GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID)
+			dynamicNodeStatus := nCtx.NodeStatus().GetNodeExecutionStatus(ctx, dynamicNodeID)
+			endNodeStatus := dynamicNodeStatus.GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID)
 			if endNodeStatus == nil {
 				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("MalformedDynamicWorkflow", "no end-node found in dynamic workflow", nil)),
 					handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: "no end-node found in dynamic workflow"},

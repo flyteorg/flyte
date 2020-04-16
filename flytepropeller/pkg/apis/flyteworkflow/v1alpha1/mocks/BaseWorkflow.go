@@ -159,3 +159,44 @@ func (_m *BaseWorkflow) StartNode() v1alpha1.ExecutableNode {
 
 	return r0
 }
+
+type BaseWorkflow_ToNode struct {
+	*mock.Call
+}
+
+func (_m BaseWorkflow_ToNode) Return(_a0 []string, _a1 error) *BaseWorkflow_ToNode {
+	return &BaseWorkflow_ToNode{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *BaseWorkflow) OnToNode(name string) *BaseWorkflow_ToNode {
+	c := _m.On("ToNode", name)
+	return &BaseWorkflow_ToNode{Call: c}
+}
+
+func (_m *BaseWorkflow) OnToNodeMatch(matchers ...interface{}) *BaseWorkflow_ToNode {
+	c := _m.On("ToNode", matchers...)
+	return &BaseWorkflow_ToNode{Call: c}
+}
+
+// ToNode provides a mock function with given fields: name
+func (_m *BaseWorkflow) ToNode(name string) ([]string, error) {
+	ret := _m.Called(name)
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func(string) []string); ok {
+		r0 = rf(name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]string)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

@@ -134,6 +134,7 @@ type WorkflowNodePhase int
 const (
 	WorkflowNodePhaseUndefined WorkflowNodePhase = iota
 	WorkflowNodePhaseExecuting
+	WorkflowNodePhaseFailing
 )
 
 type WorkflowNodeStatus struct {
