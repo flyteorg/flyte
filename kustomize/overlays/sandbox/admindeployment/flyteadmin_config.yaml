@@ -58,8 +58,6 @@ domains:
     name: staging
   - id: production
     name: production
-  - id: domain
-    name: domain
 cluster_resources:
   templatePath: "/etc/flyte/clusterresource/templates"
   customData:

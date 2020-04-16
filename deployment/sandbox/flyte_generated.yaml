@@ -599,8 +599,6 @@ data:
         name: staging
       - id: production
         name: production
-      - id: domain
-        name: domain
     cluster_resources:
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
@@ -622,7 +620,7 @@ data:
       refresh: 5m
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-htgtk9k78c
+  name: flyte-admin-config-dtcg25hb22
   namespace: flyte
 ---
 apiVersion: v1
@@ -1084,7 +1082,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-htgtk9k78c
+          name: flyte-admin-config-dtcg25hb22
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1481,7 +1479,7 @@ spec:
               name: clusterresource-template-m2kccc465f
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-htgtk9k78c
+              name: flyte-admin-config-dtcg25hb22
             name: config-volume
   schedule: '*/1 * * * *'
 ---
