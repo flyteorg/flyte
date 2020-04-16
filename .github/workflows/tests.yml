@@ -23,3 +23,11 @@ jobs:
         go-version: ${{ matrix.go-version }}
     - name: Run end-to-end tests
       run: make end2end
+  docs:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build docs
+      run: make generate-docs
