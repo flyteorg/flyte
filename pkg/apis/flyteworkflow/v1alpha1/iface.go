@@ -2,7 +2,6 @@ package v1alpha1
 
 import (
 	"context"
-
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -238,16 +237,20 @@ type MutableNodeStatus interface {
 	ClearSubNodeStatus()
 }
 
+type ExecutionTimeInfo interface {
+	GetStoppedAt() *metav1.Time
+	GetStartedAt() *metav1.Time
+	GetLastUpdatedAt() *metav1.Time
+}
+
 // Interface for a Node p. This provides a mutable API.
 type ExecutableNodeStatus interface {
 	NodeStatusGetter
 	MutableNodeStatus
 	NodeStatusVisitor
+	ExecutionTimeInfo
 	GetPhase() NodePhase
 	GetQueuedAt() *metav1.Time
-	GetStoppedAt() *metav1.Time
-	GetStartedAt() *metav1.Time
-	GetLastUpdatedAt() *metav1.Time
 	GetLastAttemptStartedAt() *metav1.Time
 	GetParentNodeID() *NodeID
 	GetParentTaskID() *core.TaskExecutionIdentifier
@@ -324,11 +327,9 @@ type ExecutableNode interface {
 // Interface for the Workflow p. This is the mutable portion for a Workflow
 type ExecutableWorkflowStatus interface {
 	NodeStatusGetter
+	ExecutionTimeInfo
 	UpdatePhase(p WorkflowPhase, msg string)
 	GetPhase() WorkflowPhase
-	GetStoppedAt() *metav1.Time
-	GetStartedAt() *metav1.Time
-	GetLastUpdatedAt() *metav1.Time
 	IsTerminated() bool
 	GetMessage() string
 	SetDataDir(DataReference)
@@ -340,13 +341,18 @@ type ExecutableWorkflowStatus interface {
 	ConstructNodeDataDir(ctx context.Context, name NodeID) (storage.DataReference, error)
 }
 
+type NodeGetter interface {
+	GetNode(nodeID NodeID) (ExecutableNode, bool)
+}
+
 type BaseWorkflow interface {
+	NodeGetter
 	StartNode() ExecutableNode
 	GetID() WorkflowID
 	// From returns all nodes that can be reached directly
 	// from the node with the given unique name.
 	FromNode(name NodeID) ([]NodeID, error)
-	GetNode(nodeID NodeID) (ExecutableNode, bool)
+	ToNode(name NodeID) ([]NodeID, error)
 }
 
 type BaseWorkflowWithStatus interface {
@@ -365,9 +371,9 @@ type ExecutableSubWorkflow interface {
 	GetOutputs() *OutputVarMap
 }
 
-// WorkflowMeta provides an interface to retrieve labels, annotations and other concepts that are declared only once
+// Meta provides an interface to retrieve labels, annotations and other concepts that are declared only once
 // for the top level workflow
-type WorkflowMeta interface {
+type Meta interface {
 	GetExecutionID() ExecutionID
 	GetK8sWorkflowID() types.NamespacedName
 	GetOwnerReference() metav1.OwnerReference
@@ -384,17 +390,21 @@ type TaskDetailsGetter interface {
 	GetTask(id TaskID) (ExecutableTask, error)
 }
 
-type WorkflowMetaExtended interface {
-	WorkflowMeta
-	TaskDetailsGetter
+type SubWorkflowGetter interface {
 	FindSubWorkflow(subID WorkflowID) ExecutableSubWorkflow
+}
+
+type MetaExtended interface {
+	Meta
+	TaskDetailsGetter
+	SubWorkflowGetter
 	GetExecutionStatus() ExecutableWorkflowStatus
 }
 
-// A Top level Workflow is a combination of WorkflowMeta and an ExecutableSubWorkflow
+// A Top level Workflow is a combination of Meta and an ExecutableSubWorkflow
 type ExecutableWorkflow interface {
 	ExecutableSubWorkflow
-	WorkflowMetaExtended
+	MetaExtended
 	NodeStatusGetter
 }
 
@@ -419,16 +429,4 @@ func GetOutputsFile(outputDir DataReference) DataReference {
 
 func GetInputsFile(inputDir DataReference) DataReference {
 	return inputDir + "/inputs.pb"
-}
-
-func GetOutputErrorFile(inputDir DataReference) DataReference {
-	return inputDir + "/error.pb"
-}
-
-func GetFutureFile() string {
-	return "futures.pb"
-}
-
-func GetCompiledFutureFile() string {
-	return "futures_compiled.pb"
 }

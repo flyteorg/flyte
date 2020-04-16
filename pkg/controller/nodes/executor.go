@@ -72,10 +72,10 @@ type nodeExecutor struct {
 	shardSelector                   ioutils.ShardSelector
 }
 
-func (c *nodeExecutor) RecordTransitionLatency(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) {
+func (c *nodeExecutor) RecordTransitionLatency(ctx context.Context, dag executors.DAGStructure, nl executors.NodeLookup, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) {
 	if nodeStatus.GetPhase() == v1alpha1.NodePhaseNotYetStarted || nodeStatus.GetPhase() == v1alpha1.NodePhaseQueued {
 		// Log transition latency (The most recently finished parent node endAt time to this node's queuedAt time -now-)
-		t, err := GetParentNodeMaxEndTime(ctx, w, node)
+		t, err := GetParentNodeMaxEndTime(ctx, dag, nl, node)
 		if err != nil {
 			logger.Warnf(ctx, "Failed to record transition latency for node. Error: %s", err.Error())
 			return
@@ -119,10 +119,10 @@ func (c *nodeExecutor) IdempotentRecordEvent(ctx context.Context, nodeEvent *eve
 // In this method we check if the queue is ready to be processed and if so, we prime it in Admin as queued
 // Before we start the node execution, we need to transition this Node status to Queued.
 // This is because a node execution has to exist before task/wf executions can start.
-func (c *nodeExecutor) preExecute(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) (handler.PhaseInfo, error) {
+func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructure, nCtx handler.NodeExecutionContext) (handler.PhaseInfo, error) {
 	logger.Debugf(ctx, "Node not yet started")
 	// Query the nodes information to figure out if it can be executed.
-	predicatePhase, err := CanExecute(ctx, w, node)
+	predicatePhase, err := CanExecute(ctx, dag, nCtx.ContextualNodeLookup(), nCtx.Node())
 	if err != nil {
 		logger.Debugf(ctx, "Node failed in CanExecute. Error [%s]", err)
 		return handler.PhaseInfoUndefined, err
@@ -131,6 +131,8 @@ func (c *nodeExecutor) preExecute(ctx context.Context, w v1alpha1.ExecutableWork
 	if predicatePhase == PredicatePhaseReady {
 		// TODO: Performance problem, we maybe in a retry loop and do not need to resolve the inputs again.
 		// For now we will do this.
+		node := nCtx.Node()
+		nodeStatus := nCtx.NodeStatus()
 		dataDir := nodeStatus.GetDataDir()
 		var nodeInputs *core.LiteralMap
 		if !node.IsStartNode() {
@@ -138,7 +140,7 @@ func (c *nodeExecutor) preExecute(ctx context.Context, w v1alpha1.ExecutableWork
 			defer t.Stop()
 			// Can execute
 			var err error
-			nodeInputs, err = Resolve(ctx, c.outputResolver, w, node.GetID(), node.GetInputBindings())
+			nodeInputs, err = Resolve(ctx, c.outputResolver, nCtx.ContextualNodeLookup(), node.GetID(), node.GetInputBindings())
 			// TODO we need to handle retryable, network errors here!!
 			if err != nil {
 				c.metrics.ResolutionFailure.Inc(ctx)
@@ -183,7 +185,7 @@ func (c *nodeExecutor) isTimeoutExpired(queuedAt *metav1.Time, timeout time.Dura
 	return false
 }
 
-func (c *nodeExecutor) isEligibleForRetry(nCtx *execContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt, maxAttempts uint32, isEligible bool) {
+func (c *nodeExecutor) isEligibleForRetry(nCtx *nodeExecContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt, maxAttempts uint32, isEligible bool) {
 	if err.Kind == core.ExecutionError_SYSTEM {
 		currentAttempt = nodeStatus.GetSystemFailures()
 		maxAttempts = c.maxNodeRetriesForSystemFailures
@@ -199,7 +201,7 @@ func (c *nodeExecutor) isEligibleForRetry(nCtx *execContext, nodeStatus v1alpha1
 	return
 }
 
-func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *execContext, nodeStatus v1alpha1.ExecutableNodeStatus) (handler.PhaseInfo, error) {
+func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *nodeExecContext, nodeStatus v1alpha1.ExecutableNodeStatus) (handler.PhaseInfo, error) {
 	logger.Debugf(ctx, "Executing node")
 	defer logger.Debugf(ctx, "Node execution round complete")
 
@@ -265,149 +267,66 @@ func (c *nodeExecutor) finalize(ctx context.Context, h handler.Node, nCtx handle
 	return h.Finalize(ctx, nCtx)
 }
 
-func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWorkflow, node v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
-	logger.Debugf(ctx, "Handling Node [%s]", node.GetID())
-	defer logger.Debugf(ctx, "Completed node [%s]", node.GetID())
-
-	nodeExecID := &core.NodeExecutionIdentifier{
-		NodeId:      node.GetID(),
-		ExecutionId: w.GetExecutionID().WorkflowExecutionIdentifier,
-	}
-
-	nodeStatus := w.GetNodeExecutionStatus(ctx, node.GetID())
-
-	if nodeStatus.IsDirty() {
-		return executors.NodeStatusRunning, nil
-	}
-
-	// Now depending on the node type decide
-	h, err := c.nodeHandlerFactory.GetHandler(node.GetKind())
+func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executors.DAGStructure, nCtx *nodeExecContext, _ handler.Node) (executors.NodeStatus, error) {
+	logger.Debugf(ctx, "Node not yet started, running pre-execute")
+	defer logger.Debugf(ctx, "Node pre-execute completed")
+	p, err := c.preExecute(ctx, dag, nCtx)
 	if err != nil {
+		logger.Errorf(ctx, "failed preExecute for node. Error: %s", err.Error())
 		return executors.NodeStatusUndefined, err
 	}
 
-	nCtx, err := c.newNodeExecContextDefault(ctx, w, node, nodeStatus)
-	if err != nil {
-		return executors.NodeStatusUndefined, err
+	if p.GetPhase() == handler.EPhaseUndefined {
+		return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "received undefined phase.")
 	}
 
-	currentPhase := nodeStatus.GetPhase()
-
-	// Optimization!
-	// If it is start node we directly move it to Queued without needing to run preExecute
-	if currentPhase == v1alpha1.NodePhaseNotYetStarted && !node.IsStartNode() {
-		logger.Debugf(ctx, "Node not yet started, running pre-execute")
-		defer logger.Debugf(ctx, "Node pre-execute completed")
-		p, err := c.preExecute(ctx, w, node, nodeStatus)
-		if err != nil {
-			logger.Errorf(ctx, "failed preExecute for node. Error: %s", err.Error())
-			return executors.NodeStatusUndefined, err
-		}
-
-		if p.GetPhase() == handler.EPhaseUndefined {
-			return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, node.GetID(), "received undefined phase.")
-		}
-
-		if p.GetPhase() == handler.EPhaseNotReady {
-			return executors.NodeStatusPending, nil
-		}
-
-		np, err := ToNodePhase(p.GetPhase())
-		if err != nil {
-			return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, node.GetID(), err, "failed to move from queued")
-		}
-
-		if np != nodeStatus.GetPhase() {
-			// assert np == Queued!
-			logger.Infof(ctx, "Change in node state detected from [%s] -> [%s]", nodeStatus.GetPhase().String(), np.String())
-			nev, err := ToNodeExecutionEvent(nodeExecID, p, nCtx.InputReader(), nCtx.NodeStatus())
-			if err != nil {
-				return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, node.GetID(), err, "could not convert phase info to event")
-			}
-			err = c.IdempotentRecordEvent(ctx, nev)
-			if err != nil {
-				logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
-				return executors.NodeStatusUndefined, errors.Wrapf(errors.EventRecordingFailed, node.GetID(), err, "failed to record node event")
-			}
-			UpdateNodeStatus(np, p, nCtx.nsm, nodeStatus)
-			c.RecordTransitionLatency(ctx, w, node, nodeStatus)
-		}
-
-		if np == v1alpha1.NodePhaseQueued {
-			return executors.NodeStatusQueued, nil
-		} else if np == v1alpha1.NodePhaseSkipped {
-			return executors.NodeStatusSuccess, nil
-		}
-
+	if p.GetPhase() == handler.EPhaseNotReady {
 		return executors.NodeStatusPending, nil
 	}
 
-	if currentPhase == v1alpha1.NodePhaseFailing {
-		logger.Debugf(ctx, "node failing")
-		if err := c.finalize(ctx, h, nCtx); err != nil {
-			return executors.NodeStatusUndefined, err
-		}
-
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, v1.Now(), nodeStatus.GetMessage())
-		c.metrics.FailureDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
-		// TODO we need to have a way to find the error message from failing to failed!
-		return executors.NodeStatusFailed(fmt.Errorf(nodeStatus.GetMessage())), nil
+	np, err := ToNodePhase(p.GetPhase())
+	if err != nil {
+		return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "failed to move from queued")
 	}
 
-	if currentPhase == v1alpha1.NodePhaseTimingOut {
-		logger.Debugf(ctx, "node timing out")
-		if err := c.abort(ctx, h, nCtx, "node timed out"); err != nil {
-			return executors.NodeStatusUndefined, err
+	nodeStatus := nCtx.NodeStatus()
+	if np != nodeStatus.GetPhase() {
+		// assert np == Queued!
+		logger.Infof(ctx, "Change in node state detected from [%s] -> [%s]", nodeStatus.GetPhase().String(), np.String())
+		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(), p, nCtx.InputReader(), nodeStatus)
+		if err != nil {
+			return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "could not convert phase info to event")
 		}
-
-		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, v1.Now(), nodeStatus.GetMessage())
-		c.metrics.TimedOutFailure.Inc(ctx)
-		return executors.NodeStatusTimedOut, nil
+		err = c.IdempotentRecordEvent(ctx, nev)
+		if err != nil {
+			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
+			return executors.NodeStatusUndefined, errors.Wrapf(errors.EventRecordingFailed, nCtx.NodeID(), err, "failed to record node event")
+		}
+		UpdateNodeStatus(np, p, nCtx.nsm, nodeStatus)
+		c.RecordTransitionLatency(ctx, dag, nCtx.ContextualNodeLookup(), nCtx.Node(), nodeStatus)
 	}
 
-	if currentPhase == v1alpha1.NodePhaseSucceeding {
-		logger.Debugf(ctx, "node succeeding")
-		if err := c.finalize(ctx, h, nCtx); err != nil {
-			return executors.NodeStatusUndefined, err
-		}
-
-		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, v1.Now(), "completed successfully")
-		c.metrics.SuccessDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
+	if np == v1alpha1.NodePhaseQueued {
+		return executors.NodeStatusQueued, nil
+	} else if np == v1alpha1.NodePhaseSkipped {
 		return executors.NodeStatusSuccess, nil
 	}
 
-	if currentPhase == v1alpha1.NodePhaseRetryableFailure {
-		logger.Debugf(ctx, "node failed with retryable failure, aborting and finalizing, message: %s", nodeStatus.GetMessage())
-		if err := c.abort(ctx, h, nCtx, nodeStatus.GetMessage()); err != nil {
-			return executors.NodeStatusUndefined, err
-		}
+	return executors.NodeStatusPending, nil
+}
 
-		// NOTE: It is important to increment attempts only after abort has been called. Increment attempt mutates the state
-		// Attempt is used throughout the system to determine the idempotent resource version.
-		nodeStatus.IncrementAttempts()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, v1.Now(), "retrying")
-		// We are going to retry in the next round, so we should clear all current state
-		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.ClearTaskStatus()
-		nodeStatus.ClearWorkflowStatus()
-		nodeStatus.ClearDynamicNodeStatus()
-		return executors.NodeStatusPending, nil
-	}
+func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx *nodeExecContext, h handler.Node) (executors.NodeStatus, error) {
+	nodeStatus := nCtx.NodeStatus()
+	currentPhase := nodeStatus.GetPhase()
 
-	if currentPhase == v1alpha1.NodePhaseFailed {
-		// This should never happen
-		return executors.NodeStatusFailed(fmt.Errorf(nodeStatus.GetMessage())), nil
-	}
+	// case v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning:
+	logger.Debugf(ctx, "node executing, current phase [%s]", currentPhase)
+	defer logger.Debugf(ctx, "node execution completed")
 
 	// Since we reset node status inside execute for retryable failure, we use lastAttemptStartTime to carry that information
 	// across execute which is used to emit metrics
 	lastAttemptStartTime := nodeStatus.GetLastAttemptStartedAt()
 
-	// case v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning:
-	logger.Debugf(ctx, "node executing, current phase [%s]", currentPhase)
-	defer logger.Debugf(ctx, "node execution completed")
 	p, err := c.execute(ctx, h, nCtx, nodeStatus)
 	if err != nil {
 		logger.Errorf(ctx, "failed Execute for node. Error: %s", err.Error())
@@ -436,12 +355,12 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 	}
 
 	if p.GetPhase() == handler.EPhaseUndefined {
-		return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, node.GetID(), "received undefined phase.")
+		return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "received undefined phase.")
 	}
 
 	np, err := ToNodePhase(p.GetPhase())
 	if err != nil {
-		return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, node.GetID(), err, "failed to move from queued")
+		return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "failed to move from queued")
 	}
 
 	finalStatus := executors.NodeStatusRunning
@@ -467,15 +386,15 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 	if np != nodeStatus.GetPhase() && np != v1alpha1.NodePhaseRetryableFailure {
 		// assert np == skipped, succeeding or failing
 		logger.Infof(ctx, "Change in node state detected from [%s] -> [%s], (handler phase [%s])", nodeStatus.GetPhase().String(), np.String(), p.GetPhase().String())
-		nev, err := ToNodeExecutionEvent(nodeExecID, p, nCtx.InputReader(), nCtx.NodeStatus())
+		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(), p, nCtx.InputReader(), nCtx.NodeStatus())
 		if err != nil {
-			return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, node.GetID(), err, "could not convert phase info to event")
+			return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "could not convert phase info to event")
 		}
 
 		err = c.IdempotentRecordEvent(ctx, nev)
 		if err != nil {
 			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
-			return executors.NodeStatusUndefined, errors.Wrapf(errors.EventRecordingFailed, node.GetID(), err, "failed to record node event")
+			return executors.NodeStatusUndefined, errors.Wrapf(errors.EventRecordingFailed, nCtx.NodeID(), err, "failed to record node event")
 		}
 
 		// We reach here only when transitioning from Queued to Running. In this case, the startedAt is not set.
@@ -490,15 +409,93 @@ func (c *nodeExecutor) handleNode(ctx context.Context, w v1alpha1.ExecutableWork
 	return finalStatus, nil
 }
 
+func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx *nodeExecContext, h handler.Node) (executors.NodeStatus, error) {
+	nodeStatus := nCtx.NodeStatus()
+	logger.Debugf(ctx, "node failed with retryable failure, aborting and finalizing, message: %s", nodeStatus.GetMessage())
+	if err := c.abort(ctx, h, nCtx, nodeStatus.GetMessage()); err != nil {
+		return executors.NodeStatusUndefined, err
+	}
+
+	// NOTE: It is important to increment attempts only after abort has been called. Increment attempt mutates the state
+	// Attempt is used throughout the system to determine the idempotent resource version.
+	nodeStatus.IncrementAttempts()
+	nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, v1.Now(), "retrying")
+	// We are going to retry in the next round, so we should clear all current state
+	nodeStatus.ClearSubNodeStatus()
+	nodeStatus.ClearTaskStatus()
+	nodeStatus.ClearWorkflowStatus()
+	nodeStatus.ClearDynamicNodeStatus()
+	return executors.NodeStatusPending, nil
+}
+
+func (c *nodeExecutor) handleNode(ctx context.Context, dag executors.DAGStructure, nCtx *nodeExecContext, h handler.Node) (executors.NodeStatus, error) {
+	logger.Debugf(ctx, "Handling Node [%s]", nCtx.NodeID())
+	defer logger.Debugf(ctx, "Completed node [%s]", nCtx.NodeID())
+
+	nodeStatus := nCtx.NodeStatus()
+	currentPhase := nodeStatus.GetPhase()
+
+	// Optimization!
+	// If it is start node we directly move it to Queued without needing to run preExecute
+	if currentPhase == v1alpha1.NodePhaseNotYetStarted && !nCtx.Node().IsStartNode() {
+		return c.handleNotYetStartedNode(ctx, dag, nCtx, h)
+	}
+
+	if currentPhase == v1alpha1.NodePhaseFailing {
+		logger.Debugf(ctx, "node failing")
+		if err := c.finalize(ctx, h, nCtx); err != nil {
+			return executors.NodeStatusUndefined, err
+		}
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, v1.Now(), nodeStatus.GetMessage())
+		c.metrics.FailureDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
+		return executors.NodeStatusFailed(fmt.Errorf(nodeStatus.GetMessage())), nil
+	}
+
+	if currentPhase == v1alpha1.NodePhaseTimingOut {
+		logger.Debugf(ctx, "node timing out")
+		if err := c.abort(ctx, h, nCtx, "node timed out"); err != nil {
+			return executors.NodeStatusUndefined, err
+		}
+
+		nodeStatus.ClearSubNodeStatus()
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, v1.Now(), nodeStatus.GetMessage())
+		c.metrics.TimedOutFailure.Inc(ctx)
+		return executors.NodeStatusTimedOut, nil
+	}
+
+	if currentPhase == v1alpha1.NodePhaseSucceeding {
+		logger.Debugf(ctx, "node succeeding")
+		if err := c.finalize(ctx, h, nCtx); err != nil {
+			return executors.NodeStatusUndefined, err
+		}
+
+		nodeStatus.ClearSubNodeStatus()
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, v1.Now(), "completed successfully")
+		c.metrics.SuccessDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
+		return executors.NodeStatusSuccess, nil
+	}
+
+	if currentPhase == v1alpha1.NodePhaseRetryableFailure {
+		return c.handleRetryableFailure(ctx, nCtx, h)
+	}
+
+	if currentPhase == v1alpha1.NodePhaseFailed {
+		// This should never happen
+		return executors.NodeStatusFailed(fmt.Errorf(nodeStatus.GetMessage())), nil
+	}
+
+	return c.handleQueuedOrRunningNode(ctx, nCtx, h)
+}
+
 // The space search for the next node to execute is implemented like a DFS algorithm. handleDownstream visits all the nodes downstream from
 // the currentNode. Visit a node is the RecursiveNodeHandler. A visit may be partial, complete or may result in a failure.
-func (c *nodeExecutor) handleDownstream(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
+func (c *nodeExecutor) handleDownstream(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
 	logger.Debugf(ctx, "Handling downstream Nodes")
 	// This node is success. Handle all downstream nodes
-	downstreamNodes, err := w.FromNode(currentNode.GetID())
+	downstreamNodes, err := dag.FromNode(currentNode.GetID())
 	if err != nil {
-		logger.Debugf(ctx, "Error when retrieving downstream nodes. Error [%v]", err)
-		return executors.NodeStatusFailed(err), nil
+		logger.Debugf(ctx, "Error when retrieving downstream nodes, [%s]", err)
+		return executors.NodeStatusFailed(errors.Wrapf(errors.BadSpecificationError, currentNode.GetID(), err, "failed to retrieve downstream nodes")), nil
 	}
 	if len(downstreamNodes) == 0 {
 		logger.Debugf(ctx, "No downstream nodes found. Complete.")
@@ -510,11 +507,11 @@ func (c *nodeExecutor) handleDownstream(ctx context.Context, w v1alpha1.Executab
 	allCompleted := true
 	partialNodeCompletion := false
 	for _, downstreamNodeName := range downstreamNodes {
-		downstreamNode, ok := w.GetNode(downstreamNodeName)
+		downstreamNode, ok := nl.GetNode(downstreamNodeName)
 		if !ok {
 			return executors.NodeStatusFailed(errors.Errorf(errors.BadSpecificationError, currentNode.GetID(), "Unable to find Downstream Node [%v]", downstreamNodeName)), nil
 		}
-		state, err := c.RecursiveNodeHandler(ctx, w, downstreamNode)
+		state, err := c.RecursiveNodeHandler(ctx, execContext, dag, nl, downstreamNode)
 		if err != nil {
 			return executors.NodeStatusUndefined, err
 		}
@@ -546,12 +543,8 @@ func (c *nodeExecutor) handleDownstream(ctx context.Context, w v1alpha1.Executab
 	return executors.NodeStatusPending, nil
 }
 
-func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, w v1alpha1.ExecutableWorkflow, inputs *core.LiteralMap) (executors.NodeStatus, error) {
-	startNode := w.StartNode()
-	if startNode == nil {
-		return executors.NodeStatusFailed(errors.Errorf(errors.BadSpecificationError, v1alpha1.StartNodeID, "Start node not found")), nil
-	}
-
+func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.LiteralMap) (executors.NodeStatus, error) {
+	startNode := dag.StartNode()
 	ctx = contextutils.WithNodeID(ctx, startNode.GetID())
 	if inputs == nil {
 		logger.Infof(ctx, "No inputs for the workflow. Skipping storing inputs")
@@ -559,7 +552,7 @@ func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, w v1alpha1.Exe
 	}
 
 	// StartNode is special. It does not have any processing step. It just takes the workflow (or subworkflow) inputs and converts to its own outputs
-	nodeStatus := w.GetNodeExecutionStatus(ctx, startNode.GetID())
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, startNode.GetID())
 
 	if len(nodeStatus.GetDataDir()) == 0 {
 		return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, startNode.GetID(), "no data-dir set, cannot store inputs")
@@ -575,23 +568,50 @@ func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, w v1alpha1.Exe
 	return executors.NodeStatusComplete, nil
 }
 
-func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
+func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
 	currentNodeCtx := contextutils.WithNodeID(ctx, currentNode.GetID())
-	nodeStatus := w.GetNodeExecutionStatus(ctx, currentNode.GetID())
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 
 	switch nodeStatus.GetPhase() {
 	case v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseTimingOut, v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseSucceeding:
+		// TODO Follow up Pull Request,
+		// 1. Rename this method to DAGTraversalHandleNode (accepts a DAGStructure along-with) the remaining arguments
+		// 2. Create a new method called HandleNode (part of the interface) (remaining all args as the previous method, but no DAGStructure
+		// 3. Additional both methods will receive inputs reader
+		// 4. The Downstream nodes handler will Resolve the Inputs
+		// 5. the method will delegate all other node handling to HandleNode.
+		// 6. Thus we can get rid of SetInputs for StartNode as well
 		logger.Debugf(currentNodeCtx, "Handling node Status [%v]", nodeStatus.GetPhase().String())
 
 		t := c.metrics.NodeExecutionTime.Start(ctx)
 		defer t.Stop()
-		return c.handleNode(currentNodeCtx, w, currentNode)
+
+		// This is an optimization to avoid creating the nodeContext object in case the node has already been looked at.
+		// If the overhead was zero, we would just do the isDirtyCheck after the nodeContext is created
+		nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
+		if nodeStatus.IsDirty() {
+			return executors.NodeStatusRunning, nil
+		}
+
+		nCtx, err := c.newNodeExecContextDefault(ctx, currentNode.GetID(), execContext, nl)
+		if err != nil {
+			// NodeExecution creation failure is a permanent fail / system error.
+			// Should a system failure always return an err?
+			return executors.NodeStatusFailed(err), nil
+		}
+
+		// Now depending on the node type decide
+		h, err := c.nodeHandlerFactory.GetHandler(nCtx.Node().GetKind())
+		if err != nil {
+			return executors.NodeStatusUndefined, err
+		}
+		return c.handleNode(currentNodeCtx, dag, nCtx, h)
 
 		// TODO we can optimize skip state handling by iterating down the graph and marking all as skipped
 		// Currently we treat either Skip or Success the same way. In this approach only one node will be skipped
 		// at a time. As we iterate down, further nodes will be skipped
 	case v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseSkipped:
-		return c.handleDownstream(ctx, w, currentNode)
+		return c.handleDownstream(ctx, execContext, dag, nl, currentNode)
 	case v1alpha1.NodePhaseFailed:
 		logger.Debugf(currentNodeCtx, "Node Failed")
 		return executors.NodeStatusFailed(errors.Errorf(errors.RuntimeExecutionError, currentNode.GetID(), "Node Failed.")), nil
@@ -602,8 +622,8 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, w v1alpha1.Exec
 	return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, currentNode.GetID(), "Should never reach here")
 }
 
-func (c *nodeExecutor) FinalizeHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode) error {
-	nodeStatus := w.GetNodeExecutionStatus(ctx, currentNode.GetID())
+func (c *nodeExecutor) FinalizeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) error {
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 
 	switch nodeStatus.GetPhase() {
 	case v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseSucceeding, v1alpha1.NodePhaseRetryableFailure:
@@ -615,7 +635,7 @@ func (c *nodeExecutor) FinalizeHandler(ctx context.Context, w v1alpha1.Executabl
 			return err
 		}
 
-		nCtx, err := c.newNodeExecContextDefault(ctx, w, currentNode, nodeStatus)
+		nCtx, err := c.newNodeExecContextDefault(ctx, currentNode.GetID(), execContext, nl)
 		if err != nil {
 			return err
 		}
@@ -626,7 +646,7 @@ func (c *nodeExecutor) FinalizeHandler(ctx context.Context, w v1alpha1.Executabl
 		}
 	default:
 		// Abort downstream nodes
-		downstreamNodes, err := w.FromNode(currentNode.GetID())
+		downstreamNodes, err := dag.FromNode(currentNode.GetID())
 		if err != nil {
 			logger.Debugf(ctx, "Error when retrieving downstream nodes. Error [%v]", err)
 			return nil
@@ -634,12 +654,12 @@ func (c *nodeExecutor) FinalizeHandler(ctx context.Context, w v1alpha1.Executabl
 
 		errs := make([]error, 0, len(downstreamNodes))
 		for _, d := range downstreamNodes {
-			downstreamNode, ok := w.GetNode(d)
+			downstreamNode, ok := nl.GetNode(d)
 			if !ok {
 				return errors.Errorf(errors.BadSpecificationError, currentNode.GetID(), "Unable to find Downstream Node [%v]", d)
 			}
 
-			if err := c.FinalizeHandler(ctx, w, downstreamNode); err != nil {
+			if err := c.FinalizeHandler(ctx, execContext, dag, nl, downstreamNode); err != nil {
 				logger.Infof(ctx, "Failed to abort node [%v]. Error: %v", d, err)
 				errs = append(errs, err)
 			}
@@ -655,8 +675,8 @@ func (c *nodeExecutor) FinalizeHandler(ctx context.Context, w v1alpha1.Executabl
 	return nil
 }
 
-func (c *nodeExecutor) AbortHandler(ctx context.Context, w v1alpha1.ExecutableWorkflow, currentNode v1alpha1.ExecutableNode, reason string) error {
-	nodeStatus := w.GetNodeExecutionStatus(ctx, currentNode.GetID())
+func (c *nodeExecutor) AbortHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode, reason string) error {
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 
 	switch nodeStatus.GetPhase() {
 	case v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseSucceeding, v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseQueued:
@@ -668,7 +688,7 @@ func (c *nodeExecutor) AbortHandler(ctx context.Context, w v1alpha1.ExecutableWo
 			return err
 		}
 
-		nCtx, err := c.newNodeExecContextDefault(ctx, w, currentNode, nodeStatus)
+		nCtx, err := c.newNodeExecContextDefault(ctx, currentNode.GetID(), execContext, nl)
 		if err != nil {
 			return err
 		}
@@ -677,12 +697,8 @@ func (c *nodeExecutor) AbortHandler(ctx context.Context, w v1alpha1.ExecutableWo
 		if err != nil {
 			return err
 		}
-		nodeExecID := &core.NodeExecutionIdentifier{
-			NodeId:      nCtx.NodeID(),
-			ExecutionId: w.GetExecutionID().WorkflowExecutionIdentifier,
-		}
 		err = c.IdempotentRecordEvent(ctx, &event.NodeExecutionEvent{
-			Id:         nodeExecID,
+			Id:         nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
 			Phase:      core.NodeExecution_ABORTED,
 			OccurredAt: ptypes.TimestampNow(),
 			OutputResult: &event.NodeExecutionEvent_Error{
@@ -702,7 +718,7 @@ func (c *nodeExecutor) AbortHandler(ctx context.Context, w v1alpha1.ExecutableWo
 		}
 	case v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseSkipped:
 		// Abort downstream nodes
-		downstreamNodes, err := w.FromNode(currentNode.GetID())
+		downstreamNodes, err := dag.FromNode(currentNode.GetID())
 		if err != nil {
 			logger.Debugf(ctx, "Error when retrieving downstream nodes. Error [%v]", err)
 			return nil
@@ -710,12 +726,12 @@ func (c *nodeExecutor) AbortHandler(ctx context.Context, w v1alpha1.ExecutableWo
 
 		errs := make([]error, 0, len(downstreamNodes))
 		for _, d := range downstreamNodes {
-			downstreamNode, ok := w.GetNode(d)
+			downstreamNode, ok := nl.GetNode(d)
 			if !ok {
 				return errors.Errorf(errors.BadSpecificationError, currentNode.GetID(), "Unable to find Downstream Node [%v]", d)
 			}
 
-			if err := c.AbortHandler(ctx, w, downstreamNode, reason); err != nil {
+			if err := c.AbortHandler(ctx, execContext, dag, nl, downstreamNode, reason); err != nil {
 				logger.Infof(ctx, "Failed to abort node [%v]. Error: %v", d, err)
 				errs = append(errs, err)
 			}

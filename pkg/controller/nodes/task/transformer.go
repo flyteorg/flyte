@@ -87,11 +87,8 @@ func ToTaskExecutionEvent(taskExecID *core.TaskExecutionIdentifier, in io.InputF
 
 func GetTaskExecutionIdentifier(nCtx handler.NodeExecutionContext) *core.TaskExecutionIdentifier {
 	return &core.TaskExecutionIdentifier{
-		TaskId:       nCtx.TaskReader().GetTaskID(),
-		RetryAttempt: nCtx.CurrentAttempt(),
-		NodeExecutionId: &core.NodeExecutionIdentifier{
-			NodeId:      nCtx.NodeID(),
-			ExecutionId: nCtx.NodeExecutionMetadata().GetExecutionID().WorkflowExecutionIdentifier,
-		},
+		TaskId:          nCtx.TaskReader().GetTaskID(),
+		RetryAttempt:    nCtx.CurrentAttempt(),
+		NodeExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
 	}
 }

@@ -103,7 +103,7 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	logger.Infof(ctx, "Setting the MetadataDir for StartNode [%v]", dataDir)
 	nodeStatus.SetDataDir(dataDir)
 	nodeStatus.SetOutputDir(outputDir)
-	s, err := c.nodeExecutor.SetInputsForStartNode(ctx, w, inputs)
+	s, err := c.nodeExecutor.SetInputsForStartNode(ctx, w, w, executors.NewNodeLookup(w, w.GetExecutionStatus()), inputs)
 	if err != nil {
 		return StatusReady, err
 	}
@@ -115,12 +115,11 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 }
 
 func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
-	contextualWf := executors.NewBaseContextualWorkflow(w)
-	startNode := contextualWf.StartNode()
+	startNode := w.StartNode()
 	if startNode == nil {
 		return StatusFailed(errors.Errorf(errors.IllegalStateError, w.GetID(), "StartNode not found in running workflow?")), nil
 	}
-	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, contextualWf, startNode)
+	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, w, w, w, startNode)
 	if err != nil {
 		return StatusRunning, err
 	}
@@ -136,21 +135,20 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 		return StatusSucceeding, nil
 	}
 	if state.PartiallyComplete() {
-		c.enqueueWorkflow(contextualWf.GetK8sWorkflowID().String())
+		c.enqueueWorkflow(w.GetK8sWorkflowID().String())
 	}
 	return StatusRunning, nil
 }
 
 func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
-	contextualWf := executors.NewBaseContextualWorkflow(w)
 	// Best effort clean-up.
-	if err := c.cleanupRunningNodes(ctx, contextualWf, "Some node execution failed, auto-abort."); err != nil {
+	if err := c.cleanupRunningNodes(ctx, w, "Some node execution failed, auto-abort."); err != nil {
 		logger.Errorf(ctx, "Failed to propagate Abort for workflow:%v. Error: %v", w.ExecutionID.WorkflowExecutionIdentifier, err)
 	}
 
-	errorNode := contextualWf.GetOnFailureNode()
+	errorNode := w.GetOnFailureNode()
 	if errorNode != nil {
-		state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, contextualWf, errorNode)
+		state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, w, w, w, errorNode)
 		if err != nil {
 			return StatusFailing(nil), err
 		}
@@ -163,12 +161,12 @@ func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha
 		}
 		if state.PartiallyComplete() {
 			// Re-enqueue the workflow
-			c.enqueueWorkflow(contextualWf.GetK8sWorkflowID().String())
+			c.enqueueWorkflow(w.GetK8sWorkflowID().String())
 			return StatusFailing(nil), nil
 		}
 		// Fallthrough to handle state is complete
 	}
-	return StatusFailed(errors.Errorf(errors.CausedByError, w.ID, contextualWf.GetExecutionStatus().GetMessage())), nil
+	return StatusFailed(errors.Errorf(errors.CausedByError, w.ID, w.GetExecutionStatus().GetMessage())), nil
 }
 
 func (c *workflowExecutor) handleSucceedingWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) Status {
@@ -371,8 +369,7 @@ func (c *workflowExecutor) HandleAbortedWorkflow(ctx context.Context, w *v1alpha
 		}
 
 		// Best effort clean-up.
-		contextualWf := executors.NewBaseContextualWorkflow(w)
-		if err2 := c.cleanupRunningNodes(ctx, contextualWf, reason); err2 != nil {
+		if err2 := c.cleanupRunningNodes(ctx, w, reason); err2 != nil {
 			logger.Errorf(ctx, "Failed to propagate Abort for workflow:%v. Error: %v", w.ExecutionID.WorkflowExecutionIdentifier, err2)
 		}
 
@@ -400,7 +397,7 @@ func (c *workflowExecutor) cleanupRunningNodes(ctx context.Context, w v1alpha1.E
 		return errors.Errorf(errors.IllegalStateError, w.GetID(), "StartNode not found in running workflow?")
 	}
 
-	if err := c.nodeExecutor.AbortHandler(ctx, w, startNode, reason); err != nil {
+	if err := c.nodeExecutor.AbortHandler(ctx, w, w, w, startNode, reason); err != nil {
 		return errors.Errorf(errors.CausedByError, w.GetID(), "Failed to propagate Abort for workflow. Error: %v", err)
 	}
 

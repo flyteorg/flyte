@@ -16,7 +16,6 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	nodeMocks "github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
@@ -31,45 +30,56 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 		Name:    "name",
 	}
 
+	nodeID := "n1"
+
 	nm := &nodeMocks.NodeExecutionMetadata{}
-	nm.On("GetAnnotations").Return(map[string]string{})
-	nm.On("GetExecutionID").Return(v1alpha1.WorkflowExecutionIdentifier{
-		WorkflowExecutionIdentifier: wfExecID,
+	nm.OnGetAnnotations().Return(map[string]string{})
+	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
+		NodeId:      nodeID,
+		ExecutionId: wfExecID,
 	})
-	nm.On("GetK8sServiceAccount").Return("service-account")
-	nm.On("GetLabels").Return(map[string]string{})
-	nm.On("GetNamespace").Return("namespace")
-	nm.On("GetOwnerID").Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
-	nm.On("GetOwnerReference").Return(v1.OwnerReference{
+	nm.OnGetK8sServiceAccount().Return("service-account")
+	nm.OnGetLabels().Return(map[string]string{})
+	nm.OnGetNamespace().Return("namespace")
+	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
+	nm.OnGetOwnerReference().Return(v1.OwnerReference{
 		Kind: "sample",
 		Name: "name",
 	})
 
 	taskID := &core.Identifier{}
 	tr := &nodeMocks.TaskReader{}
-	tr.On("GetTaskID").Return(taskID)
+	tr.OnGetTaskID().Return(taskID)
 
 	ns := &flyteMocks.ExecutableNodeStatus{}
-	ns.On("GetDataDir").Return(storage.DataReference("data-dir"))
-	ns.On("GetOutputDir").Return(storage.DataReference("output-dir"))
+	ns.OnGetDataDir().Return(storage.DataReference("data-dir"))
+	ns.OnGetOutputDir().Return(storage.DataReference("output-dir"))
 
 	res := &v12.ResourceRequirements{}
 	n := &flyteMocks.ExecutableNode{}
-	n.On("GetResources").Return(res)
+	n.OnGetResources().Return(res)
 
 	ir := &ioMocks.InputReader{}
 	nCtx := &nodeMocks.NodeExecutionContext{}
-	nCtx.On("NodeExecutionMetadata").Return(nm)
-	nCtx.On("Node").Return(n)
-	nCtx.On("InputReader").Return(ir)
-	nCtx.On("DataStore").Return(storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope()))
-	nCtx.On("CurrentAttempt").Return(uint32(1))
-	nCtx.On("TaskReader").Return(tr)
-	nCtx.On("MaxDatasetSizeBytes").Return(int64(1))
-	nCtx.On("NodeStatus").Return(ns)
-	nCtx.On("NodeID").Return("n1")
-	nCtx.On("EventsRecorder").Return(nil)
-	nCtx.On("EnqueueOwner").Return(nil)
+	nCtx.OnNodeExecutionMetadata().Return(nm)
+	nCtx.OnNode().Return(n)
+	nCtx.OnInputReader().Return(ir)
+	nCtx.OnCurrentAttempt().Return(uint32(1))
+	nCtx.OnTaskReader().Return(tr)
+	nCtx.OnMaxDatasetSizeBytes().Return(int64(1))
+	nCtx.OnNodeStatus().Return(ns)
+	nCtx.OnNodeID().Return(nodeID)
+	nCtx.OnEventsRecorder().Return(nil)
+	nCtx.OnEnqueueOwnerFunc().Return(nil)
+
+	ds, err := storage.NewDataStore(
+		&storage.Config{
+			Type: storage.TypeMemory,
+		},
+		promutils.NewTestScope(),
+	)
+	assert.NoError(t, err)
+	nCtx.OnDataStore().Return(ds)
 
 	st := bytes.NewBuffer([]byte{})
 	a := 45
@@ -79,10 +89,10 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	codex := codex.GobStateCodec{}
 	assert.NoError(t, codex.Encode(test{A: a}, st))
 	nr := &nodeMocks.NodeStateReader{}
-	nr.On("GetTaskNodeState").Return(handler.TaskNodeState{
+	nr.OnGetTaskNodeState().Return(handler.TaskNodeState{
 		PluginState: st.Bytes(),
 	})
-	nCtx.On("NodeStateReader").Return(nr)
+	nCtx.OnNodeStateReader().Return(nr)
 	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
 	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
@@ -124,7 +134,7 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), "name-n1-1")
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().TaskId, taskID)
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().RetryAttempt, uint32(1))
-	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetNodeId(), "n1")
+	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetNodeId(), nodeID)
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetExecutionId(), wfExecID)
 
 	// TODO @kumare fix this test

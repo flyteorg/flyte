@@ -205,6 +205,14 @@ func (in *WorkflowSpec) GetID() WorkflowID {
 	return in.ID
 }
 
+func (in *WorkflowSpec) ToNode(name NodeID) ([]NodeID, error) {
+	if _, ok := in.Nodes[name]; !ok {
+		return nil, errors.Errorf("Bad Node [%v], is not defined in the Workflow [%v]", name, in.ID)
+	}
+	upstreamNodes := in.Connections.UpstreamEdges[name]
+	return upstreamNodes, nil
+}
+
 func (in *WorkflowSpec) FromNode(name NodeID) ([]NodeID, error) {
 	if _, ok := in.Nodes[name]; !ok {
 		return nil, errors.Errorf("Bad Node [%v], is not defined in the Workflow [%v]", name, in.ID)

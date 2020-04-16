@@ -7,6 +7,7 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/storage"
 
+	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -20,7 +21,7 @@ type VarName = string
 
 type OutputResolver interface {
 	// Extracts a subset of node outputs to literals.
-	ExtractOutput(ctx context.Context, w v1alpha1.BaseWorkflowWithStatus, n v1alpha1.ExecutableNode,
+	ExtractOutput(ctx context.Context, nl executors.NodeLookup, n v1alpha1.ExecutableNode,
 		bindToVar VarName) (values *core.Literal, err error)
 }
 
@@ -37,9 +38,9 @@ type remoteFileOutputResolver struct {
 	store *storage.DataStore
 }
 
-func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, w v1alpha1.BaseWorkflowWithStatus, n v1alpha1.ExecutableNode,
+func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, nl executors.NodeLookup, n v1alpha1.ExecutableNode,
 	bindToVar VarName) (values *core.Literal, err error) {
-	nodeStatus := w.GetNodeExecutionStatus(ctx, n.GetID())
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, n.GetID())
 	outputsFileRef := v1alpha1.GetOutputsFile(nodeStatus.GetOutputDir())
 
 	index, actualVar, err := ParseVarName(bindToVar)

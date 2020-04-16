@@ -14,6 +14,7 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/lyft/flytepropeller/pkg/controller/executors"
 )
 
 type TaskReader interface {
@@ -30,8 +31,7 @@ type SetupContext interface {
 
 type NodeExecutionMetadata interface {
 	GetOwnerID() types.NamespacedName
-	// TODO we should covert this to a generic execution identifier instead of a workflow identifier
-	GetExecutionID() v1alpha1.WorkflowExecutionIdentifier
+	GetNodeExecutionID() *core.NodeExecutionIdentifier
 	GetNamespace() string
 	GetOwnerReference() v1.OwnerReference
 	GetLabels() map[string]string
@@ -66,8 +66,8 @@ type NodeExecutionContext interface {
 
 	EnqueueOwnerFunc() func() error
 
-	// Deprecated
-	Workflow() v1alpha1.ExecutableWorkflow
+	ContextualNodeLookup() executors.NodeLookup
+	ExecutionContext() executors.ExecutionContext
 	// TODO We should not need to pass NodeStatus, we probably only need it for DataDir, which should actually be sent using an OutputWriter interface
 	// Deprecated
 	NodeStatus() v1alpha1.ExecutableNodeStatus

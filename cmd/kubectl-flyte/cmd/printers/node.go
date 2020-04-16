@@ -11,8 +11,8 @@ import (
 
 	gotree "github.com/DiSiqueira/GoTree"
 	"github.com/fatih/color"
+
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task"
 	"github.com/lyft/flytepropeller/pkg/utils"
 )
@@ -113,8 +113,7 @@ func (p NodePrinter) traverseNode(ctx context.Context, tree gotree.Tree, w v1alp
 		if node.GetWorkflowNode().GetSubWorkflowRef() != nil {
 			s := w.FindSubWorkflow(*node.GetWorkflowNode().GetSubWorkflowRef())
 			wp := WorkflowPrinter{}
-			cw := executors.NewSubContextualWorkflow(w, s, nodeStatus)
-			return wp.Print(ctx, tree, cw)
+			return wp.PrintSubWorkflow(ctx, tree, w, s, nodeStatus)
 		}
 	case v1alpha1.NodeKindTask:
 		sub := tree.Add(strings.Join(p.NodeInfo(w.GetName(), node, nodeStatus), " | "))

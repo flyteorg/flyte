@@ -17,6 +17,7 @@ const (
 	CausedByError                      ErrorCode = "CausedByError"
 	RuntimeExecutionError              ErrorCode = "RuntimeExecutionError"
 	SubWorkflowExecutionFailed         ErrorCode = "SubWorkflowExecutionFailed"
+	SubWorkflowExecutionFailing        ErrorCode = "SubWorkflowExecutionFailing"
 	RemoteChildWorkflowExecutionFailed ErrorCode = "RemoteChildWorkflowExecutionFailed"
 	NoBranchTakenError                 ErrorCode = "NoBranchTakenError"
 	OutputsNotFoundError               ErrorCode = "OutputsNotFoundError"
