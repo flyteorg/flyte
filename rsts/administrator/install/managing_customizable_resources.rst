@@ -66,6 +66,8 @@ Running the following, will make it so that when Admin fills in cluster resource
 
     curl --request PUT 'https://flyte.company.net/api/v1/project_domain_attributes/projectname/staging' --header 'Content-Type: application/json' --data-raw '{"attributes":{"matchingAttributes":{"clusterResourceAttributes":{"attributes":{"projectQuotaCpu": "1000", "projectQuotaMemory": "5000Gi"}}}}}'
 
+These values will in turn be used to fill in the template fields in the file at ``kustomize/overlays/sandbox/admindeployment/clusterresource-templates/ab_project-resource-quota.yaml`` from the base of this repository for the ``projectname-staging`` namespace and that namespace only. For other namespaces, the defaults at the bottom of `this file <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L152>`__ would still be applied.
+
 
 Execution Queues
 ================

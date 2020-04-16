@@ -36,7 +36,7 @@ Using the `generated python protobuf code in flyteproto <https://github.com/lyft
 
 
 Primary container
-========
+================================================================================
 
 This is a required name you use to distinguish your primary container. The code in the body of the task definition will be injected in the primary container. The pod spec you pass to the task definition does not necessarily need to include a container definition with the primary container, but if you'd like to modify the primary container by setting a shared volume mount for example, you can do so in the pod spec.
 
