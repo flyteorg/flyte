@@ -229,7 +229,8 @@ func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *nodeEx
 		}
 		if c.isTimeoutExpired(nodeStatus.GetLastAttemptStartedAt(), executionDeadline) {
 			logger.Errorf(ctx, "Current execution for the node timed out; timeout configured: %v", executionDeadline)
-			phase = handler.PhaseInfoRetryableFailure("TimeoutExpired", fmt.Sprintf("task execution timeout [%s] expired", executionDeadline.String()), nil)
+			executionErr := &core.ExecutionError{Code: "TimeoutExpired", Message: fmt.Sprintf("task execution timeout [%s] expired", executionDeadline.String()), Kind: core.ExecutionError_USER}
+			phase = handler.PhaseInfoRetryableFailureErr(executionErr, nil)
 		}
 	}
 
