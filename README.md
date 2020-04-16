@@ -96,6 +96,12 @@ Resources that would help you get a better understanding of Flyte.
 # Changelogs
 [Changelogs](CHANGELOG/README.md)
 
+# Biweekly Community Sync
+Starting April 21 2020, the Flyte community meets every other Tuesday at 9:00 AM.
+You can join the [hangouts](https://hangouts.google.com/hangouts/_/calendar/a2V0YW4udW1hcmVAZ21haWwuY29t.5km2218c99820cggkefdb5549e?authuser=0)
+Meeting notes are captured in [Doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e)
+- We will soon have a demo signup sheet
+
 # Component Repos 
 Repo | Language | Purpose
 --- | --- | ---
