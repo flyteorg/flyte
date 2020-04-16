@@ -19,4 +19,9 @@ Welcome to the documentation hub for Flyte.
    :maxdepth: 1
    :name: sourcecodedocstoc
 
-   Flyte Language Specification <https://github.com/lyft/flyteidl>
+   flyteidl/index
+   Flytekit <flytekit/index>
+   FlytePropeller <https://pkg.go.dev/mod/github.com/lyft/flytepropeller>
+   FlyteAdmin <https://pkg.go.dev/mod/github.com/lyft/flyteadmin>
+   FlytePlugins <https://pkg.go.dev/mod/github.com/lyft/flyteplugins>
+   DataCatalog <https://pkg.go.dev/mod/github.com/lyft/datacatalog>
