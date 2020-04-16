@@ -16,7 +16,7 @@ RSTS_DIR=`mktemp -d "${BASEDIR}/rsts_tmp/XXXXXXXXX"`
 
 # Copy all rst files to the same place
 cp -R rsts/* ${RSTS_DIR}
-#cp -R _rsts/* ${RSTS_DIR}
+cp -R _rsts/* ${RSTS_DIR}
 
 # The toctree in this index file requires that the idl/sdk rsts are in the same folder
 cp docs_infra/index.rst ${RSTS_DIR}
