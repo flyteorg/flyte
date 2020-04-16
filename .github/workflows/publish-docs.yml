@@ -1,0 +1,17 @@
+name: publish-docs
+on:
+  push:
+    branches:
+    - master
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+    steps:
+    - uses: actions/checkout@master
+    - name: Build docs
+      run: make generate-docs
+    - name: publish
+      uses: fnkr/github-action-git-bash@v1
+      args: ["bash", "-c", "{ [ \"$(git rev-parse --abbrev-ref HEAD)\" = \"master\" ] || exit 78; } && rm -rf .github && git add -A .github && git commit -m \"Remove .github\" && git remote set-url origin git@github.com:GITHUB/PROJECT.git && git push --force origin gh-pages"]
