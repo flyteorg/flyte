@@ -76,7 +76,14 @@ Execution queues themselves are currently defined in the
 `flyteadmin config <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L97,L106>`__.
 
 The **attributes** associated with an execution queue must match the **tags** for workflow executions. The tags are associated with configurable resources
-stored in the admin database.
+stored in the Admin database.
+
+Command
+-------
+
+.. code-block:: console
+
+    curl --request PUT 'https://flyte.lyft.net/api/v1/workflow_attributes/project/domain/YourWorkflowName' --header 'Content-Type: application/json' --data-raw '{"attributes":{"matchingAttributes":{"executionQueueAttributes":{"tags":["my_queue"]}}}}'
 
 
 Execution Cluster Label
@@ -117,7 +124,7 @@ Let's say that our database includes the following
 +------------+--------------+----------+-------------+-----------+
 
 Any inbound CreateExecution requests with **[Domain: Production, Project: widgetmodels, Workflow: Demand]** for any launch plan would have a tag value of "supply".
-Any inbound CreateExecution requests with **[Domain: Production, Project: widgetmodels]** for any workflow other than Deman and for any launch plan would have a tag value of "critical".
+Any inbound CreateExecution requests with **[Domain: Production, Project: widgetmodels]** for any workflow other than Demand and for any launch plan would have a tag value of "critical".
 
 All other inbound CreateExecution requests would use the default values specified in the flyteadmin config (if any).
 
@@ -125,11 +132,11 @@ All other inbound CreateExecution requests would use the default values specifie
 Debugging
 *********
 
-Use the `get <https://github.com/lyft/flyteidl/blob/ba13965bcfbf7e7bfce40664800aaf1f2a1088a1/protos/flyteidl/service/admin.proto#L395>`_ endpoint
+Use the `get <https://github.com/lyft/flyteidl/blob/ba13965bcfbf7e7bfce40664800aaf1f2a1088a1/protos/flyteidl/service/admin.proto#L395>`__ endpoint
 to see if overrides exist for a specific resource.
 
-E.g. `https://example.com/api/v1/project_domain_attributes/widgetmodels/production?resource_type=2 <https://example.com/api/v1/project_domain_attributes/widgetmodels/production?resource_type=2>`_
+E.g. `https://example.com/api/v1/project_domain_attributes/widgetmodels/production?resource_type=2 <https://example.com/api/v1/project_domain_attributes/widgetmodels/production?resource_type=2>`__
 
-To get the global state of the world, use the list all endpoint, e.g. `https://example.com/api/v1/matchable_attributes?resource_type=2 <https://example.com/api/v1/matchable_attributes?resource_type=2>`_.
+To get the global state of the world, use the list all endpoint, e.g. `https://example.com/api/v1/matchable_attributes?resource_type=2 <https://example.com/api/v1/matchable_attributes?resource_type=2>`__.
 
-The resource type enum (int) is defined in the `proto <https://github.com/lyft/flyteidl/blob/ba13965bcfbf7e7bfce40664800aaf1f2a1088a1/protos/flyteidl/admin/matchable_resource.proto#L8,L20>`_.
+The resource type enum (int) is defined in the `proto <https://github.com/lyft/flyteidl/blob/ba13965bcfbf7e7bfce40664800aaf1f2a1088a1/protos/flyteidl/admin/matchable_resource.proto#L8,L20>`__.
