@@ -41,8 +41,8 @@ export function formatDate(input: Date) {
         : unknownValueString;
 }
 
-/** Formats a date into a standard format used throughout the UI
- * ex 12/21/2017 8:19:36 PM
+/** Formats a date into a standard UTC format used throughout the UI
+ * ex 12/21/2017 8:19:36 PM UTC
  */
 export function formatDateUTC(input: Date) {
     return isValidDate(input)
@@ -50,6 +50,9 @@ export function formatDateUTC(input: Date) {
         : unknownValueString;
 }
 
+/** Formats a date into a standard local format used throughout the UI
+ * ex 12/21/2017 8:19:36 PM PDT
+ */
 export function formatDateLocalTimezone(input: Date) {
     return isValidDate(input)
         ? moment(input)
