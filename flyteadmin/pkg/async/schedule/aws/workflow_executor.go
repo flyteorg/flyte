@@ -242,6 +242,8 @@ func (e *workflowExecutor) Run() {
 		e.metrics.MessageReceivedDelay.Observe(ctx, scheduledWorkflowExecutionRequest.KickoffTime,
 			observedMessageTriggeredTime)
 	}
+	err := e.subscriber.Err()
+	logger.Errorf(context.TODO(), "Gizmo subscriber closed channel with err: [%+v]", err)
 }
 
 func (e *workflowExecutor) Stop() error {
