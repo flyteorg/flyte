@@ -34,7 +34,7 @@ export interface ExecutionClosure extends Admin.IExecutionClosure {
     error?: ExecutionError;
     outputs?: LiteralMapBlob;
     phase: WorkflowExecutionPhase;
-    startedAt?: Protobuf.Timestamp;
+    startedAt?: Protobuf.ITimestamp;
     workflowId: Identifier;
 }
 
@@ -99,7 +99,7 @@ export interface TaskExecution extends Admin.ITaskExecution {
     closure: TaskExecutionClosure;
 }
 export interface TaskExecutionClosure extends Admin.ITaskExecutionClosure {
-    createdAt: Protobuf.Timestamp;
+    createdAt: Protobuf.ITimestamp;
     duration?: Protobuf.Duration;
     error?: ExecutionError;
     logs?: TaskLog[];

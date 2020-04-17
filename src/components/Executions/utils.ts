@@ -221,7 +221,11 @@ function getExecutionTimingMS({
     closure: { duration, createdAt, startedAt },
     isTerminal
 }: GetExecutionDurationMSArgs): GetExecutionTimingMSResult | null {
-    if ((isTerminal && duration == null) || createdAt == null) {
+    if (
+        (isTerminal && duration == null) ||
+        createdAt == null ||
+        startedAt == null
+    ) {
         return null;
     }
 
@@ -230,8 +234,8 @@ function getExecutionTimingMS({
         isTerminal && duration != null
             ? durationToMilliseconds(duration)
             : Date.now() - createdAtDate.getTime();
-    const queuedEndDate = startedAt ? timestampToDate(startedAt) : new Date();
-    const queuedMS = queuedEndDate.getTime() - createdAtDate.getTime();
+    const queuedMS =
+        timestampToDate(startedAt).getTime() - createdAtDate.getTime();
 
     return { duration: durationMS, queued: queuedMS };
 }

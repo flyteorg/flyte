@@ -24,3 +24,12 @@ export function delayedPromise<T = any>(): DelayedPromiseResult<T> {
         reject: value => reject(value)
     };
 }
+
+/** Returns a promise that will resolve after the given time. Useful in
+ * combination with `await` to pause testing for a short amount of time
+ */
+export function waitFor(timeMS: number) {
+    return new Promise(resolve => {
+        setTimeout(resolve, timeMS);
+    });
+}
