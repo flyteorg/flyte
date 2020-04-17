@@ -48,10 +48,13 @@ export const createMockNodeExecutions = (length: number) => {
         const node = generateNode();
         nodes.push(node);
         execution.id.nodeId = node.id;
+        const startedAtDate = new Date(Date.now() - 1000 * 60 * (idx + 1));
 
-        const startedAt = dateToTimestamp(
-            new Date(Date.now() - 1000 * 60 * (idx + 1))
+        const startedAt = dateToTimestamp(startedAtDate);
+        const createdAtDate = new Date(
+            startedAtDate.getTime() - 1000 * 30 * 5 * (idx + 1)
         );
+        const createdAt = dateToTimestamp(createdAtDate);
         const phase = random(Object.keys(NodeExecutionPhase).length - 1);
 
         // random duration between 0-90 minutes
@@ -67,6 +70,7 @@ export const createMockNodeExecutions = (length: number) => {
                 : undefined;
 
         Object.assign(execution.closure, {
+            createdAt,
             error,
             duration,
             phase,

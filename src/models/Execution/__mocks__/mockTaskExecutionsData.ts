@@ -48,9 +48,12 @@ export const createMockTaskExecutionsListResponse = (length: number) => {
         taskExecutions: Array.from({ length }, (_, idx) => {
             const execution = cloneDeep(mockExecution);
             execution.id.retryAttempt = idx;
-            const startedAt = dateToTimestamp(
-                new Date(Date.now() - 1000 * 60 * (idx + 1))
+            const startedAtDate = new Date(Date.now() - 1000 * 60 * (idx + 1));
+            const startedAt = dateToTimestamp(startedAtDate);
+            const createdAtDate = new Date(
+                startedAtDate.getTime() - 1000 * 30 * 5 * (idx + 1)
             );
+            const createdAt = dateToTimestamp(createdAtDate);
             const phase =
                 idx < length - 1
                     ? TaskExecutionPhase.FAILED
@@ -71,11 +74,11 @@ export const createMockTaskExecutionsListResponse = (length: number) => {
                     : undefined;
 
             Object.assign(execution.closure, {
+                createdAt,
                 error,
                 duration,
                 phase,
-                startedAt,
-                createdAt: startedAt
+                startedAt
             });
 
             return execution;

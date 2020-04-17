@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         borderLeft: `1px solid ${theme.palette.grey[400]}`,
         display: 'flex',
         height: '100vh',
-        paddingTop: theme.spacing(10),
+        padding: `${theme.spacing(2)}px 0`,
         width: '100vw'
     }
 }));
@@ -71,7 +71,6 @@ stories.addDecorator(story => {
     });
     return (
         <>
-            <NavBar />
             <div className={useStyles().container}>{story()}</div>
         </>
     );

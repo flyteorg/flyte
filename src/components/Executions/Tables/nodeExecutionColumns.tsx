@@ -1,10 +1,14 @@
 import { Typography } from '@material-ui/core';
-import { formatDateUTC, protobufDurationToHMS } from 'common/formatters';
+import {
+    formatDateLocalTimezone,
+    formatDateUTC,
+    millisecondsToHMS
+} from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
 import { NodeExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
-import { ExecutionStatusBadge } from '..';
+import { ExecutionStatusBadge, getNodeExecutionTimingMS } from '..';
 import { SelectNodeExecutionLink } from './SelectNodeExecutionLink';
 import { useColumnStyles } from './styles';
 import {
@@ -69,22 +73,55 @@ export function generateColumns(
         {
             cellRenderer: ({ execution: { closure } }) => {
                 const { startedAt } = closure;
-                return startedAt
-                    ? formatDateUTC(timestampToDate(startedAt))
-                    : '';
+                if (!startedAt) {
+                    return '';
+                }
+                const startedAtDate = timestampToDate(startedAt);
+                return (
+                    <>
+                        <Typography variant="body1">
+                            {formatDateUTC(startedAtDate)}
+                        </Typography>
+                        <Typography variant="subtitle1" color="textSecondary">
+                            {formatDateLocalTimezone(startedAtDate)}
+                        </Typography>
+                    </>
+                );
             },
             className: styles.columnStartedAt,
             key: 'startedAt',
             label: 'start time'
         },
         {
-            cellRenderer: ({ execution: { closure } }) => {
-                const { duration } = closure;
-                return duration ? protobufDurationToHMS(duration!) : '';
+            cellRenderer: ({ execution }) => {
+                const timing = getNodeExecutionTimingMS(execution);
+                if (timing === null) {
+                    return '';
+                }
+                return (
+                    <>
+                        <Typography variant="body1">
+                            {millisecondsToHMS(timing.duration)}
+                        </Typography>
+                    </>
+                );
             },
             className: styles.columnDuration,
             key: 'duration',
-            label: 'duration'
+            label: () => (
+                <>
+                    <Typography component="div" variant="overline">
+                        duration
+                    </Typography>
+                    <Typography
+                        component="div"
+                        variant="subtitle1"
+                        color="textSecondary"
+                    >
+                        Queued Time
+                    </Typography>
+                </>
+            )
         },
         {
             cellRenderer: ({ execution, state }) => (
