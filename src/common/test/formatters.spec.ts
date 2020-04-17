@@ -1,21 +1,34 @@
-import {
-    dateDiffString,
-    dateWithFromNow,
-    ensureUrlWithProtocol,
-    formatDate,
-    millisecondsToHMS
-} from '../formatters';
-
+import { millisecondsToDuration } from 'common/utils';
+import { Admin } from 'flyteidl';
 import {
     subSecondString,
     unknownValueString,
     zeroSecondsString
 } from '../constants';
+import {
+    dateDiffString,
+    dateFromNow,
+    dateWithFromNow,
+    ensureUrlWithProtocol,
+    fixedRateToString,
+    formatDate,
+    formatDateLocalTimezone,
+    formatDateUTC,
+    millisecondsToHMS,
+    protobufDurationToHMS
+} from '../formatters';
+
+jest.mock('../timezone.ts', () => ({
+    timezone: 'America/Los_Angeles'
+}));
 
 const invalidDates = ['abc', -200, 0];
 // Matches strings in the form 01/01/2000 01:01:00 PM  (5 minutes ago)
 const dateWithAgoRegex = /^[\w\/:\s]+ (AM|PM)\s+UTC\s+\([a\d] (minute|hour|day|second)s? ago\)$/;
+const dateFromNowRegex = /^[a\d] (minute|hour|day|second)s? ago$/;
 const dateRegex = /^[\w\/:\s]+ (AM|PM)/;
+const utcDateRegex = /^[\w\/:\s]+ (AM|PM) UTC/;
+const localDateRegex = /^[\w\/:\s]+ (AM|PM) (PDT|PST)/;
 
 describe('dateWithFromNow', () => {
     invalidDates.forEach(v =>
@@ -33,6 +46,22 @@ describe('dateWithFromNow', () => {
     });
 });
 
+describe('dateFromNow', () => {
+    invalidDates.forEach(v =>
+        it(`returns a constant string for invalid date: ${v}`, () => {
+            expect(dateFromNow(new Date(v))).toEqual(unknownValueString);
+        })
+    );
+
+    // Not testing this extensively because it's relying on moment, which is well-tested
+    it('Returns a reasonable string for valid inputs', () => {
+        const date = new Date();
+        expect(dateFromNow(new Date(date.getTime() - 125000))).toMatch(
+            dateFromNowRegex
+        );
+    });
+});
+
 describe('formatDate', () => {
     invalidDates.forEach(v =>
         it(`returns a constant string for invalid date: ${v}`, () => {
@@ -42,6 +71,32 @@ describe('formatDate', () => {
 
     it('returns a reasonable date string for valid inputs', () => {
         expect(formatDate(new Date())).toMatch(dateRegex);
+    });
+});
+
+describe('formatDateUTC', () => {
+    invalidDates.forEach(v =>
+        it(`returns a constant string for invalid date: ${v}`, () => {
+            expect(formatDateUTC(new Date(v))).toEqual(unknownValueString);
+        })
+    );
+
+    it('returns a reasonable date string for valid inputs', () => {
+        expect(formatDateUTC(new Date())).toMatch(utcDateRegex);
+    });
+});
+
+describe('formatDateLocalTimezone', () => {
+    invalidDates.forEach(v =>
+        it(`returns a constant string for invalid date: ${v}`, () => {
+            expect(formatDateLocalTimezone(new Date(v))).toEqual(
+                unknownValueString
+            );
+        })
+    );
+
+    it('returns a reasonable date string for valid inputs', () => {
+        expect(formatDateLocalTimezone(new Date())).toMatch(localDateRegex);
     });
 });
 
@@ -84,6 +139,16 @@ describe('dateDiffString', () => {
             const now = new Date();
             const later = new Date(now.getTime() + offset);
             expect(dateDiffString(now, later)).toEqual(expected);
+        })
+    );
+});
+
+describe('protobufDurationToHMS', () => {
+    millisecondToHMSTestCases.forEach(([ms, expected]) =>
+        it(`should convert ${ms}ms to ${expected}`, () => {
+            expect(protobufDurationToHMS(millisecondsToDuration(ms))).toBe(
+                expected
+            );
         })
     );
 });

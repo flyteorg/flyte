@@ -6,9 +6,8 @@ import {
     unknownValueString,
     zeroSecondsString
 } from './constants';
+import { timezone } from './timezone';
 import { durationToMilliseconds, isValidDate } from './utils';
-
-const currentTimeZone = moment.tz.guess();
 
 /** Formats a date into a standard string with a moment-style "from now" hint
  * ex. 12/21/2017 8:19:36 PM (18 days ago)
@@ -56,7 +55,7 @@ export function formatDateUTC(input: Date) {
 export function formatDateLocalTimezone(input: Date) {
     return isValidDate(input)
         ? moment(input)
-              .tz(currentTimeZone)
+              .tz(timezone)
               .format('l LTS z')
         : unknownValueString;
 }
