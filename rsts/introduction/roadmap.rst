@@ -8,7 +8,7 @@ How the core team works
 ========================
 Flyte is used actively in production at Lyft and its various subsidiaries. The core team is very customer focused and cares deeply about a high quality customer experience. Thus we always
 prioritize stability, reliability, observability and maintainability over raw feature development. Features are developed usually in response to specific use cases and user scenarios. That being said,
-we are proactively thinking about the evolution of the system and how we want to keep adapting to changing requirements. Thus most of our changes try to think about future development scenarios and in
+we are proactively thinking about the evolution of the system and how we want to keep adapting to changing requirements. Thus most of our changes reflect future development scenarios and in
 cases where we feel rapid prototyping would enable us to discover potential pitfalls or uncover hidden use cases we would proactively develop features, behind feature flags.
 
 We want to extend the same sense of customer obsession to our Open Source community. We would love to hear use cases that various teams are solving and see how we could adapt parts of Flyte to meet
