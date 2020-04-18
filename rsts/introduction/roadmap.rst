@@ -11,7 +11,7 @@ prioritize stability, reliability, observability and maintainability over raw fe
 we are proactively thinking about the evolution of the system and how we want to keep adapting to changing requirements. Thus most of our changes try to think about future development scenarios and in
 cases where we feel rapid prototyping would enable us to discover potential pitfalls or uncover hidden use cases we would proactively develop features, behind feature flags.
 
-We want to extend the same sense of customer obsession to our Open source community. We would love to hear use-cases that various teams are solving and see how we could adapt parts of Flyte to meet
+We want to extend the same sense of customer obsession to our Open Source community. We would love to hear use cases that various teams are solving and see how we could adapt parts of Flyte to meet
 those requirements. We welcome collaboration and contributions, but please follow our Contribution Guidelines.
 
 We will divide our roadmap into multiple sections. Please refer to each section's description to understand its goal.
