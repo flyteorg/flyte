@@ -1,12 +1,11 @@
 .. _introduction-roadmap:
 
-##############
-ROADMAP
-#############
+###############
+Roadmap
+###############
 
-------------
-How we work
-------------
+How the core team works
+========================
 So Flyte is used actively in production at Lyft and its various subsidiaries. The core team is very customer focused and cares deeply about a high quality customer experience. Thus we always
 prioritize stability, reliability, observability and maintainability over raw feature development. Features are developed usually in response to specific usecases and user scenarios. That being said,
 we are proactively thinking about the evolution of the system and how we want to keep adapting to changing requirements. Thus most of our changes try to think about future development scenarios and in
@@ -17,9 +16,8 @@ those requirements. We welcome collaboration and contributions, but please follo
 
 We will divide our roadmap into the multiple sections. Please refer to each sections description to understand what the goal is.
 
-----------------
 Continuous work
------------------
+=================
 This section highlights features and issues that are a continuous area of Focus and will always be in progress. 
 
 1. Documentation 
@@ -39,7 +37,7 @@ This section highlights features and issues that are a continuous area of Focus 
 
 
 Living Roadmap
----------------
-We are trying to maintain a Living roadmap `here<https://docs.google.com/spreadsheets/d/1V8DQfcsX_02Zac5EfAo0UrGJtLwdMPcw3wuuigVIMZU/edit?usp=sharing>`
+===============
+We are trying to maintain a Living roadmap `here <https://docs.google.com/spreadsheets/d/1V8DQfcsX_02Zac5EfAo0UrGJtLwdMPcw3wuuigVIMZU/edit?usp=sharing>`_
 
-We also maintain a raw list of all the ideas `here<https://docs.google.com/document/d/1yq8pIlhlG3gci3GJQNjdAd9bzZ-KYyLfm6I5NVms9-4/edit?usp=sharing>`
+We also maintain a raw list of all the ideas `here <https://docs.google.com/document/d/1yq8pIlhlG3gci3GJQNjdAd9bzZ-KYyLfm6I5NVms9-4/edit?usp=sharing>`_
