@@ -14,7 +14,7 @@ cases where we feel rapid prototyping would enable us to discover potential pitf
 We want to extend the same sense of customer obsession to our Open source community. We would love to hear use-cases that various teams are solving and see how we could adapt parts of Flyte to meet
 those requirements. We welcome collaboration and contributions, but please follow our Contribution Guidelines.
 
-We will divide our roadmap into the multiple sections. Please refer to each sections description to understand what the goal is.
+We will divide our roadmap into multiple sections. Please refer to each section's description to understand its goal.
 
 Continuous work
 =================
