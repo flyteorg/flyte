@@ -22,7 +22,7 @@ This section highlights features and issues that are a continuous area of Focus 
 
 1. Documentation 
 ----------------
-   Flyte's AIM is to make it absolutely easy for any new user, administrator, contributor to read the documentation and complete their job successfully. We realize That we are not even close. This
+   Flyte's aim is to make it absolutely easy for any new user, administrator, contributor to read the documentation and complete their job successfully. We realize That we are not even close. This
    effort will continue on an ongoing basis and we would love feedback on the top areas where we should improve.
 
 2. Bug Fixes & Reliability Improvements
