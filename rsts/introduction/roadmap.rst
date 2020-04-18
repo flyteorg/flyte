@@ -32,7 +32,7 @@ This section highlights features and issues that are a continuous area of Focus 
 
 3. Observability
 ----------------
-   We are currently working on an one time Observability epic that will enable all our open source users to use dashboard templates exactly like we use within Lyft (as of April 2020). Going forward,
+   We are currently working on a one time Observability epic that will enable open source users to use dashboard templates exactly like we use within Lyft (as of April 2020). Going forward,
    Observability is one of the pillars of Flyte. We will continue emphasizing on this aspect and improving it with every iteration.
 
 
