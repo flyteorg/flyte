@@ -105,22 +105,6 @@ func (p PhaseInfo) GetReason() string {
 	return p.reason
 }
 
-func (p *PhaseInfo) SetOcurredAt(t time.Time) {
-	p.occurredAt = t
-}
-
-func (p *PhaseInfo) SetErr(err *core.ExecutionError) {
-	p.err = err
-}
-
-func (p *PhaseInfo) SetInfo(info *ExecutionInfo) {
-	p.info = info
-}
-
-func (p *PhaseInfo) SetReason() string {
-	return p.reason
-}
-
 var PhaseInfoUndefined = PhaseInfo{p: EPhaseUndefined}
 
 func phaseInfo(p EPhase, err *core.ExecutionError, info *ExecutionInfo, reason string) PhaseInfo {

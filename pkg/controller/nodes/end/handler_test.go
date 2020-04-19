@@ -2,6 +2,7 @@ package end
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -86,6 +87,15 @@ func TestEndHandler_Handle(t *testing.T) {
 		return nCtx
 	}
 
+	t.Run("InputReadFailure", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.OnGetMatch(mock.Anything).Return(nil, fmt.Errorf("err"))
+		nCtx := &mocks.NodeExecutionContext{}
+		nCtx.OnInputReader().Return(ir)
+		_, err := e.Handle(ctx, nCtx)
+		assert.Error(t, err)
+	})
+
 	t.Run("NoInputs", func(t *testing.T) {
 		nCtx := createNodeCtx(nil, nil)
 		s, err := e.Handle(ctx, nCtx)
@@ -121,4 +131,19 @@ func TestEndHandler_Handle(t *testing.T) {
 		assert.True(t, errors.Matches(err, errors.CausedByError))
 		assert.Equal(t, handler.UnknownTransition, s)
 	})
+}
+
+func TestEndHandler_Abort(t *testing.T) {
+	e := New()
+	assert.NoError(t, e.Abort(context.TODO(), nil, ""))
+}
+
+func TestEndHandler_Finalize(t *testing.T) {
+	e := New()
+	assert.NoError(t, e.Finalize(context.TODO(), nil))
+}
+
+func TestEndHandler_FinalizeRequired(t *testing.T) {
+	e := New()
+	assert.False(t, e.FinalizeRequired())
 }
