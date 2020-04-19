@@ -19,10 +19,8 @@ func FixedLengthUniqueID(inputID string, maxLength int) (string, error) {
 	}
 
 	hasher := fnv.New32a()
-	_, err := hasher.Write([]byte(inputID))
-	if err != nil {
-		return "", err
-	}
+	// Using 32a an error can never happen, so this will always remain not covered by a unit test
+	_, _ = hasher.Write([]byte(inputID)) // #nosec
 	b := hasher.Sum(nil)
 	// expected length after this step is 8 chars (1 + 7 chars from base32Encoder.EncodeToString(b))
 	finalStr := "f" + base32Encoder.EncodeToString(b)
@@ -39,16 +37,12 @@ func FixedLengthUniqueIDForParts(maxLength int, parts ...string) (string, error)
 	b := strings.Builder{}
 	for i, p := range parts {
 		if i > 0 && b.Len() > 0 {
-			_, err := b.WriteRune('-')
-			if err != nil {
-				return "", err
-			}
+			// Ignoring the error as it always returns a nil error
+			_, _ = b.WriteRune('-') // #nosec
 		}
 
-		_, err := b.WriteString(p)
-		if err != nil {
-			return "", err
-		}
+		// Ignoring the error as this is always nil
+		_, _ = b.WriteString(p) // #nosec
 	}
 
 	return FixedLengthUniqueID(b.String(), maxLength)

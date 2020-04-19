@@ -176,76 +176,77 @@ func MustMakeDefaultLiteralForType(typ *core.LiteralType) *core.Literal {
 }
 
 func MakeDefaultLiteralForType(typ *core.LiteralType) (*core.Literal, error) {
-	switch t := typ.GetType().(type) {
-	case *core.LiteralType_Simple:
-		switch t.Simple {
-		case core.SimpleType_NONE:
-			return MakeLiteral(nil)
-		case core.SimpleType_INTEGER:
-			return MakeLiteral(int(0))
-		case core.SimpleType_FLOAT:
-			return MakeLiteral(float64(0))
-		case core.SimpleType_STRING:
-			return MakeLiteral("")
-		case core.SimpleType_BOOLEAN:
-			return MakeLiteral(false)
-		case core.SimpleType_DATETIME:
-			return MakeLiteral(time.Now())
-		case core.SimpleType_DURATION:
-			return MakeLiteral(time.Second)
-		case core.SimpleType_BINARY:
-			return MakeLiteral([]byte{})
-			//case core.SimpleType_WAITABLE:
-			//case core.SimpleType_ERROR:
-		}
-		return nil, errors.Errorf("Not yet implemented. Default creation is not yet implemented. ")
+	if typ != nil {
+		switch t := typ.GetType().(type) {
+		case *core.LiteralType_Simple:
+			switch t.Simple {
+			case core.SimpleType_NONE:
+				return MakeLiteral(nil)
+			case core.SimpleType_INTEGER:
+				return MakeLiteral(int(0))
+			case core.SimpleType_FLOAT:
+				return MakeLiteral(float64(0))
+			case core.SimpleType_STRING:
+				return MakeLiteral("")
+			case core.SimpleType_BOOLEAN:
+				return MakeLiteral(false)
+			case core.SimpleType_DATETIME:
+				return MakeLiteral(time.Now())
+			case core.SimpleType_DURATION:
+				return MakeLiteral(time.Second)
+			case core.SimpleType_BINARY:
+				return MakeLiteral([]byte{})
+				// case core.SimpleType_ERROR:
+				// case core.SimpleType_STRUCT:
+			}
+			return nil, errors.Errorf("Not yet implemented. Default creation is not yet implemented. ")
 
-	case *core.LiteralType_Blob:
-		return &core.Literal{
-			Value: &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Blob{
-						Blob: &core.Blob{
-							Metadata: &core.BlobMetadata{
-								Type: t.Blob,
+		case *core.LiteralType_Blob:
+			return &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Blob{
+							Blob: &core.Blob{
+								Metadata: &core.BlobMetadata{
+									Type: t.Blob,
+								},
+								Uri: "/tmp/somepath",
 							},
-							Uri: "/tmp/somepath",
 						},
 					},
 				},
-			},
-		}, nil
-	case *core.LiteralType_CollectionType:
-		single, err := MakeDefaultLiteralForType(t.CollectionType)
-		if err != nil {
-			return nil, err
-		}
+			}, nil
+		case *core.LiteralType_CollectionType:
+			single, err := MakeDefaultLiteralForType(t.CollectionType)
+			if err != nil {
+				return nil, err
+			}
 
-		return &core.Literal{
-			Value: &core.Literal_Collection{
-				Collection: &core.LiteralCollection{
-					Literals: []*core.Literal{single},
-				},
-			},
-		}, nil
-	case *core.LiteralType_MapValueType:
-		single, err := MakeDefaultLiteralForType(t.MapValueType)
-		if err != nil {
-			return nil, err
-		}
-
-		return &core.Literal{
-			Value: &core.Literal_Map{
-				Map: &core.LiteralMap{
-					Literals: map[string]*core.Literal{
-						"itemKey": single,
+			return &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{single},
 					},
 				},
-			},
-		}, nil
-		//case *core.LiteralType_Schema:
-	}
+			}, nil
+		case *core.LiteralType_MapValueType:
+			single, err := MakeDefaultLiteralForType(t.MapValueType)
+			if err != nil {
+				return nil, err
+			}
 
+			return &core.Literal{
+				Value: &core.Literal_Map{
+					Map: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"itemKey": single,
+						},
+					},
+				},
+			}, nil
+			// case *core.LiteralType_Schema:
+		}
+	}
 	return nil, errors.Errorf("Failed to convert to a known Literal. Input Type [%v] not supported", typ.String())
 }
 

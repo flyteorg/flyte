@@ -54,6 +54,8 @@ func TestMakePrimitive(t *testing.T) {
 		j, err := ptypes.TimestampProto(v)
 		assert.NoError(t, err)
 		assert.Equal(t, j, p.GetDatetime())
+		_, err = MakePrimitive(time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC))
+		assert.Error(t, err)
 	}
 	{
 		v := time.Second * 10
@@ -170,31 +172,67 @@ func TestMakeBinaryLiteral(t *testing.T) {
 }
 
 func TestMakeDefaultLiteralForType(t *testing.T) {
-
-	tests := [][]interface{}{
-		{"Integer", core.SimpleType_INTEGER, "*core.Primitive_Integer"},
-		{"Float", core.SimpleType_FLOAT, "*core.Primitive_FloatValue"},
-		{"String", core.SimpleType_STRING, "*core.Primitive_StringValue"},
-		{"Boolean", core.SimpleType_BOOLEAN, "*core.Primitive_Boolean"},
-		{"Duration", core.SimpleType_DURATION, "*core.Primitive_Duration"},
-		{"Datetime", core.SimpleType_DATETIME, "*core.Primitive_Datetime"},
+	type args struct {
+		name        string
+		ty          core.SimpleType
+		tyName      string
+		isPrimitive bool
 	}
-
-	for i := range tests {
-		name := tests[i][0].(string)
-		ty := tests[i][1].(core.SimpleType)
-		tyName := tests[i][2].(string)
-
-		t.Run(name, func(t *testing.T) {
-			l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{Simple: ty}})
+	tests := []args{
+		{"None", core.SimpleType_NONE, "*core.Scalar_NoneType", false},
+		{"Binary", core.SimpleType_BINARY, "*core.Scalar_Binary", false},
+		{"Integer", core.SimpleType_INTEGER, "*core.Primitive_Integer", true},
+		{"Float", core.SimpleType_FLOAT, "*core.Primitive_FloatValue", true},
+		{"String", core.SimpleType_STRING, "*core.Primitive_StringValue", true},
+		{"Boolean", core.SimpleType_BOOLEAN, "*core.Primitive_Boolean", true},
+		{"Duration", core.SimpleType_DURATION, "*core.Primitive_Duration", true},
+		{"Datetime", core.SimpleType_DATETIME, "*core.Primitive_Datetime", true},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{Simple: test.ty}})
 			assert.NoError(t, err)
-			assert.Equal(t, tyName, reflect.TypeOf(l.GetScalar().GetPrimitive().Value).String())
+			if test.isPrimitive {
+				assert.Equal(t, test.tyName, reflect.TypeOf(l.GetScalar().GetPrimitive().Value).String())
+			} else {
+				assert.Equal(t, test.tyName, reflect.TypeOf(l.GetScalar().Value).String())
+			}
 		})
 	}
 
-	t.Run("Binary", func(t *testing.T) {
-		s, err := MakeLiteral([]byte{'h'})
+	t.Run("Blob", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Blob{}})
 		assert.NoError(t, err)
-		assert.Equal(t, []byte{'h'}, s.GetScalar().GetBinary().GetValue())
+		assert.Equal(t, "*core.Scalar_Blob", reflect.TypeOf(l.GetScalar().Value).String())
+	})
+
+	t.Run("Collection", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_CollectionType{CollectionType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}})
+		assert.NoError(t, err)
+		assert.Equal(t, "*core.LiteralCollection", reflect.TypeOf(l.GetCollection()).String())
+	})
+
+	t.Run("Map", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_MapValueType{MapValueType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}})
+		assert.NoError(t, err)
+		assert.Equal(t, "*core.LiteralMap", reflect.TypeOf(l.GetMap()).String())
+	})
+
+	t.Run("error", func(t *testing.T) {
+		_, err := MakeDefaultLiteralForType(nil)
+		assert.Error(t, err)
+	})
+}
+
+func TestMustMakeDefaultLiteralForType(t *testing.T) {
+	t.Run("error", func(t *testing.T) {
+		assert.Panics(t, func() {
+			MustMakeDefaultLiteralForType(nil)
+		})
+	})
+
+	t.Run("Blob", func(t *testing.T) {
+		l := MustMakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Blob{}})
+		assert.Equal(t, "*core.Scalar_Blob", reflect.TypeOf(l.GetScalar().Value).String())
 	})
 }

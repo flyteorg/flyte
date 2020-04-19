@@ -80,17 +80,6 @@ func ToK8sResourceRequirements(resources *core.Resources) (*v1.ResourceRequireme
 	return res, nil
 }
 
-func GetWorkflowIDFromObject(obj metav1.Object) (v1alpha1.WorkflowID, error) {
-	controller := metav1.GetControllerOf(obj)
-	if controller == nil {
-		return "", NotTheOwnerError
-	}
-	if controller.Kind == v1alpha1.FlyteWorkflowKind {
-		return obj.GetNamespace() + "/" + controller.Name, nil
-	}
-	return "", NotTheOwnerError
-}
-
 func GetWorkflowIDFromOwner(reference *metav1.OwnerReference, namespace string) (v1alpha1.WorkflowID, error) {
 	if reference == nil {
 		return "", NotTheOwnerError

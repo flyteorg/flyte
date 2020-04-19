@@ -41,11 +41,11 @@ func (e endHandler) Handle(ctx context.Context, executionContext handler.NodeExe
 	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil
 }
 
-func (e endHandler) Abort(ctx context.Context, executionContext handler.NodeExecutionContext, reason string) error {
+func (e endHandler) Abort(_ context.Context, _ handler.NodeExecutionContext, _ string) error {
 	return nil
 }
 
-func (e endHandler) Finalize(ctx context.Context, executionContext handler.NodeExecutionContext) error {
+func (e endHandler) Finalize(_ context.Context, _ handler.NodeExecutionContext) error {
 	return nil
 }
 

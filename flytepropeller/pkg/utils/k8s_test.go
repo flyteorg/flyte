@@ -6,13 +6,12 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/stretchr/testify/assert"
-	v12 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v13 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 func TestToK8sEnvVar(t *testing.T) {
@@ -119,51 +118,6 @@ func TestToK8sResourceRequirements(t *testing.T) {
 	}
 }
 
-func TestGetWorkflowIDFromObject(t *testing.T) {
-	{
-		b := true
-		j := &v12.Job{
-			ObjectMeta: v13.ObjectMeta{
-				Namespace: "ns",
-				OwnerReferences: []v13.OwnerReference{
-					{
-						APIVersion:         "test",
-						Kind:               v1alpha1.FlyteWorkflowKind,
-						Name:               "my-id",
-						UID:                "blah",
-						BlockOwnerDeletion: &b,
-						Controller:         &b,
-					},
-				},
-			},
-		}
-		w, err := GetWorkflowIDFromObject(j)
-		assert.NoError(t, err)
-		assert.Equal(t, "ns/my-id", w)
-	}
-	{
-		b := true
-		j := &v12.Job{
-			ObjectMeta: v13.ObjectMeta{
-				Namespace: "ns",
-				OwnerReferences: []v13.OwnerReference{
-					{
-						APIVersion:         "test",
-						Kind:               "some-other",
-						Name:               "my-id",
-						UID:                "blah",
-						BlockOwnerDeletion: &b,
-						Controller:         &b,
-					},
-				},
-			},
-		}
-		_, err := GetWorkflowIDFromObject(j)
-		assert.Error(t, err)
-	}
-
-}
-
 func TestGetProtoTime(t *testing.T) {
 	assert.NotNil(t, GetProtoTime(nil))
 	n := time.Now()
@@ -191,4 +145,16 @@ func TestGetWorkflowIDFromOwner(t *testing.T) {
 			assert.Equal(t, test.expectedErr, e)
 		})
 	}
+}
+
+func TestSanitizeLabelValue(t *testing.T) {
+	assert.Equal(t, "a-b-c", SanitizeLabelValue("a.b.c"))
+	assert.Equal(t, "a-b-c", SanitizeLabelValue("a.B.c"))
+	assert.Equal(t, "a-9-c", SanitizeLabelValue("a.9.c"))
+	assert.Equal(t, "a-b-c", SanitizeLabelValue("a-b-c"))
+	assert.Equal(t, "a-b-c", SanitizeLabelValue("a-b-c/"))
+	assert.Equal(t, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", SanitizeLabelValue("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
+	assert.Equal(t, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", SanitizeLabelValue("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa."))
+	assert.Equal(t, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", SanitizeLabelValue("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab"))
+	assert.Equal(t, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", SanitizeLabelValue("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa."))
 }
