@@ -1,8 +1,13 @@
-import { formatDateUTC, protobufDurationToHMS } from 'common/formatters';
+import { Typography } from '@material-ui/core';
+import {
+    formatDateLocalTimezone,
+    formatDateUTC,
+    millisecondsToHMS
+} from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { WorkflowExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
-import { ExecutionStatusBadge } from '..';
+import { ExecutionStatusBadge, getWorkflowExecutionTimingMS } from '..';
 import { useColumnStyles } from './styles';
 import { WorkflowExecutionColumnDefinition } from './types';
 
@@ -35,22 +40,55 @@ export function generateColumns(
         {
             cellRenderer: ({ execution: { closure } }) => {
                 const { startedAt } = closure;
-                return startedAt
-                    ? formatDateUTC(timestampToDate(startedAt))
-                    : '';
+                if (!startedAt) {
+                    return '';
+                }
+                const startedAtDate = timestampToDate(startedAt);
+                return (
+                    <>
+                        <Typography variant="body1">
+                            {formatDateUTC(startedAtDate)}
+                        </Typography>
+                        <Typography variant="subtitle1" color="textSecondary">
+                            {formatDateLocalTimezone(startedAtDate)}
+                        </Typography>
+                    </>
+                );
             },
             className: styles.columnStartedAt,
             key: 'startedAt',
             label: 'start time'
         },
         {
-            cellRenderer: ({ execution: { closure } }) => {
-                const { duration } = closure;
-                return duration ? protobufDurationToHMS(duration!) : '';
+            cellRenderer: ({ execution }) => {
+                const timing = getWorkflowExecutionTimingMS(execution);
+                if (timing === null) {
+                    return '';
+                }
+                return (
+                    <>
+                        <Typography variant="body1">
+                            {millisecondsToHMS(timing.duration)}
+                        </Typography>
+                    </>
+                );
             },
             className: styles.columnDuration,
             key: 'duration',
-            label: 'duration'
+            label: () => (
+                <>
+                    <Typography component="div" variant="overline">
+                        duration
+                    </Typography>
+                    <Typography
+                        component="div"
+                        variant="subtitle1"
+                        color="textSecondary"
+                    >
+                        Queued Time
+                    </Typography>
+                </>
+            )
         },
         {
             // TODO: Implement this content

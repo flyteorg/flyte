@@ -1,4 +1,5 @@
 import {
+    BaseExecutionClosure,
     Execution,
     NodeExecution,
     TaskExecution,
@@ -14,6 +15,7 @@ import {
 } from 'models/Execution/enums';
 
 import { log } from 'common/log';
+import { durationToMilliseconds, timestampToDate } from 'common/utils';
 import { getCacheKey } from 'components/Cache';
 import { extractTaskTemplates } from 'components/hooks/utils';
 import { keyBy } from 'lodash';
@@ -202,4 +204,59 @@ export function mapNodeExecutionDetails(
                 taskTemplate
             };
         });
+}
+
+interface GetExecutionDurationMSArgs {
+    closure: BaseExecutionClosure;
+    isTerminal: boolean;
+}
+
+interface GetExecutionTimingMSResult {
+    duration: number;
+    queued: number;
+}
+
+/** Computes timing information for an execution based on its create/start times and duration. */
+function getExecutionTimingMS({
+    closure: { duration, createdAt, startedAt },
+    isTerminal
+}: GetExecutionDurationMSArgs): GetExecutionTimingMSResult | null {
+    if (
+        (isTerminal && duration == null) ||
+        createdAt == null ||
+        startedAt == null
+    ) {
+        return null;
+    }
+
+    const createdAtDate = timestampToDate(createdAt);
+    const durationMS =
+        isTerminal && duration != null
+            ? durationToMilliseconds(duration)
+            : Date.now() - createdAtDate.getTime();
+    const queuedMS =
+        timestampToDate(startedAt).getTime() - createdAtDate.getTime();
+
+    return { duration: durationMS, queued: queuedMS };
+}
+
+/** Returns timing information (duration, queue time, ...) for a WorkflowExecution */
+export function getWorkflowExecutionTimingMS(execution: Execution) {
+    const { closure } = execution;
+    const isTerminal = executionIsTerminal(execution);
+    return getExecutionTimingMS({ closure, isTerminal });
+}
+
+/** Returns timing information (duration, queue time, ...) for a NodeExecution */
+export function getNodeExecutionTimingMS(execution: NodeExecution) {
+    const { closure } = execution;
+    const isTerminal = nodeExecutionIsTerminal(execution);
+    return getExecutionTimingMS({ closure, isTerminal });
+}
+
+/** Returns timing information (duration, queue time, ...) for a TaskExecution */
+export function getTaskExecutionTimingMS(execution: TaskExecution) {
+    const { closure } = execution;
+    const isTerminal = taskExecutionIsTerminal(execution);
+    return getExecutionTimingMS({ closure, isTerminal });
 }

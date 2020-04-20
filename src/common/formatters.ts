@@ -1,8 +1,12 @@
 import cronstrue from 'cronstrue';
-import * as moment from 'moment';
-
 import { Admin, Protobuf } from 'flyteidl';
-import { unknownValueString } from './constants';
+import * as moment from 'moment-timezone';
+import {
+    subSecondString,
+    unknownValueString,
+    zeroSecondsString
+} from './constants';
+import { timezone } from './timezone';
 import { durationToMilliseconds, isValidDate } from './utils';
 
 /** Formats a date into a standard string with a moment-style "from now" hint
@@ -36,8 +40,8 @@ export function formatDate(input: Date) {
         : unknownValueString;
 }
 
-/** Formats a date into a standard format used throughout the UI
- * ex 12/21/2017 8:19:36 PM
+/** Formats a date into a standard UTC format used throughout the UI
+ * ex 12/21/2017 8:19:36 PM UTC
  */
 export function formatDateUTC(input: Date) {
     return isValidDate(input)
@@ -45,8 +49,31 @@ export function formatDateUTC(input: Date) {
         : unknownValueString;
 }
 
+/** Formats a date into a standard local format used throughout the UI
+ * ex 12/21/2017 8:19:36 PM PDT
+ */
+export function formatDateLocalTimezone(input: Date) {
+    return isValidDate(input)
+        ? moment(input)
+              .tz(timezone)
+              .format('l LTS z')
+        : unknownValueString;
+}
+
 /** Outputs a value in milliseconds in (H M S) format (ex. 2h 3m 30s) */
 export function millisecondsToHMS(valueMS: number): string {
+    if (valueMS < 0) {
+        return unknownValueString;
+    }
+
+    if (valueMS === 0) {
+        return zeroSecondsString;
+    }
+
+    if (valueMS < 1000) {
+        return subSecondString;
+    }
+
     const duration = moment.duration(valueMS);
     const parts = [];
 

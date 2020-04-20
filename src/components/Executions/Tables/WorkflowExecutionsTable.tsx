@@ -1,11 +1,13 @@
+import { Typography } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import * as classnames from 'classnames';
 import { noExecutionsFoundString } from 'common/constants';
 import {
     dateFromNow,
+    formatDateLocalTimezone,
     formatDateUTC,
-    protobufDurationToHMS
+    millisecondsToHMS
 } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { DataList, DataListRef } from 'components';
@@ -17,6 +19,7 @@ import * as React from 'react';
 import { ListRowRenderer } from 'react-virtualized';
 import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
+import { getWorkflowExecutionTimingMS } from '../utils';
 import { workflowExecutionsTableColumnWidths } from './constants';
 import { ExecutionsTableHeader } from './ExecutionsTableHeader';
 import { ExpandableExecutionError } from './ExpandableExecutionError';
@@ -73,12 +76,27 @@ type WorkflowExecutionColumnDefinition = ColumnDefinition<
 >;
 
 function generateColumns(
-    styles: ReturnType<typeof useStyles>
+    styles: ReturnType<typeof useStyles>,
+    tableStyles: ReturnType<typeof useExecutionTableStyles>
 ): WorkflowExecutionColumnDefinition[] {
     return [
         {
-            cellRenderer: ({ execution: { id } }) => (
-                <WorkflowExecutionLink className={styles.cellName} id={id} />
+            cellRenderer: ({
+                execution: {
+                    id,
+                    closure: { startedAt }
+                }
+            }) => (
+                <>
+                    <WorkflowExecutionLink id={id} />
+                    <Typography variant="subtitle1" color="textSecondary">
+                        {startedAt
+                            ? `Last run ${dateFromNow(
+                                  timestampToDate(startedAt)
+                              )}`
+                            : ''}
+                    </Typography>
+                </>
             ),
             className: styles.columnName,
             key: 'name',
@@ -97,27 +115,35 @@ function generateColumns(
         {
             cellRenderer: ({ execution: { closure } }) => {
                 const { startedAt } = closure;
-                return startedAt ? dateFromNow(timestampToDate(startedAt)) : '';
-            },
-            className: styles.columnLastRun,
-            key: 'lastRun',
-            label: 'last run'
-        },
-        {
-            cellRenderer: ({ execution: { closure } }) => {
-                const { startedAt } = closure;
-                return startedAt
-                    ? formatDateUTC(timestampToDate(startedAt))
-                    : '';
+                if (!startedAt) {
+                    return '';
+                }
+                const startedAtDate = timestampToDate(startedAt);
+                return (
+                    <>
+                        <Typography variant="body1">
+                            {formatDateUTC(startedAtDate)}
+                        </Typography>
+                        <Typography variant="subtitle1" color="textSecondary">
+                            {formatDateLocalTimezone(startedAtDate)}
+                        </Typography>
+                    </>
+                );
             },
             className: styles.columnStartedAt,
             key: 'startedAt',
             label: 'start time'
         },
         {
-            cellRenderer: ({ execution: { closure } }) => {
-                const { duration } = closure;
-                return duration ? protobufDurationToHMS(duration!) : '';
+            cellRenderer: ({ execution }) => {
+                const timing = getWorkflowExecutionTimingMS(execution);
+                return (
+                    <Typography variant="body1">
+                        {timing !== null
+                            ? millisecondsToHMS(timing.duration)
+                            : ''}
+                    </Typography>
+                );
             },
             className: styles.columnDuration,
             key: 'duration',
@@ -152,7 +178,10 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
     const tableStyles = useExecutionTableStyles();
     const listRef = React.useRef<DataListRef>(null);
     // Memoizing columns so they won't be re-generated unless the styles change
-    const columns = React.useMemo(() => generateColumns(styles), [styles]);
+    const columns = React.useMemo(() => generateColumns(styles, tableStyles), [
+        styles,
+        commonStyles
+    ]);
 
     const retry = () => props.fetch();
     const onCloseIOModal = () => state.setSelectedIOExecution(null);

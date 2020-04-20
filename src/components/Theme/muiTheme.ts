@@ -77,6 +77,20 @@ const theme = createMuiTheme({
             fontSize: '.875rem',
             fontWeight: 'bold',
             lineHeight: 1.357
+        },
+        overline: {
+            fontFamily: headerFontFamily,
+            fontSize: '.75rem',
+            fontWeight: 'bold',
+            letterSpacing: 'normal',
+            lineHeight: '1rem',
+            textTransform: 'uppercase'
+        },
+        subtitle1: {
+            fontFamily: headerFontFamily,
+            fontSize: '.75rem',
+            letterSpacing: 'normal',
+            lineHeight: '1rem'
         }
     }
 });

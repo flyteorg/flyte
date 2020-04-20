@@ -1,9 +1,9 @@
 import { makeStyles, Theme } from '@material-ui/core';
 import { headerGridHeight } from 'components';
 import {
-    bodyFontSize,
     headerFontFamily,
     listhoverColor,
+    smallFontSize,
     tableHeaderColor,
     tablePlaceholderColor
 } from 'components/Theme';
@@ -43,6 +43,11 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
             marginLeft: theme.spacing(2)
         }
     },
+    headerColumnName: {
+        fontSize: smallFontSize,
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
+    },
     headerRow: {
         alignItems: 'center',
         borderBottom: `4px solid ${theme.palette.divider}`,
@@ -50,11 +55,8 @@ export const useExecutionTableStyles = makeStyles((theme: Theme) => ({
         color: tableHeaderColor,
         display: 'flex',
         fontFamily: headerFontFamily,
-        fontSize: bodyFontSize,
-        fontWeight: 'bold',
         flexDirection: 'row',
-        height: theme.spacing(headerGridHeight),
-        textTransform: 'uppercase'
+        height: theme.spacing(headerGridHeight)
     },
     logLink: {
         '&:not(:first-child)': {

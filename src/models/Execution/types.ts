@@ -20,13 +20,21 @@ export type WorkflowExecutionIdentifier = RequiredNonNullable<
 >;
 export type ExecutionError = RequiredNonNullable<Core.IExecutionError>;
 
+export interface BaseExecutionClosure {
+    createdAt: Protobuf.ITimestamp;
+    duration?: Protobuf.Duration;
+    error?: ExecutionError;
+    startedAt?: Protobuf.ITimestamp;
+}
+
 export interface ExecutionClosure extends Admin.IExecutionClosure {
+    createdAt: Protobuf.ITimestamp;
     computedInputs: LiteralMap;
     duration?: Protobuf.Duration;
     error?: ExecutionError;
     outputs?: LiteralMapBlob;
     phase: WorkflowExecutionPhase;
-    startedAt?: Protobuf.Timestamp;
+    startedAt?: Protobuf.ITimestamp;
     workflowId: Identifier;
 }
 
@@ -67,6 +75,7 @@ export interface NodeExecution extends Admin.INodeExecution {
     closure: NodeExecutionClosure;
 }
 export interface NodeExecutionClosure extends Admin.INodeExecutionClosure {
+    createdAt: Protobuf.ITimestamp;
     duration?: Protobuf.Duration;
     error?: ExecutionError;
     outputUri: string;
@@ -90,7 +99,7 @@ export interface TaskExecution extends Admin.ITaskExecution {
     closure: TaskExecutionClosure;
 }
 export interface TaskExecutionClosure extends Admin.ITaskExecutionClosure {
-    createdAt: Protobuf.Timestamp;
+    createdAt: Protobuf.ITimestamp;
     duration?: Protobuf.Duration;
     error?: ExecutionError;
     logs?: TaskLog[];

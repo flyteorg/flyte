@@ -1,11 +1,16 @@
-import { formatDateUTC, protobufDurationToHMS } from 'common/formatters';
+import { Typography } from '@material-ui/core';
+import {
+    formatDateLocalTimezone,
+    formatDateUTC,
+    millisecondsToHMS
+} from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { NewTargetLink } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import { useTheme } from 'components/Theme/useTheme';
 import { TaskExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
-import { ExecutionStatusBadge } from '..';
+import { ExecutionStatusBadge, getTaskExecutionTimingMS } from '..';
 import { noLogsFoundString } from '../constants';
 import { getUniqueTaskExecutionName } from '../TaskExecutionsList/utils';
 import { nodeExecutionsTableColumnWidths } from './constants';
@@ -112,22 +117,58 @@ export function generateColumns(
         {
             cellRenderer: ({ execution: { closure } }) => {
                 const { startedAt } = closure;
-                return startedAt
-                    ? formatDateUTC(timestampToDate(startedAt))
-                    : '';
+                if (!startedAt) {
+                    return '';
+                }
+                const startedAtDate = timestampToDate(startedAt);
+                return (
+                    <>
+                        <Typography variant="body1">
+                            {formatDateUTC(startedAtDate)}
+                        </Typography>
+                        <Typography variant="subtitle1" color="textSecondary">
+                            {formatDateLocalTimezone(startedAtDate)}
+                        </Typography>
+                    </>
+                );
             },
             className: styles.columnStartedAt,
             key: 'startedAt',
             label: 'start time'
         },
         {
-            cellRenderer: ({ execution: { closure } }) => {
-                const { duration } = closure;
-                return duration ? protobufDurationToHMS(duration!) : '';
+            cellRenderer: ({ execution }) => {
+                const timing = getTaskExecutionTimingMS(execution);
+                if (timing === null) {
+                    return '';
+                }
+                return (
+                    <>
+                        <Typography variant="body1">
+                            {millisecondsToHMS(timing.duration)}
+                        </Typography>
+                        <Typography variant="subtitle1" color="textSecondary">
+                            {millisecondsToHMS(timing.queued)}
+                        </Typography>
+                    </>
+                );
             },
             className: styles.columnDuration,
             key: 'duration',
-            label: 'duration'
+            label: () => (
+                <>
+                    <Typography component="div" variant="overline">
+                        duration
+                    </Typography>
+                    <Typography
+                        component="div"
+                        variant="subtitle1"
+                        color="textSecondary"
+                    >
+                        Queued Time
+                    </Typography>
+                </>
+            )
         },
         {
             cellRenderer: props => <TaskExecutionLogLinks {...props} />,

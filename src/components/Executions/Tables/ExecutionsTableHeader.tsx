@@ -1,4 +1,6 @@
+import { Typography } from '@material-ui/core';
 import * as classnames from 'classnames';
+import { isFunction } from 'common/typeCheckers';
 import * as React from 'react';
 import { useExecutionTableStyles } from './styles';
 import { ColumnDefinition } from './types';
@@ -15,14 +17,24 @@ export const ExecutionsTableHeader: React.FC<{
         ) : null;
     return (
         <div className={tableStyles.headerRow}>
-            {columns.map(({ key, label, className }) => (
-                <div
-                    key={key}
-                    className={classnames(tableStyles.headerColumn, className)}
-                >
-                    {label}
-                </div>
-            ))}
+            {columns.map(({ key, label, className }) => {
+                const labelContent = isFunction(label) ? (
+                    React.createElement(label)
+                ) : (
+                    <Typography variant="overline">{label}</Typography>
+                );
+                return (
+                    <div
+                        key={key}
+                        className={classnames(
+                            tableStyles.headerColumn,
+                            className
+                        )}
+                    >
+                        {labelContent}
+                    </div>
+                );
+            })}
             {scrollbarSpacer}
         </div>
     );

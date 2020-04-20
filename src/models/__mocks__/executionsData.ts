@@ -60,6 +60,7 @@ export function fixedPhase(): WorkflowExecutionPhase {
 
 export const createMockExecutionClosure: () => ExecutionClosure = () => ({
     computedInputs: generateLiteralMap(),
+    createdAt: fixedTimestamp(),
     duration: fixedDuration(),
     outputs: generateLiteralMapBlob(),
     phase: fixedPhase(),

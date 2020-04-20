@@ -13,6 +13,8 @@ export const unknownValueString = '(unknown)';
 export const noDescriptionString = '(No description)';
 export const noneString = '(none)';
 export const noExecutionsFoundString = 'No executions found.';
+export const zeroSecondsString = '0s';
+export const subSecondString = '< 1s';
 
 export const externalLinks = {
     // TODO: add flyte docs and feedback links when we have them

@@ -7,11 +7,12 @@ export interface NodeExecutionsTableState {
     setSelectedExecution: (execution: DetailedNodeExecution | null) => void;
 }
 
+type LabelFn = () => JSX.Element;
 export interface ColumnDefinition<CellRendererData> {
     cellRenderer(data: CellRendererData): React.ReactNode;
     className?: string;
     key: string;
-    label: string;
+    label: string | React.FC;
 }
 
 export interface NodeExecutionCellRendererData {
