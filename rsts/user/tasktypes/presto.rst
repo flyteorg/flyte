@@ -88,7 +88,7 @@ This is another example usage of the Presto task, where each task is generated d
 
    presto_task = SdkPrestoTask(
        task_inputs=inputs(ds=Types.String, rg=Types.String),
-       statement=query_template,
+       statement=statement_template,
        output_schema=schema,
        routing_group="{{ .Inputs.rg }}",
        # catalog="hive",
