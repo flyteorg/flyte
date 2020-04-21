@@ -76,7 +76,7 @@ This is another example usage of the Presto task, where each task is generated d
 
    schema = Types.Schema([("session_id", Types.String), ("num_rides_completed", Types.Integer)])
 
-   query_template = """
+   statement_template = """
        SELECT
          session_id, num_rides_completed
        FROM
