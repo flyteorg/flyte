@@ -365,6 +365,7 @@ rules:
   resources:
   - services
   - configmaps
+  - secrets
   verbs:
   - create
   - get
@@ -880,6 +881,20 @@ spec:
     app: contour
   type: NodePort
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-webhook
+  namespace: sparkoperator
+spec:
+  ports:
+  - name: webhook
+    port: 443
+    targetPort: 8080
+  selector:
+    app.kubernetes.io/name: sparkoperator
+    app.kubernetes.io/version: v2.4.0-v1beta1
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -1347,7 +1362,7 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/version: v2.4.0-v1alpha1
+    app.kubernetes.io/version: v2.4.0-v1beta1
   name: sparkoperator
   namespace: sparkoperator
 spec:
@@ -1355,7 +1370,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: sparkoperator
-      app.kubernetes.io/version: v2.4.0-v1alpha1
+      app.kubernetes.io/version: v2.4.0-v1beta1
   strategy:
     type: Recreate
   template:
@@ -1366,7 +1381,7 @@ spec:
         prometheus.io/scrape: "true"
       labels:
         app.kubernetes.io/name: sparkoperator
-        app.kubernetes.io/version: v2.4.0-v1alpha1
+        app.kubernetes.io/version: v2.4.0-v1beta1
     spec:
       containers:
       - args:
@@ -1377,6 +1392,8 @@ spec:
         - '-metrics-prefix=service:'
         - -metrics-labels=task_name
         - -metrics-labels=workflow_name
+        - -enable-webhook=true
+        - -webhook-svc-namespace=sparkoperator
         command:
         - /usr/bin/spark-operator
         image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0
@@ -1384,7 +1401,15 @@ spec:
         name: sparkoperator-unknown
         ports:
         - containerPort: 10254
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /etc/webhook-certs
+          name: webhook-certs
       serviceAccountName: sparkoperator
+      volumes:
+      - name: webhook-certs
+        secret:
+          secretName: spark-webhook-certs
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -1482,6 +1507,34 @@ spec:
               name: flyte-admin-config-dtcg25hb22
             name: config-volume
   schedule: '*/1 * * * *'
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app.kubernetes.io/name: sparkoperator
+    app.kubernetes.io/version: v2.4.0-v1beta1
+  name: sparkoperator-init
+  namespace: sparkoperator
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sparkoperator
+        app.kubernetes.io/version: v2.4.0-v1beta1
+    spec:
+      containers:
+      - command:
+        - /usr/bin/gencerts.sh
+        - --namespace
+        - sparkoperator
+        - -p
+        image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0
+        imagePullPolicy: IfNotPresent
+        name: main
+      restartPolicy: Never
+      serviceAccountName: sparkoperator
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
