@@ -11,6 +11,55 @@ Presto is a query engine, similar to Hive, that is compatible with a lot of diff
 connector model. At a high level, Presto tends to run a lot faster and more efficiently than Hive. To read more about
 Presto, refer to `Presto official documentation`_
 
+#################
+Flyte Presto Task
+#################
+
+The Presto task in Flyte allows users to query Presto. Similar to the Hive task, the Presto task does some work behind
+the scenes in order to execute a user's query. To run a single Presto task from a user's point of view, we actually
+need to send 5 different requests to Presto. Together these requests (i.e. queries) take care of retrieving the data,
+saving it to an external table, and performing cleanup.
+
+If a user wanted to run a Presto query like:
+
+.. code-block:: sql
+   SELECT *
+   FROM foo
+   WHERE bar = 123
+
+Then Flyte actually runs 5 requests that get executed which look something like:
+
+.. code-block:: sql
+
+   CREATE TABLE hive.flyte_temporary_tables."nwdwxc7fjnksj9rtzdvbm894pjlvdgrm_temp" AS
+   SELECT *
+   FROM foo
+   WHERE bar = 123
+
+.. code-block:: sql
+
+   CREATE TABLE hive.flyte_temporary_tables."nwdwxc7fjnksj9rtzdvbm894pjlvdgrm_external" (LIKE hive.flyte_temporary_tables."nwdwxc7fjnksj9rtzdvbm894pjlvdgrm_temp")
+   WITH (format = 'PARQUET', external_location = 's3://my-s3-bucket/ef/iktp762nhe-p-task-0/')
+
+.. code-block:: sql
+
+   INSERT INTO hive.flyte_temporary_tables."nwdwxc7fjnksj9rtzdvbm894pjlvdgrm_external"
+   SELECT *
+   FROM hive.flyte_temporary_tables."nwdwxc7fjnksj9rtzdvbm894pjlvdgrm_temp"
+
+.. code-block:: sql
+
+   DROP TABLE hive.flyte_temporary_tables."nwdwxc7fjnksj9rtzdvbm894pjlvdgrm_temp"
+
+.. code-block:: sql
+
+   DROP TABLE hive.flyte_temporary_tables."nwdwxc7fjnksj9rtzdvbm894pjlvdgrm_external"
+
+The reason why 5 separate queries are needed is that Presto does not support running grouped statements like Hive does.
+And so, we need to separate them and execute them one by one. Because of this, users don't need to explicitly save their
+query results into a separate table as this is handled automatically by Flyte.
+
+
 ######################
 Presto task parameters
 ######################
@@ -23,6 +72,7 @@ The following are various configurations that can be set for a Presto task
 * ``Text routing_group``: The routing group that a Presto query should be sent to for the given environment
 * ``Text catalog``: The Presto catalog for the given query
 * ``Text schema``: The Presto schema for the given query
+
 
 #######
 Usage
@@ -102,7 +152,6 @@ This is another example usage of the Presto task, where each task is generated d
        temp = []
        for ds in ('2020-02-20', '2020-02-21', '2020-02-22'):
            x = presto_task(ds=ds, rg='etl')
-           yield x
            temp.append(x.outputs.results)
 
        presto_results.set(temp)
@@ -111,7 +160,6 @@ This is another example usage of the Presto task, where each task is generated d
    @workflow_class()
    class PrestoWorkflow(object):
        ds = Input(Types.String, required=True, help="Test string with no default")
-       # routing_group = Input(Types.String, required=True, help="Test string with no default")
 
        p_task = presto_task(ds=ds, rg='etl')
        presto_dynamic = multiple_presto_queries()
