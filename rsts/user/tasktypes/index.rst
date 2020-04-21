@@ -10,6 +10,7 @@ Flyte Task Types
 
     container
     hive
+    presto
     spark
     dynamic
     sidecar
