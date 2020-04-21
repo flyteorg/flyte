@@ -56,7 +56,6 @@ denotes this as a Presto task. Instead, you  use the `SdkPrestoTask` class direc
    @workflow_class()
    class PrestoWorkflow(object):
        ds = Input(Types.String, required=True, help="Test string with no default")
-       # routing_group = Input(Types.String, required=True, help="Test string with no default")
 
        p_task = presto_task(ds=ds, rg='etl')
 
