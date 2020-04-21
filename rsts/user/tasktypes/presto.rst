@@ -18,7 +18,7 @@ Presto task parameters
 The following are various configurations that can be set for a Presto task
 
 * ``dict[Text,flytekit.common.types.base_sdk_types.FlyteSdkType] task_inputs``: Optional inputs to the Presto task
-* ``Text statement``: The actual Presto query string itself (aka. a statement).
+* ``Text statement``: The templated Presto statement to execute.
 * ``flytekit.common.types.schema.Schema output_schema``: Schema representation of the resulting data that was queried from Presto
 * ``Text routing_group``: The routing group that a Presto query should be sent to for the given environment
 * ``Text catalog``: The Presto catalog for the given query
@@ -124,4 +124,3 @@ This is another example usage of the Presto task, where each task is generated d
 
 
 .. _Presto official documentation: https://prestodb.io/docs/current/
-
