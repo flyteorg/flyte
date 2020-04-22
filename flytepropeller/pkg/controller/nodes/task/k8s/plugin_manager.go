@@ -294,7 +294,24 @@ func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutio
 }
 
 func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) error {
-	logger.Infof(ctx, "KillTask invoked for %v, nothing to be done.", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+	logger.Infof(ctx, "KillTask invoked. We will attempt to delete object [%v].",
+		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+
+	o, err := e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
+	if err != nil {
+		// This will recurrent, so we will skip further finalize
+		logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v, when finalizing.",
+			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
+		return nil
+	}
+
+	err = e.kubeClient.GetClient().Delete(ctx, o)
+	if err != nil && !IsK8sObjectNotExists(err) {
+		logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v",
+			o.GetNamespace(), o.GetName(), err)
+		return err
+	}
+
 	return nil
 }
 
