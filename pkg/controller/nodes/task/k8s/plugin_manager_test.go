@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"testing"
 
+	"k8s.io/client-go/kubernetes/scheme"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
@@ -43,6 +45,7 @@ type extendedFakeClient struct {
 	client.Client
 	CreateError error
 	GetError    error
+	DeleteError error
 }
 
 func (e extendedFakeClient) Create(ctx context.Context, obj runtime.Object, opts ...client.CreateOption) error {
@@ -57,6 +60,14 @@ func (e extendedFakeClient) Get(ctx context.Context, key client.ObjectKey, obj r
 		return e.GetError
 	}
 	return e.Client.Get(ctx, key, obj)
+}
+
+func (e extendedFakeClient) Delete(ctx context.Context, obj runtime.Object, opts ...client.DeleteOption) error {
+	if e.DeleteError != nil {
+		return e.DeleteError
+	}
+
+	return e.Client.Delete(ctx, obj, opts...)
 }
 
 type k8sSampleHandler struct {
@@ -344,6 +355,57 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		podBackOffHandler, found := backOffController.GetBackOffHandler(refKey)
 		assert.True(t, found)
 		assert.Equal(t, uint32(1), podBackOffHandler.BackOffExponent.Load())
+	})
+}
+
+func TestPluginManager_Abort(t *testing.T) {
+	ctx := context.TODO()
+	tm := getMockTaskExecutionMetadata()
+	res := &v1.Pod{
+		ObjectMeta: v12.ObjectMeta{
+			Name:      tm.GetTaskExecutionID().GetGeneratedName(),
+			Namespace: tm.GetNamespace(),
+		},
+	}
+
+	t.Run("Abort Pod Exists", func(t *testing.T) {
+		// common setup code
+		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
+		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme, res)}
+		// common setup code
+		mockResourceHandler := &pluginsk8sMock.Plugin{}
+		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
+		mockResourceHandler.OnGetTaskPhaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
+		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
+			ID:              "x",
+			ResourceToWatch: &v1.Pod{},
+			Plugin:          mockResourceHandler,
+		})
+		assert.NotNil(t, res)
+		assert.NoError(t, err)
+
+		err = pluginManager.Abort(ctx, tctx)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Abort Pod doesn't exist", func(t *testing.T) {
+		// common setup code
+		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
+		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme)}
+		// common setup code
+		mockResourceHandler := &pluginsk8sMock.Plugin{}
+		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
+		mockResourceHandler.OnGetTaskPhaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
+		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
+			ID:              "x",
+			ResourceToWatch: &v1.Pod{},
+			Plugin:          mockResourceHandler,
+		})
+		assert.NotNil(t, res)
+		assert.NoError(t, err)
+
+		err = pluginManager.Abort(ctx, tctx)
+		assert.NoError(t, err)
 	})
 }
 
