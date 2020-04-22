@@ -117,6 +117,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -233,7 +237,7 @@ its inputs.</p></li>
 to produce the same outputs every single time. For example, avoid using random number generators with current clock as seed
 but opt to using a system-provided clock as the seed.</p></li>
 <li><p>Is it a pure function? i.e. does it have side effects that are not known to the system (e.g. calls a web-service). It’s strongly
-advisable to avoid side-effects in tasks. When side-effects are required, ensure that those operations are <a href="#id1"><span class="problematic" id="id2">idempotent_</span></a>.</p></li>
+advisable to avoid side-effects in tasks. When side-effects are required, ensure that those operations are idempotent.</p></li>
 </ul>
 </div>
 <div class="section" id="types">

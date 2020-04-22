@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -160,12 +164,13 @@
 
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interfaces</span><span class="p">,</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span><span class="p">,</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span><span class="p">,</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_model</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_model</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 
 
 <div class="viewcode-block" id="SdkTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask">[docs]</a><span class="k">class</span> <span class="nc">SdkTask</span><span class="p">(</span>
@@ -245,6 +250,10 @@
             <span class="n">custom</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">custom</span><span class="p">,</span>
             <span class="n">container</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">container</span>
         <span class="p">)</span>
+        <span class="c1"># Override the newly generated name if one exists in the base model</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">base_model</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">is_empty</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">t</span></div>
 
 <div class="viewcode-block" id="SdkTask.assign_custom_and_return"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.assign_custom_and_return">[docs]</a>    <span class="k">def</span> <span class="nf">assign_custom_and_return</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom</span><span class="p">):</span>
@@ -273,7 +282,7 @@
         <span class="c1"># TODO: Remove DEADBEEF</span>
         <span class="k">return</span> <span class="n">_nodes</span><span class="o">.</span><span class="n">SdkNode</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="n">_workflow_model</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span><span class="s2">&quot;DEADBEEF&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">retries</span><span class="p">),</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">_workflow_model</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span><span class="s2">&quot;DEADBEEF&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">retries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">interruptible</span><span class="p">),</span>
             <span class="n">bindings</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">bindings</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">var</span><span class="p">),</span>
             <span class="n">upstream_nodes</span><span class="o">=</span><span class="n">upstream_nodes</span><span class="p">,</span>
             <span class="n">sdk_task</span><span class="o">=</span><span class="bp">self</span>
@@ -339,14 +348,7 @@
 
 <div class="viewcode-block" id="SdkTask.add_inputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.add_inputs">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">add_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds the inputs to this task.  This can be called multiple times, but it will fail if an input with a given</span>
-<span class="sd">        name is added more than once, a name collides with an output, or if the name doesn&#39;t exist as an arg name in</span>
-<span class="sd">        the wrapped function.</span>
-<span class="sd">        :param dict[Text, flytekit.models.interface.Variable] inputs: names and variables</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_inputs</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteUserException</span><span class="p">(</span><span class="s2">&quot;You can not add inputs to this task&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkTask.add_outputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.add_outputs">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">add_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>

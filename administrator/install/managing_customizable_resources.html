@@ -110,6 +110,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -180,16 +184,26 @@
             
   <div class="section" id="configuring-customizable-resources">
 <span id="managing-customizable-resources"></span><h1>Configuring customizable resources<a class="headerlink" href="#configuring-customizable-resources" title="Permalink to this headline">¶</a></h1>
-<p>As the complexity of your user-base grows, you may find yourself tweaking resource assignments based on specific projects, domains and workflows.
-This document walks through how to use MatchableResource attributes to customize your workflow execution environment.</p>
-<p>Flyteadmin allows for overrides of task resource request and limit defaults, kubernetes cluster resource configuration,
-dynamic task execution queues and specifying executions on specific kubernetes clusters. These can all be overriden for specific combinations
-of domain; domain and project; domain, project and workflow (name); and domain, project, workflow (name), and launch plan.</p>
+<p>As the complexity of your user base grows, you may find yourself tweaking resource assignments based on specific projects, domains and workflows. This document walks through how and in what ways you can configure your Flyte deployment.</p>
 <div class="section" id="configurable-resource-types">
 <h2>Configurable Resource Types<a class="headerlink" href="#configurable-resource-types" title="Permalink to this headline">¶</a></h2>
-<p>The proto definition is the definitive source of
+<p>Flyte allows these custom settings along the following combination of dimensions</p>
+<ul class="simple">
+<li><p>domain</p></li>
+<li><p>project and domain</p></li>
+<li><p>project, domain, and name (must be either a workflow name or a launch plan name)</p></li>
+</ul>
+<p>Please see the <span class="xref std std-ref">concepts</span> document for more information on projects and domains. Along these dimensions, the following settings are configurable. Note that not all three of the combinations above are valid for each of these settings.</p>
+<ul class="simple">
+<li><p>Defaults for task resource requests and limits (when not specified by the author of the task).</p></li>
+<li><p>Settings for the cluster resource configuration that feeds into Admin’s cluster resource manager.</p></li>
+<li><p>Execution queues that are used for Dynamic Tasks. Read more about execution queues here, but effectively they’re meant to be used with constructs like AWS Batch.</p></li>
+<li><p>Determining how workflow executions get assigned to clusters in a multi-cluster Flyte deployment.</p></li>
+</ul>
+<p>The proto definition is the definitive source of which
 <a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto">matchable attributes</a>
-which can be customized. See below for a detailed explanation</p>
+can be customized.</p>
+<p>Each of the four above settings are discussed below.  Also, since the flyte-cli tool does not yet hit these endpoints, we are including some sample <code class="docutils literal notranslate"><span class="pre">curl</span></code> commands for administrators to reference.</p>
 <div class="section" id="task-resources">
 <h3>Task Resources<a class="headerlink" href="#task-resources" title="Permalink to this headline">¶</a></h3>
 <p>This includes setting default value for task resource requests and limits for the following resources:</p>
@@ -206,9 +220,17 @@ in the flyteadmin config are used.</p>
 </div>
 <div class="section" id="cluster-resources">
 <h3>Cluster Resources<a class="headerlink" href="#cluster-resources" title="Permalink to this headline">¶</a></h3>
-<p>These are free-form key-value pairs which are used when creating project-domain based resources on Flyte kubernetes clusters.</p>
-<p>The keys represent templatized variables in <a class="reference external" href="https://github.com/lyft/flyteadmin/tree/master/sampleresourcetemplates">clusterresource template yaml</a></p>
+<p>These are free-form key-value pairs which are used when filling in the templates that Admin feeds into its cluster manager. The keys represent templatized variables in <a class="reference external" href="https://github.com/lyft/flyteadmin/tree/master/sampleresourcetemplates">clusterresource template yaml</a> and the values are what you want to see filled in.</p>
 <p>In the absence of custom override values, templateData from the <a class="reference external" href="https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L154,L159">flyteadmin config</a> is used as a default.</p>
+<p>Note that these settings can only take on domain, or a project and domain specificity. Since Flyte has not tied in the notion of a workflow or a launch plan to any Kubernetes constructs, specifying a workflow or launch plan name doesn’t make any sense.</p>
+<div class="section" id="command">
+<h4>Command<a class="headerlink" href="#command" title="Permalink to this headline">¶</a></h4>
+<p>Running the following, will make it so that when Admin fills in cluster resource templates, the K8s namespace <code class="docutils literal notranslate"><span class="pre">projectname-staging</span></code> will have a resource quota of 1000 CPU cores and 5TB of memory.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">curl --request PUT &#39;https://flyte.company.net/api/v1/project_domain_attributes/projectname/staging&#39; --header &#39;Content-Type: application/json&#39; --data-raw &#39;{&quot;attributes&quot;:{&quot;matchingAttributes&quot;:{&quot;clusterResourceAttributes&quot;:{&quot;attributes&quot;:{&quot;projectQuotaCpu&quot;: &quot;1000&quot;, &quot;projectQuotaMemory&quot;: &quot;5000Gi&quot;}}}}}&#39;</span>
+</pre></div>
+</div>
+<p>These values will in turn be used to fill in the template fields in the file at <code class="docutils literal notranslate"><span class="pre">kustomize/overlays/sandbox/admindeployment/clusterresource-templates/ab_project-resource-quota.yaml</span></code> from the base of this repository for the <code class="docutils literal notranslate"><span class="pre">projectname-staging</span></code> namespace and that namespace only. For other namespaces, the defaults at the bottom of <a class="reference external" href="https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L152">this file</a> would still be applied.</p>
+</div>
 </div>
 <div class="section" id="execution-queues">
 <h3>Execution Queues<a class="headerlink" href="#execution-queues" title="Permalink to this headline">¶</a></h3>
@@ -216,7 +238,13 @@ in the flyteadmin config are used.</p>
 <p>Execution queues themselves are currently defined in the
 <a class="reference external" href="https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L97,L106">flyteadmin config</a>.</p>
 <p>The <strong>attributes</strong> associated with an execution queue must match the <strong>tags</strong> for workflow executions. The tags are associated with configurable resources
-stored in the admin database.</p>
+stored in the Admin database.</p>
+<div class="section" id="id1">
+<h4>Command<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">curl --request PUT &#39;https://flyte.company.net/api/v1/workflow_attributes/project/domain/YourWorkflowName&#39; --header &#39;Content-Type: application/json&#39; --data-raw &#39;{&quot;attributes&quot;:{&quot;matchingAttributes&quot;:{&quot;executionQueueAttributes&quot;:{&quot;tags&quot;:[&quot;my_queue&quot;]}}}}&#39;</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="execution-cluster-label">
 <h3>Execution Cluster Label<a class="headerlink" href="#execution-cluster-label" title="Permalink to this headline">¶</a></h3>
@@ -268,7 +296,7 @@ stored in the admin database.</p>
 </tbody>
 </table>
 <p>Any inbound CreateExecution requests with <strong>[Domain: Production, Project: widgetmodels, Workflow: Demand]</strong> for any launch plan would have a tag value of “supply”.
-Any inbound CreateExecution requests with <strong>[Domain: Production, Project: widgetmodels]</strong> for any workflow other than Deman and for any launch plan would have a tag value of “critical”.</p>
+Any inbound CreateExecution requests with <strong>[Domain: Production, Project: widgetmodels]</strong> for any workflow other than Demand and for any launch plan would have a tag value of “critical”.</p>
 <p>All other inbound CreateExecution requests would use the default values specified in the flyteadmin config (if any).</p>
 </div>
 </div>

@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="What is Data Catalog?" href="catalog.html" />
+    <link rel="next" title="FlyteAdmin Service Background" href="admin_service.html" />
     <link rel="prev" title="Flyte System Components" href="index.html" /> 
 </head>
 
@@ -90,9 +90,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">FlyteAdmin</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#admin-structure">Admin Structure</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#component-details">Component Details</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#admin-service">Admin Service</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="admin_service.html">FlyteAdmin Service Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="catalog.html">What is Data Catalog?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="console.html">Flyte Console</a></li>
 </ul>
@@ -107,6 +107,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -189,6 +193,7 @@ including request and response entities, see the admin
 service <a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/service/admin.proto">definition</a>. The
 RPC handlers are a thin shim that enforce some request structure validation and call out to appropriate <a class="reference internal" href="#components-admin-manager"><span class="std std-ref">manager</span></a>.
 methods to process requests.</p>
+<p>A detailed explanation of the service can be found in the <a class="reference internal" href="admin_service.html#components-admin-service"><span class="std std-ref">admin service</span></a> page.</p>
 </div>
 <div class="section" id="managers">
 <span id="components-admin-manager"></span><h3>Managers<a class="headerlink" href="#managers" title="Permalink to this headline">¶</a></h3>
@@ -225,7 +230,7 @@ implementation.  The actual code for issuing queries with gorm can be found in t
 <a class="reference external" href="https://github.com/lyft/flyteadmin/blob/master/pkg/repositories/gormimpl">gormimpl</a> directory.</p>
 <div class="section" id="models">
 <h4>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h4>
-<p>Database models are defined in the <a class="reference external" href="https://github.com/lyft/flyteadmin/blob/master/pkg/repositories/models">models</a> directory and correspond 1:1 with database tables <a class="footnote-reference brackets" href="#id10" id="id1">0</a>.</p>
+<p>Database models are defined in the <a class="reference external" href="https://github.com/lyft/flyteadmin/blob/master/pkg/repositories/models">models</a> directory and correspond 1:1 with database tables <a class="footnote-reference brackets" href="#id2" id="id1">0</a>.</p>
 <p>The full set of database tables includes:</p>
 <ul class="simple">
 <li><p>executions</p></li>
@@ -273,283 +278,8 @@ If you change either of these structures, you will find you must change the corr
 <div class="section" id="workflowengine">
 <span id="components-admin-workflowengine"></span><h3>Workflowengine<a class="headerlink" href="#workflowengine" title="Permalink to this headline">¶</a></h3>
 <p>This directory contains interfaces to build and execute workflows leveraging flytepropeller compiler and client components.</p>
-</div>
-</div>
-<div class="section" id="admin-service">
-<h2>Admin Service<a class="headerlink" href="#admin-service" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="making-requests-to-flyteadmin">
-<h3>Making Requests to FlyteAdmin<a class="headerlink" href="#making-requests-to-flyteadmin" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="adding-request-filters">
-<h4>Adding request filters<a class="headerlink" href="#adding-request-filters" title="Permalink to this headline">¶</a></h4>
-<p>We use <a class="reference external" href="https://github.com/grpc-ecosystem/grpc-gateway">gRPC Gateway</a> to reverse proxy http requests into gRPC.
-While this allows for a single implementation for both HTTP and gRPC, an important limitation is that fields mapped to the path pattern cannot be
-repeated and must have a primitive (non-message) type. Unfortunately this means that repeated string filters cannot use a proper protobuf message. Instead use
-the internal syntax shown below:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">func</span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">func</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>For example, multiple filters would be appended to an http request:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>?filters=ne(version, TheWorst)+eq(workflow.name, workflow)
-</pre></div>
-</div>
-<p>Timestamp fields use the RFC3339Nano spec (ex: “2006-01-02T15:04:05.999999999Z07:00”)</p>
-<p>The fully supported set of filter functions are</p>
-<ul class="simple">
-<li><p>contains</p></li>
-<li><p>gt (greater than)</p></li>
-<li><p>gte (greter than or equal to)</p></li>
-<li><p>lt (less than)</p></li>
-<li><p>lte (less than or equal to)</p></li>
-<li><p>eq (equal)</p></li>
-<li><p>ne (not equal)</p></li>
-<li><p>value_in (for repeated sets of values)</p></li>
-</ul>
-<p>“value_in” is a special case where multiple values are passed to the filter expression. For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">value_in</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="mi">1</span><span class="p">;</span><span class="mi">2</span><span class="p">;</span><span class="mi">3</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Filterable fields vary based on entity types:</p>
-<ul class="simple">
-<li><p>Task</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-<li><p>name</p></li>
-<li><p>version</p></li>
-<li><p>created_at</p></li>
-</ul>
-</li>
-<li><p>Workflow</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-<li><p>name</p></li>
-<li><p>version</p></li>
-<li><p>created_at</p></li>
-</ul>
-</li>
-<li><p>Launch plans</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-<li><p>name</p></li>
-<li><p>version</p></li>
-<li><p>created_at</p></li>
-<li><p>updated_at</p></li>
-<li><p>workflows.{any workflow field above} (for example: workflow.domain)</p></li>
-<li><dl class="simple">
-<dt>state (you must use the integer enum e.g. 1)</dt><dd><ul>
-<li><p>States are defined in <a class="reference external" href="https://github.com/lyft/flyteidl/blob/2c17791170ece1cced3e96daa08ea2692efe3d07/protos/flyteidl/admin/launch_plan.proto#L23">launch_plan.proto</a>.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</li>
-<li><p>Executions (Workflow executions)</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-<li><p>name</p></li>
-<li><p>workflow.{any workflow field above} (for example: workflow.domain)</p></li>
-<li><p>launch_plan.{any launch plan field above} (for example: launch_plan.name)</p></li>
-<li><dl class="simple">
-<dt>phase (you must use the upper-cased string name e.g. RUNNING)</dt><dd><ul>
-<li><p>Phases are defined in <a class="reference external" href="https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L11,L21">execution.proto</a>.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>execution_created_at</p></li>
-<li><p>execution_updated_at</p></li>
-<li><p>duration (in seconds)</p></li>
-<li><dl class="simple">
-<dt>mode (you must use the integer enum e.g. 1)</dt><dd><ul>
-<li><p>Modes are defined in <a class="reference external" href="https://github.com/lyft/flyteidl/blob/182eeb9e1d0f2369e479a981f30cb51c2d7a0672/protos/flyteidl/admin/execution.proto#L96">execution.proto</a>.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</li>
-<li><p>Node Executions</p>
-<ul>
-<li><p>node_id</p></li>
-<li><p>execution.{any execution field above} (for example: execution.domain)</p></li>
-<li><dl class="simple">
-<dt>phase (you must use the upper-cased string name e.g. QUEUED)</dt><dd><ul>
-<li><p>Phases are defined in <a class="reference external" href="https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L26,L36">execution.proto</a>.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>started_at</p></li>
-<li><p>node_execution_created_at</p></li>
-<li><p>node_execution_updated_at</p></li>
-<li><p>duration (in seconds)</p></li>
-</ul>
-</li>
-<li><p>Task Executions</p>
-<ul>
-<li><p>retry_attempt</p></li>
-<li><p>task.{any task field above} (for example: task.version)</p></li>
-<li><p>execution.{any execution field above} (for example: execution.domain)</p></li>
-<li><p>node_execution.{any node execution field above} (for example: node_execution.phase)</p></li>
-<li><dl class="simple">
-<dt>phase (you must use the upper-cased string name e.g. SUCCEEDED)</dt><dd><ul>
-<li><p>Phases are defined in <a class="reference external" href="https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L42,L49">execution.proto</a>.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>started_at</p></li>
-<li><p>task_execution_created_at</p></li>
-<li><p>task_execution_updated_at</p></li>
-<li><p>duration (in seconds)</p></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div class="section" id="putting-it-all-together">
-<h3>Putting it all together<a class="headerlink" href="#putting-it-all-together" title="Permalink to this headline">¶</a></h3>
-<p>If you wanted to do query on specific executions that were launched with a specific launch plan for a workflow with specific attributes, you could do something like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gte</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="n">value_in</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span><span class="n">RUNNING</span><span class="p">;</span><span class="n">SUCCEEDED</span><span class="p">;</span><span class="n">FAILED</span><span class="p">)</span><span class="o">+</span><span class="n">eq</span><span class="p">(</span><span class="n">lauch_plan</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">foo</span><span class="p">)</span>
-<span class="o">+</span><span class="n">eq</span><span class="p">(</span><span class="n">launch_plan</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">bar</span><span class="p">)</span><span class="o">+</span><span class="n">eq</span><span class="p">(</span><span class="n">launch_plan</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">baz</span><span class="p">)</span>
-<span class="o">+</span><span class="n">eq</span><span class="p">(</span><span class="n">launch_plan</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="mi">1234</span><span class="p">)</span>
-<span class="o">+</span><span class="n">lte</span><span class="p">(</span><span class="n">workflow</span><span class="o">.</span><span class="n">created_at</span><span class="p">,</span><span class="mi">2018</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">29</span><span class="n">T17</span><span class="p">:</span><span class="mi">34</span><span class="p">:</span><span class="mf">05.000000000</span><span class="n">Z07</span><span class="p">:</span><span class="mi">00</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="section" id="adding-sorting-to-requests">
-<h4>Adding sorting to requests<a class="headerlink" href="#adding-sorting-to-requests" title="Permalink to this headline">¶</a></h4>
-<p>Only a subset of fields are supported for sorting list queries. The explicit list is below:</p>
-<ul class="simple">
-<li><p>ListTasks</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-<li><p>name</p></li>
-<li><p>version</p></li>
-<li><p>created_at</p></li>
-</ul>
-</li>
-<li><p>ListTaskIds</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-</ul>
-</li>
-<li><p>ListWorkflows</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-<li><p>name</p></li>
-<li><p>version</p></li>
-<li><p>created_at</p></li>
-</ul>
-</li>
-<li><p>ListWorkflowIds</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-</ul>
-</li>
-<li><p>ListLaunchPlans</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-<li><p>name</p></li>
-<li><p>version</p></li>
-<li><p>created_at</p></li>
-<li><p>updated_at</p></li>
-<li><dl class="simple">
-<dt>state (you must use the integer enum e.g. 1)</dt><dd><ul>
-<li><p>States are defined in <a class="reference external" href="https://github.com/lyft/flyteidl/blob/2c17791170ece1cced3e96daa08ea2692efe3d07/protos/flyteidl/admin/launch_plan.proto#L23">launch_plan.proto</a>.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</li>
-<li><p>ListWorkflowIds</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-</ul>
-</li>
-<li><p>ListExecutions</p>
-<ul>
-<li><p>project</p></li>
-<li><p>domain</p></li>
-<li><p>name</p></li>
-<li><dl class="simple">
-<dt>phase (you must use the upper-cased string name e.g. RUNNING)</dt><dd><ul>
-<li><p>Phases are defined in <a class="reference external" href="https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L11,L21">execution.proto</a>.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>execution_created_at</p></li>
-<li><p>execution_updated_at</p></li>
-<li><p>duration (in seconds)</p></li>
-<li><dl class="simple">
-<dt>mode (you must use the integer enum e.g. 1)</dt><dd><ul>
-<li><p>Modes are defined <a class="reference external" href="https://github.com/lyft/flyteidl/blob/182eeb9e1d0f2369e479a981f30cb51c2d7a0672/protos/flyteidl/admin/execution.proto#L96">execution.proto</a>.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</li>
-<li><p>ListNodeExecutions</p>
-<ul>
-<li><p>node_id</p></li>
-<li><p>retry_attempt</p></li>
-<li><dl class="simple">
-<dt>phase (you must use the upper-cased string name e.g. QUEUED)</dt><dd><ul>
-<li><p>Phases are defined in <a class="reference external" href="https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L26,L36">execution.proto</a>.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>started_at</p></li>
-<li><p>node_execution_created_at</p></li>
-<li><p>node_execution_updated_at</p></li>
-<li><p>duration (in seconds)</p></li>
-</ul>
-</li>
-<li><p>ListTaskExecutions</p>
-<ul>
-<li><p>retry_attempt</p></li>
-<li><dl class="simple">
-<dt>phase (you must use the upper-cased string name e.g. SUCCEEDED)</dt><dd><ul>
-<li><p>Phases are defined in <a class="reference external" href="https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L42,L49">execution.proto</a>.</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p>started_at</p></li>
-<li><p>task_execution_created_at</p></li>
-<li><p>task_execution_updated_at</p></li>
-<li><p>duration (in seconds)</p></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div class="section" id="sorting-syntax">
-<h3>Sorting syntax<a class="headerlink" href="#sorting-syntax" title="Permalink to this headline">¶</a></h3>
-<p>Adding sorting to a request requires specifying the <code class="docutils literal notranslate"><span class="pre">key</span></code>, e.g. the attribute you wish to sort on. Sorting can also optionally specify the direction (one of <code class="docutils literal notranslate"><span class="pre">ASCENDING</span></code> or <code class="docutils literal notranslate"><span class="pre">DESCENDING</span></code>) where <code class="docutils literal notranslate"><span class="pre">DESCENDING</span></code> is the default.</p>
-<p>Example sorting http param:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sort_by</span><span class="o">.</span><span class="n">key</span><span class="o">=</span><span class="n">created_at</span><span class="o">&amp;</span><span class="n">sort_by</span><span class="o">.</span><span class="n">direction</span><span class="o">=</span><span class="n">DESCENDING</span>
-</pre></div>
-</div>
-<p>Alternatively, since descending is the default, the above could be rewritten as</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sort_by</span><span class="o">.</span><span class="n">key</span><span class="o">=</span><span class="n">created_at</span>
-</pre></div>
-</div>
 <dl class="footnote brackets">
-<dt class="label" id="id10"><span class="brackets"><a class="fn-backref" href="#id1">0</a></span></dt>
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">0</a></span></dt>
 <dd><p>Unfortunately, given unique naming constraints, some models are redefined in <a class="reference external" href="https://github.com/lyft/flyteadmin/blob/master/pkg/repositories/config/migration_models.go">migration_models</a> to guarantee unique index values.</p>
 </dd>
 </dl>
@@ -565,7 +295,7 @@ the internal syntax shown below:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="catalog.html" class="btn btn-neutral float-right" title="What is Data Catalog?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="admin_service.html" class="btn btn-neutral float-right" title="FlyteAdmin Service Background" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral float-left" title="Flyte System Components" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

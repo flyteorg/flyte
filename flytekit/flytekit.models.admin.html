@@ -113,6 +113,10 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -539,7 +543,7 @@
 
 <dl class="class">
 <dt id="flytekit.models.admin.workflow.WorkflowSpec">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.admin.workflow.</code><code class="sig-name descname">WorkflowSpec</code><span class="sig-paren">(</span><em class="sig-param">template</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/admin/workflow.html#WorkflowSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.admin.workflow.WorkflowSpec" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.admin.workflow.</code><code class="sig-name descname">WorkflowSpec</code><span class="sig-paren">(</span><em class="sig-param">template</em>, <em class="sig-param">sub_workflows</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/admin/workflow.html#WorkflowSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.admin.workflow.WorkflowSpec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.models.admin.workflow.WorkflowSpec.from_flyte_idl">
@@ -550,6 +554,16 @@
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="#flytekit.models.admin.workflow.WorkflowSpec" title="flytekit.models.admin.workflow.WorkflowSpec">WorkflowSpec</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.admin.workflow.WorkflowSpec.sub_workflows">
+<em class="property">property </em><code class="sig-name descname">sub_workflows</code><a class="headerlink" href="#flytekit.models.admin.workflow.WorkflowSpec.sub_workflows" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[flytekit.models.core.workflow.WorkflowTemplate.WorkflowTemplate]</p>
 </dd>
 </dl>
 </dd></dl>

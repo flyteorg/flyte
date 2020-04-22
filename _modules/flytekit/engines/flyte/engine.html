@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -179,7 +183,6 @@
 
 
 <span class="k">class</span> <span class="nc">_FlyteClientManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
     <span class="n">_CLIENT</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -386,9 +389,13 @@
 <div class="viewcode-block" id="FlyteWorkflow.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflow.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">_FlyteClientManager</span><span class="p">(</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span><span class="o">.</span><span class="n">client</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="n">sub_workflows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdk_workflow</span><span class="o">.</span><span class="n">get_sub_workflows</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">create_workflow</span><span class="p">(</span>
                 <span class="n">identifier</span><span class="p">,</span>
-                <span class="n">_workflow_model</span><span class="o">.</span><span class="n">WorkflowSpec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_workflow</span><span class="p">)</span>
+                <span class="n">_workflow_model</span><span class="o">.</span><span class="n">WorkflowSpec</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sdk_workflow</span><span class="p">,</span>
+                    <span class="n">sub_workflows</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteEntityAlreadyExistsException</span><span class="p">:</span>
             <span class="k">pass</span></div></div>

@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -158,6 +162,7 @@
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">queue</span> <span class="k">as</span> <span class="n">_queue</span>
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span><span class="p">,</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span><span class="p">,</span> \
     <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan</span><span class="p">,</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promise</span>
@@ -167,9 +172,11 @@
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_models</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span>\
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_models</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> \
     <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_models</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
 
 
 <div class="viewcode-block" id="Output"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.Output">[docs]</a><span class="k">class</span> <span class="nc">Output</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -235,11 +242,22 @@
     <span class="p">)</span>
 <span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata_defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_bindings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list[flytekit.common.promise.Input] inputs:</span>
 <span class="sd">        :param list[Output] outputs:</span>
 <span class="sd">        :param list[flytekit.common.nodes.SdkNode] nodes:</span>
+<span class="sd">        :param flytekit.models.core.identifier.Identifier id: This is an autogenerated id by the system. The id is</span>
+<span class="sd">            globally unique across Flyte.</span>
+<span class="sd">        :param WorkflowMetadata metadata: This contains information on how to run the workflow.</span>
+<span class="sd">        :param flytekit.models.interface.TypedInterface interface: Defines a strongly typed interface for the</span>
+<span class="sd">            Workflow (inputs, outputs).  This can include some optional parameters.</span>
+<span class="sd">        :param list[flytekit.models.literals.Binding] output_bindings: A list of output bindings that specify how to construct</span>
+<span class="sd">            workflow outputs. Bindings can pull node outputs or specify literals. All workflow outputs specified in</span>
+<span class="sd">            the interface field must be bound</span>
+<span class="sd">            in order for the workflow to be validated. A workflow has an implicit dependency on all of its nodes</span>
+<span class="sd">            to execute successfully in order to bind final outputs.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">upstream</span> <span class="ow">in</span> <span class="n">n</span><span class="o">.</span><span class="n">upstream_nodes</span><span class="p">:</span>
@@ -250,21 +268,31 @@
                         <span class="s2">&quot;list, dict, or tuple which is stored as an attribute in the class.&quot;</span>
                     <span class="p">)</span>
 
+        <span class="c1"># Allow overrides if specified for all the arguments to the parent class constructor</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span> <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
+            <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">WORKFLOW</span><span class="p">,</span>
+            <span class="n">_internal_config</span><span class="o">.</span><span class="n">PROJECT</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+            <span class="n">_internal_config</span><span class="o">.</span><span class="n">DOMAIN</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+            <span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
+            <span class="n">_internal_config</span><span class="o">.</span><span class="n">VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_workflow_models</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="p">()</span>
+
+        <span class="n">interface</span> <span class="o">=</span> <span class="n">interface</span> <span class="k">if</span> <span class="n">interface</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_interface</span><span class="o">.</span><span class="n">TypedInterface</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">},</span>
+            <span class="p">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="n">output_bindings</span> <span class="o">=</span> <span class="n">output_bindings</span> <span class="k">if</span> <span class="n">output_bindings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> \
+            <span class="p">[</span><span class="n">_literal_models</span><span class="o">.</span><span class="n">Binding</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">binding_data</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">]</span>
+
         <span class="nb">super</span><span class="p">(</span><span class="n">SdkWorkflow</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
-                <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">WORKFLOW</span><span class="p">,</span>
-                <span class="n">_internal_config</span><span class="o">.</span><span class="n">PROJECT</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
-                <span class="n">_internal_config</span><span class="o">.</span><span class="n">DOMAIN</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
-                <span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
-                <span class="n">_internal_config</span><span class="o">.</span><span class="n">VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-            <span class="p">),</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="n">_workflow_models</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="p">(),</span>
-            <span class="n">interface</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">TypedInterface</span><span class="p">(</span>
-                <span class="p">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">},</span>
-                <span class="p">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">}</span>
-            <span class="p">),</span>
+            <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+            <span class="n">metadata_defaults</span><span class="o">=</span><span class="n">_workflow_models</span><span class="o">.</span><span class="n">WorkflowMetadataDefaults</span><span class="p">(),</span>
+            <span class="n">interface</span><span class="o">=</span><span class="n">interface</span><span class="p">,</span>
             <span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span>
-            <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">_literal_models</span><span class="o">.</span><span class="n">Binding</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">binding_data</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">],</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="n">output_bindings</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_user_inputs</span> <span class="o">=</span> <span class="n">inputs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_upstream_entities</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">)</span>
@@ -306,6 +334,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_inputs</span>
 
+<div class="viewcode-block" id="SdkWorkflow.get_sub_workflows"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.get_sub_workflows">[docs]</a>    <span class="k">def</span> <span class="nf">get_sub_workflows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursive call that returns all subworkflows in the current workflow</span>
+
+<span class="sd">        :rtype: list[SdkWorkflow]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">workflow_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">workflow_node</span><span class="o">.</span><span class="n">sub_workflow_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="o">.</span><span class="n">entity_type_text</span> <span class="o">==</span> <span class="s1">&#39;Workflow&#39;</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">)</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="o">.</span><span class="n">get_sub_workflows</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span>
+                        <span class="s2">&quot;workflow node with subworkflow found but bad executable &quot;</span>
+                        <span class="s2">&quot;object </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">))</span>
+            <span class="c1"># Ignore other node types (branch, task)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
 <div class="viewcode-block" id="SdkWorkflow.fetch"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.fetch">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -320,38 +368,55 @@
         <span class="n">version</span> <span class="o">=</span> <span class="n">version</span> <span class="ow">or</span> <span class="n">_internal_config</span><span class="o">.</span><span class="n">VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="n">workflow_id</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">WORKFLOW</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="n">admin_workflow</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">fetch_workflow</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">)</span>
-        <span class="n">sdk_workflow</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">admin_workflow</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">compiled_workflow</span><span class="o">.</span><span class="n">primary</span><span class="o">.</span><span class="n">template</span><span class="p">)</span>
+        <span class="n">cwc</span> <span class="o">=</span> <span class="n">admin_workflow</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">compiled_workflow</span>
+        <span class="n">primary_template</span> <span class="o">=</span> <span class="n">cwc</span><span class="o">.</span><span class="n">primary</span><span class="o">.</span><span class="n">template</span>
+        <span class="n">sub_workflow_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">sw</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">sw</span><span class="o">.</span><span class="n">template</span> <span class="k">for</span> <span class="n">sw</span> <span class="ow">in</span> <span class="n">cwc</span><span class="o">.</span><span class="n">sub_workflows</span><span class="p">}</span>
+        <span class="n">task_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">template</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">cwc</span><span class="o">.</span><span class="n">tasks</span><span class="p">}</span>
+        <span class="n">sdk_workflow</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">primary_template</span><span class="p">,</span> <span class="n">sub_workflow_map</span><span class="p">,</span> <span class="n">task_map</span><span class="p">)</span>
         <span class="n">sdk_workflow</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">workflow_id</span>
         <span class="k">return</span> <span class="n">sdk_workflow</span></div>
 
+<div class="viewcode-block" id="SdkWorkflow.get_non_system_nodes"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.get_non_system_nodes">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_non_system_nodes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param list[flytekit.models.core.workflow.Node] nodes:</span>
+<span class="sd">        :rtype: list[flytekit.models.core.workflow.Node]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nodes</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="n">_constants</span><span class="o">.</span><span class="n">START_NODE_ID</span><span class="p">,</span> <span class="n">_constants</span><span class="o">.</span><span class="n">END_NODE_ID</span><span class="p">}]</span></div>
+
 <div class="viewcode-block" id="SdkWorkflow.promote_from_model"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_model</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tasks</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.workflow.WorkflowTemplate base_model:</span>
+<span class="sd">        :param dict[flytekit.models.core.identifier.Identifier, flytekit.models.core.workflow.WorkflowTemplate]</span>
+<span class="sd">            sub_workflows: Provide a list of WorkflowTemplate</span>
+<span class="sd">            models (should be returned from Admin as part of the admin CompiledWorkflowClosure. Relevant sub-workflows</span>
+<span class="sd">            should always be provided.</span>
+<span class="sd">        :param dict[flytekit.models.core.identifier.Identifier, flytekit.models.task.TaskTemplate] tasks: Same as above</span>
+<span class="sd">            but for tasks. If tasks are not provided relevant TaskTemplates will be fetched from Admin</span>
 <span class="sd">        :rtype: SdkWorkflow</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">node_map</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">_nodes</span><span class="o">.</span><span class="n">SdkNode</span><span class="p">(</span>
-                <span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                <span class="p">[],</span>
-                <span class="n">n</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
-                <span class="n">n</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
-                <span class="n">sdk_task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">sdk_workflow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">sdk_branch</span><span class="o">=</span><span class="kc">None</span>  <span class="c1"># TODO: Hydrate these objects by reference from the engine.</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">base_model</span><span class="o">.</span><span class="n">nodes</span>
-        <span class="p">}</span>
+        <span class="n">base_model_non_system_nodes</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_non_system_nodes</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="n">sub_workflows</span> <span class="o">=</span> <span class="n">sub_workflows</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">node_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">_nodes</span><span class="o">.</span><span class="n">SdkNode</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">base_model_non_system_nodes</span><span class="p">}</span>
 
-        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="n">node_map</span><span class="p">):</span>
-            <span class="n">v</span><span class="o">.</span><span class="n">upstream_nodes</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">[</span><span class="n">node_map</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">upstream_node_ids</span><span class="p">]</span>
+        <span class="c1"># Set upstream nodes for each node</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">base_model_non_system_nodes</span><span class="p">:</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">node_map</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">upstream_id</span> <span class="ow">in</span> <span class="n">current</span><span class="o">.</span><span class="n">upstream_node_ids</span><span class="p">:</span>
+                <span class="n">upstream_node</span> <span class="o">=</span> <span class="n">node_map</span><span class="p">[</span><span class="n">upstream_id</span><span class="p">]</span>
+                <span class="n">current</span> <span class="o">&lt;&lt;</span> <span class="n">upstream_node</span>
 
+        <span class="c1"># No inputs/outputs specified, see the constructor for more information on the overrides.</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">node_map</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+            <span class="nb">id</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
             <span class="n">metadata</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+            <span class="n">metadata_defaults</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">metadata_defaults</span><span class="p">,</span>
             <span class="n">interface</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">TypedInterface</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">interface</span><span class="p">),</span>
-            <span class="n">nodes</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">node_map</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
-            <span class="n">outputs</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span>
-            <span class="n">failure_node</span><span class="o">=</span><span class="kc">None</span>  <span class="c1"># TODO: Implement failure node</span>
+            <span class="n">output_bindings</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkWorkflow.register"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.register">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -440,10 +505,31 @@
         <span class="p">)</span></div>
 
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="c1"># TODO: Create a workflow node</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Embedding a workflow as a node is not supported currently.  Please use launch &quot;</span>
-                                  <span class="s2">&quot;plans.&quot;</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">input_map</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
+                <span class="s2">&quot;When adding a workflow as a node in a workflow, all inputs must be specified with kwargs only.  We &quot;</span>
+                <span class="s2">&quot;detected </span><span class="si">{}</span><span class="s2"> positional args.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Take the default values from the Inputs</span>
+        <span class="n">compiled_inputs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">sdk_default</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_inputs</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">sdk_required</span>
+        <span class="p">}</span>
+        <span class="n">compiled_inputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">input_map</span><span class="p">)</span>
+
+        <span class="n">bindings</span><span class="p">,</span> <span class="n">upstream_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">create_bindings_for_inputs</span><span class="p">(</span><span class="n">compiled_inputs</span><span class="p">)</span>
+
+        <span class="n">node</span> <span class="o">=</span> <span class="n">_nodes</span><span class="o">.</span><span class="n">SdkNode</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">_workflow_models</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span><span class="s2">&quot;placeholder&quot;</span><span class="p">,</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(),</span>
+                                                   <span class="n">_literal_models</span><span class="o">.</span><span class="n">RetryStrategy</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+            <span class="n">upstream_nodes</span><span class="o">=</span><span class="n">upstream_nodes</span><span class="p">,</span>
+            <span class="n">bindings</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">bindings</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">var</span><span class="p">),</span>
+            <span class="n">sdk_workflow</span><span class="o">=</span><span class="bp">self</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span></div>
 
 
 <span class="k">def</span> <span class="nf">_assign_indexed_attribute_name</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>

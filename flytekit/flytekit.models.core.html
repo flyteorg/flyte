@@ -113,6 +113,10 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -1688,12 +1692,22 @@ an implicit dependency on any node that appears in inputs field.
 
 <dl class="class">
 <dt id="flytekit.models.core.workflow.NodeMetadata">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.core.workflow.</code><code class="sig-name descname">NodeMetadata</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">timeout</em>, <em class="sig-param">retries</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#NodeMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.NodeMetadata" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.core.workflow.</code><code class="sig-name descname">NodeMetadata</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">timeout</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#NodeMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.NodeMetadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.models.core.workflow.NodeMetadata.from_flyte_idl">
 <em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#NodeMetadata.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.NodeMetadata.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.core.workflow.NodeMetadata.interruptible">
+<em class="property">property </em><code class="sig-name descname">interruptible</code><a class="headerlink" href="#flytekit.models.core.workflow.NodeMetadata.interruptible" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flytekit.models.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="flytekit.models.core.workflow.NodeMetadata.name">
@@ -1803,6 +1817,35 @@ an implicit dependency on any node that appears in inputs field.
 </dd></dl>
 
 <dl class="class">
+<dt id="flytekit.models.core.workflow.WorkflowMetadataDefaults">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.core.workflow.</code><code class="sig-name descname">WorkflowMetadataDefaults</code><span class="sig-paren">(</span><em class="sig-param">interruptible=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowMetadataDefaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadataDefaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.core.workflow.WorkflowMetadataDefaults.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowMetadataDefaults.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadataDefaults.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> (<em>flyteidl.core.workflow_pb2.WorkflowMetadataDefaults</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.core.workflow.WorkflowMetadata" title="flytekit.models.core.workflow.WorkflowMetadata">WorkflowMetadata</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.core.workflow.WorkflowMetadataDefaults.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowMetadataDefaults.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadataDefaults.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.core.workflow_pb2.WorkflowMetadataDefaults</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="flytekit.models.core.workflow.WorkflowNode">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.models.core.workflow.</code><code class="sig-name descname">WorkflowNode</code><span class="sig-paren">(</span><em class="sig-param">launchplan_ref=None</em>, <em class="sig-param">sub_workflow_ref=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
@@ -1857,7 +1900,7 @@ an implicit dependency on any node that appears in inputs field.
 
 <dl class="class">
 <dt id="flytekit.models.core.workflow.WorkflowTemplate">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.core.workflow.</code><code class="sig-name descname">WorkflowTemplate</code><span class="sig-paren">(</span><em class="sig-param">id</em>, <em class="sig-param">metadata</em>, <em class="sig-param">interface</em>, <em class="sig-param">nodes</em>, <em class="sig-param">outputs</em>, <em class="sig-param">failure_node=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowTemplate" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.core.workflow.</code><code class="sig-name descname">WorkflowTemplate</code><span class="sig-paren">(</span><em class="sig-param">id</em>, <em class="sig-param">metadata</em>, <em class="sig-param">metadata_defaults</em>, <em class="sig-param">interface</em>, <em class="sig-param">nodes</em>, <em class="sig-param">outputs</em>, <em class="sig-param">failure_node=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowTemplate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.models.core.workflow.WorkflowTemplate.failure_node">
@@ -1901,6 +1944,13 @@ parameters.
 <em class="property">property </em><code class="sig-name descname">metadata</code><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowTemplate.metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>This contains information on how to run the workflow.
 :rtype: WorkflowMetadata</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.core.workflow.WorkflowTemplate.metadata_defaults">
+<em class="property">property </em><code class="sig-name descname">metadata_defaults</code><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowTemplate.metadata_defaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>This contains information on how to run the workflow.
+:rtype: WorkflowMetadataDefaults</p>
 </dd></dl>
 
 <dl class="method">

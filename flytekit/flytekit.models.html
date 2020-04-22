@@ -113,6 +113,10 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -405,6 +409,11 @@ requires processing of all input data. This has to be a positive number.</p>
 <dt id="flytekit.models.common.FlyteIdlEntity">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.models.common.</code><code class="sig-name descname">FlyteIdlEntity</code><a class="reference internal" href="../_modules/flytekit/models/common.html#FlyteIdlEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.common.FlyteIdlEntity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.common.FlyteIdlEntity.is_empty">
+<em class="property">property </em><code class="sig-name descname">is_empty</code><a class="headerlink" href="#flytekit.models.common.FlyteIdlEntity.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="flytekit.models.common.FlyteIdlEntity.short_string">
 <code class="sig-name descname">short_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/common.html#FlyteIdlEntity.short_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.common.FlyteIdlEntity.short_string" title="Permalink to this definition">¶</a></dt>
@@ -2850,6 +2859,75 @@ requires processing of all input data. This has to be a positive number.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-flytekit.models.presto">
+<span id="flytekit-models-presto-module"></span><h2>flytekit.models.presto module<a class="headerlink" href="#module-flytekit.models.presto" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.models.presto.PrestoQuery">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.presto.</code><code class="sig-name descname">PrestoQuery</code><span class="sig-paren">(</span><em class="sig-param">routing_group</em>, <em class="sig-param">catalog</em>, <em class="sig-param">schema</em>, <em class="sig-param">statement</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/presto.html#PrestoQuery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.presto.PrestoQuery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.presto.PrestoQuery.catalog">
+<em class="property">property </em><code class="sig-name descname">catalog</code><a class="headerlink" href="#flytekit.models.presto.PrestoQuery.catalog" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.presto.PrestoQuery.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/presto.html#PrestoQuery.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.presto.PrestoQuery.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> (<em>_presto.PrestoQuery</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PrestoQuery</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.presto.PrestoQuery.routing_group">
+<em class="property">property </em><code class="sig-name descname">routing_group</code><a class="headerlink" href="#flytekit.models.presto.PrestoQuery.routing_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>The query string.
+:rtype: str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.presto.PrestoQuery.schema">
+<em class="property">property </em><code class="sig-name descname">schema</code><a class="headerlink" href="#flytekit.models.presto.PrestoQuery.schema" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.presto.PrestoQuery.statement">
+<em class="property">property </em><code class="sig-name descname">statement</code><a class="headerlink" href="#flytekit.models.presto.PrestoQuery.statement" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.presto.PrestoQuery.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/presto.html#PrestoQuery.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.presto.PrestoQuery.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_presto.PrestoQuery</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-flytekit.models.project">
 <span id="flytekit-models-project-module"></span><h2>flytekit.models.project module<a class="headerlink" href="#module-flytekit.models.project" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -3720,7 +3798,7 @@ requires processing of all input data. This has to be a positive number.</p>
 
 <dl class="class">
 <dt id="flytekit.models.task.TaskMetadata">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">TaskMetadata</code><span class="sig-paren">(</span><em class="sig-param">discoverable</em>, <em class="sig-param">runtime</em>, <em class="sig-param">timeout</em>, <em class="sig-param">retries</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">deprecated_error_message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#TaskMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.TaskMetadata" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">TaskMetadata</code><span class="sig-paren">(</span><em class="sig-param">discoverable</em>, <em class="sig-param">runtime</em>, <em class="sig-param">timeout</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">deprecated_error_message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#TaskMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.TaskMetadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.models.task.TaskMetadata.deprecated_error_message">
@@ -3757,6 +3835,13 @@ task are the same and the discovery_version is also the same.
 <dd class="field-even"><p><a class="reference internal" href="#flytekit.models.task.TaskMetadata" title="flytekit.models.task.TaskMetadata">TaskMetadata</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.task.TaskMetadata.interruptible">
+<em class="property">property </em><code class="sig-name descname">interruptible</code><a class="headerlink" href="#flytekit.models.task.TaskMetadata.interruptible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether or not the task is interruptible.
+:rtype: bool</p>
 </dd></dl>
 
 <dl class="method">
