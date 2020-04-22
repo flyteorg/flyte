@@ -12,9 +12,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+import re
 import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
@@ -23,10 +24,11 @@ project = u'Flyte'
 copyright = u'2020, Flyte Authors'
 author = u'Flyte Authors'
 
-# The short X.Y version
-version = u''
 # The full version, including alpha/beta/rc tags
-release = u'0.0.1'
+release = re.sub('^v', '', os.popen('git describe --abbrev=0 --tags').read().strip())
+# The short X.Y version
+version = release
+print("Generating docs for {} / {}".format(version, release))
 
 
 # -- General configuration ---------------------------------------------------
