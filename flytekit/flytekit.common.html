@@ -113,6 +113,10 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -216,6 +220,7 @@
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.executions">flytekit.common.tasks.executions module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.hive_task">flytekit.common.tasks.hive_task module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.output">flytekit.common.tasks.output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.presto_task">flytekit.common.tasks.presto_task module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.sdk_dynamic">flytekit.common.tasks.sdk_dynamic module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.sdk_runnable">flytekit.common.tasks.sdk_runnable module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.sidecar_task">flytekit.common.tasks.sidecar_task module</a></li>
@@ -252,8 +257,111 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="flytekit-common-component-nodes-module">
-<h2>flytekit.common.component_nodes module<a class="headerlink" href="#flytekit-common-component-nodes-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-flytekit.common.component_nodes">
+<span id="flytekit-common-component-nodes-module"></span><h2>flytekit.common.component_nodes module<a class="headerlink" href="#module-flytekit.common.component_nodes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.common.component_nodes.SdkTaskNode">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.component_nodes.</code><code class="sig-name descname">SdkTaskNode</code><span class="sig-paren">(</span><em class="sig-param">sdk_task</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/component_nodes.html#SdkTaskNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.component_nodes.SdkTaskNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.TaskNode" title="flytekit.models.core.workflow.TaskNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.core.workflow.TaskNode</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.common.component_nodes.SdkTaskNode.promote_from_model">
+<em class="property">classmethod </em><code class="sig-name descname">promote_from_model</code><span class="sig-paren">(</span><em class="sig-param">base_model</em>, <em class="sig-param">tasks</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/component_nodes.html#SdkTaskNode.promote_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.component_nodes.SdkTaskNode.promote_from_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes the idl wrapper for a TaskNode and returns the hydrated Flytekit object for it by fetching it from the
+engine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_model</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.TaskNode" title="flytekit.models.core.workflow.TaskNode"><em>flytekit.models.core.workflow.TaskNode</em></a>) – </p></li>
+<li><p><strong>flytekit.models.task.TaskTemplate</strong><strong>] </strong><strong>tasks</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.Identifier" title="flytekit.models.core.identifier.Identifier"><em>flytekit.models.core.identifier.Identifier</em></a><em>,</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.common.component_nodes.SdkTaskNode" title="flytekit.common.component_nodes.SdkTaskNode">SdkTaskNode</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.component_nodes.SdkTaskNode.reference_id">
+<em class="property">property </em><code class="sig-name descname">reference_id</code><a class="headerlink" href="#flytekit.common.component_nodes.SdkTaskNode.reference_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A globally unique identifier for the task.
+:rtype: flytekit.models.core.identifier.Identifier</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.component_nodes.SdkTaskNode.sdk_task">
+<em class="property">property </em><code class="sig-name descname">sdk_task</code><a class="headerlink" href="#flytekit.common.component_nodes.SdkTaskNode.sdk_task" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask" title="flytekit.common.tasks.task.SdkTask">flytekit.common.tasks.task.SdkTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.common.component_nodes.SdkWorkflowNode">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.component_nodes.</code><code class="sig-name descname">SdkWorkflowNode</code><span class="sig-paren">(</span><em class="sig-param">sdk_workflow=None</em>, <em class="sig-param">sdk_launch_plan=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/component_nodes.html#SdkWorkflowNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.component_nodes.SdkWorkflowNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.WorkflowNode" title="flytekit.models.core.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.core.workflow.WorkflowNode</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.common.component_nodes.SdkWorkflowNode.launchplan_ref">
+<em class="property">property </em><code class="sig-name descname">launchplan_ref</code><a class="headerlink" href="#flytekit.common.component_nodes.SdkWorkflowNode.launchplan_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>[Optional] A globally unique identifier for the launch plan.  Should map to Admin.
+:rtype: flytekit.models.core.identifier.Identifier</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.component_nodes.SdkWorkflowNode.promote_from_model">
+<em class="property">classmethod </em><code class="sig-name descname">promote_from_model</code><span class="sig-paren">(</span><em class="sig-param">base_model</em>, <em class="sig-param">sub_workflows</em>, <em class="sig-param">tasks</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/component_nodes.html#SdkWorkflowNode.promote_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.component_nodes.SdkWorkflowNode.promote_from_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>base_model</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.WorkflowNode" title="flytekit.models.core.workflow.WorkflowNode"><em>flytekit.models.core.workflow.WorkflowNode</em></a>) – </p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>:param dict[flytekit.models.core.identifier.Identifier, flytekit.models.core.workflow.WorkflowTemplate]</dt><dd><p>sub_workflows:</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>flytekit.models.task.TaskTemplate</strong><strong>] </strong><strong>tasks</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.Identifier" title="flytekit.models.core.identifier.Identifier"><em>flytekit.models.core.identifier.Identifier</em></a><em>,</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.common.component_nodes.SdkWorkflowNode" title="flytekit.common.component_nodes.SdkWorkflowNode">SdkWorkflowNode</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.component_nodes.SdkWorkflowNode.sdk_launch_plan">
+<em class="property">property </em><code class="sig-name descname">sdk_launch_plan</code><a class="headerlink" href="#flytekit.common.component_nodes.SdkWorkflowNode.sdk_launch_plan" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#flytekit.common.launch_plan.SdkLaunchPlan" title="flytekit.common.launch_plan.SdkLaunchPlan">flytekit.common.launch_plan.SdkLaunchPlan</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.component_nodes.SdkWorkflowNode.sdk_workflow">
+<em class="property">property </em><code class="sig-name descname">sdk_workflow</code><a class="headerlink" href="#flytekit.common.component_nodes.SdkWorkflowNode.sdk_workflow" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow">flytekit.common.workflow.SdkWorkflow</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.component_nodes.SdkWorkflowNode.sub_workflow_ref">
+<em class="property">property </em><code class="sig-name descname">sub_workflow_ref</code><a class="headerlink" href="#flytekit.common.component_nodes.SdkWorkflowNode.sub_workflow_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>[Optional] Reference to a subworkflow, that should be defined with the compiler context.
+:rtype: flytekit.models.core.identifier.Identifier</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-flytekit.common.constants">
 <span id="flytekit-common-constants-module"></span><h2>flytekit.common.constants module<a class="headerlink" href="#module-flytekit.common.constants" title="Permalink to this headline">¶</a></h2>
@@ -295,6 +403,11 @@
 <dl class="attribute">
 <dt id="flytekit.common.constants.SdkTaskType.HIVE_JOB">
 <code class="sig-name descname">HIVE_JOB</code><em class="property"> = 'hive'</em><a class="headerlink" href="#flytekit.common.constants.SdkTaskType.HIVE_JOB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.common.constants.SdkTaskType.PRESTO_TASK">
+<code class="sig-name descname">PRESTO_TASK</code><em class="property"> = 'presto'</em><a class="headerlink" href="#flytekit.common.constants.SdkTaskType.PRESTO_TASK" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -695,10 +808,21 @@ allows for syntax such as:</p>
 
 <dl class="method">
 <dt id="flytekit.common.nodes.SdkNode.promote_from_model">
-<em class="property">classmethod </em><code class="sig-name descname">promote_from_model</code><span class="sig-paren">(</span><em class="sig-param">model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/nodes.html#SdkNode.promote_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.nodes.SdkNode.promote_from_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">promote_from_model</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">sub_workflows</em>, <em class="sig-param">tasks</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/nodes.html#SdkNode.promote_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.nodes.SdkNode.promote_from_model" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>model</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.Node" title="flytekit.models.core.workflow.Node"><em>flytekit.models.core.workflow.Node</em></a>) – </p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>:param dict[flytekit.models.core.identifier.Identifier, flytekit.models.core.workflow.WorkflowTemplate]</dt><dd><p>sub_workflows:</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>flytekit.models.task.TaskTemplate</strong><strong>] </strong><strong>tasks</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.Identifier" title="flytekit.models.core.identifier.Identifier"><em>flytekit.models.core.identifier.Identifier</em></a><em>,</em>) – If specified,
+these task templates will be passed to the SdkTaskNode promote_from_model call, and used
+instead of fetching from Admin.</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="#flytekit.common.nodes.SdkNode" title="flytekit.common.nodes.SdkNode">SdkNode</a></p>
@@ -806,49 +930,6 @@ execution ended in error or the execution is in progress, an exception will be r
 <em class="property">property </em><code class="sig-name descname">workflow_executions</code><a class="headerlink" href="#flytekit.common.nodes.SdkNodeExecution.workflow_executions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the underlying workflow executions in order of try attempt.
 :rtype: list[flytekit.common.workflow_execution.SdkWorkflowExecution]</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="flytekit.common.nodes.SdkTaskNode">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.nodes.</code><code class="sig-name descname">SdkTaskNode</code><span class="sig-paren">(</span><em class="sig-param">sdk_task</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/nodes.html#SdkTaskNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.nodes.SdkTaskNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.TaskNode" title="flytekit.models.core.workflow.TaskNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.core.workflow.TaskNode</span></code></a></p>
-<dl class="method">
-<dt id="flytekit.common.nodes.SdkTaskNode.promote_from_model">
-<em class="property">classmethod </em><code class="sig-name descname">promote_from_model</code><span class="sig-paren">(</span><em class="sig-param">base_model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/nodes.html#SdkTaskNode.promote_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.nodes.SdkTaskNode.promote_from_model" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="flytekit.common.nodes.SdkTaskNode.reference_id">
-<em class="property">property </em><code class="sig-name descname">reference_id</code><a class="headerlink" href="#flytekit.common.nodes.SdkTaskNode.reference_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>A globally unique identifier for the task.
-:rtype: flytekit.models.core.identifier.Identifier</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="flytekit.common.nodes.SdkWorkflowNode">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.nodes.</code><code class="sig-name descname">SdkWorkflowNode</code><span class="sig-paren">(</span><em class="sig-param">sdk_workflow=None</em>, <em class="sig-param">sdk_launch_plan=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/nodes.html#SdkWorkflowNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.nodes.SdkWorkflowNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.WorkflowNode" title="flytekit.models.core.workflow.WorkflowNode"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.core.workflow.WorkflowNode</span></code></a></p>
-<dl class="method">
-<dt id="flytekit.common.nodes.SdkWorkflowNode.launchplan_ref">
-<em class="property">property </em><code class="sig-name descname">launchplan_ref</code><a class="headerlink" href="#flytekit.common.nodes.SdkWorkflowNode.launchplan_ref" title="Permalink to this definition">¶</a></dt>
-<dd><p>[Optional] A globally unique identifier for the launch plan.  Should map to Admin.
-:rtype: flytekit.models.core.identifier.Identifier</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="flytekit.common.nodes.SdkWorkflowNode.promote_from_model">
-<em class="property">classmethod </em><code class="sig-name descname">promote_from_model</code><span class="sig-paren">(</span><em class="sig-param">base_model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/nodes.html#SdkWorkflowNode.promote_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.nodes.SdkWorkflowNode.promote_from_model" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="flytekit.common.nodes.SdkWorkflowNode.sub_workflow_ref">
-<em class="property">property </em><code class="sig-name descname">sub_workflow_ref</code><a class="headerlink" href="#flytekit.common.nodes.SdkWorkflowNode.sub_workflow_ref" title="Permalink to this definition">¶</a></dt>
-<dd><p>[Optional] Reference to a subworkflow, that should be defined with the compiler context.
-:rtype: flytekit.models.core.identifier.Identifier</p>
 </dd></dl>
 
 </dd></dl>
@@ -1300,7 +1381,7 @@ into an actionable object.</p>
 
 <dl class="class">
 <dt id="flytekit.common.workflow.SdkWorkflow">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.workflow.</code><code class="sig-name descname">SdkWorkflow</code><span class="sig-paren">(</span><em class="sig-param">inputs</em>, <em class="sig-param">outputs</em>, <em class="sig-param">nodes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#SdkWorkflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.SdkWorkflow" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.workflow.</code><code class="sig-name descname">SdkWorkflow</code><span class="sig-paren">(</span><em class="sig-param">inputs</em>, <em class="sig-param">outputs</em>, <em class="sig-param">nodes</em>, <em class="sig-param">id=None</em>, <em class="sig-param">metadata=None</em>, <em class="sig-param">metadata_defaults=None</em>, <em class="sig-param">interface=None</em>, <em class="sig-param">output_bindings=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#SdkWorkflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.SdkWorkflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.common.mixins.html#flytekit.common.mixins.hash.HashOnReferenceMixin" title="flytekit.common.mixins.hash.HashOnReferenceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.mixins.hash.HashOnReferenceMixin</span></code></a>, <a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.WorkflowTemplate" title="flytekit.models.core.workflow.WorkflowTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.core.workflow.WorkflowTemplate</span></code></a>, <a class="reference internal" href="flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity" title="flytekit.common.mixins.registerable.RegisterableEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.mixins.registerable.RegisterableEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.common.workflow.SdkWorkflow.create_launch_plan">
@@ -1343,6 +1424,30 @@ class provided should be a subclass of flytekit.common.launch_plan.SdkLaunchPlan
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.common.workflow.SdkWorkflow.get_non_system_nodes">
+<em class="property">classmethod </em><code class="sig-name descname">get_non_system_nodes</code><span class="sig-paren">(</span><em class="sig-param">nodes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#SdkWorkflow.get_non_system_nodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.SdkWorkflow.get_non_system_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.Node" title="flytekit.models.core.workflow.Node"><em>flytekit.models.core.workflow.Node</em></a><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.Node" title="flytekit.models.core.workflow.Node">flytekit.models.core.workflow.Node</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.workflow.SdkWorkflow.get_sub_workflows">
+<code class="sig-name descname">get_sub_workflows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#SdkWorkflow.get_sub_workflows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.SdkWorkflow.get_sub_workflows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursive call that returns all subworkflows in the current workflow</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow">SdkWorkflow</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.common.workflow.SdkWorkflow.interface">
 <em class="property">property </em><code class="sig-name descname">interface</code><a class="headerlink" href="#flytekit.common.workflow.SdkWorkflow.interface" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -1354,10 +1459,22 @@ class provided should be a subclass of flytekit.common.launch_plan.SdkLaunchPlan
 
 <dl class="method">
 <dt id="flytekit.common.workflow.SdkWorkflow.promote_from_model">
-<em class="property">classmethod </em><code class="sig-name descname">promote_from_model</code><span class="sig-paren">(</span><em class="sig-param">base_model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#SdkWorkflow.promote_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.SdkWorkflow.promote_from_model" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">promote_from_model</code><span class="sig-paren">(</span><em class="sig-param">base_model</em>, <em class="sig-param">sub_workflows=None</em>, <em class="sig-param">tasks=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#SdkWorkflow.promote_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.SdkWorkflow.promote_from_model" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>base_model</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.WorkflowTemplate" title="flytekit.models.core.workflow.WorkflowTemplate"><em>flytekit.models.core.workflow.WorkflowTemplate</em></a>) – </p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>:param dict[flytekit.models.core.identifier.Identifier, flytekit.models.core.workflow.WorkflowTemplate]</dt><dd><p>sub_workflows: Provide a list of WorkflowTemplate
+models (should be returned from Admin as part of the admin CompiledWorkflowClosure. Relevant sub-workflows
+should always be provided.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>flytekit.models.task.TaskTemplate</strong><strong>] </strong><strong>tasks</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.Identifier" title="flytekit.models.core.identifier.Identifier"><em>flytekit.models.core.identifier.Identifier</em></a><em>,</em>) – Same as above
+but for tasks. If tasks are not provided relevant TaskTemplates will be fetched from Admin</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow">SdkWorkflow</a></p>

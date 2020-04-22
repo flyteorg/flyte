@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -161,6 +165,7 @@
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable_tasks</span><span class="p">,</span> <span class="n">sdk_dynamic</span> <span class="k">as</span> <span class="n">_sdk_dynamic</span><span class="p">,</span> \
     <span class="n">spark_task</span> <span class="k">as</span> <span class="n">_sdk_spark_tasks</span><span class="p">,</span> <span class="n">hive_task</span> <span class="k">as</span> <span class="n">_sdk_hive_tasks</span><span class="p">,</span> <span class="n">sidecar_task</span> <span class="k">as</span> <span class="n">_sdk_sidecar_tasks</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_model</span>
 
@@ -189,7 +194,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">apply_inputs_wrapper</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">_sdk_runnable_tasks</span><span class="o">.</span><span class="n">SdkRunnableTask</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">_task</span><span class="o">.</span><span class="n">SdkTask</span><span class="p">):</span>
             <span class="n">additional_msg</span> <span class="o">=</span> \
                 <span class="s2">&quot;Inputs can only be applied to a task. Did you forget the task decorator on method &#39;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&#39;?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">task</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
@@ -268,6 +273,7 @@
         <span class="n">_task_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -312,6 +318,8 @@
 
 <span class="sd">            If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is</span>
 <span class="sd">            strongly recommended that tasks are written to be idempotent.</span>
+
+<span class="sd">    :param bool interruptible: [optional] boolean describing if the task is interruptible.</span>
 
 <span class="sd">    :param Text deprecated: [optional] string that should be provided if this task is deprecated.  The string</span>
 <span class="sd">        will be logged as a warning so it should contain information regarding how to update to a newer task.</span>
@@ -377,6 +385,7 @@
             <span class="n">task_type</span><span class="o">=</span><span class="n">_common_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">PYTHON_TASK</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="o">=</span><span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
             <span class="n">storage_request</span><span class="o">=</span><span class="n">storage_request</span><span class="p">,</span>
             <span class="n">cpu_request</span><span class="o">=</span><span class="n">cpu_request</span><span class="p">,</span>
@@ -401,6 +410,7 @@
         <span class="n">_task_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -463,6 +473,8 @@
 <span class="sd">            If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is</span>
 <span class="sd">            strongly recommended that tasks are written to be idempotent.</span>
 
+<span class="sd">    :param bool interruptible: [optional] boolean describing if the task is interruptible.</span>
+
 <span class="sd">    :param Text deprecated: [optional] string that should be provided if this task is deprecated.  The string</span>
 <span class="sd">        will be logged as a warning so it should contain information regarding how to update to a newer task.</span>
 <span class="sd">    :param Text storage_request: [optional] Kubernetes resource string for lower-bound of disk storage space</span>
@@ -523,6 +535,7 @@
             <span class="n">task_type</span><span class="o">=</span><span class="n">_common_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">DYNAMIC_TASK</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="o">=</span><span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
             <span class="n">storage_request</span><span class="o">=</span><span class="n">storage_request</span><span class="p">,</span>
             <span class="n">cpu_request</span><span class="o">=</span><span class="n">cpu_request</span><span class="p">,</span>
@@ -550,6 +563,7 @@
         <span class="n">_task_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -617,6 +631,7 @@
             <span class="n">task_type</span><span class="o">=</span><span class="n">_common_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">SPARK_TASK</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="o">=</span><span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
             <span class="n">discoverable</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span> <span class="ow">or</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
@@ -642,6 +657,7 @@
         <span class="n">_task_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -698,6 +714,7 @@
 <span class="sd">            If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is</span>
 <span class="sd">            strongly recommended that tasks are written to be idempotent.</span>
 
+<span class="sd">    :param bool interruptible: [optional] boolean describing if task is interruptible.</span>
 <span class="sd">    :param Text deprecated: [optional] string that should be provided if this task is deprecated.  The string</span>
 <span class="sd">        will be logged as a warning so it should contain information regarding how to update to a newer task.</span>
 <span class="sd">    :param Text storage_request: [optional] Kubernetes resource string for lower-bound of disk storage space</span>
@@ -752,6 +769,7 @@
             <span class="n">task_type</span><span class="o">=</span><span class="n">_common_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">BATCH_HIVE_TASK</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="o">=</span><span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
             <span class="n">storage_request</span><span class="o">=</span><span class="n">storage_request</span><span class="p">,</span>
             <span class="n">cpu_request</span><span class="o">=</span><span class="n">cpu_request</span><span class="p">,</span>
@@ -778,6 +796,7 @@
         <span class="n">_task_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -836,6 +855,7 @@
 <span class="sd">            If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is</span>
 <span class="sd">            strongly recommended that tasks are written to be idempotent.</span>
 
+<span class="sd">    :param bool interruptible: [optional] boolean describing if task is interruptible.</span>
 <span class="sd">    :param Text deprecated: [optional] string that should be provided if this task is deprecated.  The string</span>
 <span class="sd">        will be logged as a warning so it should contain information regarding how to update to a newer task.</span>
 <span class="sd">    :param Text storage_request: [optional] Kubernetes resource string for lower-bound of disk storage space</span>
@@ -893,6 +913,7 @@
             <span class="n">task_type</span><span class="o">=</span><span class="n">_common_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">BATCH_HIVE_TASK</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="o">=</span><span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
             <span class="n">storage_request</span><span class="o">=</span><span class="n">storage_request</span><span class="p">,</span>
             <span class="n">cpu_request</span><span class="o">=</span><span class="n">cpu_request</span><span class="p">,</span>
@@ -921,6 +942,7 @@
         <span class="n">_task_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
         <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1000,6 +1022,8 @@
 <span class="sd">            If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is</span>
 <span class="sd">            strongly recommended that tasks are written to be idempotent.</span>
 
+<span class="sd">    :param bool interruptible: Specify whether task is interruptible</span>
+
 <span class="sd">    :param Text deprecated: [optional] string that should be provided if this task is deprecated.  The string</span>
 <span class="sd">        will be logged as a warning so it should contain information regarding how to update to a newer task.</span>
 
@@ -1072,6 +1096,7 @@
             <span class="n">task_type</span><span class="o">=</span><span class="n">_common_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">SIDECAR_TASK</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="o">=</span><span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
             <span class="n">storage_request</span><span class="o">=</span><span class="n">storage_request</span><span class="p">,</span>
             <span class="n">cpu_request</span><span class="o">=</span><span class="n">cpu_request</span><span class="p">,</span>

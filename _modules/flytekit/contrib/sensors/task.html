@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -176,6 +180,7 @@
 <div class="viewcode-block" id="sensor_task"><a class="viewcode-back" href="../../../../flytekit/flytekit.contrib.sensors.html#flytekit.contrib.sensors.task.sensor_task">[docs]</a><span class="k">def</span> <span class="nf">sensor_task</span><span class="p">(</span>
     <span class="n">_task_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
     <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -211,6 +216,7 @@
 <span class="sd">        .. note::</span>
 <span class="sd">            If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is</span>
 <span class="sd">            strongly recommended that tasks are written to be idempotent.</span>
+<span class="sd">    :param bool interruptible: Specify whether task is interruptible</span>
 <span class="sd">    :param Text deprecated: [optional] string that should be provided if this task is deprecated.  The string</span>
 <span class="sd">        will be logged as a warning so it should contain information regarding how to update to a newer task.</span>
 <span class="sd">    :param Text storage_request: [optional] Kubernetes resource string for lower-bound of disk storage space</span>
@@ -253,6 +259,7 @@
             <span class="n">task_function</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span>
             <span class="n">task_type</span><span class="o">=</span><span class="n">_common_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">SENSOR_TASK</span><span class="p">,</span>
             <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="o">=</span><span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
             <span class="n">storage_request</span><span class="o">=</span><span class="n">storage_request</span><span class="p">,</span>
             <span class="n">cpu_request</span><span class="o">=</span><span class="n">cpu_request</span><span class="p">,</span>

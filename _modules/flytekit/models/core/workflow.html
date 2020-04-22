@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -302,7 +306,7 @@
 
 <div class="viewcode-block" id="NodeMetadata"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.NodeMetadata">[docs]</a><span class="k">class</span> <span class="nc">NodeMetadata</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">retries</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">interruptible</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Defines extra information about the Node.</span>
 
@@ -313,6 +317,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="n">timeout</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_retries</span> <span class="o">=</span> <span class="n">retries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interruptible</span> <span class="o">=</span> <span class="n">interruptible</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -335,11 +340,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retries</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">interruptible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flytekit.models.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interruptible</span>
+
 <div class="viewcode-block" id="NodeMetadata.to_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.NodeMetadata.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.workflow_pb2.NodeMetadata</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">node_metadata</span> <span class="o">=</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">retries</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">retries</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">())</span>
+        <span class="n">node_metadata</span> <span class="o">=</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">retries</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">retries</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">interruptible</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interruptible</span><span class="p">)</span>
         <span class="n">node_metadata</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">FromTimedelta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">node_metadata</span></div>
 
@@ -612,10 +624,34 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">()</span></div></div>
 
+<div class="viewcode-block" id="WorkflowMetadataDefaults"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadataDefaults">[docs]</a><span class="k">class</span> <span class="nc">WorkflowMetadataDefaults</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Metadata Defaults for the workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interruptible_</span> <span class="o">=</span> <span class="n">interruptible</span>
+
+<div class="viewcode-block" id="WorkflowMetadataDefaults.to_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadataDefaults.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flyteidl.core.workflow_pb2.WorkflowMetadataDefaults</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowMetadataDefaults</span><span class="p">(</span>
+            <span class="n">interruptible</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interruptible_</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="WorkflowMetadataDefaults.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadataDefaults.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param flyteidl.core.workflow_pb2.WorkflowMetadataDefaults pb2_object:</span>
+<span class="sd">        :rtype: WorkflowMetadata</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">interruptible</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">interruptible</span><span class="p">)</span></div></div>
+
 
 <div class="viewcode-block" id="WorkflowTemplate"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowTemplate">[docs]</a><span class="k">class</span> <span class="nc">WorkflowTemplate</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">interface</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">failure_node</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">metadata_defaults</span><span class="p">,</span> <span class="n">interface</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">failure_node</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A workflow template encapsulates all the task, branch, and subworkflow nodes to run a statically analyzable,</span>
 <span class="sd">        directed acyclic graph. It contains also metadata that tells the system how to execute the workflow (i.e.</span>
@@ -624,6 +660,7 @@
 <span class="sd">        :param flytekit.models.core.identifier.Identifier id: This is an autogenerated id by the system. The id is</span>
 <span class="sd">            globally unique across Flyte.</span>
 <span class="sd">        :param WorkflowMetadata metadata: This contains information on how to run the workflow.</span>
+<span class="sd">        :param WorkflowMetadataDefaults metadata_defaults: This contains the default information on how to run the workflow.</span>
 <span class="sd">        :param flytekit.models.interface.TypedInterface interface: Defines a strongly typed interface for the</span>
 <span class="sd">            Workflow (inputs, outputs).  This can include some optional parameters.</span>
 <span class="sd">        :param list[Node] nodes: A list of nodes. In addition, &quot;globals&quot; is a special reserved node id that</span>
@@ -639,6 +676,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metadata_defaults</span> <span class="o">=</span> <span class="n">metadata_defaults</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="n">interface</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span> <span class="o">=</span> <span class="n">nodes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span> <span class="o">=</span> <span class="n">outputs</span>
@@ -659,6 +697,14 @@
 <span class="sd">        :rtype: WorkflowMetadata</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">metadata_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This contains information on how to run the workflow.</span>
+<span class="sd">        :rtype: WorkflowMetadataDefaults</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metadata_defaults</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -706,6 +752,7 @@
         <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowTemplate</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">metadata_defaults</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata_defaults</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">nodes</span><span class="o">=</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">],</span>
             <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">],</span>
@@ -721,6 +768,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
             <span class="n">metadata</span><span class="o">=</span><span class="n">WorkflowMetadata</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">metadata</span><span class="p">),</span>
+            <span class="n">metadata_defaults</span><span class="o">=</span><span class="n">WorkflowMetadataDefaults</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">metadata_defaults</span><span class="p">),</span>
             <span class="n">interface</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">TypedInterface</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">interface</span><span class="p">),</span>
             <span class="n">nodes</span><span class="o">=</span><span class="p">[</span><span class="n">Node</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">nodes</span><span class="p">],</span>
             <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">_Binding</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">outputs</span><span class="p">],</span>

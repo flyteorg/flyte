@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -318,6 +322,7 @@
             <span class="n">task_type</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="p">,</span>
             <span class="n">storage_request</span><span class="p">,</span>
             <span class="n">cpu_request</span><span class="p">,</span>
@@ -337,6 +342,7 @@
 <span class="sd">        :param Text task_type: string describing the task type</span>
 <span class="sd">        :param Text discovery_version: string describing the version for task discovery purposes</span>
 <span class="sd">        :param int retries: Number of retries to attempt</span>
+<span class="sd">        :param bool interruptible: Specify whether task is interruptible</span>
 <span class="sd">        :param Text deprecated:</span>
 <span class="sd">        :param Text storage_request:</span>
 <span class="sd">        :param Text cpu_request:</span>
@@ -364,6 +370,7 @@
                 <span class="p">),</span>
                 <span class="n">timeout</span><span class="p">,</span>
                 <span class="n">_literal_models</span><span class="o">.</span><span class="n">RetryStrategy</span><span class="p">(</span><span class="n">retries</span><span class="p">),</span>
+                <span class="n">interruptible</span><span class="p">,</span>
                 <span class="n">discovery_version</span><span class="p">,</span>
                 <span class="n">deprecated</span>
             <span class="p">),</span>
@@ -386,6 +393,17 @@
     <span class="n">_banned_inputs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_banned_outputs</span> <span class="o">=</span> <span class="p">{}</span>
 
+<div class="viewcode-block" id="SdkRunnableTask.add_inputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.add_inputs">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+    <span class="k">def</span> <span class="nf">add_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds the inputs to this task.  This can be called multiple times, but it will fail if an input with a given</span>
+<span class="sd">        name is added more than once, a name collides with an output, or if the name doesn&#39;t exist as an arg name in</span>
+<span class="sd">        the wrapped function.</span>
+<span class="sd">        :param dict[Text, flytekit.models.interface.Variable] inputs: names and variables</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_inputs</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span></div>
+        
 <div class="viewcode-block" id="SdkRunnableTask.promote_from_model"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_model</span><span class="p">):</span>
         <span class="c1"># TODO: If the task exists in this container, we should be able to retrieve it.</span>

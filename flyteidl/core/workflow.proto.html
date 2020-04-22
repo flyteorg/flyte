@@ -125,6 +125,10 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -330,7 +334,7 @@ Identify whether node is interruptible</p>
 </div>
 <div class="section" id="flyteidl-core-alias">
 <span id="api-msg-flyteidl-core-alias"></span><h2>flyteidl.core.Alias<a class="headerlink" href="#flyteidl-core-alias" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L83">[flyteidl.core.Alias proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L84">[flyteidl.core.Alias proto]</a></p>
 <p>Links a variable to an alias.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;var&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -349,7 +353,7 @@ Identify whether node is interruptible</p>
 </div>
 <div class="section" id="flyteidl-core-node">
 <span id="api-msg-flyteidl-core-node"></span><h2>flyteidl.core.Node<a class="headerlink" href="#flyteidl-core-node" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L93">[flyteidl.core.Node proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L94">[flyteidl.core.Node proto]</a></p>
 <p>A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch
 node.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -411,16 +415,22 @@ nodes outputs using the alias if one’s specified.</p>
 </div>
 <div class="section" id="flyteidl-core-workflowmetadata">
 <span id="api-msg-flyteidl-core-workflowmetadata"></span><h2>flyteidl.core.WorkflowMetadata<a class="headerlink" href="#flyteidl-core-workflowmetadata" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L130">[flyteidl.core.WorkflowMetadata proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L131">[flyteidl.core.WorkflowMetadata proto]</a></p>
 <p>Metadata for the entire workflow.
 To be used in the future.</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;queuing_budget&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
+<dl class="simple" id="api-field-flyteidl-core-workflowmetadata-queuing-budget">
+<dt>queuing_budget</dt><dd><p>(<span class="xref std std-ref">google.protobuf.Duration</span>) Total wait time a workflow can be delayed by queueing.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-core-workflowmetadatadefaults">
 <span id="api-msg-flyteidl-core-workflowmetadatadefaults"></span><h2>flyteidl.core.WorkflowMetadataDefaults<a class="headerlink" href="#flyteidl-core-workflowmetadatadefaults" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L135">[flyteidl.core.WorkflowMetadataDefaults proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L137">[flyteidl.core.WorkflowMetadataDefaults proto]</a></p>
 <p>Default Workflow Metadata for the entire workflow.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;interruptible&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
@@ -436,7 +446,7 @@ unless explicitly set at the node level.</p>
 </div>
 <div class="section" id="flyteidl-core-workflowtemplate">
 <span id="api-msg-flyteidl-core-workflowtemplate"></span><h2>flyteidl.core.WorkflowTemplate<a class="headerlink" href="#flyteidl-core-workflowtemplate" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L144">[flyteidl.core.WorkflowTemplate proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L146">[flyteidl.core.WorkflowTemplate proto]</a></p>
 <p>Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,
 directed acyclic graph.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>

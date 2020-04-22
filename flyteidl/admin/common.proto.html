@@ -113,6 +113,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-urlblob">flyteidl.admin.UrlBlob</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-labels">flyteidl.admin.Labels</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-annotations">flyteidl.admin.Annotations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-admin-namedentitystate">Enum flyteidl.admin.NamedEntityState</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="event.proto.html">event.proto</a></li>
@@ -137,6 +138,10 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -237,9 +242,10 @@ The combination of project + domain + name uniquely identifies the resource.
 </div>
 <div class="section" id="flyteidl-admin-namedentitymetadata">
 <span id="api-msg-flyteidl-admin-namedentitymetadata"></span><h2>flyteidl.admin.NamedEntityMetadata<a class="headerlink" href="#flyteidl-admin-namedentitymetadata" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L23">[flyteidl.admin.NamedEntityMetadata proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L32">[flyteidl.admin.NamedEntityMetadata proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-  <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+  <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -248,10 +254,15 @@ The combination of project + domain + name uniquely identifies the resource.
 +optional</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-admin-namedentitymetadata-state">
+<dt>state</dt><dd><p>(<a class="reference internal" href="#api-enum-flyteidl-admin-namedentitystate"><span class="std std-ref">flyteidl.admin.NamedEntityState</span></a>) Shared state across all version of the entity
+At this point in time, only workflow entities can have their state archived.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-admin-namedentity">
 <span id="api-msg-flyteidl-admin-namedentity"></span><h2>flyteidl.admin.NamedEntity<a class="headerlink" href="#flyteidl-admin-namedentity" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L31">[flyteidl.admin.NamedEntity proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L44">[flyteidl.admin.NamedEntity proto]</a></p>
 <p>Describes information common to a NamedEntity, identified by a project /
 domain / name / resource type combination</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -276,7 +287,7 @@ domain / name / resource type combination</p>
 </div>
 <div class="section" id="flyteidl-admin-sort">
 <span id="api-msg-flyteidl-admin-sort"></span><h2>flyteidl.admin.Sort<a class="headerlink" href="#flyteidl-admin-sort" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L38">[flyteidl.admin.Sort proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L51">[flyteidl.admin.Sort proto]</a></p>
 <p>Species sort ordering in a list request.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -297,7 +308,7 @@ TODO(katrogan): Add string validation here. This should never be empty.</p>
 </div>
 <div class="section" id="enum-flyteidl-admin-sort-direction">
 <span id="api-enum-flyteidl-admin-sort-direction"></span><h2>Enum flyteidl.admin.Sort.Direction<a class="headerlink" href="#enum-flyteidl-admin-sort-direction" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L39">[flyteidl.admin.Sort.Direction proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L52">[flyteidl.admin.Sort.Direction proto]</a></p>
 <dl class="simple" id="api-enum-value-flyteidl-admin-sort-direction-descending">
 <dt>DESCENDING</dt><dd><p><em>(DEFAULT)</em> ⁣</p>
 </dd>
@@ -309,14 +320,15 @@ TODO(katrogan): Add string validation here. This should never be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-namedentityidentifierlistrequest">
 <span id="api-msg-flyteidl-admin-namedentityidentifierlistrequest"></span><h2>flyteidl.admin.NamedEntityIdentifierListRequest<a class="headerlink" href="#flyteidl-admin-namedentityidentifierlistrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L53">[flyteidl.admin.NamedEntityIdentifierListRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L66">[flyteidl.admin.NamedEntityIdentifierListRequest proto]</a></p>
 <p>Represents a request structure to list identifiers.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;limit&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;token&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;sort_by&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;sort_by&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;filters&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -343,10 +355,15 @@ in a query.
 +optional</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-admin-namedentityidentifierlistrequest-filters">
+<dt>filters</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) Indicates a list of filters passed as string.
++optional</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-admin-namedentitylistrequest">
 <span id="api-msg-flyteidl-admin-namedentitylistrequest"></span><h2>flyteidl.admin.NamedEntityListRequest<a class="headerlink" href="#flyteidl-admin-namedentitylistrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L71">[flyteidl.admin.NamedEntityListRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L88">[flyteidl.admin.NamedEntityListRequest proto]</a></p>
 <p>Represents a request structure to list NamedEntity objects</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;resource_type&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -354,7 +371,8 @@ in a query.
   <span class="nt">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;limit&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;token&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;sort_by&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;sort_by&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;filters&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -385,10 +403,15 @@ in a query.
 +optional</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-admin-namedentitylistrequest-filters">
+<dt>filters</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) Indicates a list of filters passed as string.
++optional</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-admin-namedentityidentifierlist">
 <span id="api-msg-flyteidl-admin-namedentityidentifierlist"></span><h2>flyteidl.admin.NamedEntityIdentifierList<a class="headerlink" href="#flyteidl-admin-namedentityidentifierlist" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L90">[flyteidl.admin.NamedEntityIdentifierList proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L112">[flyteidl.admin.NamedEntityIdentifierList proto]</a></p>
 <p>Represents a list of NamedEntityIdentifiers.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;entities&quot;</span><span class="p">:</span> <span class="p">[],</span>
@@ -408,7 +431,7 @@ in a query. If there are no more results, this value will be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-namedentitylist">
 <span id="api-msg-flyteidl-admin-namedentitylist"></span><h2>flyteidl.admin.NamedEntityList<a class="headerlink" href="#flyteidl-admin-namedentitylist" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L100">[flyteidl.admin.NamedEntityList proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L122">[flyteidl.admin.NamedEntityList proto]</a></p>
 <p>Represents a list of NamedEntityIdentifiers.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;entities&quot;</span><span class="p">:</span> <span class="p">[],</span>
@@ -428,7 +451,7 @@ in a query. If there are no more results, this value will be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-namedentitygetrequest">
 <span id="api-msg-flyteidl-admin-namedentitygetrequest"></span><h2>flyteidl.admin.NamedEntityGetRequest<a class="headerlink" href="#flyteidl-admin-namedentitygetrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L110">[flyteidl.admin.NamedEntityGetRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L132">[flyteidl.admin.NamedEntityGetRequest proto]</a></p>
 <p>A request to retrieve the metadata associated with a NamedEntityIdentifier</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;resource_type&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -447,7 +470,7 @@ in a query. If there are no more results, this value will be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-namedentityupdaterequest">
 <span id="api-msg-flyteidl-admin-namedentityupdaterequest"></span><h2>flyteidl.admin.NamedEntityUpdateRequest<a class="headerlink" href="#flyteidl-admin-namedentityupdaterequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L116">[flyteidl.admin.NamedEntityUpdateRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L138">[flyteidl.admin.NamedEntityUpdateRequest proto]</a></p>
 <p>Request to set the referenced launch plan state to the configured value.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;resource_type&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -471,7 +494,7 @@ in a query. If there are no more results, this value will be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-namedentityupdateresponse">
 <span id="api-msg-flyteidl-admin-namedentityupdateresponse"></span><h2>flyteidl.admin.NamedEntityUpdateResponse<a class="headerlink" href="#flyteidl-admin-namedentityupdateresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L127">[flyteidl.admin.NamedEntityUpdateResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L149">[flyteidl.admin.NamedEntityUpdateResponse proto]</a></p>
 <p>Purposefully empty, may be populated in the future.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
 </pre></div>
@@ -479,7 +502,7 @@ in a query. If there are no more results, this value will be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-objectgetrequest">
 <span id="api-msg-flyteidl-admin-objectgetrequest"></span><h2>flyteidl.admin.ObjectGetRequest<a class="headerlink" href="#flyteidl-admin-objectgetrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L131">[flyteidl.admin.ObjectGetRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L153">[flyteidl.admin.ObjectGetRequest proto]</a></p>
 <p>Represents a structure to fetch a single resource.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
@@ -493,7 +516,7 @@ in a query. If there are no more results, this value will be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-resourcelistrequest">
 <span id="api-msg-flyteidl-admin-resourcelistrequest"></span><h2>flyteidl.admin.ResourceListRequest<a class="headerlink" href="#flyteidl-admin-resourcelistrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L138">[flyteidl.admin.ResourceListRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L160">[flyteidl.admin.ResourceListRequest proto]</a></p>
 <p>Represents a request structure to retrieve a list of resources.
 Resources include: Task, Workflow, LaunchPlan</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -533,7 +556,7 @@ More info on constructing filters : &lt;Link&gt;
 </div>
 <div class="section" id="flyteidl-admin-emailnotification">
 <span id="api-msg-flyteidl-admin-emailnotification"></span><h2>flyteidl.admin.EmailNotification<a class="headerlink" href="#flyteidl-admin-emailnotification" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L157">[flyteidl.admin.EmailNotification proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L179">[flyteidl.admin.EmailNotification proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;recipients_email&quot;</span><span class="p">:</span> <span class="p">[]</span>
 <span class="p">}</span>
@@ -546,7 +569,7 @@ More info on constructing filters : &lt;Link&gt;
 </div>
 <div class="section" id="flyteidl-admin-pagerdutynotification">
 <span id="api-msg-flyteidl-admin-pagerdutynotification"></span><h2>flyteidl.admin.PagerDutyNotification<a class="headerlink" href="#flyteidl-admin-pagerdutynotification" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L162">[flyteidl.admin.PagerDutyNotification proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L184">[flyteidl.admin.PagerDutyNotification proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;recipients_email&quot;</span><span class="p">:</span> <span class="p">[]</span>
 <span class="p">}</span>
@@ -559,7 +582,7 @@ More info on constructing filters : &lt;Link&gt;
 </div>
 <div class="section" id="flyteidl-admin-slacknotification">
 <span id="api-msg-flyteidl-admin-slacknotification"></span><h2>flyteidl.admin.SlackNotification<a class="headerlink" href="#flyteidl-admin-slacknotification" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L167">[flyteidl.admin.SlackNotification proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L189">[flyteidl.admin.SlackNotification proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;recipients_email&quot;</span><span class="p">:</span> <span class="p">[]</span>
 <span class="p">}</span>
@@ -572,7 +595,7 @@ More info on constructing filters : &lt;Link&gt;
 </div>
 <div class="section" id="flyteidl-admin-notification">
 <span id="api-msg-flyteidl-admin-notification"></span><h2>flyteidl.admin.Notification<a class="headerlink" href="#flyteidl-admin-notification" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L176">[flyteidl.admin.Notification proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L198">[flyteidl.admin.Notification proto]</a></p>
 <p>Represents a structure for notifications based on execution status.
 The Notification content is configured within Admin. Future iterations could
 expose configuring notifications with custom content.</p>
@@ -606,7 +629,7 @@ expose configuring notifications with custom content.</p>
 </div>
 <div class="section" id="flyteidl-admin-urlblob">
 <span id="api-msg-flyteidl-admin-urlblob"></span><h2>flyteidl.admin.UrlBlob<a class="headerlink" href="#flyteidl-admin-urlblob" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L190">[flyteidl.admin.UrlBlob proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L212">[flyteidl.admin.UrlBlob proto]</a></p>
 <p>Represents a string url and associated metadata used throughout the platform.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -625,7 +648,7 @@ expose configuring notifications with custom content.</p>
 </div>
 <div class="section" id="flyteidl-admin-labels">
 <span id="api-msg-flyteidl-admin-labels"></span><h2>flyteidl.admin.Labels<a class="headerlink" href="#flyteidl-admin-labels" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L201">[flyteidl.admin.Labels proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L223">[flyteidl.admin.Labels proto]</a></p>
 <p>Label values to be applied to an execution resource.
 In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
 to specify how to merge labels defined at registration and execution time.</p>
@@ -641,7 +664,7 @@ to specify how to merge labels defined at registration and execution time.</p>
 </div>
 <div class="section" id="flyteidl-admin-annotations">
 <span id="api-msg-flyteidl-admin-annotations"></span><h2>flyteidl.admin.Annotations<a class="headerlink" href="#flyteidl-admin-annotations" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L209">[flyteidl.admin.Annotations proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L231">[flyteidl.admin.Annotations proto]</a></p>
 <p>Annotation values to be applied to an execution resource.
 In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
 to specify how to merge annotations defined at registration and execution time.</p>
@@ -652,6 +675,19 @@ to specify how to merge annotations defined at registration and execution time.<
 </div>
 <dl class="simple" id="api-field-flyteidl-admin-annotations-values">
 <dt>values</dt><dd><p>(map&lt;<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>, <a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>&gt;) Map of custom annotations to be applied to the execution resource.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="enum-flyteidl-admin-namedentitystate">
+<span id="api-enum-flyteidl-admin-namedentitystate"></span><h2>Enum flyteidl.admin.NamedEntityState<a class="headerlink" href="#enum-flyteidl-admin-namedentitystate" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L24">[flyteidl.admin.NamedEntityState proto]</a></p>
+<p>The status of the named entity is used to control its visibility in the UI.</p>
+<dl class="simple" id="api-enum-value-flyteidl-admin-namedentitystate-named-entity-active">
+<dt>NAMED_ENTITY_ACTIVE</dt><dd><p><em>(DEFAULT)</em> ⁣By default, all named entities are considered active and under development.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-admin-namedentitystate-named-entity-archived">
+<dt>NAMED_ENTITY_ARCHIVED</dt><dd><p>⁣Archived named entities are no longer visible in the UI.</p>
 </dd>
 </dl>
 </div>

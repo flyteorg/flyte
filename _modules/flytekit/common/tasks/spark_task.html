@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -211,6 +215,7 @@
             <span class="n">task_type</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="p">,</span>
             <span class="n">discoverable</span><span class="p">,</span>
             <span class="n">timeout</span><span class="p">,</span>
@@ -223,6 +228,7 @@
 <span class="sd">        :param Text task_type: string describing the task type</span>
 <span class="sd">        :param Text discovery_version: string describing the version for task discovery purposes</span>
 <span class="sd">        :param int retries: Number of retries to attempt</span>
+<span class="sd">        :param bool interruptible: Whether or not task is interruptible</span>
 <span class="sd">        :param Text deprecated:</span>
 <span class="sd">        :param bool discoverable:</span>
 <span class="sd">        :param datetime.timedelta timeout:</span>
@@ -246,6 +252,7 @@
             <span class="n">task_type</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="p">,</span>
             <span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="s2">&quot;&quot;</span><span class="p">,</span>

@@ -90,7 +90,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../language/index.html">Flyte Specification Language</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../extending/index.html">Extending Flyte</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Contributing to Docs</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#building">Building</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-all-documentation-including-dependent-repos">Building all documentation including dependent repos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-a-local-copy-of-documentation-for-rst-modifications-only">Building a local copy of documentation for RST modifications only</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
 </ul>
 </li>
@@ -101,6 +102,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -176,23 +181,32 @@
 <li><p>RST files generated from the Flyte IDL repository</p></li>
 <li><p>RST files generated from the Flytekit Python SDK</p></li>
 </ul>
-<div class="section" id="building">
-<h2>Building<a class="headerlink" href="#building" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="building-all-documentation-including-dependent-repos">
+<h2>Building all documentation including dependent repos<a class="headerlink" href="#building-all-documentation-including-dependent-repos" title="Permalink to this headline">¶</a></h2>
 <p>In order to create this set of documentation run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make update_ref_docs &amp;&amp; make all_docs
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make generate-docs
 </pre></div>
 </div>
-<p>What happens is:
-* <code class="docutils literal notranslate"><span class="pre">./generate_docs.sh</span></code> runs.  All this does is create a temp directory and clone the two aforementioned repos.
-* The Sphinx builder container will run with files from all three repos (the two cloned one and this one) mounted.</p>
-<blockquote>
-<div><ul class="simple">
+<dl class="simple">
+<dt>What happens is:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">./generate_docs.sh</span></code> runs.  All this does is create a temp directory and clone the two aforementioned repos.</p></li>
+<li><p>The Sphinx builder container will run with files from all three repos (the two cloned one and this one) mounted.</p></li>
 <li><p>It will generate RST files for Flytekit from the Python source code</p></li>
 <li><p>Copy RST files from all three repos into a common location</p></li>
 <li><p>Build HTML files into the <code class="docutils literal notranslate"><span class="pre">docs/</span></code> folder</p></li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
 <p>Please then commit the newly generated files before merging your PR.  In the future we will invest in CI to help with this.</p>
+</div>
+<div class="section" id="building-a-local-copy-of-documentation-for-rst-modifications-only">
+<h2>Building a local copy of documentation for RST modifications only<a class="headerlink" href="#building-a-local-copy-of-documentation-for-rst-modifications-only" title="Permalink to this headline">¶</a></h2>
+<p>This can be used if one wants to quickly verify documentation updates in the rst files housed in the flyte repo. These are the main docs that flyte publishes.
+Building all documentation can be a slow process. To speed up the iteration one can use the make target:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make generate-local-docs
+</pre></div>
+</div>
+<p>This needs a local virtual environment with sphinx-build installed.</p>
 </div>
 <div class="section" id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>

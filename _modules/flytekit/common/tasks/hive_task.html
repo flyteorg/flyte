@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -189,6 +193,7 @@
             <span class="n">task_type</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="p">,</span>
             <span class="n">storage_request</span><span class="p">,</span>
             <span class="n">cpu_request</span><span class="p">,</span>
@@ -225,7 +230,7 @@
 <span class="sd">        :param dict[Text, Text] environment:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_task_function</span> <span class="o">=</span> <span class="n">task_function</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SdkHiveTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">task_function</span><span class="p">,</span> <span class="n">task_type</span><span class="p">,</span> <span class="n">discovery_version</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">,</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SdkHiveTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">task_function</span><span class="p">,</span> <span class="n">task_type</span><span class="p">,</span> <span class="n">discovery_version</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">interruptible</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">,</span>
                                           <span class="n">storage_request</span><span class="p">,</span> <span class="n">cpu_request</span><span class="p">,</span> <span class="n">gpu_request</span><span class="p">,</span> <span class="n">memory_request</span><span class="p">,</span> <span class="n">storage_limit</span><span class="p">,</span>
                                           <span class="n">cpu_limit</span><span class="p">,</span> <span class="n">gpu_limit</span><span class="p">,</span> <span class="n">memory_limit</span><span class="p">,</span> <span class="n">discoverable</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">environment</span><span class="p">,</span> <span class="p">{})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_task_parameters</span><span class="p">(</span><span class="n">cluster_label</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>

@@ -113,6 +113,10 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -239,13 +243,13 @@ should sleep before trying again.
 <span id="flytekit-contrib-sensors-task-module"></span><h2>flytekit.contrib.sensors.task module<a class="headerlink" href="#module-flytekit.contrib.sensors.task" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="flytekit.contrib.sensors.task.SensorTask">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.contrib.sensors.task.</code><code class="sig-name descname">SensorTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">environment</em>, <em class="sig-param">custom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/contrib/sensors/task.html#SensorTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.contrib.sensors.task.SensorTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.contrib.sensors.task.</code><code class="sig-name descname">SensorTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">environment</em>, <em class="sig-param">custom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/contrib/sensors/task.html#SensorTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.contrib.sensors.task.SensorTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span></code></a></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="flytekit.contrib.sensors.task.sensor_task">
-<code class="sig-prename descclassname">flytekit.contrib.sensors.task.</code><code class="sig-name descname">sensor_task</code><span class="sig-paren">(</span><em class="sig-param">_task_function=None</em>, <em class="sig-param">retries=0</em>, <em class="sig-param">deprecated=''</em>, <em class="sig-param">storage_request=None</em>, <em class="sig-param">cpu_request=None</em>, <em class="sig-param">gpu_request=None</em>, <em class="sig-param">memory_request=None</em>, <em class="sig-param">storage_limit=None</em>, <em class="sig-param">cpu_limit=None</em>, <em class="sig-param">gpu_limit=None</em>, <em class="sig-param">memory_limit=None</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">environment=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/contrib/sensors/task.html#sensor_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.contrib.sensors.task.sensor_task" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.contrib.sensors.task.</code><code class="sig-name descname">sensor_task</code><span class="sig-paren">(</span><em class="sig-param">_task_function=None</em>, <em class="sig-param">retries=0</em>, <em class="sig-param">interruptible=None</em>, <em class="sig-param">deprecated=''</em>, <em class="sig-param">storage_request=None</em>, <em class="sig-param">cpu_request=None</em>, <em class="sig-param">gpu_request=None</em>, <em class="sig-param">memory_request=None</em>, <em class="sig-param">storage_limit=None</em>, <em class="sig-param">cpu_limit=None</em>, <em class="sig-param">gpu_limit=None</em>, <em class="sig-param">memory_limit=None</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">environment=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/contrib/sensors/task.html#sensor_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.contrib.sensors.task.sensor_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorator to create a Sensor Task definition.  This task will run as a single unit of work on the platform.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -262,6 +266,7 @@ to 0.
 </pre></div>
 </div>
 </p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Specify whether task is interruptible</p></li>
 <li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
 will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
 <li><p><strong>storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space

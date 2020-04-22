@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -183,6 +187,9 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">SdkLaunchPlan</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="kc">None</span>
 
+        <span class="c1"># The interface is not set explicitly unless fetched in an engine context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="kc">None</span>
+
 <div class="viewcode-block" id="SdkLaunchPlan.promote_from_model"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -216,12 +223,18 @@
 <span class="sd">            domain, and name.</span>
 <span class="sd">        :rtype: SdkLaunchPlan</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow</span>
         <span class="n">launch_plan_id</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
             <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">LAUNCH_PLAN</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span>
         <span class="p">)</span>
         <span class="n">lp</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">fetch_launch_plan</span><span class="p">(</span><span class="n">launch_plan_id</span><span class="p">)</span>
         <span class="n">sdk_lp</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">lp</span><span class="o">.</span><span class="n">spec</span><span class="p">)</span>
         <span class="n">sdk_lp</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">lp</span><span class="o">.</span><span class="n">id</span>
+
+        <span class="c1"># TODO: Add a test for this, and this function as a whole</span>
+        <span class="n">wf_id</span> <span class="o">=</span> <span class="n">sdk_lp</span><span class="o">.</span><span class="n">workflow_id</span>
+        <span class="n">lp_wf</span> <span class="o">=</span> <span class="n">_workflow</span><span class="o">.</span><span class="n">SdkWorkflow</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">wf_id</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">wf_id</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">wf_id</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">wf_id</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="n">sdk_lp</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="n">lp_wf</span><span class="o">.</span><span class="n">interface</span>
         <span class="k">return</span> <span class="n">sdk_lp</span></div>
 
 <div class="viewcode-block" id="SdkLaunchPlan.register"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.register">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -510,7 +523,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
-                <span class="s2">&quot;When adding a task as a node in a workflow, all inputs must be specified with kwargs only.  We &quot;</span>
+                <span class="s2">&quot;When adding a launchplan as a node in a workflow, all inputs must be specified with kwargs only.  We &quot;</span>
                 <span class="s2">&quot;detected </span><span class="si">{}</span><span class="s2"> positional args.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
             <span class="p">)</span>
 

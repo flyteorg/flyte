@@ -89,6 +89,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../flyteidl/index.html">Flyte Language and API specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../flytekit/index.html">Flytekit</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -155,11 +159,15 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
 <span class="kn">import</span> <span class="nn">abc</span> <span class="k">as</span> <span class="nn">_abc</span>
+<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">from</span> <span class="nn">sortedcontainers</span> <span class="k">import</span> <span class="n">SortedDict</span> <span class="k">as</span> <span class="n">_SortedDict</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span><span class="p">,</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promise</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span><span class="p">,</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promise</span><span class="p">,</span> <span class="n">component_nodes</span> <span class="k">as</span> <span class="n">_component_nodes</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span><span class="p">,</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span><span class="p">,</span> <span class="n">artifact</span> <span class="k">as</span> <span class="n">_artifact_mixin</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">executions</span> <span class="k">as</span> <span class="n">_task_executions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
@@ -213,7 +221,7 @@
 
     <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;iteritems&#39;</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="s1">&#39;items&#39;</span><span class="p">):</span>
-           <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="n">key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
@@ -240,6 +248,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This subclass of ParameterMapper is used to represent outputs for a given node.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">_return_mapping_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_node</span><span class="p">,</span> <span class="n">sdk_type</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.nodes.Node sdk_node:</span>
@@ -249,62 +258,7 @@
         <span class="k">return</span> <span class="n">_promise</span><span class="o">.</span><span class="n">NodeOutput</span><span class="p">(</span><span class="n">sdk_node</span><span class="p">,</span> <span class="n">sdk_type</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="SdkTaskNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkTaskNode">[docs]</a><span class="k">class</span> <span class="nc">SdkTaskNode</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_workflow_model</span><span class="o">.</span><span class="n">TaskNode</span><span class="p">)):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_task</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param flytekit.common.tasks.task.SdkTask sdk_task:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_task</span> <span class="o">=</span> <span class="n">sdk_task</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SdkTaskNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">reference_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        A globally unique identifier for the task.</span>
-<span class="sd">        :rtype: flytekit.models.core.identifier.Identifier</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_task</span><span class="o">.</span><span class="n">id</span>
-
-<div class="viewcode-block" id="SdkTaskNode.promote_from_model"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkTaskNode.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_model</span><span class="p">):</span>
-        <span class="c1"># TODO: Hydrate using identifier and querying the engine</span>
-        <span class="k">pass</span></div></div>
-
-
-<div class="viewcode-block" id="SdkWorkflowNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkWorkflowNode">[docs]</a><span class="k">class</span> <span class="nc">SdkWorkflowNode</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_workflow_model</span><span class="o">.</span><span class="n">WorkflowNode</span><span class="p">)):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_workflow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sdk_launch_plan</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param flytekit.common.workflow.SdkWorkflow sdk_workflow:</span>
-<span class="sd">        :param flytekit.common.launch_plan.SdkRunnableLaunchPlan sdk_launch_plan:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_workflow</span> <span class="o">=</span> <span class="n">sdk_workflow</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_launch_plan</span> <span class="o">=</span> <span class="n">sdk_launch_plan</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SdkWorkflowNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">launchplan_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        [Optional] A globally unique identifier for the launch plan.  Should map to Admin.</span>
-<span class="sd">        :rtype: flytekit.models.core.identifier.Identifier</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_launch_plan</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_launch_plan</span> <span class="k">else</span> <span class="kc">None</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sub_workflow_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        [Optional] Reference to a subworkflow, that should be defined with the compiler context.</span>
-<span class="sd">        :rtype: flytekit.models.core.identifier.Identifier</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_workflow</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_workflow</span> <span class="k">else</span> <span class="kc">None</span>
-
-<div class="viewcode-block" id="SdkWorkflowNode.promote_from_model"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkWorkflowNode.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_model</span><span class="p">):</span>
-        <span class="c1"># TODO: Hydrate using identifier and querying the engine</span>
-        <span class="k">pass</span></div></div>
-
-
-<div class="viewcode-block" id="SdkNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkNode">[docs]</a><span class="k">class</span> <span class="nc">SdkNode</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span>  <span class="n">_hash_mixin</span><span class="o">.</span><span class="n">HashOnReferenceMixin</span><span class="p">,</span> <span class="n">_workflow_model</span><span class="o">.</span><span class="n">Node</span><span class="p">)):</span>
+<div class="viewcode-block" id="SdkNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkNode">[docs]</a><span class="k">class</span> <span class="nc">SdkNode</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_hash_mixin</span><span class="o">.</span><span class="n">HashOnReferenceMixin</span><span class="p">,</span> <span class="n">_workflow_model</span><span class="o">.</span><span class="n">Node</span><span class="p">)):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -316,7 +270,7 @@
             <span class="n">sdk_workflow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">sdk_launch_plan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">sdk_branch</span><span class="o">=</span><span class="kc">None</span>
-            <span class="p">):</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text id: A workflow-level unique identifier that identifies this node in the workflow. &quot;inputs&quot; and</span>
 <span class="sd">            &quot;outputs&quot; are reserved node ids that cannot be used by other nodes.</span>
@@ -329,7 +283,7 @@
 <span class="sd">        :param flytekit.common.tasks.task.SdkTask sdk_task: The task to execute in this</span>
 <span class="sd">            node.</span>
 <span class="sd">        :param flytekit.common.workflow.SdkWorkflow sdk_workflow: The workflow to execute in this node.</span>
-<span class="sd">        :param flytekit.common.launch_plan.SdkRunnableLaunchPlan sdk_launch_plan: The launch plan to execute in this</span>
+<span class="sd">        :param flytekit.common.launch_plan.SdkLaunchPlan sdk_launch_plan: The launch plan to execute in this</span>
 <span class="sd">        node.</span>
 <span class="sd">        :param TODO sdk_branch: TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -347,9 +301,9 @@
 
         <span class="n">workflow_node</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">sdk_workflow</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">workflow_node</span> <span class="o">=</span> <span class="n">SdkWorkflowNode</span><span class="p">(</span><span class="n">sdk_workflow</span><span class="o">=</span><span class="n">sdk_workflow</span><span class="p">)</span>
+            <span class="n">workflow_node</span> <span class="o">=</span> <span class="n">_component_nodes</span><span class="o">.</span><span class="n">SdkWorkflowNode</span><span class="p">(</span><span class="n">sdk_workflow</span><span class="o">=</span><span class="n">sdk_workflow</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">sdk_launch_plan</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">workflow_node</span> <span class="o">=</span> <span class="n">SdkWorkflowNode</span><span class="p">(</span><span class="n">sdk_launch_plan</span><span class="o">=</span><span class="n">sdk_launch_plan</span><span class="p">)</span>
+            <span class="n">workflow_node</span> <span class="o">=</span> <span class="n">_component_nodes</span><span class="o">.</span><span class="n">SdkWorkflowNode</span><span class="p">(</span><span class="n">sdk_launch_plan</span><span class="o">=</span><span class="n">sdk_launch_plan</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">SdkNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="n">_dnsify</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">if</span> <span class="nb">id</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
@@ -357,7 +311,7 @@
             <span class="n">inputs</span><span class="o">=</span><span class="n">bindings</span><span class="p">,</span>
             <span class="n">upstream_node_ids</span><span class="o">=</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">upstream_nodes</span><span class="p">],</span>
             <span class="n">output_aliases</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># TODO: Are aliases a thing in SDK nodes</span>
-            <span class="n">task_node</span><span class="o">=</span><span class="n">SdkTaskNode</span><span class="p">(</span><span class="n">sdk_task</span><span class="p">)</span> <span class="k">if</span> <span class="n">sdk_task</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">task_node</span><span class="o">=</span><span class="n">_component_nodes</span><span class="o">.</span><span class="n">SdkTaskNode</span><span class="p">(</span><span class="n">sdk_task</span><span class="p">)</span> <span class="k">if</span> <span class="n">sdk_task</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">workflow_node</span><span class="o">=</span><span class="n">workflow_node</span><span class="p">,</span>
             <span class="n">branch_node</span><span class="o">=</span><span class="n">sdk_branch</span><span class="o">.</span><span class="n">target</span> <span class="k">if</span> <span class="n">sdk_branch</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
@@ -370,13 +324,67 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_sdk_object</span>
 
 <div class="viewcode-block" id="SdkNode.promote_from_model"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkNode.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.workflow.Node model:</span>
+<span class="sd">        :param dict[flytekit.models.core.identifier.Identifier, flytekit.models.core.workflow.WorkflowTemplate]</span>
+<span class="sd">            sub_workflows:</span>
+<span class="sd">        :param dict[flytekit.models.core.identifier.Identifier, flytekit.models.task.TaskTemplate] tasks: If specified,</span>
+<span class="sd">            these task templates will be passed to the SdkTaskNode promote_from_model call, and used</span>
+<span class="sd">            instead of fetching from Admin.</span>
 <span class="sd">        :rtype: SdkNode</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;An SDK node cannot be instantiated merely from a data model object &quot;</span>
-                                              <span class="s2">&quot;because it must be contextualized within a workflow.&quot;</span><span class="p">)</span></div>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">id</span>
+        <span class="c1"># This should never be called</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">START_NODE_ID</span> <span class="ow">or</span> <span class="nb">id</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">END_NODE_ID</span><span class="p">:</span>
+            <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Should not call promote from model on a start node or end node </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">sdk_task_node</span><span class="p">,</span> <span class="n">sdk_workflow_node</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">task_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sdk_task_node</span> <span class="o">=</span> <span class="n">_component_nodes</span><span class="o">.</span><span class="n">SdkTaskNode</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">task_node</span><span class="p">,</span> <span class="n">tasks</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">model</span><span class="o">.</span><span class="n">workflow_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sdk_workflow_node</span> <span class="o">=</span> <span class="n">_component_nodes</span><span class="o">.</span><span class="n">SdkWorkflowNode</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">workflow_node</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span><span class="s2">&quot;Bad Node model, neither task nor workflow detected&quot;</span><span class="p">)</span>
+
+        <span class="c1"># When WorkflowTemplate models (containing node models) are returned by Admin, they&#39;ve been compiled with a</span>
+        <span class="c1"># start node.  In order to make the promoted SdkWorkflow look the same, we strip the start-node text back out.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">promise</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">node_id</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">START_NODE_ID</span><span class="p">:</span>
+                <span class="n">i</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">_node_id</span> <span class="o">=</span> <span class="n">_constants</span><span class="o">.</span><span class="n">GLOBAL_INPUT_NODE_ID</span>
+
+        <span class="k">if</span> <span class="n">sdk_task_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+                <span class="n">upstream_nodes</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># set downstream, model doesn&#39;t contain this information</span>
+                <span class="n">bindings</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+                <span class="n">sdk_task</span><span class="o">=</span><span class="n">sdk_task_node</span><span class="o">.</span><span class="n">sdk_task</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">sdk_workflow_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sdk_workflow_node</span><span class="o">.</span><span class="n">sdk_workflow</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+                    <span class="n">upstream_nodes</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># set downstream, model doesn&#39;t contain this information</span>
+                    <span class="n">bindings</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
+                    <span class="n">metadata</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+                    <span class="n">sdk_workflow</span><span class="o">=</span><span class="n">sdk_workflow_node</span><span class="o">.</span><span class="n">sdk_workflow</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">sdk_workflow_node</span><span class="o">.</span><span class="n">sdk_launch_plan</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+                    <span class="n">upstream_nodes</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># set downstream, model doesn&#39;t contain this information</span>
+                    <span class="n">bindings</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
+                    <span class="n">metadata</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+                    <span class="n">sdk_launch_plan</span><span class="o">=</span><span class="n">sdk_workflow_node</span><span class="o">.</span><span class="n">sdk_launch_plan</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span>
+                    <span class="s2">&quot;Bad SdkWorkflowNode model, both lp and workflow are None&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span><span class="s2">&quot;Bad SdkNode model, both task and workflow nodes are empty&quot;</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">upstream_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -410,6 +418,7 @@
                 <span class="s2">&quot;workflow already?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">_dnsify</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">if</span> <span class="nb">id</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="nb">id</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="SdkNode.with_overrides"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkNode.with_overrides">[docs]</a>    <span class="k">def</span> <span class="nf">with_overrides</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -430,6 +439,7 @@
     <span class="k">def</span> <span class="nf">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a node downstream of this node without necessarily mapping outputs -&gt; inputs.</span>
+
 <span class="sd">        :param Node other: node to place downstream</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">upstream_nodes</span><span class="p">):</span>

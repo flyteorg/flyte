@@ -113,6 +113,10 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/datacatalog">DataCatalog</a></li>
 </ul>
 
             
@@ -273,7 +277,7 @@ this will raise an exception.
 
 <dl class="class">
 <dt id="flytekit.common.tasks.hive_task.SdkHiveTask">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.hive_task.</code><code class="sig-name descname">SdkHiveTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">cluster_label</em>, <em class="sig-param">tags</em>, <em class="sig-param">environment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/hive_task.html#SdkHiveTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.hive_task.SdkHiveTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.hive_task.</code><code class="sig-name descname">SdkHiveTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">cluster_label</em>, <em class="sig-param">tags</em>, <em class="sig-param">environment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/hive_task.html#SdkHiveTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.hive_task.SdkHiveTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span></code></a></p>
 <p>This class includes the additional logic for building a task that executes as a batch hive task.</p>
 <dl class="method">
@@ -351,6 +355,46 @@ It will raise an exception if necessary.
 </dd></dl>
 
 </div>
+<div class="section" id="module-flytekit.common.tasks.presto_task">
+<span id="flytekit-common-tasks-presto-task-module"></span><h2>flytekit.common.tasks.presto_task module<a class="headerlink" href="#module-flytekit.common.tasks.presto_task" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.common.tasks.presto_task.SdkPrestoTask">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.presto_task.</code><code class="sig-name descname">SdkPrestoTask</code><span class="sig-paren">(</span><em class="sig-param">statement</em>, <em class="sig-param">output_schema</em>, <em class="sig-param">routing_group=None</em>, <em class="sig-param">catalog=None</em>, <em class="sig-param">schema=None</em>, <em class="sig-param">task_inputs=None</em>, <em class="sig-param">interruptible=False</em>, <em class="sig-param">discoverable=False</em>, <em class="sig-param">discovery_version=None</em>, <em class="sig-param">retries=1</em>, <em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/presto_task.html#SdkPrestoTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.presto_task.SdkPrestoTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.task.SdkTask" title="flytekit.common.tasks.task.SdkTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.task.SdkTask</span></code></a></p>
+<p>This class includes the logic for building a task that executes as a Presto task.</p>
+<dl class="method">
+<dt id="flytekit.common.tasks.presto_task.SdkPrestoTask.add_inputs">
+<code class="sig-name descname">add_inputs</code><span class="sig-paren">(</span><em class="sig-param">inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/presto_task.html#SdkPrestoTask.add_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.presto_task.SdkPrestoTask.add_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the inputs to this task.  This can be called multiple times, but it will fail if an input with a given
+name is added more than once, a name collides with an output, or if the name doesn’t exist as an arg name in
+the wrapped function.
+:param dict[Text, flytekit.models.interface.Variable] inputs: names and variables</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.tasks.presto_task.SdkPrestoTask.catalog">
+<em class="property">property </em><code class="sig-name descname">catalog</code><a class="headerlink" href="#flytekit.common.tasks.presto_task.SdkPrestoTask.catalog" title="Permalink to this definition">¶</a></dt>
+<dd><p>The catalog to set for the given Presto query
+:rtype: Text</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.tasks.presto_task.SdkPrestoTask.routing_group">
+<em class="property">property </em><code class="sig-name descname">routing_group</code><a class="headerlink" href="#flytekit.common.tasks.presto_task.SdkPrestoTask.routing_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>The routing group that a Presto query should be sent to for the given environment
+:rtype: Text</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.tasks.presto_task.SdkPrestoTask.schema">
+<em class="property">property </em><code class="sig-name descname">schema</code><a class="headerlink" href="#flytekit.common.tasks.presto_task.SdkPrestoTask.schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>The schema to set for the given Presto query
+:rtype: Text</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-flytekit.common.tasks.sdk_dynamic">
 <span id="flytekit-common-tasks-sdk-dynamic-module"></span><h2>flytekit.common.tasks.sdk_dynamic module<a class="headerlink" href="#module-flytekit.common.tasks.sdk_dynamic" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -380,7 +424,7 @@ It will raise an exception if necessary.
 
 <dl class="class">
 <dt id="flytekit.common.tasks.sdk_dynamic.SdkDynamicTask">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sdk_dynamic.</code><code class="sig-name descname">SdkDynamicTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">allowed_failure_ratio</em>, <em class="sig-param">max_concurrency</em>, <em class="sig-param">environment</em>, <em class="sig-param">custom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_dynamic.html#SdkDynamicTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_dynamic.SdkDynamicTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sdk_dynamic.</code><code class="sig-name descname">SdkDynamicTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">allowed_failure_ratio</em>, <em class="sig-param">max_concurrency</em>, <em class="sig-param">environment</em>, <em class="sig-param">custom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_dynamic.html#SdkDynamicTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_dynamic.SdkDynamicTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span></code></a></p>
 <p>This class includes the additional logic for building a task that executes parent-child tasks in Python code.  It
 has even more validation checks to ensure proper behavior than it’s superclasses.</p>
@@ -531,12 +575,21 @@ on output data to link back to the workflow run that created it.</p>
 
 <dl class="class">
 <dt id="flytekit.common.tasks.sdk_runnable.SdkRunnableTask">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sdk_runnable.</code><code class="sig-name descname">SdkRunnableTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">environment</em>, <em class="sig-param">custom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_runnable.html#SdkRunnableTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sdk_runnable.</code><code class="sig-name descname">SdkRunnableTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">environment</em>, <em class="sig-param">custom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_runnable.html#SdkRunnableTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.task.SdkTask" title="flytekit.common.tasks.task.SdkTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.task.SdkTask</span></code></a></p>
 <p>This class includes the additional logic for building a task that executes in Python code.  It has even more
 validation checks to ensure proper behavior than it’s superclasses.</p>
 <p>Since an SdkRunnableTask is assumed to run by hooking into Python code, we will provide additional shortcuts and
 methods on this object.</p>
+<dl class="method">
+<dt id="flytekit.common.tasks.sdk_runnable.SdkRunnableTask.add_inputs">
+<code class="sig-name descname">add_inputs</code><span class="sig-paren">(</span><em class="sig-param">inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_runnable.html#SdkRunnableTask.add_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.add_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the inputs to this task.  This can be called multiple times, but it will fail if an input with a given
+name is added more than once, a name collides with an output, or if the name doesn’t exist as an arg name in
+the wrapped function.
+:param dict[Text, flytekit.models.interface.Variable] inputs: names and variables</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="flytekit.common.tasks.sdk_runnable.SdkRunnableTask.execute">
 <code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_runnable.html#SdkRunnableTask.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.execute" title="Permalink to this definition">¶</a></dt>
@@ -641,7 +694,7 @@ literals.</p>
 <span id="flytekit-common-tasks-sidecar-task-module"></span><h2>flytekit.common.tasks.sidecar_task module<a class="headerlink" href="#module-flytekit.common.tasks.sidecar_task" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="flytekit.common.tasks.sidecar_task.SdkSidecarTask">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sidecar_task.</code><code class="sig-name descname">SdkSidecarTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">environment</em>, <em class="sig-param">pod_spec=None</em>, <em class="sig-param">primary_container_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sidecar_task.html#SdkSidecarTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sidecar_task.SdkSidecarTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sidecar_task.</code><code class="sig-name descname">SdkSidecarTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">environment</em>, <em class="sig-param">pod_spec=None</em>, <em class="sig-param">primary_container_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sidecar_task.html#SdkSidecarTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sidecar_task.SdkSidecarTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span></code></a></p>
 <p>This class includes the additional logic for building a task that executes as a Sidecar Job.</p>
 <dl class="method">
@@ -685,7 +738,7 @@ literals.</p>
 
 <dl class="class">
 <dt id="flytekit.common.tasks.spark_task.SdkSparkTask">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.spark_task.</code><code class="sig-name descname">SdkSparkTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">spark_conf</em>, <em class="sig-param">hadoop_conf</em>, <em class="sig-param">environment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/spark_task.html#SdkSparkTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.spark_task.SdkSparkTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.spark_task.</code><code class="sig-name descname">SdkSparkTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">spark_conf</em>, <em class="sig-param">hadoop_conf</em>, <em class="sig-param">environment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/spark_task.html#SdkSparkTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.spark_task.SdkSparkTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span></code></a></p>
 <p>This class includes the additional logic for building a task that executes as a Spark Job.</p>
 <dl class="method">
@@ -723,11 +776,7 @@ workflow.  Where as local engine will merely feed the outputs directly into the 
 <dl class="method">
 <dt id="flytekit.common.tasks.task.SdkTask.add_inputs">
 <code class="sig-name descname">add_inputs</code><span class="sig-paren">(</span><em class="sig-param">inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/task.html#SdkTask.add_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.add_inputs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the inputs to this task.  This can be called multiple times, but it will fail if an input with a given
-name is added more than once, a name collides with an output, or if the name doesn’t exist as an arg name in
-the wrapped function.
-:param dict[Text, flytekit.models.interface.Variable] inputs: names and variables</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.common.tasks.task.SdkTask.add_outputs">
