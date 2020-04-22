@@ -53,21 +53,24 @@ communication medium.
 
 Change management
 ------------------
-- PR templates
+To ensure that changes are trackable and the history is explainable, we use a slightly cumbersome but helpful process as follows. Some of these are our immediate goals
 - Every PR associated with an issue (automatic searchable documentation)
 - Large PR’s associated with Proposals
-- Start forming a PMC, to approve large proposals
 - Every major change is associated with documentation
 - Owner files for all repositories
-- Unit test coverage should be above 60% by x
-- End to end tests improvement plan
+
+Things to do
+- Unit test coverage should be above 60% for every repo by release 0.5.0
+- End to end tests should be run on an actual cluster.
 
 Release Train
 --------------
-- We will start tagging issues with milestones, every new issue will be associated with the next milestone. We should move it manually to a future milestone or at the time of cutting the milestone that issue may be removed.
+- We will start tagging issues with milestones, every new issue will be associated with the next milestone. If the issue is not completed by the milestone, or the contributor feels it may slip the deadline, they should manually move it to the next milestone. Every issue not removed, will be moved to the next milestone.
 - Every new issue has a “untriaged” label associated with, if we remove this label we should add an assignee. If a contributor is working on the issue, please remove this label.
 - Release indicates a release for overall flyte - marked mostly by a milestone.
-- We can start with monthly cadence
-- Of-course we can have patch releases eg. 0.1.x in between the monthly releases.
-- Add Golden Test Suite that is tested for every release train (could be very large)
+- Flyte release are monthly
+- We may have patch releases eg. 0.1.x in between the monthly releases.
+
+Things to do
+- Golden Test Suite that is tested for every release train 
 
