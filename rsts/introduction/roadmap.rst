@@ -41,3 +41,33 @@ Living Roadmap
 We are trying to maintain a Living roadmap `here <https://docs.google.com/spreadsheets/d/1V8DQfcsX_02Zac5EfAo0UrGJtLwdMPcw3wuuigVIMZU/edit?usp=sharing>`_
 
 We also maintain a raw list of all the ideas `here <https://docs.google.com/document/d/1yq8pIlhlG3gci3GJQNjdAd9bzZ-KYyLfm6I5NVms9-4/edit?usp=sharing>`_
+
+
+Milestones and Releases
+========================
+Flyte consists of many components and services. In true Agile fashion each service is independently iterated and co-ordiated by maintaing backwards compatible contracts using protobuf defined in :ref:`flyteidltoc`. Thus components like flytekit, flytepropeller, datacatalog are independently versioned.
+
+We have decided to release a new version of the overall platform in the github.com/lyft/flyte repo every month. Thus we create one milestone for end of every month which points to a new release of
+Flyte. This may change in the future, but to match our velocity of development this is our preferred option. Every release will be associated with a CHANGELOG and we will communicate over our
+communication medium.
+
+Change management
+------------------
+- PR templates
+- Every PR associated with an issue (automatic searchable documentation)
+- Large PR’s associated with Proposals
+- Start forming a PMC, to approve large proposals
+- Every major change is associated with documentation
+- Owner files for all repositories
+- Unit test coverage should be above 60% by x
+- End to end tests improvement plan
+
+Release Train
+--------------
+- We will start tagging issues with milestones, every new issue will be associated with the next milestone. We should move it manually to a future milestone or at the time of cutting the milestone that issue may be removed.
+- Every new issue has a “untriaged” label associated with, if we remove this label we should add an assignee. If a contributor is working on the issue, please remove this label.
+- Release indicates a release for overall flyte - marked mostly by a milestone.
+- We can start with monthly cadence
+- Of-course we can have patch releases eg. 0.1.x in between the monthly releases.
+- Add Golden Test Suite that is tested for every release train (could be very large)
+
