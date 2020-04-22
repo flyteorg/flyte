@@ -1284,6 +1284,7 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 		executionDeadline time.Duration
 		retries           int
 		err               error
+		expectedReason    string
 	}{
 		{
 			name:              "timeout",
@@ -1292,6 +1293,16 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 			activeDeadline:    time.Second * 5,
 			executionDeadline: time.Second * 5,
 			err:               nil,
+		},
+		{
+			name:              "default_execution_timeout",
+			phaseInfo:         handler.PhaseInfoRunning(nil),
+			expectedPhase:     handler.EPhaseRetryableFailure,
+			activeDeadline:    time.Second * 50,
+			executionDeadline: 0,
+			retries:           2,
+			err:               nil,
+			expectedReason:    "task execution timeout [1s] expired",
 		},
 		{
 			name:              "retryable-failure",
@@ -1348,7 +1359,7 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &nodeExecutor{}
+			c := &nodeExecutor{defaultActiveDeadline: time.Second, defaultExecutionDeadline: time.Second}
 			handlerReturn := func() (handler.Transition, error) {
 				return handler.DoTransition(handler.TransitionTypeEphemeral, tt.phaseInfo), tt.err
 			}
@@ -1384,6 +1395,9 @@ func Test_nodeExecutor_timeout(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			assert.Equal(t, tt.expectedPhase.String(), phaseInfo.GetPhase().String())
+			if tt.expectedReason != "" {
+				assert.Equal(t, tt.expectedReason, phaseInfo.GetReason())
+			}
 		})
 	}
 }
