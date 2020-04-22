@@ -41,3 +41,36 @@ Living Roadmap
 We are trying to maintain a Living roadmap `here <https://docs.google.com/spreadsheets/d/1V8DQfcsX_02Zac5EfAo0UrGJtLwdMPcw3wuuigVIMZU/edit?usp=sharing>`_
 
 We also maintain a raw list of all the ideas `here <https://docs.google.com/document/d/1yq8pIlhlG3gci3GJQNjdAd9bzZ-KYyLfm6I5NVms9-4/edit?usp=sharing>`_
+
+
+Milestones and Releases
+========================
+Flyte consists of many components and services. In true Agile fashion each service is independently iterated and co-ordiated by maintaing backwards compatible contracts using protobuf defined in :ref:`flyteidltoc`. Thus components like flytekit, flytepropeller, datacatalog are independently versioned.
+
+We have decided to release a new version of the overall platform in the github.com/lyft/flyte repo every month. Thus we create one milestone for end of every month which points to a new release of
+Flyte. This may change in the future, but to match our velocity of development this is our preferred option. Every release will be associated with a CHANGELOG and we will communicate over our
+communication medium.
+
+Change management
+------------------
+To ensure that changes are trackable and the history is explainable, we use a slightly cumbersome but helpful process as follows. Some of these are our immediate goals
+- Every PR associated with an issue (automatic searchable documentation)
+- Large PR’s associated with Proposals
+- Every major change is associated with documentation
+- Owner files for all repositories
+
+Things to do
+- Unit test coverage should be above 60% for every repo by release 0.5.0
+- End to end tests should be run on an actual cluster.
+
+Release Train
+--------------
+- We will start tagging issues with milestones, every new issue will be associated with the next milestone. If the issue is not completed by the milestone, or the contributor feels it may slip the deadline, they should manually move it to the next milestone. Every issue not removed, will be moved to the next milestone.
+- Every new issue has a “untriaged” label associated with, if we remove this label we should add an assignee. If a contributor is working on the issue, please remove this label.
+- Release indicates a release for overall flyte - marked mostly by a milestone.
+- Flyte release are monthly
+- We may have patch releases eg. 0.1.x in between the monthly releases.
+
+Things to do
+- Golden Test Suite that is tested for every release train 
+
