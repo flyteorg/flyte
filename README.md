@@ -78,7 +78,6 @@ Resources that would help you get a better understanding of Flyte.
  - Reactive pipelines
  - More integrations
 
-
 # Available Plugins
  - Containers
  - K8s Pods
@@ -97,10 +96,10 @@ Resources that would help you get a better understanding of Flyte.
 [Changelogs](CHANGELOG/README.md)
 
 # Biweekly Community Sync
-Starting April 21 2020, the Flyte community meets every other Tuesday at 9:00 AM.
-You can join the [hangouts](https://hangouts.google.com/hangouts/_/calendar/a2V0YW4udW1hcmVAZ21haWwuY29t.5km2218c99820cggkefdb5549e?authuser=0)
-Meeting notes are captured in [Doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e)
-- We will soon have a demo signup sheet
+- Starting April 21 2020, the Flyte community meets every other Tuesday at 9:00 AM PST (US West coast time).
+- You can join the [google meets](https://hangouts.google.com/hangouts/_/calendar/a2V0YW4udW1hcmVAZ21haWwuY29t.5km2218c99820cggkefdb5549e?authuser=0)
+- Meeting notes are captured in [Doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e)
+- Demo Signup [Sheet](https://docs.google.com/spreadsheets/d/1Bz-s3SpMm1hGl6Z5y3HcxrNBcg9ZhSgqVgmCxK_eEhs/edit#gid=0)
 
 # Component Repos 
 Repo | Language | Purpose
