@@ -148,7 +148,7 @@ func phaseInfoFailed(p EPhase, err *core.ExecutionError, info *ExecutionInfo) Ph
 			Message: "Unknown error message",
 		}
 	}
-	return phaseInfo(p, err, info, "")
+	return phaseInfo(p, err, info, err.Message)
 }
 
 func PhaseInfoFailure(code, reason string, info *ExecutionInfo) PhaseInfo {

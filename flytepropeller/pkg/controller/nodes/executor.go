@@ -214,17 +214,17 @@ func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *nodeEx
 	// check for timeout for non-terminal phases
 	if !phase.GetPhase().IsTerminal() {
 		activeDeadline := c.defaultActiveDeadline
-		if nCtx.Node().GetActiveDeadline() != nil {
+		if nCtx.Node().GetActiveDeadline() != nil && *nCtx.Node().GetActiveDeadline() > 0 {
 			activeDeadline = *nCtx.Node().GetActiveDeadline()
 		}
 		if c.isTimeoutExpired(nodeStatus.GetQueuedAt(), activeDeadline) {
 			logger.Errorf(ctx, "Node has timed out; timeout configured: %v", activeDeadline)
-			return handler.PhaseInfoTimedOut(nil, "active deadline elapsed"), nil
+			return handler.PhaseInfoTimedOut(nil, fmt.Sprintf("task active timeout [%s] expired", activeDeadline.String())), nil
 		}
 
 		// Execution timeout is a retry-able error
 		executionDeadline := c.defaultExecutionDeadline
-		if nCtx.Node().GetExecutionDeadline() != nil {
+		if nCtx.Node().GetExecutionDeadline() != nil && *nCtx.Node().GetExecutionDeadline() > 0 {
 			executionDeadline = *nCtx.Node().GetExecutionDeadline()
 		}
 		if c.isTimeoutExpired(nodeStatus.GetLastAttemptStartedAt(), executionDeadline) {
