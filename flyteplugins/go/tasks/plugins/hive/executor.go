@@ -93,7 +93,7 @@ func (q QuboleHiveExecutor) Finalize(ctx context.Context, tCtx core.TaskExecutio
 		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to unmarshal custom state in Finalize")
 	}
 
-	return Finalize(ctx, tCtx, incomingState)
+	return Finalize(ctx, tCtx, incomingState, q.metrics)
 }
 
 func (q QuboleHiveExecutor) GetProperties() core.PluginProperties {
@@ -150,7 +150,7 @@ func NewQuboleHiveExecutor(ctx context.Context, cfg *config.Config, quboleClient
 	return QuboleHiveExecutor{
 		id:              quboleHiveExecutorID,
 		cfg:             cfg,
-		metrics:         getQuboleHiveExecutorMetrics(scope),
+		metrics:         getQuboleHiveExecutorMetrics(scope.NewSubScope("hive")),
 		quboleClient:    quboleClient,
 		executionsCache: executionsAutoRefreshCache,
 	}, nil

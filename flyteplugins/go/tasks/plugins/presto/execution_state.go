@@ -175,10 +175,13 @@ func GetAllocationToken(
 	}
 
 	if allocationStatus == core.AllocationStatusGranted {
+		metric.AllocationGranted.Inc(ctx)
 		newState.CurrentPhase = PhaseQueued
 	} else if allocationStatus == core.AllocationStatusExhausted {
+		metric.AllocationNotGranted.Inc(ctx)
 		newState.CurrentPhase = PhaseNotStarted
 	} else if allocationStatus == core.AllocationStatusNamespaceQuotaExceeded {
+		metric.AllocationNotGranted.Inc(ctx)
 		newState.CurrentPhase = PhaseNotStarted
 	} else {
 		return newState, errors.Errorf(errors.ResourceManagerFailure, "Got bad allocation result [%s] for token [%s]",
@@ -532,7 +535,7 @@ func Abort(ctx context.Context, currentState ExecutionState, client client.Prest
 	return nil
 }
 
-func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, _ ExecutionState) error {
+func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, _ ExecutionState, metrics ExecutorMetrics) error {
 	// Release allocation token
 	uniqueID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	routingGroup, err := composeResourceNamespaceWithRoutingGroup(ctx, tCtx)
@@ -543,9 +546,11 @@ func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, _ ExecutionSt
 	err = tCtx.ResourceManager().ReleaseResource(ctx, routingGroup, uniqueID)
 
 	if err != nil {
+		metrics.ResourceReleaseFailed.Inc(ctx)
 		logger.Errorf(ctx, "Error releasing allocation token [%s] in Finalize [%s]", uniqueID, err)
 		return err
 	}
+	metrics.ResourceReleased.Inc(ctx)
 	return nil
 }
 

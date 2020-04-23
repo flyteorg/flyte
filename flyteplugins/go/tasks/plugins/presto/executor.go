@@ -85,7 +85,7 @@ func (p Executor) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) 
 		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to unmarshal custom state in Finalize")
 	}
 
-	return Finalize(ctx, tCtx, incomingState)
+	return Finalize(ctx, tCtx, incomingState, p.metrics)
 }
 
 func (p Executor) GetProperties() core.PluginProperties {
@@ -125,7 +125,8 @@ func NewPrestoExecutor(
 	cfg *config.Config,
 	prestoClient client.PrestoClient,
 	scope promutils.Scope) (Executor, error) {
-	executionsAutoRefreshCache, err := NewPrestoExecutionsCache(ctx, prestoClient, cfg, scope.NewSubScope(prestoTaskType))
+	subScope := scope.NewSubScope(prestoTaskType)
+	executionsAutoRefreshCache, err := NewPrestoExecutionsCache(ctx, prestoClient, cfg, subScope)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create AutoRefreshCache in Executor Setup. Error: %v", err)
 		return Executor{}, err
@@ -139,7 +140,7 @@ func NewPrestoExecutor(
 	return Executor{
 		id:              prestoPluginID,
 		cfg:             cfg,
-		metrics:         getPrestoExecutorMetrics(scope),
+		metrics:         getPrestoExecutorMetrics(subScope),
 		prestoClient:    prestoClient,
 		executionsCache: executionsAutoRefreshCache,
 	}, nil

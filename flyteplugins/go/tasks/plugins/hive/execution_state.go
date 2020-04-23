@@ -203,10 +203,13 @@ func GetAllocationToken(ctx context.Context, tCtx core.TaskExecutionContext, cur
 	metric.ResourceWaitTime.Observe(waitTime.Seconds())
 
 	if allocationStatus == core.AllocationStatusGranted {
+		metric.AllocationGranted.Inc(ctx)
 		newState.Phase = PhaseQueued
 	} else if allocationStatus == core.AllocationStatusExhausted {
+		metric.AllocationNotGranted.Inc(ctx)
 		newState.Phase = PhaseNotStarted
 	} else if allocationStatus == core.AllocationStatusNamespaceQuotaExceeded {
+		metric.AllocationNotGranted.Inc(ctx)
 		newState.Phase = PhaseNotStarted
 	} else {
 		return newState, errors.Errorf(errors.ResourceManagerFailure, "Got bad allocation result [%s] for token [%s]",
@@ -411,7 +414,7 @@ func Abort(ctx context.Context, tCtx core.TaskExecutionContext, currentState Exe
 	return nil
 }
 
-func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, _ ExecutionState) error {
+func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, _ ExecutionState, metrics QuboleHiveExecutorMetrics) error {
 	// Release allocation token
 	uniqueID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	clusterPrimaryLabel, err := composeResourceNamespaceWithClusterPrimaryLabel(ctx, tCtx)
@@ -422,9 +425,11 @@ func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, _ ExecutionSt
 	err = tCtx.ResourceManager().ReleaseResource(ctx, clusterPrimaryLabel, uniqueID)
 
 	if err != nil {
+		metrics.ResourceReleaseFailed.Inc(ctx)
 		logger.Errorf(ctx, "Error releasing allocation token [%s] in Finalize [%s]", uniqueID, err)
 		return err
 	}
+	metrics.ResourceReleased.Inc(ctx)
 	return nil
 }
 
