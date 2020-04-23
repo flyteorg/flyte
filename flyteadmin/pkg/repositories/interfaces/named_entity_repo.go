@@ -15,6 +15,14 @@ type GetNamedEntityInput struct {
 	Name         string
 }
 
+// Parameters for querying multiple resources.
+type ListNamedEntityInput struct {
+	ListResourceInput
+	Project      string
+	Domain       string
+	ResourceType core.ResourceType
+}
+
 type NamedEntityCollectionOutput struct {
 	Entities []models.NamedEntity
 }
@@ -23,7 +31,7 @@ type NamedEntityCollectionOutput struct {
 type NamedEntityRepoInterface interface {
 	// Returns NamedEntity objects matching the provided query. A limit is
 	// required
-	List(ctx context.Context, resourceType core.ResourceType, input ListResourceInput) (NamedEntityCollectionOutput, error)
+	List(ctx context.Context, input ListNamedEntityInput) (NamedEntityCollectionOutput, error)
 	// Updates NamedEntity record, will create metadata if it does not exist
 	Update(ctx context.Context, input models.NamedEntity) error
 	// Gets metadata (if available) associated with a NamedEntity

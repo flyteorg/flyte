@@ -4,14 +4,12 @@ package mocks
 import (
 	"context"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
 )
 
 type GetNamedEntityFunc func(input interfaces.GetNamedEntityInput) (models.NamedEntity, error)
-type ListNamedEntityFunc func(resourceType core.ResourceType, input interfaces.ListResourceInput) (interfaces.NamedEntityCollectionOutput, error)
+type ListNamedEntityFunc func(input interfaces.ListNamedEntityInput) (interfaces.NamedEntityCollectionOutput, error)
 type UpdateNamedEntityFunc func(input models.NamedEntity) error
 
 type MockNamedEntityRepo struct {
@@ -45,9 +43,9 @@ func (r *MockNamedEntityRepo) Get(
 	}, nil
 }
 
-func (r *MockNamedEntityRepo) List(ctx context.Context, resourceType core.ResourceType, input interfaces.ListResourceInput) (interfaces.NamedEntityCollectionOutput, error) {
+func (r *MockNamedEntityRepo) List(ctx context.Context, input interfaces.ListNamedEntityInput) (interfaces.NamedEntityCollectionOutput, error) {
 	if r.listFunction != nil {
-		return r.listFunction(resourceType, input)
+		return r.listFunction(input)
 	}
 	return interfaces.NamedEntityCollectionOutput{}, nil
 }

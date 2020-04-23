@@ -16,6 +16,34 @@ import (
 	"github.com/lyft/flytestdlib/promutils"
 )
 
+const innerJoinTableAlias = "entities"
+
+var resourceTypeToTableName = map[core.ResourceType]string{
+	core.ResourceType_LAUNCH_PLAN: launchPlanTableName,
+	core.ResourceType_WORKFLOW:    workflowTableName,
+	core.ResourceType_TASK:        taskTableName,
+}
+
+var joinString = "RIGHT JOIN ? AS entities ON named_entity_metadata.resource_type = %d AND " +
+	"named_entity_metadata.project = entities.project AND named_entity_metadata.domain = entities.domain AND " +
+	"named_entity_metadata.name = entities.name"
+
+func getSubQueryJoin(db *gorm.DB, tableName string, input interfaces.ListNamedEntityInput) *gorm.DB {
+	tx := db.Select([]string{Project, Domain, Name}).
+		Table(tableName).
+		Where(map[string]interface{}{Project: input.Project, Domain: input.Domain}).
+		Limit(input.Limit).
+		Offset(input.Offset).
+		Group(identifierGroupBy)
+
+	// Apply consistent sort ordering.
+	if input.SortParameter != nil {
+		tx = tx.Order(input.SortParameter.GetGormOrderExpr())
+	}
+
+	return db.Joins(fmt.Sprintf(joinString, input.ResourceType), tx.SubQuery())
+}
+
 var leftJoinWorkflowNameToMetadata = fmt.Sprintf(
 	"LEFT JOIN %s ON %s.resource_type = %d AND %s.project = %s.project AND %s.domain = %s.domain AND %s.name = %s.name", namedEntityMetadataTableName, namedEntityMetadataTableName, core.ResourceType_WORKFLOW, namedEntityMetadataTableName, workflowTableName,
 	namedEntityMetadataTableName, workflowTableName,
@@ -31,23 +59,16 @@ var leftJoinTaskNameToMetadata = fmt.Sprintf(
 	namedEntityMetadataTableName, taskTableName,
 	namedEntityMetadataTableName, taskTableName)
 
-var resourceTypeToTableName = map[core.ResourceType]string{
-	core.ResourceType_LAUNCH_PLAN: launchPlanTableName,
-	core.ResourceType_WORKFLOW:    workflowTableName,
-	core.ResourceType_TASK:        taskTableName,
-}
-
 var resourceTypeToMetadataJoin = map[core.ResourceType]string{
 	core.ResourceType_LAUNCH_PLAN: leftJoinLaunchPlanNameToMetadata,
 	core.ResourceType_WORKFLOW:    leftJoinWorkflowNameToMetadata,
 	core.ResourceType_TASK:        leftJoinTaskNameToMetadata,
 }
 
-func getGroupByForNamedEntity(tableName string) string {
-	return fmt.Sprintf("%s.%s, %s.%s, %s.%s, %s.%s, %s.%s",
-		tableName, Project, tableName, Domain, tableName, Name, namedEntityMetadataTableName, Description,
-		namedEntityMetadataTableName, State)
-}
+var getGroupByForNamedEntity = fmt.Sprintf("%s.%s, %s.%s, %s.%s, %s.%s, %s.%s",
+	innerJoinTableAlias, Project, innerJoinTableAlias, Domain, innerJoinTableAlias, Name, namedEntityMetadataTableName,
+	Description,
+	namedEntityMetadataTableName, State)
 
 func getSelectForNamedEntity(tableName string, resourceType core.ResourceType) []string {
 	return []string{
@@ -141,29 +162,33 @@ func (r *NamedEntityRepo) Get(ctx context.Context, input interfaces.GetNamedEnti
 	return namedEntity, nil
 }
 
-func (r *NamedEntityRepo) List(ctx context.Context, resourceType core.ResourceType, input interfaces.ListResourceInput) (
+func (r *NamedEntityRepo) List(ctx context.Context, input interfaces.ListNamedEntityInput) (
 	interfaces.NamedEntityCollectionOutput, error) {
 
-	// Validate input.
-	if err := ValidateListInput(input); err != nil {
-		return interfaces.NamedEntityCollectionOutput{}, err
+	// Validate input. Filters aren't required because they're implicit in the Project & Domain specified by the input.
+	if len(input.Project) == 0 {
+		return interfaces.NamedEntityCollectionOutput{}, errors.GetInvalidInputError(Project)
+	}
+	if len(input.Domain) == 0 {
+		return interfaces.NamedEntityCollectionOutput{}, errors.GetInvalidInputError(Domain)
+	}
+	if input.Limit == 0 {
+		return interfaces.NamedEntityCollectionOutput{}, errors.GetInvalidInputError(limit)
 	}
 
-	tableName, tableFound := resourceTypeToTableName[resourceType]
-	joinString, joinFound := resourceTypeToMetadataJoin[resourceType]
-	if !tableFound || !joinFound {
-		return interfaces.NamedEntityCollectionOutput{}, adminErrors.NewFlyteAdminErrorf(codes.InvalidArgument, "Cannot list entity names for resource type: %v", resourceType)
+	tableName, tableFound := resourceTypeToTableName[input.ResourceType]
+	if !tableFound {
+		return interfaces.NamedEntityCollectionOutput{}, adminErrors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"Cannot list entity names for resource type: %v", input.ResourceType)
 	}
 
-	tx := r.db.Table(tableName).Limit(input.Limit).Offset(input.Offset)
-	tx = tx.Joins(joinString)
+	tx := getSubQueryJoin(r.db, tableName, input)
 
 	// Apply filters
 	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.NamedEntityCollectionOutput{}, err
 	}
-
 	// Apply sort ordering.
 	if input.SortParameter != nil {
 		tx = tx.Order(input.SortParameter.GetGormOrderExpr())
@@ -172,8 +197,11 @@ func (r *NamedEntityRepo) List(ctx context.Context, resourceType core.ResourceTy
 	// Scan the results into a list of named entities
 	var entities []models.NamedEntity
 	timer := r.metrics.ListDuration.Start()
-	tx.Select(getSelectForNamedEntity(tableName, resourceType)).Group(getGroupByForNamedEntity(tableName)).Scan(&entities)
+
+	tx.Select(getSelectForNamedEntity(innerJoinTableAlias, input.ResourceType)).Table(namedEntityMetadataTableName).Group(getGroupByForNamedEntity).Scan(&entities)
+
 	timer.Stop()
+
 	if tx.Error != nil {
 		return interfaces.NamedEntityCollectionOutput{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}

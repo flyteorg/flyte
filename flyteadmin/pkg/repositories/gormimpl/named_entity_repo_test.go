@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/lyft/flyteadmin/pkg/common"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 
 	mocket "github.com/Selvatico/go-mocket"
@@ -132,4 +134,45 @@ func TestUpdateNamedEntity_CreateNew(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.True(t, mockQuery.Triggered)
+}
+
+func TestListNamedEntity(t *testing.T) {
+	metadataRepo := NewNamedEntityRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	results := make([]map[string]interface{}, 0)
+	metadata := getMockNamedEntityResponseFromDb(models.NamedEntity{
+		NamedEntityKey: models.NamedEntityKey{
+			ResourceType: resourceType,
+			Project:      project,
+			Domain:       domain,
+			Name:         name,
+		},
+		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
+			Description: description,
+		},
+	})
+	results = append(results, metadata)
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+	mockQuery := GlobalMock.NewMock()
+
+	mockQuery.WithQuery(
+		`GROUP BY project, domain, name ORDER BY name desc LIMIT 20 OFFSET 0) AS entities`).WithReply(results)
+
+	sortParameter, _ := common.NewSortParameter(admin.Sort{
+		Direction: admin.Sort_DESCENDING,
+		Key:       "name",
+	})
+	output, err := metadataRepo.List(context.Background(), interfaces.ListNamedEntityInput{
+		ResourceType: resourceType,
+		Project:      "admintests",
+		Domain:       "development",
+		ListResourceInput: interfaces.ListResourceInput{
+			Limit:         20,
+			SortParameter: sortParameter,
+		},
+	})
+	assert.NoError(t, err)
+	assert.Len(t, output.Entities, 1)
 }
