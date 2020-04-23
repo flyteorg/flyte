@@ -29,6 +29,11 @@ spec:
         - name: webhook-certs
           secret:
             secretName: spark-webhook-certs
+      initContainers:
+      - name: main
+        image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0
+        imagePullPolicy: IfNotPresent
+        command: ["/usr/bin/gencerts.sh","--namespace", "sparkoperator", "-p"]
       containers:
       - name: sparkoperator-unknown
         image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0

@@ -1405,6 +1405,15 @@ spec:
         volumeMounts:
         - mountPath: /etc/webhook-certs
           name: webhook-certs
+      initContainers:
+      - command:
+        - /usr/bin/gencerts.sh
+        - --namespace
+        - sparkoperator
+        - -p
+        image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0
+        imagePullPolicy: IfNotPresent
+        name: main
       serviceAccountName: sparkoperator
       volumes:
       - name: webhook-certs
@@ -1507,34 +1516,6 @@ spec:
               name: flyte-admin-config-dtcg25hb22
             name: config-volume
   schedule: '*/1 * * * *'
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  labels:
-    app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/version: v2.4.0-v1beta1
-  name: sparkoperator-init
-  namespace: sparkoperator
-spec:
-  backoffLimit: 3
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: sparkoperator
-        app.kubernetes.io/version: v2.4.0-v1beta1
-    spec:
-      containers:
-      - command:
-        - /usr/bin/gencerts.sh
-        - --namespace
-        - sparkoperator
-        - -p
-        image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0
-        imagePullPolicy: IfNotPresent
-        name: main
-      restartPolicy: Never
-      serviceAccountName: sparkoperator
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
