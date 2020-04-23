@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lyft/flyteadmin/pkg/common"
-
 	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/lyft/flyteadmin/pkg/repositories"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
@@ -86,21 +84,15 @@ func TestNamedEntityManager_Get_BadRequest(t *testing.T) {
 	assert.Nil(t, response)
 }
 
-func TestNamedEntityManager_UpdateQueryFilters(t *testing.T) {
-	identityFilter, err := common.NewSingleValueFilter(common.NamedEntityMetadata, common.Equal, "project", "proj")
-	assert.NoError(t, err)
-
+func TestNamedEntityManager_getQueryFilters(t *testing.T) {
 	repository := getMockRepositoryForNETest()
 	manager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
-	updatedFilters, err := manager.(*NamedEntityManager).updateQueryFilters([]common.InlineFilter{
-		identityFilter,
-	}, "eq(state, 0)")
+	updatedFilters, err := manager.(*NamedEntityManager).getQueryFilters("eq(state, 0)")
 	assert.NoError(t, err)
-	assert.Len(t, updatedFilters, 2)
+	assert.Len(t, updatedFilters, 1)
 
-	assert.Equal(t, "project", updatedFilters[0].GetField())
-	assert.Equal(t, "state", updatedFilters[1].GetField())
-	queryExp, err := updatedFilters[1].GetGormQueryExpr()
+	assert.Equal(t, "state", updatedFilters[0].GetField())
+	queryExp, err := updatedFilters[0].GetGormQueryExpr()
 	assert.NoError(t, err)
 	assert.Equal(t, "COALESCE(state, 0) = ?", queryExp.Query)
 	assert.Equal(t, "0", queryExp.Args)
