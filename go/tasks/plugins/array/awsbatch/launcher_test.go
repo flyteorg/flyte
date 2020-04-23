@@ -3,6 +3,8 @@ package awsbatch
 import (
 	"testing"
 
+	"github.com/lyft/flytestdlib/promutils"
+
 	"github.com/stretchr/testify/mock"
 
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -122,7 +124,7 @@ func TestLaunchSubTasks(t *testing.T) {
 			JobDefinitionArn: "arn",
 		}
 
-		newState, err := LaunchSubTasks(context.TODO(), tCtx, batchClient, &config.Config{MaxArrayJobSize: 10}, currentState)
+		newState, err := LaunchSubTasks(context.TODO(), tCtx, batchClient, &config.Config{MaxArrayJobSize: 10}, currentState, getAwsBatchExecutorMetrics(promutils.NewTestScope()))
 		assert.NoError(t, err)
 		assertEqual(t, expectedState, newState)
 	})
@@ -143,7 +145,7 @@ func TestTerminateSubTasks(t *testing.T) {
 	batchClient.OnTerminateJob(ctx, "abc-123", "Test terminate").Return(nil).Once()
 
 	t.Run("Simple", func(t *testing.T) {
-		assert.NoError(t, TerminateSubTasks(ctx, tCtx, batchClient, "Test terminate"))
+		assert.NoError(t, TerminateSubTasks(ctx, tCtx, batchClient, "Test terminate", getAwsBatchExecutorMetrics(promutils.NewTestScope())))
 	})
 
 	batchClient.AssertExpectations(t)

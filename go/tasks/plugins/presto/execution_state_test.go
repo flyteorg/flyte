@@ -263,7 +263,7 @@ func TestFinalize(t *testing.T) {
 		called = true
 	}).Return(nil)
 
-	err := Finalize(ctx, tCtx, state)
+	err := Finalize(ctx, tCtx, state, getPrestoExecutorMetrics(promutils.NewTestScope()))
 	assert.NoError(t, err)
 	assert.True(t, called)
 }

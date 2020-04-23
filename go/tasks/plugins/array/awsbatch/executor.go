@@ -34,6 +34,7 @@ type Executor struct {
 
 	outputAssembler array.OutputAssembler
 	errorAssembler  array.OutputAssembler
+	metrics         ExecutorMetrics
 }
 
 func (e Executor) GetID() string {
@@ -74,12 +75,12 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 		fallthrough
 
 	case arrayCore.PhaseLaunch:
-		pluginState, err = LaunchSubTasks(ctx, tCtx, e.jobStore, pluginConfig, pluginState)
+		pluginState, err = LaunchSubTasks(ctx, tCtx, e.jobStore, pluginConfig, pluginState, e.metrics)
 
 	case arrayCore.PhaseCheckingSubTaskExecutions:
 		pluginState, err = CheckSubTasksState(ctx, tCtx.TaskExecutionMetadata(),
 			tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(),
-			e.jobStore, tCtx.DataStore(), pluginConfig, pluginState)
+			e.jobStore, tCtx.DataStore(), pluginConfig, pluginState, e.metrics)
 
 	case arrayCore.PhaseAssembleFinalOutput:
 		pluginState.State, err = array.AssembleFinalOutputs(ctx, e.outputAssembler, tCtx, arrayCore.PhaseSuccess, pluginState.State)
@@ -120,11 +121,11 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 }
 
 func (e Executor) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {
-	return TerminateSubTasks(ctx, tCtx, e.jobStore.Client, "Aborted")
+	return TerminateSubTasks(ctx, tCtx, e.jobStore.Client, "Aborted", e.metrics)
 }
 
 func (e Executor) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
-	return TerminateSubTasks(ctx, tCtx, e.jobStore.Client, "Finalized")
+	return TerminateSubTasks(ctx, tCtx, e.jobStore.Client, "Finalized", e.metrics)
 }
 
 func NewExecutor(ctx context.Context, awsClient aws.Client, cfg *batchConfig.Config,
@@ -164,6 +165,7 @@ func NewExecutor(ctx context.Context, awsClient aws.Client, cfg *batchConfig.Con
 		jobDefinitionCache: definition.NewCache(cfg.JobDefCacheSize),
 		outputAssembler:    outputAssembler,
 		errorAssembler:     errorAssembler,
+		metrics:            getAwsBatchExecutorMetrics(scope.NewSubScope("awsbatch")),
 	}, nil
 }
 

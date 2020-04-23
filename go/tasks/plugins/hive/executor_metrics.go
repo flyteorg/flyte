@@ -8,7 +8,8 @@ import (
 
 type QuboleHiveExecutorMetrics struct {
 	Scope                 promutils.Scope
-	ReleaseResourceFailed labeled.Counter
+	ResourceReleased      labeled.Counter
+	ResourceReleaseFailed labeled.Counter
 	AllocationGranted     labeled.Counter
 	AllocationNotGranted  labeled.Counter
 	ResourceWaitTime      prometheus.Summary
@@ -21,12 +22,14 @@ var (
 func getQuboleHiveExecutorMetrics(scope promutils.Scope) QuboleHiveExecutorMetrics {
 	return QuboleHiveExecutorMetrics{
 		Scope: scope,
-		ReleaseResourceFailed: labeled.NewCounter("released_resource_failed",
-			"Error releasing allocation token", scope),
-		AllocationGranted: labeled.NewCounter("allocation_granted",
-			"Allocation request granted", scope),
-		AllocationNotGranted: labeled.NewCounter("allocation_not_granted",
-			"Allocation request did not fail but not granted", scope),
+		ResourceReleased: labeled.NewCounter("resource_release_success",
+			"Resource allocation token released", scope, labeled.EmitUnlabeledMetric),
+		ResourceReleaseFailed: labeled.NewCounter("resource_release_failed",
+			"Error releasing allocation token", scope, labeled.EmitUnlabeledMetric),
+		AllocationGranted: labeled.NewCounter("allocation_grant_success",
+			"Allocation request granted", scope, labeled.EmitUnlabeledMetric),
+		AllocationNotGranted: labeled.NewCounter("allocation_grant_failed",
+			"Allocation request did not fail but not granted", scope, labeled.EmitUnlabeledMetric),
 		ResourceWaitTime: scope.MustNewSummaryWithOptions("resource_wait_time", "Duration the execution has been waiting for a resource allocation token",
 			promutils.SummaryOptions{Objectives: tokenAgeObjectives}),
 	}
