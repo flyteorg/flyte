@@ -62,8 +62,14 @@ func TestNewSingleValueCustomizedFilter(t *testing.T) {
 }
 
 func TestNewRepeatedValueFilter(t *testing.T) {
-	_, err := NewRepeatedValueFilter(Workflow, ValueIn, "project", []string{"SuperAwesomeProject", "AnotherAwesomeProject"})
+	vals := []string{"SuperAwesomeProject", "AnotherAwesomeProject"}
+	filter, err := NewRepeatedValueFilter(Workflow, ValueIn, "project", vals)
 	assert.NoError(t, err)
+
+	expression, err := filter.GetGormJoinTableQueryExpr("projects")
+	assert.NoError(t, err)
+	assert.Equal(t, "projects.project in (?)", expression.Query)
+	assert.Equal(t, vals, expression.Args)
 
 	_, err = NewRepeatedValueFilter(Workflow, Equal, "domain", []string{"production", "qa"})
 	assert.EqualError(t, err, "invalid repeated value filter expression: equal")
