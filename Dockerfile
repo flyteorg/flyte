@@ -1,6 +1,5 @@
-FROM node:8 as builder
+FROM node:10 as builder
 
-RUN npm install -g yarn@1.9
 WORKDIR /code/flyteconsole
 COPY package*.json yarn.lock ./
 RUN : \
@@ -17,7 +16,7 @@ RUN : \
   # build
   && make build_prod \
   # place the runtime application in /app
-  && mv dist corsProxy.js index.js env.js /app
+  && mv dist corsProxy.js index.js env.js plugins.js /app
 
 FROM gcr.io/distroless/nodejs
 COPY --from=builder /app app
