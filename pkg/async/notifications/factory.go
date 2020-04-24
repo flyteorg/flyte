@@ -9,7 +9,8 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 
 	"github.com/NYTimes/gizmo/pubsub"
-	gizmoConfig "github.com/NYTimes/gizmo/pubsub/aws"
+	gizmoAWS "github.com/NYTimes/gizmo/pubsub/aws"
+	gizmoGCP "github.com/NYTimes/gizmo/pubsub/gcp"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
@@ -63,7 +64,7 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 	var emailer interfaces.Emailer
 	switch config.Type {
 	case common.AWS:
-		sqsConfig := gizmoConfig.SQSConfig{
+		sqsConfig := gizmoAWS.SQSConfig{
 			QueueName:           config.NotificationsProcessorConfig.QueueName,
 			QueueOwnerAccountID: config.NotificationsProcessorConfig.AccountID,
 			// The AWS configuration type uses SNS to SQS for notifications.
@@ -72,7 +73,7 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 			ConsumeBase64: &enable64decoding,
 		}
 		sqsConfig.Region = config.Region
-		process, err := gizmoConfig.NewSubscriber(sqsConfig)
+		process, err := gizmoAWS.NewSubscriber(sqsConfig)
 		if err != nil {
 			panic(err)
 		}
@@ -91,12 +92,26 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 func NewNotificationsPublisher(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) interfaces.Publisher {
 	switch config.Type {
 	case common.AWS:
-		snsConfig := gizmoConfig.SNSConfig{
+		snsConfig := gizmoAWS.SNSConfig{
 			Topic: config.NotificationsPublisherConfig.TopicName,
 		}
-		snsConfig.Region = config.Region
-		publisher, err := gizmoConfig.NewPublisher(snsConfig)
+		if config.AWSConfig.Region != "" {
+			snsConfig.Region = config.AWSConfig.Region
+		} else {
+			snsConfig.Region = config.Region
+		}
+		publisher, err := gizmoAWS.NewPublisher(snsConfig)
 		// Any errors initiating Publisher with Amazon configurations results in a failed start up.
+		if err != nil {
+			panic(err)
+		}
+		return implementations.NewPublisher(publisher, scope)
+	case common.GCP:
+		pubsubConfig := gizmoGCP.Config{
+			Topic: config.NotificationsPublisherConfig.TopicName,
+		}
+		pubsubConfig.ProjectID = config.GCPConfig.ProjectID
+		publisher, err := gizmoGCP.NewPublisher(context.TODO(), pubsubConfig)
 		if err != nil {
 			panic(err)
 		}
