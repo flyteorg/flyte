@@ -162,7 +162,7 @@ func (f *inlineFilterImpl) getGormQueryExpr(formattedField string) (GormQueryExp
 
 	// ValueIn is special because it uses repeating values.
 	if f.function == ValueIn {
-		queryStr := fmt.Sprintf(valueInQuery, f.field)
+		queryStr := fmt.Sprintf(valueInQuery, formattedField)
 		return GormQueryExpr{
 			Query: queryStr,
 			Args:  f.repeatedValue,

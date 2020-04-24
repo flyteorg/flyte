@@ -283,7 +283,7 @@ func TestCreateAndListTaskExecution(t *testing.T) {
 		NodeExecutionId: nodeExecutionId,
 		Limit:           10,
 		Filters: "eq(task.project, project)+eq(task.domain, development)+eq(task.name, task name)+" +
-			"eq(task.version, task version)+eq(task_execution.retry_attempt, 1)",
+			"eq(task.version, task version)+eq(task_execution.retry_attempt, 1)+value_in(phase, RUNNING)",
 	})
 	assert.Len(t, response.TaskExecutions, 1)
 	assert.Nil(t, err)
