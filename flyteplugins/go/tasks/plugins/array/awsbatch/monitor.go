@@ -36,7 +36,6 @@ func createSubJobList(count int) []*Job {
 
 func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata, outputPrefix, baseOutputSandbox storage.DataReference, jobStore *JobStore,
 	dataStore *storage.DataStore, cfg *config.Config, currentState *State, metrics ExecutorMetrics) (newState *State, err error) {
-	logger.Debugf(ctx, "Entering CheckSubTasksState ")
 	newState = currentState
 	parentState := currentState.State
 	jobName := taskMeta.GetTaskExecutionID().GetGeneratedName()
