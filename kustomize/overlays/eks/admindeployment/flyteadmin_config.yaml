@@ -1,0 +1,76 @@
+logger:
+  show-source: true
+  level: 5
+server:
+  httpPort: 8088
+  grpcPort: 8089
+  security:
+    secure: false
+    useAuth: false
+    allowCors: false
+flyteadmin:
+  roleNameKey: "iam.amazonaws.com/role"
+  profilerPort: 10254
+  metricsScope: "flyte:"
+  metadataStoragePrefix:
+    - "metadata"
+    - "admin"
+database:
+  port: 5432
+  username: flyteadmin
+  host: flyteadmin-cluster.cluster-456123e6ivib.us-west-2.rds.amazonaws.com
+  dbname: flyteadmin
+  password: spongebob
+remoteData:
+  region: "us-west-2"
+  scheme: aws
+  signedUrls:
+    durationMinutes: 3
+storage:
+  type: s3
+  connection:
+    auth-type: iam
+    region: us-west-2
+  cache:
+    max_size_mbs: 64
+    target_gc_percent: 70
+  container: "flyte-admin"
+task_resources:
+  defaults:
+    cpu: 100m
+    memory: 100Mi
+    storage: 5Mi
+  limits:
+    cpu: 2
+    memory: 2G
+    storage: 20Mi
+task_type_whitelist:
+  spark:
+    - project: flytekit
+    - project: flytetester
+domains:
+  - id: development
+    name: development
+  - id: staging
+    name: staging
+  - id: production
+    name: production
+cluster_resources:
+  templatePath: "/etc/flyte/clusterresource/templates"
+  customData:
+    production:
+      - projectQuotaCpu:
+          value: "5"
+      - projectQuotaMemory:
+          value: "4000Mi"
+    staging:
+      - projectQuotaCpu:
+          value: "1"
+      - projectQuotaMemory:
+          value: "2000Mi"
+    development:
+      - projectQuotaCpu:
+          value: "1"
+      - projectQuotaMemory:
+          value: "2000Mi"
+  refresh: 5m
