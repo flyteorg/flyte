@@ -6,16 +6,6 @@ services:
   - docker
 jobs:
   include:
-    - if: fork = true
-      stage: test
-      name: docker build
-      install: true
-      script: make docker_build
-    - if: fork = false
-      stage: test
-      name: docker build
-      install: true
-      script: make docker_build
     - stage: test
       install: make install
       name: lint
