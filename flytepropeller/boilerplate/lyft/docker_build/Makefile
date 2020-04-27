@@ -10,3 +10,7 @@ docker_build:
 .PHONY: dockerhub_push
 dockerhub_push:
 	IMAGE_NAME=lyft/$$REPOSITORY REGISTRY=docker.io ./boilerplate/lyft/docker_build/docker_build.sh
+
+.PHONY: github_push
+github_push:
+	IMAGE_NAME=lyft/$REPOSITORY/$$REPOSITORY REGISTRY=docker.pkg.github.com ./boilerplate/lyft/docker_build/docker_build.sh
