@@ -195,7 +195,7 @@ data:
       username: flyteadmin
       host: flyteadmin-cluster.cluster-456123e6ivib.us-west-2.rds.amazonaws.com
       dbname: flytedatacatalog
-      password: awesomesauce
+      password: spongebob
     storage:
       type: s3
       connection:
@@ -208,7 +208,7 @@ data:
 
 kind: ConfigMap
 metadata:
-  name: datacatalog-config-5gt9kdt89c
+  name: datacatalog-config-86hg5m74g6
   namespace: flyte
 ---
 apiVersion: v1
@@ -236,7 +236,7 @@ data:
       username: flyteadmin
       host: flyteadmin-cluster.cluster-456123e6ivib.us-west-2.rds.amazonaws.com
       dbname: flyteadmin
-      password: awesomesauce
+      password: spongebob
     remoteData:
       region: "us-west-2"
       scheme: aws
@@ -292,7 +292,7 @@ data:
       refresh: 5m
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-fm598984bc
+  name: flyte-admin-config-g4cdd4724d
   namespace: flyte
 ---
 apiVersion: v1
@@ -570,7 +570,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config-5gt9kdt89c
+          name: datacatalog-config-86hg5m74g6
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -692,7 +692,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-fm598984bc
+          name: flyte-admin-config-g4cdd4724d
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -889,7 +889,7 @@ spec:
               name: clusterresource-template-m2kccc465f
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-fm598984bc
+              name: flyte-admin-config-g4cdd4724d
             name: config-volume
   schedule: '*/1 * * * *'
 ---
