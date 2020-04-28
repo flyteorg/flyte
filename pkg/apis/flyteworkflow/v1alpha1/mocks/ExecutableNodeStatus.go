@@ -177,6 +177,40 @@ func (_m *ExecutableNodeStatus) GetDynamicNodeStatus() v1alpha1.MutableDynamicNo
 	return r0
 }
 
+type ExecutableNodeStatus_GetExecutionError struct {
+	*mock.Call
+}
+
+func (_m ExecutableNodeStatus_GetExecutionError) Return(_a0 *core.ExecutionError) *ExecutableNodeStatus_GetExecutionError {
+	return &ExecutableNodeStatus_GetExecutionError{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNodeStatus) OnGetExecutionError() *ExecutableNodeStatus_GetExecutionError {
+	c := _m.On("GetExecutionError")
+	return &ExecutableNodeStatus_GetExecutionError{Call: c}
+}
+
+func (_m *ExecutableNodeStatus) OnGetExecutionErrorMatch(matchers ...interface{}) *ExecutableNodeStatus_GetExecutionError {
+	c := _m.On("GetExecutionError", matchers...)
+	return &ExecutableNodeStatus_GetExecutionError{Call: c}
+}
+
+// GetExecutionError provides a mock function with given fields:
+func (_m *ExecutableNodeStatus) GetExecutionError() *core.ExecutionError {
+	ret := _m.Called()
+
+	var r0 *core.ExecutionError
+	if rf, ok := ret.Get(0).(func() *core.ExecutionError); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.ExecutionError)
+		}
+	}
+
+	return r0
+}
+
 type ExecutableNodeStatus_GetLastAttemptStartedAt struct {
 	*mock.Call
 }
@@ -1007,9 +1041,9 @@ func (_m *ExecutableNodeStatus) SetParentTaskID(t *core.TaskExecutionIdentifier)
 	_m.Called(t)
 }
 
-// UpdatePhase provides a mock function with given fields: phase, occurredAt, reason
-func (_m *ExecutableNodeStatus) UpdatePhase(phase v1alpha1.NodePhase, occurredAt v1.Time, reason string) {
-	_m.Called(phase, occurredAt, reason)
+// UpdatePhase provides a mock function with given fields: phase, occurredAt, reason, err
+func (_m *ExecutableNodeStatus) UpdatePhase(phase v1alpha1.NodePhase, occurredAt v1.Time, reason string, err *core.ExecutionError) {
+	_m.Called(phase, occurredAt, reason, err)
 }
 
 // VisitNodeStatuses provides a mock function with given fields: visitor

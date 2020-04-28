@@ -3,6 +3,7 @@ package subworkflow
 import (
 	"context"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/promutils"
 
 	"github.com/lyft/flytestdlib/logger"
@@ -44,7 +45,7 @@ func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecu
 	logger.Debug(ctx, "Starting workflow Node")
 	invalidWFNodeError := func() (handler.Transition, error) {
 		errMsg := "workflow wfNode does not have a subworkflow or child workflow reference"
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM,
 			errors.BadSpecificationError, errMsg, nil)), nil
 	}
 
@@ -67,7 +68,7 @@ func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx handler.NodeExecu
 	if workflowPhase == v1alpha1.WorkflowNodePhaseUndefined {
 		if wfNode == nil {
 			errMsg := "Invoked workflow handler, for a non workflow Node."
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, errMsg, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.RuntimeExecutionError, errMsg, nil)), nil
 		}
 
 		if wfNode.GetSubWorkflowRef() != nil {

@@ -24,7 +24,7 @@ require (
 	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/lyft/datacatalog v0.2.1
 	github.com/lyft/flyteidl v0.17.24
-	github.com/lyft/flyteplugins v0.3.21
+	github.com/lyft/flyteplugins v0.3.22
 	github.com/lyft/flytestdlib v0.3.3
 	github.com/magiconair/properties v1.8.1
 	github.com/mattn/go-colorable v0.1.6 // indirect
@@ -45,6 +45,7 @@ require (
 	k8s.io/api v0.17.3
 	k8s.io/apimachinery v0.17.3
 	k8s.io/client-go v11.0.0+incompatible
+	k8s.io/code-generator v0.17.2
 	k8s.io/klog v1.0.0
 	k8s.io/kube-openapi v0.0.0-20200204173128-addea2498afe // indirect
 	k8s.io/utils v0.0.0-20200229041039-0a110f9eb7ab // indirect

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils"
 
@@ -26,7 +27,7 @@ func (b *branchHandler) FinalizeRequired() bool {
 	return false
 }
 
-func (b *branchHandler) Setup(ctx context.Context, setupContext handler.SetupContext) error {
+func (b *branchHandler) Setup(ctx context.Context, _ handler.SetupContext) error {
 	logger.Debugf(ctx, "BranchNode::Setup: nothing to do")
 	return nil
 }
@@ -36,12 +37,13 @@ func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha
 		nodeInputs, err := nCtx.InputReader().Get(ctx)
 		if err != nil {
 			errMsg := fmt.Sprintf("Failed to read input. Error [%s]", err)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.RuntimeExecutionError, errMsg, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.RuntimeExecutionError, errMsg, nil)), nil
 		}
 		finalNodeID, err := DecideBranch(ctx, nl, nCtx.NodeID(), branchNode, nodeInputs)
 		if err != nil {
+			// TODO @kumare differentiate branch error user vs system. We should define errors for branch only
 			errMsg := fmt.Sprintf("Branch evaluation failed. Error [%s]", err)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.IllegalStateError, errMsg, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.IllegalStateError, errMsg, nil)), nil
 		}
 
 		branchNodeState := handler.BranchNodeState{FinalizedNodeID: finalNodeID, Phase: v1alpha1.BranchNodeSuccess}
@@ -56,7 +58,7 @@ func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha
 		if !ok {
 			errMsg := fmt.Sprintf("Branch downstream finalized node not found. FinalizedNode [%s]", *finalNodeID)
 			logger.Debugf(ctx, errMsg)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.DownstreamNodeNotFoundError, errMsg, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.DownstreamNodeNotFoundError, errMsg, nil)), nil
 		}
 		i := nCtx.NodeID()
 		childNodeStatus := nl.GetNodeExecutionStatus(ctx, finalNode.GetID())
@@ -75,16 +77,16 @@ func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha
 		if userError != nil {
 			// We should never reach here, but for safety and completeness
 			errMsg := fmt.Sprintf("Branch node userError [%s]", userError)
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.UserProvidedError, errMsg, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, errors.UserProvidedError, errMsg, nil)), nil
 		}
 		errMsg := "no node finalized through previous branchNodestatus evaluation"
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.IllegalStateError, errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.IllegalStateError, errMsg, nil)), nil
 	}
 
 	branchTakenNode, ok := nl.GetNode(*finalNodeID)
 	if !ok {
 		errMsg := fmt.Sprintf("Downstream node [%v] not found", *finalNodeID)
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.DownstreamNodeNotFoundError, errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.DownstreamNodeNotFoundError, errMsg, nil)), nil
 	}
 
 	// Recurse downstream
@@ -96,7 +98,7 @@ func (b *branchHandler) Handle(ctx context.Context, nCtx handler.NodeExecutionCo
 	logger.Debug(ctx, "Starting Branch Node")
 	branchNode := nCtx.Node().GetBranchNode()
 	if branchNode == nil {
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(errors.IllegalStateError, "Invoked branch handler, for a non branch node.", nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.IllegalStateError, "Invoked branch handler, for a non branch node.", nil)), nil
 	}
 
 	nl := nCtx.ContextualNodeLookup()
@@ -126,12 +128,7 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx handler.Node
 	}
 
 	if downstreamStatus.HasFailed() {
-		errMsg := downstreamStatus.Err.Error()
-		code, nodeError := errors.GetErrorCode(downstreamStatus.Err)
-		if !nodeError {
-			code = errors.UnknownError
-		}
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(code, errMsg, nil)), nil
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailureErr(downstreamStatus.Err, nil)), nil
 	}
 
 	phase := handler.PhaseInfoRunning(nil)

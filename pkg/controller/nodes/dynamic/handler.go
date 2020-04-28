@@ -6,14 +6,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils/labeled"
+
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 
 	"github.com/lyft/flytepropeller/pkg/compiler"
 	common2 "github.com/lyft/flytepropeller/pkg/compiler/common"
@@ -98,7 +98,8 @@ func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevSt
 func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, nCtx handler.NodeExecutionContext, prevState handler.DynamicNodeState) (handler.Transition, handler.DynamicNodeState, error) {
 	execContext, dynamicWF, nl, _, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 	if err != nil {
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(
+		// TODO @kumare classify system vs user errors
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM,
 			"DynamicWorkflowBuildFailed", err.Error(), nil)), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error()}, nil
 	}
 
@@ -159,7 +160,7 @@ func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx handler.Nod
 			return trns, err
 		}
 
-		trns = handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("DynamicNodeFailed", ds.Reason, nil))
+		trns = handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_UNKNOWN, "DynamicNodeInFailing", ds.Reason, nil))
 	case v1alpha1.DynamicNodePhaseParentFinalizing:
 		if err := d.finalizeParentNode(ctx, nCtx); err != nil {
 			return handler.UnknownTransition, err
@@ -441,24 +442,17 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 		return handler.UnknownTransition, prevState, err
 	}
 
-	if state.HasFailed() {
+	if state.HasFailed() || state.HasTimedOut() {
+		// When the subworkflow either fails or times-out we need to handle failing
 		if dynamicWorkflow.GetOnFailureNode() != nil {
 			// TODO Once we migrate to closure node we need to handle subworkflow using the subworkflow handler
 			logger.Errorf(ctx, "We do not support failure nodes in dynamic workflow today")
 		}
 
+		// As we do not support Failure Node, we can just return failure in this case
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)),
-			handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: state.Err.Error()},
+			handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: state.Err.String()},
 			nil
-	}
-
-	if state.HasTimedOut() {
-		if dynamicWorkflow.GetOnFailureNode() != nil {
-			// TODO Once we migrate to closure node we need to handle subworkflow using the subworkflow handler
-			logger.Errorf(ctx, "We do not support failure nodes in dynamic workflow today")
-		}
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("DynamicNodeTimeout", "timed out", nil)),
-			handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: "dynamic node timed out"}, nil
 	}
 
 	if state.IsComplete() {
@@ -468,7 +462,7 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 			dynamicNodeStatus := nCtx.NodeStatus().GetNodeExecutionStatus(ctx, dynamicNodeID)
 			endNodeStatus := dynamicNodeStatus.GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID)
 			if endNodeStatus == nil {
-				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("MalformedDynamicWorkflow", "no end-node found in dynamic workflow", nil)),
+				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "MalformedDynamicWorkflow", "no end-node found in dynamic workflow", nil)),
 					handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: "no end-node found in dynamic workflow"},
 					nil
 			}
@@ -476,7 +470,7 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 			sourcePath := v1alpha1.GetOutputsFile(endNodeStatus.GetOutputDir())
 			if metadata, err := nCtx.DataStore().Head(ctx, sourcePath); err == nil {
 				if !metadata.Exists() {
-					return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("DynamicWorkflowOutputsNotFound", fmt.Sprintf(" is expected to produce outputs but no outputs file was written to %v.", sourcePath), nil)),
+					return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure(core.ExecutionError_SYSTEM, "DynamicWorkflowOutputsNotFound", fmt.Sprintf(" is expected to produce outputs but no outputs file was written to %v.", sourcePath), nil)),
 						handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: "DynamicWorkflow is expected to produce outputs but no outputs file was written"},
 						nil
 				}
@@ -487,7 +481,7 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 			destinationPath := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
 			if err := nCtx.DataStore().CopyRaw(ctx, sourcePath, destinationPath, storage.Options{}); err != nil {
 				return handler.DoTransition(handler.TransitionTypeEphemeral,
-						handler.PhaseInfoFailure(errors.OutputsNotFoundError,
+						handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.OutputsNotFoundError,
 							fmt.Sprintf("Failed to copy subworkflow outputs from [%v] to [%v]", sourcePath, destinationPath), nil),
 					), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: "Failed to copy subworkflow outputs"},
 					nil

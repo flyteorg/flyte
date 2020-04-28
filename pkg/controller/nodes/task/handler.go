@@ -171,7 +171,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 	// and then convert it to proxies later and pass them to plugins
 	enabledPlugins, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to finalize enabled plugins. Err: %s", err)
+		logger.Errorf(ctx, "Failed to finalize enabled plugins. Error: %s", err)
 		return err
 	}
 

@@ -180,6 +180,8 @@ type NodeStatus struct {
 
 	TaskNodeStatus    *TaskNodeStatus    `json:",omitempty"`
 	DynamicNodeStatus *DynamicNodeStatus `json:"dynamicNodeStatus,omitempty"`
+	// In case of Failing/Failed Phase, an execution error can be optionally associated with the Node
+	Error *ExecutionError `json:"error,omitempty"`
 
 	// Not Persisted
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
@@ -379,7 +381,7 @@ func (in *NodeStatus) GetOrCreateTaskStatus() MutableTaskNodeStatus {
 	return in.TaskNodeStatus
 }
 
-func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason string) {
+func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason string, err *core.ExecutionError) {
 	if in.Phase == p {
 		// We will not update the phase multiple times. This prevents the comparison from returning false positive
 		return
@@ -394,6 +396,10 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 	n := occurredAt
 	if occurredAt.IsZero() {
 		n = metav1.Now()
+	}
+
+	if err != nil {
+		in.Error = &ExecutionError{err}
 	}
 
 	if p == NodePhaseQueued && in.QueuedAt == nil {
@@ -457,7 +463,7 @@ func (in *NodeStatus) SetParentTaskID(t *core.TaskExecutionIdentifier) {
 		}
 
 		// We do not need to set Dirty here because this field is not persisted.
-		//in.SetDirty()
+		// in.SetDirty()
 	}
 }
 
@@ -627,6 +633,13 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 	}
 
 	return in.BranchStatus.Equals(other.BranchStatus) && in.DynamicNodeStatus.Equals(other.DynamicNodeStatus)
+}
+
+func (in *NodeStatus) GetExecutionError() *core.ExecutionError {
+	if in.Error != nil {
+		return in.Error.ExecutionError
+	}
+	return nil
 }
 
 // THIS IS NOT AUTO GENERATED

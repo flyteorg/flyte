@@ -121,7 +121,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 	n.OnGetResources().Return(res)
 	n.OnGetID().Return(nodeID)
 
-	expectedError := fmt.Errorf("error")
+	expectedError := &core.ExecutionError{}
 	bn := &mocks2.ExecutableNode{}
 	bn.OnGetID().Return(childNodeID)
 
@@ -136,7 +136,7 @@ func TestBranchHandler_RecurseDownstream(t *testing.T) {
 		childPhase      v1alpha1.NodePhase
 		nl              *execMocks.NodeLookup
 	}{
-		{"childNodeError", executors.NodeStatusUndefined, expectedError,
+		{"childNodeError", executors.NodeStatusUndefined, fmt.Errorf("err"),
 			nil, bn, true, handler.EPhaseUndefined, v1alpha1.NodePhaseFailed, nil},
 		{"childPending", executors.NodeStatusPending, nil,
 			nil, bn, false, handler.EPhaseRunning, v1alpha1.NodePhaseQueued, nil},

@@ -152,7 +152,7 @@ func (t *Handler) ValidateOutputAndCacheAdd(ctx context.Context, nodeID v1alpha1
 			}
 			if err2 := t.catalog.Put(ctx, key, r, m); err2 != nil {
 				t.metrics.catalogPutFailureCount.Inc(ctx)
-				logger.Errorf(ctx, "Failed to write results to catalog for Task [%v]. Err: %v", tk.GetId(), err2)
+				logger.Errorf(ctx, "Failed to write results to catalog for Task [%v]. Error: %v", tk.GetId(), err2)
 			} else {
 				t.metrics.catalogPutSuccessCount.Inc(ctx)
 				logger.Debugf(ctx, "Successfully cached results to catalog - Task [%v]", tk.GetId())

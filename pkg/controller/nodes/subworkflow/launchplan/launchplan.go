@@ -7,7 +7,7 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-//go:generate mockery -name Executor
+//go:generate mockery -all -case=underscore
 
 // A simple context that is used to start an execution of a LaunchPlan. It encapsulates enough parent information
 // to tie the executions

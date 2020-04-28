@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lyft/flytepropeller/pkg/controller/config"
-	"github.com/lyft/flytepropeller/pkg/controller/workflowstore"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/lyft/flytepropeller/pkg/controller/config"
+	"github.com/lyft/flytepropeller/pkg/controller/workflowstore"
+
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 type mockExecutor struct {
@@ -81,7 +84,7 @@ func TestPropeller_Handle(t *testing.T) {
 			},
 		}))
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
-			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "done")
+			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "done", nil)
 			return nil
 		}
 		assert.NoError(t, p.Handle(ctx, namespace, name))
@@ -130,7 +133,7 @@ func TestPropeller_Handle(t *testing.T) {
 			},
 		}))
 		exec.HandleAbortedCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow, maxRetries uint32) error {
-			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "done")
+			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "done", nil)
 			return nil
 		}
 		assert.NoError(t, p.Handle(ctx, namespace, name))
@@ -188,7 +191,7 @@ func TestPropeller_Handle(t *testing.T) {
 			},
 		}))
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
-			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "")
+			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "", nil)
 			return nil
 		}
 		assert.NoError(t, p.Handle(ctx, namespace, name))
@@ -242,7 +245,7 @@ func TestPropeller_Handle(t *testing.T) {
 			},
 		}))
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
-			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "")
+			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "", nil)
 			return nil
 		}
 		assert.NoError(t, p.Handle(ctx, namespace, name))
@@ -271,7 +274,7 @@ func TestPropeller_Handle(t *testing.T) {
 		}))
 		abortCalled := false
 		exec.HandleAbortedCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow, maxRetries uint32) error {
-			w.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailed, "Aborted")
+			w.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailed, "Aborted", nil)
 			abortCalled = true
 			return nil
 		}
@@ -302,7 +305,7 @@ func TestPropeller_Handle(t *testing.T) {
 			},
 		}))
 		exec.HandleAbortedCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow, maxRetries uint32) error {
-			w.Status.UpdatePhase(v1alpha1.WorkflowPhaseAborted, "Aborted")
+			w.Status.UpdatePhase(v1alpha1.WorkflowPhaseAborted, "Aborted", nil)
 			return nil
 		}
 		assert.NoError(t, p.Handle(ctx, namespace, name))
@@ -356,7 +359,7 @@ func TestPropeller_Handle(t *testing.T) {
 			},
 		}))
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
-			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSuccess, "done")
+			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSuccess, "done", nil)
 			return nil
 		}
 		assert.NoError(t, p.Handle(ctx, namespace, name))
@@ -380,7 +383,7 @@ func TestPropeller_Handle(t *testing.T) {
 			},
 		}))
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
-			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "done")
+			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "done", &core.ExecutionError{Kind: core.ExecutionError_USER, Code: "code", Message: "message"})
 			return nil
 		}
 		assert.NoError(t, p.Handle(ctx, namespace, name))

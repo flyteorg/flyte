@@ -19,47 +19,6 @@ type Executor struct {
 	mock.Mock
 }
 
-type Executor_GetLaunchPlan struct {
-	*mock.Call
-}
-
-func (_m Executor_GetLaunchPlan) Return(_a0 *admin.LaunchPlan, _a1 error) *Executor_GetLaunchPlan {
-	return &Executor_GetLaunchPlan{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *Executor) OnGetLaunchPlan(ctx context.Context, launchPlanRef *core.Identifier) *Executor_GetLaunchPlan {
-	c := _m.On("GetLaunchPlan", ctx, launchPlanRef)
-	return &Executor_GetLaunchPlan{Call: c}
-}
-
-func (_m *Executor) OnGetLaunchPlanMatch(matchers ...interface{}) *Executor_GetLaunchPlan {
-	c := _m.On("GetLaunchPlan", matchers...)
-	return &Executor_GetLaunchPlan{Call: c}
-}
-
-// GetLaunchPlan provides a mock function with given fields: ctx, launchPlanRef
-func (_m *Executor) GetLaunchPlan(ctx context.Context, launchPlanRef *core.Identifier) (*admin.LaunchPlan, error) {
-	ret := _m.Called(ctx, launchPlanRef)
-
-	var r0 *admin.LaunchPlan
-	if rf, ok := ret.Get(0).(func(context.Context, *core.Identifier) *admin.LaunchPlan); ok {
-		r0 = rf(ctx, launchPlanRef)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.LaunchPlan)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *core.Identifier) error); ok {
-		r1 = rf(ctx, launchPlanRef)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 type Executor_GetStatus struct {
 	*mock.Call
 }

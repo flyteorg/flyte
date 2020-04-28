@@ -36,7 +36,7 @@ type workflowMetrics struct {
 
 type Status struct {
 	TransitionToPhase v1alpha1.WorkflowPhase
-	Err               error
+	Err               *core.ExecutionError
 }
 
 var StatusReady = Status{TransitionToPhase: v1alpha1.WorkflowPhaseReady}
@@ -44,11 +44,11 @@ var StatusRunning = Status{TransitionToPhase: v1alpha1.WorkflowPhaseRunning}
 var StatusSucceeding = Status{TransitionToPhase: v1alpha1.WorkflowPhaseSucceeding}
 var StatusSuccess = Status{TransitionToPhase: v1alpha1.WorkflowPhaseSuccess}
 
-func StatusFailing(err error) Status {
+func StatusFailing(err *core.ExecutionError) Status {
 	return Status{TransitionToPhase: v1alpha1.WorkflowPhaseFailing, Err: err}
 }
 
-func StatusFailed(err error) Status {
+func StatusFailed(err *core.ExecutionError) Status {
 	return Status{TransitionToPhase: v1alpha1.WorkflowPhaseFailed, Err: err}
 }
 
@@ -76,12 +76,18 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 
 	startNode := w.StartNode()
 	if startNode == nil {
-		return StatusFailing(errors.Errorf(errors.BadSpecificationError, w.GetID(), "StartNode not found.")), nil
+		return StatusFailing(&core.ExecutionError{
+			Kind:    core.ExecutionError_SYSTEM,
+			Code:    errors.BadSpecificationError.String(),
+			Message: "StartNode not found."}), nil
 	}
 
 	ref, err := c.constructWorkflowMetadataPrefix(ctx, w)
 	if err != nil {
-		return StatusFailing(errors.Wrapf(errors.CausedByError, w.GetID(), err, "failed to create metadata prefix.")), nil
+		return StatusFailing(&core.ExecutionError{
+			Kind:    core.ExecutionError_SYSTEM,
+			Code:    "MetadataPrefixCreationFailure",
+			Message: err.Error()}), nil
 	}
 	w.GetExecutionStatus().SetDataDir(ref)
 	var inputs *core.LiteralMap
@@ -93,11 +99,17 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	nodeStatus := w.GetNodeExecutionStatus(ctx, startNode.GetID())
 	dataDir, err := c.store.ConstructReference(ctx, ref, startNode.GetID(), "data")
 	if err != nil {
-		return StatusFailing(errors.Wrapf(errors.CausedByError, w.GetID(), err, "failed to create metadata prefix for start node.")), nil
+		return StatusFailing(&core.ExecutionError{
+			Kind:    core.ExecutionError_SYSTEM,
+			Code:    "MetadataPrefixCreationFailure",
+			Message: err.Error()}), nil
 	}
 	outputDir, err := c.store.ConstructReference(ctx, dataDir, "0")
 	if err != nil {
-		return StatusFailing(errors.Wrapf(errors.CausedByError, w.GetID(), err, "failed to create metadata prefix for start node.")), nil
+		return StatusFailing(&core.ExecutionError{
+			Kind:    core.ExecutionError_SYSTEM,
+			Code:    "MetadataPrefixCreationFailure",
+			Message: err.Error()}), nil
 	}
 
 	logger.Infof(ctx, "Setting the MetadataDir for StartNode [%v]", dataDir)
@@ -109,7 +121,7 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	}
 
 	if s.HasFailed() {
-		return StatusFailing(errors.Wrapf(errors.CausedByError, w.GetID(), err, "failed to set inputs for Start node.")), nil
+		return StatusFailing(s.Err), nil
 	}
 	return StatusRunning, nil
 }
@@ -117,19 +129,24 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
 	startNode := w.StartNode()
 	if startNode == nil {
-		return StatusFailed(errors.Errorf(errors.IllegalStateError, w.GetID(), "StartNode not found in running workflow?")), nil
+		return StatusFailing(&core.ExecutionError{
+			Kind:    core.ExecutionError_SYSTEM,
+			Code:    errors.IllegalStateError.String(),
+			Message: "Start node not found"}), nil
 	}
 	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, w, w, w, startNode)
 	if err != nil {
 		return StatusRunning, err
 	}
 	if state.HasFailed() {
-		logger.Infof(ctx, "Workflow has failed. Error [%s]", state.Err.Error())
+		logger.Infof(ctx, "Workflow has failed. Error [%s]", state.Err.String())
 		return StatusFailing(state.Err), nil
 	}
 	if state.HasTimedOut() {
-		err := errors.Errorf(errors.RuntimeExecutionError, w.GetID(), "Workflow Node timed out")
-		return StatusFailing(err), nil
+		return StatusFailing(&core.ExecutionError{
+			Kind:    core.ExecutionError_USER,
+			Code:    "Timeout",
+			Message: "Timeout in node"}), nil
 	}
 	if state.IsComplete() {
 		return StatusSucceeding, nil
@@ -156,8 +173,10 @@ func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha
 			return StatusFailed(state.Err), nil
 		}
 		if state.HasTimedOut() {
-			err := errors.Errorf(errors.RuntimeExecutionError, w.GetID(), "Workflow Node timed out")
-			return StatusFailed(err), nil
+			return StatusFailed(&core.ExecutionError{
+				Kind:    core.ExecutionError_USER,
+				Code:    "TimedOut",
+				Message: "FailureNode Timedout"}), nil
 		}
 		if state.PartiallyComplete() {
 			// Re-enqueue the workflow
@@ -166,7 +185,15 @@ func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha
 		}
 		// Fallthrough to handle state is complete
 	}
-	return StatusFailed(errors.Errorf(errors.CausedByError, w.ID, w.GetExecutionStatus().GetMessage())), nil
+	err := w.GetExecutionStatus().GetExecutionError()
+	if err == nil {
+		err = &core.ExecutionError{
+			Code:    "UnknownError",
+			Message: fmt.Sprintf("Unknown error, last seen message [%s]", w.GetExecutionStatus().GetMessage()),
+			Kind:    core.ExecutionError_UNKNOWN,
+		}
+	}
+	return StatusFailed(err), nil
 }
 
 func (c *workflowExecutor) handleSucceedingWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) Status {
@@ -180,24 +207,20 @@ func (c *workflowExecutor) handleSucceedingWorkflow(ctx context.Context, w *v1al
 	return StatusSuccess
 }
 
-func convertToExecutionError(err error, alternateErr string) *event.WorkflowExecutionEvent_Error {
-	if err != nil {
-		if code, isWorkflowErr := errors.GetErrorCode(err); isWorkflowErr {
-			return &event.WorkflowExecutionEvent_Error{
-				Error: &core.ExecutionError{
-					Code:    code.String(),
-					Message: err.Error(),
-				},
+func convertToExecutionError(err *core.ExecutionError, alternateErr *core.ExecutionError) *event.WorkflowExecutionEvent_Error {
+	if err == nil {
+		if alternateErr != nil {
+			err = alternateErr
+		} else {
+			err = &core.ExecutionError{
+				Code:    errors.RuntimeExecutionError.String(),
+				Message: "Unknown error",
+				Kind:    core.ExecutionError_UNKNOWN,
 			}
 		}
-	} else {
-		err = fmt.Errorf(alternateErr)
 	}
 	return &event.WorkflowExecutionEvent_Error{
-		Error: &core.ExecutionError{
-			Code:    errors.RuntimeExecutionError.String(),
-			Message: err.Error(),
-		},
+		Error: err,
 	}
 }
 
@@ -218,28 +241,26 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 		wfEvent := &event.WorkflowExecutionEvent{
 			ExecutionId: execID,
 		}
-		previousMsg := wStatus.GetMessage()
+		previousError := wStatus.GetExecutionError()
 		switch toStatus.TransitionToPhase {
 		case v1alpha1.WorkflowPhaseReady:
 			// Do nothing
 			return nil
 		case v1alpha1.WorkflowPhaseRunning:
 			wfEvent.Phase = core.WorkflowExecution_RUNNING
-			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseRunning, fmt.Sprintf("Workflow Started"))
+			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseRunning, fmt.Sprintf("Workflow Started"), nil)
 			wfEvent.OccurredAt = utils.GetProtoTime(wStatus.GetStartedAt())
 		case v1alpha1.WorkflowPhaseFailing:
 			wfEvent.Phase = core.WorkflowExecution_FAILING
-			e := convertToExecutionError(toStatus.Err, previousMsg)
-			wfEvent.OutputResult = e
-			// Completion latency is only observed when a workflow completes successfully
-			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailing, e.Error.Message)
+			wfEvent.OutputResult = convertToExecutionError(toStatus.Err, previousError)
+			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "", wfEvent.GetError())
 			wfEvent.OccurredAt = utils.GetProtoTime(nil)
 		case v1alpha1.WorkflowPhaseFailed:
 			wfEvent.Phase = core.WorkflowExecution_FAILED
-			e := convertToExecutionError(toStatus.Err, previousMsg)
-			wfEvent.OutputResult = e
-			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailed, e.Error.Message)
+			wfEvent.OutputResult = convertToExecutionError(toStatus.Err, previousError)
+			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailed, "", wfEvent.GetError())
 			wfEvent.OccurredAt = utils.GetProtoTime(wStatus.GetStoppedAt())
+			// Completion latency is only observed when a workflow completes successfully
 			c.metrics.FailureDuration.Observe(ctx, wStatus.GetStartedAt().Time, wStatus.GetStoppedAt().Time)
 		case v1alpha1.WorkflowPhaseSucceeding:
 			wfEvent.Phase = core.WorkflowExecution_SUCCEEDING
@@ -250,11 +271,11 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 				c.metrics.CompletionLatency.Observe(ctx, endNodeStatus.GetStartedAt().Time, time.Now())
 			}
 
-			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "")
+			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "", nil)
 			wfEvent.OccurredAt = utils.GetProtoTime(nil)
 		case v1alpha1.WorkflowPhaseSuccess:
 			wfEvent.Phase = core.WorkflowExecution_SUCCEEDED
-			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseSuccess, "")
+			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseSuccess, "", nil)
 			// Not all workflows have outputs
 			if wStatus.GetOutputReference() != "" {
 				wfEvent.OutputResult = &event.WorkflowExecutionEvent_OutputUri{
@@ -268,7 +289,7 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 			if wStatus.GetLastUpdatedAt() != nil {
 				c.metrics.CompletionLatency.Observe(ctx, wStatus.GetLastUpdatedAt().Time, time.Now())
 			}
-			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseAborted, "")
+			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseAborted, "", nil)
 			wfEvent.OccurredAt = utils.GetProtoTime(wStatus.GetStoppedAt())
 		default:
 			return errors.Errorf(errors.IllegalStateError, "", "Illegal transition from [%v] -> [%v]", wStatus.GetPhase().String(), toStatus.TransitionToPhase.String())
@@ -279,7 +300,7 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 				// Move to WorkflowPhaseFailed for state mis-match
 				msg := fmt.Sprintf("workflow state mismatch between propeller and control plane; Propeller State: %s, ExecutionId %s", wfEvent.Phase.String(), wfEvent.ExecutionId)
 				logger.Warningf(ctx, msg)
-				wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailed, msg)
+				wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailed, msg, nil)
 				return nil
 			}
 			logger.Warningf(ctx, "Event recording failed. Error [%s]", recordingErr.Error())
@@ -376,7 +397,11 @@ func (c *workflowExecutor) HandleAbortedWorkflow(ctx context.Context, w *v1alpha
 		var status Status
 		if err != nil {
 			// This workflow failed, record that phase and corresponding error message.
-			status = StatusFailed(err)
+			status = StatusFailed(&core.ExecutionError{
+				Code:    "Workflow abort failed",
+				Message: err.Error(),
+				Kind:    core.ExecutionError_SYSTEM,
+			})
 		} else {
 			// Otherwise, this workflow is aborted.
 			status = Status{

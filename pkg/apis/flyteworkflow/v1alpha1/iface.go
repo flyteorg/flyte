@@ -215,7 +215,7 @@ type MutableNodeStatus interface {
 	SetOutputDir(d DataReference)
 	SetParentNodeID(n *NodeID)
 	SetParentTaskID(t *core.TaskExecutionIdentifier)
-	UpdatePhase(phase NodePhase, occurredAt metav1.Time, reason string)
+	UpdatePhase(phase NodePhase, occurredAt metav1.Time, reason string, err *core.ExecutionError)
 	IncrementAttempts() uint32
 	IncrementSystemFailures() uint32
 	SetCached()
@@ -257,6 +257,7 @@ type ExecutableNodeStatus interface {
 	GetDataDir() DataReference
 	GetOutputDir() DataReference
 	GetMessage() string
+	GetExecutionError() *core.ExecutionError
 	GetAttempts() uint32
 	GetSystemFailures() uint32
 	GetWorkflowNodeStatus() ExecutableWorkflowNodeStatus
@@ -328,10 +329,11 @@ type ExecutableNode interface {
 type ExecutableWorkflowStatus interface {
 	NodeStatusGetter
 	ExecutionTimeInfo
-	UpdatePhase(p WorkflowPhase, msg string)
+	UpdatePhase(p WorkflowPhase, msg string, err *core.ExecutionError)
 	GetPhase() WorkflowPhase
 	IsTerminated() bool
 	GetMessage() string
+	GetExecutionError() *core.ExecutionError
 	SetDataDir(DataReference)
 	GetDataDir() DataReference
 	GetOutputReference() DataReference

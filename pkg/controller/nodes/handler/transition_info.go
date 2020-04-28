@@ -151,16 +151,16 @@ func phaseInfoFailed(p EPhase, err *core.ExecutionError, info *ExecutionInfo) Ph
 	return phaseInfo(p, err, info, err.Message)
 }
 
-func PhaseInfoFailure(code, reason string, info *ExecutionInfo) PhaseInfo {
-	return phaseInfoFailed(EPhaseFailed, &core.ExecutionError{Code: code, Message: reason}, info)
+func PhaseInfoFailure(kind core.ExecutionError_ErrorKind, code, reason string, info *ExecutionInfo) PhaseInfo {
+	return phaseInfoFailed(EPhaseFailed, &core.ExecutionError{Kind: kind, Code: code, Message: reason}, info)
 }
 
 func PhaseInfoFailureErr(err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {
 	return phaseInfoFailed(EPhaseFailed, err, info)
 }
 
-func PhaseInfoRetryableFailure(code, reason string, info *ExecutionInfo) PhaseInfo {
-	return phaseInfoFailed(EPhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason}, info)
+func PhaseInfoRetryableFailure(kind core.ExecutionError_ErrorKind, code, reason string, info *ExecutionInfo) PhaseInfo {
+	return phaseInfoFailed(EPhaseRetryableFailure, &core.ExecutionError{Kind: kind, Code: code, Message: reason}, info)
 }
 
 func PhaseInfoRetryableFailureErr(err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {

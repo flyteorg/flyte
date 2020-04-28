@@ -14,24 +14,6 @@ type NodeLookup interface {
 	GetNodeExecutionStatus(ctx context.Context, id v1alpha1.NodeID) v1alpha1.ExecutableNodeStatus
 }
 
-// Implements a de-generate case of NodeLookup, where only one Node is always looked up
-type singleNodeLookup struct {
-	n v1alpha1.ExecutableNode
-	v1alpha1.NodeStatusGetter
-}
-
-func (s singleNodeLookup) GetNode(nodeID v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool) {
-	if nodeID != s.n.GetID() {
-		return nil, false
-	}
-	return s.n, true
-}
-
-// Returns a De-generate NodeLookup that always returns one node and the status of that node
-func NewSingleNodeLookup(n v1alpha1.ExecutableNode, s v1alpha1.NodeStatusGetter) NodeLookup {
-	return singleNodeLookup{NodeStatusGetter: s, n: n}
-}
-
 // Implements a contextual NodeLookup that can be composed of a disparate NodeGetter and a NodeStatusGetter
 type contextualNodeLookup struct {
 	v1alpha1.NodeGetter

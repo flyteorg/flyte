@@ -5,8 +5,10 @@ package mocks
 import (
 	context "context"
 
-	storage "github.com/lyft/flytestdlib/storage"
+	core "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	mock "github.com/stretchr/testify/mock"
+
+	storage "github.com/lyft/flytestdlib/storage"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -84,6 +86,40 @@ func (_m *ExecutableWorkflowStatus) GetDataDir() storage.DataReference {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
+
+type ExecutableWorkflowStatus_GetExecutionError struct {
+	*mock.Call
+}
+
+func (_m ExecutableWorkflowStatus_GetExecutionError) Return(_a0 *core.ExecutionError) *ExecutableWorkflowStatus_GetExecutionError {
+	return &ExecutableWorkflowStatus_GetExecutionError{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableWorkflowStatus) OnGetExecutionError() *ExecutableWorkflowStatus_GetExecutionError {
+	c := _m.On("GetExecutionError")
+	return &ExecutableWorkflowStatus_GetExecutionError{Call: c}
+}
+
+func (_m *ExecutableWorkflowStatus) OnGetExecutionErrorMatch(matchers ...interface{}) *ExecutableWorkflowStatus_GetExecutionError {
+	c := _m.On("GetExecutionError", matchers...)
+	return &ExecutableWorkflowStatus_GetExecutionError{Call: c}
+}
+
+// GetExecutionError provides a mock function with given fields:
+func (_m *ExecutableWorkflowStatus) GetExecutionError() *core.ExecutionError {
+	ret := _m.Called()
+
+	var r0 *core.ExecutionError
+	if rf, ok := ret.Get(0).(func() *core.ExecutionError); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.ExecutionError)
+		}
 	}
 
 	return r0
@@ -373,7 +409,7 @@ func (_m *ExecutableWorkflowStatus) SetOutputReference(reference storage.DataRef
 	_m.Called(reference)
 }
 
-// UpdatePhase provides a mock function with given fields: p, msg
-func (_m *ExecutableWorkflowStatus) UpdatePhase(p v1alpha1.WorkflowPhase, msg string) {
-	_m.Called(p, msg)
+// UpdatePhase provides a mock function with given fields: p, msg, err
+func (_m *ExecutableWorkflowStatus) UpdatePhase(p v1alpha1.WorkflowPhase, msg string, err *core.ExecutionError) {
+	_m.Called(p, msg, err)
 }
