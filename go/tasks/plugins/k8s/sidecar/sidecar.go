@@ -127,7 +127,6 @@ func determinePrimaryContainerPhase(primaryContainerName string, statuses []k8sv
 	}
 
 	// If for some reason we can't find the primary container, always just return a permanent failure
-
 	return pluginsCore.PhaseInfoFailure("PrimaryContainerMissing",
 		fmt.Sprintf("Primary container [%s] not found in pod's container statuses", primaryContainerName), info)
 }

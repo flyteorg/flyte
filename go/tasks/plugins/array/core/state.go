@@ -212,7 +212,7 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 		if state.GetExecutionErr() != nil {
 			phaseInfo = core.PhaseInfoFailed(core.PhasePermanentFailure, state.GetExecutionErr(), nowTaskInfo)
 		} else {
-			phaseInfo = core.PhaseInfoFailure(ErrorK8sArrayGeneric, state.GetReason(), nowTaskInfo)
+			phaseInfo = core.PhaseInfoSystemFailure(ErrorK8sArrayGeneric, state.GetReason(), nowTaskInfo)
 		}
 	default:
 		return phaseInfo, fmt.Errorf("failed to map custom state phase to core phase. State Phase [%v]", p)
