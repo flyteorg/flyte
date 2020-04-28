@@ -180,8 +180,12 @@ func PhaseInfoSuccess(info *TaskInfo) PhaseInfo {
 	return phaseInfo(PhaseSuccess, DefaultPhaseVersion, nil, info)
 }
 
+func PhaseInfoSystemFailure(code, reason string, info *TaskInfo) PhaseInfo {
+	return PhaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info)
+}
+
 func PhaseInfoFailure(code, reason string, info *TaskInfo) PhaseInfo {
-	return PhaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason}, info)
+	return PhaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info)
 }
 
 func PhaseInfoRetryableFailure(code, reason string, info *TaskInfo) PhaseInfo {
