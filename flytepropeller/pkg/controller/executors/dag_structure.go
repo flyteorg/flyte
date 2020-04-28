@@ -26,10 +26,6 @@ type leafNodeDAGStructure struct {
 	currentNode v1alpha1.NodeID
 }
 
-func (l leafNodeDAGStructure) StartNode() v1alpha1.ExecutableNode {
-	return nil
-}
-
 func (l leafNodeDAGStructure) ToNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
 	if id == l.currentNode {
 		return l.parentNodes, nil

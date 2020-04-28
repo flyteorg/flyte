@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/logger"
 
 	"github.com/lyft/flytestdlib/storage"
@@ -31,6 +32,9 @@ type WorkflowStatus struct {
 	// the retries the workflow will fail
 	FailedAttempts uint32 `json:"failedAttempts,omitempty"`
 
+	// Stores the Error during the Execution of the Workflow. It is optional and usually associated with Failing/Failed state only
+	Error *ExecutionError `json:"error,omitempty"`
+
 	// non-Serialized fields
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
 }
@@ -43,7 +47,7 @@ func (in *WorkflowStatus) SetMessage(msg string) {
 	in.Message = msg
 }
 
-func (in *WorkflowStatus) UpdatePhase(p WorkflowPhase, msg string) {
+func (in *WorkflowStatus) UpdatePhase(p WorkflowPhase, msg string, err *core.ExecutionError) {
 	in.Phase = p
 	in.Message = msg
 	if len(msg) > maxMessageSize {
@@ -55,11 +59,22 @@ func (in *WorkflowStatus) UpdatePhase(p WorkflowPhase, msg string) {
 		in.StartedAt = &n
 	}
 
+	if err != nil {
+		in.Error = &ExecutionError{err}
+	}
+
 	if IsWorkflowPhaseTerminal(p) && in.StoppedAt == nil {
 		in.StoppedAt = &n
 	}
 
 	in.LastUpdatedAt = &n
+}
+
+func (in *WorkflowStatus) GetExecutionError() *core.ExecutionError {
+	if in.Error != nil {
+		return in.Error.ExecutionError
+	}
+	return nil
 }
 
 func (in *WorkflowStatus) IncFailedAttempts() {

@@ -84,7 +84,7 @@ type Node interface {
 // Helper struct to allow passing of status between functions
 type NodeStatus struct {
 	NodePhase NodePhase
-	Err       error
+	Err       *core.ExecutionError
 }
 
 func (n *NodeStatus) IsComplete() bool {
@@ -111,6 +111,6 @@ var NodeStatusComplete = NodeStatus{NodePhase: NodePhaseComplete}
 var NodeStatusUndefined = NodeStatus{NodePhase: NodePhaseUndefined}
 var NodeStatusTimedOut = NodeStatus{NodePhase: NodePhaseTimedOut}
 
-func NodeStatusFailed(err error) NodeStatus {
+func NodeStatusFailed(err *core.ExecutionError) NodeStatus {
 	return NodeStatus{NodePhase: NodePhaseFailed, Err: err}
 }

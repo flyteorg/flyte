@@ -23,8 +23,6 @@ set -o pipefail
 : "${RESOURCE_NAME:?should be set for CRD}"
 : "${OPERATOR_PKG:?should be set for operator}"
 
-go install github.com/lyft/flytepropeller/vendor/k8s.io/code-generator/cmd/deepcopy-gen
-
 echo "Generating CRD: ${RESOURCE_NAME}, in package ${OPERATOR_PKG}..."
 
 SCRIPT_ROOT=$(dirname ${BASH_SOURCE})/..
@@ -34,7 +32,7 @@ CODEGEN_PKG=${CODEGEN_PKG:-$(cd ${SCRIPT_ROOT}; ls -d -1 ./vendor/k8s.io/code-ge
 # --output-base    because this script should also be able to run inside the vendor dir of
 #                  k8s.io/kubernetes. The output-base is needed for the generators to output into the vendor dir
 #                  instead of the $GOPATH directly. For normal projects this can be dropped.
-${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
+bash ${CODEGEN_PKG}/generate-groups.sh "deepcopy,client,informer,lister" \
   ${OPERATOR_PKG}/pkg/client \
   ${OPERATOR_PKG}/pkg/apis \
   ${RESOURCE_NAME}:v1alpha1 \

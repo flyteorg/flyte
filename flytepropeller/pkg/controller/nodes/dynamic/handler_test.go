@@ -154,12 +154,12 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 		{"error", args{isErr: true}, want{isErr: true}},
 		{"success-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil))}, want{p: handler.EPhaseSuccess, phase: v1alpha1.DynamicNodePhaseNone}},
 		{"running-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(i))}, want{p: handler.EPhaseRunning, info: i}},
-		{"retryfailure-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("x", "y", i))}, want{p: handler.EPhaseRetryableFailure, info: i}},
-		{"failure-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("x", "y", i))}, want{p: handler.EPhaseFailed, info: i}},
+		{"retryfailure-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure(core.ExecutionError_SYSTEM, "x", "y", i))}, want{p: handler.EPhaseRetryableFailure, info: i}},
+		{"failure-non-parent", args{trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, "x", "y", i))}, want{p: handler.EPhaseFailed, info: i}},
 		{"success-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil))}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseParentFinalizing}},
 		{"running-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(i))}, want{p: handler.EPhaseRunning, info: i}},
-		{"retryfailure-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure("x", "y", i))}, want{p: handler.EPhaseRetryableFailure, info: i}},
-		{"failure-non-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure("x", "y", i))}, want{p: handler.EPhaseFailed, info: i}},
+		{"retryfailure-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRetryableFailure(core.ExecutionError_SYSTEM, "x", "y", i))}, want{p: handler.EPhaseRetryableFailure, info: i}},
+		{"failure-non-parent", args{isDynamic: true, trns: handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, "x", "y", i))}, want{p: handler.EPhaseFailed, info: i}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -173,7 +173,7 @@ func Test_dynamicNodeHandler_Handle_Parent(t *testing.T) {
 				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 			}
 			h := &mocks.TaskNodeHandler{}
-			mockLPLauncher := &lpMocks.Executor{}
+			mockLPLauncher := &lpMocks.Reader{}
 			n := &executorMocks.Node{}
 			if tt.args.isErr {
 				h.OnHandleMatch(mock.Anything, mock.Anything).Return(handler.UnknownTransition, fmt.Errorf("error"))
@@ -287,7 +287,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
 		assert.NoError(t, err)
 		dj := &core.DynamicJobSpec{}
-		mockLPLauncher := &lpMocks.Executor{}
+		mockLPLauncher := &lpMocks.Reader{}
 		n := &executorMocks.Node{}
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 		h := &mocks.TaskNodeHandler{}
@@ -307,7 +307,7 @@ func Test_dynamicNodeHandler_Handle_ParentFinalize(t *testing.T) {
 		f, err := nCtx.DataStore().ConstructReference(context.TODO(), nCtx.NodeStatus().GetDataDir(), "futures.pb")
 		assert.NoError(t, err)
 		dj := &core.DynamicJobSpec{}
-		mockLPLauncher := &lpMocks.Executor{}
+		mockLPLauncher := &lpMocks.Reader{}
 		n := &executorMocks.Node{}
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 		h := &mocks.TaskNodeHandler{}
@@ -525,7 +525,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 		{"complete-no-outputs", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), generateOutputs: false}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
 		{"complete-valid-error-retryable", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{IsRecoverable: true}, generateOutputs: true}, want{p: handler.EPhaseRetryableFailure, phase: v1alpha1.DynamicNodePhaseFailing}},
 		{"complete-valid-error", args{s: executors.NodeStatusComplete, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}, generateOutputs: true}, want{p: handler.EPhaseFailed, phase: v1alpha1.DynamicNodePhaseFailing}},
-		{"failed", args{s: executors.NodeStatusFailed(fmt.Errorf("error")), dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseFailing}},
+		{"failed", args{s: executors.NodeStatusFailed(&core.ExecutionError{}), dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseFailing}},
 		{"running", args{s: executors.NodeStatusRunning, dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
 		{"running-valid-err", args{s: executors.NodeStatusRunning, dj: createDynamicJobSpec(), validErr: &io.ExecutionError{}}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
 		{"queued", args{s: executors.NodeStatusQueued, dj: createDynamicJobSpec()}, want{p: handler.EPhaseRunning, phase: v1alpha1.DynamicNodePhaseExecuting}},
@@ -541,7 +541,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			if tt.args.dj != nil {
 				assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, tt.args.dj))
 			}
-			mockLPLauncher := &lpMocks.Executor{}
+			mockLPLauncher := &lpMocks.Reader{}
 			h := &mocks.TaskNodeHandler{}
 			if tt.args.validErr != nil {
 				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.validErr, nil)
@@ -736,7 +736,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		assert.NoError(t, err)
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, djSpec))
 
-		mockLPLauncher := &lpMocks.Executor{}
+		mockLPLauncher := &lpMocks.Reader{}
 		var callsAdmin = false
 		mockLPLauncher.OnGetLaunchPlanMatch(ctx, lpID).Run(func(args mock.Arguments) {
 			// When a launch plan node is detected, a call should be made to Admin to fetch the interface for the LP
@@ -793,7 +793,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		assert.NoError(t, err)
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, djSpec))
 
-		mockLPLauncher := &lpMocks.Executor{}
+		mockLPLauncher := &lpMocks.Reader{}
 		var callsAdmin = false
 		mockLPLauncher.OnGetLaunchPlanMatch(ctx, lpID).Run(func(args mock.Arguments) {
 			// When a launch plan node is detected, a call should be made to Admin to fetch the interface for the LP
@@ -848,7 +848,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		nCtx.OnNodeStateReader().Return(sr)
 		nCtx.OnCurrentAttempt().Return(0)
 
-		mockLPLauncher := &lpMocks.Executor{}
+		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalize(ctx, nCtx).Return(nil)
 		n := &executorMocks.Node{}
@@ -976,7 +976,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		dj := createDynamicJobSpec()
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 
-		mockLPLauncher := &lpMocks.Executor{}
+		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalize(ctx, nCtx).Return(nil)
 		n := &executorMocks.Node{}
@@ -997,7 +997,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		dj := createDynamicJobSpec()
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 
-		mockLPLauncher := &lpMocks.Executor{}
+		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalize(ctx, nCtx).Return(fmt.Errorf("err"))
 		n := &executorMocks.Node{}
@@ -1018,7 +1018,7 @@ func TestDynamicNodeTaskNodeHandler_Finalize(t *testing.T) {
 		dj := createDynamicJobSpec()
 		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, dj))
 
-		mockLPLauncher := &lpMocks.Executor{}
+		mockLPLauncher := &lpMocks.Reader{}
 		h := &mocks.TaskNodeHandler{}
 		h.OnFinalize(ctx, nCtx).Return(nil)
 		n := &executorMocks.Node{}

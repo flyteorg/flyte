@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	listers "github.com/lyft/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	listers "github.com/lyft/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
 
 	"github.com/lyft/flytepropeller/pkg/client/clientset/versioned/fake"
 
@@ -111,14 +113,14 @@ func TestPassthroughWorkflowStore_UpdateStatus(t *testing.T) {
 	t.Run("Found-Updated", func(t *testing.T) {
 		n := mockClient.FlyteWorkflows(namespace)
 		wf := dummyWf(namespace, "x")
-		wf.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "")
+		wf.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "", nil)
 		wf.ResourceVersion = "r1"
 		_, err := n.Create(wf)
 		assert.NoError(t, err)
 		updated, err := n.Get("x", v1.GetOptions{})
 		if assert.NoError(t, err) {
 			assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, updated.GetExecutionStatus().GetPhase())
-			wf.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "")
+			wf.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "", &core.ExecutionError{})
 			_, err := wfStore.UpdateStatus(ctx, wf, PriorityClassCritical)
 			assert.NoError(t, err)
 			newVal, err := n.Get("x", v1.GetOptions{})

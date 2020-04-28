@@ -121,7 +121,7 @@ func TestPhaseInfo(t *testing.T) {
 
 	t.Run("failure", func(t *testing.T) {
 		i := &ExecutionInfo{}
-		p := PhaseInfoFailure("code", "reason", i)
+		p := PhaseInfoFailure(core.ExecutionError_SYSTEM, "code", "reason", i)
 		assert.Equal(t, EPhaseFailed, p.GetPhase())
 		assert.Equal(t, i, p.GetInfo())
 		if assert.NotNil(t, p.GetErr()) {
@@ -152,7 +152,7 @@ func TestPhaseInfo(t *testing.T) {
 
 	t.Run("retryable-fail", func(t *testing.T) {
 		i := &ExecutionInfo{}
-		p := PhaseInfoRetryableFailure("code", "reason", i)
+		p := PhaseInfoRetryableFailure(core.ExecutionError_SYSTEM, "code", "reason", i)
 		assert.Equal(t, EPhaseRetryableFailure, p.GetPhase())
 		assert.Equal(t, i, p.GetInfo())
 		if assert.NotNil(t, p.GetErr()) {

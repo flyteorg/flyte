@@ -126,7 +126,7 @@ func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.
 		}
 		nStatus := nl.GetNodeExecutionStatus(ctx, n.GetID())
 		logger.Infof(ctx, "Branch Setting Node[%v] status to Skipped!", skippedNodeID)
-		nStatus.UpdatePhase(v1alpha1.NodePhaseSkipped, v1.Now(), "Branch evaluated to false")
+		nStatus.UpdatePhase(v1alpha1.NodePhaseSkipped, v1.Now(), "Branch evaluated to false", nil)
 	}
 
 	if selectedNodeID == nil {

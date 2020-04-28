@@ -441,7 +441,7 @@ func (_m *MutableNodeStatus) SetParentTaskID(t *core.TaskExecutionIdentifier) {
 	_m.Called(t)
 }
 
-// UpdatePhase provides a mock function with given fields: phase, occurredAt, reason
-func (_m *MutableNodeStatus) UpdatePhase(phase v1alpha1.NodePhase, occurredAt v1.Time, reason string) {
-	_m.Called(phase, occurredAt, reason)
+// UpdatePhase provides a mock function with given fields: phase, occurredAt, reason, err
+func (_m *MutableNodeStatus) UpdatePhase(phase v1alpha1.NodePhase, occurredAt v1.Time, reason string, err *core.ExecutionError) {
+	_m.Called(phase, occurredAt, reason, err)
 }
