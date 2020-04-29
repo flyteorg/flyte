@@ -44,7 +44,7 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 		if launchplan.IsAlreadyExists(err) {
 			logger.Infof(ctx, "Execution already exists [%s].", childID.Name)
 		} else if launchplan.IsUserError(err) {
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, errors.RuntimeExecutionError, "failed to create unique ID", &handler.ExecutionInfo{
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, errors.RuntimeExecutionError, err.Error(), &handler.ExecutionInfo{
 				WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
 			})), nil
 		} else {
@@ -77,7 +77,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 		if launchplan.IsNotFound(err) { // NotFound
 			errorCode, _ := errors.GetErrorCode(err)
 			err = errors.Wrapf(errorCode, nCtx.NodeID(), err, "launch-plan not found")
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, errorCode, err.Error(), &handler.ExecutionInfo{
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errorCode, err.Error(), &handler.ExecutionInfo{
 				WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
 			})), nil
 		}
@@ -97,7 +97,7 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 	switch wfStatusClosure.GetPhase() {
 	case core.WorkflowExecution_ABORTED:
 		wErr = fmt.Errorf("launchplan execution aborted")
-		err = errors.Wrapf(errors.RemoteChildWorkflowExecutionFailed, nCtx.NodeID(), wErr, "launchplan [%s] failed", childID.Name)
+		err = errors.Wrapf(errors.RemoteChildWorkflowExecutionFailed, nCtx.NodeID(), wErr, "launchplan [%s] aborted", childID.Name)
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, errors.RemoteChildWorkflowExecutionFailed, err.Error(), &handler.ExecutionInfo{
 			WorkflowNodeInfo: &handler.WorkflowNodeInfo{LaunchedWorkflowID: childID},
 		})), nil

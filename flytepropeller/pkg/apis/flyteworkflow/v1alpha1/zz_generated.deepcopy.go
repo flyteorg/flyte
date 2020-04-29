@@ -113,6 +113,10 @@ func (in *Connections) DeepCopy() *Connections {
 func (in *DynamicNodeStatus) DeepCopyInto(out *DynamicNodeStatus) {
 	*out = *in
 	out.MutableStruct = in.MutableStruct
+	if in.Error != nil {
+		in, out := &in.Error, &out.Error
+		*out = (*in).DeepCopy()
+	}
 	return
 }
 
@@ -202,7 +206,7 @@ func (in *FlyteWorkflow) DeepCopyInto(out *FlyteWorkflow) {
 	}
 	in.Status.DeepCopyInto(&out.Status)
 	if in.DataReferenceConstructor != nil {
-    // This was manually modified to not generated a deep copy constructor for this. There is no way to skip generation of fields
+		// This was manually modified to not generated a deep copy constructor for this. There is no way to skip generation of fields
 		out.DataReferenceConstructor = in.DataReferenceConstructor
 	}
 	return
@@ -508,14 +512,14 @@ func (in *NodeStatus) DeepCopyInto(out *NodeStatus) {
 	if in.DynamicNodeStatus != nil {
 		in, out := &in.DynamicNodeStatus, &out.DynamicNodeStatus
 		*out = new(DynamicNodeStatus)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Error != nil {
 		in, out := &in.Error, &out.Error
 		*out = (*in).DeepCopy()
 	}
 	if in.DataReferenceConstructor != nil {
-    // This was manually modified to not generated a deep copy constructor for this. There is no way to skip generation of fields
+		// This was manually modified to not generated a deep copy constructor for this. There is no way to skip generation of fields
 		out.DataReferenceConstructor = in.DataReferenceConstructor
 	}
 	return
@@ -720,7 +724,7 @@ func (in *WorkflowStatus) DeepCopyInto(out *WorkflowStatus) {
 		*out = (*in).DeepCopy()
 	}
 	if in.DataReferenceConstructor != nil {
-    // This was manually modified to not generated a deep copy constructor for this. There is no way to skip generation of fields
+		// This was manually modified to not generated a deep copy constructor for this. There is no way to skip generation of fields
 		out.DataReferenceConstructor = in.DataReferenceConstructor
 	}
 	return

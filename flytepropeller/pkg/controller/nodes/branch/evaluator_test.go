@@ -2,8 +2,10 @@ package branch
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
+	"github.com/lyft/flytestdlib/errors"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/storage"
 
@@ -11,7 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/lyft/flytepropeller/pkg/utils"
 )
 
@@ -384,7 +385,10 @@ func TestDecideBranch(t *testing.T) {
 		b, err := DecideBranch(ctx, w, "n1", branchNode, inputs)
 		assert.Error(t, err)
 		assert.Nil(t, b)
-		assert.Equal(t, errors.NoBranchTakenError, err.(*errors.NodeError).ErrCode)
+		e, ok := errors.GetErrorCode(err)
+		assert.True(t, ok)
+		assert.NotNil(t, e)
+		assert.Equal(t, ErrorCodeMalformedBranch, e)
 	})
 
 	t.Run("WithThenNode", func(t *testing.T) {
@@ -620,7 +624,9 @@ func TestDecideBranch(t *testing.T) {
 		b, err := DecideBranch(ctx, w, "n", branchNode, inputs)
 		assert.Error(t, err)
 		assert.Nil(t, b)
-		assert.Equal(t, errors.DownstreamNodeNotFoundError, err.(*errors.NodeError).ErrCode)
+		ec, ok := errors.GetErrorCode(err)
+		assert.True(t, ok)
+		assert.Equal(t, ErrorCodeCompilerError, ec)
 	})
 
 	t.Run("ElseFailCase", func(t *testing.T) {
@@ -677,8 +683,10 @@ func TestDecideBranch(t *testing.T) {
 		b, err := DecideBranch(ctx, w, "n", branchNode, inputs)
 		assert.Error(t, err)
 		assert.Nil(t, b)
-		assert.Equal(t, errors.UserProvidedError, err.(*errors.NodeError).ErrCode)
-		assert.Equal(t, userError, err.(*errors.NodeError).Message)
+		ec, ok := errors.GetErrorCode(err)
+		assert.True(t, ok)
+		assert.Equal(t, ErrorCodeUserProvidedError, ec)
+		assert.Equal(t, fmt.Sprintf("[UserProvidedError] %s", userError), err.Error())
 		assert.Equal(t, v1alpha1.NodePhaseSkipped, w.Status.NodeStatus[n1].GetPhase())
 		assert.Equal(t, v1alpha1.NodePhaseSkipped, w.Status.NodeStatus[n2].GetPhase())
 	})

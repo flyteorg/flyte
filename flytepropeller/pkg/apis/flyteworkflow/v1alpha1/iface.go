@@ -175,6 +175,7 @@ type MutableBranchNodeStatus interface {
 type ExecutableDynamicNodeStatus interface {
 	GetDynamicNodePhase() DynamicNodePhase
 	GetDynamicNodeReason() string
+	GetExecutionError() *core.ExecutionError
 }
 
 type MutableDynamicNodeStatus interface {
@@ -183,6 +184,7 @@ type MutableDynamicNodeStatus interface {
 
 	SetDynamicNodePhase(phase DynamicNodePhase)
 	SetDynamicNodeReason(reason string)
+	SetExecutionError(executionError *core.ExecutionError)
 }
 
 // Interface for Branch node. All the methods are purely read only except for the GetExecutionStatus.

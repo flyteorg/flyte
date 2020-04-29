@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	stdErrors "github.com/lyft/flytestdlib/errors"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils"
 
@@ -41,7 +42,12 @@ func (b *branchHandler) HandleBranchNode(ctx context.Context, branchNode v1alpha
 		}
 		finalNodeID, err := DecideBranch(ctx, nl, nCtx.NodeID(), branchNode, nodeInputs)
 		if err != nil {
-			// TODO @kumare differentiate branch error user vs system. We should define errors for branch only
+			ec, ok := stdErrors.GetErrorCode(err)
+			if ok {
+				if ec == ErrorCodeMalformedBranch || ec == ErrorCodeUserProvidedError {
+					return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, ec, err.Error(), nil)), nil
+				}
+			}
 			errMsg := fmt.Sprintf("Branch evaluation failed. Error [%s]", err)
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.IllegalStateError, errMsg, nil)), nil
 		}
@@ -153,7 +159,8 @@ func (b *branchHandler) Abort(ctx context.Context, nCtx handler.NodeExecutionCon
 		if branch.GetElseFail() != nil {
 			errMsg = branch.GetElseFail().Message
 		}
-		return errors.Errorf(errors.UserProvidedError, nCtx.NodeID(), errMsg)
+		logger.Errorf(ctx, errMsg)
+		return nil
 	}
 
 	finalNodeID := branchNodeState.FinalizedNodeID
@@ -188,7 +195,8 @@ func (b *branchHandler) Finalize(ctx context.Context, nCtx handler.NodeExecution
 		if branch.GetElseFail() != nil {
 			errMsg = branch.GetElseFail().Message
 		}
-		return errors.Errorf(errors.UserProvidedError, nCtx.NodeID(), errMsg)
+		logger.Errorf(ctx, "failed to evaluate branch - user error: %s", errMsg)
+		return nil
 	}
 
 	finalNodeID := branchNodeState.FinalizedNodeID

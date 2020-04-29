@@ -4,15 +4,17 @@ import (
 	"context"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/errors"
 	"github.com/lyft/flytestdlib/logger"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
-
-	regErrors "github.com/pkg/errors"
 )
+
+const ErrorCodeUserProvidedError = "UserProvidedError"
+const ErrorCodeMalformedBranch = "MalformedBranchUserError"
+const ErrorCodeCompilerError = "CompilerError"
 
 func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.LiteralMap) (bool, error) {
 	var lValue *core.Literal
@@ -22,11 +24,11 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.Litera
 
 	if expr.GetLeftValue().GetPrimitive() == nil {
 		if nodeInputs == nil {
-			return false, regErrors.Errorf("Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
 		lValue = nodeInputs.Literals[expr.GetLeftValue().GetVar()]
 		if lValue == nil {
-			return false, regErrors.Errorf("Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
 	} else {
 		lPrim = expr.GetLeftValue().GetPrimitive()
@@ -34,11 +36,11 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.Litera
 
 	if expr.GetRightValue().GetPrimitive() == nil {
 		if nodeInputs == nil {
-			return false, regErrors.Errorf("Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
 		rValue = nodeInputs.Literals[expr.GetRightValue().GetVar()]
 		if rValue == nil {
-			return false, regErrors.Errorf("Failed to find Value for Variable [%v]", expr.GetRightValue().GetVar())
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetRightValue().GetVar())
 		}
 	} else {
 		rPrim = expr.GetRightValue().GetPrimitive()
@@ -61,7 +63,7 @@ func EvaluateBooleanExpression(expr *core.BooleanExpression, nodeInputs *core.Li
 		return EvaluateComparison(expr.GetComparison(), nodeInputs)
 	}
 	if expr.GetConjunction() == nil {
-		return false, regErrors.Errorf("No Comparison or Conjunction found in Branch node expression.")
+		return false, errors.Errorf(ErrorCodeMalformedBranch, "No Comparison or Conjunction found in Branch node expression.")
 	}
 	lvalue, err := EvaluateBooleanExpression(expr.GetConjunction().GetLeftExpression(), nodeInputs)
 	if err != nil {
@@ -122,7 +124,7 @@ func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.
 		skippedNodeID := *nodeIDPtr
 		n, ok := nl.GetNode(skippedNodeID)
 		if !ok {
-			return nil, errors.Errorf(errors.DownstreamNodeNotFoundError, nodeID, "Downstream node [%v] not found", skippedNodeID)
+			return nil, errors.Errorf(ErrorCodeCompilerError, "Downstream node [%v] not found", skippedNodeID)
 		}
 		nStatus := nl.GetNodeExecutionStatus(ctx, n.GetID())
 		logger.Infof(ctx, "Branch Setting Node[%v] status to Skipped!", skippedNodeID)
@@ -131,9 +133,9 @@ func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.
 
 	if selectedNodeID == nil {
 		if node.GetElseFail() != nil {
-			return nil, errors.Errorf(errors.UserProvidedError, nodeID, node.GetElseFail().Message)
+			return nil, errors.Errorf(ErrorCodeUserProvidedError, node.GetElseFail().Message)
 		}
-		return nil, errors.Errorf(errors.NoBranchTakenError, nodeID, "No branch satisfied")
+		return nil, errors.Errorf(ErrorCodeMalformedBranch, "No branch satisfied")
 	}
 	logger.Infof(ctx, "Branch Node[%v] selected!", *selectedNodeID)
 	return selectedNodeID, nil

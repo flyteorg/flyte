@@ -7,6 +7,7 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+// Wrapper around core.Execution error. Execution Error has a protobuf enum and hence needs to be wrapped by custom marshaller
 type ExecutionError struct {
 	*core.ExecutionError
 }
