@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/pkg/errors"
+	"github.com/lyft/flytestdlib/errors"
 )
 
 type comparator func(lValue *core.Primitive, rValue *core.Primitive) bool
@@ -75,7 +75,7 @@ func Evaluate(lValue *core.Primitive, rValue *core.Primitive, op core.Comparison
 	lValueType := reflect.TypeOf(lValue.Value)
 	rValueType := reflect.TypeOf(rValue.Value)
 	if lValueType != rValueType {
-		return false, errors.Errorf("Comparison between different primitives types. lVal[%v]:rVal[%v]", lValueType, rValueType)
+		return false, errors.Errorf(ErrorCodeMalformedBranch, "Comparison between different primitives types. lVal[%v]:rVal[%v]", lValueType, rValueType)
 	}
 	comps, ok := perTypeComparators[lValueType.String()]
 	if !ok {
@@ -88,22 +88,22 @@ func Evaluate(lValue *core.Primitive, rValue *core.Primitive, op core.Comparison
 	switch op {
 	case core.ComparisonExpression_GT:
 		if isBoolean {
-			return false, errors.Errorf("[GT] not defined for boolean operands.")
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "[GT] not defined for boolean operands.")
 		}
 		return comps.gt(lValue, rValue), nil
 	case core.ComparisonExpression_GTE:
 		if isBoolean {
-			return false, errors.Errorf("[GTE] not defined for boolean operands.")
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "[GTE] not defined for boolean operands.")
 		}
 		return comps.eq(lValue, rValue) || comps.gt(lValue, rValue), nil
 	case core.ComparisonExpression_LT:
 		if isBoolean {
-			return false, errors.Errorf("[LT] not defined for boolean operands.")
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "[LT] not defined for boolean operands.")
 		}
 		return !(comps.gt(lValue, rValue) || comps.eq(lValue, rValue)), nil
 	case core.ComparisonExpression_LTE:
 		if isBoolean {
-			return false, errors.Errorf("[LTE] not defined for boolean operands.")
+			return false, errors.Errorf(ErrorCodeMalformedBranch, "[LTE] not defined for boolean operands.")
 		}
 		return !comps.gt(lValue, rValue), nil
 	case core.ComparisonExpression_EQ:
@@ -111,29 +111,29 @@ func Evaluate(lValue *core.Primitive, rValue *core.Primitive, op core.Comparison
 	case core.ComparisonExpression_NEQ:
 		return !comps.eq(lValue, rValue), nil
 	}
-	return false, errors.Errorf("Unsupported operator type in Propeller. System error.")
+	return false, errors.Errorf(ErrorCodeMalformedBranch, "Unsupported operator type in Propeller. System error.")
 }
 
 func Evaluate1(lValue *core.Primitive, rValue *core.Literal, op core.ComparisonExpression_Operator) (bool, error) {
 	if rValue.GetScalar() == nil || rValue.GetScalar().GetPrimitive() == nil {
-		return false, errors.Errorf("Only primitives can be compared. RHS Variable is non primitive.")
+		return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. RHS Variable is non primitive.")
 	}
 	return Evaluate(lValue, rValue.GetScalar().GetPrimitive(), op)
 }
 
 func Evaluate2(lValue *core.Literal, rValue *core.Primitive, op core.ComparisonExpression_Operator) (bool, error) {
 	if lValue.GetScalar() == nil || lValue.GetScalar().GetPrimitive() == nil {
-		return false, errors.Errorf("Only primitives can be compared. LHS Variable is non primitive.")
+		return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. LHS Variable is non primitive.")
 	}
 	return Evaluate(lValue.GetScalar().GetPrimitive(), rValue, op)
 }
 
 func EvaluateLiterals(lValue *core.Literal, rValue *core.Literal, op core.ComparisonExpression_Operator) (bool, error) {
 	if lValue.GetScalar() == nil || lValue.GetScalar().GetPrimitive() == nil {
-		return false, errors.Errorf("Only primitives can be compared. LHS Variable is non primitive.")
+		return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. LHS Variable is non primitive.")
 	}
 	if rValue.GetScalar() == nil || rValue.GetScalar().GetPrimitive() == nil {
-		return false, errors.Errorf("Only primitives can be compared. RHS Variable is non primitive")
+		return false, errors.Errorf(ErrorCodeMalformedBranch, "Only primitives can be compared. RHS Variable is non primitive")
 	}
 	return Evaluate(lValue.GetScalar().GetPrimitive(), rValue.GetScalar().GetPrimitive(), op)
 }

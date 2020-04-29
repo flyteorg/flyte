@@ -94,7 +94,8 @@ const (
 type DynamicNodeStatus struct {
 	MutableStruct
 	Phase  DynamicNodePhase `json:"phase"`
-	Reason string           `json:"reason"`
+	Reason string           `json:"reason,omitempty"`
+	Error  *ExecutionError  `json:"error,omitempty"`
 }
 
 func (in *DynamicNodeStatus) GetDynamicNodePhase() DynamicNodePhase {
@@ -103,6 +104,13 @@ func (in *DynamicNodeStatus) GetDynamicNodePhase() DynamicNodePhase {
 
 func (in *DynamicNodeStatus) GetDynamicNodeReason() string {
 	return in.Reason
+}
+
+func (in *DynamicNodeStatus) GetExecutionError() *core.ExecutionError {
+	if in.Error == nil {
+		return nil
+	}
+	return in.Error.ExecutionError
 }
 
 func (in *DynamicNodeStatus) SetDynamicNodeReason(reason string) {
@@ -117,6 +125,10 @@ func (in *DynamicNodeStatus) SetDynamicNodePhase(phase DynamicNodePhase) {
 		in.SetDirty()
 		in.Phase = phase
 	}
+}
+
+func (in *DynamicNodeStatus) SetExecutionError(err *core.ExecutionError) {
+	in.Error = &ExecutionError{ExecutionError: err}
 }
 
 func (in *DynamicNodeStatus) Equals(o *DynamicNodeStatus) bool {

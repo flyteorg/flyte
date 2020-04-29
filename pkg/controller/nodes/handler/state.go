@@ -3,6 +3,7 @@ package handler
 import (
 	"time"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -30,6 +31,7 @@ type DynamicNodePhase uint8
 type DynamicNodeState struct {
 	Phase  v1alpha1.DynamicNodePhase
 	Reason string
+	Error  *core.ExecutionError
 }
 
 type WorkflowNodeState struct {

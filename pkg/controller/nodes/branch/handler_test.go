@@ -21,7 +21,6 @@ import (
 	mocks2 "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/lyft/flytepropeller/pkg/controller/executors"
 	execMocks "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
 )
@@ -257,8 +256,7 @@ func TestBranchHandler_AbortNode(t *testing.T) {
 		nCtx, _ := createNodeContext(v1alpha1.BranchNodeError, nil, n, nil, nil)
 		branch := New(mockNodeExecutor, promutils.NewTestScope())
 		err := branch.Abort(ctx, nCtx, "")
-		assert.Error(t, err)
-		assert.True(t, errors.Matches(err, errors.UserProvidedError))
+		assert.NoError(t, err)
 	})
 
 	t.Run("BranchNodeSuccess", func(t *testing.T) {

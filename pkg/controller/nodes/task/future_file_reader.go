@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/errors"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/storage"
-	"github.com/pkg/errors"
 
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/lyft/flytepropeller/pkg/utils"
 )
 
 // TODO this file exists only until we need to support dynamic nodes instead of closure.
@@ -28,7 +29,7 @@ func (f FutureFileReader) Exists(ctx context.Context) (bool, error) {
 	// If no futures file produced, then declare success and return.
 	if err != nil {
 		logger.Warnf(ctx, "Failed to read futures file. Error: %v", err)
-		return false, errors.Wrap(err, "Failed to do HEAD on futures file.")
+		return false, errors.Wrapf(utils.ErrorCodeUser, err, "Failed to do HEAD on futures file.")
 	}
 	return metadata.Exists(), nil
 }
@@ -37,7 +38,7 @@ func (f FutureFileReader) Read(ctx context.Context) (*core.DynamicJobSpec, error
 	djSpec := &core.DynamicJobSpec{}
 	if err := f.store.ReadProtobuf(ctx, f.loc, djSpec); err != nil {
 		logger.Warnf(ctx, "Failed to read futures file. Error: %v", err)
-		return nil, errors.Wrap(err, "Failed to read futures protobuf file.")
+		return nil, errors.Wrapf(utils.ErrorCodeSystem, err, "Failed to read futures protobuf file.")
 	}
 
 	return djSpec, nil
@@ -59,13 +60,13 @@ func NewRemoteFutureFileReader(ctx context.Context, dataDir storage.DataReferenc
 	loc, err := store.ConstructReference(ctx, dataDir, implicitFutureFileName)
 	if err != nil {
 		logger.Warnf(ctx, "Failed to construct data path for futures file. Error: %v", err)
-		return FutureFileReader{}, err
+		return FutureFileReader{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to construct data path")
 	}
 
 	cacheLoc, err := store.ConstructReference(ctx, dataDir, implicitCompileWorkflowsName)
 	if err != nil {
 		logger.Warnf(ctx, "Failed to construct data path for compile workflows file, error: %s", err)
-		return FutureFileReader{}, err
+		return FutureFileReader{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to construct reference for cache location")
 	}
 	return FutureFileReader{
 		loc:                     loc,

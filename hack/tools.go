@@ -2,4 +2,4 @@
 package tools
 
 // Uncomment this to make code-generator work
-// import _ "k8s.io/code-generator"
+//import _ "k8s.io/code-generator"
