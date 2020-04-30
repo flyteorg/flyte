@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -162,4 +163,30 @@ func TestWorkflowStatus_Deserialize(t *testing.T) {
 	parsed := &NodeStatus{}
 	err := json.Unmarshal(raw, parsed)
 	assert.NoError(t, err)
+}
+
+func TestDynamicNodeStatus_SetExecutionError(t *testing.T) {
+	tests := []struct {
+		name     string
+		Error    *ExecutionError
+		NewError *core.ExecutionError
+	}{
+		{"preset", &ExecutionError{}, nil},
+		{"preset-new", &ExecutionError{}, &core.ExecutionError{}},
+		{"new", nil, &core.ExecutionError{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			in := &DynamicNodeStatus{
+				Error: tt.Error,
+			}
+			in.SetExecutionError(tt.NewError)
+			if tt.NewError == nil {
+				assert.Nil(t, in.Error)
+			} else {
+				assert.NotNil(t, in.Error)
+				assert.Equal(t, tt.NewError, in.Error.ExecutionError)
+			}
+		})
+	}
 }

@@ -128,7 +128,11 @@ func (in *DynamicNodeStatus) SetDynamicNodePhase(phase DynamicNodePhase) {
 }
 
 func (in *DynamicNodeStatus) SetExecutionError(err *core.ExecutionError) {
-	in.Error = &ExecutionError{ExecutionError: err}
+	if err != nil {
+		in.Error = &ExecutionError{ExecutionError: err}
+	} else {
+		in.Error = nil
+	}
 }
 
 func (in *DynamicNodeStatus) Equals(o *DynamicNodeStatus) bool {
