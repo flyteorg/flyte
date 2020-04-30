@@ -305,6 +305,8 @@ func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecution
 		return nil
 	}
 
+	AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+
 	err = e.kubeClient.GetClient().Delete(ctx, o)
 	if err != nil && !IsK8sObjectNotExists(err) {
 		logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v",
