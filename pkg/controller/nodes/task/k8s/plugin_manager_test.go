@@ -372,6 +372,7 @@ func TestPluginManager_Abort(t *testing.T) {
 		// common setup code
 		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
 		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme, res)}
+
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
 		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
