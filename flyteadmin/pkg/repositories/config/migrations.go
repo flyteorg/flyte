@@ -199,4 +199,17 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Exec("ALTER TABLE workflows ADD COLUMN IF NOT EXISTS state integer;").Error
 		},
 	},
+	// Modify the executions & node_executison table, if necessary
+	{
+		ID: "2020-04-29-executions",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.Execution{}, &models.NodeExecution{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			if err := tx.Model(&models.Execution{}).DropColumn("error_code").DropColumn("error_kind").Error; err != nil {
+				return err
+			}
+			return tx.Model(&models.NodeExecution{}).DropColumn("error_code").DropColumn("error_kind").Error
+		},
+	},
 }

@@ -3,18 +3,18 @@ package transformers
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
 
-	"time"
-
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/lyft/flyteadmin/pkg/repositories/models"
 )
 
 func getRunningExecutionModel(specBytes []byte, existingClosureBytes []byte, startedAt time.Time) models.Execution {
@@ -170,6 +170,8 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 		Phase:     core.WorkflowExecution_RUNNING,
 		StartedAt: startedAtProto,
 	}
+	ec := "foo"
+	ek := core.ExecutionError_SYSTEM
 	spec := testutils.GetExecutionRequest().Spec
 	specBytes, _ := proto.Marshal(spec)
 	existingClosureBytes, _ := proto.Marshal(&existingClosure)
@@ -178,7 +180,8 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 	occurredAt := startedAt.Add(duration).UTC()
 	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
 	executionError := core.ExecutionError{
-		Code:    "foo",
+		Code:    ec,
+		Kind:    ek,
 		Message: "bar baz",
 	}
 	err := UpdateExecutionModelState(&executionModel, admin.WorkflowExecutionEventRequest{
@@ -192,6 +195,7 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
+	ekString := ek.String()
 	durationProto := ptypes.DurationProto(duration)
 	expectedClosure := admin.ExecutionClosure{
 		ComputedInputs: &core.LiteralMap{
@@ -223,6 +227,8 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 		Duration:           duration,
 		ExecutionCreatedAt: executionModel.ExecutionCreatedAt,
 		ExecutionUpdatedAt: &occurredAt,
+		ErrorCode:          &ec,
+		ErrorKind:          &ekString,
 	}
 	assert.EqualValues(t, expectedModel, executionModel)
 }
