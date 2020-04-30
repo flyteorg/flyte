@@ -63,6 +63,9 @@ func addTerminalState(
 		closure.OutputResult = &admin.NodeExecutionClosure_Error{
 			Error: request.Event.GetError(),
 		}
+		k := request.Event.GetError().Kind.String()
+		nodeExecutionModel.ErrorKind = &k
+		nodeExecutionModel.ErrorCode = &request.Event.GetError().Code
 	}
 	return nil
 }
