@@ -239,14 +239,14 @@ func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName,
 		templateFileName := templateFile.Name()
 		if filepath.Ext(templateFileName) != ".yaml" {
 			// nothing to do.
-			logger.Infof(ctx, "syncing namespace [%s]: ignoring unrecognized filetype [%s]",
+			logger.Debugf(ctx, "syncing namespace [%s]: ignoring unrecognized filetype [%s]",
 				namespace, templateFile.Name())
 			continue
 		}
 
 		if c.templateAlreadyApplied(namespace, templateFile) {
 			// nothing to do.
-			logger.Infof(ctx, "syncing namespace [%s]: templateFile [%s] already applied, nothing to do.", namespace, templateFile.Name())
+			logger.Debugf(ctx, "syncing namespace [%s]: templateFile [%s] already applied, nothing to do.", namespace, templateFile.Name())
 			continue
 		}
 
@@ -315,7 +315,7 @@ func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName,
 
 					if err != nil {
 						c.metrics.TemplateUpdateErrors.Inc()
-						logger.Infof(ctx, "Failed to update resource [%+v] in namespace [%s] with err :%v",
+						logger.Warningf(ctx, "Failed to update resource [%+v] in namespace [%s] with err :%v",
 							k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace, err)
 						collectedErrs = append(collectedErrs, err)
 					} else {
@@ -333,7 +333,7 @@ func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName,
 					collectedErrs = append(collectedErrs, err)
 				}
 			} else {
-				logger.Infof(ctx, "Created resource [%+v] for namespace [%s] in kubernetes",
+				logger.Debugf(ctx, "Created resource [%+v] for namespace [%s] in kubernetes",
 					k8sObj.GetObjectKind().GroupVersionKind().Kind, namespace)
 				c.metrics.KubernetesResourcesCreated.Inc()
 				c.appliedTemplates[namespace][templateFile.Name()] = templateFile.ModTime()
@@ -354,7 +354,7 @@ func (c *controller) Sync(ctx context.Context) error {
 		}
 	}()
 	c.metrics.SyncStarted.Inc()
-	logger.Info(ctx, "Running an invocation of ClusterResource Sync")
+	logger.Debugf(ctx, "Running an invocation of ClusterResource Sync")
 
 	// Prefer to sync projects most newly created to ensure their resources get created first when other resources exist.
 	projects, err := c.db.ProjectRepo().ListAll(ctx, descCreatedAtSortParam)
@@ -389,9 +389,8 @@ func (c *controller) Sync(ctx context.Context) error {
 				c.metrics.ResourceAddErrors.Inc()
 				errs = append(errs, err)
 			} else {
-				logger.Infof(ctx, "Created cluster resources for namespace [%s] in kubernetes", namespace)
 				c.metrics.ResourcesAdded.Inc()
-				logger.Debugf(ctx, "Successfully created kubernetes resources for [%s-%s]", project.Identifier, domain.ID)
+				logger.Debugf(ctx, "Successfully created kubernetes resources for [%s]", namespace)
 			}
 		}
 	}
@@ -403,7 +402,7 @@ func (c *controller) Sync(ctx context.Context) error {
 
 func (c *controller) Run() {
 	ctx := context.Background()
-	logger.Infof(ctx, "Running ClusterResourceController")
+	logger.Debugf(ctx, "Running ClusterResourceController")
 	interval := c.config.ClusterResourceConfiguration().GetRefreshInterval()
 	wait.Forever(func() {
 		err := c.Sync(ctx)
