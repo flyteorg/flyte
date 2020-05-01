@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients.friendly &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.clients.friendly &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -706,6 +706,29 @@
             <span class="n">_launch_plan_pb2</span><span class="o">.</span><span class="n">LaunchPlanUpdateRequest</span><span class="p">(</span>
                 <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
                 <span class="n">state</span><span class="o">=</span><span class="n">state</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+    <span class="c1">####################################################################################################################</span>
+    <span class="c1">#</span>
+    <span class="c1">#  Named Entity Endpoints</span>
+    <span class="c1">#</span>
+    <span class="c1">####################################################################################################################</span>
+
+<div class="viewcode-block" id="SynchronousFlyteClient.update_named_entity"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.update_named_entity">[docs]</a>    <span class="k">def</span> <span class="nf">update_named_entity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the metadata associated with a named entity.  A named entity is designated a resource, e.g. a workflow,</span>
+<span class="sd">        task or launch plan specified by {project, domain, name} across all versions of the resource.</span>
+
+<span class="sd">        :param int resource_type: Enum value from flytekit.models.identifier.ResourceType</span>
+<span class="sd">        :param flytekit.models.admin.named_entity.NamedEntityIdentifier id: identifier for named entity to update</span>
+<span class="sd">        :param flytekit.models.admin.named_entity.NamedEntityIdentifierMetadata metadata:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update_named_entity</span><span class="p">(</span>
+            <span class="n">_common_pb2</span><span class="o">.</span><span class="n">NamedEntityUpdateRequest</span><span class="p">(</span>
+                <span class="n">resource_type</span><span class="o">=</span><span class="n">resource_type</span><span class="p">,</span>
+                <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="p">)</span>
         <span class="p">)</span></div>
 

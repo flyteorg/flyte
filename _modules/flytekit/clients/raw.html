@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients.raw &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.clients.raw &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -557,6 +557,20 @@
 <span class="sd">        :rtype: flyteidl.admin.launch_plan_pb2.LaunchPlanList</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListActiveLaunchPlans</span><span class="p">(</span><span class="n">active_launch_plan_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
+
+    <span class="c1">####################################################################################################################</span>
+    <span class="c1">#</span>
+    <span class="c1">#  Named Entity Endpoints</span>
+    <span class="c1">#</span>
+    <span class="c1">####################################################################################################################</span>
+
+<div class="viewcode-block" id="RawSynchronousFlyteClient.update_named_entity"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.update_named_entity">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">update_named_entity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_named_entity_request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param flyteidl.admin.common_pb2.NamedEntityUpdateRequest update_named_entity_request:</span>
+<span class="sd">        :rtype: flyteidl.admin.common_pb2.NamedEntityUpdateResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">UpdateNamedEntity</span><span class="p">(</span><span class="n">update_named_entity_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>

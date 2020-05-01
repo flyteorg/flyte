@@ -12,7 +12,6 @@ personas.
 User: I want to write Flyte Workflows
 =====================================
 A user refers to anyone who wants to:
-
   - Explore how Flyte works and try it out before installing, operating, or
     using it
   - Use a hosted Flyte deployment available at her organization
@@ -23,11 +22,10 @@ A user refers to anyone who wants to:
 
 Administrator: I want to manage a Flyte installation at my company
 ==================================================================
-An administrator is someone who wants to deploy, manage, and scale a Flyte installation for
-his or her organization. The administrator is not interested in altering or modifying any code,
-only using the system off the shelf, and configuring the various available knobs and settings. This
-section also talks about the typical installation structure and scalability
-primitives available in the system.
+An administrator is someone who wants to:
+  - deploy, manage, and scale a Flyte installation for their organization. 
+  - The administrator is not interested in altering or modifying any code, only using the system off the shelf, and configuring the various available knobs and settings. 
+  - This section also talks about the typical installation structure and scalability primitives available in the system.
 
 :ref:`Jump to Administrator Docs <administrator>`
 

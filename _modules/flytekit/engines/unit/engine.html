@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.engines.unit.engine &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.engines.unit.engine &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -306,6 +306,19 @@
 
 <div class="viewcode-block" id="DynamicTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.DynamicTask">[docs]</a><span class="k">class</span> <span class="nc">DynamicTask</span><span class="p">(</span><span class="n">ReturnOutputsTask</span><span class="p">):</span>
 
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_workflow_node</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DynamicTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_transform_for_user_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_workflow_node</span><span class="p">:</span>
+            <span class="c1"># If a workflow node has been detected, then we skip any transformation</span>
+            <span class="c1"># This is to support the early termination behavior of the unit test engine when it comes to dynamic tasks</span>
+            <span class="c1"># that produce launch plan or subworkflow nodes.</span>
+            <span class="c1"># See the warning message in the code below for additional information</span>
+            <span class="k">return</span> <span class="n">outputs</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DynamicTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_transform_for_user_output</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_execute_user_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.literals.LiteralMap inputs:</span>
@@ -318,6 +331,15 @@
             <span class="n">tasks_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">task</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">task</span> <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">futures</span><span class="o">.</span><span class="n">tasks</span><span class="p">}</span>
 
             <span class="k">for</span> <span class="n">future_node</span> <span class="ow">in</span> <span class="n">futures</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">future_node</span><span class="o">.</span><span class="n">workflow_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># TODO: implement proper unit testing for launchplan and subworkflow nodes somehow</span>
+                    <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;A workflow node has been detected in the output of the dynamic task. The &quot;</span>
+                                     <span class="s2">&quot;Flytekit unit test engine is incomplete for dynamic tasks that return launch &quot;</span>
+                                     <span class="s2">&quot;plans or subworkflows. The generated dynamic job spec will be returned but &quot;</span>
+                                     <span class="s2">&quot;they will not be run.&quot;</span><span class="p">)</span>
+                    <span class="c1"># For now, just return the output of the parent task</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_has_workflow_node</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">return</span> <span class="n">results</span>
                 <span class="n">task</span> <span class="o">=</span> <span class="n">tasks_map</span><span class="p">[</span><span class="n">future_node</span><span class="o">.</span><span class="n">task_node</span><span class="o">.</span><span class="n">reference_id</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">_sdk_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">CONTAINER_ARRAY_TASK</span><span class="p">:</span>
                     <span class="n">sub_task_output</span> <span class="o">=</span> <span class="n">DynamicTask</span><span class="o">.</span><span class="n">execute_array_task</span><span class="p">(</span><span class="n">future_node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
@@ -345,6 +367,13 @@
                 <span class="p">}</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_workflow_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_workflow_node</span>
 
 <div class="viewcode-block" id="DynamicTask.execute_array_task"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.DynamicTask.execute_array_task">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">execute_array_task</span><span class="p">(</span><span class="n">root_input_path</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">array_inputs</span><span class="p">):</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Presto Tasks &mdash; Flyte 0.0.1 documentation</title>
+  <title>Presto Tasks &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -198,6 +198,11 @@ the scenes in order to execute a user’s query. To run a single Presto task fro
 need to send 5 different requests to Presto. Together these requests (i.e. queries) take care of retrieving the data,
 saving it to an external table, and performing cleanup.</p>
 <p>If a user wanted to run a Presto query like:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="o">*</span>
+<span class="k">FROM</span> <span class="n">foo</span>
+<span class="k">WHERE</span> <span class="n">bar</span> <span class="o">=</span> <span class="mi">123</span>
+</pre></div>
+</div>
 <p>Then Flyte actually runs 5 requests that get executed which look something like:</p>
 <div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">hive</span><span class="p">.</span><span class="n">flyte_temporary_tables</span><span class="p">.</span><span class="ss">&quot;nwdwxc7fjnksj9rtzdvbm894pjlvdgrm_temp&quot;</span> <span class="k">AS</span>
 <span class="k">SELECT</span> <span class="o">*</span>

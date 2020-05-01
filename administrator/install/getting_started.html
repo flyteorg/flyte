@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started &mdash; Flyte 0.0.1 documentation</title>
+  <title>Getting Started &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -212,11 +212,25 @@ Once deployed, you can access the Flyte console on any kubernetes node at <code 
 <p>For local deployments, this endpoint is typically <a class="reference external" href="http://localhost:30081/console">http://localhost:30081/console</a>.</p>
 <p>(for Minikube deployment, you need to run <code class="docutils literal notranslate"><span class="pre">minikube</span> <span class="pre">tunnel</span></code> and use the ip that Minikube tunnel outputs)</p>
 <dl class="simple">
-<dt>WARNING:</dt><dd><p>The sandbox deployment is not well suited for production use.
-Most importantly, Flyte needs access to an object store, and a PostgreSQL database.
-In the sandbox deployment, the object store and PostgreSQL database are each installed as a single kubernetes pod.
-These pods are sufficient for testing and playground purposes, but they not designed to handle production load.
-Read on to learn how to configure Flyte for production.</p>
+<dt>WARNING:</dt><dd><ul class="simple">
+<li><p>The sandbox deployment is not well suited for production use.</p></li>
+<li><p>Most importantly, Flyte needs access to an object store, and a PostgreSQL database.</p></li>
+<li><p>In the sandbox deployment, the object store and PostgreSQL database are each installed as a single kubernetes pod.</p></li>
+<li><p>These pods are sufficient for testing and playground purposes, but they not designed to handle production load.</p></li>
+<li><p>Read on to learn how to configure Flyte for production.</p></li>
+</ul>
+</dd>
+<dt>SPECIAL NOTE FOR MINIKUBE:</dt><dd><ul class="simple">
+<li><p>Minikube runs in a Virtual Machine on your host</p></li>
+<li><p>So if you try to access the flyte console on localhost, that will not work, because the Virtual Machine has a different IP address.</p></li>
+<li><p>Flyte runs within Kubernetes (minikube), thus to access FlyteConsole, you cannot just use <a class="reference external" href="https://localhost:30081/console">https://localhost:30081/console</a>, you need to use the <code class="docutils literal notranslate"><span class="pre">IP</span> <span class="pre">address</span></code> of the minikube VM instead of <code class="docutils literal notranslate"><span class="pre">localhost</span></code></p></li>
+<li><p>Refer to <a class="reference external" href="https://kubernetes.io/docs/tutorials/hello-minikube/">https://kubernetes.io/docs/tutorials/hello-minikube/</a> to understand how to access a</p></li>
+<li><p>also to register workflows, tasks etc or use the CLI to query Flyte service, you have to use the IP address.</p></li>
+<li><p>If you are building an image locally and want to execute on Minikube hosted Flyte environment, please push the image to docker registry running on the Minikube VM.</p></li>
+<li><p>Another alternative is to change the docker host, to build the docker image on the Minikube hosted docker daemon. <a class="reference external" href="https://minikube.sigs.k8s.io/docs/handbook/pushing/">https://minikube.sigs.k8s.io/docs/handbook/pushing/</a> provides more
+detailed information about this process. As a TL;DR, Flyte can only run images that are accessible to Kubernetes. To make an image accessible, you could either push it to a remote registry or to
+a regisry that is available to Kuberentes. In case on minikube this registry is the one thats running on the VM.</p></li>
+</ul>
 </dd>
 </dl>
 </div>

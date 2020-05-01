@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.component_nodes &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.common.component_nodes &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -223,9 +223,24 @@
 <span class="sd">        :param flytekit.common.workflow.SdkWorkflow sdk_workflow:</span>
 <span class="sd">        :param flytekit.common.launch_plan.SdkLaunchPlan sdk_launch_plan:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sdk_workflow</span> <span class="ow">and</span> <span class="n">sdk_launch_plan</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span><span class="s2">&quot;SdkWorkflowNode cannot be called with both a workflow and &quot;</span>
+                                                          <span class="s2">&quot;a launchplan specified, please pick one. WF: </span><span class="si">{}</span><span class="s2"> LP: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                                          <span class="n">sdk_workflow</span><span class="p">,</span> <span class="n">sdk_launch_plan</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_workflow</span> <span class="o">=</span> <span class="n">sdk_workflow</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_launch_plan</span> <span class="o">=</span> <span class="n">sdk_launch_plan</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SdkWorkflowNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">sdk_wf_id</span> <span class="o">=</span> <span class="n">sdk_workflow</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="n">sdk_workflow</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">sdk_lp_id</span> <span class="o">=</span> <span class="n">sdk_launch_plan</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="n">sdk_launch_plan</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SdkWorkflowNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">launchplan_ref</span><span class="o">=</span><span class="n">sdk_lp_id</span><span class="p">,</span> <span class="n">sub_workflow_ref</span><span class="o">=</span><span class="n">sdk_wf_id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: Text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdk_workflow</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;SdkWorkflowNode with workflow: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_workflow</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;SdkWorkflowNode with launch plan: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_launch_plan</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">launchplan_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common package &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.common package &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -218,6 +218,7 @@
 <li class="toctree-l1"><a class="reference internal" href="flytekit.common.tasks.html">flytekit.common.tasks package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.executions">flytekit.common.tasks.executions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.generic_spark_task">flytekit.common.tasks.generic_spark_task module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.hive_task">flytekit.common.tasks.hive_task module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.output">flytekit.common.tasks.output module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.presto_task">flytekit.common.tasks.presto_task module</a></li>
@@ -623,21 +624,6 @@ notifications.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="flytekit.common.launch_plan.SdkLaunchPlan.register">
-<code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/launch_plan.html#SdkLaunchPlan.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.launch_plan.SdkLaunchPlan.register" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>project</strong> (<em>Text</em>) – </p></li>
-<li><p><strong>domain</strong> (<em>Text</em>) – </p></li>
-<li><p><strong>name</strong> (<em>Text</em>) – </p></li>
-<li><p><strong>version</strong> (<em>Text</em>) – </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
 <dt id="flytekit.common.launch_plan.SdkLaunchPlan.resource_type">
 <em class="property">property </em><code class="sig-name descname">resource_type</code><a class="headerlink" href="#flytekit.common.launch_plan.SdkLaunchPlan.resource_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integer from _identifier.ResourceType enum
@@ -708,6 +694,21 @@ notifications.</p></li>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="#flytekit.common.launch_plan.SdkRunnableLaunchPlan" title="flytekit.common.launch_plan.SdkRunnableLaunchPlan">SdkRunnableLaunchPlan</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.launch_plan.SdkRunnableLaunchPlan.register">
+<code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/launch_plan.html#SdkRunnableLaunchPlan.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.launch_plan.SdkRunnableLaunchPlan.register" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>domain</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>name</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>version</strong> (<em>Text</em>) – </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1530,13 +1531,14 @@ but for tasks. If tasks are not provided relevant TaskTemplates will be fetched 
 
 <dl class="function">
 <dt id="flytekit.common.workflow.build_sdk_workflow_from_metaclass">
-<code class="sig-prename descclassname">flytekit.common.workflow.</code><code class="sig-name descname">build_sdk_workflow_from_metaclass</code><span class="sig-paren">(</span><em class="sig-param">metaclass</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#build_sdk_workflow_from_metaclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.build_sdk_workflow_from_metaclass" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.common.workflow.</code><code class="sig-name descname">build_sdk_workflow_from_metaclass</code><span class="sig-paren">(</span><em class="sig-param">metaclass</em>, <em class="sig-param">queuing_budget=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#build_sdk_workflow_from_metaclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.build_sdk_workflow_from_metaclass" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>metaclass</strong> (<em>T</em>) – </p></li>
 <li><p><strong>cls</strong> – This is the class that will be instantiated from the inputs, outputs, and nodes.  This will be used
 by users extending the base Flyte programming model. If set, it must be a subclass of SdkWorkflow.</p></li>
+<li><p><strong>datetime.timedelta</strong> (<em>queuing_budget</em>) – [Optional] Budget that specifies the amount of time a workflow can be queued up for execution.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>

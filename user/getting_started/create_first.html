@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Writing Your First Workflow &mdash; Flyte 0.0.1 documentation</title>
+  <title>Writing Your First Workflow &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -205,7 +205,7 @@
 </div>
 <div class="section" id="writing-a-task">
 <h2>Writing a Task<a class="headerlink" href="#writing-a-task" title="Permalink to this headline">¶</a></h2>
-<p>The most basic Flyte primitive is a “task”. Flyte Tasks are units of work that can be composed in a workflow. The simplest way to write a Flyte task is using the FlyteSDK.</p>
+<p>The most basic Flyte primitive is a “task”. Flyte Tasks are units of work that can be composed in a workflow. The simplest way to write a Flyte task is using the Flyte Python SDK - flytekit.</p>
 <p>Start by creating a new file</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="n">workflows</span>
 <span class="n">touch</span> <span class="n">workflows</span><span class="o">/</span><span class="n">first</span><span class="o">.</span><span class="n">py</span>
@@ -271,7 +271,7 @@
 </pre></div>
 </div>
 <p>If you have the flyte sandbox installed on your local machine, the image will be accessible to to your Flyte system. If you’re running a remote Flyte instance, you’ll need to upload this image to a remote registry such as Dockerhub, Amazon ECR, or Google Container Registry, so that it can be used by the Flyte system.</p>
-<p>To upload to a remote registry, use</p>
+<p>To upload to a remote registry (or even local registry), use</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DOCKER_REGISTRY_USERNAME</span><span class="o">=</span><span class="p">{</span><span class="n">username</span><span class="p">}</span> <span class="n">DOCKER_REGISTRY_PASSWORD</span><span class="o">=</span><span class="p">{</span><span class="k">pass</span><span class="p">}</span> <span class="n">REGISTRY</span><span class="o">=</span><span class="n">docker</span><span class="o">.</span><span class="n">io</span> <span class="n">make</span> <span class="n">docker_build</span>
 </pre></div>
 </div>

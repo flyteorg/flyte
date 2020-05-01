@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.sdk_runnable &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.common.tasks.sdk_runnable &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -650,8 +650,8 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_argname_in_function_definition</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValidationException</span><span class="p">(</span>
-                    <span class="s2">&quot;The input &#39;</span><span class="si">{}</span><span class="s2">&#39; was not specified in the task function.  Therefore, this input cannot be &quot;</span>
-                    <span class="s2">&quot;provided to the task.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="s2">&quot;The input named &#39;</span><span class="si">{}</span><span class="s2">&#39; was not specified in the task function.  Therefore, this input cannot be &quot;</span>
+                    <span class="s2">&quot;provided to the task.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_banned_inputs</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValidationException</span><span class="p">(</span>

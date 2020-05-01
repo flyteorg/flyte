@@ -23,6 +23,7 @@ saving it to an external table, and performing cleanup.
 If a user wanted to run a Presto query like:
 
 .. code-block:: sql
+
    SELECT *
    FROM foo
    WHERE bar = 123

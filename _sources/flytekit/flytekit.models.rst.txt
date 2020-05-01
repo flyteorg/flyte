@@ -76,6 +76,14 @@ flytekit.models.literals module
    :undoc-members:
    :show-inheritance:
 
+flytekit.models.named\_entity module
+------------------------------------
+
+.. automodule:: flytekit.models.named_entity
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 flytekit.models.node\_execution module
 --------------------------------------
 

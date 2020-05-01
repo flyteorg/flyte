@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks package &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.common.tasks package &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -261,6 +261,25 @@ this will raise an exception.
 <code class="sig-name descname">sync</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/executions.html#SdkTaskExecution.sync"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.executions.SdkTaskExecution.sync" title="Permalink to this definition">¶</a></dt>
 <dd><p>Syncs the state of the underlying execution artifact with the state observed by the platform.
 :rtype: None</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-flytekit.common.tasks.generic_spark_task">
+<span id="flytekit-common-tasks-generic-spark-task-module"></span><h2>flytekit.common.tasks.generic_spark_task module<a class="headerlink" href="#module-flytekit.common.tasks.generic_spark_task" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.common.tasks.generic_spark_task.SdkGenericSparkTask">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.generic_spark_task.</code><code class="sig-name descname">SdkGenericSparkTask</code><span class="sig-paren">(</span><em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">task_inputs</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">spark_type</em>, <em class="sig-param">main_class</em>, <em class="sig-param">main_application_file</em>, <em class="sig-param">spark_conf</em>, <em class="sig-param">hadoop_conf</em>, <em class="sig-param">environment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/generic_spark_task.html#SdkGenericSparkTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.generic_spark_task.SdkGenericSparkTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.task.SdkTask" title="flytekit.common.tasks.task.SdkTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.task.SdkTask</span></code></a></p>
+<p>This class includes the additional logic for building a task that executes as a Spark Job.</p>
+<dl class="method">
+<dt id="flytekit.common.tasks.generic_spark_task.SdkGenericSparkTask.add_inputs">
+<code class="sig-name descname">add_inputs</code><span class="sig-paren">(</span><em class="sig-param">inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/generic_spark_task.html#SdkGenericSparkTask.add_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.generic_spark_task.SdkGenericSparkTask.add_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the inputs to this task.  This can be called multiple times, but it will fail if an input with a given
+name is added more than once, a name collides with an output, or if the name doesn’t exist as an arg name in
+the wrapped function.
+:param dict[Text, flytekit.models.interface.Variable] inputs: names and variables</p>
 </dd></dl>
 
 </dd></dl>
@@ -738,7 +757,7 @@ literals.</p>
 
 <dl class="class">
 <dt id="flytekit.common.tasks.spark_task.SdkSparkTask">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.spark_task.</code><code class="sig-name descname">SdkSparkTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">spark_conf</em>, <em class="sig-param">hadoop_conf</em>, <em class="sig-param">environment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/spark_task.html#SdkSparkTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.spark_task.SdkSparkTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.spark_task.</code><code class="sig-name descname">SdkSparkTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">spark_type</em>, <em class="sig-param">spark_conf</em>, <em class="sig-param">hadoop_conf</em>, <em class="sig-param">environment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/spark_task.html#SdkSparkTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.spark_task.SdkSparkTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span></code></a></p>
 <p>This class includes the additional logic for building a task that executes as a Spark Job.</p>
 <dl class="method">

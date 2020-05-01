@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.mixins package &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.common.mixins package &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -330,8 +330,46 @@ notifications.</p></li>
 <span id="flytekit-common-mixins-registerable-module"></span><h2>flytekit.common.mixins.registerable module<a class="headerlink" href="#module-flytekit.common.mixins.registerable" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="flytekit.common.mixins.registerable.RegisterableEntity">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.registerable.</code><code class="sig-name descname">RegisterableEntity</code><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#RegisterableEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.registerable.</code><code class="sig-name descname">RegisterableEntity</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#RegisterableEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.common.mixins.registerable.RegisterableEntity.auto_assign_name">
+<code class="sig-name descname">auto_assign_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#RegisterableEntity.auto_assign_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.auto_assign_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is a bit of trickster Python code that goes hand in hand with the _InstanceTracker metaclass
+defined above. Thanks &#64;matthewphsmith for this bit of ingenuity.</p>
+<p>For instance, if a user has code that looks like this:</p>
+<blockquote>
+<div><p>from some.other.module import wf
+my_launch_plan = wf.create_launch_plan()</p>
+<p>&#64;dynamic_task
+def sample_task(wf_params):</p>
+<blockquote>
+<div><p>yield my_launch_plan()</p>
+</div></blockquote>
+</div></blockquote>
+<p>This code means that we should have a launch plan with a name ending in “my_launch_plan”, since that is the
+name of the variable that the created launch plan gets assigned to. That is also the name that the launch plan
+would be registered with.</p>
+<p>However, when the create_launch_plan() function runs, the Python interpreter has no idea where the created
+object will be assigned to. It has no idea that the output of the create_launch_plan call is to be paired up
+with a variable named “my_launch_plan”. This function basically does this after the fact. Leveraging the
+_instantiated_in field provided by the _InstanceTracker class above, this code will re-import the
+module (ie Python file) that the object is in. Since it’s already loaded, it’s just retrieved from memory.
+It then scans all objects in the module, and when an object match is found, it knows it’s found the right
+variable name.</p>
+<p>Just to drive the point home, this function is mostly needed for Launch Plans. Assuming that user code has:</p>
+<blockquote>
+<div><p>&#64;python_task
+def some_task()</p>
+</div></blockquote>
+<p>When Flytekit calls the module loader and loads the task, the name of the task is the name of the function
+itself.  It’s known at time of creation. In contrast, when</p>
+<blockquote>
+<div><p>xyz = SomeWorflow.create_launch_plan()</p>
+</div></blockquote>
+<p>is called, the name of the launch plan isn’t known until after creation, it’s not “SomeWorkflow”, it’s “xyz”</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="flytekit.common.mixins.registerable.RegisterableEntity.entity_type_text">
 <em class="property">abstract property </em><code class="sig-name descname">entity_type_text</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.entity_type_text" title="Permalink to this definition">¶</a></dt>
@@ -343,10 +381,30 @@ notifications.</p></li>
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.common.mixins.registerable.RegisterableEntity.has_valid_name">
+<em class="property">property </em><code class="sig-name descname">has_valid_name</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.has_valid_name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.common.mixins.registerable.RegisterableEntity.instantiated_in">
 <em class="property">property </em><code class="sig-name descname">instantiated_in</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.instantiated_in" title="Permalink to this definition">¶</a></dt>
 <dd><p>If found, we try to specify the module where the task was first instantiated.
 :rtype: Optional[Text]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.mixins.registerable.RegisterableEntity.platform_valid_name">
+<em class="property">property </em><code class="sig-name descname">platform_valid_name</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.platform_valid_name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Text</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">

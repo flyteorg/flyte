@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.type_engines.common &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.sdk.spark_types &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -140,7 +140,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>flytekit.type_engines.common</li>
+      <li>flytekit.sdk.spark_types</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -155,41 +155,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for flytekit.type_engines.common</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">import</span> <span class="nn">abc</span> <span class="k">as</span> <span class="nn">_abc</span>
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+  <h1>Source code for flytekit.sdk.spark_types</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">enum</span>
 
 
-<div class="viewcode-block" id="TypeEngine"><a class="viewcode-back" href="../../../flytekit/flytekit.type_engines.html#flytekit.type_engines.common.TypeEngine">[docs]</a><span class="k">class</span> <span class="nc">TypeEngine</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
-
-<div class="viewcode-block" id="TypeEngine.python_std_to_sdk_type"><a class="viewcode-back" href="../../../flytekit/flytekit.type_engines.html#flytekit.type_engines.common.TypeEngine.python_std_to_sdk_type">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">python_std_to_sdk_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Converts a standard format for specifying types in Python to the Flyte typing structure.</span>
-<span class="sd">        :param T t: User input.  Usually of the form: Types.Integer, [Types.Integer], {Types.String:</span>
-<span class="sd">        Types.Integer}, etc.</span>
-<span class="sd">        :rtype: flytekit.common.types.base_sdk_types.FlyteSdkType</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="TypeEngine.get_sdk_type_from_literal_type"><a class="viewcode-back" href="../../../flytekit/flytekit.type_engines.html#flytekit.type_engines.common.TypeEngine.get_sdk_type_from_literal_type">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">literal_type</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Takes the Flyte spec language and converts to an SDK object.</span>
-<span class="sd">        :param flytekit.models.types.LiteralType literal_type:</span>
-<span class="sd">        :rtype: flytekit.common.types.base_sdk_types.FlyteSdkType</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="TypeEngine.infer_sdk_type_from_literal"><a class="viewcode-back" href="../../../flytekit/flytekit.type_engines.html#flytekit.type_engines.common.TypeEngine.infer_sdk_type_from_literal">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">infer_sdk_type_from_literal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">literal</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        From a literal value, we infer the correct SDK type.</span>
-<span class="sd">        :param flytekit.models.literals.Literal literal:</span>
-<span class="sd">        :rtype: flytekit.common.types.base_sdk_types.FlyteSdkType</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
+<div class="viewcode-block" id="SparkType"><a class="viewcode-back" href="../../../flytekit/flytekit.sdk.html#flytekit.sdk.spark_types.SparkType">[docs]</a><span class="k">class</span> <span class="nc">SparkType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">PYTHON</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">SCALA</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">JAVA</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="mi">4</span></div>
 </pre></div>
 
            </div>

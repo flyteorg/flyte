@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.task &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.models.task &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -166,9 +166,10 @@
 <span class="kn">from</span> <span class="nn">flyteidl.plugins</span> <span class="k">import</span> <span class="n">spark_pb2</span> <span class="k">as</span> <span class="n">_spark_task</span>
 <span class="kn">from</span> <span class="nn">flytekit.plugins</span> <span class="k">import</span> <span class="n">flyteidl</span> <span class="k">as</span> <span class="n">_lazy_flyteidl</span>
 <span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span><span class="p">,</span> <span class="n">struct_pb2</span> <span class="k">as</span> <span class="n">_struct</span>
-
+<span class="kn">from</span> <span class="nn">flytekit.sdk.spark_types</span> <span class="k">import</span> <span class="n">SparkType</span> <span class="k">as</span> <span class="n">_spark_type</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span><span class="p">,</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 
 
 <div class="viewcode-block" id="Resources"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.Resources">[docs]</a><span class="k">class</span> <span class="nc">Resources</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
@@ -702,7 +703,7 @@
 
 <div class="viewcode-block" id="SparkJob"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.SparkJob">[docs]</a><span class="k">class</span> <span class="nc">SparkJob</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_file</span><span class="p">,</span> <span class="n">spark_conf</span><span class="p">,</span> <span class="n">hadoop_conf</span><span class="p">,</span> <span class="n">executor_path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spark_type</span><span class="p">,</span> <span class="n">application_file</span><span class="p">,</span> <span class="n">main_class</span><span class="p">,</span> <span class="n">spark_conf</span><span class="p">,</span> <span class="n">hadoop_conf</span><span class="p">,</span> <span class="n">executor_path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This defines a SparkJob target.  It will execute the appropriate SparkJob.</span>
 
@@ -711,9 +712,27 @@
 <span class="sd">        :param dict[Text, Text] hadoop_conf: A definition of key-value pairs for hadoop config for the job.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_application_file</span> <span class="o">=</span> <span class="n">application_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spark_type</span> <span class="o">=</span> <span class="n">spark_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_main_class</span> <span class="o">=</span> <span class="n">main_class</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_executor_path</span> <span class="o">=</span> <span class="n">executor_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_spark_conf</span> <span class="o">=</span> <span class="n">spark_conf</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hadoop_conf</span> <span class="o">=</span> <span class="n">hadoop_conf</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">main_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The main class to execute</span>
+<span class="sd">        :rtype: Text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_main_class</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">spark_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Spark Job Type</span>
+<span class="sd">        :rtype: Text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spark_type</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">application_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -751,8 +770,22 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.plugins.spark_pb2.SparkJob</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_type</span> <span class="o">==</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">PYTHON</span><span class="p">:</span>
+            <span class="n">application_type</span> <span class="o">=</span> <span class="n">_spark_task</span><span class="o">.</span><span class="n">SparkApplication</span><span class="o">.</span><span class="n">PYTHON</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_type</span> <span class="o">==</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">JAVA</span><span class="p">:</span>
+            <span class="n">application_type</span> <span class="o">=</span> <span class="n">_spark_task</span><span class="o">.</span><span class="n">SparkApplication</span><span class="o">.</span><span class="n">JAVA</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_type</span> <span class="o">==</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">SCALA</span><span class="p">:</span>
+            <span class="n">application_type</span> <span class="o">=</span> <span class="n">_spark_task</span><span class="o">.</span><span class="n">SparkApplication</span><span class="o">.</span><span class="n">SCALA</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_type</span> <span class="o">==</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">R</span><span class="p">:</span>
+            <span class="n">application_type</span> <span class="o">=</span> <span class="n">_spark_task</span><span class="o">.</span><span class="n">SparkApplication</span><span class="o">.</span><span class="n">R</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValidationException</span><span class="p">(</span><span class="s2">&quot;Invalid Spark Application Type Specified&quot;</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">_spark_task</span><span class="o">.</span><span class="n">SparkJob</span><span class="p">(</span>
+            <span class="n">applicationType</span><span class="o">=</span><span class="n">application_type</span><span class="p">,</span>
             <span class="n">mainApplicationFile</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">application_file</span><span class="p">,</span>
+            <span class="n">mainClass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">main_class</span><span class="p">,</span>
             <span class="n">executorPath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">executor_path</span><span class="p">,</span>
             <span class="n">sparkConf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spark_conf</span><span class="p">,</span>
             <span class="n">hadoopConf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hadoop_conf</span><span class="p">,</span>
@@ -764,9 +797,20 @@
 <span class="sd">        :param flyteidl.plugins.spark_pb2.SparkJob pb2_object:</span>
 <span class="sd">        :rtype: SparkJob</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">application_type</span> <span class="o">=</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">PYTHON</span>
+        <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">_spark_task</span><span class="o">.</span><span class="n">SparkApplication</span><span class="o">.</span><span class="n">JAVA</span><span class="p">:</span>
+            <span class="n">application_type</span> <span class="o">=</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">JAVA</span>
+        <span class="k">elif</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">_spark_task</span><span class="o">.</span><span class="n">SparkApplication</span><span class="o">.</span><span class="n">SCALA</span><span class="p">:</span>
+            <span class="n">application_type</span> <span class="o">=</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">SCALA</span>
+        <span class="k">elif</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">_spark_task</span><span class="o">.</span><span class="n">SparkApplication</span><span class="o">.</span><span class="n">R</span><span class="p">:</span>
+            <span class="n">application_type</span> <span class="o">=</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">R</span>
+
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="nb">type</span><span class="o">=</span> <span class="n">application_type</span><span class="p">,</span>
             <span class="n">spark_conf</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">sparkConf</span><span class="p">,</span>
             <span class="n">application_file</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">mainApplicationFile</span><span class="p">,</span>
+            <span class="n">main_class</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">mainClass</span><span class="p">,</span>
             <span class="n">hadoop_conf</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">hadoopConf</span><span class="p">,</span>
             <span class="n">executor_path</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">executorPath</span><span class="p">,</span>
         <span class="p">)</span></div></div>
