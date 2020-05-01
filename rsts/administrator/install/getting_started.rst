@@ -51,9 +51,9 @@ SPECIAL NOTE FOR MINIKUBE:
   - Minikube runs in a Virtual Machine on your host
   - So if you try to access the flyte console on localhost, that will not work, because the Virtual Machine has a different IP address.
   - Flyte runs within Kubernetes (minikube), thus to access FlyteConsole, you cannot just use https://localhost:30081/console, you need to use the ``IP address`` of the minikube VM instead of ``localhost``
-  - Refer to `K8s official Minikube Page<https://kubernetes.io/docs/tutorials/hello-minikube/>`_ to understand how to access a
+  - Refer to https://kubernetes.io/docs/tutorials/hello-minikube/ to understand how to access a
   - also to register workflows, tasks etc or use the CLI to query Flyte service, you have to use the IP address.
   - If you are building an image locally and want to execute on Minikube hosted Flyte environment, please push the image to docker registry running on the Minikube VM.
-  - Another alternative is to change the docker host, to build the docker image on the Minikube hosted docker daemon. `This page<https://minikube.sigs.k8s.io/docs/handbook/pushing/>`_ provides more
+  - Another alternative is to change the docker host, to build the docker image on the Minikube hosted docker daemon. https://minikube.sigs.k8s.io/docs/handbook/pushing/ provides more
     detailed information about this process. As a TL;DR, Flyte can only run images that are accessible to Kubernetes. To make an image accessible, you could either push it to a remote registry or to
     a regisry that is available to Kuberentes. In case on minikube this registry is the one thats running on the VM.
