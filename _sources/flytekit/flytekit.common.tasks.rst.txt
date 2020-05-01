@@ -12,6 +12,14 @@ flytekit.common.tasks.executions module
    :undoc-members:
    :show-inheritance:
 
+flytekit.common.tasks.generic\_spark\_task module
+-------------------------------------------------
+
+.. automodule:: flytekit.common.tasks.generic_spark_task
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 flytekit.common.tasks.hive\_task module
 ---------------------------------------
 

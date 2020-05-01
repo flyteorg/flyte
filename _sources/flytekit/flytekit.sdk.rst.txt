@@ -12,6 +12,14 @@ flytekit.sdk.exceptions module
    :undoc-members:
    :show-inheritance:
 
+flytekit.sdk.spark\_types module
+--------------------------------
+
+.. automodule:: flytekit.sdk.spark_types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 flytekit.sdk.tasks module
 -------------------------
 

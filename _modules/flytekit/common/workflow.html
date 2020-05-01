@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.workflow &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.common.workflow &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -599,19 +599,21 @@
     <span class="k">return</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">nodes</span>
 
 
-<div class="viewcode-block" id="build_sdk_workflow_from_metaclass"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.build_sdk_workflow_from_metaclass">[docs]</a><span class="k">def</span> <span class="nf">build_sdk_workflow_from_metaclass</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="build_sdk_workflow_from_metaclass"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.build_sdk_workflow_from_metaclass">[docs]</a><span class="k">def</span> <span class="nf">build_sdk_workflow_from_metaclass</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">queuing_budget</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param T metaclass:</span>
 <span class="sd">    :param cls: This is the class that will be instantiated from the inputs, outputs, and nodes.  This will be used</span>
 <span class="sd">        by users extending the base Flyte programming model. If set, it must be a subclass of SdkWorkflow.</span>
+<span class="sd">    :param queuing_budget datetime.timedelta: [Optional] Budget that specifies the amount of time a workflow can be queued up for execution.</span>
 <span class="sd">    :rtype: SdkWorkflow</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">nodes</span> <span class="o">=</span> <span class="n">_discover_workflow_components</span><span class="p">(</span><span class="n">metaclass</span><span class="p">)</span>
-
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">_workflow_models</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="p">(</span><span class="n">queuing_budget</span><span class="p">)</span> <span class="k">if</span> <span class="n">queuing_budget</span> <span class="k">else</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span> <span class="ow">or</span> <span class="n">SdkWorkflow</span><span class="p">)(</span>
         <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">)],</span>
         <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">)],</span>
-        <span class="n">nodes</span><span class="o">=</span><span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">id</span><span class="p">)]</span>
+        <span class="n">nodes</span><span class="o">=</span><span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">id</span><span class="p">)],</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span>
     <span class="p">)</span></div>
 </pre></div>
 

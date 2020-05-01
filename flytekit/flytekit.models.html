@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models package &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.models package &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -2718,6 +2718,143 @@ requires processing of all input data. This has to be a positive number.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-flytekit.models.named_entity">
+<span id="flytekit-models-named-entity-module"></span><h2>flytekit.models.named_entity module<a class="headerlink" href="#module-flytekit.models.named_entity" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.models.named_entity.NamedEntityIdentifier">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.named_entity.</code><code class="sig-name descname">NamedEntityIdentifier</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/named_entity.html#NamedEntityIdentifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityIdentifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.named_entity.NamedEntityIdentifier.domain">
+<em class="property">property </em><code class="sig-name descname">domain</code><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityIdentifier.domain" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Text</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.named_entity.NamedEntityIdentifier.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">p</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/named_entity.html#NamedEntityIdentifier.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityIdentifier.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>flyteidl.core.common_pb2.NamedEntityIdentifier</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.common.core.html#flytekit.common.core.identifier.Identifier" title="flytekit.common.core.identifier.Identifier">Identifier</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.named_entity.NamedEntityIdentifier.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityIdentifier.name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Text</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.named_entity.NamedEntityIdentifier.project">
+<em class="property">property </em><code class="sig-name descname">project</code><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityIdentifier.project" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Text</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.named_entity.NamedEntityIdentifier.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/named_entity.html#NamedEntityIdentifier.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityIdentifier.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.admin.common_pb2.NamedEntityIdentifier</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.named_entity.NamedEntityMetadata">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.named_entity.</code><code class="sig-name descname">NamedEntityMetadata</code><span class="sig-paren">(</span><em class="sig-param">description</em>, <em class="sig-param">state</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/named_entity.html#NamedEntityMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityMetadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.named_entity.NamedEntityMetadata.description">
+<em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityMetadata.description" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Text</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.named_entity.NamedEntityMetadata.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">p</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/named_entity.html#NamedEntityMetadata.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityMetadata.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>flyteidl.core.common_pb2.NamedEntityMetadata</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.common.core.html#flytekit.common.core.identifier.Identifier" title="flytekit.common.core.identifier.Identifier">Identifier</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.named_entity.NamedEntityMetadata.state">
+<em class="property">property </em><code class="sig-name descname">state</code><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityMetadata.state" title="Permalink to this definition">¶</a></dt>
+<dd><p>enum value from NamedEntityState
+:rtype: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.named_entity.NamedEntityMetadata.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/named_entity.html#NamedEntityMetadata.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityMetadata.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.admin.common_pb2.NamedEntityMetadata</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.named_entity.NamedEntityState">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.named_entity.</code><code class="sig-name descname">NamedEntityState</code><a class="reference internal" href="../_modules/flytekit/models/named_entity.html#NamedEntityState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="flytekit.models.named_entity.NamedEntityState.ACTIVE">
+<code class="sig-name descname">ACTIVE</code><em class="property"> = 0</em><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityState.ACTIVE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.models.named_entity.NamedEntityState.ARCHIVED">
+<code class="sig-name descname">ARCHIVED</code><em class="property"> = 1</em><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityState.ARCHIVED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.named_entity.NamedEntityState.enum_to_string">
+<em class="property">classmethod </em><code class="sig-name descname">enum_to_string</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/named_entity.html#NamedEntityState.enum_to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.named_entity.NamedEntityState.enum_to_string" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>val</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Text</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-flytekit.models.node_execution">
 <span id="flytekit-models-node-execution-module"></span><h2>flytekit.models.node_execution module<a class="headerlink" href="#module-flytekit.models.node_execution" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -3647,7 +3784,7 @@ requires processing of all input data. This has to be a positive number.</p>
 
 <dl class="class">
 <dt id="flytekit.models.task.SparkJob">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">SparkJob</code><span class="sig-paren">(</span><em class="sig-param">application_file</em>, <em class="sig-param">spark_conf</em>, <em class="sig-param">hadoop_conf</em>, <em class="sig-param">executor_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#SparkJob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.SparkJob" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">SparkJob</code><span class="sig-paren">(</span><em class="sig-param">spark_type</em>, <em class="sig-param">application_file</em>, <em class="sig-param">main_class</em>, <em class="sig-param">spark_conf</em>, <em class="sig-param">hadoop_conf</em>, <em class="sig-param">executor_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#SparkJob"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.SparkJob" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.models.task.SparkJob.application_file">
@@ -3690,6 +3827,13 @@ requires processing of all input data. This has to be a positive number.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.models.task.SparkJob.main_class">
+<em class="property">property </em><code class="sig-name descname">main_class</code><a class="headerlink" href="#flytekit.models.task.SparkJob.main_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main class to execute
+:rtype: Text</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.models.task.SparkJob.spark_conf">
 <em class="property">property </em><code class="sig-name descname">spark_conf</code><a class="headerlink" href="#flytekit.models.task.SparkJob.spark_conf" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
@@ -3700,6 +3844,13 @@ requires processing of all input data. This has to be a positive number.</p>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.task.SparkJob.spark_type">
+<em class="property">property </em><code class="sig-name descname">spark_type</code><a class="headerlink" href="#flytekit.models.task.SparkJob.spark_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spark Job Type
+:rtype: Text</p>
 </dd></dl>
 
 <dl class="method">

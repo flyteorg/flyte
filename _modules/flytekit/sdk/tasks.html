@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk.tasks &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.sdk.tasks &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -164,9 +164,10 @@
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_common_constants</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable_tasks</span><span class="p">,</span> <span class="n">sdk_dynamic</span> <span class="k">as</span> <span class="n">_sdk_dynamic</span><span class="p">,</span> \
-    <span class="n">spark_task</span> <span class="k">as</span> <span class="n">_sdk_spark_tasks</span><span class="p">,</span> <span class="n">hive_task</span> <span class="k">as</span> <span class="n">_sdk_hive_tasks</span><span class="p">,</span> <span class="n">sidecar_task</span> <span class="k">as</span> <span class="n">_sdk_sidecar_tasks</span>
+    <span class="n">spark_task</span> <span class="k">as</span> <span class="n">_sdk_spark_tasks</span><span class="p">,</span> <span class="n">generic_spark_task</span> <span class="k">as</span> <span class="n">_sdk_generic_spark_task</span><span class="p">,</span> <span class="n">hive_task</span> <span class="k">as</span> <span class="n">_sdk_hive_tasks</span><span class="p">,</span> <span class="n">sidecar_task</span> <span class="k">as</span> <span class="n">_sdk_sidecar_tasks</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
+<span class="kn">from</span> <span class="nn">flytekit.sdk.spark_types</span> <span class="k">import</span>  <span class="n">SparkType</span> <span class="k">as</span> <span class="n">_spark_type</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_model</span>
 
 
@@ -632,6 +633,7 @@
             <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
             <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
             <span class="n">interruptible</span><span class="o">=</span><span class="n">interruptible</span><span class="p">,</span>
+            <span class="n">spark_type</span><span class="o">=</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">PYTHON</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
             <span class="n">discoverable</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span> <span class="ow">or</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
@@ -644,6 +646,45 @@
         <span class="k">return</span> <span class="n">wrapper</span><span class="p">(</span><span class="n">_task_function</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="generic_spark_task"><a class="viewcode-back" href="../../../flytekit/flytekit.sdk.html#flytekit.sdk.tasks.generic_spark_task">[docs]</a><span class="k">def</span> <span class="nf">generic_spark_task</span><span class="p">(</span>
+        <span class="n">spark_type</span><span class="p">,</span>
+        <span class="n">main_class</span><span class="p">,</span>
+        <span class="n">main_application_file</span><span class="p">,</span>
+        <span class="n">cache_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">spark_conf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">hadoop_conf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a generic spark task. This task will connect to a Spark cluster, configure the environment,</span>
+<span class="sd">    and then execute the mainClass code as the Spark driver program.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">_sdk_generic_spark_task</span><span class="o">.</span><span class="n">SdkGenericSparkTask</span><span class="p">(</span>
+            <span class="n">task_type</span><span class="o">=</span><span class="n">_common_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">SPARK_TASK</span><span class="p">,</span>
+            <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
+            <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="o">=</span><span class="n">interruptible</span><span class="p">,</span>
+            <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
+            <span class="n">discoverable</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span> <span class="ow">or</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="n">spark_type</span> <span class="o">=</span> <span class="n">spark_type</span><span class="p">,</span>
+            <span class="n">task_inputs</span><span class="o">=</span> <span class="n">inputs</span><span class="p">,</span>
+            <span class="n">main_class</span> <span class="o">=</span> <span class="n">main_class</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">main_application_file</span> <span class="o">=</span> <span class="n">main_application_file</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">spark_conf</span><span class="o">=</span><span class="n">spark_conf</span> <span class="ow">or</span> <span class="p">{},</span>
+            <span class="n">hadoop_conf</span><span class="o">=</span><span class="n">hadoop_conf</span> <span class="ow">or</span> <span class="p">{},</span>
+            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span> <span class="ow">or</span> <span class="p">{},</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="qubole_spark_task"><a class="viewcode-back" href="../../../flytekit/flytekit.sdk.html#flytekit.sdk.tasks.qubole_spark_task">[docs]</a><span class="k">def</span> <span class="nf">qubole_spark_task</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

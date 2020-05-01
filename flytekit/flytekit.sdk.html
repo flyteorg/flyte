@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk package &mdash; Flyte 0.0.1 documentation</title>
+  <title>flytekit.sdk package &mdash; Flyte 0.3.0 documentation</title>
   
 
   
@@ -202,6 +202,36 @@ will fail without additional retries.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-flytekit.sdk.spark_types">
+<span id="flytekit-sdk-spark-types-module"></span><h2>flytekit.sdk.spark_types module<a class="headerlink" href="#module-flytekit.sdk.spark_types" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.sdk.spark_types.SparkType">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.sdk.spark_types.</code><code class="sig-name descname">SparkType</code><a class="reference internal" href="../_modules/flytekit/sdk/spark_types.html#SparkType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.spark_types.SparkType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="flytekit.sdk.spark_types.SparkType.JAVA">
+<code class="sig-name descname">JAVA</code><em class="property"> = 3</em><a class="headerlink" href="#flytekit.sdk.spark_types.SparkType.JAVA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.sdk.spark_types.SparkType.PYTHON">
+<code class="sig-name descname">PYTHON</code><em class="property"> = 1</em><a class="headerlink" href="#flytekit.sdk.spark_types.SparkType.PYTHON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.sdk.spark_types.SparkType.R">
+<code class="sig-name descname">R</code><em class="property"> = 4</em><a class="headerlink" href="#flytekit.sdk.spark_types.SparkType.R" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.sdk.spark_types.SparkType.SCALA">
+<code class="sig-name descname">SCALA</code><em class="property"> = 2</em><a class="headerlink" href="#flytekit.sdk.spark_types.SparkType.SCALA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-flytekit.sdk.tasks">
 <span id="flytekit-sdk-tasks-module"></span><h2>flytekit.sdk.tasks module<a class="headerlink" href="#module-flytekit.sdk.tasks" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
@@ -311,6 +341,13 @@ logic into the base Flyte programming model.</p></li>
 <dd class="field-even"><p>flytekit.common.tasks.sdk_runnable.SdkDynamicTask</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="flytekit.sdk.tasks.generic_spark_task">
+<code class="sig-prename descclassname">flytekit.sdk.tasks.</code><code class="sig-name descname">generic_spark_task</code><span class="sig-paren">(</span><em class="sig-param">spark_type</em>, <em class="sig-param">main_class</em>, <em class="sig-param">main_application_file</em>, <em class="sig-param">cache_version=''</em>, <em class="sig-param">retries=0</em>, <em class="sig-param">interruptible=None</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">deprecated=''</em>, <em class="sig-param">cache=False</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">spark_conf=None</em>, <em class="sig-param">hadoop_conf=None</em>, <em class="sig-param">environment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/tasks.html#generic_spark_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.tasks.generic_spark_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a generic spark task. This task will connect to a Spark cluster, configure the environment,
+and then execute the mainClass code as the Spark driver program.</p>
 </dd></dl>
 
 <dl class="function">
@@ -2127,7 +2164,7 @@ executing–either by being downloaded from an accessible remote location like s
 
 <dl class="function">
 <dt id="flytekit.sdk.workflow.workflow">
-<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow</code><span class="sig-paren">(</span><em class="sig-param">nodes</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">outputs=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow</code><span class="sig-paren">(</span><em class="sig-param">nodes</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">outputs=None</em>, <em class="sig-param">cls=None</em>, <em class="sig-param">queuing_budget=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function provides a user-friendly interface for authoring workflows.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_a</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Tell me something&quot;</span><span class="p">)</span>
@@ -2162,6 +2199,7 @@ executing–either by being downloaded from an accessible remote location like s
 <li><p><strong>cls</strong> (<em>T</em>) – This is the class that will be instantiated from the inputs, outputs, and nodes. This will be used
 by users extending the base Flyte programming model. If set, it must be a subclass of
 <a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.workflow.SdkWorkflow</span></code></a>.</p></li>
+<li><p><strong>datetime.timedelta</strong> (<em>queuing_budget</em>) – [Optional] Budget that specifies the amount of time a workflow can be queued up for execution.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -2172,7 +2210,7 @@ by users extending the base Flyte programming model. If set, it must be a subcla
 
 <dl class="function">
 <dt id="flytekit.sdk.workflow.workflow_class">
-<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow_class</code><span class="sig-paren">(</span><em class="sig-param">_workflow_metaclass=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow_class" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow_class</code><span class="sig-paren">(</span><em class="sig-param">_workflow_metaclass=None</em>, <em class="sig-param">cls=None</em>, <em class="sig-param">queuing_budget=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a decorator for wrapping class definitions into workflows.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@workflow_class</span>
@@ -2193,6 +2231,7 @@ wrapped by this decorator.</p></li>
 <li><p><strong>cls</strong> – This is the class that will be instantiated from the inputs, outputs, and nodes. This will be used
 by users extending the base Flyte programming model. If set, it must be a subclass of
 <a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.workflow.SdkWorkflow</span></code></a>.</p></li>
+<li><p><strong>datetime.timedelta</strong> (<em>queuing_budget</em>) – [Optional] Budget that specifies the amount of time a workflow can be queued up for execution.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
