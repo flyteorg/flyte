@@ -12,7 +12,7 @@ spec:
           serviceAccountName: flyteadmin
           containers:
           - name: sync-cluster-resources
-            image: docker.io/lyft/flyteadmin:v0.2.6
+            image: docker.io/lyft/flyteadmin:v0.2.7
             imagePullPolicy: IfNotPresent
             command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
             volumeMounts:
