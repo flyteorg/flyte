@@ -19,7 +19,6 @@ module.exports = {
         '^.+\\.(j|t)sx?$': 'ts-jest'
     },
     transformIgnorePatterns: ['<rootDir>/node_modules/(?!@lyft/flyteidl)'],
-    collectCoverage: true,
     coverageDirectory: '.coverage',
     collectCoverageFrom: ['**/*.{ts,tsx}'],
     coveragePathIgnorePatterns: [

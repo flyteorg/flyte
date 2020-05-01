@@ -1,4 +1,4 @@
-import { fireEvent, render, wait } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import * as React from 'react';
 
 import { APIContext, useAPIState } from 'components/data/apiContext';
@@ -47,7 +47,7 @@ describe('LoginExpiredHandler', () => {
             })
         );
 
-        await wait();
+        await waitFor(() => {});
         expect(getByText('Login')).toBeInTheDocument();
     });
 });

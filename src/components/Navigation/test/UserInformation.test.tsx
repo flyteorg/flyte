@@ -1,4 +1,4 @@
-import { render, wait } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import * as React from 'react';
 
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
@@ -27,7 +27,7 @@ describe('UserInformation', () => {
 
     it('Shows login link if no user profile exists', async () => {
         const { getByText } = render(<UserInformationWithContext />);
-        await wait(() => getByText('Login'));
+        await waitFor(() => getByText('Login'));
         expect(mockGetUserProfile).toHaveBeenCalled();
         const element = getByText('Login');
         expect(element).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe('UserInformation', () => {
     it('Shows user preferredName if profile exists', async () => {
         mockGetUserProfile.mockResolvedValue(sampleUserProfile);
         const { getByText } = render(<UserInformationWithContext />);
-        await wait(() => getByText(sampleUserProfile.preferredUsername));
+        await waitFor(() => getByText(sampleUserProfile.preferredUsername));
         expect(mockGetUserProfile).toHaveBeenCalled();
         expect(
             getByText(sampleUserProfile.preferredUsername)

@@ -12,8 +12,10 @@ import { TaskNodeRenderer } from '../TaskNodeRenderer';
 import { WorkflowGraph } from '../WorkflowGraph';
 import * as graphData from './rich.json';
 
+const graphDataClosure = (graphData as unknown) as CompiledWorkflowClosure;
+
 const workflow: Workflow = {
-    closure: { compiledWorkflow: graphData as CompiledWorkflowClosure },
+    closure: { compiledWorkflow: graphDataClosure },
     id: {
         project: 'test',
         domain: 'test',

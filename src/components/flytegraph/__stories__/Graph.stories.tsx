@@ -9,10 +9,18 @@ import * as largeGraph from './largeGraph.json';
 import * as rich from './rich.json';
 import * as simple from './simple.json';
 
-const simpleData = convertFlyteGraphToDAG(simple);
-const batchData = convertFlyteGraphToDAG(batchTasks);
-const richData = convertFlyteGraphToDAG(rich as CompiledWorkflowClosure);
-const largeData = convertFlyteGraphToDAG(largeGraph);
+const simpleData = convertFlyteGraphToDAG(
+    (simple as unknown) as CompiledWorkflowClosure
+);
+const batchData = convertFlyteGraphToDAG(
+    (batchTasks as unknown) as CompiledWorkflowClosure
+);
+const richData = convertFlyteGraphToDAG(
+    (rich as unknown) as CompiledWorkflowClosure
+);
+const largeData = convertFlyteGraphToDAG(
+    (largeGraph as unknown) as CompiledWorkflowClosure
+);
 
 const stories = storiesOf('flytegraph/Graph', module);
 stories.addDecorator(story => (

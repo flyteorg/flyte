@@ -6,8 +6,7 @@ import {
     getByRole,
     queryAllByRole,
     render,
-    wait,
-    waitForElement
+    waitFor
 } from '@testing-library/react';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
@@ -188,7 +187,7 @@ describe('LaunchWorkflowForm', () => {
         it('should not show workflow selector until options have loaded', async () => {
             mockListWorkflows.mockReturnValue(pendingPromise());
             const { queryByText } = renderForm();
-            await wait();
+            await waitFor(() => {});
             expect(
                 queryByText(formStrings.workflowVersion)
             ).not.toBeInTheDocument();
@@ -197,15 +196,13 @@ describe('LaunchWorkflowForm', () => {
         it('should not show launch plan selector until list has loaded', async () => {
             mockListLaunchPlans.mockReturnValue(pendingPromise());
             const { getByLabelText, queryByText } = renderForm();
-            await waitForElement(() =>
-                getByLabelText(formStrings.workflowVersion)
-            );
+            await waitFor(() => getByLabelText(formStrings.workflowVersion));
             expect(queryByText(formStrings.launchPlan)).not.toBeInTheDocument();
         });
 
         it('should select the most recent workflow version by default', async () => {
             const { getByLabelText } = renderForm();
-            await wait();
+            await waitFor(() => {});
             expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
                 mockWorkflowVersions[0].id.version
             );
@@ -213,7 +210,7 @@ describe('LaunchWorkflowForm', () => {
 
         it('should select the launch plan matching the workflow name by default', async () => {
             const { getByLabelText } = renderForm();
-            await wait();
+            await waitFor(() => {});
             expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
                 mockWorkflow.id.name
             );
@@ -224,7 +221,7 @@ describe('LaunchWorkflowForm', () => {
                 entities: []
             });
             const { getByLabelText, queryByLabelText } = renderForm();
-            await wait();
+            await waitFor(() => {});
 
             // Find the launch plan selector, verify it has no value selected
             const launchPlanInput = getByLabelText(formStrings.launchPlan);
@@ -247,20 +244,20 @@ describe('LaunchWorkflowForm', () => {
             });
             const { container } = renderForm();
 
-            await wait();
+            await waitFor(() => {});
 
             const submitButton = getSubmitButton(container);
 
             expect(submitButton).toBeDisabled();
             resolve(createMockWorkflowWithInputs(identifier));
 
-            await wait();
+            await waitFor(() => {});
             expect(submitButton).not.toBeDisabled();
         });
 
         it('should not show validation errors until first submit', async () => {
             const { container, getByLabelText } = renderForm();
-            await wait();
+            await waitFor(() => {});
 
             const integerInput = getByLabelText(integerInputName, {
                 exact: false
@@ -270,38 +267,38 @@ describe('LaunchWorkflowForm', () => {
             act(() => {
                 jest.runAllTimers();
             });
-            await wait();
+            await waitFor(() => {});
             expect(integerInput).not.toBeInvalid();
 
             fireEvent.click(getSubmitButton(container));
-            await wait();
+            await waitFor(() => {});
 
             expect(integerInput).toBeInvalid();
         });
 
         it('should update validation errors while typing', async () => {
             const { container, getByLabelText } = renderForm();
-            await wait();
+            await waitFor(() => {});
 
             const integerInput = getByLabelText(integerInputName, {
                 exact: false
             });
             fireEvent.change(integerInput, { target: { value: 'abc' } });
             fireEvent.click(getSubmitButton(container));
-            await wait();
+            await waitFor(() => {});
             expect(integerInput).toBeInvalid();
 
             fireEvent.change(integerInput, { target: { value: '123' } });
             act(() => {
                 jest.runAllTimers();
             });
-            await wait();
+            await waitFor(() => {});
             expect(integerInput).toBeValid();
         });
 
         it('should update launch plan when selecting a new workflow version', async () => {
             const { getByTitle } = renderForm();
-            await wait();
+            await waitFor(() => {});
 
             mockListLaunchPlans.mockClear();
 
@@ -309,18 +306,18 @@ describe('LaunchWorkflowForm', () => {
             const workflowDiv = getByTitle(formStrings.workflowVersion);
             const expander = getByRole(workflowDiv, 'button');
             fireEvent.click(expander);
-            const items = await waitForElement(() =>
+            const items = await waitFor(() =>
                 getAllByRole(workflowDiv, 'menuitem')
             );
             fireEvent.click(items[1]);
 
-            await wait();
+            await waitFor(() => {});
             expect(mockListLaunchPlans).toHaveBeenCalled();
         });
 
         it('should not clear launch plan when selecting the already selected workflow version', async () => {
             const { getByLabelText, getByTitle } = renderForm();
-            await wait();
+            await waitFor(() => {});
 
             mockListLaunchPlans.mockClear();
 
@@ -328,12 +325,12 @@ describe('LaunchWorkflowForm', () => {
             const workflowDiv = getByTitle(formStrings.workflowVersion);
             const expander = getByRole(workflowDiv, 'button');
             fireEvent.click(expander);
-            const items = await waitForElement(() =>
+            const items = await waitFor(() =>
                 getAllByRole(workflowDiv, 'menuitem')
             );
             fireEvent.click(items[0]);
 
-            await wait();
+            await waitFor(() => {});
             expect(mockListLaunchPlans).not.toHaveBeenCalled();
             expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
                 mockWorkflow.id.name
@@ -342,7 +339,7 @@ describe('LaunchWorkflowForm', () => {
 
         it('should update inputs when selecting a new launch plan', async () => {
             const { queryByLabelText, getByTitle } = renderForm();
-            await wait();
+            await waitFor(() => {});
 
             // Delete the string input so that its corresponding input will
             // disappear after the new launch plan is loaded.
@@ -355,12 +352,12 @@ describe('LaunchWorkflowForm', () => {
             const launchPlanDiv = getByTitle(formStrings.launchPlan);
             const expander = getByRole(launchPlanDiv, 'button');
             fireEvent.click(expander);
-            const items = await waitForElement(() =>
+            const items = await waitFor(() =>
                 getAllByRole(launchPlanDiv, 'menuitem')
             );
             fireEvent.click(items[1]);
 
-            await wait();
+            await waitFor(() => {});
             expect(
                 queryByLabelText(stringInputName, {
                     // Don't use exact match because the label will be decorated with type info
@@ -371,23 +368,23 @@ describe('LaunchWorkflowForm', () => {
 
         it('should preserve input values when changing launch plan', async () => {
             const { getByLabelText, getByTitle } = renderForm();
-            await wait();
+            await waitFor(() => {});
 
             const integerInput = getByLabelText(integerInputName, {
                 exact: false
             });
             fireEvent.change(integerInput, { target: { value: '10' } });
-            await wait();
+            await waitFor(() => {});
 
             // Click the expander for the launch plan, select the second item
             const launchPlanDiv = getByTitle(formStrings.launchPlan);
             const expander = getByRole(launchPlanDiv, 'button');
             fireEvent.click(expander);
-            const items = await waitForElement(() =>
+            const items = await waitFor(() =>
                 getAllByRole(launchPlanDiv, 'menuitem')
             );
             fireEvent.click(items[1]);
-            await wait();
+            await waitFor(() => {});
 
             expect(
                 getByLabelText(integerInputName, {
@@ -408,10 +405,10 @@ describe('LaunchWorkflowForm', () => {
                 getByTitle,
                 queryByText
             } = renderForm();
-            await wait();
+            await waitFor(() => {});
 
             fireEvent.click(getSubmitButton(container));
-            await wait();
+            await waitFor(() => {});
 
             expect(getByText(errorString)).toBeInTheDocument();
 
@@ -420,11 +417,11 @@ describe('LaunchWorkflowForm', () => {
             const launchPlanDiv = getByTitle(formStrings.launchPlan);
             const expander = getByRole(launchPlanDiv, 'button');
             fireEvent.click(expander);
-            const items = await waitForElement(() =>
+            const items = await waitFor(() =>
                 getAllByRole(launchPlanDiv, 'menuitem')
             );
             fireEvent.click(items[1]);
-            await wait();
+            await waitFor(() => {});
             expect(queryByText(errorString)).not.toBeInTheDocument();
         });
 
@@ -441,10 +438,10 @@ describe('LaunchWorkflowForm', () => {
                 );
 
                 const { container } = renderForm();
-                await wait();
+                await waitFor(() => {});
 
                 fireEvent.click(getSubmitButton(container));
-                await wait();
+                await waitFor(() => {});
 
                 expect(mockCreateWorkflowExecution).toHaveBeenCalled();
                 expect(inputs.literals).toBeDefined();
@@ -469,7 +466,7 @@ describe('LaunchWorkflowForm', () => {
                 mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[0]);
 
                 const { getByLabelText } = renderForm();
-                await wait();
+                await waitFor(() => {});
 
                 expect(
                     getByLabelText(stringInputName, { exact: false })
@@ -488,7 +485,7 @@ describe('LaunchWorkflowForm', () => {
                 mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[0]);
 
                 const { getByText } = renderForm();
-                await wait();
+                await waitFor(() => {});
                 expect(
                     getByText(stringInputName, {
                         exact: false,
@@ -504,7 +501,7 @@ describe('LaunchWorkflowForm', () => {
                     workflow: mockWorkflowVersions[2].id
                 };
                 const { getByLabelText } = renderForm({ initialParameters });
-                await wait();
+                await waitFor(() => {});
                 expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
                     mockWorkflowVersions[2].id.version
                 );
@@ -515,12 +512,12 @@ describe('LaunchWorkflowForm', () => {
                     workflow: mockWorkflowVersions[2].id
                 };
                 const { getByTitle } = renderForm({ initialParameters });
-                await wait();
+                await waitFor(() => {});
                 // Click the expander for the workflow, select the second item
                 const versionDiv = getByTitle(formStrings.workflowVersion);
                 const expander = getByRole(versionDiv, 'button');
                 fireEvent.click(expander);
-                const items = await waitForElement(() =>
+                const items = await waitFor(() =>
                     getAllByRole(versionDiv, 'menuitem')
                 );
 
@@ -552,7 +549,7 @@ describe('LaunchWorkflowForm', () => {
                     workflow: { ...baseId, version: 'nonexistentValue' }
                 };
                 const { getByLabelText } = renderForm({ initialParameters });
-                await wait();
+                await waitFor(() => {});
                 expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
                     mockWorkflowVersions[0].id.version
                 );
@@ -563,7 +560,7 @@ describe('LaunchWorkflowForm', () => {
                     launchPlan: mockLaunchPlans[1].id
                 };
                 const { getByLabelText } = renderForm({ initialParameters });
-                await wait();
+                await waitFor(() => {});
                 expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
                     mockLaunchPlans[1].id.name
                 );
@@ -574,12 +571,12 @@ describe('LaunchWorkflowForm', () => {
                     launchPlan: mockLaunchPlans[1].id
                 };
                 const { getByTitle } = renderForm({ initialParameters });
-                await wait();
+                await waitFor(() => {});
                 // Click the expander for the LaunchPlan, select the second item
                 const launchPlanDiv = getByTitle(formStrings.launchPlan);
                 const expander = getByRole(launchPlanDiv, 'button');
                 fireEvent.click(expander);
-                const items = await waitForElement(() =>
+                const items = await waitFor(() =>
                     getAllByRole(launchPlanDiv, 'menuitem')
                 );
 
@@ -610,7 +607,7 @@ describe('LaunchWorkflowForm', () => {
                     launchPlan: launchPlanId
                 };
                 const { getByLabelText } = renderForm({ initialParameters });
-                await wait();
+                await waitFor(() => {});
                 expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
                     mockLaunchPlans[0].id.name
                 );
@@ -618,28 +615,28 @@ describe('LaunchWorkflowForm', () => {
 
             it('should maintain selected launch plan by name after switching workflow versions', async () => {
                 const { getByLabelText, getByTitle } = renderForm();
-                await wait();
+                await waitFor(() => {});
 
                 // Click the expander for the launch plan, select the second item
                 const launchPlanDiv = getByTitle(formStrings.launchPlan);
                 const launchPlanExpander = getByRole(launchPlanDiv, 'button');
                 fireEvent.click(launchPlanExpander);
-                const launchPlanItems = await waitForElement(() =>
+                const launchPlanItems = await waitFor(() =>
                     getAllByRole(launchPlanDiv, 'menuitem')
                 );
                 fireEvent.click(launchPlanItems[1]);
-                await wait();
+                await waitFor(() => {});
 
                 // Click the expander for the workflow, select the second item
                 const workflowDiv = getByTitle(formStrings.workflowVersion);
                 const expander = getByRole(workflowDiv, 'button');
                 fireEvent.click(expander);
-                const items = await waitForElement(() =>
+                const items = await waitFor(() =>
                     getAllByRole(workflowDiv, 'menuitem')
                 );
                 fireEvent.click(items[1]);
 
-                await wait();
+                await waitFor(() => {});
                 expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
                     mockLaunchPlans[1].id.name
                 );
@@ -663,7 +660,7 @@ describe('LaunchWorkflowForm', () => {
                 const { getByLabelText } = renderForm({
                     initialParameters: { values }
                 });
-                await wait();
+                await waitFor(() => {});
 
                 expect(
                     getByLabelText(stringInputName, { exact: false })
@@ -677,7 +674,7 @@ describe('LaunchWorkflowForm', () => {
                     workflow: missingWorkflow.id
                 };
                 const { getByLabelText } = renderForm({ initialParameters });
-                await wait();
+                await waitFor(() => {});
                 expect(getByLabelText(formStrings.workflowVersion)).toHaveValue(
                     missingWorkflow.id.version
                 );
@@ -690,7 +687,7 @@ describe('LaunchWorkflowForm', () => {
                     launchPlan: missingLaunchPlan.id
                 };
                 const { getByLabelText } = renderForm({ initialParameters });
-                await wait();
+                await waitFor(() => {});
                 expect(getByLabelText(formStrings.launchPlan)).toHaveValue(
                     missingLaunchPlan.id.name
                 );
@@ -698,7 +695,7 @@ describe('LaunchWorkflowForm', () => {
 
             it('should select contents of workflow version input on focus', async () => {
                 const { getByLabelText } = renderForm();
-                await wait();
+                await waitFor(() => {});
 
                 // Focus the workflow version input
                 const workflowInput = getByLabelText(
@@ -728,7 +725,7 @@ describe('LaunchWorkflowForm', () => {
                     4
                 );
                 const { getByLabelText } = renderForm({ initialParameters });
-                await wait();
+                await waitFor(() => {});
 
                 mockListWorkflows.mockClear();
 
@@ -742,7 +739,7 @@ describe('LaunchWorkflowForm', () => {
                 act(() => {
                     jest.runAllTimers();
                 });
-                await wait();
+                await waitFor(() => {});
                 const { project, domain, name } = mockWorkflowVersions[2].id;
                 expect(mockListWorkflows).toHaveBeenCalledWith(
                     { project, domain, name },

@@ -5,7 +5,7 @@ import { Workflow, WorkflowClosure } from '../Workflow';
 import * as simpleClosure from './simpleWorkflowClosure.json';
 
 const decodedClosure = Admin.WorkflowClosure.create(
-    simpleClosure
+    (simpleClosure as unknown) as Admin.IWorkflowClosure
 ) as WorkflowClosure;
 
 const workflowId: (name: string, version: string) => Identifier = (

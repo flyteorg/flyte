@@ -65,7 +65,7 @@ export interface DataListRef {
     recomputeRowHeights(index: number): void;
 }
 
-let DataListImpl: React.RefForwardingComponent<
+const DataListImplComponent: React.RefForwardingComponent<
     DataListRef,
     DataListImplProps
 > = (props, ref) => {
@@ -178,17 +178,17 @@ let DataListImpl: React.RefForwardingComponent<
         </>
     );
 };
-DataListImpl = React.forwardRef(DataListImpl);
+const DataListImpl = React.forwardRef(DataListImplComponent);
 
 /** The default version of DataList doesn't require a width/height and will expand to
  * fill its parent container (this can have odd behavior when using flex or the parent
  * doesn't have an explicit width/height set). When passing an explicit width/height,
  * the auto-sizing behavior is disabled and a slightly simpler component tree will be rendered.
  */
-let DataList: React.RefForwardingComponent<DataListRef, DataListProps> = (
-    props,
-    ref
-) => {
+const DataListComponent: React.RefForwardingComponent<
+    DataListRef,
+    DataListProps
+> = (props, ref) => {
     const commonStyles = useCommonStyles();
     const styles = useStyles();
 
@@ -214,6 +214,6 @@ let DataList: React.RefForwardingComponent<DataListRef, DataListProps> = (
         </div>
     );
 };
-DataList = React.forwardRef(DataList);
+const DataList = React.forwardRef(DataListComponent);
 
 export { DataList, DataListImpl };

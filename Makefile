@@ -40,4 +40,4 @@ clean:
 # submits the coverage to codecov.io
 .PHONY: test_unit_codecov
 test_unit_codecov:
-	yarn run test:coverage && yarn run codecov
+	yarn run test-coverage && yarn run codecov
