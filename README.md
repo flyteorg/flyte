@@ -6,7 +6,7 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic)
 ![GitHub milestones Completed](https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic)
-![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/3?style=plastic)
+![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/4?style=plastic)
 ![Twitter Follow](https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
 
@@ -97,7 +97,7 @@ Resources that would help you get a better understanding of Flyte.
 
 # Biweekly Community Sync
 - Starting April 21 2020, the Flyte community meets every other Tuesday at 9:00 AM PST (US West coast time).
-- You can join the [google meets](https://hangouts.google.com/hangouts/_/calendar/a2V0YW4udW1hcmVAZ21haWwuY29t.5km2218c99820cggkefdb5549e?authuser=0)
+- You can join the [google meet](meet.google.com/rbn-rvcv-odx). 
 - Meeting notes are captured in [Doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e)
 - Demo Signup [Sheet](https://docs.google.com/spreadsheets/d/1Bz-s3SpMm1hGl6Z5y3HcxrNBcg9ZhSgqVgmCxK_eEhs/edit#gid=0)
 
