@@ -42,6 +42,7 @@ func (r RemoteFileOutputReader) ReadError(ctx context.Context) (io.ExecutionErro
 				ExecutionError: &core.ExecutionError{
 					Code:    "ErrorFileNotFound",
 					Message: err.Error(),
+					Kind:    core.ExecutionError_SYSTEM,
 				},
 			}, nil
 		}
@@ -54,6 +55,7 @@ func (r RemoteFileOutputReader) ReadError(ctx context.Context) (io.ExecutionErro
 			ExecutionError: &core.ExecutionError{
 				Code:    "ErrorFileBadFormat",
 				Message: fmt.Sprintf("error not formatted correctly, nil error @path [%s]", r.outPath.GetErrorPath()),
+				Kind:    core.ExecutionError_SYSTEM,
 			},
 		}, nil
 	}
@@ -62,11 +64,14 @@ func (r RemoteFileOutputReader) ReadError(ctx context.Context) (io.ExecutionErro
 		ExecutionError: &core.ExecutionError{
 			Code:    errorDoc.Error.Code,
 			Message: errorDoc.Error.Message,
+			Kind:    core.ExecutionError_USER, // TODO: read it from container error once populated by SDK
 		},
 	}
+
 	if errorDoc.Error.Kind == core.ContainerError_RECOVERABLE {
 		ee.IsRecoverable = true
 	}
+
 	return ee, nil
 }
 
