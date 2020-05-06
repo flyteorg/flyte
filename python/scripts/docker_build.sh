@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
-
-# WARNING: THIS FILE IS MANAGED IN THE 'BOILERPLATE' REPO AND COPIED TO OTHER REPOSITORIES.
-# ONLY EDIT THIS FILE FROM WITHIN THE 'LYFT/BOILERPLATE' REPOSITORY:
-# 
-# TO OPT OUT OF UPDATES, SEE https://github.com/lyft/boilerplate/blob/master/Readme.rst
-
 set -e
+
+# NB: This script is originally bundled with the FlyteKit SDK with slight modifications
 
 echo ""
 echo "------------------------------------"
 echo "           DOCKER BUILD"
 echo "------------------------------------"
 echo ""
+
+# Go into the directory representing the user's repo
+pushd "$1"
 
 if [ -n "$REGISTRY" ]; then
   # Do not push if there are unstaged git changes
@@ -22,39 +21,43 @@ if [ -n "$REGISTRY" ]; then
   fi
 fi
 
-
-GIT_SHA=$(git rev-parse HEAD)
-
-IMAGE_TAG_WITH_SHA="${IMAGE_NAME}:${GIT_SHA}"
-
-RELEASE_SEMVER=$(git describe --tags --exact-match "$GIT_SHA" 2>/dev/null) || true
-if [ -n "$RELEASE_SEMVER" ]; then
-  IMAGE_TAG_WITH_SEMVER="${IMAGE_NAME}:${RELEASE_SEMVER}${IMAGE_TAG_SUFFIX}"
+# set default tag to the latest git SHA
+if [ -z "$TAG" ]; then
+  TAG=$(git rev-parse HEAD)
 fi
 
-# build the image
-docker build -t "$IMAGE_TAG_WITH_SHA" --build-arg IMAGE_TAG="${IMAGE_TAG_WITH_SHA}" .
-echo "${IMAGE_TAG_WITH_SHA} built locally."
-
-# if REGISTRY specified, push the images to the remote registy
+# If the registry does not exist, don't worry about it, and let users build locally
+# This is the name of the image that will be injected into the container as an environment variable
 if [ -n "$REGISTRY" ]; then
-
-  if [ -n "${DOCKER_REGISTRY_PASSWORD}" ]; then
-    docker login --username="$DOCKER_REGISTRY_USERNAME" --password="$DOCKER_REGISTRY_PASSWORD"
-  fi
-
-  docker tag "$IMAGE_TAG_WITH_SHA" "${REGISTRY}/${IMAGE_TAG_WITH_SHA}"
-
-  docker push "${REGISTRY}/${IMAGE_TAG_WITH_SHA}"
-  echo "${REGISTRY}/${IMAGE_TAG_WITH_SHA} pushed to remote."
-
-  # If the current commit has a semver tag, also push the images with the semver tag
-  if [ -n "$RELEASE_SEMVER" ]; then
-
-    docker tag "$IMAGE_TAG_WITH_SHA" "${REGISTRY}/${IMAGE_TAG_WITH_SEMVER}"
-
-    docker push "${REGISTRY}/${IMAGE_TAG_WITH_SEMVER}"
-    echo "${REGISTRY}/${IMAGE_TAG_WITH_SEMVER} pushed to remote."
-
-  fi
+  FLYTE_INTERNAL_IMAGE=${REGISTRY}/${IMAGE_NAME}:${TAG}
+else
+  FLYTE_INTERNAL_IMAGE=${IMAGE_NAME}:${TAG}
 fi
+echo "Building: $FLYTE_INTERNAL_IMAGE"
+
+# This build command is the raison d'etre of this script, it ensures that the version is injected into the image itself
+docker build . --build-arg tag="$FLYTE_INTERNAL_IMAGE" -t "$IMAGE_NAME" -f ./Dockerfile
+echo "$IMAGE_NAME built locally."
+
+# Create the appropriate tags
+docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:${TAG}"
+echo "${IMAGE_NAME}:latest also tagged with ${IMAGE_NAME}:${TAG}"
+if [ -n "$REGISTRY" ]; then
+  docker tag "${IMAGE_NAME}:latest" "${FLYTE_INTERNAL_IMAGE}"
+  echo "${IMAGE_NAME}:latest also tagged with ${FLYTE_INTERNAL_IMAGE}"
+
+  # Also push if there's a registry to push to
+  if [[ "${REGISTRY}" == "docker.io"* ]]; then
+    docker login --username="${DOCKERHUB_USERNAME}" --password="${DOCKERHUB_PASSWORD}"
+  fi
+  docker push "${FLYTE_INTERNAL_IMAGE}"
+  echo "${FLYTE_INTERNAL_IMAGE} pushed to remote"
+fi
+
+popd
+
+echo ""
+echo "------------------------------------"
+echo "              SUCCESS"
+echo "------------------------------------"
+echo ""
