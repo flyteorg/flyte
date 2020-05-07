@@ -70,6 +70,23 @@ public final class Errors {
      * <code>.flyteidl.core.ContainerError.Kind kind = 3;</code>
      */
     flyteidl.core.Errors.ContainerError.Kind getKind();
+
+    /**
+     * <pre>
+     * Defines the origin of the error (system, user, unknown).
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExecutionError.ErrorKind origin = 4;</code>
+     */
+    int getOriginValue();
+    /**
+     * <pre>
+     * Defines the origin of the error (system, user, unknown).
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExecutionError.ErrorKind origin = 4;</code>
+     */
+    flyteidl.core.Execution.ExecutionError.ErrorKind getOrigin();
   }
   /**
    * <pre>
@@ -92,6 +109,7 @@ public final class Errors {
       code_ = "";
       message_ = "";
       kind_ = 0;
+      origin_ = 0;
     }
 
     @java.lang.Override
@@ -134,6 +152,12 @@ public final class Errors {
               int rawValue = input.readEnum();
 
               kind_ = rawValue;
+              break;
+            }
+            case 32: {
+              int rawValue = input.readEnum();
+
+              origin_ = rawValue;
               break;
             }
             default: {
@@ -379,6 +403,31 @@ public final class Errors {
       return result == null ? flyteidl.core.Errors.ContainerError.Kind.UNRECOGNIZED : result;
     }
 
+    public static final int ORIGIN_FIELD_NUMBER = 4;
+    private int origin_;
+    /**
+     * <pre>
+     * Defines the origin of the error (system, user, unknown).
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExecutionError.ErrorKind origin = 4;</code>
+     */
+    public int getOriginValue() {
+      return origin_;
+    }
+    /**
+     * <pre>
+     * Defines the origin of the error (system, user, unknown).
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExecutionError.ErrorKind origin = 4;</code>
+     */
+    public flyteidl.core.Execution.ExecutionError.ErrorKind getOrigin() {
+      @SuppressWarnings("deprecation")
+      flyteidl.core.Execution.ExecutionError.ErrorKind result = flyteidl.core.Execution.ExecutionError.ErrorKind.valueOf(origin_);
+      return result == null ? flyteidl.core.Execution.ExecutionError.ErrorKind.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -402,6 +451,9 @@ public final class Errors {
       if (kind_ != flyteidl.core.Errors.ContainerError.Kind.NON_RECOVERABLE.getNumber()) {
         output.writeEnum(3, kind_);
       }
+      if (origin_ != flyteidl.core.Execution.ExecutionError.ErrorKind.UNKNOWN.getNumber()) {
+        output.writeEnum(4, origin_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -420,6 +472,10 @@ public final class Errors {
       if (kind_ != flyteidl.core.Errors.ContainerError.Kind.NON_RECOVERABLE.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(3, kind_);
+      }
+      if (origin_ != flyteidl.core.Execution.ExecutionError.ErrorKind.UNKNOWN.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(4, origin_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -441,6 +497,7 @@ public final class Errors {
       if (!getMessage()
           .equals(other.getMessage())) return false;
       if (kind_ != other.kind_) return false;
+      if (origin_ != other.origin_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -458,6 +515,8 @@ public final class Errors {
       hash = (53 * hash) + getMessage().hashCode();
       hash = (37 * hash) + KIND_FIELD_NUMBER;
       hash = (53 * hash) + kind_;
+      hash = (37 * hash) + ORIGIN_FIELD_NUMBER;
+      hash = (53 * hash) + origin_;
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -602,6 +661,8 @@ public final class Errors {
 
         kind_ = 0;
 
+        origin_ = 0;
+
         return this;
       }
 
@@ -631,6 +692,7 @@ public final class Errors {
         result.code_ = code_;
         result.message_ = message_;
         result.kind_ = kind_;
+        result.origin_ = origin_;
         onBuilt();
         return result;
       }
@@ -689,6 +751,9 @@ public final class Errors {
         }
         if (other.kind_ != 0) {
           setKindValue(other.getKindValue());
+        }
+        if (other.origin_ != 0) {
+          setOriginValue(other.getOriginValue());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -958,6 +1023,71 @@ public final class Errors {
       public Builder clearKind() {
         
         kind_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int origin_ = 0;
+      /**
+       * <pre>
+       * Defines the origin of the error (system, user, unknown).
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExecutionError.ErrorKind origin = 4;</code>
+       */
+      public int getOriginValue() {
+        return origin_;
+      }
+      /**
+       * <pre>
+       * Defines the origin of the error (system, user, unknown).
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExecutionError.ErrorKind origin = 4;</code>
+       */
+      public Builder setOriginValue(int value) {
+        origin_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Defines the origin of the error (system, user, unknown).
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExecutionError.ErrorKind origin = 4;</code>
+       */
+      public flyteidl.core.Execution.ExecutionError.ErrorKind getOrigin() {
+        @SuppressWarnings("deprecation")
+        flyteidl.core.Execution.ExecutionError.ErrorKind result = flyteidl.core.Execution.ExecutionError.ErrorKind.valueOf(origin_);
+        return result == null ? flyteidl.core.Execution.ExecutionError.ErrorKind.UNRECOGNIZED : result;
+      }
+      /**
+       * <pre>
+       * Defines the origin of the error (system, user, unknown).
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExecutionError.ErrorKind origin = 4;</code>
+       */
+      public Builder setOrigin(flyteidl.core.Execution.ExecutionError.ErrorKind value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        origin_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Defines the origin of the error (system, user, unknown).
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExecutionError.ErrorKind origin = 4;</code>
+       */
+      public Builder clearOrigin() {
+        
+        origin_ = 0;
         onChanged();
         return this;
       }
@@ -1710,13 +1840,15 @@ public final class Errors {
   static {
     java.lang.String[] descriptorData = {
       "\n\032flyteidl/core/errors.proto\022\rflyteidl.c" +
-      "ore\"\217\001\n\016ContainerError\022\014\n\004code\030\001 \001(\t\022\017\n\007" +
-      "message\030\002 \001(\t\0220\n\004kind\030\003 \001(\0162\".flyteidl.c" +
-      "ore.ContainerError.Kind\",\n\004Kind\022\023\n\017NON_R" +
-      "ECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n\rErrorDo" +
-      "cument\022,\n\005error\030\001 \001(\0132\035.flyteidl.core.Co" +
-      "ntainerErrorB2Z0github.com/lyft/flyteidl" +
-      "/gen/pb-go/flyteidl/coreb\006proto3"
+      "ore\032\035flyteidl/core/execution.proto\"\310\001\n\016C" +
+      "ontainerError\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002" +
+      " \001(\t\0220\n\004kind\030\003 \001(\0162\".flyteidl.core.Conta" +
+      "inerError.Kind\0227\n\006origin\030\004 \001(\0162\'.flyteid" +
+      "l.core.ExecutionError.ErrorKind\",\n\004Kind\022" +
+      "\023\n\017NON_RECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n" +
+      "\rErrorDocument\022,\n\005error\030\001 \001(\0132\035.flyteidl" +
+      ".core.ContainerErrorB2Z0github.com/lyft/" +
+      "flyteidl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1729,19 +1861,21 @@ public final class Errors {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          flyteidl.core.Execution.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_core_ContainerError_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_flyteidl_core_ContainerError_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_ContainerError_descriptor,
-        new java.lang.String[] { "Code", "Message", "Kind", });
+        new java.lang.String[] { "Code", "Message", "Kind", "Origin", });
     internal_static_flyteidl_core_ErrorDocument_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_core_ErrorDocument_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_ErrorDocument_descriptor,
         new java.lang.String[] { "Error", });
+    flyteidl.core.Execution.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

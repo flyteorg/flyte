@@ -9284,6 +9284,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [code] ContainerError code
              * @property {string|null} [message] ContainerError message
              * @property {flyteidl.core.ContainerError.Kind|null} [kind] ContainerError kind
+             * @property {flyteidl.core.ExecutionError.ErrorKind|null} [origin] ContainerError origin
              */
 
             /**
@@ -9326,6 +9327,14 @@ export const flyteidl = $root.flyteidl = (() => {
             ContainerError.prototype.kind = 0;
 
             /**
+             * ContainerError origin.
+             * @member {flyteidl.core.ExecutionError.ErrorKind} origin
+             * @memberof flyteidl.core.ContainerError
+             * @instance
+             */
+            ContainerError.prototype.origin = 0;
+
+            /**
              * Creates a new ContainerError instance using the specified properties.
              * @function create
              * @memberof flyteidl.core.ContainerError
@@ -9355,6 +9364,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
                 if (message.kind != null && message.hasOwnProperty("kind"))
                     writer.uint32(/* id 3, wireType 0 =*/24).int32(message.kind);
+                if (message.origin != null && message.hasOwnProperty("origin"))
+                    writer.uint32(/* id 4, wireType 0 =*/32).int32(message.origin);
                 return writer;
             };
 
@@ -9384,6 +9395,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 3:
                         message.kind = reader.int32();
+                        break;
+                    case 4:
+                        message.origin = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -9416,6 +9430,15 @@ export const flyteidl = $root.flyteidl = (() => {
                         return "kind: enum value expected";
                     case 0:
                     case 1:
+                        break;
+                    }
+                if (message.origin != null && message.hasOwnProperty("origin"))
+                    switch (message.origin) {
+                    default:
+                        return "origin: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
                         break;
                     }
                 return null;
