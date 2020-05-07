@@ -50,6 +50,8 @@ func (m *ContainerError) Validate() error {
 
 	// no validation rules for Kind
 
+	// no validation rules for Origin
+
 	return nil
 }
 

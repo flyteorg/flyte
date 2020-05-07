@@ -3816,6 +3816,9 @@ export namespace flyteidl {
 
             /** ContainerError kind */
             kind?: (flyteidl.core.ContainerError.Kind|null);
+
+            /** ContainerError origin */
+            origin?: (flyteidl.core.ExecutionError.ErrorKind|null);
         }
 
         /** Represents a ContainerError. */
@@ -3835,6 +3838,9 @@ export namespace flyteidl {
 
             /** ContainerError kind. */
             public kind: flyteidl.core.ContainerError.Kind;
+
+            /** ContainerError origin. */
+            public origin: flyteidl.core.ExecutionError.ErrorKind;
 
             /**
              * Creates a new ContainerError instance using the specified properties.
