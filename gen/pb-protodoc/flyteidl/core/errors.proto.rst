@@ -8,7 +8,7 @@ errors.proto
 flyteidl.core.ContainerError
 ----------------------------
 
-`[flyteidl.core.ContainerError proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/errors.proto#L8>`_
+`[flyteidl.core.ContainerError proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/errors.proto#L10>`_
 
 Error message to propagate detailed errors from container executions to the execution
 engine.
@@ -18,7 +18,8 @@ engine.
   {
     "code": "...",
     "message": "...",
-    "kind": "..."
+    "kind": "...",
+    "origin": "..."
   }
 
 .. _api_field_flyteidl.core.ContainerError.code:
@@ -39,13 +40,19 @@ kind
   (:ref:`flyteidl.core.ContainerError.Kind <api_enum_flyteidl.core.ContainerError.Kind>`) An abstract error kind for this error. Defaults to Non_Recoverable if not specified.
   
   
+.. _api_field_flyteidl.core.ContainerError.origin:
+
+origin
+  (:ref:`flyteidl.core.ExecutionError.ErrorKind <api_enum_flyteidl.core.ExecutionError.ErrorKind>`) Defines the origin of the error (system, user, unknown).
+  
+  
 
 .. _api_enum_flyteidl.core.ContainerError.Kind:
 
 Enum flyteidl.core.ContainerError.Kind
 --------------------------------------
 
-`[flyteidl.core.ContainerError.Kind proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/errors.proto#L15>`_
+`[flyteidl.core.ContainerError.Kind proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/errors.proto#L17>`_
 
 Defines a generic error type that dictates the behavior of the retry strategy.
 
@@ -65,7 +72,7 @@ RECOVERABLE
 flyteidl.core.ErrorDocument
 ---------------------------
 
-`[flyteidl.core.ErrorDocument proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/errors.proto#L26>`_
+`[flyteidl.core.ErrorDocument proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/errors.proto#L31>`_
 
 Defines the errors.pb file format the container can produce to communicate
 failure reasons to the execution engine.

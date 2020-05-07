@@ -13,6 +13,7 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+from flyteidl.core import execution_pb2 as flyteidl_dot_core_dot_execution__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -20,8 +21,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.core',
   syntax='proto3',
   serialized_options=_b('Z0github.com/lyft/flyteidl/gen/pb-go/flyteidl/core'),
-  serialized_pb=_b('\n\x1a\x66lyteidl/core/errors.proto\x12\rflyteidl.core\"\x8f\x01\n\x0e\x43ontainerError\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x30\n\x04kind\x18\x03 \x01(\x0e\x32\".flyteidl.core.ContainerError.Kind\",\n\x04Kind\x12\x13\n\x0fNON_RECOVERABLE\x10\x00\x12\x0f\n\x0bRECOVERABLE\x10\x01\"=\n\rErrorDocument\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.flyteidl.core.ContainerErrorB2Z0github.com/lyft/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
-)
+  serialized_pb=_b('\n\x1a\x66lyteidl/core/errors.proto\x12\rflyteidl.core\x1a\x1d\x66lyteidl/core/execution.proto\"\xc8\x01\n\x0e\x43ontainerError\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x30\n\x04kind\x18\x03 \x01(\x0e\x32\".flyteidl.core.ContainerError.Kind\x12\x37\n\x06origin\x18\x04 \x01(\x0e\x32\'.flyteidl.core.ExecutionError.ErrorKind\",\n\x04Kind\x12\x13\n\x0fNON_RECOVERABLE\x10\x00\x12\x0f\n\x0bRECOVERABLE\x10\x01\"=\n\rErrorDocument\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.flyteidl.core.ContainerErrorB2Z0github.com/lyft/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
+  ,
+  dependencies=[flyteidl_dot_core_dot_execution__pb2.DESCRIPTOR,])
 
 
 
@@ -42,8 +44,8 @@ _CONTAINERERROR_KIND = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=145,
-  serialized_end=189,
+  serialized_start=233,
+  serialized_end=277,
 )
 _sym_db.RegisterEnumDescriptor(_CONTAINERERROR_KIND)
 
@@ -76,6 +78,13 @@ _CONTAINERERROR = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='origin', full_name='flyteidl.core.ContainerError.origin', index=3,
+      number=4, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -89,8 +98,8 @@ _CONTAINERERROR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=46,
-  serialized_end=189,
+  serialized_start=77,
+  serialized_end=277,
 )
 
 
@@ -120,11 +129,12 @@ _ERRORDOCUMENT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=191,
-  serialized_end=252,
+  serialized_start=279,
+  serialized_end=340,
 )
 
 _CONTAINERERROR.fields_by_name['kind'].enum_type = _CONTAINERERROR_KIND
+_CONTAINERERROR.fields_by_name['origin'].enum_type = flyteidl_dot_core_dot_execution__pb2._EXECUTIONERROR_ERRORKIND
 _CONTAINERERROR_KIND.containing_type = _CONTAINERERROR
 _ERRORDOCUMENT.fields_by_name['error'].message_type = _CONTAINERERROR
 DESCRIPTOR.message_types_by_name['ContainerError'] = _CONTAINERERROR

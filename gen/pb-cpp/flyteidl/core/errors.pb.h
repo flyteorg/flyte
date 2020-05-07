@@ -32,6 +32,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "flyteidl/core/execution.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ferrors_2eproto
@@ -246,6 +247,12 @@ class ContainerError final :
   ::flyteidl::core::ContainerError_Kind kind() const;
   void set_kind(::flyteidl::core::ContainerError_Kind value);
 
+  // .flyteidl.core.ExecutionError.ErrorKind origin = 4;
+  void clear_origin();
+  static const int kOriginFieldNumber = 4;
+  ::flyteidl::core::ExecutionError_ErrorKind origin() const;
+  void set_origin(::flyteidl::core::ExecutionError_ErrorKind value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.ContainerError)
  private:
   class HasBitSetters;
@@ -254,6 +261,7 @@ class ContainerError final :
   ::google::protobuf::internal::ArenaStringPtr code_;
   ::google::protobuf::internal::ArenaStringPtr message_;
   int kind_;
+  int origin_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2ferrors_2eproto;
 };
@@ -501,6 +509,20 @@ inline void ContainerError::set_kind(::flyteidl::core::ContainerError_Kind value
   
   kind_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.core.ContainerError.kind)
+}
+
+// .flyteidl.core.ExecutionError.ErrorKind origin = 4;
+inline void ContainerError::clear_origin() {
+  origin_ = 0;
+}
+inline ::flyteidl::core::ExecutionError_ErrorKind ContainerError::origin() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.ContainerError.origin)
+  return static_cast< ::flyteidl::core::ExecutionError_ErrorKind >(origin_);
+}
+inline void ContainerError::set_origin(::flyteidl::core::ExecutionError_ErrorKind value) {
+  
+  origin_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.ContainerError.origin)
 }
 
 // -------------------------------------------------------------------

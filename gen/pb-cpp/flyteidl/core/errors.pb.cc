@@ -76,6 +76,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2ferrors_2eproto::o
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::ContainerError, code_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::ContainerError, message_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::ContainerError, kind_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ContainerError, origin_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::ErrorDocument, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -85,7 +86,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2ferrors_2eproto::o
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::core::ContainerError)},
-  { 8, -1, sizeof(::flyteidl::core::ErrorDocument)},
+  { 9, -1, sizeof(::flyteidl::core::ErrorDocument)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -101,25 +102,28 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto[] =
   "\n\032flyteidl/core/errors.proto\022\rflyteidl.c"
-  "ore\"\217\001\n\016ContainerError\022\014\n\004code\030\001 \001(\t\022\017\n\007"
-  "message\030\002 \001(\t\0220\n\004kind\030\003 \001(\0162\".flyteidl.c"
-  "ore.ContainerError.Kind\",\n\004Kind\022\023\n\017NON_R"
-  "ECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n\rErrorDo"
-  "cument\022,\n\005error\030\001 \001(\0132\035.flyteidl.core.Co"
-  "ntainerErrorB2Z0github.com/lyft/flyteidl"
-  "/gen/pb-go/flyteidl/coreb\006proto3"
+  "ore\032\035flyteidl/core/execution.proto\"\310\001\n\016C"
+  "ontainerError\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002"
+  " \001(\t\0220\n\004kind\030\003 \001(\0162\".flyteidl.core.Conta"
+  "inerError.Kind\0227\n\006origin\030\004 \001(\0162\'.flyteid"
+  "l.core.ExecutionError.ErrorKind\",\n\004Kind\022"
+  "\023\n\017NON_RECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n"
+  "\rErrorDocument\022,\n\005error\030\001 \001(\0132\035.flyteidl"
+  ".core.ContainerErrorB2Z0github.com/lyft/"
+  "flyteidl/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2ferrors_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2ferrors_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto,
-  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 312,
+  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 400,
 };
 
 void AddDescriptors_flyteidl_2fcore_2ferrors_2eproto() {
   static constexpr ::google::protobuf::internal::InitFunc deps[1] =
   {
+    ::AddDescriptors_flyteidl_2fcore_2fexecution_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2ferrors_2eproto, deps, 0);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2ferrors_2eproto, deps, 1);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -160,6 +164,7 @@ class ContainerError::HasBitSetters {
 const int ContainerError::kCodeFieldNumber;
 const int ContainerError::kMessageFieldNumber;
 const int ContainerError::kKindFieldNumber;
+const int ContainerError::kOriginFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ContainerError::ContainerError()
@@ -179,7 +184,9 @@ ContainerError::ContainerError(const ContainerError& from)
   if (from.message().size() > 0) {
     message_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.message_);
   }
-  kind_ = from.kind_;
+  ::memcpy(&kind_, &from.kind_,
+    static_cast<size_t>(reinterpret_cast<char*>(&origin_) -
+    reinterpret_cast<char*>(&kind_)) + sizeof(origin_));
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.ContainerError)
 }
 
@@ -188,7 +195,9 @@ void ContainerError::SharedCtor() {
       &scc_info_ContainerError_flyteidl_2fcore_2ferrors_2eproto.base);
   code_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  kind_ = 0;
+  ::memset(&kind_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&origin_) -
+      reinterpret_cast<char*>(&kind_)) + sizeof(origin_));
 }
 
 ContainerError::~ContainerError() {
@@ -218,7 +227,9 @@ void ContainerError::Clear() {
 
   code_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  kind_ = 0;
+  ::memset(&kind_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&origin_) -
+      reinterpret_cast<char*>(&kind_)) + sizeof(origin_));
   _internal_metadata_.Clear();
 }
 
@@ -272,6 +283,14 @@ const char* ContainerError::_InternalParse(const char* begin, const char* end, v
         if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
         ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
         msg->set_kind(static_cast<::flyteidl::core::ContainerError_Kind>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // .flyteidl.core.ExecutionError.ErrorKind origin = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_origin(static_cast<::flyteidl::core::ExecutionError_ErrorKind>(val));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
@@ -353,6 +372,20 @@ bool ContainerError::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.core.ExecutionError.ErrorKind origin = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
+          int value = 0;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_origin(static_cast< ::flyteidl::core::ExecutionError_ErrorKind >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -406,6 +439,12 @@ void ContainerError::SerializeWithCachedSizes(
       3, this->kind(), output);
   }
 
+  // .flyteidl.core.ExecutionError.ErrorKind origin = 4;
+  if (this->origin() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      4, this->origin(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -445,6 +484,12 @@ void ContainerError::SerializeWithCachedSizes(
   if (this->kind() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       3, this->kind(), target);
+  }
+
+  // .flyteidl.core.ExecutionError.ErrorKind origin = 4;
+  if (this->origin() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      4, this->origin(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -488,6 +533,12 @@ size_t ContainerError::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->kind());
   }
 
+  // .flyteidl.core.ExecutionError.ErrorKind origin = 4;
+  if (this->origin() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->origin());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -526,6 +577,9 @@ void ContainerError::MergeFrom(const ContainerError& from) {
   if (from.kind() != 0) {
     set_kind(from.kind());
   }
+  if (from.origin() != 0) {
+    set_origin(from.origin());
+  }
 }
 
 void ContainerError::CopyFrom(const ::google::protobuf::Message& from) {
@@ -558,6 +612,7 @@ void ContainerError::InternalSwap(ContainerError* other) {
   message_.Swap(&other->message_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(kind_, other->kind_);
+  swap(origin_, other->origin_);
 }
 
 ::google::protobuf::Metadata ContainerError::GetMetadata() const {
