@@ -47,6 +47,7 @@ var (
 		TokenKey:                  "FLYTE_QUBOLE_CLIENT_TOKEN",
 		LruCacheSize:              2000,
 		Workers:                   15,
+		DefaultClusterLabel:       "default",
 		ClusterConfigs:            []ClusterConfig{{PrimaryLabel: "default", Labels: []string{"default"}, Limit: 100, ProjectScopeQuotaProportionCap: 0.7, NamespaceScopeQuotaProportionCap: 0.7}},
 		DestinationClusterConfigs: []DestinationClusterConfig{},
 	}
@@ -62,6 +63,7 @@ type Config struct {
 	TokenKey                  string                     `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
 	LruCacheSize              int                        `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
 	Workers                   int                        `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
+	DefaultClusterLabel       string                     `json:"defaultClusterConfig" pflag:",The default cluster label. This will be used if label is not specified on the hive job."`
 	ClusterConfigs            []ClusterConfig            `json:"clusterConfigs" pflag:"-,A list of cluster configs. Each of the configs corresponds to a service cluster"`
 	DestinationClusterConfigs []DestinationClusterConfig `json:"destinationClusterConfigs" pflag:"-,A list configs specifying the destination service cluster for (project, domain)"`
 }

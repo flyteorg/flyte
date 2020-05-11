@@ -348,6 +348,7 @@ func TestKickOffQuery(t *testing.T) {
 
 func createMockQuboleCfg() *config.Config {
 	return &config.Config{
+		DefaultClusterLabel: "default",
 		ClusterConfigs: []config.ClusterConfig{
 			{PrimaryLabel: "primary A", Labels: []string{"primary A", "A", "label A", "A-prod"}, Limit: 10},
 			{PrimaryLabel: "primary B", Labels: []string{"B"}, Limit: 10},
