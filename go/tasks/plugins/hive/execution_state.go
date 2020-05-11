@@ -259,13 +259,13 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 	return
 }
 
-func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label string) (string, bool) {
-	primaryLabel := DefaultClusterPrimaryLabel
-	found := false
+func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label string) (primaryLabel string, found bool) {
+	primaryLabel = quboleCfg.DefaultClusterLabel
+	found = false
 
 	if label == "" {
-		logger.Debugf(ctx, "Input cluster label is an empty string; falling back to using the default primary label [%v]", label, DefaultClusterPrimaryLabel)
-		return primaryLabel, found
+		logger.Debugf(ctx, "Input cluster label is an empty string; falling back to using the default primary label [%v]", label, primaryLabel)
+		return
 	}
 
 	// Using a linear search because N is small and because of ClusterConfig's struct definition
@@ -280,8 +280,11 @@ func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label
 		}
 	}
 
-	logger.Debugf(ctx, "Cannot find the primary cluster label for label [%v] in configmap; "+
-		"falling back to using the default primary label [%v]", label, DefaultClusterPrimaryLabel)
+	if !found {
+		logger.Debugf(ctx, "Cannot find the primary cluster label for label [%v] in configmap; "+
+			"falling back to using the default primary label [%v]", label, primaryLabel)
+	}
+
 	return primaryLabel, found
 }
 
@@ -319,7 +322,7 @@ func getClusterPrimaryLabel(ctx context.Context, tCtx core.TaskExecutionContext,
 	}
 
 	// Else we return the default primary label
-	return DefaultClusterPrimaryLabel
+	return cfg.DefaultClusterLabel
 }
 
 func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState, quboleClient client.QuboleClient,
