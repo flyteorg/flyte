@@ -28,6 +28,9 @@ enum NamedEntityState {
 
     // Archived named entities are no longer visible in the UI.
     NAMED_ENTITY_ARCHIVED = 1;
+
+    // System generated entities that aren't explicitly created or managed by a user.
+    SYSTEM_GENERATED = 2;
 }
 
 message NamedEntityMetadata {
@@ -232,5 +235,13 @@ message Labels {
 message Annotations {
     // Map of custom annotations to be applied to the execution resource.
     map<string, string> values          = 1;
+}
+
+// Defines permissions associated with executions.
+message AuthRole {
+  oneof method {
+    string assumable_iam_role         = 1;
+    string kubernetes_service_account = 2;
+  }
 }
 

@@ -22,4 +22,6 @@ type AdminExecutionSpec struct {
 	Labels *AdminLabels `json:"labels,omitempty"`
 	// Annotations to apply to the execution resource.
 	Annotations *AdminAnnotations `json:"annotations,omitempty"`
+	// Optional: auth override to apply this execution.
+	AuthRole *AdminAuthRole `json:"auth_role,omitempty"`
 }

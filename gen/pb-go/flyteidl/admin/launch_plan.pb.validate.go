@@ -520,6 +520,16 @@ func (m *LaunchPlanSpec) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetAuthRole()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LaunchPlanSpecValidationError{
+				field:  "AuthRole",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
