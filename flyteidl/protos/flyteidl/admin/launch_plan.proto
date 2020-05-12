@@ -88,7 +88,9 @@ message LaunchPlanSpec {
     Annotations annotations               = 7;
 
     // Indicates the permission associated with workflow executions triggered with this launch plan.
-    Auth auth                             = 8;
+    Auth auth                             = 8 [deprecated=true];
+
+    AuthRole auth_role                    = 9;
 }
 
 // Values computed by the flyte platform after launch plan registration.

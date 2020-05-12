@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from flyteadmin.models.admin_abort_metadata import AdminAbortMetadata
 from flyteadmin.models.admin_annotations import AdminAnnotations
 from flyteadmin.models.admin_auth import AdminAuth
+from flyteadmin.models.admin_auth_role import AdminAuthRole
 from flyteadmin.models.admin_cluster_resource_attributes import AdminClusterResourceAttributes
 from flyteadmin.models.admin_domain import AdminDomain
 from flyteadmin.models.admin_email_notification import AdminEmailNotification

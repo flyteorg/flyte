@@ -122,6 +122,7 @@ Class | Method | HTTP request | Description
  - [AdminAbortMetadata](docs/AdminAbortMetadata.md)
  - [AdminAnnotations](docs/AdminAnnotations.md)
  - [AdminAuth](docs/AdminAuth.md)
+ - [AdminAuthRole](docs/AdminAuthRole.md)
  - [AdminClusterResourceAttributes](docs/AdminClusterResourceAttributes.md)
  - [AdminDomain](docs/AdminDomain.md)
  - [AdminEmailNotification](docs/AdminEmailNotification.md)
