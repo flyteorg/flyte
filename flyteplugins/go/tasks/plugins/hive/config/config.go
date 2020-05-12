@@ -63,7 +63,7 @@ type Config struct {
 	TokenKey                  string                     `json:"quboleTokenKey" pflag:",Name of the key where to find Qubole token in the secret manager."`
 	LruCacheSize              int                        `json:"lruCacheSize" pflag:",Size of the AutoRefreshCache"`
 	Workers                   int                        `json:"workers" pflag:",Number of parallel workers to refresh the cache"`
-	DefaultClusterLabel       string                     `json:"defaultClusterConfig" pflag:",The default cluster label. This will be used if label is not specified on the hive job."`
+	DefaultClusterLabel       string                     `json:"defaultClusterLabel" pflag:",The default cluster label. This will be used if label is not specified on the hive job."`
 	ClusterConfigs            []ClusterConfig            `json:"clusterConfigs" pflag:"-,A list of cluster configs. Each of the configs corresponds to a service cluster"`
 	DestinationClusterConfigs []DestinationClusterConfig `json:"destinationClusterConfigs" pflag:"-,A list configs specifying the destination service cluster for (project, domain)"`
 }

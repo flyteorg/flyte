@@ -47,5 +47,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "quboleTokenKey"), defaultConfig.TokenKey, "Name of the key where to find Qubole token in the secret manager.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "lruCacheSize"), defaultConfig.LruCacheSize, "Size of the AutoRefreshCache")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "workers"), defaultConfig.Workers, "Number of parallel workers to refresh the cache")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultClusterLabel"), defaultConfig.DefaultClusterLabel, "The default cluster label. This will be used if label is not specified on the hive job.")
 	return cmdFlags
 }
