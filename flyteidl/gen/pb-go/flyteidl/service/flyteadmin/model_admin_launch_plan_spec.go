@@ -22,4 +22,5 @@ type AdminLaunchPlanSpec struct {
 	Annotations *AdminAnnotations `json:"annotations,omitempty"`
 	// Indicates the permission associated with workflow executions triggered with this launch plan.
 	Auth *AdminAuth `json:"auth,omitempty"`
+	AuthRole *AdminAuthRole `json:"auth_role,omitempty"`
 }

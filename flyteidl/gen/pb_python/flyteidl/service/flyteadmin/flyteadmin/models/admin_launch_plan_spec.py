@@ -18,6 +18,7 @@ import six
 
 from flyteadmin.models.admin_annotations import AdminAnnotations  # noqa: F401,E501
 from flyteadmin.models.admin_auth import AdminAuth  # noqa: F401,E501
+from flyteadmin.models.admin_auth_role import AdminAuthRole  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_launch_plan_metadata import AdminLaunchPlanMetadata  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
@@ -46,7 +47,8 @@ class AdminLaunchPlanSpec(object):
         'role': 'str',
         'labels': 'AdminLabels',
         'annotations': 'AdminAnnotations',
-        'auth': 'AdminAuth'
+        'auth': 'AdminAuth',
+        'auth_role': 'AdminAuthRole'
     }
 
     attribute_map = {
@@ -57,10 +59,11 @@ class AdminLaunchPlanSpec(object):
         'role': 'role',
         'labels': 'labels',
         'annotations': 'annotations',
-        'auth': 'auth'
+        'auth': 'auth',
+        'auth_role': 'auth_role'
     }
 
-    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None):  # noqa: E501
+    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None):  # noqa: E501
         """AdminLaunchPlanSpec - a model defined in Swagger"""  # noqa: E501
 
         self._workflow_id = None
@@ -71,6 +74,7 @@ class AdminLaunchPlanSpec(object):
         self._labels = None
         self._annotations = None
         self._auth = None
+        self._auth_role = None
         self.discriminator = None
 
         if workflow_id is not None:
@@ -89,6 +93,8 @@ class AdminLaunchPlanSpec(object):
             self.annotations = annotations
         if auth is not None:
             self.auth = auth
+        if auth_role is not None:
+            self.auth_role = auth_role
 
     @property
     def workflow_id(self):
@@ -263,6 +269,27 @@ class AdminLaunchPlanSpec(object):
         """
 
         self._auth = auth
+
+    @property
+    def auth_role(self):
+        """Gets the auth_role of this AdminLaunchPlanSpec.  # noqa: E501
+
+
+        :return: The auth_role of this AdminLaunchPlanSpec.  # noqa: E501
+        :rtype: AdminAuthRole
+        """
+        return self._auth_role
+
+    @auth_role.setter
+    def auth_role(self, auth_role):
+        """Sets the auth_role of this AdminLaunchPlanSpec.
+
+
+        :param auth_role: The auth_role of this AdminLaunchPlanSpec.  # noqa: E501
+        :type: AdminAuthRole
+        """
+
+        self._auth_role = auth_role
 
     def to_dict(self):
         """Returns the model properties as a dict"""

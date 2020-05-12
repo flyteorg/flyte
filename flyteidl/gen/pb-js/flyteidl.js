@@ -11728,11 +11728,13 @@ export const flyteidl = $root.flyteidl = (() => {
          * @enum {string}
          * @property {number} NAMED_ENTITY_ACTIVE=0 NAMED_ENTITY_ACTIVE value
          * @property {number} NAMED_ENTITY_ARCHIVED=1 NAMED_ENTITY_ARCHIVED value
+         * @property {number} SYSTEM_GENERATED=2 SYSTEM_GENERATED value
          */
         admin.NamedEntityState = (function() {
             const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "NAMED_ENTITY_ACTIVE"] = 0;
             values[valuesById[1] = "NAMED_ENTITY_ARCHIVED"] = 1;
+            values[valuesById[2] = "SYSTEM_GENERATED"] = 2;
             return values;
         })();
 
@@ -11860,6 +11862,7 @@ export const flyteidl = $root.flyteidl = (() => {
                         return "state: enum value expected";
                     case 0:
                     case 1:
+                    case 2:
                         break;
                     }
                 return null;
@@ -14485,6 +14488,154 @@ export const flyteidl = $root.flyteidl = (() => {
             };
 
             return Annotations;
+        })();
+
+        admin.AuthRole = (function() {
+
+            /**
+             * Properties of an AuthRole.
+             * @memberof flyteidl.admin
+             * @interface IAuthRole
+             * @property {string|null} [assumableIamRole] AuthRole assumableIamRole
+             * @property {string|null} [kubernetesServiceAccount] AuthRole kubernetesServiceAccount
+             */
+
+            /**
+             * Constructs a new AuthRole.
+             * @memberof flyteidl.admin
+             * @classdesc Represents an AuthRole.
+             * @implements IAuthRole
+             * @constructor
+             * @param {flyteidl.admin.IAuthRole=} [properties] Properties to set
+             */
+            function AuthRole(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * AuthRole assumableIamRole.
+             * @member {string} assumableIamRole
+             * @memberof flyteidl.admin.AuthRole
+             * @instance
+             */
+            AuthRole.prototype.assumableIamRole = "";
+
+            /**
+             * AuthRole kubernetesServiceAccount.
+             * @member {string} kubernetesServiceAccount
+             * @memberof flyteidl.admin.AuthRole
+             * @instance
+             */
+            AuthRole.prototype.kubernetesServiceAccount = "";
+
+            // OneOf field names bound to virtual getters and setters
+            let $oneOfFields;
+
+            /**
+             * AuthRole method.
+             * @member {"assumableIamRole"|"kubernetesServiceAccount"|undefined} method
+             * @memberof flyteidl.admin.AuthRole
+             * @instance
+             */
+            Object.defineProperty(AuthRole.prototype, "method", {
+                get: $util.oneOfGetter($oneOfFields = ["assumableIamRole", "kubernetesServiceAccount"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
+            /**
+             * Creates a new AuthRole instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.AuthRole
+             * @static
+             * @param {flyteidl.admin.IAuthRole=} [properties] Properties to set
+             * @returns {flyteidl.admin.AuthRole} AuthRole instance
+             */
+            AuthRole.create = function create(properties) {
+                return new AuthRole(properties);
+            };
+
+            /**
+             * Encodes the specified AuthRole message. Does not implicitly {@link flyteidl.admin.AuthRole.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.AuthRole
+             * @static
+             * @param {flyteidl.admin.IAuthRole} message AuthRole message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            AuthRole.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.assumableIamRole != null && message.hasOwnProperty("assumableIamRole"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.assumableIamRole);
+                if (message.kubernetesServiceAccount != null && message.hasOwnProperty("kubernetesServiceAccount"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.kubernetesServiceAccount);
+                return writer;
+            };
+
+            /**
+             * Decodes an AuthRole message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.AuthRole
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.AuthRole} AuthRole
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            AuthRole.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.AuthRole();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.assumableIamRole = reader.string();
+                        break;
+                    case 2:
+                        message.kubernetesServiceAccount = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies an AuthRole message.
+             * @function verify
+             * @memberof flyteidl.admin.AuthRole
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            AuthRole.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                let properties = {};
+                if (message.assumableIamRole != null && message.hasOwnProperty("assumableIamRole")) {
+                    properties.method = 1;
+                    if (!$util.isString(message.assumableIamRole))
+                        return "assumableIamRole: string expected";
+                }
+                if (message.kubernetesServiceAccount != null && message.hasOwnProperty("kubernetesServiceAccount")) {
+                    if (properties.method === 1)
+                        return "method: multiple values";
+                    properties.method = 1;
+                    if (!$util.isString(message.kubernetesServiceAccount))
+                        return "kubernetesServiceAccount: string expected";
+                }
+                return null;
+            };
+
+            return AuthRole;
         })();
 
         admin.EventErrorAlreadyInTerminalState = (function() {
@@ -17353,6 +17504,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {boolean|null} [disableAll] ExecutionSpec disableAll
              * @property {flyteidl.admin.ILabels|null} [labels] ExecutionSpec labels
              * @property {flyteidl.admin.IAnnotations|null} [annotations] ExecutionSpec annotations
+             * @property {flyteidl.admin.IAuthRole|null} [authRole] ExecutionSpec authRole
              */
 
             /**
@@ -17426,6 +17578,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             ExecutionSpec.prototype.annotations = null;
 
+            /**
+             * ExecutionSpec authRole.
+             * @member {flyteidl.admin.IAuthRole|null|undefined} authRole
+             * @memberof flyteidl.admin.ExecutionSpec
+             * @instance
+             */
+            ExecutionSpec.prototype.authRole = null;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -17478,6 +17638,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.Labels.encode(message.labels, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                 if (message.annotations != null && message.hasOwnProperty("annotations"))
                     $root.flyteidl.admin.Annotations.encode(message.annotations, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                if (message.authRole != null && message.hasOwnProperty("authRole"))
+                    $root.flyteidl.admin.AuthRole.encode(message.authRole, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
             };
 
@@ -17519,6 +17681,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 8:
                         message.annotations = $root.flyteidl.admin.Annotations.decode(reader, reader.uint32());
+                        break;
+                    case 16:
+                        message.authRole = $root.flyteidl.admin.AuthRole.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -17579,6 +17744,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.Annotations.verify(message.annotations);
                     if (error)
                         return "annotations." + error;
+                }
+                if (message.authRole != null && message.hasOwnProperty("authRole")) {
+                    let error = $root.flyteidl.admin.AuthRole.verify(message.authRole);
+                    if (error)
+                        return "authRole." + error;
                 }
                 return null;
             };
@@ -18738,6 +18908,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.admin.ILabels|null} [labels] LaunchPlanSpec labels
              * @property {flyteidl.admin.IAnnotations|null} [annotations] LaunchPlanSpec annotations
              * @property {flyteidl.admin.IAuth|null} [auth] LaunchPlanSpec auth
+             * @property {flyteidl.admin.IAuthRole|null} [authRole] LaunchPlanSpec authRole
              */
 
             /**
@@ -18820,6 +18991,14 @@ export const flyteidl = $root.flyteidl = (() => {
             LaunchPlanSpec.prototype.auth = null;
 
             /**
+             * LaunchPlanSpec authRole.
+             * @member {flyteidl.admin.IAuthRole|null|undefined} authRole
+             * @memberof flyteidl.admin.LaunchPlanSpec
+             * @instance
+             */
+            LaunchPlanSpec.prototype.authRole = null;
+
+            /**
              * Creates a new LaunchPlanSpec instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.LaunchPlanSpec
@@ -18859,6 +19038,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.Annotations.encode(message.annotations, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                 if (message.auth != null && message.hasOwnProperty("auth"))
                     $root.flyteidl.admin.Auth.encode(message.auth, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                if (message.authRole != null && message.hasOwnProperty("authRole"))
+                    $root.flyteidl.admin.AuthRole.encode(message.authRole, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                 return writer;
             };
 
@@ -18903,6 +19084,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 8:
                         message.auth = $root.flyteidl.admin.Auth.decode(reader, reader.uint32());
+                        break;
+                    case 9:
+                        message.authRole = $root.flyteidl.admin.AuthRole.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -18960,6 +19144,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.Auth.verify(message.auth);
                     if (error)
                         return "auth." + error;
+                }
+                if (message.authRole != null && message.hasOwnProperty("authRole")) {
+                    let error = $root.flyteidl.admin.AuthRole.verify(message.authRole);
+                    if (error)
+                        return "authRole." + error;
                 }
                 return null;
             };

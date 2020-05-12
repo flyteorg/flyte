@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.admin_annotations import AdminAnnotations  # noqa: F401,E501
+from flyteadmin.models.admin_auth_role import AdminAuthRole  # noqa: F401,E501
 from flyteadmin.models.admin_execution_metadata import AdminExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_notification_list import AdminNotificationList  # noqa: F401,E501
@@ -44,7 +45,8 @@ class AdminExecutionSpec(object):
         'notifications': 'AdminNotificationList',
         'disable_all': 'bool',
         'labels': 'AdminLabels',
-        'annotations': 'AdminAnnotations'
+        'annotations': 'AdminAnnotations',
+        'auth_role': 'AdminAuthRole'
     }
 
     attribute_map = {
@@ -54,10 +56,11 @@ class AdminExecutionSpec(object):
         'notifications': 'notifications',
         'disable_all': 'disable_all',
         'labels': 'labels',
-        'annotations': 'annotations'
+        'annotations': 'annotations',
+        'auth_role': 'auth_role'
     }
 
-    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None):  # noqa: E501
+    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, auth_role=None):  # noqa: E501
         """AdminExecutionSpec - a model defined in Swagger"""  # noqa: E501
 
         self._launch_plan = None
@@ -67,6 +70,7 @@ class AdminExecutionSpec(object):
         self._disable_all = None
         self._labels = None
         self._annotations = None
+        self._auth_role = None
         self.discriminator = None
 
         if launch_plan is not None:
@@ -83,6 +87,8 @@ class AdminExecutionSpec(object):
             self.labels = labels
         if annotations is not None:
             self.annotations = annotations
+        if auth_role is not None:
+            self.auth_role = auth_role
 
     @property
     def launch_plan(self):
@@ -238,6 +244,29 @@ class AdminExecutionSpec(object):
         """
 
         self._annotations = annotations
+
+    @property
+    def auth_role(self):
+        """Gets the auth_role of this AdminExecutionSpec.  # noqa: E501
+
+        Optional: auth override to apply this execution.  # noqa: E501
+
+        :return: The auth_role of this AdminExecutionSpec.  # noqa: E501
+        :rtype: AdminAuthRole
+        """
+        return self._auth_role
+
+    @auth_role.setter
+    def auth_role(self, auth_role):
+        """Sets the auth_role of this AdminExecutionSpec.
+
+        Optional: auth override to apply this execution.  # noqa: E501
+
+        :param auth_role: The auth_role of this AdminExecutionSpec.  # noqa: E501
+        :type: AdminAuthRole
+        """
+
+        self._auth_role = auth_role
 
     def to_dict(self):
         """Returns the model properties as a dict"""

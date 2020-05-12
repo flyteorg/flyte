@@ -2450,6 +2450,17 @@ definitions:
     example:
       kubernetes_service_account: "kubernetes_service_account"
       assumable_iam_role: "assumable_iam_role"
+  adminAuthRole:
+    type: "object"
+    properties:
+      assumable_iam_role:
+        type: "string"
+      kubernetes_service_account:
+        type: "string"
+    description: "Defines permissions associated with executions."
+    example:
+      kubernetes_service_account: "kubernetes_service_account"
+      assumable_iam_role: "assumable_iam_role"
   adminClusterResourceAttributes:
     type: "object"
     properties:
@@ -2633,6 +2644,9 @@ definitions:
         labels:
           values:
             key: "values"
+        auth_role:
+          kubernetes_service_account: "kubernetes_service_account"
+          assumable_iam_role: "assumable_iam_role"
   adminExecutionClosure:
     type: "object"
     properties:
@@ -2929,6 +2943,9 @@ definitions:
           labels:
             values:
               key: "values"
+          auth_role:
+            kubernetes_service_account: "kubernetes_service_account"
+            assumable_iam_role: "assumable_iam_role"
       - id:
           domain: "domain"
           name: "name"
@@ -3056,6 +3073,9 @@ definitions:
           labels:
             values:
               key: "values"
+          auth_role:
+            kubernetes_service_account: "kubernetes_service_account"
+            assumable_iam_role: "assumable_iam_role"
       token: "token"
   adminExecutionMetadata:
     type: "object"
@@ -3164,6 +3184,9 @@ definitions:
       annotations:
         description: "Annotations to apply to the execution resource."
         $ref: "#/definitions/adminAnnotations"
+      auth_role:
+        description: "Optional: auth override to apply this execution."
+        $ref: "#/definitions/adminAuthRole"
     description: "An ExecutionSpec encompasses all data used to launch this execution.\
       \ The Spec does not change over the lifetime\nof an execution as it progresses\
       \ across phase changes.."
@@ -3232,6 +3255,9 @@ definitions:
       labels:
         values:
           key: "values"
+      auth_role:
+        kubernetes_service_account: "kubernetes_service_account"
+        assumable_iam_role: "assumable_iam_role"
   adminExecutionTerminateRequest:
     type: "object"
     properties:
@@ -3541,6 +3567,9 @@ definitions:
         labels:
           values:
             key: "values"
+        auth_role:
+          kubernetes_service_account: "kubernetes_service_account"
+          assumable_iam_role: "assumable_iam_role"
   adminLaunchPlanClosure:
     type: "object"
     properties:
@@ -3945,6 +3974,9 @@ definitions:
           labels:
             values:
               key: "values"
+          auth_role:
+            kubernetes_service_account: "kubernetes_service_account"
+            assumable_iam_role: "assumable_iam_role"
       - id:
           domain: "domain"
           resource_type: {}
@@ -4188,6 +4220,9 @@ definitions:
           labels:
             values:
               key: "values"
+          auth_role:
+            kubernetes_service_account: "kubernetes_service_account"
+            assumable_iam_role: "assumable_iam_role"
       token: "token"
   adminLaunchPlanMetadata:
     type: "object"
@@ -4268,6 +4303,8 @@ definitions:
         description: "Indicates the permission associated with workflow executions\
           \ triggered with this launch plan."
         $ref: "#/definitions/adminAuth"
+      auth_role:
+        $ref: "#/definitions/adminAuthRole"
     description: "User-provided launch plan definition and configuration values."
     example:
       workflow_id:
@@ -4401,6 +4438,9 @@ definitions:
       labels:
         values:
           key: "values"
+      auth_role:
+        kubernetes_service_account: "kubernetes_service_account"
+        assumable_iam_role: "assumable_iam_role"
   adminLaunchPlanState:
     type: "string"
     description: "By default any launch plan regardless of state can be used to launch\
@@ -4706,10 +4746,12 @@ definitions:
     description: "The status of the named entity is used to control its visibility\
       \ in the UI.\n\n - NAMED_ENTITY_ACTIVE: By default, all named entities are considered\
       \ active and under development.\n - NAMED_ENTITY_ARCHIVED: Archived named entities\
-      \ are no longer visible in the UI."
+      \ are no longer visible in the UI.\n - SYSTEM_GENERATED: System generated entities\
+      \ that aren't explicitly created or managed by a user."
     enum:
     - "NAMED_ENTITY_ACTIVE"
     - "NAMED_ENTITY_ARCHIVED"
+    - "SYSTEM_GENERATED"
     default: "NAMED_ENTITY_ACTIVE"
   adminNamedEntityUpdateRequest:
     type: "object"

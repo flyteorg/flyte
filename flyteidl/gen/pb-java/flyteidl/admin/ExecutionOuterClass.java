@@ -14872,6 +14872,31 @@ public final class ExecutionOuterClass {
      */
     flyteidl.admin.Common.AnnotationsOrBuilder getAnnotationsOrBuilder();
 
+    /**
+     * <pre>
+     * Optional: auth override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     */
+    boolean hasAuthRole();
+    /**
+     * <pre>
+     * Optional: auth override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     */
+    flyteidl.admin.Common.AuthRole getAuthRole();
+    /**
+     * <pre>
+     * Optional: auth override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     */
+    flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder();
+
     public flyteidl.admin.ExecutionOuterClass.ExecutionSpec.NotificationOverridesCase getNotificationOverridesCase();
   }
   /**
@@ -14998,6 +15023,19 @@ public final class ExecutionOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(annotations_);
                 annotations_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 130: {
+              flyteidl.admin.Common.AuthRole.Builder subBuilder = null;
+              if (authRole_ != null) {
+                subBuilder = authRole_.toBuilder();
+              }
+              authRole_ = input.readMessage(flyteidl.admin.Common.AuthRole.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(authRole_);
+                authRole_ = subBuilder.buildPartial();
               }
 
               break;
@@ -15296,6 +15334,39 @@ public final class ExecutionOuterClass {
       return getAnnotations();
     }
 
+    public static final int AUTH_ROLE_FIELD_NUMBER = 16;
+    private flyteidl.admin.Common.AuthRole authRole_;
+    /**
+     * <pre>
+     * Optional: auth override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     */
+    public boolean hasAuthRole() {
+      return authRole_ != null;
+    }
+    /**
+     * <pre>
+     * Optional: auth override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     */
+    public flyteidl.admin.Common.AuthRole getAuthRole() {
+      return authRole_ == null ? flyteidl.admin.Common.AuthRole.getDefaultInstance() : authRole_;
+    }
+    /**
+     * <pre>
+     * Optional: auth override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     */
+    public flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder() {
+      return getAuthRole();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -15331,6 +15402,9 @@ public final class ExecutionOuterClass {
       }
       if (annotations_ != null) {
         output.writeMessage(8, getAnnotations());
+      }
+      if (authRole_ != null) {
+        output.writeMessage(16, getAuthRole());
       }
       unknownFields.writeTo(output);
     }
@@ -15369,6 +15443,10 @@ public final class ExecutionOuterClass {
       if (annotations_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, getAnnotations());
+      }
+      if (authRole_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(16, getAuthRole());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -15409,6 +15487,11 @@ public final class ExecutionOuterClass {
       if (hasAnnotations()) {
         if (!getAnnotations()
             .equals(other.getAnnotations())) return false;
+      }
+      if (hasAuthRole() != other.hasAuthRole()) return false;
+      if (hasAuthRole()) {
+        if (!getAuthRole()
+            .equals(other.getAuthRole())) return false;
       }
       if (!getNotificationOverridesCase().equals(other.getNotificationOverridesCase())) return false;
       switch (notificationOverridesCase_) {
@@ -15453,6 +15536,10 @@ public final class ExecutionOuterClass {
       if (hasAnnotations()) {
         hash = (37 * hash) + ANNOTATIONS_FIELD_NUMBER;
         hash = (53 * hash) + getAnnotations().hashCode();
+      }
+      if (hasAuthRole()) {
+        hash = (37 * hash) + AUTH_ROLE_FIELD_NUMBER;
+        hash = (53 * hash) + getAuthRole().hashCode();
       }
       switch (notificationOverridesCase_) {
         case 5:
@@ -15635,6 +15722,12 @@ public final class ExecutionOuterClass {
           annotations_ = null;
           annotationsBuilder_ = null;
         }
+        if (authRoleBuilder_ == null) {
+          authRole_ = null;
+        } else {
+          authRole_ = null;
+          authRoleBuilder_ = null;
+        }
         notificationOverridesCase_ = 0;
         notificationOverrides_ = null;
         return this;
@@ -15697,6 +15790,11 @@ public final class ExecutionOuterClass {
           result.annotations_ = annotations_;
         } else {
           result.annotations_ = annotationsBuilder_.build();
+        }
+        if (authRoleBuilder_ == null) {
+          result.authRole_ = authRole_;
+        } else {
+          result.authRole_ = authRoleBuilder_.build();
         }
         result.notificationOverridesCase_ = notificationOverridesCase_;
         onBuilt();
@@ -15761,6 +15859,9 @@ public final class ExecutionOuterClass {
         }
         if (other.hasAnnotations()) {
           mergeAnnotations(other.getAnnotations());
+        }
+        if (other.hasAuthRole()) {
+          mergeAuthRole(other.getAuthRole());
         }
         switch (other.getNotificationOverridesCase()) {
           case NOTIFICATIONS: {
@@ -16814,6 +16915,159 @@ public final class ExecutionOuterClass {
           annotations_ = null;
         }
         return annotationsBuilder_;
+      }
+
+      private flyteidl.admin.Common.AuthRole authRole_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.AuthRole, flyteidl.admin.Common.AuthRole.Builder, flyteidl.admin.Common.AuthRoleOrBuilder> authRoleBuilder_;
+      /**
+       * <pre>
+       * Optional: auth override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       */
+      public boolean hasAuthRole() {
+        return authRoleBuilder_ != null || authRole_ != null;
+      }
+      /**
+       * <pre>
+       * Optional: auth override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       */
+      public flyteidl.admin.Common.AuthRole getAuthRole() {
+        if (authRoleBuilder_ == null) {
+          return authRole_ == null ? flyteidl.admin.Common.AuthRole.getDefaultInstance() : authRole_;
+        } else {
+          return authRoleBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Optional: auth override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       */
+      public Builder setAuthRole(flyteidl.admin.Common.AuthRole value) {
+        if (authRoleBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          authRole_ = value;
+          onChanged();
+        } else {
+          authRoleBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional: auth override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       */
+      public Builder setAuthRole(
+          flyteidl.admin.Common.AuthRole.Builder builderForValue) {
+        if (authRoleBuilder_ == null) {
+          authRole_ = builderForValue.build();
+          onChanged();
+        } else {
+          authRoleBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional: auth override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       */
+      public Builder mergeAuthRole(flyteidl.admin.Common.AuthRole value) {
+        if (authRoleBuilder_ == null) {
+          if (authRole_ != null) {
+            authRole_ =
+              flyteidl.admin.Common.AuthRole.newBuilder(authRole_).mergeFrom(value).buildPartial();
+          } else {
+            authRole_ = value;
+          }
+          onChanged();
+        } else {
+          authRoleBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional: auth override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       */
+      public Builder clearAuthRole() {
+        if (authRoleBuilder_ == null) {
+          authRole_ = null;
+          onChanged();
+        } else {
+          authRole_ = null;
+          authRoleBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional: auth override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       */
+      public flyteidl.admin.Common.AuthRole.Builder getAuthRoleBuilder() {
+        
+        onChanged();
+        return getAuthRoleFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Optional: auth override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       */
+      public flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder() {
+        if (authRoleBuilder_ != null) {
+          return authRoleBuilder_.getMessageOrBuilder();
+        } else {
+          return authRole_ == null ?
+              flyteidl.admin.Common.AuthRole.getDefaultInstance() : authRole_;
+        }
+      }
+      /**
+       * <pre>
+       * Optional: auth override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.AuthRole, flyteidl.admin.Common.AuthRole.Builder, flyteidl.admin.Common.AuthRoleOrBuilder> 
+          getAuthRoleFieldBuilder() {
+        if (authRoleBuilder_ == null) {
+          authRoleBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.AuthRole, flyteidl.admin.Common.AuthRole.Builder, flyteidl.admin.Common.AuthRoleOrBuilder>(
+                  getAuthRole(),
+                  getParentForChildren(),
+                  isClean());
+          authRole_ = null;
+        }
+        return authRoleBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -19894,7 +20148,7 @@ public final class ExecutionOuterClass {
       "CHEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016" +
       "CHILD_WORKFLOW\020\004\"G\n\020NotificationList\0223\n\r" +
       "notifications\030\001 \003(\0132\034.flyteidl.admin.Not" +
-      "ification\"\357\002\n\rExecutionSpec\022.\n\013launch_pl" +
+      "ification\"\234\003\n\rExecutionSpec\022.\n\013launch_pl" +
       "an\030\001 \001(\0132\031.flyteidl.core.Identifier\022-\n\006i" +
       "nputs\030\002 \001(\0132\031.flyteidl.core.LiteralMapB\002" +
       "\030\001\0223\n\010metadata\030\003 \001(\0132!.flyteidl.admin.Ex" +
@@ -19902,18 +20156,19 @@ public final class ExecutionOuterClass {
       ".flyteidl.admin.NotificationListH\000\022\025\n\013di" +
       "sable_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyt" +
       "eidl.admin.Labels\0220\n\013annotations\030\010 \001(\0132\033" +
-      ".flyteidl.admin.AnnotationsB\030\n\026notificat" +
-      "ion_overridesJ\004\010\004\020\005\"b\n\031ExecutionTerminat" +
-      "eRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wor" +
-      "kflowExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"" +
-      "\034\n\032ExecutionTerminateResponse\"Y\n\037Workflo" +
-      "wExecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*.f" +
-      "lyteidl.core.WorkflowExecutionIdentifier" +
-      "\"u\n WorkflowExecutionGetDataResponse\022(\n\007" +
-      "outputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlob\022\'" +
-      "\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB" +
-      "3Z1github.com/lyft/flyteidl/gen/pb-go/fl" +
-      "yteidl/adminb\006proto3"
+      ".flyteidl.admin.Annotations\022+\n\tauth_role" +
+      "\030\020 \001(\0132\030.flyteidl.admin.AuthRoleB\030\n\026noti" +
+      "fication_overridesJ\004\010\004\020\005\"b\n\031ExecutionTer" +
+      "minateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.cor" +
+      "e.WorkflowExecutionIdentifier\022\r\n\005cause\030\002" +
+      " \001(\t\"\034\n\032ExecutionTerminateResponse\"Y\n\037Wo" +
+      "rkflowExecutionGetDataRequest\0226\n\002id\030\001 \001(" +
+      "\0132*.flyteidl.core.WorkflowExecutionIdent" +
+      "ifier\"u\n WorkflowExecutionGetDataRespons" +
+      "e\022(\n\007outputs\030\001 \001(\0132\027.flyteidl.admin.UrlB" +
+      "lob\022\'\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.Url" +
+      "BlobB3Z1github.com/lyft/flyteidl/gen/pb-" +
+      "go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20010,7 +20265,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionSpec_descriptor,
-        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "NotificationOverrides", });
+        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "AuthRole", "NotificationOverrides", });
     internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor =
       getDescriptor().getMessageTypes().get(13);
     internal_static_flyteidl_admin_ExecutionTerminateRequest_fieldAccessorTable = new

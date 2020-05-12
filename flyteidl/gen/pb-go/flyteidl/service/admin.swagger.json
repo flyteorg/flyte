@@ -2827,6 +2827,18 @@
       },
       "description": "Defines permissions associated with executions created by this launch plan spec."
     },
+    "adminAuthRole": {
+      "type": "object",
+      "properties": {
+        "assumable_iam_role": {
+          "type": "string"
+        },
+        "kubernetes_service_account": {
+          "type": "string"
+        }
+      },
+      "description": "Defines permissions associated with executions."
+    },
     "adminClusterResourceAttributes": {
       "type": "object",
       "properties": {
@@ -3094,6 +3106,10 @@
         "annotations": {
           "$ref": "#/definitions/adminAnnotations",
           "description": "Annotations to apply to the execution resource."
+        },
+        "auth_role": {
+          "$ref": "#/definitions/adminAuthRole",
+          "description": "Optional: auth override to apply this execution."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes.."
@@ -3278,6 +3294,9 @@
         "auth": {
           "$ref": "#/definitions/adminAuth",
           "description": "Indicates the permission associated with workflow executions triggered with this launch plan."
+        },
+        "auth_role": {
+          "$ref": "#/definitions/adminAuthRole"
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -3469,10 +3488,11 @@
       "type": "string",
       "enum": [
         "NAMED_ENTITY_ACTIVE",
-        "NAMED_ENTITY_ARCHIVED"
+        "NAMED_ENTITY_ARCHIVED",
+        "SYSTEM_GENERATED"
       ],
       "default": "NAMED_ENTITY_ACTIVE",
-      "description": "The status of the named entity is used to control its visibility in the UI.\n\n - NAMED_ENTITY_ACTIVE: By default, all named entities are considered active and under development.\n - NAMED_ENTITY_ARCHIVED: Archived named entities are no longer visible in the UI."
+      "description": "The status of the named entity is used to control its visibility in the UI.\n\n - NAMED_ENTITY_ACTIVE: By default, all named entities are considered active and under development.\n - NAMED_ENTITY_ARCHIVED: Archived named entities are no longer visible in the UI.\n - SYSTEM_GENERATED: System generated entities that aren't explicitly created or managed by a user."
     },
     "adminNamedEntityUpdateRequest": {
       "type": "object",

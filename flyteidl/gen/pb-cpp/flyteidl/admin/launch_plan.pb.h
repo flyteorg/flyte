@@ -957,14 +957,23 @@ class LaunchPlanSpec final :
   ::flyteidl::admin::Annotations* mutable_annotations();
   void set_allocated_annotations(::flyteidl::admin::Annotations* annotations);
 
-  // .flyteidl.admin.Auth auth = 8;
-  bool has_auth() const;
-  void clear_auth();
-  static const int kAuthFieldNumber = 8;
-  const ::flyteidl::admin::Auth& auth() const;
-  ::flyteidl::admin::Auth* release_auth();
-  ::flyteidl::admin::Auth* mutable_auth();
-  void set_allocated_auth(::flyteidl::admin::Auth* auth);
+  // .flyteidl.admin.Auth auth = 8 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_auth() const;
+  PROTOBUF_DEPRECATED void clear_auth();
+  PROTOBUF_DEPRECATED static const int kAuthFieldNumber = 8;
+  PROTOBUF_DEPRECATED const ::flyteidl::admin::Auth& auth() const;
+  PROTOBUF_DEPRECATED ::flyteidl::admin::Auth* release_auth();
+  PROTOBUF_DEPRECATED ::flyteidl::admin::Auth* mutable_auth();
+  PROTOBUF_DEPRECATED void set_allocated_auth(::flyteidl::admin::Auth* auth);
+
+  // .flyteidl.admin.AuthRole auth_role = 9;
+  bool has_auth_role() const;
+  void clear_auth_role();
+  static const int kAuthRoleFieldNumber = 9;
+  const ::flyteidl::admin::AuthRole& auth_role() const;
+  ::flyteidl::admin::AuthRole* release_auth_role();
+  ::flyteidl::admin::AuthRole* mutable_auth_role();
+  void set_allocated_auth_role(::flyteidl::admin::AuthRole* auth_role);
 
   // @@protoc_insertion_point(class_scope:flyteidl.admin.LaunchPlanSpec)
  private:
@@ -979,6 +988,7 @@ class LaunchPlanSpec final :
   ::flyteidl::admin::Labels* labels_;
   ::flyteidl::admin::Annotations* annotations_;
   ::flyteidl::admin::Auth* auth_;
+  ::flyteidl::admin::AuthRole* auth_role_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
 };
@@ -2650,7 +2660,7 @@ inline void LaunchPlanSpec::set_allocated_annotations(::flyteidl::admin::Annotat
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.annotations)
 }
 
-// .flyteidl.admin.Auth auth = 8;
+// .flyteidl.admin.Auth auth = 8 [deprecated = true];
 inline bool LaunchPlanSpec::has_auth() const {
   return this != internal_default_instance() && auth_ != nullptr;
 }
@@ -2699,6 +2709,51 @@ inline void LaunchPlanSpec::set_allocated_auth(::flyteidl::admin::Auth* auth) {
   }
   auth_ = auth;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.auth)
+}
+
+// .flyteidl.admin.AuthRole auth_role = 9;
+inline bool LaunchPlanSpec::has_auth_role() const {
+  return this != internal_default_instance() && auth_role_ != nullptr;
+}
+inline const ::flyteidl::admin::AuthRole& LaunchPlanSpec::auth_role() const {
+  const ::flyteidl::admin::AuthRole* p = auth_role_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.LaunchPlanSpec.auth_role)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::AuthRole*>(
+      &::flyteidl::admin::_AuthRole_default_instance_);
+}
+inline ::flyteidl::admin::AuthRole* LaunchPlanSpec::release_auth_role() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.LaunchPlanSpec.auth_role)
+  
+  ::flyteidl::admin::AuthRole* temp = auth_role_;
+  auth_role_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::AuthRole* LaunchPlanSpec::mutable_auth_role() {
+  
+  if (auth_role_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::AuthRole>(GetArenaNoVirtual());
+    auth_role_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.LaunchPlanSpec.auth_role)
+  return auth_role_;
+}
+inline void LaunchPlanSpec::set_allocated_auth_role(::flyteidl::admin::AuthRole* auth_role) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(auth_role_);
+  }
+  if (auth_role) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      auth_role = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, auth_role, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  auth_role_ = auth_role;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.auth_role)
 }
 
 // -------------------------------------------------------------------
