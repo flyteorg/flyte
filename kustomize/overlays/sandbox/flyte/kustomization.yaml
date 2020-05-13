@@ -19,4 +19,4 @@ bases:
 - ../redis
 
 # dependencies
-- ../dependencies/service.yaml
+- ../dependencies

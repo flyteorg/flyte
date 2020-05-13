@@ -1,0 +1,2 @@
+bases:
+  - ../dependencies/service.yaml
