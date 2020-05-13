@@ -846,7 +846,7 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - nodePort: 30082
+  - nodePort: 30084
     port: 9000
     protocol: TCP
   selector:
