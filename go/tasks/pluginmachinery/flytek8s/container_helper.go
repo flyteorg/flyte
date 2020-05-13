@@ -118,11 +118,12 @@ func ToK8sContainer(ctx context.Context, taskExecutionMetadata pluginsCore.TaskE
 		containerName = rand.String(4)
 	}
 	c := &v1.Container{
-		Name:    containerName,
-		Image:   taskContainer.GetImage(),
-		Args:    modifiedArgs,
-		Command: modifiedCommand,
-		Env:     envVars,
+		Name:                     containerName,
+		Image:                    taskContainer.GetImage(),
+		Args:                     modifiedArgs,
+		Command:                  modifiedCommand,
+		Env:                      envVars,
+		TerminationMessagePolicy: v1.TerminationMessageFallbackToLogsOnError,
 	}
 
 	if res != nil {
