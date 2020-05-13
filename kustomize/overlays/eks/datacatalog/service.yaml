@@ -5,4 +5,3 @@ metadata:
   namespace: flyte
 spec:
   type: NodePort
-

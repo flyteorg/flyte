@@ -17,3 +17,6 @@ bases:
 - ../../../base/adminserviceaccount
 - ../propeller
 - ../redis
+
+# dependencies
+- ../dependencies

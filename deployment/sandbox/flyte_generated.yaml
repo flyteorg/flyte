@@ -840,6 +840,22 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  labels:
+    app: minio
+  name: minio-direct
+  namespace: flyte
+spec:
+  ports:
+  - nodePort: 30084
+    port: 9000
+    protocol: TCP
+  selector:
+    app: minio
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: postgres
   namespace: flyte
 spec:
@@ -847,6 +863,22 @@ spec:
   - port: 5432
   selector:
     app: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: postgres
+  name: postgres-direct
+  namespace: flyte
+spec:
+  ports:
+  - nodePort: 30083
+    port: 5432
+    protocol: TCP
+  selector:
+    app: postgres
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
