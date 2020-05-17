@@ -3664,6 +3664,9 @@ export namespace flyteidl {
 
             /** Container ports */
             ports?: (flyteidl.core.IContainerPort[]|null);
+
+            /** Container dataConfig */
+            dataConfig?: (flyteidl.core.IDataLoadingConfig|null);
         }
 
         /** Represents a Container. */
@@ -3696,6 +3699,9 @@ export namespace flyteidl {
             /** Container ports. */
             public ports: flyteidl.core.IContainerPort[];
 
+            /** Container dataConfig. */
+            public dataConfig?: (flyteidl.core.IDataLoadingConfig|null);
+
             /**
              * Creates a new Container instance using the specified properties.
              * @param [properties] Properties to set
@@ -3727,6 +3733,86 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a DataLoadingConfig. */
+        interface IDataLoadingConfig {
+
+            /** DataLoadingConfig inputPath */
+            inputPath?: (string|null);
+
+            /** DataLoadingConfig outputPath */
+            outputPath?: (string|null);
+
+            /** DataLoadingConfig format */
+            format?: (flyteidl.core.DataLoadingConfig.MetadataFormat|null);
+
+            /** DataLoadingConfig enabled */
+            enabled?: (boolean|null);
+        }
+
+        /** Represents a DataLoadingConfig. */
+        class DataLoadingConfig implements IDataLoadingConfig {
+
+            /**
+             * Constructs a new DataLoadingConfig.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IDataLoadingConfig);
+
+            /** DataLoadingConfig inputPath. */
+            public inputPath: string;
+
+            /** DataLoadingConfig outputPath. */
+            public outputPath: string;
+
+            /** DataLoadingConfig format. */
+            public format: flyteidl.core.DataLoadingConfig.MetadataFormat;
+
+            /** DataLoadingConfig enabled. */
+            public enabled: boolean;
+
+            /**
+             * Creates a new DataLoadingConfig instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DataLoadingConfig instance
+             */
+            public static create(properties?: flyteidl.core.IDataLoadingConfig): flyteidl.core.DataLoadingConfig;
+
+            /**
+             * Encodes the specified DataLoadingConfig message. Does not implicitly {@link flyteidl.core.DataLoadingConfig.verify|verify} messages.
+             * @param message DataLoadingConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IDataLoadingConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DataLoadingConfig message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DataLoadingConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.DataLoadingConfig;
+
+            /**
+             * Verifies a DataLoadingConfig message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace DataLoadingConfig {
+
+            /** MetadataFormat enum. */
+            enum MetadataFormat {
+                JSON = 0,
+                YAML = 1,
+                PROTO = 2
+            }
         }
 
         /** Properties of a DynamicJobSpec. */
