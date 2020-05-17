@@ -22,4 +22,5 @@ type CoreContainer struct {
 	// Allows extra configs to be available for the container. TODO: elaborate on how configs will become available.
 	Config []CoreKeyValuePair `json:"config,omitempty"`
 	Ports []CoreContainerPort `json:"ports,omitempty"`
+	DataConfig *CoreDataLoadingConfig `json:"data_config,omitempty"`
 }

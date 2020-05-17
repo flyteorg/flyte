@@ -7712,6 +7712,7 @@ public final class Tasks {
      * <pre>
      * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
      * not supported on AWS Batch)
+     * Only K8s
      * </pre>
      *
      * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -7722,6 +7723,7 @@ public final class Tasks {
      * <pre>
      * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
      * not supported on AWS Batch)
+     * Only K8s
      * </pre>
      *
      * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -7731,6 +7733,7 @@ public final class Tasks {
      * <pre>
      * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
      * not supported on AWS Batch)
+     * Only K8s
      * </pre>
      *
      * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -7740,6 +7743,7 @@ public final class Tasks {
      * <pre>
      * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
      * not supported on AWS Batch)
+     * Only K8s
      * </pre>
      *
      * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -7750,12 +7754,56 @@ public final class Tasks {
      * <pre>
      * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
      * not supported on AWS Batch)
+     * Only K8s
      * </pre>
      *
      * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
      */
     flyteidl.core.Tasks.ContainerPortOrBuilder getPortsOrBuilder(
         int index);
+
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+     */
+    boolean hasDataConfig();
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+     */
+    flyteidl.core.Tasks.DataLoadingConfig getDataConfig();
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+     */
+    flyteidl.core.Tasks.DataLoadingConfigOrBuilder getDataConfigOrBuilder();
   }
   /**
    * Protobuf type {@code flyteidl.core.Container}
@@ -7864,6 +7912,19 @@ public final class Tasks {
               }
               ports_.add(
                   input.readMessage(flyteidl.core.Tasks.ContainerPort.parser(), extensionRegistry));
+              break;
+            }
+            case 74: {
+              flyteidl.core.Tasks.DataLoadingConfig.Builder subBuilder = null;
+              if (dataConfig_ != null) {
+                subBuilder = dataConfig_.toBuilder();
+              }
+              dataConfig_ = input.readMessage(flyteidl.core.Tasks.DataLoadingConfig.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(dataConfig_);
+                dataConfig_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -8208,6 +8269,7 @@ public final class Tasks {
      * <pre>
      * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
      * not supported on AWS Batch)
+     * Only K8s
      * </pre>
      *
      * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -8219,6 +8281,7 @@ public final class Tasks {
      * <pre>
      * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
      * not supported on AWS Batch)
+     * Only K8s
      * </pre>
      *
      * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -8231,6 +8294,7 @@ public final class Tasks {
      * <pre>
      * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
      * not supported on AWS Batch)
+     * Only K8s
      * </pre>
      *
      * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -8242,6 +8306,7 @@ public final class Tasks {
      * <pre>
      * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
      * not supported on AWS Batch)
+     * Only K8s
      * </pre>
      *
      * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -8253,6 +8318,7 @@ public final class Tasks {
      * <pre>
      * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
      * not supported on AWS Batch)
+     * Only K8s
      * </pre>
      *
      * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -8260,6 +8326,57 @@ public final class Tasks {
     public flyteidl.core.Tasks.ContainerPortOrBuilder getPortsOrBuilder(
         int index) {
       return ports_.get(index);
+    }
+
+    public static final int DATA_CONFIG_FIELD_NUMBER = 9;
+    private flyteidl.core.Tasks.DataLoadingConfig dataConfig_;
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+     */
+    public boolean hasDataConfig() {
+      return dataConfig_ != null;
+    }
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+     */
+    public flyteidl.core.Tasks.DataLoadingConfig getDataConfig() {
+      return dataConfig_ == null ? flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance() : dataConfig_;
+    }
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+     */
+    public flyteidl.core.Tasks.DataLoadingConfigOrBuilder getDataConfigOrBuilder() {
+      return getDataConfig();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -8296,6 +8413,9 @@ public final class Tasks {
       }
       for (int i = 0; i < ports_.size(); i++) {
         output.writeMessage(7, ports_.get(i));
+      }
+      if (dataConfig_ != null) {
+        output.writeMessage(9, getDataConfig());
       }
       unknownFields.writeTo(output);
     }
@@ -8341,6 +8461,10 @@ public final class Tasks {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(7, ports_.get(i));
       }
+      if (dataConfig_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(9, getDataConfig());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -8373,6 +8497,11 @@ public final class Tasks {
           .equals(other.getConfigList())) return false;
       if (!getPortsList()
           .equals(other.getPortsList())) return false;
+      if (hasDataConfig() != other.hasDataConfig()) return false;
+      if (hasDataConfig()) {
+        if (!getDataConfig()
+            .equals(other.getDataConfig())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -8409,6 +8538,10 @@ public final class Tasks {
       if (getPortsCount() > 0) {
         hash = (37 * hash) + PORTS_FIELD_NUMBER;
         hash = (53 * hash) + getPortsList().hashCode();
+      }
+      if (hasDataConfig()) {
+        hash = (37 * hash) + DATA_CONFIG_FIELD_NUMBER;
+        hash = (53 * hash) + getDataConfig().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -8576,6 +8709,12 @@ public final class Tasks {
         } else {
           portsBuilder_.clear();
         }
+        if (dataConfigBuilder_ == null) {
+          dataConfig_ = null;
+        } else {
+          dataConfig_ = null;
+          dataConfigBuilder_ = null;
+        }
         return this;
       }
 
@@ -8646,6 +8785,11 @@ public final class Tasks {
           result.ports_ = ports_;
         } else {
           result.ports_ = portsBuilder_.build();
+        }
+        if (dataConfigBuilder_ == null) {
+          result.dataConfig_ = dataConfig_;
+        } else {
+          result.dataConfig_ = dataConfigBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -8800,6 +8944,9 @@ public final class Tasks {
               portsBuilder_.addAllMessages(other.ports_);
             }
           }
+        }
+        if (other.hasDataConfig()) {
+          mergeDataConfig(other.getDataConfig());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -10009,6 +10156,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10024,6 +10172,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10039,6 +10188,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10054,6 +10204,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10076,6 +10227,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10095,6 +10247,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10116,6 +10269,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10138,6 +10292,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10157,6 +10312,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10176,6 +10332,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10196,6 +10353,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10214,6 +10372,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10232,6 +10391,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10244,6 +10404,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10259,6 +10420,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10275,6 +10437,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10287,6 +10450,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10300,6 +10464,7 @@ public final class Tasks {
        * <pre>
        * Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
        * not supported on AWS Batch)
+       * Only K8s
        * </pre>
        *
        * <code>repeated .flyteidl.core.ContainerPort ports = 7;</code>
@@ -10321,6 +10486,213 @@ public final class Tasks {
           ports_ = null;
         }
         return portsBuilder_;
+      }
+
+      private flyteidl.core.Tasks.DataLoadingConfig dataConfig_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.DataLoadingConfig, flyteidl.core.Tasks.DataLoadingConfig.Builder, flyteidl.core.Tasks.DataLoadingConfigOrBuilder> dataConfigBuilder_;
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+       */
+      public boolean hasDataConfig() {
+        return dataConfigBuilder_ != null || dataConfig_ != null;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+       */
+      public flyteidl.core.Tasks.DataLoadingConfig getDataConfig() {
+        if (dataConfigBuilder_ == null) {
+          return dataConfig_ == null ? flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance() : dataConfig_;
+        } else {
+          return dataConfigBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+       */
+      public Builder setDataConfig(flyteidl.core.Tasks.DataLoadingConfig value) {
+        if (dataConfigBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          dataConfig_ = value;
+          onChanged();
+        } else {
+          dataConfigBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+       */
+      public Builder setDataConfig(
+          flyteidl.core.Tasks.DataLoadingConfig.Builder builderForValue) {
+        if (dataConfigBuilder_ == null) {
+          dataConfig_ = builderForValue.build();
+          onChanged();
+        } else {
+          dataConfigBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+       */
+      public Builder mergeDataConfig(flyteidl.core.Tasks.DataLoadingConfig value) {
+        if (dataConfigBuilder_ == null) {
+          if (dataConfig_ != null) {
+            dataConfig_ =
+              flyteidl.core.Tasks.DataLoadingConfig.newBuilder(dataConfig_).mergeFrom(value).buildPartial();
+          } else {
+            dataConfig_ = value;
+          }
+          onChanged();
+        } else {
+          dataConfigBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+       */
+      public Builder clearDataConfig() {
+        if (dataConfigBuilder_ == null) {
+          dataConfig_ = null;
+          onChanged();
+        } else {
+          dataConfig_ = null;
+          dataConfigBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+       */
+      public flyteidl.core.Tasks.DataLoadingConfig.Builder getDataConfigBuilder() {
+        
+        onChanged();
+        return getDataConfigFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+       */
+      public flyteidl.core.Tasks.DataLoadingConfigOrBuilder getDataConfigOrBuilder() {
+        if (dataConfigBuilder_ != null) {
+          return dataConfigBuilder_.getMessageOrBuilder();
+        } else {
+          return dataConfig_ == null ?
+              flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance() : dataConfig_;
+        }
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 9;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.DataLoadingConfig, flyteidl.core.Tasks.DataLoadingConfig.Builder, flyteidl.core.Tasks.DataLoadingConfigOrBuilder> 
+          getDataConfigFieldBuilder() {
+        if (dataConfigBuilder_ == null) {
+          dataConfigBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.DataLoadingConfig, flyteidl.core.Tasks.DataLoadingConfig.Builder, flyteidl.core.Tasks.DataLoadingConfigOrBuilder>(
+                  getDataConfig(),
+                  getParentForChildren(),
+                  isClean());
+          dataConfig_ = null;
+        }
+        return dataConfigBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -10375,6 +10747,1182 @@ public final class Tasks {
 
   }
 
+  public interface DataLoadingConfigOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.DataLoadingConfig)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * File system path (start at root). This folder will contain all the inputs exploded to a separate file. 
+     * Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
+     * /var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations 
+     * /var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format
+     * /var/flyte/inputs/y -&gt; Y is a file in Binary format
+     * /var/flyte/inputs/z/... -&gt; Note Z itself is a directory
+     * More information about the protocol - refer to docs #TODO reference docs here
+     * </pre>
+     *
+     * <code>string input_path = 1;</code>
+     */
+    java.lang.String getInputPath();
+    /**
+     * <pre>
+     * File system path (start at root). This folder will contain all the inputs exploded to a separate file. 
+     * Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
+     * /var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations 
+     * /var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format
+     * /var/flyte/inputs/y -&gt; Y is a file in Binary format
+     * /var/flyte/inputs/z/... -&gt; Note Z itself is a directory
+     * More information about the protocol - refer to docs #TODO reference docs here
+     * </pre>
+     *
+     * <code>string input_path = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getInputPathBytes();
+
+    /**
+     * <pre>
+     * File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file
+     * </pre>
+     *
+     * <code>string output_path = 2;</code>
+     */
+    java.lang.String getOutputPath();
+    /**
+     * <pre>
+     * File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file
+     * </pre>
+     *
+     * <code>string output_path = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getOutputPathBytes();
+
+    /**
+     * <pre>
+     * In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+     * This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;</code>
+     */
+    int getFormatValue();
+    /**
+     * <pre>
+     * In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+     * This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;</code>
+     */
+    flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat getFormat();
+
+    /**
+     * <pre>
+     * Flag enables DataLoading Config. If this is not set, data loading will not be used! 
+     * </pre>
+     *
+     * <code>bool enabled = 4;</code>
+     */
+    boolean getEnabled();
+  }
+  /**
+   * <pre>
+   * This configuration allows executing raw containers in Flyte using the Flyte CoPilot system.
+   * Flyte CoPilot, eliminates the needs of flytekit or sdk inside the container. Any inputs required by the users container are side-loaded in the input_path
+   * Any outputs generated by the user container - within output_path are automatically uploaded.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.DataLoadingConfig}
+   */
+  public  static final class DataLoadingConfig extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.DataLoadingConfig)
+      DataLoadingConfigOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use DataLoadingConfig.newBuilder() to construct.
+    private DataLoadingConfig(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private DataLoadingConfig() {
+      inputPath_ = "";
+      outputPath_ = "";
+      format_ = 0;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private DataLoadingConfig(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              inputPath_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              outputPath_ = s;
+              break;
+            }
+            case 24: {
+              int rawValue = input.readEnum();
+
+              format_ = rawValue;
+              break;
+            }
+            case 32: {
+
+              enabled_ = input.readBool();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_DataLoadingConfig_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_DataLoadingConfig_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Tasks.DataLoadingConfig.class, flyteidl.core.Tasks.DataLoadingConfig.Builder.class);
+    }
+
+    /**
+     * <pre>
+     * MetadataFormat decides the encoding format in which the input metadata should be made available to the containers. 
+     * If the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.
+     * JSON and YAML do not need any protobuf definitions to read it
+     * All remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)
+     * </pre>
+     *
+     * Protobuf enum {@code flyteidl.core.DataLoadingConfig.MetadataFormat}
+     */
+    public enum MetadataFormat
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <pre>
+       * JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html
+       * </pre>
+       *
+       * <code>JSON = 0;</code>
+       */
+      JSON(0),
+      /**
+       * <code>YAML = 1;</code>
+       */
+      YAML(1),
+      /**
+       * <pre>
+       * Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core
+       * </pre>
+       *
+       * <code>PROTO = 2;</code>
+       */
+      PROTO(2),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <pre>
+       * JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html
+       * </pre>
+       *
+       * <code>JSON = 0;</code>
+       */
+      public static final int JSON_VALUE = 0;
+      /**
+       * <code>YAML = 1;</code>
+       */
+      public static final int YAML_VALUE = 1;
+      /**
+       * <pre>
+       * Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core
+       * </pre>
+       *
+       * <code>PROTO = 2;</code>
+       */
+      public static final int PROTO_VALUE = 2;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static MetadataFormat valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static MetadataFormat forNumber(int value) {
+        switch (value) {
+          case 0: return JSON;
+          case 1: return YAML;
+          case 2: return PROTO;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<MetadataFormat>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          MetadataFormat> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<MetadataFormat>() {
+              public MetadataFormat findValueByNumber(int number) {
+                return MetadataFormat.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return flyteidl.core.Tasks.DataLoadingConfig.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final MetadataFormat[] VALUES = values();
+
+      public static MetadataFormat valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private MetadataFormat(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:flyteidl.core.DataLoadingConfig.MetadataFormat)
+    }
+
+    public static final int INPUT_PATH_FIELD_NUMBER = 1;
+    private volatile java.lang.Object inputPath_;
+    /**
+     * <pre>
+     * File system path (start at root). This folder will contain all the inputs exploded to a separate file. 
+     * Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
+     * /var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations 
+     * /var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format
+     * /var/flyte/inputs/y -&gt; Y is a file in Binary format
+     * /var/flyte/inputs/z/... -&gt; Note Z itself is a directory
+     * More information about the protocol - refer to docs #TODO reference docs here
+     * </pre>
+     *
+     * <code>string input_path = 1;</code>
+     */
+    public java.lang.String getInputPath() {
+      java.lang.Object ref = inputPath_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        inputPath_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * File system path (start at root). This folder will contain all the inputs exploded to a separate file. 
+     * Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
+     * /var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations 
+     * /var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format
+     * /var/flyte/inputs/y -&gt; Y is a file in Binary format
+     * /var/flyte/inputs/z/... -&gt; Note Z itself is a directory
+     * More information about the protocol - refer to docs #TODO reference docs here
+     * </pre>
+     *
+     * <code>string input_path = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getInputPathBytes() {
+      java.lang.Object ref = inputPath_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        inputPath_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int OUTPUT_PATH_FIELD_NUMBER = 2;
+    private volatile java.lang.Object outputPath_;
+    /**
+     * <pre>
+     * File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file
+     * </pre>
+     *
+     * <code>string output_path = 2;</code>
+     */
+    public java.lang.String getOutputPath() {
+      java.lang.Object ref = outputPath_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        outputPath_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file
+     * </pre>
+     *
+     * <code>string output_path = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOutputPathBytes() {
+      java.lang.Object ref = outputPath_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        outputPath_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int FORMAT_FIELD_NUMBER = 3;
+    private int format_;
+    /**
+     * <pre>
+     * In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+     * This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;</code>
+     */
+    public int getFormatValue() {
+      return format_;
+    }
+    /**
+     * <pre>
+     * In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+     * This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;</code>
+     */
+    public flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat getFormat() {
+      @SuppressWarnings("deprecation")
+      flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat result = flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat.valueOf(format_);
+      return result == null ? flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat.UNRECOGNIZED : result;
+    }
+
+    public static final int ENABLED_FIELD_NUMBER = 4;
+    private boolean enabled_;
+    /**
+     * <pre>
+     * Flag enables DataLoading Config. If this is not set, data loading will not be used! 
+     * </pre>
+     *
+     * <code>bool enabled = 4;</code>
+     */
+    public boolean getEnabled() {
+      return enabled_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getInputPathBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, inputPath_);
+      }
+      if (!getOutputPathBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, outputPath_);
+      }
+      if (format_ != flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat.JSON.getNumber()) {
+        output.writeEnum(3, format_);
+      }
+      if (enabled_ != false) {
+        output.writeBool(4, enabled_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getInputPathBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, inputPath_);
+      }
+      if (!getOutputPathBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, outputPath_);
+      }
+      if (format_ != flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat.JSON.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(3, format_);
+      }
+      if (enabled_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, enabled_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Tasks.DataLoadingConfig)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Tasks.DataLoadingConfig other = (flyteidl.core.Tasks.DataLoadingConfig) obj;
+
+      if (!getInputPath()
+          .equals(other.getInputPath())) return false;
+      if (!getOutputPath()
+          .equals(other.getOutputPath())) return false;
+      if (format_ != other.format_) return false;
+      if (getEnabled()
+          != other.getEnabled()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + INPUT_PATH_FIELD_NUMBER;
+      hash = (53 * hash) + getInputPath().hashCode();
+      hash = (37 * hash) + OUTPUT_PATH_FIELD_NUMBER;
+      hash = (53 * hash) + getOutputPath().hashCode();
+      hash = (37 * hash) + FORMAT_FIELD_NUMBER;
+      hash = (53 * hash) + format_;
+      hash = (37 * hash) + ENABLED_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getEnabled());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Tasks.DataLoadingConfig parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.DataLoadingConfig parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Tasks.DataLoadingConfig prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * This configuration allows executing raw containers in Flyte using the Flyte CoPilot system.
+     * Flyte CoPilot, eliminates the needs of flytekit or sdk inside the container. Any inputs required by the users container are side-loaded in the input_path
+     * Any outputs generated by the user container - within output_path are automatically uploaded.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.DataLoadingConfig}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.DataLoadingConfig)
+        flyteidl.core.Tasks.DataLoadingConfigOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_DataLoadingConfig_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_DataLoadingConfig_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Tasks.DataLoadingConfig.class, flyteidl.core.Tasks.DataLoadingConfig.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Tasks.DataLoadingConfig.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        inputPath_ = "";
+
+        outputPath_ = "";
+
+        format_ = 0;
+
+        enabled_ = false;
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_DataLoadingConfig_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.DataLoadingConfig getDefaultInstanceForType() {
+        return flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.DataLoadingConfig build() {
+        flyteidl.core.Tasks.DataLoadingConfig result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.DataLoadingConfig buildPartial() {
+        flyteidl.core.Tasks.DataLoadingConfig result = new flyteidl.core.Tasks.DataLoadingConfig(this);
+        result.inputPath_ = inputPath_;
+        result.outputPath_ = outputPath_;
+        result.format_ = format_;
+        result.enabled_ = enabled_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Tasks.DataLoadingConfig) {
+          return mergeFrom((flyteidl.core.Tasks.DataLoadingConfig)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Tasks.DataLoadingConfig other) {
+        if (other == flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance()) return this;
+        if (!other.getInputPath().isEmpty()) {
+          inputPath_ = other.inputPath_;
+          onChanged();
+        }
+        if (!other.getOutputPath().isEmpty()) {
+          outputPath_ = other.outputPath_;
+          onChanged();
+        }
+        if (other.format_ != 0) {
+          setFormatValue(other.getFormatValue());
+        }
+        if (other.getEnabled() != false) {
+          setEnabled(other.getEnabled());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Tasks.DataLoadingConfig parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Tasks.DataLoadingConfig) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object inputPath_ = "";
+      /**
+       * <pre>
+       * File system path (start at root). This folder will contain all the inputs exploded to a separate file. 
+       * Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
+       * /var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations 
+       * /var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format
+       * /var/flyte/inputs/y -&gt; Y is a file in Binary format
+       * /var/flyte/inputs/z/... -&gt; Note Z itself is a directory
+       * More information about the protocol - refer to docs #TODO reference docs here
+       * </pre>
+       *
+       * <code>string input_path = 1;</code>
+       */
+      public java.lang.String getInputPath() {
+        java.lang.Object ref = inputPath_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          inputPath_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * File system path (start at root). This folder will contain all the inputs exploded to a separate file. 
+       * Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
+       * /var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations 
+       * /var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format
+       * /var/flyte/inputs/y -&gt; Y is a file in Binary format
+       * /var/flyte/inputs/z/... -&gt; Note Z itself is a directory
+       * More information about the protocol - refer to docs #TODO reference docs here
+       * </pre>
+       *
+       * <code>string input_path = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getInputPathBytes() {
+        java.lang.Object ref = inputPath_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          inputPath_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * File system path (start at root). This folder will contain all the inputs exploded to a separate file. 
+       * Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
+       * /var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations 
+       * /var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format
+       * /var/flyte/inputs/y -&gt; Y is a file in Binary format
+       * /var/flyte/inputs/z/... -&gt; Note Z itself is a directory
+       * More information about the protocol - refer to docs #TODO reference docs here
+       * </pre>
+       *
+       * <code>string input_path = 1;</code>
+       */
+      public Builder setInputPath(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        inputPath_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * File system path (start at root). This folder will contain all the inputs exploded to a separate file. 
+       * Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
+       * /var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations 
+       * /var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format
+       * /var/flyte/inputs/y -&gt; Y is a file in Binary format
+       * /var/flyte/inputs/z/... -&gt; Note Z itself is a directory
+       * More information about the protocol - refer to docs #TODO reference docs here
+       * </pre>
+       *
+       * <code>string input_path = 1;</code>
+       */
+      public Builder clearInputPath() {
+        
+        inputPath_ = getDefaultInstance().getInputPath();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * File system path (start at root). This folder will contain all the inputs exploded to a separate file. 
+       * Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
+       * /var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations 
+       * /var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format
+       * /var/flyte/inputs/y -&gt; Y is a file in Binary format
+       * /var/flyte/inputs/z/... -&gt; Note Z itself is a directory
+       * More information about the protocol - refer to docs #TODO reference docs here
+       * </pre>
+       *
+       * <code>string input_path = 1;</code>
+       */
+      public Builder setInputPathBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        inputPath_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object outputPath_ = "";
+      /**
+       * <pre>
+       * File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file
+       * </pre>
+       *
+       * <code>string output_path = 2;</code>
+       */
+      public java.lang.String getOutputPath() {
+        java.lang.Object ref = outputPath_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          outputPath_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file
+       * </pre>
+       *
+       * <code>string output_path = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOutputPathBytes() {
+        java.lang.Object ref = outputPath_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          outputPath_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file
+       * </pre>
+       *
+       * <code>string output_path = 2;</code>
+       */
+      public Builder setOutputPath(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        outputPath_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file
+       * </pre>
+       *
+       * <code>string output_path = 2;</code>
+       */
+      public Builder clearOutputPath() {
+        
+        outputPath_ = getDefaultInstance().getOutputPath();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file
+       * </pre>
+       *
+       * <code>string output_path = 2;</code>
+       */
+      public Builder setOutputPathBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        outputPath_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int format_ = 0;
+      /**
+       * <pre>
+       * In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+       * This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;</code>
+       */
+      public int getFormatValue() {
+        return format_;
+      }
+      /**
+       * <pre>
+       * In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+       * This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;</code>
+       */
+      public Builder setFormatValue(int value) {
+        format_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+       * This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;</code>
+       */
+      public flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat getFormat() {
+        @SuppressWarnings("deprecation")
+        flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat result = flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat.valueOf(format_);
+        return result == null ? flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat.UNRECOGNIZED : result;
+      }
+      /**
+       * <pre>
+       * In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+       * This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;</code>
+       */
+      public Builder setFormat(flyteidl.core.Tasks.DataLoadingConfig.MetadataFormat value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        format_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+       * This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;</code>
+       */
+      public Builder clearFormat() {
+        
+        format_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private boolean enabled_ ;
+      /**
+       * <pre>
+       * Flag enables DataLoading Config. If this is not set, data loading will not be used! 
+       * </pre>
+       *
+       * <code>bool enabled = 4;</code>
+       */
+      public boolean getEnabled() {
+        return enabled_;
+      }
+      /**
+       * <pre>
+       * Flag enables DataLoading Config. If this is not set, data loading will not be used! 
+       * </pre>
+       *
+       * <code>bool enabled = 4;</code>
+       */
+      public Builder setEnabled(boolean value) {
+        
+        enabled_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Flag enables DataLoading Config. If this is not set, data loading will not be used! 
+       * </pre>
+       *
+       * <code>bool enabled = 4;</code>
+       */
+      public Builder clearEnabled() {
+        
+        enabled_ = false;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.DataLoadingConfig)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.DataLoadingConfig)
+    private static final flyteidl.core.Tasks.DataLoadingConfig DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Tasks.DataLoadingConfig();
+    }
+
+    public static flyteidl.core.Tasks.DataLoadingConfig getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<DataLoadingConfig>
+        PARSER = new com.google.protobuf.AbstractParser<DataLoadingConfig>() {
+      @java.lang.Override
+      public DataLoadingConfig parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new DataLoadingConfig(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<DataLoadingConfig> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<DataLoadingConfig> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Tasks.DataLoadingConfig getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_Resources_descriptor;
   private static final 
@@ -10410,6 +11958,11 @@ public final class Tasks {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_Container_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_DataLoadingConfig_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_DataLoadingConfig_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -10449,15 +12002,21 @@ public final class Tasks {
       "Interface\022\'\n\006custom\030\005 \001(\0132\027.google.proto" +
       "buf.Struct\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl" +
       ".core.ContainerH\000B\010\n\006target\"\'\n\rContainer" +
-      "Port\022\026\n\016container_port\030\001 \001(\r\"\352\001\n\tContain" +
+      "Port\022\026\n\016container_port\030\001 \001(\r\"\241\002\n\tContain" +
       "er\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004ar" +
       "gs\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.flyteidl.c" +
       "ore.Resources\022(\n\003env\030\005 \003(\0132\033.flyteidl.co" +
       "re.KeyValuePair\022+\n\006config\030\006 \003(\0132\033.flytei" +
       "dl.core.KeyValuePair\022+\n\005ports\030\007 \003(\0132\034.fl" +
-      "yteidl.core.ContainerPortB2Z0github.com/" +
-      "lyft/flyteidl/gen/pb-go/flyteidl/coreb\006p" +
-      "roto3"
+      "yteidl.core.ContainerPort\0225\n\013data_config" +
+      "\030\t \001(\0132 .flyteidl.core.DataLoadingConfig" +
+      "\"\277\001\n\021DataLoadingConfig\022\022\n\ninput_path\030\001 \001" +
+      "(\t\022\023\n\013output_path\030\002 \001(\t\022?\n\006format\030\003 \001(\0162" +
+      "/.flyteidl.core.DataLoadingConfig.Metada" +
+      "taFormat\022\017\n\007enabled\030\004 \001(\010\"/\n\016MetadataFor" +
+      "mat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002B2Z0gi" +
+      "thub.com/lyft/flyteidl/gen/pb-go/flyteid" +
+      "l/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10517,7 +12076,13 @@ public final class Tasks {
     internal_static_flyteidl_core_Container_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Container_descriptor,
-        new java.lang.String[] { "Image", "Command", "Args", "Resources", "Env", "Config", "Ports", });
+        new java.lang.String[] { "Image", "Command", "Args", "Resources", "Env", "Config", "Ports", "DataConfig", });
+    internal_static_flyteidl_core_DataLoadingConfig_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_flyteidl_core_DataLoadingConfig_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_DataLoadingConfig_descriptor,
+        new java.lang.String[] { "InputPath", "OutputPath", "Format", "Enabled", });
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Interface.getDescriptor();
     flyteidl.core.Literals.getDescriptor();

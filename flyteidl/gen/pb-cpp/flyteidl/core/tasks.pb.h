@@ -47,7 +47,7 @@ struct TableStruct_flyteidl_2fcore_2ftasks_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[7]
+  static const ::google::protobuf::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -62,6 +62,9 @@ extern ContainerDefaultTypeInternal _Container_default_instance_;
 class ContainerPort;
 class ContainerPortDefaultTypeInternal;
 extern ContainerPortDefaultTypeInternal _ContainerPort_default_instance_;
+class DataLoadingConfig;
+class DataLoadingConfigDefaultTypeInternal;
+extern DataLoadingConfigDefaultTypeInternal _DataLoadingConfig_default_instance_;
 class Resources;
 class ResourcesDefaultTypeInternal;
 extern ResourcesDefaultTypeInternal _Resources_default_instance_;
@@ -83,6 +86,7 @@ namespace google {
 namespace protobuf {
 template<> ::flyteidl::core::Container* Arena::CreateMaybeMessage<::flyteidl::core::Container>(Arena*);
 template<> ::flyteidl::core::ContainerPort* Arena::CreateMaybeMessage<::flyteidl::core::ContainerPort>(Arena*);
+template<> ::flyteidl::core::DataLoadingConfig* Arena::CreateMaybeMessage<::flyteidl::core::DataLoadingConfig>(Arena*);
 template<> ::flyteidl::core::Resources* Arena::CreateMaybeMessage<::flyteidl::core::Resources>(Arena*);
 template<> ::flyteidl::core::Resources_ResourceEntry* Arena::CreateMaybeMessage<::flyteidl::core::Resources_ResourceEntry>(Arena*);
 template<> ::flyteidl::core::RuntimeMetadata* Arena::CreateMaybeMessage<::flyteidl::core::RuntimeMetadata>(Arena*);
@@ -137,6 +141,28 @@ inline bool RuntimeMetadata_RuntimeType_Parse(
     const ::std::string& name, RuntimeMetadata_RuntimeType* value) {
   return ::google::protobuf::internal::ParseNamedEnum<RuntimeMetadata_RuntimeType>(
     RuntimeMetadata_RuntimeType_descriptor(), name, value);
+}
+enum DataLoadingConfig_MetadataFormat {
+  DataLoadingConfig_MetadataFormat_JSON = 0,
+  DataLoadingConfig_MetadataFormat_YAML = 1,
+  DataLoadingConfig_MetadataFormat_PROTO = 2,
+  DataLoadingConfig_MetadataFormat_DataLoadingConfig_MetadataFormat_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  DataLoadingConfig_MetadataFormat_DataLoadingConfig_MetadataFormat_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool DataLoadingConfig_MetadataFormat_IsValid(int value);
+const DataLoadingConfig_MetadataFormat DataLoadingConfig_MetadataFormat_MetadataFormat_MIN = DataLoadingConfig_MetadataFormat_JSON;
+const DataLoadingConfig_MetadataFormat DataLoadingConfig_MetadataFormat_MetadataFormat_MAX = DataLoadingConfig_MetadataFormat_PROTO;
+const int DataLoadingConfig_MetadataFormat_MetadataFormat_ARRAYSIZE = DataLoadingConfig_MetadataFormat_MetadataFormat_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* DataLoadingConfig_MetadataFormat_descriptor();
+inline const ::std::string& DataLoadingConfig_MetadataFormat_Name(DataLoadingConfig_MetadataFormat value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    DataLoadingConfig_MetadataFormat_descriptor(), value);
+}
+inline bool DataLoadingConfig_MetadataFormat_Parse(
+    const ::std::string& name, DataLoadingConfig_MetadataFormat* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<DataLoadingConfig_MetadataFormat>(
+    DataLoadingConfig_MetadataFormat_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -1294,6 +1320,15 @@ class Container final :
   ::flyteidl::core::Resources* mutable_resources();
   void set_allocated_resources(::flyteidl::core::Resources* resources);
 
+  // .flyteidl.core.DataLoadingConfig data_config = 9;
+  bool has_data_config() const;
+  void clear_data_config();
+  static const int kDataConfigFieldNumber = 9;
+  const ::flyteidl::core::DataLoadingConfig& data_config() const;
+  ::flyteidl::core::DataLoadingConfig* release_data_config();
+  ::flyteidl::core::DataLoadingConfig* mutable_data_config();
+  void set_allocated_data_config(::flyteidl::core::DataLoadingConfig* data_config);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.Container)
  private:
   class HasBitSetters;
@@ -1306,6 +1341,184 @@ class Container final :
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ContainerPort > ports_;
   ::google::protobuf::internal::ArenaStringPtr image_;
   ::flyteidl::core::Resources* resources_;
+  ::flyteidl::core::DataLoadingConfig* data_config_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2ftasks_2eproto;
+};
+// -------------------------------------------------------------------
+
+class DataLoadingConfig final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.DataLoadingConfig) */ {
+ public:
+  DataLoadingConfig();
+  virtual ~DataLoadingConfig();
+
+  DataLoadingConfig(const DataLoadingConfig& from);
+
+  inline DataLoadingConfig& operator=(const DataLoadingConfig& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DataLoadingConfig(DataLoadingConfig&& from) noexcept
+    : DataLoadingConfig() {
+    *this = ::std::move(from);
+  }
+
+  inline DataLoadingConfig& operator=(DataLoadingConfig&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const DataLoadingConfig& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DataLoadingConfig* internal_default_instance() {
+    return reinterpret_cast<const DataLoadingConfig*>(
+               &_DataLoadingConfig_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(DataLoadingConfig* other);
+  friend void swap(DataLoadingConfig& a, DataLoadingConfig& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DataLoadingConfig* New() const final {
+    return CreateMaybeMessage<DataLoadingConfig>(nullptr);
+  }
+
+  DataLoadingConfig* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DataLoadingConfig>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DataLoadingConfig& from);
+  void MergeFrom(const DataLoadingConfig& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DataLoadingConfig* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef DataLoadingConfig_MetadataFormat MetadataFormat;
+  static const MetadataFormat JSON =
+    DataLoadingConfig_MetadataFormat_JSON;
+  static const MetadataFormat YAML =
+    DataLoadingConfig_MetadataFormat_YAML;
+  static const MetadataFormat PROTO =
+    DataLoadingConfig_MetadataFormat_PROTO;
+  static inline bool MetadataFormat_IsValid(int value) {
+    return DataLoadingConfig_MetadataFormat_IsValid(value);
+  }
+  static const MetadataFormat MetadataFormat_MIN =
+    DataLoadingConfig_MetadataFormat_MetadataFormat_MIN;
+  static const MetadataFormat MetadataFormat_MAX =
+    DataLoadingConfig_MetadataFormat_MetadataFormat_MAX;
+  static const int MetadataFormat_ARRAYSIZE =
+    DataLoadingConfig_MetadataFormat_MetadataFormat_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  MetadataFormat_descriptor() {
+    return DataLoadingConfig_MetadataFormat_descriptor();
+  }
+  static inline const ::std::string& MetadataFormat_Name(MetadataFormat value) {
+    return DataLoadingConfig_MetadataFormat_Name(value);
+  }
+  static inline bool MetadataFormat_Parse(const ::std::string& name,
+      MetadataFormat* value) {
+    return DataLoadingConfig_MetadataFormat_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // string input_path = 1;
+  void clear_input_path();
+  static const int kInputPathFieldNumber = 1;
+  const ::std::string& input_path() const;
+  void set_input_path(const ::std::string& value);
+  #if LANG_CXX11
+  void set_input_path(::std::string&& value);
+  #endif
+  void set_input_path(const char* value);
+  void set_input_path(const char* value, size_t size);
+  ::std::string* mutable_input_path();
+  ::std::string* release_input_path();
+  void set_allocated_input_path(::std::string* input_path);
+
+  // string output_path = 2;
+  void clear_output_path();
+  static const int kOutputPathFieldNumber = 2;
+  const ::std::string& output_path() const;
+  void set_output_path(const ::std::string& value);
+  #if LANG_CXX11
+  void set_output_path(::std::string&& value);
+  #endif
+  void set_output_path(const char* value);
+  void set_output_path(const char* value, size_t size);
+  ::std::string* mutable_output_path();
+  ::std::string* release_output_path();
+  void set_allocated_output_path(::std::string* output_path);
+
+  // .flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;
+  void clear_format();
+  static const int kFormatFieldNumber = 3;
+  ::flyteidl::core::DataLoadingConfig_MetadataFormat format() const;
+  void set_format(::flyteidl::core::DataLoadingConfig_MetadataFormat value);
+
+  // bool enabled = 4;
+  void clear_enabled();
+  static const int kEnabledFieldNumber = 4;
+  bool enabled() const;
+  void set_enabled(bool value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.DataLoadingConfig)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr input_path_;
+  ::google::protobuf::internal::ArenaStringPtr output_path_;
+  int format_;
+  bool enabled_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2ftasks_2eproto;
 };
@@ -2521,9 +2734,200 @@ Container::ports() const {
   return ports_;
 }
 
+// .flyteidl.core.DataLoadingConfig data_config = 9;
+inline bool Container::has_data_config() const {
+  return this != internal_default_instance() && data_config_ != nullptr;
+}
+inline void Container::clear_data_config() {
+  if (GetArenaNoVirtual() == nullptr && data_config_ != nullptr) {
+    delete data_config_;
+  }
+  data_config_ = nullptr;
+}
+inline const ::flyteidl::core::DataLoadingConfig& Container::data_config() const {
+  const ::flyteidl::core::DataLoadingConfig* p = data_config_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.Container.data_config)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::DataLoadingConfig*>(
+      &::flyteidl::core::_DataLoadingConfig_default_instance_);
+}
+inline ::flyteidl::core::DataLoadingConfig* Container::release_data_config() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Container.data_config)
+  
+  ::flyteidl::core::DataLoadingConfig* temp = data_config_;
+  data_config_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::DataLoadingConfig* Container::mutable_data_config() {
+  
+  if (data_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::DataLoadingConfig>(GetArenaNoVirtual());
+    data_config_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Container.data_config)
+  return data_config_;
+}
+inline void Container::set_allocated_data_config(::flyteidl::core::DataLoadingConfig* data_config) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete data_config_;
+  }
+  if (data_config) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      data_config = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, data_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  data_config_ = data_config;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Container.data_config)
+}
+
+// -------------------------------------------------------------------
+
+// DataLoadingConfig
+
+// string input_path = 1;
+inline void DataLoadingConfig::clear_input_path() {
+  input_path_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& DataLoadingConfig::input_path() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.DataLoadingConfig.input_path)
+  return input_path_.GetNoArena();
+}
+inline void DataLoadingConfig::set_input_path(const ::std::string& value) {
+  
+  input_path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.DataLoadingConfig.input_path)
+}
+#if LANG_CXX11
+inline void DataLoadingConfig::set_input_path(::std::string&& value) {
+  
+  input_path_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.DataLoadingConfig.input_path)
+}
+#endif
+inline void DataLoadingConfig::set_input_path(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  input_path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.DataLoadingConfig.input_path)
+}
+inline void DataLoadingConfig::set_input_path(const char* value, size_t size) {
+  
+  input_path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.DataLoadingConfig.input_path)
+}
+inline ::std::string* DataLoadingConfig::mutable_input_path() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.DataLoadingConfig.input_path)
+  return input_path_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* DataLoadingConfig::release_input_path() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.DataLoadingConfig.input_path)
+  
+  return input_path_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void DataLoadingConfig::set_allocated_input_path(::std::string* input_path) {
+  if (input_path != nullptr) {
+    
+  } else {
+    
+  }
+  input_path_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), input_path);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.DataLoadingConfig.input_path)
+}
+
+// string output_path = 2;
+inline void DataLoadingConfig::clear_output_path() {
+  output_path_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& DataLoadingConfig::output_path() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.DataLoadingConfig.output_path)
+  return output_path_.GetNoArena();
+}
+inline void DataLoadingConfig::set_output_path(const ::std::string& value) {
+  
+  output_path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.DataLoadingConfig.output_path)
+}
+#if LANG_CXX11
+inline void DataLoadingConfig::set_output_path(::std::string&& value) {
+  
+  output_path_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.DataLoadingConfig.output_path)
+}
+#endif
+inline void DataLoadingConfig::set_output_path(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  output_path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.DataLoadingConfig.output_path)
+}
+inline void DataLoadingConfig::set_output_path(const char* value, size_t size) {
+  
+  output_path_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.DataLoadingConfig.output_path)
+}
+inline ::std::string* DataLoadingConfig::mutable_output_path() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.DataLoadingConfig.output_path)
+  return output_path_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* DataLoadingConfig::release_output_path() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.DataLoadingConfig.output_path)
+  
+  return output_path_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void DataLoadingConfig::set_allocated_output_path(::std::string* output_path) {
+  if (output_path != nullptr) {
+    
+  } else {
+    
+  }
+  output_path_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), output_path);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.DataLoadingConfig.output_path)
+}
+
+// .flyteidl.core.DataLoadingConfig.MetadataFormat format = 3;
+inline void DataLoadingConfig::clear_format() {
+  format_ = 0;
+}
+inline ::flyteidl::core::DataLoadingConfig_MetadataFormat DataLoadingConfig::format() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.DataLoadingConfig.format)
+  return static_cast< ::flyteidl::core::DataLoadingConfig_MetadataFormat >(format_);
+}
+inline void DataLoadingConfig::set_format(::flyteidl::core::DataLoadingConfig_MetadataFormat value) {
+  
+  format_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.DataLoadingConfig.format)
+}
+
+// bool enabled = 4;
+inline void DataLoadingConfig::clear_enabled() {
+  enabled_ = false;
+}
+inline bool DataLoadingConfig::enabled() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.DataLoadingConfig.enabled)
+  return enabled_;
+}
+inline void DataLoadingConfig::set_enabled(bool value) {
+  
+  enabled_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.DataLoadingConfig.enabled)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -2554,6 +2958,11 @@ template <> struct is_proto_enum< ::flyteidl::core::RuntimeMetadata_RuntimeType>
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::RuntimeMetadata_RuntimeType>() {
   return ::flyteidl::core::RuntimeMetadata_RuntimeType_descriptor();
+}
+template <> struct is_proto_enum< ::flyteidl::core::DataLoadingConfig_MetadataFormat> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::DataLoadingConfig_MetadataFormat>() {
+  return ::flyteidl::core::DataLoadingConfig_MetadataFormat_descriptor();
 }
 
 }  // namespace protobuf

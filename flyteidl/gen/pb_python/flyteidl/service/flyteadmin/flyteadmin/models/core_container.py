@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_container_port import CoreContainerPort  # noqa: F401,E501
+from flyteadmin.models.core_data_loading_config import CoreDataLoadingConfig  # noqa: F401,E501
 from flyteadmin.models.core_key_value_pair import CoreKeyValuePair  # noqa: F401,E501
 from flyteadmin.models.core_resources import CoreResources  # noqa: F401,E501
 
@@ -41,7 +42,8 @@ class CoreContainer(object):
         'resources': 'CoreResources',
         'env': 'list[CoreKeyValuePair]',
         'config': 'list[CoreKeyValuePair]',
-        'ports': 'list[CoreContainerPort]'
+        'ports': 'list[CoreContainerPort]',
+        'data_config': 'CoreDataLoadingConfig'
     }
 
     attribute_map = {
@@ -51,10 +53,11 @@ class CoreContainer(object):
         'resources': 'resources',
         'env': 'env',
         'config': 'config',
-        'ports': 'ports'
+        'ports': 'ports',
+        'data_config': 'data_config'
     }
 
-    def __init__(self, image=None, command=None, args=None, resources=None, env=None, config=None, ports=None):  # noqa: E501
+    def __init__(self, image=None, command=None, args=None, resources=None, env=None, config=None, ports=None, data_config=None):  # noqa: E501
         """CoreContainer - a model defined in Swagger"""  # noqa: E501
 
         self._image = None
@@ -64,6 +67,7 @@ class CoreContainer(object):
         self._env = None
         self._config = None
         self._ports = None
+        self._data_config = None
         self.discriminator = None
 
         if image is not None:
@@ -80,6 +84,8 @@ class CoreContainer(object):
             self.config = config
         if ports is not None:
             self.ports = ports
+        if data_config is not None:
+            self.data_config = data_config
 
     @property
     def image(self):
@@ -237,6 +243,27 @@ class CoreContainer(object):
         """
 
         self._ports = ports
+
+    @property
+    def data_config(self):
+        """Gets the data_config of this CoreContainer.  # noqa: E501
+
+
+        :return: The data_config of this CoreContainer.  # noqa: E501
+        :rtype: CoreDataLoadingConfig
+        """
+        return self._data_config
+
+    @data_config.setter
+    def data_config(self, data_config):
+        """Sets the data_config of this CoreContainer.
+
+
+        :param data_config: The data_config of this CoreContainer.  # noqa: E501
+        :type: CoreDataLoadingConfig
+        """
+
+        self._data_config = data_config
 
     def to_dict(self):
         """Returns the model properties as a dict"""

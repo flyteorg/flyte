@@ -135,6 +135,7 @@ from flyteadmin.models.core_conjunction_expression import CoreConjunctionExpress
 from flyteadmin.models.core_connection_set import CoreConnectionSet
 from flyteadmin.models.core_container import CoreContainer
 from flyteadmin.models.core_container_port import CoreContainerPort
+from flyteadmin.models.core_data_loading_config import CoreDataLoadingConfig
 from flyteadmin.models.core_error import CoreError
 from flyteadmin.models.core_execution_error import CoreExecutionError
 from flyteadmin.models.core_identifier import CoreIdentifier
@@ -177,6 +178,7 @@ from flyteadmin.models.core_workflow_metadata import CoreWorkflowMetadata
 from flyteadmin.models.core_workflow_metadata_defaults import CoreWorkflowMetadataDefaults
 from flyteadmin.models.core_workflow_node import CoreWorkflowNode
 from flyteadmin.models.core_workflow_template import CoreWorkflowTemplate
+from flyteadmin.models.data_loading_config_metadata_format import DataLoadingConfigMetadataFormat
 from flyteadmin.models.event_node_execution_event import EventNodeExecutionEvent
 from flyteadmin.models.event_parent_task_execution_metadata import EventParentTaskExecutionMetadata
 from flyteadmin.models.event_task_execution_event import EventTaskExecutionEvent
