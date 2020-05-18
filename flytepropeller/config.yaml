@@ -59,7 +59,7 @@ storage:
     access-key: minio
     auth-type: accesskey
     disable-ssl: true
-    endpoint: http://localhost:9000
+    endpoint: http://localhost:30084
     region: us-east-1
     secret-key: miniostorage
   type: minio
