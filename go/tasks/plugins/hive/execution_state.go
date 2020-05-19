@@ -116,7 +116,7 @@ func MapExecutionStateToPhaseInfo(state ExecutionState, quboleClient client.Qubo
 		phaseInfo = core.PhaseInfoSuccess(ConstructTaskInfo(state))
 
 	case PhaseQueryFailed:
-		phaseInfo = core.PhaseInfoFailure(errors.DownstreamSystemError, "Query failed", ConstructTaskInfo(state))
+		phaseInfo = core.PhaseInfoRetryableFailure(errors.DownstreamSystemError, "Query failed", ConstructTaskInfo(state))
 	}
 
 	return phaseInfo
