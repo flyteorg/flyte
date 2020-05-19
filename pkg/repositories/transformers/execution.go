@@ -28,6 +28,7 @@ type CreateExecutionModelInput struct {
 	Notifications         []*admin.Notification
 	WorkflowIdentifier    *core.Identifier
 	ParentNodeExecutionID uint
+	SourceExecutionID     uint
 	Cluster               string
 	InputsURI             storage.DataReference
 	UserInputsURI         storage.DataReference
@@ -85,6 +86,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		ExecutionCreatedAt:    &input.CreatedAt,
 		ExecutionUpdatedAt:    &input.CreatedAt,
 		ParentNodeExecutionID: input.ParentNodeExecutionID,
+		SourceExecutionID:     input.SourceExecutionID,
 		Cluster:               input.Cluster,
 		InputsURI:             input.InputsURI,
 		UserInputsURI:         input.UserInputsURI,

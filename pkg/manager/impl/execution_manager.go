@@ -346,8 +346,9 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 	ctx = getExecutionContext(ctx, &workflowExecutionID)
 
-	// Get the node execution (if any) that launched this execution
+	// Get the node and parent execution (if any) that launched this execution
 	var parentNodeExecutionID uint
+	var sourceExecutionID uint
 	if request.Spec.Metadata != nil && request.Spec.Metadata.ParentNodeExecution != nil {
 		parentNodeExecutionModel, err := util.GetNodeExecutionModel(ctx, m.db, request.Spec.Metadata.ParentNodeExecution)
 		if err != nil {
@@ -357,6 +358,14 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		}
 
 		parentNodeExecutionID = parentNodeExecutionModel.ID
+
+		sourceExecutionModel, err := util.GetExecutionModel(ctx, m.db, *request.Spec.Metadata.ParentNodeExecution.ExecutionId)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to get node execution [%+v] that launched this execution [%+v] with error %v",
+				request.Spec.Metadata.ParentNodeExecution, workflowExecutionID, err)
+			return nil, nil, err
+		}
+		sourceExecutionID = sourceExecutionModel.ID
 	}
 
 	// Dynamically assign task resource defaults.
@@ -424,6 +433,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		Notifications:         notificationsSettings,
 		WorkflowIdentifier:    workflow.Id,
 		ParentNodeExecutionID: parentNodeExecutionID,
+		SourceExecutionID:     sourceExecutionID,
 		Cluster:               execInfo.Cluster,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,

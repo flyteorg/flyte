@@ -44,6 +44,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	lpID := uint(33)
 	wfID := uint(23)
 	nodeID := uint(11)
+	sourceID := uint(12)
 	createdAt := time.Now()
 	workflowIdentifier := &core.Identifier{
 		Project: "project",
@@ -67,6 +68,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		CreatedAt:             createdAt,
 		WorkflowIdentifier:    workflowIdentifier,
 		ParentNodeExecutionID: nodeID,
+		SourceExecutionID:     sourceID,
 		Principal:             principal,
 		Cluster:               cluster,
 	})
@@ -80,6 +82,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	assert.EqualValues(t, createdAt, *execution.ExecutionUpdatedAt)
 	assert.Equal(t, int32(admin.ExecutionMetadata_SYSTEM), execution.Mode)
 	assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
+	assert.Equal(t, sourceID, execution.SourceExecutionID)
 	expectedSpec := execRequest.Spec
 	expectedSpec.Metadata.Principal = principal
 	expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
