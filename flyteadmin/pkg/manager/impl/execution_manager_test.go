@@ -264,9 +264,33 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 			}, nil
 		},
 	)
+	getExecutionCalled := false
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
+		func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+			assert.EqualValues(t, input.Project, parentNodeExecutionID.ExecutionId.Project)
+			assert.EqualValues(t, input.Domain, parentNodeExecutionID.ExecutionId.Domain)
+			assert.EqualValues(t, input.Name, parentNodeExecutionID.ExecutionId.Name)
+			getExecutionCalled = true
+			return models.Execution{
+				BaseModel: models.BaseModel{
+					ID: 2,
+				},
+			}, nil
+		},
+	)
+
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(
 		func(ctx context.Context, input models.Execution) error {
 			assert.Equal(t, input.ParentNodeExecutionID, uint(1))
+			var spec admin.ExecutionSpec
+			err := proto.Unmarshal(input.Spec, &spec)
+			assert.NoError(t, err)
+			assert.Equal(t, admin.ExecutionMetadata_CHILD_WORKFLOW, spec.Metadata.Mode)
+			assert.Equal(t, "feeny", spec.Metadata.Principal)
+			assert.EqualValues(t, 1, spec.Metadata.Nesting)
+			assert.True(t, proto.Equal(&parentNodeExecutionID, spec.Metadata.ParentNodeExecution))
+			assert.EqualValues(t, input.ParentNodeExecutionID, 1)
+			assert.EqualValues(t, input.SourceExecutionID, 2)
 			return nil
 		},
 	)
@@ -276,12 +300,15 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL)
 	request := testutils.GetExecutionRequest()
 	request.Spec.Metadata = &admin.ExecutionMetadata{
-		Mode:                admin.ExecutionMetadata_SYSTEM,
+		Mode:                admin.ExecutionMetadata_CHILD_WORKFLOW,
+		Nesting:             1,
 		ParentNodeExecution: &parentNodeExecutionID,
+		Principal:           "feeny",
 	}
 	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
 	assert.Nil(t, err)
 	assert.True(t, getNodeExecutionCalled)
+	assert.True(t, getExecutionCalled)
 	expectedResponse := &admin.ExecutionCreateResponse{
 		Id: &executionIdentifier,
 	}
