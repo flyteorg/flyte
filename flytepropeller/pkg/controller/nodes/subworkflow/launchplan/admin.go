@@ -48,7 +48,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 		Spec: &admin.ExecutionSpec{
 			LaunchPlan: launchPlanRef,
 			Metadata: &admin.ExecutionMetadata{
-				Mode:                admin.ExecutionMetadata_SYSTEM,
+				Mode:                admin.ExecutionMetadata_CHILD_WORKFLOW,
 				Nesting:             launchCtx.NestingLevel + 1,
 				Principal:           launchCtx.Principal,
 				ParentNodeExecution: launchCtx.ParentNodeExecution,

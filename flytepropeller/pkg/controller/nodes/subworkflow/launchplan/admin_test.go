@@ -147,7 +147,8 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 		mockClient.On("CreateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
-				return o.Project == "p" && o.Domain == "d" && o.Name == "n" && o.Spec.Inputs == nil
+				return o.Project == "p" && o.Domain == "d" && o.Name == "n" && o.Spec.Inputs == nil &&
+					o.Spec.Metadata.Mode == admin.ExecutionMetadata_CHILD_WORKFLOW
 			}),
 		).Return(nil, nil)
 		assert.NoError(t, err)
