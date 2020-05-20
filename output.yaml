@@ -1,0 +1,62 @@
+apiVersion: flyte.lyft.com/v1alpha1
+executionId:
+  domain: dev
+  name: zajjlmvcyx4
+kind: FlyteWorkflow
+metadata:
+  labels:
+    execution-id: zajjlmvcyx4
+  name: zajjlmvcyx4
+  namespace: dev
+node-defaults: {}
+spec:
+  connections:
+    first-task:
+    - end-node
+    start-node:
+    - first-task
+  id: avexampleworkflows:dev:app.workflows.example_dynamic_task.HelloWorldDynamicTaskWorkflow
+  nodes:
+    end-node:
+      id: end-node
+      kind: end
+      resources: {}
+    first-task:
+      id: first-task
+      kind: task
+      resources:
+        limits:
+          cpu: "1"
+          memory: 100M
+        requests:
+          cpu: "1"
+          memory: 100M
+      retry:
+        minAttempts: 1
+      task: 'resource_type:TASK project:"avexampleworkflows" domain:"dev" name:"app.workflows.example_dynamic_task.simple_batch_task"
+        version:"3aad3551e093a1ef8242a24da70d183ee098accd" '
+    start-node:
+      id: start-node
+      kind: start
+      resources: {}
+  outputs: {}
+tasks:
+  ? 'resource_type:TASK project:"avexampleworkflows" domain:"dev" name:"app.workflows.example_dynamic_task.simple_batch_task"
+    version:"3aad3551e093a1ef8242a24da70d183ee098accd" '
+  : container:
+      image: library.pdx.aws.av.lyft.net/application/avexampleworkflows:3aad3551e093a1ef8242a24da70d183ee098accd
+    id:
+      domain: dev
+      name: app.workflows.example_dynamic_task.simple_batch_task
+      project: avexampleworkflows
+      resourceType: TASK
+      version: 3aad3551e093a1ef8242a24da70d183ee098accd
+    metadata:
+      discoveryVersion: "1"
+      retries: {}
+      runtime:
+        flavor: python
+        type: FLYTE_SDK
+        version: 0.4.4
+      timeout: 0s
+    type: dynamic-task

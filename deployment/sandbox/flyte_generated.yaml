@@ -650,6 +650,7 @@ data:
         kubernetes-url: "http://localhost:30082"
       k8s:
         default-env-vars:
+          - FLYTE_STATSD_HOST: "flyte-telegraf.infrastructure.svc.cluster.local"
           - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
           - FLYTE_AWS_ACCESS_KEY_ID: minio
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
@@ -711,7 +712,7 @@ data:
       type: minio
       container: my-s3-bucket
     event:
-      type: admin
+      type: log
       rate: 500
       capacity: 1000
     admin:
@@ -1206,7 +1207,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.2.36
+        image: library.pdx.aws.av.lyft.net/application/avflytepropeller:1.0.316
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
