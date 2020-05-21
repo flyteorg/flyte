@@ -25,7 +25,7 @@ require (
 	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/lib/pq v1.3.0
-	github.com/lyft/flyteidl v0.17.27
+	github.com/lyft/flyteidl v0.17.30
 	github.com/lyft/flytepropeller v0.2.13
 	github.com/lyft/flytestdlib v0.3.2
 	github.com/magiconair/properties v1.8.1

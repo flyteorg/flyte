@@ -34,15 +34,9 @@ func ValidateMaxLengthStringField(field string, fieldName string, limit int) err
 	return nil
 }
 
-// Validates that all required fields for an identifier are present.
-func ValidateIdentifier(id *core.Identifier, expectedType common.Entity) error {
+func ValidateIdentifierFieldsSet(id *core.Identifier) error {
 	if id == nil {
 		return shared.GetMissingArgumentError(shared.ID)
-	}
-	if entityToResourceType[expectedType] != id.ResourceType {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"unexpected resource type %s for identifier [%+v], expected %s instead",
-			strings.ToLower(id.ResourceType.String()), id, strings.ToLower(entityToResourceType[expectedType].String()))
 	}
 	if err := ValidateEmptyStringField(id.Project, shared.Project); err != nil {
 		return err
@@ -57,6 +51,19 @@ func ValidateIdentifier(id *core.Identifier, expectedType common.Entity) error {
 		return err
 	}
 	return nil
+}
+
+// Validates that all required fields for an identifier are present.
+func ValidateIdentifier(id *core.Identifier, expectedType common.Entity) error {
+	if id == nil {
+		return shared.GetMissingArgumentError(shared.ID)
+	}
+	if entityToResourceType[expectedType] != id.ResourceType {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"unexpected resource type %s for identifier [%+v], expected %s instead",
+			strings.ToLower(id.ResourceType.String()), id, strings.ToLower(entityToResourceType[expectedType].String()))
+	}
+	return ValidateIdentifierFieldsSet(id)
 }
 
 // Validates that all required fields for an identifier are present.
