@@ -81,6 +81,8 @@ type ExecutionManager struct {
 	userMetrics        executionUserMetrics
 	notificationClient notificationInterfaces.Publisher
 	urlData            dataInterfaces.RemoteURLInterface
+	workflowManager    interfaces.WorkflowInterface
+	namedEntityManager interfaces.NamedEntityInterface
 }
 
 func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
@@ -303,6 +305,150 @@ func setCompiledTaskDefaults(ctx context.Context, config runtimeInterfaces.Confi
 		taskResourceSpec)
 }
 
+func (m *ExecutionManager) launchSingleTaskExecution(
+	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
+	context.Context, *models.Execution, error) {
+
+	taskModel, err := m.db.TaskRepo().Get(ctx, repositoryInterfaces.GetResourceInput{
+		Project: request.Spec.LaunchPlan.Project,
+		Domain:  request.Spec.LaunchPlan.Domain,
+		Name:    request.Spec.LaunchPlan.Name,
+		Version: request.Spec.LaunchPlan.Version,
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	task, err := transformers.FromTaskModel(taskModel)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Prepare a skeleton workflow
+	taskIdentifier := request.Spec.LaunchPlan
+	workflowModel, err :=
+		util.CreateOrGetWorkflowModel(ctx, request, m.db, m.workflowManager, m.namedEntityManager, taskIdentifier, &task)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to created skeleton workflow for [%+v] with err: %v", taskIdentifier, err)
+		return nil, nil, err
+	}
+	workflow, err := transformers.FromWorkflowModel(*workflowModel)
+	if err != nil {
+		return nil, nil, err
+	}
+	closure, err := util.FetchAndGetWorkflowClosure(ctx, m.storageClient, workflowModel.RemoteClosureIdentifier)
+	if err != nil {
+		return nil, nil, err
+	}
+	closure.CreatedAt = workflow.Closure.CreatedAt
+	workflow.Closure = closure
+	// Also prepare a skeleton launch plan.
+	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, taskIdentifier,
+		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID, request.Spec)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	name := util.GetExecutionName(request)
+	workflowExecutionID := core.WorkflowExecutionIdentifier{
+		Project: request.Project,
+		Domain:  request.Domain,
+		Name:    name,
+	}
+	ctx = getExecutionContext(ctx, &workflowExecutionID)
+
+	// Get the node execution (if any) that launched this execution
+	var parentNodeExecutionID uint
+	if request.Spec.Metadata != nil && request.Spec.Metadata.ParentNodeExecution != nil {
+		parentNodeExecutionModel, err := util.GetNodeExecutionModel(ctx, m.db, request.Spec.Metadata.ParentNodeExecution)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to get node execution [%+v] that launched this execution [%+v] with error %v",
+				request.Spec.Metadata.ParentNodeExecution, workflowExecutionID, err)
+			return nil, nil, err
+		}
+
+		parentNodeExecutionID = parentNodeExecutionModel.ID
+	}
+
+	// Dynamically assign task resource defaults.
+	for _, task := range workflow.Closure.CompiledWorkflow.Tasks {
+		setCompiledTaskDefaults(ctx, m.config, task, m.db, name)
+	}
+
+	// Dynamically assign execution queues.
+	m.populateExecutionQueue(ctx, *workflow.Id, workflow.Closure.CompiledWorkflow)
+
+	inputsURI, err := m.offloadInputs(ctx, request.Inputs, &workflowExecutionID, shared.Inputs)
+	if err != nil {
+		return nil, nil, err
+	}
+	userInputsURI, err := m.offloadInputs(ctx, request.Inputs, &workflowExecutionID, shared.UserInputs)
+	if err != nil {
+		return nil, nil, err
+	}
+	executeTaskInputs := workflowengineInterfaces.ExecuteTaskInput{
+		ExecutionID:   &workflowExecutionID,
+		WfClosure:     *workflow.Closure.CompiledWorkflow,
+		Inputs:        request.Inputs,
+		ReferenceName: taskIdentifier.Name,
+		AcceptedAt:    requestedAt,
+		Auth:          request.Spec.AuthRole,
+	}
+	if request.Spec.Labels != nil {
+		executeTaskInputs.Labels = request.Spec.Labels.Values
+	}
+	if request.Spec.Annotations != nil {
+		executeTaskInputs.Annotations = request.Spec.Annotations.Values
+	}
+
+	execInfo, err := m.workflowExecutor.ExecuteTask(ctx, executeTaskInputs)
+	if err != nil {
+		m.systemMetrics.PropellerFailures.Inc()
+		logger.Infof(ctx, "Failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
+			request, workflowExecutionID, request.Inputs, err)
+		return nil, nil, err
+	}
+	executionCreatedAt := time.Now()
+	acceptanceDelay := executionCreatedAt.Sub(requestedAt)
+	m.systemMetrics.AcceptanceDelay.Observe(acceptanceDelay.Seconds())
+
+	// Request notification settings takes precedence over the launch plan settings.
+	// If there is no notification in the request and DisableAll is not true, use the settings from the launch plan.
+	var notificationsSettings []*admin.Notification
+	if launchPlan.Spec.GetEntityMetadata() != nil {
+		notificationsSettings = launchPlan.Spec.EntityMetadata.GetNotifications()
+	}
+	if request.Spec.GetNotifications() != nil && request.Spec.GetNotifications().Notifications != nil &&
+		len(request.Spec.GetNotifications().Notifications) > 0 {
+		notificationsSettings = request.Spec.GetNotifications().Notifications
+	} else if request.Spec.GetDisableAll() {
+		notificationsSettings = make([]*admin.Notification, 0)
+	}
+
+	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
+		WorkflowExecutionID: workflowExecutionID,
+		RequestSpec:         request.Spec,
+		TaskID:              taskModel.ID,
+		WorkflowID:          workflowModel.ID,
+		// The execution is not considered running until the propeller sends a specific event saying so.
+		Phase:                 core.WorkflowExecution_UNDEFINED,
+		CreatedAt:             m._clock.Now(),
+		Notifications:         notificationsSettings,
+		WorkflowIdentifier:    workflow.Id,
+		ParentNodeExecutionID: parentNodeExecutionID,
+		Cluster:               execInfo.Cluster,
+		InputsURI:             inputsURI,
+		UserInputsURI:         userInputsURI,
+		Principal:             getUser(ctx),
+	})
+	if err != nil {
+		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
+			workflowExecutionID, err)
+		return nil, nil, err
+	}
+	return ctx, executionModel, nil
+
+}
+
 func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, error) {
@@ -311,6 +457,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Debugf(ctx, "Failed to validate ExecutionCreateRequest %+v with err %v", request, err)
 		return nil, nil, err
 	}
+	if request.Spec.LaunchPlan.ResourceType == core.ResourceType_TASK {
+		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.Spec.LaunchPlan)
+		return m.launchSingleTaskExecution(ctx, request, requestedAt)
+	}
+
 	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *request.Spec.LaunchPlan)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get launch plan model for ExecutionCreateRequest %+v with err %v", request, err)
@@ -333,7 +484,9 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 			request.Inputs, launchPlan.Spec.FixedInputs, launchPlan.Closure.ExpectedInputs, err)
 		return nil, nil, err
 	}
+
 	workflow, err := util.GetWorkflow(ctx, m.db, m.storageClient, *launchPlan.Spec.WorkflowId)
+
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
 		return nil, nil, err
@@ -1050,7 +1203,9 @@ func NewExecutionManager(
 	systemScope promutils.Scope,
 	userScope promutils.Scope,
 	publisher notificationInterfaces.Publisher,
-	urlData dataInterfaces.RemoteURLInterface) interfaces.ExecutionInterface {
+	urlData dataInterfaces.RemoteURLInterface,
+	workflowManager interfaces.WorkflowInterface,
+	namedEntityManager interfaces.NamedEntityInterface) interfaces.ExecutionInterface {
 	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
 
@@ -1070,5 +1225,7 @@ func NewExecutionManager(
 		userMetrics:        userMetrics,
 		notificationClient: publisher,
 		urlData:            urlData,
+		workflowManager:    workflowManager,
+		namedEntityManager: namedEntityManager,
 	}
 }

@@ -22,6 +22,7 @@ type Execution struct {
 	ExecutionKey
 	LaunchPlanID uint `gorm:"index"`
 	WorkflowID   uint `gorm:"index"`
+	TaskID       uint `gorm:"index"`
 	Phase        string
 	Closure      []byte
 	Spec         []byte `gorm:"not null"`

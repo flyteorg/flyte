@@ -23,6 +23,7 @@ type CreateExecutionModelInput struct {
 	RequestSpec           *admin.ExecutionSpec
 	LaunchPlanID          uint
 	WorkflowID            uint
+	TaskID                uint
 	Phase                 core.WorkflowExecution_Phase
 	CreatedAt             time.Time
 	Notifications         []*admin.Notification
@@ -81,7 +82,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		Spec:                  spec,
 		Phase:                 input.Phase.String(),
 		Closure:               closureBytes,
-		LaunchPlanID:          input.LaunchPlanID,
 		WorkflowID:            input.WorkflowID,
 		ExecutionCreatedAt:    &input.CreatedAt,
 		ExecutionUpdatedAt:    &input.CreatedAt,
@@ -90,6 +90,13 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		Cluster:               input.Cluster,
 		InputsURI:             input.InputsURI,
 		UserInputsURI:         input.UserInputsURI,
+	}
+	// A reference launch entity can be one of either or a task OR launch plan. Traditionally, workflows are executed
+	// with a reference launch plan which is why this behavior is the default below.
+	if input.TaskID > 0 {
+		executionModel.TaskID = input.TaskID
+	} else {
+		executionModel.LaunchPlanID = input.LaunchPlanID
 	}
 	if input.RequestSpec.Metadata != nil {
 		executionModel.Mode = int32(input.RequestSpec.Metadata.Mode)

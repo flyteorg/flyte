@@ -129,9 +129,14 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		RemoteDataStoreClient:    dataStorageClient,
 	}).GetRemoteURLInterface()
 
+	workflowManager := manager.NewWorkflowManager(
+		db, configuration, workflowengine.NewCompiler(), dataStorageClient, applicationConfiguration.MetadataStoragePrefix,
+		adminScope.NewSubScope("workflow_manager"))
+	namedEntityManager := manager.NewNamedEntityManager(db, configuration, adminScope.NewSubScope("named_entity_manager"))
 	executionManager := manager.NewExecutionManager(
 		db, configuration, dataStorageClient, workflowExecutor, adminScope.NewSubScope("execution_manager"),
-		adminScope.NewSubScope("user_execution_metrics"), publisher, urlData)
+		adminScope.NewSubScope("user_execution_metrics"), publisher, urlData, workflowManager,
+		namedEntityManager)
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)
 	logger.Info(context.Background(), "Successfully initialized a new scheduled workflow executor")
@@ -164,12 +169,10 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	return &AdminService{
 		TaskManager: manager.NewTaskManager(db, configuration, workflowengine.NewCompiler(),
 			adminScope.NewSubScope("task_manager")),
-		WorkflowManager: manager.NewWorkflowManager(
-			db, configuration, workflowengine.NewCompiler(), dataStorageClient, applicationConfiguration.MetadataStoragePrefix,
-			adminScope.NewSubScope("workflow_manager")),
+		WorkflowManager:    workflowManager,
 		LaunchPlanManager:  launchPlanManager,
 		ExecutionManager:   executionManager,
-		NamedEntityManager: manager.NewNamedEntityManager(db, configuration, adminScope.NewSubScope("named_entity_manager")),
+		NamedEntityManager: namedEntityManager,
 		NodeExecutionManager: manager.NewNodeExecutionManager(
 			db, adminScope.NewSubScope("node_execution_manager"), urlData),
 		TaskExecutionManager: manager.NewTaskExecutionManager(

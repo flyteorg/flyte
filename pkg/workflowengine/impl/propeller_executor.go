@@ -69,12 +69,17 @@ func addMapValues(overrides map[string]string, flyteWfValues map[string]string) 
 
 func (c *FlytePropeller) addPermissions(launchPlan admin.LaunchPlan, flyteWf *v1alpha1.FlyteWorkflow) {
 	// Set role permissions based on launch plan Auth values.
+	// The branched-ness of this check is due to the presence numerous deprecated fields
 	var role string
-	if launchPlan.GetSpec().GetAuth() != nil && len(launchPlan.GetSpec().GetAuth().GetAssumableIamRole()) > 0 {
+	if launchPlan.Spec.GetAuthRole() != nil && len(launchPlan.GetSpec().GetAuthRole().GetAssumableIamRole()) > 0 {
+		role = launchPlan.GetSpec().GetAuthRole().GetAssumableIamRole()
+	} else if launchPlan.GetSpec().GetAuth() != nil && len(launchPlan.GetSpec().GetAuth().GetAssumableIamRole()) > 0 {
 		role = launchPlan.GetSpec().GetAuth().GetAssumableIamRole()
 	} else if len(launchPlan.GetSpec().GetRole()) > 0 {
 		// Although deprecated, older launch plans may reference the role field instead of the Auth AssumableIamRole.
 		role = launchPlan.GetSpec().GetRole()
+	} else if launchPlan.GetSpec().GetAuthRole() != nil && len(launchPlan.GetSpec().GetAuthRole().GetKubernetesServiceAccount()) > 0 {
+		flyteWf.ServiceAccountName = launchPlan.GetSpec().GetAuthRole().GetKubernetesServiceAccount()
 	} else if launchPlan.GetSpec().GetAuth() != nil && len(launchPlan.GetSpec().GetAuth().GetKubernetesServiceAccount()) > 0 {
 		flyteWf.ServiceAccountName = launchPlan.GetSpec().GetAuth().GetKubernetesServiceAccount()
 	}
@@ -122,6 +127,75 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 		Domain:      input.ExecutionID.Domain,
 		Workflow:    input.Reference.Spec.WorkflowId.Name,
 		LaunchPlan:  input.Reference.Id.Name,
+		ExecutionID: input.ExecutionID.Name,
+	}
+	targetCluster, err := c.executionCluster.GetTarget(ctx, &executionTargetSpec)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create workflow in propeller %v", err)
+	}
+	_, err = targetCluster.FlyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(namespace).Create(flyteWf)
+	if err != nil {
+		if !k8_api_err.IsAlreadyExists(err) {
+			logger.Debugf(ctx, "failed to create workflow [%+v] in cluster %s %v",
+				input.WfClosure.Primary.Template.Id, targetCluster.ID, err)
+			c.metrics.ExecutionCreationFailure.Inc()
+			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create workflow in propeller %v", err)
+		}
+	}
+
+	logger.Debugf(ctx, "Successfully created workflow execution [%+v]", input.WfClosure.Primary.Template.Id)
+	c.metrics.ExecutionCreationSuccess.Inc()
+
+	return &interfaces.ExecutionInfo{
+		Cluster: targetCluster.ID,
+	}, nil
+}
+
+func (c *FlytePropeller) ExecuteTask(ctx context.Context, input interfaces.ExecuteTaskInput) (*interfaces.ExecutionInfo, error) {
+	if input.ExecutionID == nil {
+		c.metrics.InvalidExecutionID.Inc()
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "invalid execution id")
+	}
+	namespace := common.GetNamespaceName(c.config.GetNamespaceMappingConfig(), input.ExecutionID.GetProject(), input.ExecutionID.GetDomain())
+	flyteWf, err := c.builder.BuildFlyteWorkflow(&input.WfClosure, input.Inputs, input.ExecutionID, namespace)
+	if err != nil {
+		c.metrics.WorkflowBuildFailure.Inc()
+		logger.Infof(ctx, "failed to build the workflow [%+v] %v",
+			input.WfClosure.Primary.Template.Id, err)
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to build the workflow [%+v] %v",
+			input.WfClosure.Primary.Template.Id, err)
+	}
+	c.metrics.WorkflowBuildSuccess.Inc()
+
+	// add the executionId so Propeller can send events back that are associated with the ID
+	flyteWf.ExecutionID = v1alpha1.WorkflowExecutionIdentifier{
+		WorkflowExecutionIdentifier: input.ExecutionID,
+	}
+	// add the acceptedAt timestamp so propeller can emit latency metrics.
+	acceptAtWrapper := v1.NewTime(input.AcceptedAt)
+	flyteWf.AcceptedAt = &acceptAtWrapper
+
+	// Add execution roles from auth if any.
+	if input.Auth != nil && len(input.Auth.GetAssumableIamRole()) > 0 {
+		role := input.Auth.GetAssumableIamRole()
+		if flyteWf.Annotations == nil {
+			flyteWf.Annotations = map[string]string{}
+		}
+		flyteWf.Annotations[c.roleNameKey] = role
+	} else if input.Auth != nil && len(input.Auth.GetKubernetesServiceAccount()) > 0 {
+		flyteWf.ServiceAccountName = input.Auth.GetKubernetesServiceAccount()
+	}
+
+	labels := addMapValues(input.Labels, flyteWf.Labels)
+	flyteWf.Labels = labels
+	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
+	flyteWf.Annotations = annotations
+
+	executionTargetSpec := executioncluster.ExecutionTargetSpec{
+		Project:     input.ExecutionID.Project,
+		Domain:      input.ExecutionID.Domain,
+		Workflow:    input.ReferenceName,
+		LaunchPlan:  input.ReferenceName,
 		ExecutionID: input.ExecutionID.Name,
 	}
 	targetCluster, err := c.executionCluster.GetTarget(ctx, &executionTargetSpec)

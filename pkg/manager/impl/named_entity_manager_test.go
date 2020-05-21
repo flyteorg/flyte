@@ -87,7 +87,7 @@ func TestNamedEntityManager_Get_BadRequest(t *testing.T) {
 func TestNamedEntityManager_getQueryFilters(t *testing.T) {
 	repository := getMockRepositoryForNETest()
 	manager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
-	updatedFilters, err := manager.(*NamedEntityManager).getQueryFilters("eq(state, 0)")
+	updatedFilters, err := manager.(*NamedEntityManager).getQueryFilters(core.ResourceType_TASK, "eq(state, 0)")
 	assert.NoError(t, err)
 	assert.Len(t, updatedFilters, 1)
 
@@ -96,6 +96,14 @@ func TestNamedEntityManager_getQueryFilters(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "COALESCE(state, 0) = ?", queryExp.Query)
 	assert.Equal(t, "0", queryExp.Args)
+
+	updatedFilters, err = manager.(*NamedEntityManager).getQueryFilters(core.ResourceType_WORKFLOW, "")
+	assert.NoError(t, err)
+	assert.Len(t, updatedFilters, 1)
+	queryExp, err = updatedFilters[0].GetGormQueryExpr()
+	assert.NoError(t, err)
+	assert.Equal(t, "COALESCE(state, 0) <> ?", queryExp.Query)
+	assert.Equal(t, admin.NamedEntityState_SYSTEM_GENERATED, queryExp.Args)
 }
 
 func TestNamedEntityManager_Update(t *testing.T) {

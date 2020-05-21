@@ -7,8 +7,6 @@ import (
 
 	"github.com/lyft/flyteadmin/pkg/repositories"
 
-	"github.com/lyft/flyteadmin/pkg/common"
-
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
 	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
@@ -21,6 +19,11 @@ import (
 const allowedExecutionNameLength = 20
 
 var executionIDRegex = regexp.MustCompile(`^[a-z][a-z\-0-9]*$`)
+
+var acceptedReferenceLaunchTypes = map[core.ResourceType]interface{}{
+	core.ResourceType_LAUNCH_PLAN: nil,
+	core.ResourceType_TASK:        nil,
+}
 
 func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreateRequest,
 	db repositories.RepositoryInterface, config runtimeInterfaces.ApplicationConfiguration) error {
@@ -46,8 +49,15 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 	if request.Spec == nil {
 		return shared.GetMissingArgumentError(shared.Spec)
 	}
-	if err := ValidateIdentifier(request.Spec.LaunchPlan, common.LaunchPlan); err != nil {
+	// TODO(katrogan): Change the name of Spec.LaunchPlan to something more generic to permit reference Tasks.
+	// https://github.com/lyft/flyte/issues/262
+	if err := ValidateIdentifierFieldsSet(request.Spec.LaunchPlan); err != nil {
 		return err
+	}
+	if _, ok := acceptedReferenceLaunchTypes[request.Spec.LaunchPlan.ResourceType]; !ok {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"Invalid reference entity resource type [%v], only [%+v] allowed",
+			request.Spec.LaunchPlan.ResourceType, acceptedReferenceLaunchTypes)
 	}
 	if err := validateLiteralMap(request.Inputs, shared.Inputs); err != nil {
 		return err
