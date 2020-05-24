@@ -13,6 +13,7 @@ while ! systemctl is-active --quiet multi-user.target; do
     echo "ERROR: timed out waiting for kubernetes to start."
     kubectl get all --all-namespaces
     # exit 1
+    break
   fi
 done
 
