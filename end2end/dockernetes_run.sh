@@ -20,4 +20,4 @@ done
 echo "kubernetes started in $SECONDS seconds."
 echo ""
 
-exec $
+exec $1
