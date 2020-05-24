@@ -2,6 +2,8 @@
 
 set -ex
 
+kubectl get all --all-namespaces
+
 function get_flyte_pods() {
     echo $(kubectl -n flyte get pods | awk '{print $1}' | grep -v NAME)
 }
