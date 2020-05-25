@@ -23,6 +23,7 @@ fi
 
 # This is a separate function so that we can potentially reuse in the future when we have more than one test
 function wait_for_flyte_deploys() {
+    df -H
     SECONDS=0
     echo ""
     echo "waiting for flyte deploy to complete..."
