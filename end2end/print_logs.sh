@@ -2,6 +2,7 @@
 
 set -ex
 
+df -H
 kubectl get all --all-namespaces
 
 function get_flyte_pods() {
