@@ -4,7 +4,7 @@ set -e
 echo ""
 echo "waiting up to 5 minutes for kubernetes to start..."
 
-K8S_TIMEOUT="60"
+K8S_TIMEOUT="120"
 
 SECONDS=0
 while ! systemctl is-active --quiet multi-user.target; do

@@ -5,6 +5,9 @@ set -ex
 df -H
 kubectl get all --all-namespaces
 
+echo "kubectl describe nodes"
+kubectl describe nodes
+
 function get_flyte_pods() {
     echo $(kubectl -n flyte get pods | awk '{print $1}' | grep -v NAME)
 }
