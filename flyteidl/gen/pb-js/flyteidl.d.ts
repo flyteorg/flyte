@@ -3735,8 +3735,86 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a IOStrategy. */
+        interface IIOStrategy {
+
+            /** IOStrategy downloadMode */
+            downloadMode?: (flyteidl.core.IOStrategy.DownloadMode|null);
+
+            /** IOStrategy uploadMode */
+            uploadMode?: (flyteidl.core.IOStrategy.UploadMode|null);
+        }
+
+        /** Represents a IOStrategy. */
+        class IOStrategy implements IIOStrategy {
+
+            /**
+             * Constructs a new IOStrategy.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IIOStrategy);
+
+            /** IOStrategy downloadMode. */
+            public downloadMode: flyteidl.core.IOStrategy.DownloadMode;
+
+            /** IOStrategy uploadMode. */
+            public uploadMode: flyteidl.core.IOStrategy.UploadMode;
+
+            /**
+             * Creates a new IOStrategy instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns IOStrategy instance
+             */
+            public static create(properties?: flyteidl.core.IIOStrategy): flyteidl.core.IOStrategy;
+
+            /**
+             * Encodes the specified IOStrategy message. Does not implicitly {@link flyteidl.core.IOStrategy.verify|verify} messages.
+             * @param message IOStrategy message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IIOStrategy, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a IOStrategy message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns IOStrategy
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.IOStrategy;
+
+            /**
+             * Verifies a IOStrategy message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace IOStrategy {
+
+            /** DownloadMode enum. */
+            enum DownloadMode {
+                DOWNLOAD_EAGER = 0,
+                DOWNLOAD_STREAM = 1,
+                DO_NOT_DOWNLOAD = 2
+            }
+
+            /** UploadMode enum. */
+            enum UploadMode {
+                UPLOAD_ON_EXIT = 0,
+                UPLOAD_EAGER = 1,
+                DO_NOT_UPLOAD = 2
+            }
+        }
+
         /** Properties of a DataLoadingConfig. */
         interface IDataLoadingConfig {
+
+            /** DataLoadingConfig enabled */
+            enabled?: (boolean|null);
 
             /** DataLoadingConfig inputPath */
             inputPath?: (string|null);
@@ -3745,10 +3823,10 @@ export namespace flyteidl {
             outputPath?: (string|null);
 
             /** DataLoadingConfig format */
-            format?: (flyteidl.core.DataLoadingConfig.MetadataFormat|null);
+            format?: (flyteidl.core.DataLoadingConfig.LiteralMapFormat|null);
 
-            /** DataLoadingConfig enabled */
-            enabled?: (boolean|null);
+            /** DataLoadingConfig ioStrategy */
+            ioStrategy?: (flyteidl.core.IIOStrategy|null);
         }
 
         /** Represents a DataLoadingConfig. */
@@ -3760,6 +3838,9 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.core.IDataLoadingConfig);
 
+            /** DataLoadingConfig enabled. */
+            public enabled: boolean;
+
             /** DataLoadingConfig inputPath. */
             public inputPath: string;
 
@@ -3767,10 +3848,10 @@ export namespace flyteidl {
             public outputPath: string;
 
             /** DataLoadingConfig format. */
-            public format: flyteidl.core.DataLoadingConfig.MetadataFormat;
+            public format: flyteidl.core.DataLoadingConfig.LiteralMapFormat;
 
-            /** DataLoadingConfig enabled. */
-            public enabled: boolean;
+            /** DataLoadingConfig ioStrategy. */
+            public ioStrategy?: (flyteidl.core.IIOStrategy|null);
 
             /**
              * Creates a new DataLoadingConfig instance using the specified properties.
@@ -3807,8 +3888,8 @@ export namespace flyteidl {
 
         namespace DataLoadingConfig {
 
-            /** MetadataFormat enum. */
-            enum MetadataFormat {
+            /** LiteralMapFormat enum. */
+            enum LiteralMapFormat {
                 JSON = 0,
                 YAML = 1,
                 PROTO = 2
