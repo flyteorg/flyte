@@ -16,7 +16,7 @@ spec:
     name: flytetester
     resources:
       requests:
-        cpu: "1"
+        cpu: "0.2"
         memory: 500Mi
   dnsPolicy: ClusterFirst
   priority: 0
