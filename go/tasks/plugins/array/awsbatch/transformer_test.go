@@ -168,6 +168,7 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	ir := &mocks2.InputReader{}
 	ir.OnGetInputPath().Return("inputs.pb")
 	ir.OnGetInputPrefixPath().Return("/inputs/prefix")
+	ir.OnGetMatch(mock.Anything).Return(nil, nil)
 
 	or := &mocks2.OutputWriter{}
 	or.OnGetOutputPrefixPath().Return("/path/output")
