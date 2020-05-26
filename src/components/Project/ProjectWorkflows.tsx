@@ -1,18 +1,14 @@
-import { Typography } from '@material-ui/core';
-import ChevronRight from '@material-ui/icons/ChevronRight';
-import { SearchResult, WaitForData } from 'components/common';
-import {
-    SearchableNamedEntity,
-    SearchableNamedEntityList,
-    useNamedEntityListStyles
-} from 'components/common/SearchableNamedEntityList';
-import { useCommonStyles } from 'components/common/styles';
+import { WaitForData } from 'components/common';
 import { useWorkflowNameList } from 'components/hooks/useNamedEntity';
 import { SearchableWorkflowNameList } from 'components/Workflow/SearchableWorkflowNameList';
-import { limits, SortDirection, workflowSortFields } from 'models';
+import { Admin } from 'flyteidl';
+import {
+    FilterOperationName,
+    limits,
+    SortDirection,
+    workflowSortFields
+} from 'models';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
-import { Routes } from 'routes';
 
 export interface ProjectWorkflowsProps {
     projectId: string;
@@ -31,7 +27,15 @@ export const ProjectWorkflows: React.FC<ProjectWorkflowsProps> = ({
             sort: {
                 direction: SortDirection.ASCENDING,
                 key: workflowSortFields.name
-            }
+            },
+            // Hide archived workflows from the list
+            filter: [
+                {
+                    key: 'state',
+                    operation: FilterOperationName.EQ,
+                    value: Admin.NamedEntityState.NAMED_ENTITY_ACTIVE
+                }
+            ]
         }
     );
 
