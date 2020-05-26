@@ -51,47 +51,49 @@ func ReplaceTemplateCommandArgs(ctx context.Context, command []string, in io.Inp
 	return res, nil
 }
 
-func replaceTemplateCommandArgs(ctx context.Context, commandTemplate string, in io.InputReader, out io.OutputFilePaths) (string, error) {
-	val := inputFileRegex.ReplaceAllString(commandTemplate, in.GetInputPath().String())
-	val = outputRegex.ReplaceAllString(val, out.GetOutputPrefixPath().String())
-	val = inputPrefixRegex.ReplaceAllString(val, in.GetInputPrefixPath().String())
-	groupMatches := inputVarRegex.FindAllStringSubmatchIndex(val, -1)
-	if len(groupMatches) == 0 {
-		return val, nil
-	} else if len(groupMatches) > 1 {
-		return val, fmt.Errorf("only one level of inputs nesting is supported. Syntax in [%v] is invalid", commandTemplate)
-	} else if len(groupMatches[0]) > 4 {
-		return val, fmt.Errorf("longer submatches not supported. Syntax in [%v] is invalid", commandTemplate)
-	}
-	startIdx := groupMatches[0][0]
-	endIdx := groupMatches[0][1]
-	inputStartIdx := groupMatches[0][2]
-	inputEndIdx := groupMatches[0][3]
-	inputName := val[inputStartIdx:inputEndIdx]
-
-	inputs, err := in.Get(ctx)
-	if err != nil {
-		return val, errors.Wrapf(err, "unable to read inputs for [%s]", inputName)
-	}
-	if inputs == nil || inputs.Literals == nil {
-		return val, fmt.Errorf("no inputs provided, cannot bind input name [%s]", inputName)
-	}
-	inputVal, exists := inputs.Literals[inputName]
+func transformVarNameToStringVal(ctx context.Context, varName string, inputs *core.LiteralMap) (string, error) {
+	inputVal, exists := inputs.Literals[varName]
 	if !exists {
-		return val, fmt.Errorf("requested input is not found [%v] while processing template [%v]",
-			inputName, commandTemplate)
+		return "", fmt.Errorf("requested input is not found [%s]", varName)
 	}
 
 	v, err := serializeLiteral(ctx, inputVal)
 	if err != nil {
-		return val, errors.Wrapf(err, "failed to bind a value to inputName [%s]", inputName)
+		return "", errors.Wrapf(err, "failed to bind a value to inputName [%s]", varName)
 	}
-	if endIdx >= len(val) {
-		return val[:startIdx] + v, nil
+	return v, nil
+}
+
+func replaceTemplateCommandArgs(ctx context.Context, commandTemplate string, in io.InputReader, out io.OutputFilePaths) (string, error) {
+	val := inputFileRegex.ReplaceAllString(commandTemplate, in.GetInputPath().String())
+	val = outputRegex.ReplaceAllString(val, out.GetOutputPrefixPath().String())
+	val = inputPrefixRegex.ReplaceAllString(val, in.GetInputPrefixPath().String())
+
+	inputs, err := in.Get(ctx)
+	if err != nil {
+		return val, errors.Wrapf(err, "unable to read inputs")
+	}
+	if inputs == nil || inputs.Literals == nil {
+		return val, nil
 	}
 
-	return val[:startIdx] + v + val[endIdx:], nil
+	var errs ErrorCollection
+	val = inputVarRegex.ReplaceAllStringFunc(val, func(s string) string {
+		matches := inputVarRegex.FindAllStringSubmatch(s, 1)
+		varName := matches[0][1]
+		replaced, err := transformVarNameToStringVal(ctx, varName, inputs)
+		if err != nil {
+			errs.Errors = append(errs.Errors, errors.Wrapf(err, "input template [%s]", s))
+			return ""
+		}
+		return replaced
+	})
 
+	if len(errs.Errors) > 0 {
+		return "", errs
+	}
+
+	return val, nil
 }
 
 func serializePrimitive(p *core.Primitive) (string, error) {

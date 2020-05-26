@@ -16,3 +16,11 @@ func TestContains(t *testing.T) {
 
 	assert.False(t, Contains(nil, "b"))
 }
+
+func TestCopyMap(t *testing.T) {
+	assert.Nil(t, CopyMap(nil))
+	m := map[string]string{
+		"l": "v",
+	}
+	assert.Equal(t, m, CopyMap(m))
+}
