@@ -20,7 +20,7 @@ docker run \
   --volume $DIR/..:/flyte \
   --name dockernetes \
   --env "DOCKERNETES_DEBUG=${DOCKERNETES_DEBUG}" \
-  lyft/dockernetes:a65a0237bfaf9055b7503473515c8dd5c99df07a /sbin/init
+  lyft/dockernetes:7692164d7e6b3963bbcc39a3f5510495509cb71a /sbin/init
 
 # wait for the system to initalize, then run execute.sh
 if [ -n "$DOCKERNETES_DEBUG" ]; then
