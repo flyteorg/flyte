@@ -5,7 +5,7 @@ set -ex
 df -H
 kubectl get all --all-namespaces
 
-echo "kubectl describe nodes"
+echo "print_logs kubectl describe nodes"
 kubectl describe nodes
 
 function get_flyte_pods() {
