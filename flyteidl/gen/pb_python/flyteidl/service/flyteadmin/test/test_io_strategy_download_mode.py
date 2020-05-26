@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import flyteadmin
-from flyteadmin.models.data_loading_config_metadata_format import DataLoadingConfigMetadataFormat  # noqa: E501
+from flyteadmin.models.io_strategy_download_mode import IOStrategyDownloadMode  # noqa: E501
 from flyteadmin.rest import ApiException
 
 
-class TestDataLoadingConfigMetadataFormat(unittest.TestCase):
-    """DataLoadingConfigMetadataFormat unit test stubs"""
+class TestIOStrategyDownloadMode(unittest.TestCase):
+    """IOStrategyDownloadMode unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestDataLoadingConfigMetadataFormat(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testDataLoadingConfigMetadataFormat(self):
-        """Test DataLoadingConfigMetadataFormat"""
+    def testIOStrategyDownloadMode(self):
+        """Test IOStrategyDownloadMode"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = flyteadmin.models.data_loading_config_metadata_format.DataLoadingConfigMetadataFormat()  # noqa: E501
+        # model = flyteadmin.models.io_strategy_download_mode.IOStrategyDownloadMode()  # noqa: E501
         pass
 
 

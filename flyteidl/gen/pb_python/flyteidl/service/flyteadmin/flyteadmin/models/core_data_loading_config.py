@@ -16,7 +16,8 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.data_loading_config_metadata_format import DataLoadingConfigMetadataFormat  # noqa: F401,E501
+from flyteadmin.models.core_io_strategy import CoreIOStrategy  # noqa: F401,E501
+from flyteadmin.models.data_loading_config_literal_map_format import DataLoadingConfigLiteralMapFormat  # noqa: F401,E501
 
 
 class CoreDataLoadingConfig(object):
@@ -33,36 +34,62 @@ class CoreDataLoadingConfig(object):
                             and the value is json key in definition.
     """
     swagger_types = {
+        'enabled': 'bool',
         'input_path': 'str',
         'output_path': 'str',
-        'format': 'DataLoadingConfigMetadataFormat',
-        'enabled': 'bool'
+        'format': 'DataLoadingConfigLiteralMapFormat',
+        'io_strategy': 'CoreIOStrategy'
     }
 
     attribute_map = {
+        'enabled': 'enabled',
         'input_path': 'input_path',
         'output_path': 'output_path',
         'format': 'format',
-        'enabled': 'enabled'
+        'io_strategy': 'io_strategy'
     }
 
-    def __init__(self, input_path=None, output_path=None, format=None, enabled=None):  # noqa: E501
+    def __init__(self, enabled=None, input_path=None, output_path=None, format=None, io_strategy=None):  # noqa: E501
         """CoreDataLoadingConfig - a model defined in Swagger"""  # noqa: E501
 
+        self._enabled = None
         self._input_path = None
         self._output_path = None
         self._format = None
-        self._enabled = None
+        self._io_strategy = None
         self.discriminator = None
 
+        if enabled is not None:
+            self.enabled = enabled
         if input_path is not None:
             self.input_path = input_path
         if output_path is not None:
             self.output_path = output_path
         if format is not None:
             self.format = format
-        if enabled is not None:
-            self.enabled = enabled
+        if io_strategy is not None:
+            self.io_strategy = io_strategy
+
+    @property
+    def enabled(self):
+        """Gets the enabled of this CoreDataLoadingConfig.  # noqa: E501
+
+
+        :return: The enabled of this CoreDataLoadingConfig.  # noqa: E501
+        :rtype: bool
+        """
+        return self._enabled
+
+    @enabled.setter
+    def enabled(self, enabled):
+        """Sets the enabled of this CoreDataLoadingConfig.
+
+
+        :param enabled: The enabled of this CoreDataLoadingConfig.  # noqa: E501
+        :type: bool
+        """
+
+        self._enabled = enabled
 
     @property
     def input_path(self):
@@ -112,7 +139,7 @@ class CoreDataLoadingConfig(object):
 
 
         :return: The format of this CoreDataLoadingConfig.  # noqa: E501
-        :rtype: DataLoadingConfigMetadataFormat
+        :rtype: DataLoadingConfigLiteralMapFormat
         """
         return self._format
 
@@ -122,31 +149,31 @@ class CoreDataLoadingConfig(object):
 
 
         :param format: The format of this CoreDataLoadingConfig.  # noqa: E501
-        :type: DataLoadingConfigMetadataFormat
+        :type: DataLoadingConfigLiteralMapFormat
         """
 
         self._format = format
 
     @property
-    def enabled(self):
-        """Gets the enabled of this CoreDataLoadingConfig.  # noqa: E501
+    def io_strategy(self):
+        """Gets the io_strategy of this CoreDataLoadingConfig.  # noqa: E501
 
 
-        :return: The enabled of this CoreDataLoadingConfig.  # noqa: E501
-        :rtype: bool
+        :return: The io_strategy of this CoreDataLoadingConfig.  # noqa: E501
+        :rtype: CoreIOStrategy
         """
-        return self._enabled
+        return self._io_strategy
 
-    @enabled.setter
-    def enabled(self, enabled):
-        """Sets the enabled of this CoreDataLoadingConfig.
+    @io_strategy.setter
+    def io_strategy(self, io_strategy):
+        """Sets the io_strategy of this CoreDataLoadingConfig.
 
 
-        :param enabled: The enabled of this CoreDataLoadingConfig.  # noqa: E501
-        :type: bool
+        :param io_strategy: The io_strategy of this CoreDataLoadingConfig.  # noqa: E501
+        :type: CoreIOStrategy
         """
 
-        self._enabled = enabled
+        self._io_strategy = io_strategy
 
     def to_dict(self):
         """Returns the model properties as a dict"""
