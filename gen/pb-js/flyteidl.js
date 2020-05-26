@@ -9076,16 +9076,188 @@ export const flyteidl = $root.flyteidl = (() => {
             return Container;
         })();
 
+        core.IOStrategy = (function() {
+
+            /**
+             * Properties of a IOStrategy.
+             * @memberof flyteidl.core
+             * @interface IIOStrategy
+             * @property {flyteidl.core.IOStrategy.DownloadMode|null} [downloadMode] IOStrategy downloadMode
+             * @property {flyteidl.core.IOStrategy.UploadMode|null} [uploadMode] IOStrategy uploadMode
+             */
+
+            /**
+             * Constructs a new IOStrategy.
+             * @memberof flyteidl.core
+             * @classdesc Represents a IOStrategy.
+             * @implements IIOStrategy
+             * @constructor
+             * @param {flyteidl.core.IIOStrategy=} [properties] Properties to set
+             */
+            function IOStrategy(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * IOStrategy downloadMode.
+             * @member {flyteidl.core.IOStrategy.DownloadMode} downloadMode
+             * @memberof flyteidl.core.IOStrategy
+             * @instance
+             */
+            IOStrategy.prototype.downloadMode = 0;
+
+            /**
+             * IOStrategy uploadMode.
+             * @member {flyteidl.core.IOStrategy.UploadMode} uploadMode
+             * @memberof flyteidl.core.IOStrategy
+             * @instance
+             */
+            IOStrategy.prototype.uploadMode = 0;
+
+            /**
+             * Creates a new IOStrategy instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.IOStrategy
+             * @static
+             * @param {flyteidl.core.IIOStrategy=} [properties] Properties to set
+             * @returns {flyteidl.core.IOStrategy} IOStrategy instance
+             */
+            IOStrategy.create = function create(properties) {
+                return new IOStrategy(properties);
+            };
+
+            /**
+             * Encodes the specified IOStrategy message. Does not implicitly {@link flyteidl.core.IOStrategy.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.IOStrategy
+             * @static
+             * @param {flyteidl.core.IIOStrategy} message IOStrategy message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            IOStrategy.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.downloadMode != null && message.hasOwnProperty("downloadMode"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.downloadMode);
+                if (message.uploadMode != null && message.hasOwnProperty("uploadMode"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.uploadMode);
+                return writer;
+            };
+
+            /**
+             * Decodes a IOStrategy message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.IOStrategy
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.IOStrategy} IOStrategy
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            IOStrategy.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.IOStrategy();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.downloadMode = reader.int32();
+                        break;
+                    case 2:
+                        message.uploadMode = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a IOStrategy message.
+             * @function verify
+             * @memberof flyteidl.core.IOStrategy
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            IOStrategy.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.downloadMode != null && message.hasOwnProperty("downloadMode"))
+                    switch (message.downloadMode) {
+                    default:
+                        return "downloadMode: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
+                    }
+                if (message.uploadMode != null && message.hasOwnProperty("uploadMode"))
+                    switch (message.uploadMode) {
+                    default:
+                        return "uploadMode: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
+                    }
+                return null;
+            };
+
+            /**
+             * DownloadMode enum.
+             * @name flyteidl.core.IOStrategy.DownloadMode
+             * @enum {string}
+             * @property {number} DOWNLOAD_EAGER=0 DOWNLOAD_EAGER value
+             * @property {number} DOWNLOAD_STREAM=1 DOWNLOAD_STREAM value
+             * @property {number} DO_NOT_DOWNLOAD=2 DO_NOT_DOWNLOAD value
+             */
+            IOStrategy.DownloadMode = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "DOWNLOAD_EAGER"] = 0;
+                values[valuesById[1] = "DOWNLOAD_STREAM"] = 1;
+                values[valuesById[2] = "DO_NOT_DOWNLOAD"] = 2;
+                return values;
+            })();
+
+            /**
+             * UploadMode enum.
+             * @name flyteidl.core.IOStrategy.UploadMode
+             * @enum {string}
+             * @property {number} UPLOAD_ON_EXIT=0 UPLOAD_ON_EXIT value
+             * @property {number} UPLOAD_EAGER=1 UPLOAD_EAGER value
+             * @property {number} DO_NOT_UPLOAD=2 DO_NOT_UPLOAD value
+             */
+            IOStrategy.UploadMode = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "UPLOAD_ON_EXIT"] = 0;
+                values[valuesById[1] = "UPLOAD_EAGER"] = 1;
+                values[valuesById[2] = "DO_NOT_UPLOAD"] = 2;
+                return values;
+            })();
+
+            return IOStrategy;
+        })();
+
         core.DataLoadingConfig = (function() {
 
             /**
              * Properties of a DataLoadingConfig.
              * @memberof flyteidl.core
              * @interface IDataLoadingConfig
+             * @property {boolean|null} [enabled] DataLoadingConfig enabled
              * @property {string|null} [inputPath] DataLoadingConfig inputPath
              * @property {string|null} [outputPath] DataLoadingConfig outputPath
-             * @property {flyteidl.core.DataLoadingConfig.MetadataFormat|null} [format] DataLoadingConfig format
-             * @property {boolean|null} [enabled] DataLoadingConfig enabled
+             * @property {flyteidl.core.DataLoadingConfig.LiteralMapFormat|null} [format] DataLoadingConfig format
+             * @property {flyteidl.core.IIOStrategy|null} [ioStrategy] DataLoadingConfig ioStrategy
              */
 
             /**
@@ -9102,6 +9274,14 @@ export const flyteidl = $root.flyteidl = (() => {
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
+
+            /**
+             * DataLoadingConfig enabled.
+             * @member {boolean} enabled
+             * @memberof flyteidl.core.DataLoadingConfig
+             * @instance
+             */
+            DataLoadingConfig.prototype.enabled = false;
 
             /**
              * DataLoadingConfig inputPath.
@@ -9121,19 +9301,19 @@ export const flyteidl = $root.flyteidl = (() => {
 
             /**
              * DataLoadingConfig format.
-             * @member {flyteidl.core.DataLoadingConfig.MetadataFormat} format
+             * @member {flyteidl.core.DataLoadingConfig.LiteralMapFormat} format
              * @memberof flyteidl.core.DataLoadingConfig
              * @instance
              */
             DataLoadingConfig.prototype.format = 0;
 
             /**
-             * DataLoadingConfig enabled.
-             * @member {boolean} enabled
+             * DataLoadingConfig ioStrategy.
+             * @member {flyteidl.core.IIOStrategy|null|undefined} ioStrategy
              * @memberof flyteidl.core.DataLoadingConfig
              * @instance
              */
-            DataLoadingConfig.prototype.enabled = false;
+            DataLoadingConfig.prototype.ioStrategy = null;
 
             /**
              * Creates a new DataLoadingConfig instance using the specified properties.
@@ -9159,14 +9339,16 @@ export const flyteidl = $root.flyteidl = (() => {
             DataLoadingConfig.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
-                if (message.inputPath != null && message.hasOwnProperty("inputPath"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.inputPath);
-                if (message.outputPath != null && message.hasOwnProperty("outputPath"))
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.outputPath);
-                if (message.format != null && message.hasOwnProperty("format"))
-                    writer.uint32(/* id 3, wireType 0 =*/24).int32(message.format);
                 if (message.enabled != null && message.hasOwnProperty("enabled"))
-                    writer.uint32(/* id 4, wireType 0 =*/32).bool(message.enabled);
+                    writer.uint32(/* id 1, wireType 0 =*/8).bool(message.enabled);
+                if (message.inputPath != null && message.hasOwnProperty("inputPath"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.inputPath);
+                if (message.outputPath != null && message.hasOwnProperty("outputPath"))
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.outputPath);
+                if (message.format != null && message.hasOwnProperty("format"))
+                    writer.uint32(/* id 4, wireType 0 =*/32).int32(message.format);
+                if (message.ioStrategy != null && message.hasOwnProperty("ioStrategy"))
+                    $root.flyteidl.core.IOStrategy.encode(message.ioStrategy, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                 return writer;
             };
 
@@ -9189,16 +9371,19 @@ export const flyteidl = $root.flyteidl = (() => {
                     let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
-                        message.inputPath = reader.string();
+                        message.enabled = reader.bool();
                         break;
                     case 2:
-                        message.outputPath = reader.string();
+                        message.inputPath = reader.string();
                         break;
                     case 3:
-                        message.format = reader.int32();
+                        message.outputPath = reader.string();
                         break;
                     case 4:
-                        message.enabled = reader.bool();
+                        message.format = reader.int32();
+                        break;
+                    case 5:
+                        message.ioStrategy = $root.flyteidl.core.IOStrategy.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -9219,6 +9404,9 @@ export const flyteidl = $root.flyteidl = (() => {
             DataLoadingConfig.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (message.enabled != null && message.hasOwnProperty("enabled"))
+                    if (typeof message.enabled !== "boolean")
+                        return "enabled: boolean expected";
                 if (message.inputPath != null && message.hasOwnProperty("inputPath"))
                     if (!$util.isString(message.inputPath))
                         return "inputPath: string expected";
@@ -9234,21 +9422,23 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 2:
                         break;
                     }
-                if (message.enabled != null && message.hasOwnProperty("enabled"))
-                    if (typeof message.enabled !== "boolean")
-                        return "enabled: boolean expected";
+                if (message.ioStrategy != null && message.hasOwnProperty("ioStrategy")) {
+                    let error = $root.flyteidl.core.IOStrategy.verify(message.ioStrategy);
+                    if (error)
+                        return "ioStrategy." + error;
+                }
                 return null;
             };
 
             /**
-             * MetadataFormat enum.
-             * @name flyteidl.core.DataLoadingConfig.MetadataFormat
+             * LiteralMapFormat enum.
+             * @name flyteidl.core.DataLoadingConfig.LiteralMapFormat
              * @enum {string}
              * @property {number} JSON=0 JSON value
              * @property {number} YAML=1 YAML value
              * @property {number} PROTO=2 PROTO value
              */
-            DataLoadingConfig.MetadataFormat = (function() {
+            DataLoadingConfig.LiteralMapFormat = (function() {
                 const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "JSON"] = 0;
                 values[valuesById[1] = "YAML"] = 1;

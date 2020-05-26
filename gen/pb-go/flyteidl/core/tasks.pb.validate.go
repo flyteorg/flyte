@@ -630,6 +630,74 @@ var _ interface {
 	ErrorName() string
 } = ContainerValidationError{}
 
+// Validate checks the field values on IOStrategy with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *IOStrategy) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for DownloadMode
+
+	// no validation rules for UploadMode
+
+	return nil
+}
+
+// IOStrategyValidationError is the validation error returned by
+// IOStrategy.Validate if the designated constraints aren't met.
+type IOStrategyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IOStrategyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IOStrategyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IOStrategyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IOStrategyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IOStrategyValidationError) ErrorName() string { return "IOStrategyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IOStrategyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIOStrategy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IOStrategyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IOStrategyValidationError{}
+
 // Validate checks the field values on DataLoadingConfig with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -638,13 +706,23 @@ func (m *DataLoadingConfig) Validate() error {
 		return nil
 	}
 
+	// no validation rules for Enabled
+
 	// no validation rules for InputPath
 
 	// no validation rules for OutputPath
 
 	// no validation rules for Format
 
-	// no validation rules for Enabled
+	if v, ok := interface{}(m.GetIoStrategy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DataLoadingConfigValidationError{
+				field:  "IoStrategy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	return nil
 }

@@ -2691,7 +2691,7 @@
         }
       }
     },
-    "DataLoadingConfigMetadataFormat": {
+    "DataLoadingConfigLiteralMapFormat": {
       "type": "string",
       "enum": [
         "JSON",
@@ -2700,7 +2700,7 @@
       ],
       "default": "JSON",
       "description": "- JSON: JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html\n - PROTO: Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core",
-      "title": "MetadataFormat decides the encoding format in which the input metadata should be made available to the containers. \nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
+      "title": "LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers. \nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
     },
     "ExecutionErrorErrorKind": {
       "type": "string",
@@ -2723,6 +2723,28 @@
       ],
       "default": "MANUAL",
       "description": "The method by which this execution was launched.\n\n - MANUAL: The default execution mode, MANUAL implies that an execution was launched by an individual.\n - SCHEDULED: A schedule triggered this execution launch.\n - SYSTEM: A system process was responsible for launching this execution rather an individual.\n - RELAUNCH: This execution was launched with identical inputs as a previous execution.\n - CHILD_WORKFLOW: This execution was triggered by another execution."
+    },
+    "IOStrategyDownloadMode": {
+      "type": "string",
+      "enum": [
+        "DOWNLOAD_EAGER",
+        "DOWNLOAD_STREAM",
+        "DO_NOT_DOWNLOAD"
+      ],
+      "default": "DOWNLOAD_EAGER",
+      "description": "- DOWNLOAD_EAGER: All data will be downloaded before the main container is executed\n - DOWNLOAD_STREAM: Data will be downloaded as a stream and an End-Of-Stream marker will be written to indicate all data has been downloaded. Refer to protocol for details\n - DO_NOT_DOWNLOAD: Large objects (offloaded) will not be downloaded",
+      "title": "Mode to use for downloading"
+    },
+    "IOStrategyUploadMode": {
+      "type": "string",
+      "enum": [
+        "UPLOAD_ON_EXIT",
+        "UPLOAD_EAGER",
+        "DO_NOT_UPLOAD"
+      ],
+      "default": "UPLOAD_ON_EXIT",
+      "description": "- UPLOAD_ON_EXIT: All data will be uploaded after the main container exits\n - UPLOAD_EAGER: Data will be uploaded as it appears. Refer to protocol specification for details\n - DO_NOT_UPLOAD: Data will not be uploaded, only references will be written",
+      "title": "Mode to use for uploading"
     },
     "ResourcesResourceEntry": {
       "type": "object",
@@ -4511,6 +4533,11 @@
     "coreDataLoadingConfig": {
       "type": "object",
       "properties": {
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Flag enables DataLoading Config. If this is not set, data loading will not be used!"
+        },
         "input_path": {
           "type": "string",
           "title": "File system path (start at root). This folder will contain all the inputs exploded to a separate file. \nExample, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is \"/var/flyte/inputs\", then the file system will look like\n/var/flyte/inputs/inputs.\u003cmetadata format dependent -\u003e .pb .json .yaml\u003e -\u003e Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations \n/var/flyte/inputs/x -\u003e X is a file that contains the value of x (integer) in string format\n/var/flyte/inputs/y -\u003e Y is a file in Binary format\n/var/flyte/inputs/z/... -\u003e Note Z itself is a directory\nMore information about the protocol - refer to docs #TODO reference docs here"
@@ -4520,13 +4547,11 @@
           "title": "File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file"
         },
         "format": {
-          "$ref": "#/definitions/DataLoadingConfigMetadataFormat",
+          "$ref": "#/definitions/DataLoadingConfigLiteralMapFormat",
           "title": "In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.\nThis format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding"
         },
-        "enabled": {
-          "type": "boolean",
-          "format": "boolean",
-          "title": "Flag enables DataLoading Config. If this is not set, data loading will not be used!"
+        "io_strategy": {
+          "$ref": "#/definitions/coreIOStrategy"
         }
       },
       "description": "This configuration allows executing raw containers in Flyte using the Flyte CoPilot system.\nFlyte CoPilot, eliminates the needs of flytekit or sdk inside the container. Any inputs required by the users container are side-loaded in the input_path\nAny outputs generated by the user container - within output_path are automatically uploaded."
@@ -4565,6 +4590,20 @@
         }
       },
       "description": "Represents the error message from the execution."
+    },
+    "coreIOStrategy": {
+      "type": "object",
+      "properties": {
+        "download_mode": {
+          "$ref": "#/definitions/IOStrategyDownloadMode",
+          "title": "Mode to use to manage downloads"
+        },
+        "upload_mode": {
+          "$ref": "#/definitions/IOStrategyUploadMode",
+          "title": "Mode to use to manage uploads"
+        }
+      },
+      "title": "Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)"
     },
     "coreIdentifier": {
       "type": "object",
