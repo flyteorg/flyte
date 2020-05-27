@@ -6,6 +6,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        go-version: [1.13]
     steps:
       - uses: actions/checkout@v1
       - name: Push Docker Image to Github Registry
@@ -17,3 +21,14 @@ jobs:
           image_tag: ${{ github.sha }}
           push_git_tag: true
           registry: docker.pkg.github.com
+      - uses: engineerd/setup-kind@v0.4.0
+      - name: End2End
+        env:
+          DOCKER_USERNAME: ${{ github.actor }}
+          DOCKER_PASSWORD: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          kubectl cluster-info
+          kubectl get pods -n kube-system
+          echo "current-context:" $(kubectl config current-context)
+          echo "environment-kubeconfig:" ${KUBECONFIG}
+          PROPELLER=${{ secrets.flytegithub_repo }}/operator:${{ github.sha }} make end2end_execute
