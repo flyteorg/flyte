@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-df -H
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 # stop any existing test container that might be running
