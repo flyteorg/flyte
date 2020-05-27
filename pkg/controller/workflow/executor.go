@@ -44,6 +44,10 @@ var StatusRunning = Status{TransitionToPhase: v1alpha1.WorkflowPhaseRunning}
 var StatusSucceeding = Status{TransitionToPhase: v1alpha1.WorkflowPhaseSucceeding}
 var StatusSuccess = Status{TransitionToPhase: v1alpha1.WorkflowPhaseSuccess}
 
+func StatusFailureNode(originalErr *core.ExecutionError) Status {
+	return Status{TransitionToPhase: v1alpha1.WorkflowPhaseHandlingFailureNode, Err: originalErr}
+}
+
 func StatusFailing(err *core.ExecutionError) Status {
 	return Status{TransitionToPhase: v1alpha1.WorkflowPhaseFailing, Err: err}
 }
@@ -157,43 +161,63 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 	return StatusRunning, nil
 }
 
+func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
+	execErr := executionErrorOrDefault(w.GetExecutionStatus().GetExecutionError(), w.GetExecutionStatus().GetMessage())
+	errorNode := w.GetOnFailureNode()
+	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, w, w, w, errorNode)
+	if err != nil {
+		return StatusFailureNode(execErr), err
+	}
+
+	if state.HasFailed() {
+		return StatusFailed(state.Err), nil
+	}
+
+	if state.HasTimedOut() {
+		return StatusFailed(&core.ExecutionError{
+			Kind:    core.ExecutionError_USER,
+			Code:    "TimedOut",
+			Message: "FailureNode Timed-out"}), nil
+	}
+
+	if state.PartiallyComplete() {
+		// Re-enqueue the workflow
+		c.enqueueWorkflow(w.GetK8sWorkflowID().String())
+		return StatusFailureNode(execErr), nil
+	}
+
+	// If the failure node finished executing, transition to failed.
+	return StatusFailed(execErr), nil
+}
+
+func executionErrorOrDefault(execError *core.ExecutionError, fallbackMessage string) *core.ExecutionError {
+	if execError == nil {
+		return &core.ExecutionError{
+			Code:    "UnknownError",
+			Message: fmt.Sprintf("Unknown error, last seen message [%s]", fallbackMessage),
+			Kind:    core.ExecutionError_UNKNOWN,
+		}
+	}
+
+	return execError
+}
+
 func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
+	execErr := executionErrorOrDefault(w.GetExecutionStatus().GetExecutionError(), w.GetExecutionStatus().GetMessage())
+
 	// Best effort clean-up.
 	if err := c.cleanupRunningNodes(ctx, w, "Some node execution failed, auto-abort."); err != nil {
-		logger.Errorf(ctx, "Failed to propagate Abort for workflow:%v. Error: %v", w.ExecutionID.WorkflowExecutionIdentifier, err)
+		logger.Errorf(ctx, "Failed to propagate Abort for workflow:%v. Error: %v",
+			w.ExecutionID.WorkflowExecutionIdentifier, err)
+		return StatusFailing(execErr), err
 	}
 
 	errorNode := w.GetOnFailureNode()
 	if errorNode != nil {
-		state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, w, w, w, errorNode)
-		if err != nil {
-			return StatusFailing(nil), err
-		}
-		if state.HasFailed() {
-			return StatusFailed(state.Err), nil
-		}
-		if state.HasTimedOut() {
-			return StatusFailed(&core.ExecutionError{
-				Kind:    core.ExecutionError_USER,
-				Code:    "TimedOut",
-				Message: "FailureNode Timedout"}), nil
-		}
-		if state.PartiallyComplete() {
-			// Re-enqueue the workflow
-			c.enqueueWorkflow(w.GetK8sWorkflowID().String())
-			return StatusFailing(nil), nil
-		}
-		// Fallthrough to handle state is complete
+		return StatusFailureNode(execErr), nil
 	}
-	err := w.GetExecutionStatus().GetExecutionError()
-	if err == nil {
-		err = &core.ExecutionError{
-			Code:    "UnknownError",
-			Message: fmt.Sprintf("Unknown error, last seen message [%s]", w.GetExecutionStatus().GetMessage()),
-			Kind:    core.ExecutionError_UNKNOWN,
-		}
-	}
-	return StatusFailed(err), nil
+
+	return StatusFailed(execErr), nil
 }
 
 func (c *workflowExecutor) handleSucceedingWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) Status {
@@ -250,6 +274,8 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 			wfEvent.Phase = core.WorkflowExecution_RUNNING
 			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseRunning, fmt.Sprintf("Workflow Started"), nil)
 			wfEvent.OccurredAt = utils.GetProtoTime(wStatus.GetStartedAt())
+		case v1alpha1.WorkflowPhaseHandlingFailureNode:
+			fallthrough
 		case v1alpha1.WorkflowPhaseFailing:
 			wfEvent.Phase = core.WorkflowExecution_FAILING
 			wfEvent.OutputResult = convertToExecutionError(toStatus.Err, previousError)
@@ -364,6 +390,16 @@ func (c *workflowExecutor) HandleFlyteWorkflow(ctx context.Context, w *v1alpha1.
 		return nil
 	case v1alpha1.WorkflowPhaseFailing:
 		newStatus, err := c.handleFailingWorkflow(ctx, w)
+		if err != nil {
+			return err
+		}
+		if err := c.TransitionToPhase(ctx, w.ExecutionID.WorkflowExecutionIdentifier, wStatus, newStatus); err != nil {
+			return err
+		}
+		c.k8sRecorder.Event(w, corev1.EventTypeWarning, v1alpha1.WorkflowPhaseFailed.String(), "Workflow failed.")
+		return nil
+	case v1alpha1.WorkflowPhaseHandlingFailureNode:
+		newStatus, err := c.handleFailureNode(ctx, w)
 		if err != nil {
 			return err
 		}

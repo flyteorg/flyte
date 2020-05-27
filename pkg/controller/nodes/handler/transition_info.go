@@ -7,6 +7,8 @@ import (
 	"github.com/lyft/flytestdlib/storage"
 )
 
+//go:generate enumer --type=EPhase --trimprefix=EPhase
+
 type EPhase uint8
 
 const (
@@ -19,29 +21,8 @@ const (
 	EPhaseRetryableFailure
 	EPhaseSuccess
 	EPhaseTimedout
+	EPhaseFailing
 )
-
-func (p EPhase) String() string {
-	switch p {
-	case EPhaseNotReady:
-		return "not-ready"
-	case EPhaseQueued:
-		return "queued"
-	case EPhaseRunning:
-		return "running"
-	case EPhaseSkip:
-		return "skip"
-	case EPhaseFailed:
-		return "failed"
-	case EPhaseRetryableFailure:
-		return "retryable-fail"
-	case EPhaseSuccess:
-		return "success"
-	case EPhaseTimedout:
-		return "timedout"
-	}
-	return "undefined"
-}
 
 func (p EPhase) IsTerminal() bool {
 	if p == EPhaseFailed || p == EPhaseSuccess || p == EPhaseSkip || p == EPhaseTimedout {
@@ -148,6 +129,7 @@ func phaseInfoFailed(p EPhase, err *core.ExecutionError, info *ExecutionInfo) Ph
 			Message: "Unknown error message",
 		}
 	}
+
 	return phaseInfo(p, err, info, err.Message)
 }
 
@@ -157,6 +139,10 @@ func PhaseInfoFailure(kind core.ExecutionError_ErrorKind, code, reason string, i
 
 func PhaseInfoFailureErr(err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {
 	return phaseInfoFailed(EPhaseFailed, err, info)
+}
+
+func PhaseInfoFailingErr(err *core.ExecutionError, info *ExecutionInfo) PhaseInfo {
+	return phaseInfoFailed(EPhaseFailing, err, info)
 }
 
 func PhaseInfoRetryableFailure(kind core.ExecutionError_ErrorKind, code, reason string, info *ExecutionInfo) PhaseInfo {

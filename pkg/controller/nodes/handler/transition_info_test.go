@@ -8,32 +8,8 @@ import (
 )
 
 func TestPhaseInfoQueued(t *testing.T) {
-	p := PhaseInfoQueued("queued")
+	p := PhaseInfoQueued("Queued")
 	assert.Equal(t, EPhaseQueued, p.p)
-}
-
-func TestEPhase_String(t *testing.T) {
-	tests := []struct {
-		name string
-		p    EPhase
-	}{
-		{"queued", EPhaseQueued},
-		{"not-ready", EPhaseNotReady},
-		{"timedout", EPhaseTimedout},
-		{"undefined", EPhaseUndefined},
-		{"success", EPhaseSuccess},
-		{"skip", EPhaseSkip},
-		{"failed", EPhaseFailed},
-		{"running", EPhaseRunning},
-		{"retryable-fail", EPhaseRetryableFailure},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.p.String(); got != tt.name {
-				t.Errorf("String() = %v, want %v", got, tt.name)
-			}
-		})
-	}
 }
 
 func TestEPhase_IsTerminal(t *testing.T) {

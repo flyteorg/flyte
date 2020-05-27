@@ -5,7 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime/pprof"
 	"strings"
+
+	"github.com/lyft/flytestdlib/contextutils"
 
 	"k8s.io/klog"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -215,10 +218,24 @@ func executeRootCmd(cfg *config2.Config) {
 		logger.Fatalf(ctx, "Failed to initialize controller run-time manager. Error: %v", err)
 	}
 
-	c, err := controller.New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, mgr, propellerScope)
+	// Start controller runtime manager to start listening to resource changes.
+	// K8sPluginManager uses controller runtime to create informers for the CRDs being monitored by plugins. The informer
+	// EventHandler enqueues the owner workflow for reevaluation. These informer events allow propeller to detect
+	// workflow changes faster than the default sync interval for workflow CRDs.
+	go func(ctx context.Context) {
+		ctx = contextutils.WithGoroutineLabel(ctx, "controller-runtime-manager")
+		pprof.SetGoroutineLabels(ctx)
+		logger.Infof(ctx, "Starting controller-runtime manager")
+		err := mgr.Start(ctx.Done())
+		if err != nil {
+			logger.Fatalf(ctx, "Failed to start manager. Error: %v", err)
+		}
+	}(ctx)
 
+	c, err := controller.New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, mgr, propellerScope)
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to start Controller - [%v]", err.Error())
+		return
 	} else if c == nil {
 		logger.Fatalf(ctx, "Failed to start Controller, nil controller received.")
 	}

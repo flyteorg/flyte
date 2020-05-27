@@ -5,6 +5,7 @@
 package v1alpha1
 
 import (
+	core "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -206,7 +207,8 @@ func (in *FlyteWorkflow) DeepCopyInto(out *FlyteWorkflow) {
 	}
 	in.Status.DeepCopyInto(&out.Status)
 	if in.DataReferenceConstructor != nil {
-		// This was manually modified to not generated a deep copy constructor for this. There is no way to skip generation of fields
+		// This was manually modified to not generated a deep copy constructor for this. There is no way to skip
+		// generation of fields
 		out.DataReferenceConstructor = in.DataReferenceConstructor
 	}
 	return
@@ -503,7 +505,7 @@ func (in *NodeStatus) DeepCopyInto(out *NodeStatus) {
 	if in.WorkflowNodeStatus != nil {
 		in, out := &in.WorkflowNodeStatus, &out.WorkflowNodeStatus
 		*out = new(WorkflowNodeStatus)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	if in.TaskNodeStatus != nil {
 		in, out := &in.TaskNodeStatus, &out.TaskNodeStatus
@@ -519,7 +521,8 @@ func (in *NodeStatus) DeepCopyInto(out *NodeStatus) {
 		*out = (*in).DeepCopy()
 	}
 	if in.DataReferenceConstructor != nil {
-		// This was manually modified to not generated a deep copy constructor for this. There is no way to skip generation of fields
+		// This was manually modified to not generated a deep copy constructor for this. There is no way to skip
+		// generation of fields
 		out.DataReferenceConstructor = in.DataReferenceConstructor
 	}
 	return
@@ -625,6 +628,11 @@ func (in *WorkflowNodeSpec) DeepCopy() *WorkflowNodeSpec {
 func (in *WorkflowNodeStatus) DeepCopyInto(out *WorkflowNodeStatus) {
 	*out = *in
 	out.MutableStruct = in.MutableStruct
+	if in.ExecutionError != nil {
+		in, out := &in.ExecutionError, &out.ExecutionError
+		*out = new(core.ExecutionError)
+		**out = **in
+	}
 	return
 }
 
@@ -724,7 +732,8 @@ func (in *WorkflowStatus) DeepCopyInto(out *WorkflowStatus) {
 		*out = (*in).DeepCopy()
 	}
 	if in.DataReferenceConstructor != nil {
-		// This was manually modified to not generated a deep copy constructor for this. There is no way to skip generation of fields
+		// This was manually modified to not generated a deep copy constructor for this. There is no way to skip
+		// generation of fields
 		out.DataReferenceConstructor = in.DataReferenceConstructor
 	}
 	return
