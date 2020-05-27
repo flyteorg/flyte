@@ -36,6 +36,7 @@ type DynamicNodeState struct {
 
 type WorkflowNodeState struct {
 	Phase v1alpha1.WorkflowNodePhase
+	Error *core.ExecutionError
 }
 
 type NodeStateWriter interface {

@@ -67,18 +67,18 @@ func (p *Propeller) Initialize(ctx context.Context) error {
 // The return value should be an error, in the case, we wish to retry this workflow
 // <pre>
 //
-//     +--------+        +--------+        +--------+     +--------+
-//     |        |        |        |        |        |     |        |
-//     | Ready  +--------> Running+--------> Succeeding---> Success|
-//     |        |        |        |        |        |     |        |
-//     +--------+        +--------+        +---------     +--------+
+//     +--------+        +---------+        +------------+     +---------+
+//     |        |        |         |        |            |     |         |
+//     | Ready  +--------> Running +--------> Succeeding +-----> Success |
+//     |        |        |         |        |            |     |         |
+//     +--------+        +---------+        +------------+     +---------+
 //         |                  |
 //         |                  |
-//         |             +----v---+        +--------+
-//         |             |        |        |        |
-//         +-------------> Failing+--------> Failed |
-//                       |        |        |        |
-//                       +--------+        +--------+
+//         |             +----v----+        +---------------------+        +--------+
+//         |             |         |        |     (optional)      |        |        |
+//         +-------------> Failing +--------> HandlingFailureNode +--------> Failed |
+//                       |         |        |                     |        |        |
+//                       +---------+        +---------------------+        +--------+
 // </pre>
 func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	logger.Infof(ctx, "Processing Workflow.")

@@ -592,12 +592,22 @@ func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, execContext ex
 	return executors.NodeStatusComplete, nil
 }
 
+func canHandleNode(phase v1alpha1.NodePhase) bool {
+	return phase == v1alpha1.NodePhaseNotYetStarted ||
+		phase == v1alpha1.NodePhaseQueued ||
+		phase == v1alpha1.NodePhaseRunning ||
+		phase == v1alpha1.NodePhaseFailing ||
+		phase == v1alpha1.NodePhaseTimingOut ||
+		phase == v1alpha1.NodePhaseRetryableFailure ||
+		phase == v1alpha1.NodePhaseSucceeding
+}
+
 func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
 	currentNodeCtx := contextutils.WithNodeID(ctx, currentNode.GetID())
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
+	nodePhase := nodeStatus.GetPhase()
 
-	switch nodeStatus.GetPhase() {
-	case v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseTimingOut, v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseSucceeding:
+	if canHandleNode(nodePhase) {
 		// TODO Follow up Pull Request,
 		// 1. Rename this method to DAGTraversalHandleNode (accepts a DAGStructure along-with) the remaining arguments
 		// 2. Create a new method called HandleNode (part of the interface) (remaining all args as the previous method, but no DAGStructure
@@ -638,9 +648,9 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext exe
 		// TODO we can optimize skip state handling by iterating down the graph and marking all as skipped
 		// Currently we treat either Skip or Success the same way. In this approach only one node will be skipped
 		// at a time. As we iterate down, further nodes will be skipped
-	case v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseSkipped:
+	} else if nodePhase == v1alpha1.NodePhaseSucceeded || nodePhase == v1alpha1.NodePhaseSkipped {
 		return c.handleDownstream(ctx, execContext, dag, nl, currentNode)
-	case v1alpha1.NodePhaseFailed:
+	} else if nodePhase == v1alpha1.NodePhaseFailed {
 		// This should not happen
 		logger.Debugf(currentNodeCtx, "Node Failed")
 		return executors.NodeStatusFailed(&core.ExecutionError{
@@ -648,7 +658,7 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext exe
 			Message: "Node failed",
 			Kind:    core.ExecutionError_SYSTEM,
 		}), nil
-	case v1alpha1.NodePhaseTimedOut:
+	} else if nodePhase == v1alpha1.NodePhaseTimedOut {
 		logger.Debugf(currentNodeCtx, "Node Timed Out")
 		return executors.NodeStatusTimedOut, nil
 	}
@@ -657,9 +667,9 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext exe
 
 func (c *nodeExecutor) FinalizeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) error {
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
+	nodePhase := nodeStatus.GetPhase()
 
-	switch nodeStatus.GetPhase() {
-	case v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseSucceeding, v1alpha1.NodePhaseRetryableFailure:
+	if canHandleNode(nodePhase) {
 		ctx = contextutils.WithNodeID(ctx, currentNode.GetID())
 
 		// Now depending on the node type decide
@@ -677,7 +687,7 @@ func (c *nodeExecutor) FinalizeHandler(ctx context.Context, execContext executor
 		if err != nil {
 			return err
 		}
-	default:
+	} else {
 		// Abort downstream nodes
 		downstreamNodes, err := dag.FromNode(currentNode.GetID())
 		if err != nil {
@@ -710,9 +720,8 @@ func (c *nodeExecutor) FinalizeHandler(ctx context.Context, execContext executor
 
 func (c *nodeExecutor) AbortHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode, reason string) error {
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
-
-	switch nodeStatus.GetPhase() {
-	case v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseSucceeding, v1alpha1.NodePhaseRetryableFailure, v1alpha1.NodePhaseQueued:
+	nodePhase := nodeStatus.GetPhase()
+	if canHandleNode(nodePhase) {
 		ctx = contextutils.WithNodeID(ctx, currentNode.GetID())
 
 		// Now depending on the node type decide
@@ -749,7 +758,7 @@ func (c *nodeExecutor) AbortHandler(ctx context.Context, execContext executors.E
 				return errors.Wrapf(errors.EventRecordingFailed, nCtx.NodeID(), err, "failed to record node event")
 			}
 		}
-	case v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseSkipped:
+	} else if nodePhase == v1alpha1.NodePhaseSucceeded || nodePhase == v1alpha1.NodePhaseSkipped {
 		// Abort downstream nodes
 		downstreamNodes, err := dag.FromNode(currentNode.GetID())
 		if err != nil {
@@ -775,10 +784,11 @@ func (c *nodeExecutor) AbortHandler(ctx context.Context, execContext executors.E
 		}
 
 		return nil
-	default:
+	} else {
 		ctx = contextutils.WithNodeID(ctx, currentNode.GetID())
 		logger.Warnf(ctx, "Trying to abort a node in state [%s]", nodeStatus.GetPhase().String())
 	}
+
 	return nil
 }
 

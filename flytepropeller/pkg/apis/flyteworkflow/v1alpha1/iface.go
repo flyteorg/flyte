@@ -99,6 +99,15 @@ const (
 	WorkflowPhaseFailing
 	WorkflowPhaseFailed
 	WorkflowPhaseAborted
+	// WorkflowPhaseHandlingFailureNode is the phase the workflow will enter when a failure is detected in the workflow,
+	// the workflow has finished cleaning up (aborted running nodes... etc.) and a failure node is declared in the
+	// workflow spec. We enter this explicit phase so as to ensure we do not attempt to repeatedly clean up old nodes
+	// when handling a workflow event which might yield to seemingly random failures. This phase ensure we are handling,
+	// and only so, the failure node until it's done executing or it fails itself.
+	// If a failure node fails to execute (a real possibility), the final failure output of the workflow will only include
+	// its failure reason. In other words, its failure will mask the original failure for the workflow. It's imperative
+	// failure nodes should be very simple, very resilient and very well tested.
+	WorkflowPhaseHandlingFailureNode
 )
 
 func (p WorkflowPhase) String() string {
@@ -117,6 +126,8 @@ func (p WorkflowPhase) String() string {
 		return "Succeeding"
 	case WorkflowPhaseAborted:
 		return "Aborted"
+	case WorkflowPhaseHandlingFailureNode:
+		return "HandlingFailureNode"
 	}
 	return "Unknown"
 }
@@ -198,12 +209,14 @@ type ExecutableBranchNode interface {
 
 type ExecutableWorkflowNodeStatus interface {
 	GetWorkflowNodePhase() WorkflowNodePhase
+	GetExecutionError() *core.ExecutionError
 }
 
 type MutableWorkflowNodeStatus interface {
 	Mutable
 	ExecutableWorkflowNodeStatus
 	SetWorkflowNodePhase(phase WorkflowNodePhase)
+	SetExecutionError(executionError *core.ExecutionError)
 }
 
 type Mutable interface {

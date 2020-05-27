@@ -155,7 +155,19 @@ const (
 
 type WorkflowNodeStatus struct {
 	MutableStruct
-	Phase WorkflowNodePhase `json:"phase"`
+	Phase          WorkflowNodePhase    `json:"phase"`
+	ExecutionError *core.ExecutionError `json:"executionError"`
+}
+
+func (in *WorkflowNodeStatus) SetExecutionError(executionError *core.ExecutionError) {
+	if in.ExecutionError != executionError {
+		in.SetDirty()
+		in.ExecutionError = executionError
+	}
+}
+
+func (in *WorkflowNodeStatus) GetExecutionError() *core.ExecutionError {
+	return in.ExecutionError
 }
 
 func (in *WorkflowNodeStatus) GetWorkflowNodePhase() WorkflowNodePhase {
