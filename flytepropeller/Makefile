@@ -1,6 +1,7 @@
 export REPOSITORY=flytepropeller
 include boilerplate/lyft/docker_build/Makefile
 include boilerplate/lyft/golang_test_targets/Makefile
+include boilerplate/lyft/end2end/Makefile
 
 .PHONY: update_boilerplate
 update_boilerplate:
