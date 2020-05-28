@@ -28,7 +28,7 @@ type StopWatch struct {
 //   ....
 // }
 func (c StopWatch) Start(ctx context.Context) Timer {
-	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, metricKeys...))
+	w, err := c.StopWatchVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, c.additionalLabels...)...))
 	if err != nil {
 		panic(err.Error())
 	}

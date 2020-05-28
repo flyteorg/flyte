@@ -20,7 +20,7 @@ type Counter struct {
 // Inc increments the counter by 1. Use Add to increment it by arbitrary non-negative values. The data point will be
 // labeled with values from context. See labeled.SetMetricsKeys for information about to configure that.
 func (c Counter) Inc(ctx context.Context) {
-	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, metricKeys...))
+	counter, err := c.CounterVec.GetMetricWith(contextutils.Values(ctx, append(metricKeys, c.additionalLabels...)...))
 	if err != nil {
 		panic(err.Error())
 	}
