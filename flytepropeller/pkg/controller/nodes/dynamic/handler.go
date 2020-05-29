@@ -156,7 +156,7 @@ func (d dynamicNodeTaskNodeHandler) Handle(ctx context.Context, nCtx handler.Nod
 	case v1alpha1.DynamicNodePhaseFailing:
 		err = d.Abort(ctx, nCtx, ds.Reason)
 		if err != nil {
-			logger.Errorf(ctx, "Failing to abort dynamic workflow")
+			logger.Errorf(ctx, "Failing to abort dynamic workflow, reason [%s]", err)
 			return trns, err
 		}
 
@@ -216,7 +216,7 @@ func (d dynamicNodeTaskNodeHandler) Abort(ctx context.Context, nCtx handler.Node
 func (d dynamicNodeTaskNodeHandler) finalizeParentNode(ctx context.Context, nCtx handler.NodeExecutionContext) error {
 	logger.Infof(ctx, "Finalizing Parent node RetryAttempt [%d]", nCtx.CurrentAttempt())
 	if err := d.TaskNodeHandler.Finalize(ctx, nCtx); err != nil {
-		logger.Errorf(ctx, "Failed to finalize Dynamic Nodes Parent.")
+		logger.Errorf(ctx, "Failed to finalize DynamicNodes Parent, reason: [%s]", err)
 		return err
 	}
 	return nil
