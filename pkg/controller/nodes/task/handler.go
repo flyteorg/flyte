@@ -500,6 +500,7 @@ func (t Handler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, r
 	currentPhase := nCtx.NodeStateReader().GetTaskNodeState().PluginPhase
 	logger.Debugf(ctx, "Abort invoked with phase [%v]", currentPhase)
 
+	// If the current Phase is terminal, nothing needs to be done, return.
 	if currentPhase.IsTerminal() {
 		logger.Debugf(ctx, "Returning immediately from Abort since task is already in terminal phase.", currentPhase)
 		return nil
