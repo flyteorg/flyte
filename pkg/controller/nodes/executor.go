@@ -669,6 +669,12 @@ func (c *nodeExecutor) FinalizeHandler(ctx context.Context, execContext executor
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 	nodePhase := nodeStatus.GetPhase()
 
+	if nodePhase == v1alpha1.NodePhaseNotYetStarted {
+		logger.Infof(ctx, "Node not yet started, will not finalize")
+		// Nothing to be aborted
+		return nil
+	}
+
 	if canHandleNode(nodePhase) {
 		ctx = contextutils.WithNodeID(ctx, currentNode.GetID())
 
@@ -721,6 +727,13 @@ func (c *nodeExecutor) FinalizeHandler(ctx context.Context, execContext executor
 func (c *nodeExecutor) AbortHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode, reason string) error {
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 	nodePhase := nodeStatus.GetPhase()
+
+	if nodePhase == v1alpha1.NodePhaseNotYetStarted {
+		logger.Infof(ctx, "Node not yet started, will not finalize")
+		// Nothing to be aborted
+		return nil
+	}
+
 	if canHandleNode(nodePhase) {
 		ctx = contextutils.WithNodeID(ctx, currentNode.GetID())
 
