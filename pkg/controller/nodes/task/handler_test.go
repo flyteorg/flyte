@@ -574,6 +574,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 			nCtx := createNodeContext(tt.args.startingPluginPhase, uint32(tt.args.startingPluginPhaseVersion), tt.args.expectedState, ev, "test", state)
 			c := &pluginCatalogMocks.Client{}
 			tk := Handler{
+				cfg: &config.Config{MaxErrorMessageLength: 100},
 				plugins: map[pluginCore.TaskType]pluginCore.Plugin{
 					"test": fakeplugins.NewPhaseBasedPlugin(),
 				},

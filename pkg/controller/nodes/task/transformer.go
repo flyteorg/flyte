@@ -42,6 +42,14 @@ func ToTaskEventPhase(p pluginCore.Phase) core.TaskExecution_Phase {
 	}
 }
 
+func trimErrorMessage(original string, maxLength int) string {
+	if len(original) <= maxLength {
+		return original
+	}
+
+	return original[0:maxLength/2] + original[len(original)-maxLength/2:]
+}
+
 func ToTaskExecutionEvent(taskExecID *core.TaskExecutionIdentifier, in io.InputFilePaths, out io.OutputFilePaths, info pluginCore.PhaseInfo) (*event.TaskExecutionEvent, error) {
 	// Transitions to a new phase
 
