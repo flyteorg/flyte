@@ -7,12 +7,13 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	errors2 "github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	errors2 "github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
 )
 
 func (t *Handler) CheckCatalogCache(ctx context.Context, tr pluginCore.TaskReader, inputReader io.InputReader, outputWriter io.OutputWriter) (bool, error) {
@@ -94,6 +95,14 @@ func (t *Handler) ValidateOutputAndCacheAdd(ctx context.Context, nodeID v1alpha1
 		if err != nil {
 			return nil, err
 		}
+
+		if taskErr.ExecutionError == nil {
+			taskErr.ExecutionError = &core.ExecutionError{Kind: core.ExecutionError_UNKNOWN, Code: "Unknown", Message: "Unknown"}
+		}
+		// Errors can be arbitrary long since they are written by containers/potentially 3rd party plugins. This ensures
+		// the error message length will never be big enough to cause write failures to Etcd. or spam Admin DB with huge
+		// objects.
+		taskErr.Message = trimErrorMessage(taskErr.Message, t.cfg.MaxErrorMessageLength)
 		return &taskErr, nil
 	}
 

@@ -27,6 +27,29 @@ func TestToTaskEventPhase(t *testing.T) {
 	assert.Equal(t, core.TaskExecution_QUEUED, ToTaskEventPhase(pluginCore.PhaseQueued))
 }
 
+func Test_trimErrorMessage(t *testing.T) {
+	const inputStr = "0123456789"
+	t.Run("Length less or equal than max", func(t *testing.T) {
+		input := inputStr
+		assert.Equal(t, input, trimErrorMessage(input, 10))
+	})
+
+	t.Run("Length > max", func(t *testing.T) {
+		input := inputStr
+		assert.Equal(t, "01236789", trimErrorMessage(input, 8))
+	})
+
+	t.Run("Odd Max", func(t *testing.T) {
+		input := inputStr
+		assert.Equal(t, "01236789", trimErrorMessage(input, 9))
+	})
+
+	t.Run("Odd input", func(t *testing.T) {
+		input := "012345678"
+		assert.Equal(t, "012345678", trimErrorMessage(input, 9))
+	})
+}
+
 func TestToTaskExecutionEvent(t *testing.T) {
 	tkID := &core.Identifier{}
 	nodeID := &core.NodeExecutionIdentifier{}
