@@ -1523,3 +1523,35 @@ func Test_nodeExecutor_abort(t *testing.T) {
 		assert.True(t, called)
 	})
 }
+
+func TestNodeExecutor_AbortHandler(t *testing.T) {
+	ctx := context.Background()
+	exec := nodeExecutor{}
+
+	t.Run("not-yet-started", func(t *testing.T) {
+		id := "id"
+		n := &mocks.ExecutableNode{}
+		n.OnGetID().Return(id)
+		nl := &mocks4.NodeLookup{}
+		ns := &mocks.ExecutableNodeStatus{}
+		ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+		assert.NoError(t, exec.AbortHandler(ctx, nil, nil, nl, n, "aborting"))
+	})
+}
+
+func TestNodeExecutor_FinalizeHandler(t *testing.T) {
+	ctx := context.Background()
+	exec := nodeExecutor{}
+
+	t.Run("not-yet-started", func(t *testing.T) {
+		id := "id"
+		n := &mocks.ExecutableNode{}
+		n.OnGetID().Return(id)
+		nl := &mocks4.NodeLookup{}
+		ns := &mocks.ExecutableNodeStatus{}
+		ns.OnGetPhase().Return(v1alpha1.NodePhaseNotYetStarted)
+		nl.OnGetNodeExecutionStatusMatch(mock.Anything, id).Return(ns)
+		assert.NoError(t, exec.FinalizeHandler(ctx, nil, nil, nl, n))
+	})
+}
