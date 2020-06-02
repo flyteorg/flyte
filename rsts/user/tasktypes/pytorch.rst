@@ -10,9 +10,9 @@ PyTorch Task Type allows users to run distributed PyTorch training jobs on the K
 #######
 
 In order to build image that is to be eventually submitted to Kubernetes, you'll need to make sure it includes following:
-- pytorch and its dependencies (GPU support, distributed communication backend libs and etc.)
-- flytekit with pytorch extra (``pip install flytekit[pytroch]``)
-- user defined flyte workflows and its dependencies
+  - pytorch and its dependencies (GPU support, distributed communication backend libs and etc.)
+  - flytekit with pytorch extra (``pip install flytekit[pytroch]``)
+  - user defined flyte workflows and its dependencies
 
 You might want to leverage official `Dockerfile`_ or `prebuilt images`_.
 
