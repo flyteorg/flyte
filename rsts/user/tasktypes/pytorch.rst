@@ -20,7 +20,7 @@ You might want to leverage official `Dockerfile`_ or `prebuilt images`_.
 Usage
 #######
 
-Use ``pytorch_task`` decorator for configuring job execution resources. Here you can specify number of worker replicas (in addition to single master) and resource `requests and limits`_ on per replica basis.
+Use pytorch_task_ decorator for configuring job execution resources. Here you can specify number of worker replicas (in addition to single master) and resource `requests and limits`_ on per replica basis.
 
 .. code-block:: python
    :caption: PyTorch task type decorator example
@@ -42,5 +42,6 @@ Note that if you request GPU resources, toleration `flyte/gpu=dedicated:NoSchedu
 .. _`PyTorch Operator`: https://github.com/kubeflow/pytorch-operator
 .. _Dockerfile: https://github.com/pytorch/pytorch/blob/master/docker/pytorch/Dockerfile
 .. _`prebuilt images`: https://hub.docker.com/r/pytorch/pytorch/tags
+.. _pytorch_task: https://lyft.github.io/flyte/flytekit/flytekit.sdk.html#flytekit.sdk.tasks.pytorch_task
 .. _`requests and limits`: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits
 .. _taint: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
