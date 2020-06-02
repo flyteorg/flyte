@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks package &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.common.tasks package &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -409,6 +409,28 @@ the wrapped function.
 <em class="property">property </em><code class="sig-name descname">schema</code><a class="headerlink" href="#flytekit.common.tasks.presto_task.SdkPrestoTask.schema" title="Permalink to this definition">¶</a></dt>
 <dd><p>The schema to set for the given Presto query
 :rtype: Text</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-flytekit.common.tasks.pytorch_task">
+<span id="flytekit-common-tasks-pytorch-task-module"></span><h2>flytekit.common.tasks.pytorch_task module<a class="headerlink" href="#module-flytekit.common.tasks.pytorch_task" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.common.tasks.pytorch_task.SdkPyTorchTask">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.pytorch_task.</code><code class="sig-name descname">SdkPyTorchTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">workers_count</em>, <em class="sig-param">per_replica_storage_request</em>, <em class="sig-param">per_replica_cpu_request</em>, <em class="sig-param">per_replica_gpu_request</em>, <em class="sig-param">per_replica_memory_request</em>, <em class="sig-param">per_replica_storage_limit</em>, <em class="sig-param">per_replica_cpu_limit</em>, <em class="sig-param">per_replica_gpu_limit</em>, <em class="sig-param">per_replica_memory_limit</em>, <em class="sig-param">environment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/pytorch_task.html#SdkPyTorchTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.pytorch_task.SdkPyTorchTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.common.tasks.pytorch_task.SdkRunnablePytorchContainer">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.pytorch_task.</code><code class="sig-name descname">SdkRunnablePytorchContainer</code><span class="sig-paren">(</span><em class="sig-param">command</em>, <em class="sig-param">args</em>, <em class="sig-param">resources</em>, <em class="sig-param">env</em>, <em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/pytorch_task.html#SdkRunnablePytorchContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.pytorch_task.SdkRunnablePytorchContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableContainer" title="flytekit.common.tasks.sdk_runnable.SdkRunnableContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableContainer</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.common.tasks.pytorch_task.SdkRunnablePytorchContainer.args">
+<em class="property">property </em><code class="sig-name descname">args</code><a class="headerlink" href="#flytekit.common.tasks.pytorch_task.SdkRunnablePytorchContainer.args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override args to remove the injection of command prefixes
+:rtype: list[Text]</p>
 </dd></dl>
 
 </dd></dl>
@@ -893,6 +915,16 @@ the wrapped function.
 <em class="property">property </em><code class="sig-name descname">resource_type</code><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.resource_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integer from _identifier.ResourceType enum
 :rtype: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.tasks.task.SdkTask.serialize">
+<code class="sig-name descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/task.html#SdkTask.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.admin.task_pb2.TaskSpec</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">

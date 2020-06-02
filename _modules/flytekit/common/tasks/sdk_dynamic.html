@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.sdk_dynamic &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.common.tasks.sdk_dynamic &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -168,13 +168,12 @@
     <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan</span><span class="p">,</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span><span class="p">,</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span><span class="p">,</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.utils</span> <span class="k">import</span> <span class="n">_dnsify</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> <span class="n">dynamic_job</span> <span class="k">as</span> <span class="n">_dynamic_job</span><span class="p">,</span> <span class="n">array_job</span> <span class="k">as</span> <span class="n">_array_job</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">platform</span> <span class="k">as</span> <span class="n">_platform_config</span><span class="p">,</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
 
 
 <div class="viewcode-block" id="PromiseOutputReference"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.PromiseOutputReference">[docs]</a><span class="k">class</span> <span class="nc">PromiseOutputReference</span><span class="p">(</span><span class="n">_task_output</span><span class="o">.</span><span class="n">OutputReference</span><span class="p">):</span>
@@ -195,6 +194,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_raw_value</span> <span class="o">=</span> <span class="n">value</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_append_node</span><span class="p">(</span><span class="n">generated_files</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">sub_task_node</span><span class="p">):</span>
+    <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">node_output</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">outputs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">node_output</span><span class="o">.</span><span class="n">sdk_node</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+            <span class="n">node_output</span><span class="o">.</span><span class="n">sdk_node</span><span class="o">.</span><span class="n">assign_id_and_return</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="c1"># Upload inputs to working directory under /array_job.input_ref/inputs.pb</span>
+    <span class="n">input_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">_constants</span><span class="o">.</span><span class="n">INPUT_FILE_NAME</span><span class="p">)</span>
+    <span class="n">generated_files</span><span class="p">[</span><span class="n">input_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
+        <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span>
+                  <span class="n">sub_task_node</span><span class="o">.</span><span class="n">inputs</span><span class="p">})</span>
 
 
 <div class="viewcode-block" id="SdkDynamicTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTask">[docs]</a><span class="k">class</span> <span class="nc">SdkDynamicTask</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableTask</span><span class="p">)):</span>
@@ -279,6 +291,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">task_type</span> <span class="o">==</span> <span class="n">_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">PYTHON_TASK</span>
 
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_add_upstream_entities</span><span class="p">(</span><span class="n">executable_sdk_object</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">upstream_entity</span> <span class="ow">in</span> <span class="n">executable_sdk_object</span><span class="o">.</span><span class="n">upstream_entities</span><span class="p">:</span>
+            <span class="c1"># If the upstream entity is either a Workflow or a Task, yield them in the</span>
+            <span class="c1"># dynamic job spec. Otherwise (e.g. a LaunchPlan), we will assume it already</span>
+            <span class="c1"># is registered (can&#39;t be dynamically created). Thi will cause a runtime error</span>
+            <span class="c1"># if it&#39;s not already registered with the control plane.</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">upstream_entity</span><span class="p">,</span> <span class="n">_workflow</span><span class="o">.</span><span class="n">SdkWorkflow</span><span class="p">):</span>
+                <span class="n">sub_workflows</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">upstream_entity</span><span class="p">)</span>
+                <span class="c1"># Recursively discover all statically defined dependencies</span>
+                <span class="n">SdkDynamicTask</span><span class="o">.</span><span class="n">_add_upstream_entities</span><span class="p">(</span><span class="n">upstream_entity</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">upstream_entity</span><span class="p">,</span> <span class="n">_task</span><span class="o">.</span><span class="n">SdkTask</span><span class="p">):</span>
+                <span class="n">tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">upstream_entity</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_produce_dynamic_job_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Runs user code and and produces future task nodes to run sub-tasks.</span>
@@ -310,8 +336,9 @@
         <span class="c1"># Keeping future-tasks in original order. We don&#39;t use upstream_nodes exclusively because the parent task can</span>
         <span class="c1"># yield sub-tasks that it never uses to produce final outputs but they need to execute nevertheless.</span>
         <span class="n">array_job_index</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sub_workflows</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">visited_nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">generated_ids</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">effective_failure_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allowed_failure_ratio</span> <span class="ow">or</span> <span class="mf">0.0</span>
@@ -348,20 +375,18 @@
                 <span class="n">new_count</span> <span class="o">=</span> <span class="n">generated_ids</span><span class="p">[</span><span class="n">safe_task_id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">unique_node_id</span> <span class="o">=</span> <span class="n">_dnsify</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">safe_task_id</span><span class="p">,</span> <span class="n">new_count</span><span class="p">))</span>
 
-            <span class="c1"># Handling cases where the yielded nodes are launch plan or subworkflow nodes</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">,</span> <span class="p">(</span><span class="n">_launch_plan</span><span class="o">.</span><span class="n">SdkLaunchPlan</span><span class="p">,</span> <span class="n">_workflow</span><span class="o">.</span><span class="n">SdkWorkflow</span><span class="p">)):</span>
+            <span class="c1"># Handling case where the yielded node is launch plan</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">,</span> <span class="n">_launch_plan</span><span class="o">.</span><span class="n">SdkLaunchPlan</span><span class="p">):</span>
                 <span class="n">node</span> <span class="o">=</span> <span class="n">sub_task_node</span><span class="o">.</span><span class="n">assign_id_and_return</span><span class="p">(</span><span class="n">unique_node_id</span><span class="p">)</span>
-                <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">node_output</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">outputs</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">node_output</span><span class="o">.</span><span class="n">sdk_node</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
-                        <span class="n">node_output</span><span class="o">.</span><span class="n">sdk_node</span><span class="o">.</span><span class="n">assign_id_and_return</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-
-                    <span class="c1"># Upload inputs to working directory under /array_job.input_ref/inputs.pb</span>
-                    <span class="n">input_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">_constants</span><span class="o">.</span><span class="n">INPUT_FILE_NAME</span><span class="p">)</span>
-                    <span class="n">generated_files</span><span class="p">[</span><span class="n">input_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
-                        <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span>
-                                  <span class="n">sub_task_node</span><span class="o">.</span><span class="n">inputs</span><span class="p">})</span>
-
+                <span class="n">_append_node</span><span class="p">(</span><span class="n">generated_files</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">sub_task_node</span><span class="p">)</span>
+            <span class="c1"># Handling case where the yielded node is launching a sub-workflow</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">,</span> <span class="n">_workflow</span><span class="o">.</span><span class="n">SdkWorkflow</span><span class="p">):</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="n">sub_task_node</span><span class="o">.</span><span class="n">assign_id_and_return</span><span class="p">(</span><span class="n">unique_node_id</span><span class="p">)</span>
+                <span class="n">_append_node</span><span class="p">(</span><span class="n">generated_files</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">sub_task_node</span><span class="p">)</span>
+                <span class="c1"># Add the workflow itself to the yielded sub-workflows</span>
+                <span class="n">sub_workflows</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">)</span>
+                <span class="c1"># Recursively discover statically defined upstream entities (tasks, wfs)</span>
+                <span class="n">SdkDynamicTask</span><span class="o">.</span><span class="n">_add_upstream_entities</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="p">)</span>
             <span class="c1"># Handling tasks</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># If the task can run as an array job, group its instances together. Otherwise, keep each</span>
@@ -389,24 +414,13 @@
                                   <span class="n">sub_task_node</span><span class="o">.</span><span class="n">inputs</span><span class="p">})</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">node</span> <span class="o">=</span> <span class="n">sub_task_node</span><span class="o">.</span><span class="n">assign_id_and_return</span><span class="p">(</span><span class="n">unique_node_id</span><span class="p">)</span>
-
-                    <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">)</span>
-                    <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-
-                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">node_output</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">outputs</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="ow">not</span> <span class="n">node_output</span><span class="o">.</span><span class="n">sdk_node</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
-                            <span class="n">node_output</span><span class="o">.</span><span class="n">sdk_node</span><span class="o">.</span><span class="n">assign_id_and_return</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-
-                    <span class="c1"># Upload inputs to working directory under /array_job.input_ref/inputs.pb</span>
-                    <span class="n">input_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">_constants</span><span class="o">.</span><span class="n">INPUT_FILE_NAME</span><span class="p">)</span>
-                    <span class="n">generated_files</span><span class="p">[</span><span class="n">input_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
-                        <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span>
-                                  <span class="n">sub_task_node</span><span class="o">.</span><span class="n">inputs</span><span class="p">})</span>
+                    <span class="n">tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">)</span>
+                    <span class="n">_append_node</span><span class="p">(</span><span class="n">generated_files</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">sub_task_node</span><span class="p">)</span>
 
         <span class="c1"># assign custom field to the ArrayJob properties computed.</span>
         <span class="k">for</span> <span class="n">task</span><span class="p">,</span> <span class="p">(</span><span class="n">array_job</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">array_job_index</span><span class="p">):</span>
             <span class="c1"># TODO: Reconstruct task template object instead of modifying an existing one?</span>
-            <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">assign_custom_and_return</span><span class="p">(</span><span class="n">array_job</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span><span class="o">.</span><span class="n">assign_type_and_return</span><span class="p">(</span>
+            <span class="n">tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">assign_custom_and_return</span><span class="p">(</span><span class="n">array_job</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span><span class="o">.</span><span class="n">assign_type_and_return</span><span class="p">(</span>
                 <span class="n">_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">CONTAINER_ARRAY_TASK</span><span class="p">))</span>
 
         <span class="c1"># min_successes is absolute, it&#39;s computed as the reverse of allowed_failure_ratio and multiplied by the</span>
@@ -414,10 +428,10 @@
         <span class="n">nodes</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">array_job_node</span> <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">array_job_node</span><span class="p">)</span> <span class="ow">in</span> <span class="n">array_job_index</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
         <span class="n">dynamic_job_spec</span> <span class="o">=</span> <span class="n">_dynamic_job</span><span class="o">.</span><span class="n">DynamicJobSpec</span><span class="p">(</span>
             <span class="n">min_successes</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">),</span>
-            <span class="n">tasks</span><span class="o">=</span><span class="n">tasks</span><span class="p">,</span>
+            <span class="n">tasks</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">tasks</span><span class="p">),</span>
             <span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span>
             <span class="n">outputs</span><span class="o">=</span><span class="n">output_bindings</span><span class="p">,</span>
-            <span class="n">subworkflows</span><span class="o">=</span><span class="p">[])</span>
+            <span class="n">subworkflows</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">sub_workflows</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">dynamic_job_spec</span><span class="p">,</span> <span class="n">generated_files</span>
 
@@ -438,7 +452,7 @@
         <span class="n">spec</span><span class="p">,</span> <span class="n">generated_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_produce_dynamic_job_spec</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
 
         <span class="c1"># If no sub-tasks are requested to run, just produce an outputs file like any other single-step tasks.</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">generated_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span>
                 <span class="n">_constants</span><span class="o">.</span><span class="n">OUTPUT_FILE_NAME</span><span class="p">:</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
                     <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">outputs</span><span class="p">})</span>

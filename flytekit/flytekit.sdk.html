@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk package &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.sdk package &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -585,6 +585,109 @@ re-usable.</p></li>
 <li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
+provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  A user can use this to
+inject bespoke logic into the base Flyte programming model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="flytekit.sdk.tasks.pytorch_task">
+<code class="sig-prename descclassname">flytekit.sdk.tasks.</code><code class="sig-name descname">pytorch_task</code><span class="sig-paren">(</span><em class="sig-param">_task_function=None</em>, <em class="sig-param">cache_version=''</em>, <em class="sig-param">retries=0</em>, <em class="sig-param">interruptible=False</em>, <em class="sig-param">deprecated=''</em>, <em class="sig-param">cache=False</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">workers_count=1</em>, <em class="sig-param">per_replica_storage_request=''</em>, <em class="sig-param">per_replica_cpu_request=''</em>, <em class="sig-param">per_replica_gpu_request=''</em>, <em class="sig-param">per_replica_memory_request=''</em>, <em class="sig-param">per_replica_storage_limit=''</em>, <em class="sig-param">per_replica_cpu_limit=''</em>, <em class="sig-param">per_replica_gpu_limit=''</em>, <em class="sig-param">per_replica_memory_limit=''</em>, <em class="sig-param">environment=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/tasks.html#pytorch_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.tasks.pytorch_task" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Decorator to create a Pytorch Task definition. This task will submit PyTorchJob (see <a class="reference external" href="https://github.com/kubeflow/pytorch-operator">https://github.com/kubeflow/pytorch-operator</a>)</dt><dd><p>defined by the code within the _task_function to k8s cluster.</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@inputs</span><span class="p">(</span><span class="n">int_list</span><span class="o">=</span><span class="p">[</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">])</span>
+<span class="nd">@outputs</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span>
+<span class="nd">@pytorch_task</span><span class="p">(</span>
+    <span class="n">workers_count</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">per_replica_cpu_request</span><span class="o">=</span><span class="s2">&quot;500m&quot;</span><span class="p">,</span>
+    <span class="n">per_replica_memory_request</span><span class="o">=</span><span class="s2">&quot;4Gi&quot;</span><span class="p">,</span>
+    <span class="n">per_replica_memory_limit</span><span class="o">=</span><span class="s2">&quot;8Gi&quot;</span><span class="p">,</span>
+    <span class="n">per_replica_gpu_limit</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_pytorch_job</span><span class="p">(</span><span class="n">wf_params</span><span class="p">,</span> <span class="n">int_list</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_task_function</strong> – this is the decorated method and shouldn’t be declared explicitly.  The function must
+take a first argument, and then named arguments matching those defined in &#64;inputs and &#64;outputs.  No keyword
+arguments are allowed for wrapped task functions.</p></li>
+<li><p><strong>cache_version</strong> (<em>Text</em>) – <p>[optional] string representing logical version for discovery.  This field should be
+updated whenever the underlying algorithm changes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
+</div>
+</p></li>
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<a class="reference internal" href="#flytekit.sdk.exceptions.RecoverableException" title="flytekit.sdk.exceptions.RecoverableException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.sdk.exceptions.RecoverableException</span></code></a> or transient platform failures.  Defaults
+to 0.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is
+strongly recommended that tasks are written to be idempotent.</p>
+</div>
+</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
+<li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
+will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+re-usable.</p></li>
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
+indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
+<li><p><strong>workers_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – integer determining the number of worker replicas spawned in the cluster for this job
+(in addition to 1 master).</p></li>
+<li><p><strong>per_replica_storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
+for each replica spawned for this job (i.e. both for master and workers).  Default is set by platform-level configuration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is currently not supported by the platform.</p>
+</div>
+</p></li>
+<li><p><strong>per_replica_cpu_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of cores for each replica
+spawned for this job (i.e. both for master and workers).
+This can be set to a fractional portion of a CPU. Default is set by platform-level configuration.</p>
+<p>TODO: Add links to resource string documentation for Kubernetes</p>
+</p></li>
+<li><p><strong>per_replica_gpu_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of desired GPUs for each
+replica spawned for this job (i.e. both for master and workers).
+Default is set by platform-level configuration.</p>
+<p>TODO: Add links to resource string documentation for Kubernetes</p>
+</p></li>
+<li><p><strong>per_replica_memory_request</strong> (<em>Text</em>) – <p>[optional]  Kubernetes resource string for lower-bound of physical memory
+necessary for each replica spawned for this job (i.e. both for master and workers).  Default is set by platform-level configuration.</p>
+<p>TODO: Add links to resource string documentation for Kubernetes</p>
+</p></li>
+<li><p><strong>per_replica_storage_limit</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for upper-bound of disk storage space
+for each replica spawned for this job (i.e. both for master and workers).
+This amount is not guaranteed!  If not specified, it is set equal to storage_request.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is currently not supported by the platform.</p>
+</div>
+</p></li>
+<li><p><strong>per_replica_cpu_limit</strong> (<em>Text</em>) – [optional] Kubernetes resource string for upper-bound of cores for each replica
+spawned for this job (i.e. both for master and workers).
+This can be set to a fractional portion of a CPU. This amount is not guaranteed!  If not specified,
+it is set equal to cpu_request.</p></li>
+<li><p><strong>per_replica_gpu_limit</strong> (<em>Text</em>) – [optional] Kubernetes resource string for upper-bound of desired GPUs for each
+replica spawned for this job (i.e. both for master and workers).
+This amount is not guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
+<li><p><strong>per_replica_memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
+necessary for each replica spawned for this job (i.e. both for master and workers).
+This amount is not guaranteed!  If not specified, it is set equal to memory_request.</p></li>
 <li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
 provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  A user can use this to

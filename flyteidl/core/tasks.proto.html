@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>tasks.proto &mdash; Flyte 0.3.0 documentation</title>
+  <title>tasks.proto &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -110,6 +110,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-tasktemplate">flyteidl.core.TaskTemplate</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-containerport">flyteidl.core.ContainerPort</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-container">flyteidl.core.Container</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-iostrategy">flyteidl.core.IOStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-core-iostrategy-downloadmode">Enum flyteidl.core.IOStrategy.DownloadMode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-core-iostrategy-uploadmode">Enum flyteidl.core.IOStrategy.UploadMode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-dataloadingconfig">flyteidl.core.DataLoadingConfig</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-core-dataloadingconfig-literalmapformat">Enum flyteidl.core.DataLoadingConfig.LiteralMapFormat</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="types.proto.html">types.proto</a></li>
@@ -422,7 +427,8 @@ This must be a valid port number, 0 &lt; x &lt; 65536.</p>
   <span class="nt">&quot;resources&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;env&quot;</span><span class="p">:</span> <span class="p">[],</span>
   <span class="nt">&quot;config&quot;</span><span class="p">:</span> <span class="p">[],</span>
-  <span class="nt">&quot;ports&quot;</span><span class="p">:</span> <span class="p">[]</span>
+  <span class="nt">&quot;ports&quot;</span><span class="p">:</span> <span class="p">[],</span>
+  <span class="nt">&quot;data_config&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -455,7 +461,134 @@ TODO: elaborate on how configs will become available.</p>
 </dl>
 <dl class="simple" id="api-field-flyteidl-core-container-ports">
 <dt>ports</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-core-containerport"><span class="std std-ref">flyteidl.core.ContainerPort</span></a>) Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
-not supported on AWS Batch)</p>
+not supported on AWS Batch)
+Only K8s</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-core-container-data-config">
+<dt>data_config</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-core-dataloadingconfig"><span class="std std-ref">flyteidl.core.DataLoadingConfig</span></a>) BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+This makes it possible to to run a completely portable container, that uses inputs and outputs
+only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
+If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+to understand the default paths.
+Only K8s</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="flyteidl-core-iostrategy">
+<span id="api-msg-flyteidl-core-iostrategy"></span><h2>flyteidl.core.IOStrategy<a class="headerlink" href="#flyteidl-core-iostrategy" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L169">[flyteidl.core.IOStrategy proto]</a></p>
+<p>Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;download_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;upload_mode&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="simple" id="api-field-flyteidl-core-iostrategy-download-mode">
+<dt>download_mode</dt><dd><p>(<a class="reference internal" href="#api-enum-flyteidl-core-iostrategy-downloadmode"><span class="std std-ref">flyteidl.core.IOStrategy.DownloadMode</span></a>) Mode to use to manage downloads</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-core-iostrategy-upload-mode">
+<dt>upload_mode</dt><dd><p>(<a class="reference internal" href="#api-enum-flyteidl-core-iostrategy-uploadmode"><span class="std std-ref">flyteidl.core.IOStrategy.UploadMode</span></a>) Mode to use to manage uploads</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="enum-flyteidl-core-iostrategy-downloadmode">
+<span id="api-enum-flyteidl-core-iostrategy-downloadmode"></span><h2>Enum flyteidl.core.IOStrategy.DownloadMode<a class="headerlink" href="#enum-flyteidl-core-iostrategy-downloadmode" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L171">[flyteidl.core.IOStrategy.DownloadMode proto]</a></p>
+<p>Mode to use for downloading</p>
+<dl class="simple" id="api-enum-value-flyteidl-core-iostrategy-downloadmode-download-eager">
+<dt>DOWNLOAD_EAGER</dt><dd><p><em>(DEFAULT)</em> ⁣All data will be downloaded before the main container is executed</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-iostrategy-downloadmode-download-stream">
+<dt>DOWNLOAD_STREAM</dt><dd><p>⁣Data will be downloaded as a stream and an End-Of-Stream marker will be written to indicate all data has been downloaded. Refer to protocol for details</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-iostrategy-downloadmode-do-not-download">
+<dt>DO_NOT_DOWNLOAD</dt><dd><p>⁣Large objects (offloaded) will not be downloaded</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="enum-flyteidl-core-iostrategy-uploadmode">
+<span id="api-enum-flyteidl-core-iostrategy-uploadmode"></span><h2>Enum flyteidl.core.IOStrategy.UploadMode<a class="headerlink" href="#enum-flyteidl-core-iostrategy-uploadmode" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L180">[flyteidl.core.IOStrategy.UploadMode proto]</a></p>
+<p>Mode to use for uploading</p>
+<dl class="simple" id="api-enum-value-flyteidl-core-iostrategy-uploadmode-upload-on-exit">
+<dt>UPLOAD_ON_EXIT</dt><dd><p><em>(DEFAULT)</em> ⁣All data will be uploaded after the main container exits</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-iostrategy-uploadmode-upload-eager">
+<dt>UPLOAD_EAGER</dt><dd><p>⁣Data will be uploaded as it appears. Refer to protocol specification for details</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-iostrategy-uploadmode-do-not-upload">
+<dt>DO_NOT_UPLOAD</dt><dd><p>⁣Data will not be uploaded, only references will be written</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="flyteidl-core-dataloadingconfig">
+<span id="api-msg-flyteidl-core-dataloadingconfig"></span><h2>flyteidl.core.DataLoadingConfig<a class="headerlink" href="#flyteidl-core-dataloadingconfig" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L197">[flyteidl.core.DataLoadingConfig proto]</a></p>
+<p>This configuration allows executing raw containers in Flyte using the Flyte CoPilot system.
+Flyte CoPilot, eliminates the needs of flytekit or sdk inside the container. Any inputs required by the users container are side-loaded in the input_path
+Any outputs generated by the user container - within output_path are automatically uploaded.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;enabled&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;input_path&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;output_path&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;io_strategy&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="simple" id="api-field-flyteidl-core-dataloadingconfig-enabled">
+<dt>enabled</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">bool</a>) Flag enables DataLoading Config. If this is not set, data loading will not be used!</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-core-dataloadingconfig-input-path">
+<dt>input_path</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) File system path (start at root). This folder will contain all the inputs exploded to a separate file.
+Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is “/var/flyte/inputs”, then the file system will look like
+/var/flyte/inputs/inputs.&lt;metadata format dependent -&gt; .pb .json .yaml&gt; -&gt; Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations
+/var/flyte/inputs/x -&gt; X is a file that contains the value of x (integer) in string format
+/var/flyte/inputs/y -&gt; Y is a file in Binary format
+/var/flyte/inputs/z/… -&gt; Note Z itself is a directory
+More information about the protocol - refer to docs #TODO reference docs here</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-core-dataloadingconfig-output-path">
+<dt>output_path</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-core-dataloadingconfig-format">
+<dt>format</dt><dd><p>(<a class="reference internal" href="#api-enum-flyteidl-core-dataloadingconfig-literalmapformat"><span class="std std-ref">flyteidl.core.DataLoadingConfig.LiteralMapFormat</span></a>) In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.
+This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-core-dataloadingconfig-io-strategy">
+<dt>io_strategy</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-core-iostrategy"><span class="std std-ref">flyteidl.core.IOStrategy</span></a>)</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="enum-flyteidl-core-dataloadingconfig-literalmapformat">
+<span id="api-enum-flyteidl-core-dataloadingconfig-literalmapformat"></span><h2>Enum flyteidl.core.DataLoadingConfig.LiteralMapFormat<a class="headerlink" href="#enum-flyteidl-core-dataloadingconfig-literalmapformat" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L202">[flyteidl.core.DataLoadingConfig.LiteralMapFormat proto]</a></p>
+<p>LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.
+If the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.
+JSON and YAML do not need any protobuf definitions to read it
+All remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)</p>
+<dl class="simple" id="api-enum-value-flyteidl-core-dataloadingconfig-literalmapformat-json">
+<dt>JSON</dt><dd><p><em>(DEFAULT)</em> ⁣JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - <a class="reference external" href="https://www.json.org/json-en.html">https://www.json.org/json-en.html</a></p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-dataloadingconfig-literalmapformat-yaml">
+<dt>YAML</dt><dd><p>⁣</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-dataloadingconfig-literalmapformat-proto">
+<dt>PROTO</dt><dd><p>⁣Proto is a serialized binary of <cite>core.LiteralMap</cite> defined in flyteidl/core</p>
 </dd>
 </dl>
 </div>

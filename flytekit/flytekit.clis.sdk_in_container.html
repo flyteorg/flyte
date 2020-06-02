@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clis.sdk_in_container package &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.clis.sdk_in_container package &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -301,14 +301,51 @@ at the base of the repository.</p>
 <div class="section" id="module-flytekit.clis.sdk_in_container.serialize">
 <span id="flytekit-clis-sdk-in-container-serialize-module"></span><h2>flytekit.clis.sdk_in_container.serialize module<a class="headerlink" href="#module-flytekit.clis.sdk_in_container.serialize" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="flytekit.clis.sdk_in_container.serialize.serialize_tasks">
-<code class="sig-prename descclassname">flytekit.clis.sdk_in_container.serialize.</code><code class="sig-name descname">serialize_tasks</code><span class="sig-paren">(</span><em class="sig-param">pkgs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clis/sdk_in_container/serialize.html#serialize_tasks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clis.sdk_in_container.serialize.serialize_tasks" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="flytekit.clis.sdk_in_container.serialize.serialize_all">
+<code class="sig-prename descclassname">flytekit.clis.sdk_in_container.serialize.</code><code class="sig-name descname">serialize_all</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">pkgs</em>, <em class="sig-param">version</em>, <em class="sig-param">folder=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clis/sdk_in_container/serialize.html#serialize_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clis.sdk_in_container.serialize.serialize_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>In order to register, we have to comply with Admin’s endpoints. Those endpoints take the following objects. These
+flyteidl.admin.launch_plan_pb2.LaunchPlanSpec
+flyteidl.admin.workflow_pb2.WorkflowSpec
+flyteidl.admin.task_pb2.TaskSpec</p>
+<p>However, if we were to merely call .to_flyte_idl() on all the discovered entities, what we would get are:
+flyteidl.admin.launch_plan_pb2.LaunchPlanSpec
+flyteidl.core.workflow_pb2.WorkflowTemplate
+flyteidl.core.tasks_pb2.TaskTemplate</p>
+<p>For Workflows and Tasks therefore, there is special logic in the serialize function that translates these objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>domain</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>pkgs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>Text</em><em>]</em>) – </p></li>
+<li><p><strong>version</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>folder</strong> (<em>Text</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="function">
-<dt id="flytekit.clis.sdk_in_container.serialize.serialize_workflows">
-<code class="sig-prename descclassname">flytekit.clis.sdk_in_container.serialize.</code><code class="sig-name descname">serialize_workflows</code><span class="sig-paren">(</span><em class="sig-param">pkgs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clis/sdk_in_container/serialize.html#serialize_workflows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clis.sdk_in_container.serialize.serialize_workflows" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="flytekit.clis.sdk_in_container.serialize.serialize_tasks_only">
+<code class="sig-prename descclassname">flytekit.clis.sdk_in_container.serialize.</code><code class="sig-name descname">serialize_tasks_only</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">pkgs</em>, <em class="sig-param">version</em>, <em class="sig-param">folder=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clis/sdk_in_container/serialize.html#serialize_tasks_only"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clis.sdk_in_container.serialize.serialize_tasks_only" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>domain</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>pkgs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>Text</em><em>]</em>) – </p></li>
+<li><p><strong>version</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>folder</strong> (<em>Text</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 <div class="section" id="module-flytekit.clis.sdk_in_container">

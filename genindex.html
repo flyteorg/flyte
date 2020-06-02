@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; Flyte 0.3.0 documentation</title>
+  <title>Index &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -236,9 +236,11 @@
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.named_entity.NamedEntityState.ARCHIVED">ARCHIVED (flytekit.models.named_entity.NamedEntityState attribute)</a>
 </li>
-      <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableContainer.args">args() (flytekit.common.tasks.sdk_runnable.SdkRunnableContainer property)</a>
+      <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.pytorch_task.SdkRunnablePytorchContainer.args">args() (flytekit.common.tasks.pytorch_task.SdkRunnablePytorchContainer property)</a>
 
       <ul>
+        <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableContainer.args">(flytekit.common.tasks.sdk_runnable.SdkRunnableContainer property)</a>
+</li>
         <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.spark_task.SdkRunnableSparkContainer.args">(flytekit.common.tasks.spark_task.SdkRunnableSparkContainer property)</a>
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.task.Container.args">(flytekit.models.task.Container property)</a>
@@ -1180,6 +1182,8 @@
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#module-flytekit.common.tasks.presto_task">flytekit.common.tasks.presto_task (module)</a>
 </li>
+      <li><a href="flytekit/flytekit.common.tasks.html#module-flytekit.common.tasks.pytorch_task">flytekit.common.tasks.pytorch_task (module)</a>
+</li>
       <li><a href="flytekit/flytekit.common.tasks.html#module-flytekit.common.tasks.sdk_dynamic">flytekit.common.tasks.sdk_dynamic (module)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#module-flytekit.common.tasks.sdk_runnable">flytekit.common.tasks.sdk_runnable (module)</a>
@@ -1662,6 +1666,8 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.task.CompiledTask.from_flyte_idl">(flytekit.models.task.CompiledTask class method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.task.Container.from_flyte_idl">(flytekit.models.task.Container class method)</a>
+</li>
+        <li><a href="flytekit/flytekit.models.html#flytekit.models.task.PyTorchJob.from_flyte_idl">(flytekit.models.task.PyTorchJob class method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.task.Resources.from_flyte_idl">(flytekit.models.task.Resources class method)</a>
 </li>
@@ -3084,6 +3090,12 @@
 </li>
       <li><a href="flytekit/flytekit.sdk.html#flytekit.sdk.tasks.python_task">python_task() (in module flytekit.sdk.tasks)</a>
 </li>
+      <li><a href="flytekit/flytekit.common.html#flytekit.common.constants.SdkTaskType.PYTORCH_TASK">PYTORCH_TASK (flytekit.common.constants.SdkTaskType attribute)</a>
+</li>
+      <li><a href="flytekit/flytekit.sdk.html#flytekit.sdk.tasks.pytorch_task">pytorch_task() (in module flytekit.sdk.tasks)</a>
+</li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.task.PyTorchJob">PyTorchJob (class in flytekit.models.task)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -3129,6 +3141,8 @@
       <li><a href="flytekit/flytekit.interfaces.html#flytekit.interfaces.random.random">random (in module flytekit.interfaces.random)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.schedule.Schedule.rate">rate() (flytekit.models.schedule.Schedule property)</a>
+</li>
+      <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.raw">raw() (flytekit.clients.friendly.SynchronousFlyteClient property)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.PromiseOutputReference.raw_value">raw_value() (flytekit.common.tasks.sdk_dynamic.PromiseOutputReference property)</a>
 </li>
@@ -3424,9 +3438,13 @@
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.presto_task.SdkPrestoTask">SdkPrestoTask (class in flytekit.common.tasks.presto_task)</a>
 </li>
+      <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.pytorch_task.SdkPyTorchTask">SdkPyTorchTask (class in flytekit.common.tasks.pytorch_task)</a>
+</li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableContainer">SdkRunnableContainer (class in flytekit.common.tasks.sdk_runnable)</a>
 </li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkRunnableLaunchPlan">SdkRunnableLaunchPlan (class in flytekit.common.launch_plan)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.pytorch_task.SdkRunnablePytorchContainer">SdkRunnablePytorchContainer (class in flytekit.common.tasks.pytorch_task)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.spark_task.SdkRunnableSparkContainer">SdkRunnableSparkContainer (class in flytekit.common.tasks.spark_task)</a>
 </li>
@@ -3464,9 +3482,19 @@
 </li>
       <li><a href="flytekit/flytekit.contrib.sensors.html#flytekit.contrib.sensors.task.SensorTask">SensorTask (class in flytekit.contrib.sensors.task)</a>
 </li>
-      <li><a href="flytekit/flytekit.clis.sdk_in_container.html#flytekit.clis.sdk_in_container.serialize.serialize_tasks">serialize_tasks() (in module flytekit.clis.sdk_in_container.serialize)</a>
+      <li><a href="flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkRunnableLaunchPlan.serialize">serialize() (flytekit.common.launch_plan.SdkRunnableLaunchPlan method)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity.serialize">(flytekit.common.mixins.registerable.RegisterableEntity method)</a>
 </li>
-      <li><a href="flytekit/flytekit.clis.sdk_in_container.html#flytekit.clis.sdk_in_container.serialize.serialize_workflows">serialize_workflows() (in module flytekit.clis.sdk_in_container.serialize)</a>
+        <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.serialize">(flytekit.common.tasks.task.SdkTask method)</a>
+</li>
+        <li><a href="flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.serialize">(flytekit.common.workflow.SdkWorkflow method)</a>
+</li>
+      </ul></li>
+      <li><a href="flytekit/flytekit.clis.sdk_in_container.html#flytekit.clis.sdk_in_container.serialize.serialize_all">serialize_all() (in module flytekit.clis.sdk_in_container.serialize)</a>
+</li>
+      <li><a href="flytekit/flytekit.clis.sdk_in_container.html#flytekit.clis.sdk_in_container.serialize.serialize_tasks_only">serialize_tasks_only() (in module flytekit.clis.sdk_in_container.serialize)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.output.OutputReference.set">set() (flytekit.common.tasks.output.OutputReference method)</a>
 
@@ -4047,6 +4075,8 @@
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.task.Container.to_flyte_idl">(flytekit.models.task.Container method)</a>
 </li>
+        <li><a href="flytekit/flytekit.models.html#flytekit.models.task.PyTorchJob.to_flyte_idl">(flytekit.models.task.PyTorchJob method)</a>
+</li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.task.Resources.to_flyte_idl">(flytekit.models.task.Resources method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.task.Resources.ResourceEntry.to_flyte_idl">(flytekit.models.task.Resources.ResourceEntry method)</a>
@@ -4489,6 +4519,8 @@
       <li><a href="flytekit/flytekit.common.mixins.html#flytekit.common.mixins.artifact.ExecutionArtifact.wait_for_completion">wait_for_completion() (flytekit.common.mixins.artifact.ExecutionArtifact method)</a>
 </li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.nodes.SdkNode.with_overrides">with_overrides() (flytekit.common.nodes.SdkNode method)</a>
+</li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.task.PyTorchJob.workers_count">workers_count() (flytekit.models.task.PyTorchJob property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.admin.html#flytekit.models.admin.workflow.Workflow">Workflow (class in flytekit.models.admin.workflow)</a>
 </li>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.task &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.models.task &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -164,6 +164,7 @@
 <span class="kn">from</span> <span class="nn">flyteidl.admin</span> <span class="k">import</span> <span class="n">task_pb2</span> <span class="k">as</span> <span class="n">_admin_task</span>
 <span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">tasks_pb2</span> <span class="k">as</span> <span class="n">_core_task</span><span class="p">,</span> <span class="n">literals_pb2</span> <span class="k">as</span> <span class="n">_literals_pb2</span><span class="p">,</span> <span class="n">compiler_pb2</span> <span class="k">as</span> <span class="n">_compiler</span>
 <span class="kn">from</span> <span class="nn">flyteidl.plugins</span> <span class="k">import</span> <span class="n">spark_pb2</span> <span class="k">as</span> <span class="n">_spark_task</span>
+<span class="kn">from</span> <span class="nn">flyteidl.plugins</span> <span class="k">import</span> <span class="n">pytorch_pb2</span> <span class="k">as</span> <span class="n">_pytorch_task</span>
 <span class="kn">from</span> <span class="nn">flytekit.plugins</span> <span class="k">import</span> <span class="n">flyteidl</span> <span class="k">as</span> <span class="n">_lazy_flyteidl</span>
 <span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span><span class="p">,</span> <span class="n">struct_pb2</span> <span class="k">as</span> <span class="n">_struct</span>
 <span class="kn">from</span> <span class="nn">flytekit.sdk.spark_types</span> <span class="k">import</span> <span class="n">SparkType</span> <span class="k">as</span> <span class="n">_spark_type</span>
@@ -961,6 +962,27 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">pod_spec</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">pod_spec</span><span class="p">,</span>
             <span class="n">primary_container_name</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">primary_container_name</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PyTorchJob"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.PyTorchJob">[docs]</a><span class="k">class</span> <span class="nc">PyTorchJob</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workers_count</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_workers_count</span> <span class="o">=</span> <span class="n">workers_count</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">workers_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workers_count</span>
+
+<div class="viewcode-block" id="PyTorchJob.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.PyTorchJob.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_pytorch_task</span><span class="o">.</span><span class="n">DistributedPyTorchTrainingTask</span><span class="p">(</span>
+            <span class="n">workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workers_count</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PyTorchJob.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.PyTorchJob.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">workers_count</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">workers</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 </pre></div>
 

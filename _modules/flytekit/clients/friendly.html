@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients.friendly &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.clients.friendly &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -163,15 +163,25 @@
 <span class="kn">from</span> <span class="nn">flyteidl.admin</span> <span class="k">import</span> <span class="n">task_pb2</span> <span class="k">as</span> <span class="n">_task_pb2</span><span class="p">,</span> <span class="n">common_pb2</span> <span class="k">as</span> <span class="n">_common_pb2</span><span class="p">,</span> <span class="n">workflow_pb2</span> <span class="k">as</span> <span class="n">_workflow_pb2</span><span class="p">,</span> \
     <span class="n">launch_plan_pb2</span> <span class="k">as</span> <span class="n">_launch_plan_pb2</span><span class="p">,</span> <span class="n">execution_pb2</span> <span class="k">as</span> <span class="n">_execution_pb2</span><span class="p">,</span> <span class="n">node_execution_pb2</span> <span class="k">as</span> <span class="n">_node_execution_pb2</span><span class="p">,</span> \
     <span class="n">task_execution_pb2</span> <span class="k">as</span> <span class="n">_task_execution_pb2</span><span class="p">,</span> <span class="n">project_pb2</span> <span class="k">as</span> <span class="n">_project_pb2</span>
+<span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">identifier_pb2</span> <span class="k">as</span> <span class="n">_identifier_pb2</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.clients.raw</span> <span class="k">import</span> <span class="n">RawSynchronousFlyteClient</span> <span class="k">as</span> <span class="n">_RawSynchronousFlyteClient</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">filters</span> <span class="k">as</span> <span class="n">_filters</span><span class="p">,</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span><span class="p">,</span> <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task</span><span class="p">,</span> \
     <span class="n">execution</span> <span class="k">as</span> <span class="n">_execution</span><span class="p">,</span> <span class="n">node_execution</span> <span class="k">as</span> <span class="n">_node_execution</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.admin</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow</span><span class="p">,</span> <span class="n">task_execution</span> <span class="k">as</span> <span class="n">_task_execution</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions.user</span> <span class="k">import</span> <span class="n">FlyteAssertion</span> <span class="k">as</span> <span class="n">_FlyteAssertion</span>
 
 
 <div class="viewcode-block" id="SynchronousFlyteClient"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient">[docs]</a><span class="k">class</span> <span class="nc">SynchronousFlyteClient</span><span class="p">(</span><span class="n">_RawSynchronousFlyteClient</span><span class="p">):</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gives access to the raw client</span>
+<span class="sd">        :rtype: flytekit.clients.raw.RawSynchronousFlyteClient</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>
@@ -344,9 +354,6 @@
 <span class="sd">            remains identical, calling this method multiple times will result in success.</span>
 
 <span class="sd">        :param: flytekit.models.core.identifier.Identifier workflow_identifier: The identifier for this workflow.</span>
-<span class="sd">        :param: Text version: The version identifier of this workflow. Used to distinguish between different iterations</span>
-<span class="sd">            of tasks with the same name. If any aspect of the underlying workflow definition changes, then the version</span>
-<span class="sd">            must also change to be accepted by the Flyte Admin Service.</span>
 <span class="sd">        :param: flytekit.models.admin.workflow.WorkflowSpec workflow_spec: This is the actual definition of the workflow</span>
 <span class="sd">            that should be created.</span>
 <span class="sd">        :raises flytekit.common.exceptions.user.FlyteEntityAlreadyExistsException: If an identical version of the</span>
@@ -497,9 +504,6 @@
 <span class="sd">            remains identical, calling this method multiple times will result in success.</span>
 
 <span class="sd">        :param: flytekit.models.core.identifier.Identifier launch_plan_identifer: The identifier for this launch plan.</span>
-<span class="sd">        :param: Text version: The version identifier of this launch plan. Used to distinguish between different</span>
-<span class="sd">            iterations of tasks with the same name. If any aspect of the underlying launch plan definition changes,</span>
-<span class="sd">            then the version must also change to be accepted by the Flyte Admin Service.</span>
 <span class="sd">        :param: flytekit.models.launch_plan.LaunchPlanSpec launch_plan_spec: This is the actual definition of the</span>
 <span class="sd">            launch plan that should be created.</span>
 <span class="sd">        :raises flytekit.common.exceptions.user.FlyteEntityAlreadyExistsException: If an identical version of the</span>

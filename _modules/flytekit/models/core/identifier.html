@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core.identifier &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.models.core.identifier &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -222,7 +222,7 @@
 
 <div class="viewcode-block" id="Identifier.to_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.Identifier.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: flyteidl.core.identifier_pb2.NamedEntityIdentifier</span>
+<span class="sd">        :rtype: flyteidl.core.identifier_pb2.Identifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_identifier_pb2</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
             <span class="n">resource_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_type</span><span class="p">,</span>
@@ -235,7 +235,7 @@
 <div class="viewcode-block" id="Identifier.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.Identifier.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param flyteidl.core.identifier_pb2.NamedEntityIdentifier p:</span>
+<span class="sd">        :param flyteidl.core.identifier_pb2.Identifier p:</span>
 <span class="sd">        :rtype: Identifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>

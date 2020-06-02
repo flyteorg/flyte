@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.workflow &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.common.workflow &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -177,6 +177,7 @@
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_models</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.admin</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_admin_workflow_model</span>
 
 
 <div class="viewcode-block" id="Output"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.Output">[docs]</a><span class="k">class</span> <span class="nc">Output</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -443,6 +444,20 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">old_id</span>
             <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="SdkWorkflow.serialize"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.serialize">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Serializing a workflow should produce an object similar to what the registration step produces, in preparation</span>
+<span class="sd">        for actual registration to Admin.</span>
+
+<span class="sd">        :rtype: flyteidl.admin.workflow_pb2.WorkflowSpec</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sub_workflows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sub_workflows</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_admin_workflow_model</span><span class="o">.</span><span class="n">WorkflowSpec</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">sub_workflows</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SdkWorkflow.validate"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.validate">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
