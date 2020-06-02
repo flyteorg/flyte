@@ -1,7 +1,7 @@
 .. _pytorch-task-type:
 
 PyTorch Task
-==========
+============
 
 PyTorch Task Type allows users to run distributed PyTorch training jobs on the Kubernetes cluster via `PyTorch Operator`_.
 
