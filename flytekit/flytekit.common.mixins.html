@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.mixins package &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.common.mixins package &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -427,6 +427,24 @@ itself.  It’s known at time of creation. In contrast, when</p>
 <em class="property">abstract property </em><code class="sig-name descname">resource_type</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.resource_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integer from _identifier.ResourceType enum
 :rtype: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.mixins.registerable.RegisterableEntity.serialize">
+<em class="property">abstract </em><code class="sig-name descname">serialize</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#RegisterableEntity.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registerable entities also are required to be serialized. This allows flytekit to separate serialization from
+the network call to Admin (mostly at least, if a Launch Plan is fetched for instance as part of another
+workflow, it will still hit Admin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<em>Text</em>) – The project in which to serialize this task.</p></li>
+<li><p><strong>domain</strong> (<em>Text</em>) – The domain in which to serialize this task.</p></li>
+<li><p><strong>name</strong> (<em>Text</em>) – The name to give this task.</p></li>
+<li><p><strong>version</strong> (<em>Text</em>) – The version in which to serialize this task.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk.tasks &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.sdk.tasks &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -164,7 +164,8 @@
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_common_constants</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable_tasks</span><span class="p">,</span> <span class="n">sdk_dynamic</span> <span class="k">as</span> <span class="n">_sdk_dynamic</span><span class="p">,</span> \
-    <span class="n">spark_task</span> <span class="k">as</span> <span class="n">_sdk_spark_tasks</span><span class="p">,</span> <span class="n">generic_spark_task</span> <span class="k">as</span> <span class="n">_sdk_generic_spark_task</span><span class="p">,</span> <span class="n">hive_task</span> <span class="k">as</span> <span class="n">_sdk_hive_tasks</span><span class="p">,</span> <span class="n">sidecar_task</span> <span class="k">as</span> <span class="n">_sdk_sidecar_tasks</span>
+    <span class="n">spark_task</span> <span class="k">as</span> <span class="n">_sdk_spark_tasks</span><span class="p">,</span> <span class="n">generic_spark_task</span> <span class="k">as</span> <span class="n">_sdk_generic_spark_task</span><span class="p">,</span> <span class="n">hive_task</span> <span class="k">as</span> <span class="n">_sdk_hive_tasks</span><span class="p">,</span> \
+    <span class="n">sidecar_task</span> <span class="k">as</span> <span class="n">_sdk_sidecar_tasks</span><span class="p">,</span> <span class="n">pytorch_task</span> <span class="k">as</span> <span class="n">_sdk_pytorch_tasks</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.sdk.spark_types</span> <span class="k">import</span>  <span class="n">SparkType</span> <span class="k">as</span> <span class="n">_spark_type</span>
@@ -1152,6 +1153,160 @@
             <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
             <span class="n">pod_spec</span><span class="o">=</span><span class="n">pod_spec</span><span class="p">,</span>
             <span class="n">primary_container_name</span><span class="o">=</span><span class="n">primary_container_name</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_task_function</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">wrapper</span><span class="p">(</span><span class="n">_task_function</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="pytorch_task"><a class="viewcode-back" href="../../../flytekit/flytekit.sdk.html#flytekit.sdk.tasks.pytorch_task">[docs]</a><span class="k">def</span> <span class="nf">pytorch_task</span><span class="p">(</span>
+        <span class="n">_task_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cache_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">workers_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">per_replica_storage_request</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">per_replica_cpu_request</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">per_replica_gpu_request</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">per_replica_memory_request</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">per_replica_storage_limit</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">per_replica_cpu_limit</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">per_replica_gpu_limit</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">per_replica_memory_limit</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to create a Pytorch Task definition. This task will submit PyTorchJob (see https://github.com/kubeflow/pytorch-operator)</span>
+<span class="sd">        defined by the code within the _task_function to k8s cluster.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        @inputs(int_list=[Types.Integer])</span>
+<span class="sd">        @outputs(result=Types.Integer</span>
+<span class="sd">        @pytorch_task(</span>
+<span class="sd">            workers_count=2,</span>
+<span class="sd">            per_replica_cpu_request=&quot;500m&quot;,</span>
+<span class="sd">            per_replica_memory_request=&quot;4Gi&quot;,</span>
+<span class="sd">            per_replica_memory_limit=&quot;8Gi&quot;,</span>
+<span class="sd">            per_replica_gpu_limit=&quot;1&quot;,</span>
+<span class="sd">        )</span>
+<span class="sd">        def my_pytorch_job(wf_params, int_list, result):</span>
+<span class="sd">            pass</span>
+
+<span class="sd">    :param _task_function: this is the decorated method and shouldn&#39;t be declared explicitly.  The function must</span>
+<span class="sd">        take a first argument, and then named arguments matching those defined in @inputs and @outputs.  No keyword</span>
+<span class="sd">        arguments are allowed for wrapped task functions.</span>
+
+<span class="sd">    :param Text cache_version: [optional] string representing logical version for discovery.  This field should be</span>
+<span class="sd">        updated whenever the underlying algorithm changes.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            This argument is required to be a non-empty string if `cache` is True.</span>
+
+<span class="sd">    :param int retries: [optional] integer determining number of times task can be retried on</span>
+<span class="sd">        :py:exc:`flytekit.sdk.exceptions.RecoverableException` or transient platform failures.  Defaults</span>
+<span class="sd">        to 0.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is</span>
+<span class="sd">            strongly recommended that tasks are written to be idempotent.</span>
+
+<span class="sd">    :param bool interruptible: [optional] boolean describing if the task is interruptible.</span>
+
+<span class="sd">    :param Text deprecated: [optional] string that should be provided if this task is deprecated.  The string</span>
+<span class="sd">        will be logged as a warning so it should contain information regarding how to update to a newer task.</span>
+
+<span class="sd">    :param bool cache: [optional] boolean describing if the outputs of this task should be cached and</span>
+<span class="sd">        re-usable.</span>
+
+<span class="sd">    :param datetime.timedelta timeout: [optional] describes how long the task should be allowed to</span>
+<span class="sd">        run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run</span>
+<span class="sd">        indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</span>
+
+<span class="sd">    :param int workers_count: integer determining the number of worker replicas spawned in the cluster for this job</span>
+<span class="sd">        (in addition to 1 master).</span>
+
+<span class="sd">    :param Text per_replica_storage_request: [optional] Kubernetes resource string for lower-bound of disk storage space</span>
+<span class="sd">        for each replica spawned for this job (i.e. both for master and workers).  Default is set by platform-level configuration.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            This is currently not supported by the platform.</span>
+
+<span class="sd">    :param Text per_replica_cpu_request: [optional] Kubernetes resource string for lower-bound of cores for each replica</span>
+<span class="sd">        spawned for this job (i.e. both for master and workers).</span>
+<span class="sd">        This can be set to a fractional portion of a CPU. Default is set by platform-level configuration.</span>
+
+<span class="sd">        TODO: Add links to resource string documentation for Kubernetes</span>
+
+<span class="sd">    :param Text per_replica_gpu_request: [optional] Kubernetes resource string for lower-bound of desired GPUs for each</span>
+<span class="sd">        replica spawned for this job (i.e. both for master and workers).</span>
+<span class="sd">        Default is set by platform-level configuration.</span>
+
+<span class="sd">        TODO: Add links to resource string documentation for Kubernetes</span>
+
+<span class="sd">    :param Text per_replica_memory_request: [optional]  Kubernetes resource string for lower-bound of physical memory</span>
+<span class="sd">        necessary for each replica spawned for this job (i.e. both for master and workers).  Default is set by platform-level configuration.</span>
+
+<span class="sd">        TODO: Add links to resource string documentation for Kubernetes</span>
+
+<span class="sd">    :param Text per_replica_storage_limit: [optional] Kubernetes resource string for upper-bound of disk storage space</span>
+<span class="sd">        for each replica spawned for this job (i.e. both for master and workers).</span>
+<span class="sd">        This amount is not guaranteed!  If not specified, it is set equal to storage_request.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            This is currently not supported by the platform.</span>
+
+<span class="sd">    :param Text per_replica_cpu_limit: [optional] Kubernetes resource string for upper-bound of cores for each replica</span>
+<span class="sd">        spawned for this job (i.e. both for master and workers).</span>
+<span class="sd">        This can be set to a fractional portion of a CPU. This amount is not guaranteed!  If not specified,</span>
+<span class="sd">        it is set equal to cpu_request.</span>
+
+<span class="sd">    :param Text per_replica_gpu_limit: [optional] Kubernetes resource string for upper-bound of desired GPUs for each</span>
+<span class="sd">        replica spawned for this job (i.e. both for master and workers).</span>
+<span class="sd">        This amount is not guaranteed!  If not specified, it is set equal to gpu_request.</span>
+
+<span class="sd">    :param Text per_replica_memory_limit: [optional]  Kubernetes resource string for upper-bound of physical memory</span>
+<span class="sd">        necessary for each replica spawned for this job (i.e. both for master and workers).</span>
+<span class="sd">        This amount is not guaranteed!  If not specified, it is set equal to memory_request.</span>
+
+<span class="sd">    :param dict[Text,Text] environment: [optional] environment variables to set when executing this task.</span>
+
+<span class="sd">    :param cls: This can be used to override the task implementation with a user-defined extension. The class</span>
+<span class="sd">        provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  A user can use this to</span>
+<span class="sd">        inject bespoke logic into the base Flyte programming model.</span>
+
+<span class="sd">    :rtype: flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span> <span class="ow">or</span> <span class="n">_sdk_pytorch_tasks</span><span class="o">.</span><span class="n">SdkPyTorchTask</span><span class="p">)(</span>
+            <span class="n">task_function</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span>
+            <span class="n">task_type</span><span class="o">=</span><span class="n">_common_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">PYTORCH_TASK</span><span class="p">,</span>
+            <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
+            <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="o">=</span><span class="n">interruptible</span><span class="p">,</span>
+            <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
+            <span class="n">discoverable</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span> <span class="ow">or</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="n">workers_count</span><span class="o">=</span><span class="n">workers_count</span><span class="p">,</span>
+            <span class="n">per_replica_storage_request</span><span class="o">=</span><span class="n">per_replica_storage_request</span><span class="p">,</span>
+            <span class="n">per_replica_cpu_request</span><span class="o">=</span><span class="n">per_replica_cpu_request</span><span class="p">,</span>
+            <span class="n">per_replica_gpu_request</span><span class="o">=</span><span class="n">per_replica_gpu_request</span><span class="p">,</span>
+            <span class="n">per_replica_memory_request</span><span class="o">=</span><span class="n">per_replica_memory_request</span><span class="p">,</span>
+            <span class="n">per_replica_storage_limit</span><span class="o">=</span><span class="n">per_replica_storage_limit</span><span class="p">,</span>
+            <span class="n">per_replica_cpu_limit</span><span class="o">=</span><span class="n">per_replica_cpu_limit</span><span class="p">,</span>
+            <span class="n">per_replica_gpu_limit</span><span class="o">=</span><span class="n">per_replica_gpu_limit</span><span class="p">,</span>
+            <span class="n">per_replica_memory_limit</span><span class="o">=</span><span class="n">per_replica_memory_limit</span><span class="p">,</span>
+            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">_task_function</span><span class="p">:</span>

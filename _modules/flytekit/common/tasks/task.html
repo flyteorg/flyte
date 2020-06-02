@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.task &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.common.tasks.task &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -306,6 +306,13 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">old_id</span>
             <span class="k">raise</span></div>
+
+<div class="viewcode-block" id="SdkTask.serialize"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.serialize">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flyteidl.admin.task_pb2.TaskSpec</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_task_model</span><span class="o">.</span><span class="n">TaskSpec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SdkTask.fetch"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.fetch">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>

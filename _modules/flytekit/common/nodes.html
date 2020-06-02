@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.nodes &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.common.nodes &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -570,8 +570,16 @@
             <span class="n">ne</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_task_executions</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">_task_executions</span><span class="o">.</span><span class="n">SdkTaskExecution</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">te</span><span class="p">)</span> <span class="k">for</span> <span class="n">te</span> <span class="ow">in</span> <span class="n">ne</span><span class="o">.</span><span class="n">get_task_executions</span><span class="p">()</span>
-            <span class="p">]</span></div></div>
+            <span class="p">]</span></div>
             <span class="c1"># TODO: Sub-workflows too once implemented</span>
+
+    <span class="k">def</span> <span class="nf">_sync_closure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Syncs the closure of the underlying execution artifact with the state observed by the platform.</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ne</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_node_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">ne</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span></div>
 </pre></div>
 
            </div>

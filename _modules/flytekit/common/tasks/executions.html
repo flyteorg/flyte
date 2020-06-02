@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.executions &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.common.tasks.executions &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -264,7 +264,14 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkTaskExecution.sync"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.executions.SdkTaskExecution.sync">[docs]</a>    <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_task_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sync_closure</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_sync_closure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Syncs the closure of the underlying execution artifact with the state observed by the platform.</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_task_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span></div>
 </pre></div>
 
            </div>

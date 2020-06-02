@@ -12,6 +12,7 @@ Plugins available in the Flyte system.
 
 	array_job.proto
 	presto.proto
+	pytorch.proto
 	qubole.proto
 	sidecar.proto
 	spark.proto

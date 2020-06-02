@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common package &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.common package &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -222,6 +222,7 @@
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.hive_task">flytekit.common.tasks.hive_task module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.output">flytekit.common.tasks.output module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.presto_task">flytekit.common.tasks.presto_task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.pytorch_task">flytekit.common.tasks.pytorch_task module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.sdk_dynamic">flytekit.common.tasks.sdk_dynamic module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.sdk_runnable">flytekit.common.tasks.sdk_runnable module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.sidecar_task">flytekit.common.tasks.sidecar_task module</a></li>
@@ -414,6 +415,11 @@ engine.</p>
 <dl class="attribute">
 <dt id="flytekit.common.constants.SdkTaskType.PYTHON_TASK">
 <code class="sig-name descname">PYTHON_TASK</code><em class="property"> = 'python-task'</em><a class="headerlink" href="#flytekit.common.constants.SdkTaskType.PYTHON_TASK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.common.constants.SdkTaskType.PYTORCH_TASK">
+<code class="sig-name descname">PYTORCH_TASK</code><em class="property"> = 'pytorch'</em><a class="headerlink" href="#flytekit.common.constants.SdkTaskType.PYTORCH_TASK" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -711,6 +717,13 @@ notifications.</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.launch_plan.SdkRunnableLaunchPlan.serialize">
+<code class="sig-name descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/launch_plan.html#SdkRunnableLaunchPlan.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.launch_plan.SdkRunnableLaunchPlan.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unlike the SdkWorkflow serialize call, nothing special needs to be done here.
+:rtype: flyteidl.admin.launch_plan_pb2.LaunchPlanSpec</p>
 </dd></dl>
 
 <dl class="method">
@@ -1503,6 +1516,18 @@ but for tasks. If tasks are not provided relevant TaskTemplates will be fetched 
 <em class="property">property </em><code class="sig-name descname">resource_type</code><a class="headerlink" href="#flytekit.common.workflow.SdkWorkflow.resource_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Integer from _identifier.ResourceType enum
 :rtype: int</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.workflow.SdkWorkflow.serialize">
+<code class="sig-name descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#SdkWorkflow.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.SdkWorkflow.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serializing a workflow should produce an object similar to what the registration step produces, in preparation
+for actual registration to Admin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.admin.workflow_pb2.WorkflowSpec</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">

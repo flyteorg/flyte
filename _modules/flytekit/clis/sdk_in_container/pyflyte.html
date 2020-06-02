@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clis.sdk_in_container.pyflyte &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.clis.sdk_in_container.pyflyte &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -160,7 +160,7 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
-
+<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">click</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -173,7 +173,7 @@
 <span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container.serialize</span> <span class="k">import</span> <span class="n">serialize</span>
 <span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container.constants</span> <span class="k">import</span> <span class="n">CTX_PROJECT</span><span class="p">,</span> <span class="n">CTX_DOMAIN</span><span class="p">,</span> <span class="n">CTX_VERSION</span>
 <span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container.launch_plan</span> <span class="k">import</span> <span class="n">launch_plans</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span><span class="p">,</span> <span class="n">platform</span> <span class="k">as</span> <span class="n">_platform_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span><span class="p">,</span> <span class="n">platform</span> <span class="k">as</span> <span class="n">_platform_config</span><span class="p">,</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.configuration.internal</span> <span class="k">import</span> <span class="n">CONFIGURATION_PATH</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration.platform</span> <span class="k">import</span> <span class="n">URL</span> <span class="k">as</span> <span class="n">_URL</span>
@@ -200,6 +200,11 @@
 <span class="sd">    Entrypoint for all the user commands.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">update_configuration_file</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># Update the logger if it&#39;s set</span>
+    <span class="n">log_level</span> <span class="o">=</span> <span class="n">_internal_config</span><span class="o">.</span><span class="n">LOGGING_LEVEL</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="ow">or</span> <span class="n">_sdk_config</span><span class="o">.</span><span class="n">LOGGING_LEVEL</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">log_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
 
     <span class="n">ctx</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">[</span><span class="n">CTX_PROJECT</span><span class="p">]</span> <span class="o">=</span> <span class="n">project</span>

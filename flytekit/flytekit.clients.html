@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients package &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.clients package &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -225,16 +225,11 @@ remains identical, calling this method multiple times will result in success.</p
 <dd class="field-odd"><p>flytekit.models.core.identifier.Identifier launch_plan_identifer: The identifier for this launch plan.</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>Text version: The version identifier of this launch plan. Used to distinguish between different
-iterations of tasks with the same name. If any aspect of the underlying launch plan definition changes,
-then the version must also change to be accepted by the Flyte Admin Service.</p>
-</dd>
-<dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>flytekit.models.launch_plan.LaunchPlanSpec launch_plan_spec: This is the actual definition of the
+<dd class="field-even"><p>flytekit.models.launch_plan.LaunchPlanSpec launch_plan_spec: This is the actual definition of the
 launch plan that should be created.</p>
 </dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><ul class="simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
 <li><p><a class="reference internal" href="flytekit.common.exceptions.html#flytekit.common.exceptions.user.FlyteEntityAlreadyExistsException" title="flytekit.common.exceptions.user.FlyteEntityAlreadyExistsException"><strong>flytekit.common.exceptions.user.FlyteEntityAlreadyExistsException</strong></a> – If an identical version of the
 launch plan is found, this exception is raised.  The client might choose to ignore this exception because
 the identical launch plan is already registered.</p></li>
@@ -290,16 +285,11 @@ remains identical, calling this method multiple times will result in success.</p
 <dd class="field-odd"><p>flytekit.models.core.identifier.Identifier workflow_identifier: The identifier for this workflow.</p>
 </dd>
 <dt class="field-even">Param</dt>
-<dd class="field-even"><p>Text version: The version identifier of this workflow. Used to distinguish between different iterations
-of tasks with the same name. If any aspect of the underlying workflow definition changes, then the version
-must also change to be accepted by the Flyte Admin Service.</p>
-</dd>
-<dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>flytekit.models.admin.workflow.WorkflowSpec workflow_spec: This is the actual definition of the workflow
+<dd class="field-even"><p>flytekit.models.admin.workflow.WorkflowSpec workflow_spec: This is the actual definition of the workflow
 that should be created.</p>
 </dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><ul class="simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
 <li><p><a class="reference internal" href="flytekit.common.exceptions.html#flytekit.common.exceptions.user.FlyteEntityAlreadyExistsException" title="flytekit.common.exceptions.user.FlyteEntityAlreadyExistsException"><strong>flytekit.common.exceptions.user.FlyteEntityAlreadyExistsException</strong></a> – If an identical version of the
 workflow is found, this exception is raised.  The client might choose to ignore this exception because the
 identical workflow is already registered.</p></li>
@@ -818,6 +808,13 @@ the query.  If the filter is not supported, an exception will be raised.</p></li
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.workflow.Workflow" title="flytekit.models.admin.workflow.Workflow">flytekit.models.admin.workflow.Workflow</a>], Text</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.raw">
+<em class="property">property </em><code class="sig-name descname">raw</code><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives access to the raw client
+:rtype: flytekit.clients.raw.RawSynchronousFlyteClient</p>
 </dd></dl>
 
 <dl class="method">

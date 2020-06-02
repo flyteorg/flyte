@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>launch_plan.proto &mdash; Flyte 0.3.0 documentation</title>
+  <title>launch_plan.proto &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -311,7 +311,8 @@ in a query. If there are no more results, this value will be empty.</p>
   <span class="nt">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;annotations&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;auth&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;auth&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;auth_role&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -347,10 +348,14 @@ in a query. If there are no more results, this value will be empty.</p>
 <dt>auth</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-admin-auth"><span class="std std-ref">flyteidl.admin.Auth</span></a>) Indicates the permission associated with workflow executions triggered with this launch plan.</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-admin-launchplanspec-auth-role">
+<dt>auth_role</dt><dd><p>(<a class="reference internal" href="common.proto.html#api-msg-flyteidl-admin-authrole"><span class="std std-ref">flyteidl.admin.AuthRole</span></a>)</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-admin-launchplanclosure">
 <span id="api-msg-flyteidl-admin-launchplanclosure"></span><h2>flyteidl.admin.LaunchPlanClosure<a class="headerlink" href="#flyteidl-admin-launchplanclosure" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L96">[flyteidl.admin.LaunchPlanClosure proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L98">[flyteidl.admin.LaunchPlanClosure proto]</a></p>
 <p>Values computed by the flyte platform after launch plan registration.
 These include expected_inputs required to be present in a CreateExecutionRequest
 to launch the reference workflow as well timestamp values associated with the launch plan.</p>
@@ -386,7 +391,7 @@ to launch the reference workflow as well timestamp values associated with the la
 </div>
 <div class="section" id="flyteidl-admin-launchplanmetadata">
 <span id="api-msg-flyteidl-admin-launchplanmetadata"></span><h2>flyteidl.admin.LaunchPlanMetadata<a class="headerlink" href="#flyteidl-admin-launchplanmetadata" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L115">[flyteidl.admin.LaunchPlanMetadata proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L117">[flyteidl.admin.LaunchPlanMetadata proto]</a></p>
 <p>Additional launch plan attributes included in the LaunchPlanSpec not strictly required to launch
 the reference workflow.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -406,7 +411,7 @@ the reference workflow.</p>
 </div>
 <div class="section" id="flyteidl-admin-launchplanupdaterequest">
 <span id="api-msg-flyteidl-admin-launchplanupdaterequest"></span><h2>flyteidl.admin.LaunchPlanUpdateRequest<a class="headerlink" href="#flyteidl-admin-launchplanupdaterequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L124">[flyteidl.admin.LaunchPlanUpdateRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L126">[flyteidl.admin.LaunchPlanUpdateRequest proto]</a></p>
 <p>Request to set the referenced launch plan state to the configured value.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
@@ -425,7 +430,7 @@ the reference workflow.</p>
 </div>
 <div class="section" id="flyteidl-admin-launchplanupdateresponse">
 <span id="api-msg-flyteidl-admin-launchplanupdateresponse"></span><h2>flyteidl.admin.LaunchPlanUpdateResponse<a class="headerlink" href="#flyteidl-admin-launchplanupdateresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L133">[flyteidl.admin.LaunchPlanUpdateResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L135">[flyteidl.admin.LaunchPlanUpdateResponse proto]</a></p>
 <p>Purposefully empty, may be populated in the future.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
 </pre></div>
@@ -433,7 +438,7 @@ the reference workflow.</p>
 </div>
 <div class="section" id="flyteidl-admin-activelaunchplanrequest">
 <span id="api-msg-flyteidl-admin-activelaunchplanrequest"></span><h2>flyteidl.admin.ActiveLaunchPlanRequest<a class="headerlink" href="#flyteidl-admin-activelaunchplanrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L137">[flyteidl.admin.ActiveLaunchPlanRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L139">[flyteidl.admin.ActiveLaunchPlanRequest proto]</a></p>
 <p>Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
@@ -447,7 +452,7 @@ the reference workflow.</p>
 </div>
 <div class="section" id="flyteidl-admin-activelaunchplanlistrequest">
 <span id="api-msg-flyteidl-admin-activelaunchplanlistrequest"></span><h2>flyteidl.admin.ActiveLaunchPlanListRequest<a class="headerlink" href="#flyteidl-admin-activelaunchplanlistrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L142">[flyteidl.admin.ActiveLaunchPlanListRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L144">[flyteidl.admin.ActiveLaunchPlanListRequest proto]</a></p>
 <p>Represents a request structure to list active launch plans within a project/domain.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>

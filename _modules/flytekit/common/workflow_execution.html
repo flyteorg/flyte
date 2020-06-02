@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.workflow_execution &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.common.workflow_execution &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -281,8 +281,16 @@
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_complete</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_executions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_workflow_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sync_closure</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_node_executions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node_executions</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_sync_closure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Syncs the closure of the underlying execution artifact with the state observed by the platform.</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_complete</span><span class="p">:</span>
+            <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_workflow_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SdkWorkflowExecution.get_node_executions"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow_execution.SdkWorkflowExecution.get_node_executions">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

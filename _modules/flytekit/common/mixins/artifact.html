@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.mixins.artifact &mdash; Flyte 0.3.0 documentation</title>
+  <title>flytekit.common.mixins.artifact &mdash; Flyte 0.4.0 documentation</title>
   
 
   
@@ -209,6 +209,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
+    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_sync_closure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Syncs the closure of the underlying execution artifact with the state observed by the platform.</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
 <div class="viewcode-block" id="ExecutionArtifact.wait_for_completion"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.artifact.ExecutionArtifact.wait_for_completion">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">poll_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param datetime.timedelta timeout: Amount of time to wait until the execution has completed before timing</span>
@@ -222,12 +230,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">time_to_give_up</span> <span class="o">=</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timeout</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sync_closure</span><span class="p">()</span>
         <span class="k">while</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">time_to_give_up</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_complete</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
                 <span class="k">return</span>
             <span class="n">_time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">())</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sync_closure</span><span class="p">()</span>
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTimeout</span><span class="p">(</span><span class="s2">&quot;Execution </span><span class="si">{}</span><span class="s2"> did not complete before timeout.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div></div>
 </pre></div>
 
