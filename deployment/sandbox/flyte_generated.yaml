@@ -1024,7 +1024,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.2.7
+        app.kubernetes.io/version: 0.2.8
     spec:
       containers:
       - command:
@@ -1033,7 +1033,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.2.7
+        image: docker.io/lyft/flyteadmin:v0.2.8
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -1084,7 +1084,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.2.7
+        image: docker.io/lyft/flyteadmin:v0.2.8
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -1100,7 +1100,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: docker.io/lyft/flyteadmin:v0.2.7
+        image: docker.io/lyft/flyteadmin:v0.2.8
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -1113,7 +1113,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.2.7
+        image: docker.io/lyft/flyteadmin:v0.2.8
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -1149,13 +1149,13 @@ spec:
       labels:
         app: flyteconsole
         app.kubernetes.io/name: flyteconsole
-        app.kubernetes.io/version: 0.5.2
+        app.kubernetes.io/version: 0.5.3
     spec:
       containers:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: docker.io/lyft/flyteconsole:v0.5.2
+        image: docker.io/lyft/flyteconsole:v0.5.3
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -1191,7 +1191,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.2.36
+        app.kubernetes.io/version: 0.2.45
     spec:
       containers:
       - args:
@@ -1206,7 +1206,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.2.36
+        image: docker.io/lyft/flytepropeller:v0.2.45
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -1521,7 +1521,7 @@ spec:
             - /etc/flyte/config/flyteadmin_config.yaml
             - clusterresource
             - sync
-            image: docker.io/lyft/flyteadmin:v0.2.7
+            image: docker.io/lyft/flyteadmin:v0.2.8
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:

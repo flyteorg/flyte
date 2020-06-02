@@ -24,9 +24,9 @@ generate-local-docs:
 # Builds the entire doc tree. Assumes update_ref_docs has run and that all externals rsts are in _rsts/ dir
 .PHONY: generate-docs
 generate-docs: generate-dependent-repo-docs
-	@FLYTEKIT_VERSION=0.7.0 ./script/generate_docs.sh
+	@FLYTEKIT_VERSION=0.8.1 ./script/generate_docs.sh
 
 # updates referenced docs from other repositories (e.g. flyteidl, flytekit)
 .PHONY: generate-dependent-repo-docs
 generate-dependent-repo-docs:
-	@FLYTEKIT_VERSION=0.7.0 FLYTEIDL_VERSION=0.17.27 ./script/update_ref_docs.sh
+	@FLYTEKIT_VERSION=0.8.1 FLYTEIDL_VERSION=0.17.32 ./script/update_ref_docs.sh

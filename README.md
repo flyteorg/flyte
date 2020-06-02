@@ -6,7 +6,7 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic)
 ![GitHub milestones Completed](https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic)
-![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/4?style=plastic)
+![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/5?style=plastic)
 ![Twitter Follow](https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
 
@@ -42,8 +42,9 @@ Resources that would help you get a better understanding of Flyte.
 
 
 # Features
- - Used at Scale in production by 500+ users at Lyft with more than 400k workflows a month and more than 20+ million container executions per month
+ - Used at Scale in production by 500+ users at Lyft with more than *900k* workflow executed a month and more than *30+* million container executions per month
  - Centralized Inventory of Tasks, Workflows and Executions
+ - Single Task Execution support - Start executing a task and then convert it to a workflow
  - gRPC / REST interface to define and executes tasks and workflows
  - Type safe construction of pipelines, each task has an interface which is characterized by its input and outputs. Thus illegal construction of pipelines fails during declaration rather than at
    runtime
@@ -74,8 +75,10 @@ Resources that would help you get a better understanding of Flyte.
  - Written in Golang and optimized for performance
 
 ## Coming Soon
- - Single Task Execution support
  - Reactive pipelines
+ - Golang CLI
+ - Grafana templates (user/system observability)
+ - Arbitrary flytekit less container support
  - More integrations
 
 # Available Plugins
@@ -86,6 +89,11 @@ Resources that would help you get a better understanding of Flyte.
  - K8s Spark (native pyspark and java/scala)
  - Qubole Hive
  - Presto Queries
+ - Pytorch Operator
+
+## Coming soon
+ - Sagemaker
+ - Flink-K8s
 
 # Current Usage 
 - Lyft Rideshare
