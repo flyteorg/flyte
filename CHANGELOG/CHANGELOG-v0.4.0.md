@@ -11,9 +11,8 @@
 
 ### Flytekit (SDK improvements)
 - Serialization of flyte workflows
-- registering flyte workflows from a file
+- Registration of flyte entities from files
 - Write tasks and subworkflows in dynamic job spec
 
 ### Flyte Console (UI)
 - Hide archived workflows in UI
-
