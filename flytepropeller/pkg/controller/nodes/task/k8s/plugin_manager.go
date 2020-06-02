@@ -6,18 +6,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/backoff"
+	v1 "k8s.io/api/core/v1"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/lyft/flytestdlib/contextutils"
 	stdErrors "github.com/lyft/flytestdlib/errors"
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/util/workqueue"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/backoff"
 
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
@@ -35,9 +34,8 @@ import (
 
 	"github.com/lyft/flyteplugins/go/tasks/errors"
 
-	"sigs.k8s.io/controller-runtime/pkg/handler"
-
 	nodeTaskConfig "github.com/lyft/flytepropeller/pkg/controller/nodes/task/config"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 )
 
 const finalizer = "flyte/flytek8s"
@@ -296,8 +294,26 @@ func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutio
 }
 
 func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) error {
-	logger.Infof(ctx, "KillTask invoked. NO-OP for K8s plugins [%v].",
+	logger.Infof(ctx, "KillTask invoked. We will attempt to delete object [%v].",
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+
+	o, err := e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
+	if err != nil {
+		// This will recurrent, so we will skip further finalize
+		logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v, when finalizing.",
+			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
+		return nil
+	}
+
+	AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+
+	err = e.kubeClient.GetClient().Delete(ctx, o)
+	if err != nil && !IsK8sObjectNotExists(err) {
+		logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v",
+			o.GetNamespace(), o.GetName(), err)
+		return err
+	}
+
 	return nil
 }
 
@@ -317,34 +333,17 @@ func (e *PluginManager) ClearFinalizers(ctx context.Context, o k8s.Resource) err
 	return nil
 }
 
-// We first clear the finalizers, if finalizers are enabled. Following this we delete the object.
-// This order is important, because clearing finalizer is a mutation, that uses the object resource version number
-// to ensure consistent mutations. Deletion is also a mutation, that is independent of the object version.
-// So Algorithm:
-// 	 	- First build the object
-//      - If finalizers enabled
-//            - get the object, clear the finalizers and update the object
-//            - if it fails bubble up an error
-//           # Subsequent retries will continue clearing the finalizer as that is more important
-//      - Now issue a background deletion for the object.
 func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) error {
-	logger.Infof(ctx, "Finalize invoked. K8s object deletion attempted [%v].",
-		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
-	// We will always delete the object first
-	// Build Identity Resource
-	o, err := e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
-	if err != nil {
-		// This will recurrent, so we will skip further finalize
-		logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v, when finalizing.", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
-		return nil
-	}
-
-	// Add additional object metadata like name etc
-	AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
-
-	// Remove finalizers, if finalizers are enabled!
+	// If you change InjectFinalizer on the
 	if config.GetK8sPluginConfig().InjectFinalizer {
+		o, err := e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
+		if err != nil {
+			// This will recurrent, so we will skip further finalize
+			logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v, when finalizing.", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
+			return nil
+		}
 
+		AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 		nsName := k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
 		// Attempt to get resource from informer cache, if not found, retrieve it from API server.
 		if err := e.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
@@ -364,13 +363,6 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 		if err != nil {
 			return err
 		}
-	}
-	// Delete the object
-	err = e.kubeClient.GetClient().Delete(ctx, o, client.PropagationPolicy(metav1.DeletePropagationBackground))
-	if err != nil && !IsK8sObjectNotExists(err) {
-		logger.Warningf(ctx, "Failed to delete Resource with name: %v/%v. Error: %v",
-			o.GetNamespace(), o.GetName(), err)
-		return err
 	}
 	return nil
 }

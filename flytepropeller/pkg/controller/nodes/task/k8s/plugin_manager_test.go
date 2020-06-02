@@ -14,6 +14,7 @@ import (
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/backoff"
 	"github.com/lyft/flytestdlib/promutils"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -21,8 +22,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/cache/informertest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/backoff"
 
 	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCoreMock "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
@@ -47,7 +46,6 @@ type extendedFakeClient struct {
 	CreateError error
 	GetError    error
 	DeleteError error
-	UpdateError error
 }
 
 func (e extendedFakeClient) Create(ctx context.Context, obj runtime.Object, opts ...client.CreateOption) error {
@@ -70,14 +68,6 @@ func (e extendedFakeClient) Delete(ctx context.Context, obj runtime.Object, opts
 	}
 
 	return e.Client.Delete(ctx, obj, opts...)
-}
-
-func (e extendedFakeClient) Update(ctx context.Context, obj runtime.Object, opts ...client.UpdateOption) error {
-	if e.UpdateError != nil {
-		return e.UpdateError
-	}
-
-	return e.Client.Update(ctx, obj, opts...)
 }
 
 type k8sSampleHandler struct {
@@ -370,15 +360,54 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 
 func TestPluginManager_Abort(t *testing.T) {
 	ctx := context.TODO()
-	tm := &pluginsCoreMock.TaskExecutionMetadata{}
-	id := &pluginsCoreMock.TaskExecutionID{}
-	id.OnGetGeneratedName().Return("test")
-	tm.OnGetTaskExecutionID().Return(id)
-	tctx := &pluginsCoreMock.TaskExecutionContext{}
-	tctx.OnTaskExecutionMetadata().Return(tm)
-	pluginManager := PluginManager{}
-	err := pluginManager.Abort(ctx, tctx)
-	assert.NoError(t, err)
+	tm := getMockTaskExecutionMetadata()
+	res := &v1.Pod{
+		ObjectMeta: v12.ObjectMeta{
+			Name:      tm.GetTaskExecutionID().GetGeneratedName(),
+			Namespace: tm.GetNamespace(),
+		},
+	}
+
+	t.Run("Abort Pod Exists", func(t *testing.T) {
+		// common setup code
+		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
+		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme, res)}
+
+		// common setup code
+		mockResourceHandler := &pluginsk8sMock.Plugin{}
+		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
+		mockResourceHandler.OnGetTaskPhaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
+		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
+			ID:              "x",
+			ResourceToWatch: &v1.Pod{},
+			Plugin:          mockResourceHandler,
+		})
+		assert.NotNil(t, res)
+		assert.NoError(t, err)
+
+		err = pluginManager.Abort(ctx, tctx)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Abort Pod doesn't exist", func(t *testing.T) {
+		// common setup code
+		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
+		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme)}
+		// common setup code
+		mockResourceHandler := &pluginsk8sMock.Plugin{}
+		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
+		mockResourceHandler.OnGetTaskPhaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
+		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
+			ID:              "x",
+			ResourceToWatch: &v1.Pod{},
+			Plugin:          mockResourceHandler,
+		})
+		assert.NotNil(t, res)
+		assert.NoError(t, err)
+
+		err = pluginManager.Abort(ctx, tctx)
+		assert.NoError(t, err)
+	})
 }
 
 func TestPluginManager_Handle_CheckResourceStatus(t *testing.T) {
@@ -545,116 +574,6 @@ func TestAddObjectMetadata(t *testing.T) {
 		"aKey": "aVal",
 	}, o.GetAnnotations())
 	assert.Equal(t, l, o.GetLabels())
-}
-
-func TestPluginManager_Finalize(t *testing.T) {
-	ctx := context.TODO()
-	tm := getMockTaskExecutionMetadata()
-	res := &v1.Pod{
-		ObjectMeta: v12.ObjectMeta{
-			Name:       tm.GetTaskExecutionID().GetGeneratedName(),
-			Namespace:  tm.GetNamespace(),
-			Finalizers: []string{"f1"},
-		},
-	}
-	cfg := config.GetK8sPluginConfig()
-	cfg.InjectFinalizer = true
-	assert.NoError(t, config.SetK8sPluginConfig(cfg))
-
-	t.Run("Clear & Delete Pod Exists", func(t *testing.T) {
-		// common setup code
-		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
-		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme, res)}
-
-		// common setup code
-		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
-		mockResourceHandler.OnGetTaskPhaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
-		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
-			ID:              "x",
-			ResourceToWatch: &v1.Pod{},
-			Plugin:          mockResourceHandler,
-		})
-		assert.NotNil(t, res)
-		assert.NoError(t, err)
-
-		err = pluginManager.Finalize(ctx, tctx)
-		assert.NoError(t, err)
-		err = fc.Get(ctx, k8stypes.NamespacedName{Namespace: res.Namespace, Name: res.Name}, res)
-		assert.Error(t, err)
-		assert.True(t, IsK8sObjectNotExists(err))
-	})
-
-	t.Run("Clear & Delete Pod doesn't exist", func(t *testing.T) {
-		// common setup code
-		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
-		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme)}
-		// common setup code
-		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
-		mockResourceHandler.OnGetTaskPhaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
-		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
-			ID:              "x",
-			ResourceToWatch: &v1.Pod{},
-			Plugin:          mockResourceHandler,
-		})
-		assert.NotNil(t, res)
-		assert.NoError(t, err)
-
-		err = pluginManager.Finalize(ctx, tctx)
-		assert.NoError(t, err)
-	})
-
-	t.Run("Clear & Delete Pod Exists, delete failure", func(t *testing.T) {
-		// common setup code
-		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
-		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme, res), DeleteError: fmt.Errorf("failed")}
-
-		// common setup code
-		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
-		mockResourceHandler.OnGetTaskPhaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
-		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
-			ID:              "x",
-			ResourceToWatch: &v1.Pod{},
-			Plugin:          mockResourceHandler,
-		})
-		assert.NotNil(t, res)
-		assert.NoError(t, err)
-
-		res2 := &v1.Pod{}
-		err = pluginManager.Finalize(ctx, tctx)
-		assert.Error(t, err)
-		err = fc.Get(ctx, k8stypes.NamespacedName{Namespace: res.Namespace, Name: res.Name}, res2)
-		assert.NoError(t, err)
-		assert.Len(t, res2.Finalizers, 0)
-	})
-
-	t.Run("Clear & Delete Pod Exists, update failure", func(t *testing.T) {
-		// common setup code
-		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
-		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme, res), UpdateError: fmt.Errorf("failed")}
-
-		// common setup code
-		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.OnBuildIdentityResourceMatch(mock.Anything, tctx.TaskExecutionMetadata()).Return(&v1.Pod{}, nil)
-		mockResourceHandler.OnGetTaskPhaseMatch(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfo{}, nil)
-		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fc), k8s.PluginEntry{
-			ID:              "x",
-			ResourceToWatch: &v1.Pod{},
-			Plugin:          mockResourceHandler,
-		})
-		assert.NotNil(t, res)
-		assert.NoError(t, err)
-
-		res2 := &v1.Pod{}
-		err = pluginManager.Finalize(ctx, tctx)
-		assert.Error(t, err)
-		err = fc.Get(ctx, k8stypes.NamespacedName{Namespace: res.Namespace, Name: res.Name}, res2)
-		assert.NoError(t, err)
-		assert.Len(t, res2.Finalizers, 1)
-	})
-
 }
 
 func init() {
