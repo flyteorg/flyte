@@ -37,7 +37,7 @@ Use pytorch_task_ decorator for configuring job execution resources. Here you ca
     def my_pytorch_job(wf_params, int_list, result):
         pass
 
-Note that if you request GPU resources, toleration `flyte/gpu=dedicated:NoSchedule` is added to pod spec automatically. So you can use respective taint_ to make GPU-enabled nodes available exclusively for flyte-originated GPU-oriented tasks.
+Note that if you request GPU resources, toleration like, `flyte/gpu=dedicated:NoSchedule` (configured in the common flyteplugins configuration) is added to pod spec automatically. So you can use respective taint_ to make GPU-enabled nodes available exclusively for flyte-originated GPU-oriented tasks.
 
 .. _`PyTorch Operator`: https://github.com/kubeflow/pytorch-operator
 .. _Dockerfile: https://github.com/pytorch/pytorch/blob/master/docker/pytorch/Dockerfile
