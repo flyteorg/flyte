@@ -63,9 +63,13 @@ func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata
 		Detailed: arrayCore.NewPhasesCompactArray(uint(currentState.GetExecutionArraySize())),
 	}
 
+	queued := 0
 	for childIdx, subJob := range job.SubJobs {
 		actualPhase := subJob.Status.Phase
 		originalIdx := arrayCore.CalculateOriginalIndex(childIdx, currentState.GetIndexesToCache())
+		if subJob.Status.Phase == core.PhaseQueued {
+			queued++
+		}
 		if subJob.Status.Phase.IsFailure() {
 			if len(subJob.Status.Message) > 0 {
 				// If the service reported an error but there is no error.pb written, write one with the
@@ -108,6 +112,10 @@ func CheckSubTasksState(ctx context.Context, taskMeta core.TaskExecutionMetadata
 
 		newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(actualPhase))
 		newArrayStatus.Summary.Inc(actualPhase)
+	}
+
+	if queued > 0 {
+		metrics.SubTasksQueued.Add(ctx, float64(queued))
 	}
 
 	parentState = parentState.SetArrayStatus(newArrayStatus)
