@@ -114,6 +114,49 @@ func TestCheckSubTasksState(t *testing.T) {
 		assert.Equal(t, arrayCore.PhaseWriteToDiscovery.String(), p.String())
 	})
 
+	t.Run("queued", func(t *testing.T) {
+		mBatchClient := batchMocks.NewMockAwsBatchClient()
+		batchClient := NewCustomBatchClient(mBatchClient, "", "",
+			utils.NewRateLimiter("", 10, 20),
+			utils.NewRateLimiter("", 10, 20))
+
+		jobStore := newJobsStore(t, batchClient)
+		_, err := jobStore.GetOrCreate(tID.GetGeneratedName(), &Job{
+			ID: "job-id",
+			Status: JobStatus{
+				Phase: core.PhaseRunning,
+			},
+			SubJobs: []*Job{
+				{Status: JobStatus{Phase: core.PhaseQueued}},
+			},
+		})
+
+		assert.NoError(t, err)
+
+		inMemDatastore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		assert.NoError(t, err)
+
+		newState, err := CheckSubTasksState(ctx, tMeta, "", "", jobStore, inMemDatastore, &config.Config{}, &State{
+			State: &arrayCore.State{
+				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
+				ExecutionArraySize:   1,
+				OriginalArraySize:    1,
+				OriginalMinSuccesses: 1,
+				ArrayStatus: arraystatus.ArrayStatus{
+					Detailed: arrayCore.NewPhasesCompactArray(1),
+				},
+				IndexesToCache: bitarray.NewBitSet(1),
+			},
+			ExternalJobID:    refStr("job-id"),
+			JobDefinitionArn: "",
+		}, getAwsBatchExecutorMetrics(promutils.NewTestScope()))
+
+		assert.NoError(t, err)
+		p, _ := newState.GetPhase()
+		assert.Equal(t, arrayCore.PhaseCheckingSubTaskExecutions.String(), p.String())
+
+	})
+
 	t.Run("Still running", func(t *testing.T) {
 		mBatchClient := batchMocks.NewMockAwsBatchClient()
 		batchClient := NewCustomBatchClient(mBatchClient, "", "",
