@@ -6,6 +6,8 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/lyft/flytepropeller/pkg/utils"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
 	"github.com/golang/protobuf/ptypes"
@@ -50,6 +52,13 @@ type metrics struct {
 	scope promutils.Scope
 }
 
+type MetricKey = string
+
+type taskMetrics struct {
+	taskSucceeded labeled.Counter
+	taskFailed    labeled.Counter
+}
+
 type pluginRequestedTransition struct {
 	previouslyObserved bool
 	ttype              handler.TransitionType
@@ -57,6 +66,10 @@ type pluginRequestedTransition struct {
 	execInfo           handler.ExecutionInfo
 	pluginState        []byte
 	pluginStateVersion uint32
+}
+
+func getPluginMetricKey(pluginID, taskType string) string {
+	return taskType + "_" + pluginID
 }
 
 func (p *pluginRequestedTransition) CacheHit(outputPath storage.DataReference) {
@@ -133,6 +146,7 @@ type Handler struct {
 	catalog         catalog.Client
 	asyncCatalog    catalog.AsyncClient
 	plugins         map[pluginCore.TaskType]pluginCore.Plugin
+	taskMetricsMap  map[MetricKey]*taskMetrics
 	defaultPlugin   pluginCore.Plugin
 	metrics         *metrics
 	pluginRegistry  PluginRegistryIface
@@ -141,6 +155,7 @@ type Handler struct {
 	resourceManager resourcemanager.BaseResourceManager
 	barrierCache    *barrier
 	cfg             *config.Config
+	pluginScope     promutils.Scope
 }
 
 func (t *Handler) FinalizeRequired() bool {
@@ -187,7 +202,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
 		}
 		for _, tt := range p.RegisteredTaskTypes {
-			logger.Infof(ctx, "Plugin [%s] registered for TaskType [%s]", p.ID, tt)
+			logger.Infof(ctx, "Plugin [%s] registered for TaskType [%s]", cp.GetID(), tt)
 			t.plugins[tt] = cp
 		}
 		if p.IsDefault {
@@ -227,6 +242,22 @@ func validateTransition(transition pluginCore.Transition) error {
 	}
 
 	return nil
+}
+
+func (t Handler) fetchPluginTaskMetrics(pluginID, taskType string) (*taskMetrics, error) {
+	metricNameKey, err := utils.GetSanitizedPrometheusKey(getPluginMetricKey(pluginID, taskType))
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := t.taskMetricsMap[metricNameKey]; !ok {
+		t.taskMetricsMap[metricNameKey] = &taskMetrics{
+			taskSucceeded: labeled.NewCounter(metricNameKey+"_success",
+				"Task "+metricNameKey+" finished successfully", t.pluginScope, labeled.EmitUnlabeledMetric),
+			taskFailed: labeled.NewCounter(metricNameKey+"_failure",
+				"Task "+metricNameKey+" failed", t.pluginScope, labeled.EmitUnlabeledMetric),
+		}
+	}
+	return t.taskMetricsMap[metricNameKey], nil
 }
 
 func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *taskExecutionContext, ts handler.TaskNodeState) (*pluginRequestedTransition, error) {
@@ -295,6 +326,20 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 				IsRecoverable: false,
 			})
 			return pluginTrns, nil
+		}
+	}
+
+	if !pluginTrns.IsPreviouslyObserved() {
+		taskType := fmt.Sprintf("%v", ctx.Value(contextutils.TaskTypeKey))
+		taskMetric, err := t.fetchPluginTaskMetrics(p.GetID(), taskType)
+		if err != nil {
+			return nil, err
+		}
+		if pluginTrns.pInfo.Phase() == pluginCore.PhaseSuccess {
+			taskMetric.taskSucceeded.Inc(ctx)
+		}
+		if pluginTrns.pInfo.Phase() == pluginCore.PhasePermanentFailure || pluginTrns.pInfo.Phase() == pluginCore.PhaseRetryableFailure {
+			taskMetric.taskFailed.Inc(ctx)
 		}
 	}
 
@@ -598,6 +643,7 @@ func New(ctx context.Context, kubeClient executors.Client, client catalog.Client
 	return &Handler{
 		pluginRegistry: pluginMachinery.PluginRegistry(),
 		plugins:        make(map[pluginCore.TaskType]pluginCore.Plugin),
+		taskMetricsMap: make(map[MetricKey]*taskMetrics),
 		metrics: &metrics{
 			pluginPanics:           labeled.NewCounter("plugin_panic", "Task plugin paniced when trying to execute a Handler.", scope),
 			unsupportedTaskType:    labeled.NewCounter("unsupported_tasktype", "No Handler plugin configured for Handler type", scope),
@@ -610,6 +656,7 @@ func New(ctx context.Context, kubeClient executors.Client, client catalog.Client
 			pluginQueueLatency:     labeled.NewStopWatch("plugin_queue_latency", "Time spent by plugin in queued phase", time.Microsecond, scope),
 			scope:                  scope,
 		},
+		pluginScope:     scope.NewSubScope("plugin"),
 		kubeClient:      kubeClient,
 		catalog:         client,
 		asyncCatalog:    async,
