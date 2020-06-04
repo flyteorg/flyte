@@ -23,3 +23,15 @@ func TestRefUint32(t *testing.T) {
 	res := RefInt(input)
 	assert.Equal(t, input, *res)
 }
+
+func TestMustCompileRegexp(t *testing.T) {
+	t.Run("Valid regexp", func(t *testing.T) {
+		MustCompileRegexp("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$")
+	})
+
+	t.Run("Invalid regexp", func(t *testing.T) {
+		assert.Panics(t, func() {
+			MustCompileRegexp("^(")
+		})
+	})
+}
