@@ -17,3 +17,21 @@ func TestCopyMap(t *testing.T) {
 
 	assert.Nil(t, CopyMap(nil))
 }
+
+func TestGetSanitizedPrometheusKey(t *testing.T) {
+	output, err := GetSanitizedPrometheusKey("Metric:a_mc")
+	assert.Nil(t, err)
+	assert.Equal(t, "Metric:a_mc", output)
+}
+
+func TestGetSanitizedPrometheusKeyDash(t *testing.T) {
+	output, err := GetSanitizedPrometheusKey("Metric--amc")
+	assert.Nil(t, err)
+	assert.Equal(t, "Metricamc", output)
+}
+
+func TestGetSanitizedPrometheusKeySlach(t *testing.T) {
+	output, err := GetSanitizedPrometheusKey("Metric:amc\\")
+	assert.Nil(t, err)
+	assert.Equal(t, "Metric:amc", output)
+}
