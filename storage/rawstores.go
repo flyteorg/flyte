@@ -11,7 +11,7 @@ type dataStoreCreateFn func(cfg *Config, metricsScope promutils.Scope) (RawStore
 
 var stores = map[string]dataStoreCreateFn{
 	TypeMemory: NewInMemoryRawStore,
-	TypeLocal:  newLocalRawStore,
+	TypeLocal:  newStowRawStore,
 	TypeMinio:  newStowRawStore,
 	TypeS3:     newStowRawStore,
 	TypeStow:   newStowRawStore,
