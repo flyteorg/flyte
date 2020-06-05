@@ -2,11 +2,22 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"sync"
 	"time"
 
-	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	s32 "github.com/aws/aws-sdk-go/service/s3"
+	"github.com/graymeta/stow/azure"
+	"github.com/graymeta/stow/google"
+	"github.com/graymeta/stow/local"
+	"github.com/graymeta/stow/oracle"
+	"github.com/graymeta/stow/s3"
+	"github.com/graymeta/stow/swift"
 
+	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils/labeled"
 
 	"github.com/lyft/flytestdlib/errors"
@@ -21,6 +32,54 @@ const (
 	FailureTypeLabel contextutils.Key = "failure_type"
 )
 
+var fQNFn = map[string]func(string) DataReference{
+	s3.Kind: func(bucket string) DataReference {
+		return DataReference(fmt.Sprintf("s3://%s", bucket))
+	},
+	google.Kind: func(bucket string) DataReference {
+		return DataReference(fmt.Sprintf("gs://%s", bucket))
+	},
+	oracle.Kind: func(bucket string) DataReference {
+		return DataReference(fmt.Sprintf("os://%s", bucket))
+	},
+	swift.Kind: func(bucket string) DataReference {
+		return DataReference(fmt.Sprintf("sw://%s", bucket))
+	},
+	azure.Kind: func(bucket string) DataReference {
+		return DataReference(fmt.Sprintf("afs://%s", bucket))
+	},
+	local.Kind: func(bucket string) DataReference {
+		return DataReference(fmt.Sprintf("file://%s", bucket))
+	},
+}
+
+// Checks if the error is AWS S3 bucket not found error
+func awsBucketIsNotFound(err error) bool {
+	if IsNotFound(err) {
+		return true
+	}
+
+	if awsErr, errOk := errs.Cause(err).(awserr.Error); errOk {
+		return awsErr.Code() == s32.ErrCodeNoSuchBucket
+	}
+
+	return false
+}
+
+// Checks if the error is AWS S3 bucket already exists error.
+func awsBucketAlreadyExists(err error) bool {
+	if IsExists(err) {
+		return true
+	}
+
+	if awsErr, errOk := errs.Cause(err).(awserr.Error); errOk {
+		return awsErr.Code() == s32.ErrCodeBucketAlreadyOwnedByYou
+	}
+
+	return false
+}
+
+// Metrics for Stow store
 type stowMetrics struct {
 	BadReference labeled.Counter
 	BadContainer labeled.Counter
@@ -35,14 +94,7 @@ type stowMetrics struct {
 	WriteLatency labeled.StopWatch
 }
 
-// Implements DataStore to talk to stow location store.
-type StowStore struct {
-	stow.Container
-	copyImpl
-	metrics          *stowMetrics
-	containerBaseFQN DataReference
-}
-
+// Metadata that will be returned
 type StowMetadata struct {
 	exists bool
 	size   int64
@@ -56,13 +108,63 @@ func (s StowMetadata) Exists() bool {
 	return s.exists
 }
 
+// Implements DataStore to talk to stow location store.
+type StowStore struct {
+	copyImpl
+	loc stow.Location
+	// This is a default configured container.
+	baseContainer stow.Container
+	// If dynamic container loading is enabled, then for any new container that is not the base container
+	// stowstore will dynamically load the given container
+	enableDynamicContainerLoading bool
+	// all dynamically loaded containers will be recorded in this map. It is possible that we may load the same container concurrently multiple times
+	dynamicContainerMap sync.Map
+	metrics             *stowMetrics
+	baseContainerFQN    DataReference
+}
+
+func (s *StowStore) LoadContainer(ctx context.Context, container string, createIfNotFound bool) (stow.Container, error) {
+	c, err := s.loc.Container(container)
+	if err != nil {
+		if createIfNotFound {
+			logger.Infof(ctx, "Container [%s] lookup failed, err [%s], will try to create a new one", err)
+			if IsNotFound(err) || awsBucketIsNotFound(err) {
+				c, err := s.loc.CreateContainer(container)
+				// If the container's already created, move on. Otherwise, fail with error.
+				if err != nil && !awsBucketAlreadyExists(err) && !IsExists(err) {
+					return nil, fmt.Errorf("unable to initialize container [%v]. Error: %v", container, err)
+				}
+				return c, nil
+			}
+		} else {
+			logger.Errorf(ctx, "Container [%s] lookup failed. Error %s", container, err)
+		}
+		return nil, err
+	}
+	return c, nil
+}
+
 func (s *StowStore) getContainer(ctx context.Context, container string) (c stow.Container, err error) {
-	if s.Container.Name() != container {
-		s.metrics.BadContainer.Inc(ctx)
-		return nil, errs.Wrapf(stow.ErrNotFound, "Conf container:%v != Passed Container:%v", s.Container.Name(), container)
+	if s.baseContainer != nil && s.baseContainer.Name() == container {
+		return s.baseContainer, nil
 	}
 
-	return s.Container, nil
+	if !s.enableDynamicContainerLoading {
+		s.metrics.BadContainer.Inc(ctx)
+		return nil, errs.Wrapf(stow.ErrNotFound, "Conf container:%v != Passed Container:%v. Dynamic loading is disabled", s.baseContainer.Name(), container)
+	}
+
+	iface, ok := s.dynamicContainerMap.Load(container)
+	if !ok {
+		c, err := s.LoadContainer(ctx, container, false)
+		if err != nil {
+			logger.Errorf(ctx, "failed to load container [%s] dynamically, error %s", container, err)
+			return nil, err
+		}
+		s.dynamicContainerMap.Store(container, c)
+		return c, nil
+	}
+	return iface.(stow.Container), nil
 }
 
 func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
@@ -157,14 +259,16 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 }
 
 func (s *StowStore) GetBaseContainerFQN(ctx context.Context) DataReference {
-	return s.containerBaseFQN
+	return s.baseContainerFQN
 }
 
-func NewStowRawStore(containerBaseFQN DataReference, container stow.Container, metricsScope promutils.Scope) (*StowStore, error) {
+func NewStowRawStore(baseContainerFQN DataReference, loc stow.Location, enableDynamicContainerLoading bool, metricsScope promutils.Scope) (*StowStore, error) {
 	failureTypeOption := labeled.AdditionalLabelsOption{Labels: []string{FailureTypeLabel.String()}}
 	self := &StowStore{
-		Container:        container,
-		containerBaseFQN: containerBaseFQN,
+		loc:                           loc,
+		baseContainerFQN:              baseContainerFQN,
+		enableDynamicContainerLoading: enableDynamicContainerLoading,
+		dynamicContainerMap:           sync.Map{},
 		metrics: &stowMetrics{
 			BadReference: labeled.NewCounter("bad_key", "Indicates the provided storage reference/key is incorrectly formatted", metricsScope, labeled.EmitUnlabeledMetric),
 			BadContainer: labeled.NewCounter("bad_container", "Indicates request for a container that has not been initialized", metricsScope, labeled.EmitUnlabeledMetric),
@@ -181,6 +285,72 @@ func NewStowRawStore(containerBaseFQN DataReference, container stow.Container, m
 	}
 
 	self.copyImpl = newCopyImpl(self, metricsScope)
-
+	_, c, _, err := baseContainerFQN.Split()
+	if err != nil {
+		return nil, err
+	}
+	container, err := self.LoadContainer(context.TODO(), c, true)
+	if err != nil {
+		return nil, err
+	}
+	self.baseContainer = container
 	return self, nil
+}
+
+// Constructor for the StowRawStore
+func newStowRawStore(cfg *Config, metricsScope promutils.Scope) (RawStore, error) {
+	if cfg.InitContainer == "" {
+		return nil, fmt.Errorf("initContainer is required even with `enable-multicontainer`")
+	}
+
+	var cfgMap stow.ConfigMap
+	var kind string
+	if cfg.Stow != nil {
+		kind = cfg.Stow.Kind
+		cfgMap = cfg.Stow.Config
+	} else {
+		logger.Warnf(context.TODO(), "stow configuration section missing, defaulting to legacy s3/minio connection config")
+		// This is for supporting legacy configurations which configure S3 via connection config
+		kind = s3.Kind
+		cfgMap = legacyS3ConfigMap(cfg.Connection)
+	}
+
+	fn, ok := fQNFn[kind]
+	if !ok {
+		return nil, errs.Errorf("unsupported stow.kind [%s], add support in flytestdlib?", kind)
+	}
+
+	loc, err := stow.Dial(kind, cfgMap)
+	if err != nil {
+		return emptyStore, fmt.Errorf("unable to configure the storage for %s. Error: %v", kind, err)
+	}
+
+	return NewStowRawStore(fn(cfg.InitContainer), loc, cfg.MultiContainerEnabled, metricsScope)
+}
+
+func legacyS3ConfigMap(cfg ConnectionConfig) stow.ConfigMap {
+	// Non-nullable fields
+	stowConfig := stow.ConfigMap{
+		s3.ConfigAuthType: cfg.AuthType,
+		s3.ConfigRegion:   cfg.Region,
+	}
+
+	// Fields that differ between minio and real S3
+	if endpoint := cfg.Endpoint.String(); endpoint != "" {
+		stowConfig[s3.ConfigEndpoint] = endpoint
+	}
+
+	if accessKey := cfg.AccessKey; accessKey != "" {
+		stowConfig[s3.ConfigAccessKeyID] = accessKey
+	}
+
+	if secretKey := cfg.SecretKey; secretKey != "" {
+		stowConfig[s3.ConfigSecretKey] = secretKey
+	}
+
+	if disableSsl := cfg.DisableSSL; disableSsl {
+		stowConfig[s3.ConfigDisableSSL] = "True"
+	}
+
+	return stowConfig
 }

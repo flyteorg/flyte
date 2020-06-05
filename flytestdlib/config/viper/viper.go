@@ -11,10 +11,13 @@ import (
 
 	"github.com/pkg/errors"
 
+	stdLibErrs "github.com/lyft/flytestdlib/errors"
+
+	"github.com/spf13/cobra"
+
 	"github.com/lyft/flytestdlib/config"
 	"github.com/lyft/flytestdlib/config/files"
 	"github.com/lyft/flytestdlib/logger"
-	"github.com/spf13/cobra"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/mitchellh/mapstructure"
@@ -94,7 +97,7 @@ func (v viperAccessor) bindViperConfigsFromEnv(root config.Section) (err error) 
 }
 
 func (v viperAccessor) bindViperConfigsEnvDepth(m map[string]interface{}, prefix string) error {
-	errs := config.ErrorCollection{}
+	errs := stdLibErrs.ErrorCollection{}
 	for key, val := range m {
 		subKey := prefix + key
 		if asMap, ok := val.(map[string]interface{}); ok {
@@ -120,7 +123,7 @@ func (v viperAccessor) updateConfig(ctx context.Context, r config.Section) error
 	// If a config file is found, read it in.
 	if err = v.viper.ReadInConfig(); err == nil {
 		logger.Printf(ctx, "Using config file: %+v", v.viper.ConfigFilesUsed())
-	} else if asErrorCollection, ok := err.(config.ErrorCollection); ok {
+	} else if asErrorCollection, ok := err.(stdLibErrs.ErrorCollection); ok {
 		shouldWatchChanges = false
 		for i, e := range asErrorCollection {
 			if _, isNotFound := errors.Cause(e).(viperLib.ConfigFileNotFoundError); isNotFound {
@@ -196,7 +199,7 @@ func (v viperAccessor) parseViperConfig(root config.Section) error {
 }
 
 func (v viperAccessor) parseViperConfigRecursive(root config.Section, settings interface{}) error {
-	errs := config.ErrorCollection{}
+	errs := stdLibErrs.ErrorCollection{}
 	var mine interface{}
 	myKeysCount := 0
 	if asMap, casted := settings.(map[string]interface{}); casted {

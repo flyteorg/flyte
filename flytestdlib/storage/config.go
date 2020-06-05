@@ -39,15 +39,20 @@ var (
 			Region:   "us-east-1",
 			AuthType: "iam",
 		},
+		MultiContainerEnabled: false,
 	}
 )
 
 // A common storage config.
 type Config struct {
-	Type          Type             `json:"type" pflag:",Sets the type of storage to configure [s3/minio/local/mem/stow]."`
-	Connection    ConnectionConfig `json:"connection"`
-	Stow          *StowConfig      `json:"stow,omitempty"`
-	InitContainer string           `json:"container" pflag:",Initial container to create -if it doesn't exist-.'"`
+	Type       Type             `json:"type" pflag:",Sets the type of storage to configure [s3/minio/local/mem/stow]."`
+	Connection ConnectionConfig `json:"connection"`
+	Stow       *StowConfig      `json:"stow,omitempty"`
+	// Container here is misleading, it refers to a Bucket (AWS S3) like blobstore entity. In some terms it could be a table
+	InitContainer string `json:"container" pflag:",Initial container (in s3 a bucket) to create -if it doesn't exist-.'"`
+	// By default if this is not enabled, multiple containers are not supported by the storage layer. Only the configured `container` InitContainer will be allowed to requests data from. But, if enabled then data will be loaded to written to any
+	// container specified in the DataReference.
+	MultiContainerEnabled bool `json:"enable-multicontainer" pflag:",If this is true, then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered"`
 	// Caching is recommended to improve the performance of underlying systems. It caches the metadata and resolving
 	// inputs is accelerated. The size of the cache is large so understand how to configure the cache.
 	// TODO provide some default config choices

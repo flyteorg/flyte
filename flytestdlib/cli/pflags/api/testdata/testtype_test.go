@@ -429,6 +429,28 @@ func TestTestType_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_storage.enable-multicontainer", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vBool, err := cmdFlags.GetBool("storage.enable-multicontainer"); err == nil {
+				assert.Equal(t, bool(DefaultTestType.StorageConfig.MultiContainerEnabled), vBool)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("storage.enable-multicontainer", testValue)
+			if vBool, err := cmdFlags.GetBool("storage.enable-multicontainer"); err == nil {
+				testDecodeJson_TestType(t, fmt.Sprintf("%v", vBool), &actual.StorageConfig.MultiContainerEnabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_storage.cache.max_size_mbs", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly

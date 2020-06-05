@@ -6,6 +6,8 @@ import (
 	"reflect"
 
 	"github.com/pkg/errors"
+
+	stdLibErrs "github.com/lyft/flytestdlib/errors"
 )
 
 // Uses Json marshal/unmarshal to make a deep copy of a config object.
@@ -42,7 +44,7 @@ func toInterface(config Config) (interface{}, error) {
 
 // Builds a generic map out of the root section config and its sub-sections configs.
 func AllConfigsAsMap(root Section) (m map[string]interface{}, err error) {
-	errs := ErrorCollection{}
+	errs := stdLibErrs.ErrorCollection{}
 	allConfigs := make(map[string]interface{}, len(root.GetSections()))
 	if root.GetConfig() != nil {
 		rootConfig, err := toInterface(root.GetConfig())

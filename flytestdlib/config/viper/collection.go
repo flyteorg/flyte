@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lyft/flytestdlib/config"
+	"github.com/lyft/flytestdlib/errors"
 
 	"github.com/lyft/flytestdlib/logger"
 
@@ -38,7 +38,7 @@ type CollectionProxy struct {
 }
 
 func (c *CollectionProxy) BindPFlags(flags *pflag.FlagSet) error {
-	err := config.ErrorCollection{}
+	err := errors.ErrorCollection{}
 	for _, v := range c.underlying {
 		err.Append(v.BindPFlags(flags))
 	}
@@ -49,7 +49,7 @@ func (c *CollectionProxy) BindPFlags(flags *pflag.FlagSet) error {
 }
 
 func (c *CollectionProxy) BindEnv(input ...string) error {
-	err := config.ErrorCollection{}
+	err := errors.ErrorCollection{}
 	for _, v := range c.underlying {
 		err.Append(v.BindEnv(input...))
 	}
@@ -72,7 +72,7 @@ func (c *CollectionProxy) AutomaticEnv() {
 }
 
 func (c CollectionProxy) ReadInConfig() error {
-	err := config.ErrorCollection{}
+	err := errors.ErrorCollection{}
 	for _, v := range c.underlying {
 		err.Append(v.ReadInConfig())
 	}
