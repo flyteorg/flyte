@@ -428,6 +428,7 @@ func (c *workflowExecutor) HandleAbortedWorkflow(ctx context.Context, w *v1alpha
 		// Best effort clean-up.
 		if err2 := c.cleanupRunningNodes(ctx, w, reason); err2 != nil {
 			logger.Errorf(ctx, "Failed to propagate Abort for workflow:%v. Error: %v", w.ExecutionID.WorkflowExecutionIdentifier, err2)
+			return err2
 		}
 
 		var status Status

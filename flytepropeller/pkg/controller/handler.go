@@ -10,6 +10,7 @@ import (
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
 
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/lyft/flytepropeller/pkg/controller/config"
 	"github.com/lyft/flytepropeller/pkg/controller/workflowstore"
 
@@ -47,6 +48,15 @@ func newPropellerMetrics(scope promutils.Scope) *propellerMetrics {
 	}
 }
 
+func RecordSystemError(w *v1alpha1.FlyteWorkflow, err error) *v1alpha1.FlyteWorkflow {
+	// Let's mark these as system errors.
+	// We only want to increase failed attempts and discard any other partial changes to the CRD.
+	wfDeepCopy := w.DeepCopy()
+	wfDeepCopy.GetExecutionStatus().IncFailedAttempts()
+	wfDeepCopy.GetExecutionStatus().SetMessage(err.Error())
+	return wfDeepCopy
+}
+
 type Propeller struct {
 	wfStore          workflowstore.FlyteWorkflow
 	workflowExecutor executors.Workflow
@@ -56,6 +66,68 @@ type Propeller struct {
 
 func (p *Propeller) Initialize(ctx context.Context) error {
 	return p.workflowExecutor.Initialize(ctx)
+}
+
+func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
+
+	t := p.metrics.DeepCopyTime.Start()
+	mutableW := originalW.DeepCopy()
+	t.Stop()
+	ctx = contextutils.WithWorkflowID(ctx, mutableW.GetID())
+	if execID := mutableW.GetExecutionID(); execID.WorkflowExecutionIdentifier != nil {
+		ctx = contextutils.WithProjectDomain(ctx, mutableW.GetExecutionID().Project, mutableW.GetExecutionID().Domain)
+	}
+	ctx = contextutils.WithResourceVersion(ctx, mutableW.GetResourceVersion())
+
+	maxRetries := uint32(p.cfg.MaxWorkflowRetries)
+	if IsDeleted(mutableW) || (mutableW.Status.FailedAttempts > maxRetries) {
+		var err error
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					stack := debug.Stack()
+					err = fmt.Errorf("panic when aborting workflow, Stack: [%s]", string(stack))
+					logger.Errorf(ctx, err.Error())
+					p.metrics.PanicObserved.Inc(ctx)
+				}
+			}()
+			err = p.workflowExecutor.HandleAbortedWorkflow(ctx, mutableW, maxRetries)
+		}()
+		if err != nil {
+			p.metrics.AbortError.Inc(ctx)
+			return nil, err
+		}
+		return mutableW, nil
+	}
+
+	if !mutableW.GetExecutionStatus().IsTerminated() {
+		var err error
+		SetFinalizerIfEmpty(mutableW, FinalizerKey)
+
+		func() {
+			t := p.metrics.RawWorkflowTraversalTime.Start(ctx)
+			defer func() {
+				t.Stop()
+				if r := recover(); r != nil {
+					stack := debug.Stack()
+					err = fmt.Errorf("panic when reconciling workflow, Stack: [%s]", string(stack))
+					logger.Errorf(ctx, err.Error())
+					p.metrics.PanicObserved.Inc(ctx)
+				}
+			}()
+			err = p.workflowExecutor.HandleFlyteWorkflow(ctx, mutableW)
+		}()
+
+		if err != nil {
+			logger.Errorf(ctx, "Error when trying to reconcile workflow. Error [%v]. Error Type[%v]. Is nill [%v]",
+				err, reflect.TypeOf(err))
+			p.metrics.SystemError.Inc(ctx)
+			return nil, err
+		}
+	} else {
+		logger.Warn(ctx, "Workflow is marked as terminated but doesn't have the completed label, marking it as completed.")
+	}
+	return mutableW, nil
 }
 
 // reconciler compares the actual state with the desired, and attempts to
@@ -85,106 +157,62 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	defer logger.Infof(ctx, "Completed processing workflow.")
 
 	// Get the FlyteWorkflow resource with this namespace/name
-	w, err := p.wfStore.Get(ctx, namespace, name)
-	if err != nil {
-		if workflowstore.IsNotFound(err) {
+	w, fetchErr := p.wfStore.Get(ctx, namespace, name)
+	if fetchErr != nil {
+		if workflowstore.IsNotFound(fetchErr) {
 			p.metrics.WorkflowNotFound.Inc()
 			logger.Warningf(ctx, "Workflow namespace[%v]/name[%v] not found, may be deleted.", namespace, name)
 			return nil
 		}
-		if workflowstore.IsWorkflowStale(err) {
+		if workflowstore.IsWorkflowStale(fetchErr) {
 			p.metrics.RoundSkipped.Inc()
 			logger.Warningf(ctx, "Workflow namespace[%v]/name[%v] Stale.", namespace, name)
 			return nil
 		}
-		logger.Warningf(ctx, "Failed to GetWorkflow, retrying with back-off", err)
-		return err
+		logger.Warningf(ctx, "Failed to GetWorkflow, retrying with back-off", fetchErr)
+		return fetchErr
 	}
 
-	t := p.metrics.DeepCopyTime.Start()
-	wfDeepCopy := w.DeepCopy()
-	t.Stop()
-	ctx = contextutils.WithWorkflowID(ctx, wfDeepCopy.GetID())
-	if execID := wfDeepCopy.GetExecutionID(); execID.WorkflowExecutionIdentifier != nil {
-		ctx = contextutils.WithProjectDomain(ctx, wfDeepCopy.GetExecutionID().Project, wfDeepCopy.GetExecutionID().Domain)
-	}
-	ctx = contextutils.WithResourceVersion(ctx, wfDeepCopy.GetResourceVersion())
-
-	maxRetries := uint32(p.cfg.MaxWorkflowRetries)
-	if IsDeleted(wfDeepCopy) || (wfDeepCopy.Status.FailedAttempts > maxRetries) {
-		var err error
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					stack := debug.Stack()
-					err = fmt.Errorf("panic when aborting workflow, Stack: [%s]", string(stack))
-					logger.Errorf(ctx, err.Error())
-					p.metrics.PanicObserved.Inc(ctx)
-				}
-			}()
-			err = p.workflowExecutor.HandleAbortedWorkflow(ctx, wfDeepCopy, maxRetries)
-		}()
-		if err != nil {
-			p.metrics.AbortError.Inc(ctx)
-			return err
+	if w.GetExecutionStatus().IsTerminated() {
+		if HasCompletedLabel(w) && !HasFinalizer(w) {
+			logger.Debugf(ctx, "Workflow is terminated.")
+			// This workflow had previously completed, let us ignore it
+			return nil
 		}
+	}
+
+	mutatedWf, err := p.TryMutateWorkflow(ctx, w)
+	if err != nil {
+		// NOTE We are overriding the deepcopy here, as we are essentially ingnoring all mutations
+		// We only want to increase failed attempts and discard any other partial changes to the CRD.
+		mutatedWf = RecordSystemError(w, err)
+		p.metrics.SystemError.Inc(ctx)
+	} else if mutatedWf == nil {
+		return nil
 	} else {
-		if wfDeepCopy.GetExecutionStatus().IsTerminated() {
-			if HasCompletedLabel(wfDeepCopy) && !HasFinalizer(wfDeepCopy) {
-				logger.Debugf(ctx, "Workflow is terminated.")
+		if !w.GetExecutionStatus().IsTerminated() {
+			// No updates in the status we detected, we will skip writing to KubeAPI
+			if mutatedWf.Status.Equals(&w.Status) {
+				logger.Info(ctx, "WF hasn't been updated in this round.")
 				return nil
 			}
-			// NOTE: This should never really happen, but in case we externally mark the workflow as terminated
-			// We should allow cleanup
-			logger.Warn(ctx, "Workflow is marked as terminated but doesn't have the completed label, marking it as completed.")
-		} else {
-			SetFinalizerIfEmpty(wfDeepCopy, FinalizerKey)
-
-			func() {
-				t := p.metrics.RawWorkflowTraversalTime.Start(ctx)
-				defer func() {
-					t.Stop()
-					if r := recover(); r != nil {
-						stack := debug.Stack()
-						err = fmt.Errorf("panic when reconciling workflow, Stack: [%s]", string(stack))
-						logger.Errorf(ctx, err.Error())
-						p.metrics.PanicObserved.Inc(ctx)
-					}
-				}()
-				err = p.workflowExecutor.HandleFlyteWorkflow(ctx, wfDeepCopy)
-			}()
-
-			if err != nil {
-				logger.Errorf(ctx, "Error when trying to reconcile workflow. Error [%v]. Error Type[%v]. Is nill [%v]",
-					err, reflect.TypeOf(err))
-
-				// Let's mark these as system errors.
-				// We only want to increase failed attempts and discard any other partial changes to the CRD.
-				wfDeepCopy = w.DeepCopy()
-				wfDeepCopy.GetExecutionStatus().IncFailedAttempts()
-				wfDeepCopy.GetExecutionStatus().SetMessage(err.Error())
-				p.metrics.SystemError.Inc(ctx)
-			} else {
-				// No updates in the status we detected, we will skip writing to KubeAPI
-				if wfDeepCopy.Status.Equals(&w.Status) {
-					logger.Info(ctx, "WF hasn't been updated in this round.")
-					return nil
-				}
-			}
 		}
-	}
-	// If the end result is a terminated workflow, we remove the labels
-	if wfDeepCopy.GetExecutionStatus().IsTerminated() {
-		// We add a completed label so that we can avoid polling for this workflow
-		SetCompletedLabel(wfDeepCopy, time.Now())
-		ResetFinalizers(wfDeepCopy)
+		if mutatedWf.GetExecutionStatus().IsTerminated() {
+			// If the end result is a terminated workflow, we remove the labels
+			// We add a completed label so that we can avoid polling for this workflow
+			SetCompletedLabel(mutatedWf, time.Now())
+			ResetFinalizers(mutatedWf)
+		}
 	}
 	// TODO we will need to call updatestatus when it is supported. But to preserve metadata like (label/finalizer) we will need to use update
 
 	// update the GetExecutionStatus block of the FlyteWorkflow resource. UpdateStatus will not
 	// allow changes to the Spec of the resource, which is ideal for ensuring
 	// nothing other than resource status has been updated.
-	_, err = p.wfStore.Update(ctx, wfDeepCopy, workflowstore.PriorityClassCritical)
+	_, updateErr := p.wfStore.Update(ctx, mutatedWf, workflowstore.PriorityClassCritical)
+	if updateErr != nil {
+		return updateErr
+	}
 	return err
 }
 
