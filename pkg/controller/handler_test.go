@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -51,6 +52,31 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.NoError(t, p.Handle(ctx, namespace, name))
 	})
 
+	t.Run("terminated-and-finalized", func(t *testing.T) {
+		w := &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "w1",
+			},
+			Status: v1alpha1.WorkflowStatus{
+				Phase: v1alpha1.WorkflowPhaseFailed,
+			},
+		}
+		SetCompletedLabel(w, time.Now())
+		assert.NoError(t, s.Create(ctx, w))
+		assert.NoError(t, p.Handle(ctx, namespace, name))
+
+		r, err := s.Get(ctx, namespace, name)
+		assert.NoError(t, err)
+		assert.Equal(t, v1alpha1.WorkflowPhaseFailed, r.GetExecutionStatus().GetPhase())
+		assert.Equal(t, 0, len(r.Finalizers))
+		assert.True(t, HasCompletedLabel(r))
+		assert.Equal(t, uint32(0), r.Status.FailedAttempts)
+	})
+
 	t.Run("terminated", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
@@ -71,6 +97,7 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.Equal(t, v1alpha1.WorkflowPhaseFailed, r.GetExecutionStatus().GetPhase())
 		assert.Equal(t, 0, len(r.Finalizers))
 		assert.True(t, HasCompletedLabel(r))
+		assert.Equal(t, uint32(0), r.Status.FailedAttempts)
 	})
 
 	t.Run("happy", func(t *testing.T) {
@@ -94,6 +121,7 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, r.GetExecutionStatus().GetPhase())
 		assert.Equal(t, 1, len(r.Finalizers))
 		assert.False(t, HasCompletedLabel(r))
+		assert.Equal(t, uint32(0), r.Status.FailedAttempts)
 	})
 
 	t.Run("error", func(t *testing.T) {
@@ -109,7 +137,7 @@ func TestPropeller_Handle(t *testing.T) {
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
 			return fmt.Errorf("failed")
 		}
-		assert.NoError(t, p.Handle(ctx, namespace, name))
+		assert.Error(t, p.Handle(ctx, namespace, name))
 
 		r, err := s.Get(ctx, namespace, name)
 		assert.NoError(t, err)
@@ -147,6 +175,32 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.Equal(t, uint32(1), r.Status.FailedAttempts)
 	})
 
+	t.Run("abort-error", func(t *testing.T) {
+		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "w1",
+			},
+			Status: v1alpha1.WorkflowStatus{
+				FailedAttempts: 1,
+				Phase:          v1alpha1.WorkflowPhaseRunning,
+			},
+		}))
+		exec.HandleAbortedCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow, maxRetries uint32) error {
+			return fmt.Errorf("abort error")
+		}
+		assert.Error(t, p.Handle(ctx, namespace, name))
+		r, err := s.Get(ctx, namespace, name)
+		assert.NoError(t, err)
+		assert.Equal(t, v1alpha1.WorkflowPhaseRunning, r.GetExecutionStatus().GetPhase())
+		assert.Equal(t, 0, len(r.Finalizers))
+		assert.False(t, HasCompletedLabel(r))
+		assert.Equal(t, uint32(2), r.Status.FailedAttempts)
+	})
+
 	t.Run("abort_panics", func(t *testing.T) {
 		assert.NoError(t, s.Create(ctx, &v1alpha1.FlyteWorkflow{
 			ObjectMeta: v1.ObjectMeta{
@@ -168,12 +222,11 @@ func TestPropeller_Handle(t *testing.T) {
 		assert.Error(t, p.Handle(ctx, namespace, name))
 
 		r, err := s.Get(ctx, namespace, name)
-
 		assert.NoError(t, err)
 		assert.Equal(t, v1alpha1.WorkflowPhaseRunning, r.GetExecutionStatus().GetPhase())
 		assert.Equal(t, 1, len(r.Finalizers))
 		assert.False(t, HasCompletedLabel(r))
-		assert.Equal(t, uint32(1), r.Status.FailedAttempts)
+		assert.Equal(t, uint32(2), r.Status.FailedAttempts)
 	})
 
 	t.Run("noUpdate", func(t *testing.T) {
@@ -220,7 +273,7 @@ func TestPropeller_Handle(t *testing.T) {
 		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
 			panic("error")
 		}
-		assert.NoError(t, p.Handle(ctx, namespace, name))
+		assert.Error(t, p.Handle(ctx, namespace, name))
 
 		r, err := s.Get(ctx, namespace, name)
 		assert.NoError(t, err)
