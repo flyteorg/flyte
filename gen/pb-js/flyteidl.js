@@ -2047,6 +2047,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @memberof flyteidl.core
              * @interface IWorkflowMetadata
              * @property {google.protobuf.IDuration|null} [queuingBudget] WorkflowMetadata queuingBudget
+             * @property {flyteidl.core.WorkflowMetadata.OnFailurePolicy|null} [onFailure] WorkflowMetadata onFailure
              */
 
             /**
@@ -2071,6 +2072,14 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              */
             WorkflowMetadata.prototype.queuingBudget = null;
+
+            /**
+             * WorkflowMetadata onFailure.
+             * @member {flyteidl.core.WorkflowMetadata.OnFailurePolicy} onFailure
+             * @memberof flyteidl.core.WorkflowMetadata
+             * @instance
+             */
+            WorkflowMetadata.prototype.onFailure = 0;
 
             /**
              * Creates a new WorkflowMetadata instance using the specified properties.
@@ -2098,6 +2107,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer = $Writer.create();
                 if (message.queuingBudget != null && message.hasOwnProperty("queuingBudget"))
                     $root.google.protobuf.Duration.encode(message.queuingBudget, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.onFailure != null && message.hasOwnProperty("onFailure"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.onFailure);
                 return writer;
             };
 
@@ -2121,6 +2132,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     switch (tag >>> 3) {
                     case 1:
                         message.queuingBudget = $root.google.protobuf.Duration.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.onFailure = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -2146,8 +2160,33 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "queuingBudget." + error;
                 }
+                if (message.onFailure != null && message.hasOwnProperty("onFailure"))
+                    switch (message.onFailure) {
+                    default:
+                        return "onFailure: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
+                    }
                 return null;
             };
+
+            /**
+             * OnFailurePolicy enum.
+             * @name flyteidl.core.WorkflowMetadata.OnFailurePolicy
+             * @enum {string}
+             * @property {number} FAIL_IMMEDIATELY=0 FAIL_IMMEDIATELY value
+             * @property {number} FAIL_AFTER_RUNNING_NODES_COMPLETE=1 FAIL_AFTER_RUNNING_NODES_COMPLETE value
+             * @property {number} FAIL_AFTER_EXECUTABLE_NODES_COMPLETE=2 FAIL_AFTER_EXECUTABLE_NODES_COMPLETE value
+             */
+            WorkflowMetadata.OnFailurePolicy = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "FAIL_IMMEDIATELY"] = 0;
+                values[valuesById[1] = "FAIL_AFTER_RUNNING_NODES_COMPLETE"] = 1;
+                values[valuesById[2] = "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE"] = 2;
+                return values;
+            })();
 
             return WorkflowMetadata;
         })();

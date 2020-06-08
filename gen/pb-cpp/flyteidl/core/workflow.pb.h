@@ -30,6 +30,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/condition.pb.h"
 #include "flyteidl/core/identifier.pb.h"
@@ -109,6 +110,28 @@ template<> ::flyteidl::core::WorkflowTemplate* Arena::CreateMaybeMessage<::flyte
 namespace flyteidl {
 namespace core {
 
+enum WorkflowMetadata_OnFailurePolicy {
+  WorkflowMetadata_OnFailurePolicy_FAIL_IMMEDIATELY = 0,
+  WorkflowMetadata_OnFailurePolicy_FAIL_AFTER_RUNNING_NODES_COMPLETE = 1,
+  WorkflowMetadata_OnFailurePolicy_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE = 2,
+  WorkflowMetadata_OnFailurePolicy_WorkflowMetadata_OnFailurePolicy_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  WorkflowMetadata_OnFailurePolicy_WorkflowMetadata_OnFailurePolicy_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool WorkflowMetadata_OnFailurePolicy_IsValid(int value);
+const WorkflowMetadata_OnFailurePolicy WorkflowMetadata_OnFailurePolicy_OnFailurePolicy_MIN = WorkflowMetadata_OnFailurePolicy_FAIL_IMMEDIATELY;
+const WorkflowMetadata_OnFailurePolicy WorkflowMetadata_OnFailurePolicy_OnFailurePolicy_MAX = WorkflowMetadata_OnFailurePolicy_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE;
+const int WorkflowMetadata_OnFailurePolicy_OnFailurePolicy_ARRAYSIZE = WorkflowMetadata_OnFailurePolicy_OnFailurePolicy_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* WorkflowMetadata_OnFailurePolicy_descriptor();
+inline const ::std::string& WorkflowMetadata_OnFailurePolicy_Name(WorkflowMetadata_OnFailurePolicy value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    WorkflowMetadata_OnFailurePolicy_descriptor(), value);
+}
+inline bool WorkflowMetadata_OnFailurePolicy_Parse(
+    const ::std::string& name, WorkflowMetadata_OnFailurePolicy* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<WorkflowMetadata_OnFailurePolicy>(
+    WorkflowMetadata_OnFailurePolicy_descriptor(), name, value);
+}
 // ===================================================================
 
 class IfBlock final :
@@ -1414,6 +1437,34 @@ class WorkflowMetadata final :
 
   // nested types ----------------------------------------------------
 
+  typedef WorkflowMetadata_OnFailurePolicy OnFailurePolicy;
+  static const OnFailurePolicy FAIL_IMMEDIATELY =
+    WorkflowMetadata_OnFailurePolicy_FAIL_IMMEDIATELY;
+  static const OnFailurePolicy FAIL_AFTER_RUNNING_NODES_COMPLETE =
+    WorkflowMetadata_OnFailurePolicy_FAIL_AFTER_RUNNING_NODES_COMPLETE;
+  static const OnFailurePolicy FAIL_AFTER_EXECUTABLE_NODES_COMPLETE =
+    WorkflowMetadata_OnFailurePolicy_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE;
+  static inline bool OnFailurePolicy_IsValid(int value) {
+    return WorkflowMetadata_OnFailurePolicy_IsValid(value);
+  }
+  static const OnFailurePolicy OnFailurePolicy_MIN =
+    WorkflowMetadata_OnFailurePolicy_OnFailurePolicy_MIN;
+  static const OnFailurePolicy OnFailurePolicy_MAX =
+    WorkflowMetadata_OnFailurePolicy_OnFailurePolicy_MAX;
+  static const int OnFailurePolicy_ARRAYSIZE =
+    WorkflowMetadata_OnFailurePolicy_OnFailurePolicy_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  OnFailurePolicy_descriptor() {
+    return WorkflowMetadata_OnFailurePolicy_descriptor();
+  }
+  static inline const ::std::string& OnFailurePolicy_Name(OnFailurePolicy value) {
+    return WorkflowMetadata_OnFailurePolicy_Name(value);
+  }
+  static inline bool OnFailurePolicy_Parse(const ::std::string& name,
+      OnFailurePolicy* value) {
+    return WorkflowMetadata_OnFailurePolicy_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   // .google.protobuf.Duration queuing_budget = 1;
@@ -1425,12 +1476,19 @@ class WorkflowMetadata final :
   ::google::protobuf::Duration* mutable_queuing_budget();
   void set_allocated_queuing_budget(::google::protobuf::Duration* queuing_budget);
 
+  // .flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;
+  void clear_on_failure();
+  static const int kOnFailureFieldNumber = 2;
+  ::flyteidl::core::WorkflowMetadata_OnFailurePolicy on_failure() const;
+  void set_on_failure(::flyteidl::core::WorkflowMetadata_OnFailurePolicy value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.WorkflowMetadata)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::Duration* queuing_budget_;
+  int on_failure_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fworkflow_2eproto;
 };
@@ -2902,6 +2960,20 @@ inline void WorkflowMetadata::set_allocated_queuing_budget(::google::protobuf::D
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.WorkflowMetadata.queuing_budget)
 }
 
+// .flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;
+inline void WorkflowMetadata::clear_on_failure() {
+  on_failure_ = 0;
+}
+inline ::flyteidl::core::WorkflowMetadata_OnFailurePolicy WorkflowMetadata::on_failure() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.WorkflowMetadata.on_failure)
+  return static_cast< ::flyteidl::core::WorkflowMetadata_OnFailurePolicy >(on_failure_);
+}
+inline void WorkflowMetadata::set_on_failure(::flyteidl::core::WorkflowMetadata_OnFailurePolicy value) {
+  
+  on_failure_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.WorkflowMetadata.on_failure)
+}
+
 // -------------------------------------------------------------------
 
 // WorkflowMetadataDefaults
@@ -3252,6 +3324,18 @@ inline void WorkflowTemplate::set_allocated_metadata_defaults(::flyteidl::core::
 
 }  // namespace core
 }  // namespace flyteidl
+
+namespace google {
+namespace protobuf {
+
+template <> struct is_proto_enum< ::flyteidl::core::WorkflowMetadata_OnFailurePolicy> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::WorkflowMetadata_OnFailurePolicy>() {
+  return ::flyteidl::core::WorkflowMetadata_OnFailurePolicy_descriptor();
+}
+
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
 

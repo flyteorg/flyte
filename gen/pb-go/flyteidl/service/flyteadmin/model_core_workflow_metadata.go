@@ -9,8 +9,10 @@
 
 package flyteadmin
 
-// Metadata for the entire workflow. To be used in the future.
+// Metadata for the entire workflow. Defines execution behavior that does not change the final outputs of the workflow.
 type CoreWorkflowMetadata struct {
 	// Total wait time a workflow can be delayed by queueing.
 	QueuingBudget string `json:"queuing_budget,omitempty"`
+	// Defines how the system should behave when a failure is detected in the workflow execution.
+	OnFailure *WorkflowMetadataOnFailurePolicy `json:"on_failure,omitempty"`
 }
