@@ -2822,6 +2822,17 @@
       ],
       "default": "UNKNOWN"
     },
+    "WorkflowMetadataOnFailurePolicy": {
+      "type": "string",
+      "enum": [
+        "FAIL_IMMEDIATELY",
+        "FAIL_AFTER_RUNNING_NODES_COMPLETE",
+        "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE"
+      ],
+      "default": "FAIL_IMMEDIATELY",
+      "description": "- FAIL_IMMEDIATELY: FAIL_IMMEDIATELY instructs the system to fail as soon as a node fails in the workflow. It'll automatically\nabort all currently running nodes and clean up resources before finally marking the workflow executions as\nfailed.\n - FAIL_AFTER_RUNNING_NODES_COMPLETE: FAIL_AFTER_RUNNING_NODES_COMPLETE instructs the system not to schedule new nodes to run but to wait for all\ncurrently running nodes to finish executing before cleaning up resources and marking the workflow execution\nas failed.\n - FAIL_AFTER_EXECUTABLE_NODES_COMPLETE: FAIL_AFTER_EXECUTABLE_NODES_COMPLETE instructs the system to make as much progress as it can. The system will\nnot alter the dependencies of the execution graph so any node that depend on the failed node will not be run.\nOther nodes that will be executed to completion before cleaning up resources and marking the workflow\nexecution as failed.",
+      "title": "Failure Handling Strategy"
+    },
     "adminAbortMetadata": {
       "type": "object",
       "properties": {
@@ -5259,9 +5270,13 @@
         "queuing_budget": {
           "type": "string",
           "description": "Total wait time a workflow can be delayed by queueing."
+        },
+        "on_failure": {
+          "$ref": "#/definitions/WorkflowMetadataOnFailurePolicy",
+          "description": "Defines how the system should behave when a failure is detected in the workflow execution."
         }
       },
-      "description": "Metadata for the entire workflow.\nTo be used in the future."
+      "description": "Metadata for the entire workflow. Defines execution behavior that does not change the final outputs of the workflow."
     },
     "coreWorkflowMetadataDefaults": {
       "type": "object",
