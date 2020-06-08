@@ -247,7 +247,7 @@ void InitDefaults_flyteidl_2fcore_2fworkflow_2eproto() {
 }
 
 ::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fworkflow_2eproto[11];
-constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fcore_2fworkflow_2eproto = nullptr;
+const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fcore_2fworkflow_2eproto[1];
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fcore_2fworkflow_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fworkflow_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -326,6 +326,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fworkflow_2eproto:
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata, queuing_budget_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata, on_failure_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadataDefaults, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -355,8 +356,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 48, -1, sizeof(::flyteidl::core::Alias)},
   { 55, -1, sizeof(::flyteidl::core::Node)},
   { 69, -1, sizeof(::flyteidl::core::WorkflowMetadata)},
-  { 75, -1, sizeof(::flyteidl::core::WorkflowMetadataDefaults)},
-  { 81, -1, sizeof(::flyteidl::core::WorkflowTemplate)},
+  { 76, -1, sizeof(::flyteidl::core::WorkflowMetadataDefaults)},
+  { 82, -1, sizeof(::flyteidl::core::WorkflowTemplate)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -413,25 +414,30 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto[] =
   "flyteidl.core.TaskNodeH\000\0224\n\rworkflow_nod"
   "e\030\007 \001(\0132\033.flyteidl.core.WorkflowNodeH\000\0220"
   "\n\013branch_node\030\010 \001(\0132\031.flyteidl.core.Bran"
-  "chNodeH\000B\010\n\006target\"E\n\020WorkflowMetadata\0221"
-  "\n\016queuing_budget\030\001 \001(\0132\031.google.protobuf"
-  ".Duration\"1\n\030WorkflowMetadataDefaults\022\025\n"
-  "\rinterruptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplat"
-  "e\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identifier"
-  "\0221\n\010metadata\030\002 \001(\0132\037.flyteidl.core.Workf"
-  "lowMetadata\0220\n\tinterface\030\003 \001(\0132\035.flyteid"
-  "l.core.TypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.f"
-  "lyteidl.core.Node\022\'\n\007outputs\030\005 \003(\0132\026.fly"
-  "teidl.core.Binding\022)\n\014failure_node\030\006 \001(\013"
-  "2\023.flyteidl.core.Node\022B\n\021metadata_defaul"
-  "ts\030\007 \001(\0132\'.flyteidl.core.WorkflowMetadat"
-  "aDefaultsB2Z0github.com/lyft/flyteidl/ge"
-  "n/pb-go/flyteidl/coreb\006proto3"
+  "chNodeH\000B\010\n\006target\"\204\002\n\020WorkflowMetadata\022"
+  "1\n\016queuing_budget\030\001 \001(\0132\031.google.protobu"
+  "f.Duration\022C\n\non_failure\030\002 \001(\0162/.flyteid"
+  "l.core.WorkflowMetadata.OnFailurePolicy\""
+  "x\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDIATELY\020\000"
+  "\022%\n!FAIL_AFTER_RUNNING_NODES_COMPLETE\020\001\022"
+  "(\n$FAIL_AFTER_EXECUTABLE_NODES_COMPLETE\020"
+  "\002\"1\n\030WorkflowMetadataDefaults\022\025\n\rinterru"
+  "ptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002id\030"
+  "\001 \001(\0132\031.flyteidl.core.Identifier\0221\n\010meta"
+  "data\030\002 \001(\0132\037.flyteidl.core.WorkflowMetad"
+  "ata\0220\n\tinterface\030\003 \001(\0132\035.flyteidl.core.T"
+  "ypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl."
+  "core.Node\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.co"
+  "re.Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyte"
+  "idl.core.Node\022B\n\021metadata_defaults\030\007 \001(\013"
+  "2\'.flyteidl.core.WorkflowMetadataDefault"
+  "sB2Z0github.com/lyft/flyteidl/gen/pb-go/"
+  "flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fworkflow_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fworkflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto,
-  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 1869,
+  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 2061,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto() {
@@ -451,6 +457,29 @@ void AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto() {
 static bool dynamic_init_dummy_flyteidl_2fcore_2fworkflow_2eproto = []() { AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto(); return true; }();
 namespace flyteidl {
 namespace core {
+const ::google::protobuf::EnumDescriptor* WorkflowMetadata_OnFailurePolicy_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto);
+  return file_level_enum_descriptors_flyteidl_2fcore_2fworkflow_2eproto[0];
+}
+bool WorkflowMetadata_OnFailurePolicy_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const WorkflowMetadata_OnFailurePolicy WorkflowMetadata::FAIL_IMMEDIATELY;
+const WorkflowMetadata_OnFailurePolicy WorkflowMetadata::FAIL_AFTER_RUNNING_NODES_COMPLETE;
+const WorkflowMetadata_OnFailurePolicy WorkflowMetadata::FAIL_AFTER_EXECUTABLE_NODES_COMPLETE;
+const WorkflowMetadata_OnFailurePolicy WorkflowMetadata::OnFailurePolicy_MIN;
+const WorkflowMetadata_OnFailurePolicy WorkflowMetadata::OnFailurePolicy_MAX;
+const int WorkflowMetadata::OnFailurePolicy_ARRAYSIZE;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 // ===================================================================
 
@@ -4147,6 +4176,7 @@ void WorkflowMetadata::clear_queuing_budget() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int WorkflowMetadata::kQueuingBudgetFieldNumber;
+const int WorkflowMetadata::kOnFailureFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 WorkflowMetadata::WorkflowMetadata()
@@ -4163,13 +4193,16 @@ WorkflowMetadata::WorkflowMetadata(const WorkflowMetadata& from)
   } else {
     queuing_budget_ = nullptr;
   }
+  on_failure_ = from.on_failure_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.WorkflowMetadata)
 }
 
 void WorkflowMetadata::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_WorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto.base);
-  queuing_budget_ = nullptr;
+  ::memset(&queuing_budget_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&on_failure_) -
+      reinterpret_cast<char*>(&queuing_budget_)) + sizeof(on_failure_));
 }
 
 WorkflowMetadata::~WorkflowMetadata() {
@@ -4200,6 +4233,7 @@ void WorkflowMetadata::Clear() {
     delete queuing_budget_;
   }
   queuing_budget_ = nullptr;
+  on_failure_ = 0;
   _internal_metadata_.Clear();
 }
 
@@ -4227,6 +4261,14 @@ const char* WorkflowMetadata::_InternalParse(const char* begin, const char* end,
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
             {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_on_failure(static_cast<::flyteidl::core::WorkflowMetadata_OnFailurePolicy>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -4270,6 +4312,20 @@ bool WorkflowMetadata::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
+          int value = 0;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_on_failure(static_cast< ::flyteidl::core::WorkflowMetadata_OnFailurePolicy >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -4303,6 +4359,12 @@ void WorkflowMetadata::SerializeWithCachedSizes(
       1, HasBitSetters::queuing_budget(this), output);
   }
 
+  // .flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;
+  if (this->on_failure() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      2, this->on_failure(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -4321,6 +4383,12 @@ void WorkflowMetadata::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         1, HasBitSetters::queuing_budget(this), target);
+  }
+
+  // .flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;
+  if (this->on_failure() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      2, this->on_failure(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -4349,6 +4417,12 @@ size_t WorkflowMetadata::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *queuing_budget_);
+  }
+
+  // .flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;
+  if (this->on_failure() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->on_failure());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -4381,6 +4455,9 @@ void WorkflowMetadata::MergeFrom(const WorkflowMetadata& from) {
   if (from.has_queuing_budget()) {
     mutable_queuing_budget()->::google::protobuf::Duration::MergeFrom(from.queuing_budget());
   }
+  if (from.on_failure() != 0) {
+    set_on_failure(from.on_failure());
+  }
 }
 
 void WorkflowMetadata::CopyFrom(const ::google::protobuf::Message& from) {
@@ -4409,6 +4486,7 @@ void WorkflowMetadata::InternalSwap(WorkflowMetadata* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(queuing_budget_, other->queuing_budget_);
+  swap(on_failure_, other->on_failure_);
 }
 
 ::google::protobuf::Metadata WorkflowMetadata::GetMetadata() const {

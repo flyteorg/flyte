@@ -11,7 +11,6 @@ import "flyteidl/core/literals.proto";
 import "flyteidl/core/types.proto";
 import "google/protobuf/duration.proto";
 
-
 // Defines a condition and the execution unit that should be executed if the condition is satisfied.
 message IfBlock {
     core.BooleanExpression condition = 1;
@@ -127,11 +126,32 @@ message Node {
     }
 }
 
-// Metadata for the entire workflow.
-// To be used in the future.
+// Metadata for the entire workflow. Defines execution behavior that does not change the final outputs of the workflow.
 message WorkflowMetadata {
     // Total wait time a workflow can be delayed by queueing.
     google.protobuf.Duration queuing_budget = 1;
+
+    // Failure Handling Strategy
+    enum OnFailurePolicy {
+        // FAIL_IMMEDIATELY instructs the system to fail as soon as a node fails in the workflow. It'll automatically
+        // abort all currently running nodes and clean up resources before finally marking the workflow executions as
+        // failed.
+        FAIL_IMMEDIATELY = 0;
+
+        // FAIL_AFTER_RUNNING_NODES_COMPLETE instructs the system not to schedule new nodes to run but to wait for all
+        // currently running nodes to finish executing before cleaning up resources and marking the workflow execution
+        // as failed.
+        FAIL_AFTER_RUNNING_NODES_COMPLETE = 1;
+
+        // FAIL_AFTER_EXECUTABLE_NODES_COMPLETE instructs the system to make as much progress as it can. The system will
+        // not alter the dependencies of the execution graph so any node that depend on the failed node will not be run.
+        // Other nodes that will be executed to completion before cleaning up resources and marking the workflow
+        // execution as failed.
+        FAIL_AFTER_EXECUTABLE_NODES_COMPLETE = 2;
+    }
+
+    // Defines how the system should behave when a failure is detected in the workflow execution.
+    OnFailurePolicy on_failure = 2;
 }
 
 // Default Workflow Metadata for the entire workflow.
@@ -170,7 +190,7 @@ message WorkflowTemplate {
     // The interface of this node must match the Workflow interface with an additional input named "error" of type
     // pb.lyft.flyte.core.Error.
     Node failure_node = 6;
-    
+
     // workflow defaults
     WorkflowMetadataDefaults metadata_defaults = 7;
 }

@@ -811,6 +811,8 @@ func (m *WorkflowMetadata) Validate() error {
 		}
 	}
 
+	// no validation rules for OnFailure
+
 	return nil
 }
 
