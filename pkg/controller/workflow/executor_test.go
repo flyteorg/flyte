@@ -11,6 +11,8 @@ import (
 
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -20,6 +22,7 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 
 	eventsErr "github.com/lyft/flyteidl/clients/go/events/errors"
+
 	mocks2 "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/fakeplugins"
@@ -653,5 +656,171 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_EventFailure(t *testing.T) {
 		err = executor.HandleFlyteWorkflow(ctx, w)
 		assert.Error(t, err)
 		assert.True(t, wfErrors.Matches(err, wfErrors.EventRecordingError))
+	})
+}
+
+func TestWorkflowExecutor_HandleAbortedWorkflow(t *testing.T) {
+	ctx := context.TODO()
+
+	t.Run("user-initiated-fail", func(t *testing.T) {
+
+		nodeExec := &mocks2.Node{}
+		wExec := &workflowExecutor{
+			nodeExecutor: nodeExec,
+			metrics:      newMetrics(promutils.NewTestScope()),
+		}
+
+		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("error"))
+
+		w := &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				DeletionTimestamp: &v1.Time{},
+			},
+			Status: v1alpha1.WorkflowStatus{
+				FailedAttempts: 1,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+					v1alpha1.StartNodeID: {},
+				},
+			},
+		}
+
+		assert.Error(t, wExec.HandleAbortedWorkflow(ctx, w, 5))
+
+		assert.Equal(t, uint32(1), w.Status.FailedAttempts)
+	})
+
+	t.Run("user-initiated-success", func(t *testing.T) {
+
+		var evs []*event.WorkflowExecutionEvent
+		nodeExec := &mocks2.Node{}
+		wExec := &workflowExecutor{
+			nodeExecutor: nodeExec,
+			wfRecorder: &events.MockRecorder{
+				RecordWorkflowEventCb: func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
+					evs = append(evs, event)
+					return nil
+				},
+			},
+			metrics: newMetrics(promutils.NewTestScope()),
+		}
+
+		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+		w := &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				DeletionTimestamp: &v1.Time{},
+			},
+			Status: v1alpha1.WorkflowStatus{
+				FailedAttempts: 1,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+					v1alpha1.StartNodeID: {},
+				},
+			},
+		}
+
+		assert.NoError(t, wExec.HandleAbortedWorkflow(ctx, w, 5))
+
+		assert.Equal(t, uint32(1), w.Status.FailedAttempts)
+		assert.Len(t, evs, 1)
+	})
+
+	t.Run("user-initiated-attempts-exhausted", func(t *testing.T) {
+
+		var evs []*event.WorkflowExecutionEvent
+		nodeExec := &mocks2.Node{}
+		wExec := &workflowExecutor{
+			nodeExecutor: nodeExec,
+			wfRecorder: &events.MockRecorder{
+				RecordWorkflowEventCb: func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
+					evs = append(evs, event)
+					return nil
+				},
+			},
+			metrics: newMetrics(promutils.NewTestScope()),
+		}
+
+		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+		w := &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				DeletionTimestamp: &v1.Time{},
+			},
+			Status: v1alpha1.WorkflowStatus{
+				FailedAttempts: 6,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+					v1alpha1.StartNodeID: {},
+				},
+			},
+		}
+
+		assert.NoError(t, wExec.HandleAbortedWorkflow(ctx, w, 5))
+
+		assert.Equal(t, uint32(6), w.Status.FailedAttempts)
+		assert.Len(t, evs, 1)
+	})
+
+	t.Run("failure-abort-success", func(t *testing.T) {
+		var evs []*event.WorkflowExecutionEvent
+		nodeExec := &mocks2.Node{}
+		wExec := &workflowExecutor{
+			nodeExecutor: nodeExec,
+			wfRecorder: &events.MockRecorder{
+				RecordWorkflowEventCb: func(ctx context.Context, event *event.WorkflowExecutionEvent) error {
+					evs = append(evs, event)
+					return nil
+				},
+			},
+			metrics: newMetrics(promutils.NewTestScope()),
+		}
+
+		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+		w := &v1alpha1.FlyteWorkflow{
+			Status: v1alpha1.WorkflowStatus{
+				FailedAttempts: 5,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+					v1alpha1.StartNodeID: {},
+				},
+			},
+		}
+
+		assert.NoError(t, wExec.HandleAbortedWorkflow(ctx, w, 5))
+
+		assert.Equal(t, uint32(5), w.Status.FailedAttempts)
+		assert.Len(t, evs, 1)
+	})
+
+	t.Run("failure-abort-failed", func(t *testing.T) {
+
+		nodeExec := &mocks2.Node{}
+		wExec := &workflowExecutor{
+			nodeExecutor: nodeExec,
+			metrics:      newMetrics(promutils.NewTestScope()),
+		}
+
+		nodeExec.OnAbortHandlerMatch(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("err"))
+
+		w := &v1alpha1.FlyteWorkflow{
+			Status: v1alpha1.WorkflowStatus{
+				FailedAttempts: 1,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				Nodes: map[v1alpha1.NodeID]*v1alpha1.NodeSpec{
+					v1alpha1.StartNodeID: {},
+				},
+			},
+		}
+
+		assert.Error(t, wExec.HandleAbortedWorkflow(ctx, w, 5))
+
+		assert.Equal(t, uint32(1), w.Status.FailedAttempts)
 	})
 }
