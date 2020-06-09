@@ -417,18 +417,24 @@ func (c *workflowExecutor) HandleAbortedWorkflow(ctx context.Context, w *v1alpha
 	w.DataReferenceConstructor = c.store
 
 	if !w.Status.IsTerminated() {
-		reason := "User initiated workflow abort."
+		reason := fmt.Sprintf("max number of system retry attempts [%d/%d] exhausted - system failure.", w.Status.FailedAttempts, maxRetries)
 		c.metrics.IncompleteWorkflowAborted.Inc(ctx)
-		var err error
-		if w.Status.FailedAttempts > maxRetries {
-			reason = fmt.Sprintf("max number of system retry attempts [%d/%d] exhausted - system failure.", w.Status.FailedAttempts, maxRetries)
-			err = errors.Errorf(errors.RuntimeExecutionError, w.GetID(), "max number of system retry attempts [%d/%d] exhausted. Last known status message: %v", w.Status.FailedAttempts, maxRetries, w.Status.Message)
+		// Check of the workflow was deleted and that caused the abort
+		if w.GetDeletionTimestamp() != nil {
+			reason = "Workflow aborted."
 		}
 
+		// We will always try to cleanup, even if we have extinguished all our retries
+		// TODO ABORT should have its separate set of retries
+		err := c.cleanupRunningNodes(ctx, w, reason)
 		// Best effort clean-up.
-		if err2 := c.cleanupRunningNodes(ctx, w, reason); err2 != nil {
-			logger.Errorf(ctx, "Failed to propagate Abort for workflow:%v. Error: %v", w.ExecutionID.WorkflowExecutionIdentifier, err2)
-			return err2
+		if err != nil && w.Status.FailedAttempts <= maxRetries {
+			logger.Errorf(ctx, "Failed to propagate Abort for workflow:%v. Error: %v", w.ExecutionID.WorkflowExecutionIdentifier, err)
+			return err
+		}
+
+		if w.Status.FailedAttempts > maxRetries {
+			err = errors.Errorf(errors.RuntimeExecutionError, w.GetID(), "max number of system retry attempts [%d/%d] exhausted. Last known status message: %v", w.Status.FailedAttempts, maxRetries, w.Status.Message)
 		}
 
 		var status Status
@@ -486,13 +492,17 @@ func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1al
 		wfRecorder:      events.NewWorkflowEventRecorder(eventSink, workflowScope),
 		k8sRecorder:     k8sEventRecorder,
 		metadataPrefix:  basePrefix,
-		metrics: &workflowMetrics{
-			AcceptedWorkflows:         labeled.NewCounter("accepted", "Number of workflows accepted by propeller", workflowScope),
-			FailureDuration:           labeled.NewStopWatch("failure_duration", "Indicates the total execution time of a failed workflow.", time.Millisecond, workflowScope, labeled.EmitUnlabeledMetric),
-			SuccessDuration:           labeled.NewStopWatch("success_duration", "Indicates the total execution time of a successful workflow.", time.Millisecond, workflowScope, labeled.EmitUnlabeledMetric),
-			IncompleteWorkflowAborted: labeled.NewCounter("workflow_aborted", "Indicates an inprogress execution was aborted", workflowScope, labeled.EmitUnlabeledMetric),
-			AcceptanceLatency:         labeled.NewStopWatch("acceptance_latency", "Delay between workflow creation and moving it to running state.", time.Millisecond, workflowScope, labeled.EmitUnlabeledMetric),
-			CompletionLatency:         labeled.NewStopWatch("completion_latency", "Measures the time between when the WF moved to succeeding/failing state and when it finally moved to a terminal state.", time.Millisecond, workflowScope, labeled.EmitUnlabeledMetric),
-		},
+		metrics:         newMetrics(workflowScope),
 	}, nil
+}
+
+func newMetrics(workflowScope promutils.Scope) *workflowMetrics {
+	return &workflowMetrics{
+		AcceptedWorkflows:         labeled.NewCounter("accepted", "Number of workflows accepted by propeller", workflowScope),
+		FailureDuration:           labeled.NewStopWatch("failure_duration", "Indicates the total execution time of a failed workflow.", time.Millisecond, workflowScope, labeled.EmitUnlabeledMetric),
+		SuccessDuration:           labeled.NewStopWatch("success_duration", "Indicates the total execution time of a successful workflow.", time.Millisecond, workflowScope, labeled.EmitUnlabeledMetric),
+		IncompleteWorkflowAborted: labeled.NewCounter("workflow_aborted", "Indicates an inprogress execution was aborted", workflowScope, labeled.EmitUnlabeledMetric),
+		AcceptanceLatency:         labeled.NewStopWatch("acceptance_latency", "Delay between workflow creation and moving it to running state.", time.Millisecond, workflowScope, labeled.EmitUnlabeledMetric),
+		CompletionLatency:         labeled.NewStopWatch("completion_latency", "Measures the time between when the WF moved to succeeding/failing state and when it finally moved to a terminal state.", time.Millisecond, workflowScope, labeled.EmitUnlabeledMetric),
+	}
 }
