@@ -119,7 +119,7 @@ func (b *BatchingWorkQueue) runSubQueueHandler(ctx context.Context) {
 	}
 
 	for _, obj := range objectsRetrieved {
-		b.Add(obj)
+		b.AddRateLimited(obj)
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
 		b.subQueue.Forget(obj)
