@@ -131,7 +131,7 @@ func (c *Controller) enqueueFlyteWorkflow(obj interface{}) {
 	}
 	key := wf.GetK8sWorkflowID()
 	logger.Infof(ctx, "==> Enqueueing workflow [%v]", key)
-	c.workQueue.Add(key.String())
+	c.workQueue.AddRateLimited(key.String())
 }
 
 func (c *Controller) enqueueWorkflowForNodeUpdates(wID v1alpha1.WorkflowID) {
