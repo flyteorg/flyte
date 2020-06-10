@@ -380,14 +380,6 @@ FAIL_IMMEDIATELY
   failed.
   
   
-.. _api_enum_value_flyteidl.core.WorkflowMetadata.OnFailurePolicy.FAIL_AFTER_RUNNING_NODES_COMPLETE:
-
-FAIL_AFTER_RUNNING_NODES_COMPLETE
-  ⁣FAIL_AFTER_RUNNING_NODES_COMPLETE instructs the system not to schedule new nodes to run but to wait for all
-  currently running nodes to finish executing before cleaning up resources and marking the workflow execution
-  as failed.
-  
-  
 .. _api_enum_value_flyteidl.core.WorkflowMetadata.OnFailurePolicy.FAIL_AFTER_EXECUTABLE_NODES_COMPLETE:
 
 FAIL_AFTER_EXECUTABLE_NODES_COMPLETE
@@ -403,7 +395,7 @@ FAIL_AFTER_EXECUTABLE_NODES_COMPLETE
 flyteidl.core.WorkflowMetadataDefaults
 --------------------------------------
 
-`[flyteidl.core.WorkflowMetadataDefaults proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L157>`_
+`[flyteidl.core.WorkflowMetadataDefaults proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L152>`_
 
 Default Workflow Metadata for the entire workflow.
 
@@ -428,7 +420,7 @@ interruptible
 flyteidl.core.WorkflowTemplate
 ------------------------------
 
-`[flyteidl.core.WorkflowTemplate proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L166>`_
+`[flyteidl.core.WorkflowTemplate proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L161>`_
 
 Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,
 directed acyclic graph.
