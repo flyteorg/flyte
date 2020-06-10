@@ -31,7 +31,7 @@ spec:
           name: flyte-admin-config
       initContainers:
       - name: run-migrations
-        image: docker.io/lyft/flyteadmin:97497b22da4ebe7df50a0ba6335861bd92bc50dd
+        image: docker.io/lyft/flyteadmin:d2c296fa458dce30c0911e723ebb6597ea6a2120
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "run"]
         volumeMounts:
@@ -39,7 +39,7 @@ spec:
           mountPath: /etc/flyte/config
       containers:
       - name: flyteadmin
-        image: docker.io/lyft/flyteadmin:97497b22da4ebe7df50a0ba6335861bd92bc50dd
+        image: docker.io/lyft/flyteadmin:d2c296fa458dce30c0911e723ebb6597ea6a2120
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "serve"]
         ports:
