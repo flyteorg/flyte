@@ -882,8 +882,7 @@ export namespace flyteidl {
             /** OnFailurePolicy enum. */
             enum OnFailurePolicy {
                 FAIL_IMMEDIATELY = 0,
-                FAIL_AFTER_RUNNING_NODES_COMPLETE = 1,
-                FAIL_AFTER_EXECUTABLE_NODES_COMPLETE = 2
+                FAIL_AFTER_EXECUTABLE_NODES_COMPLETE = 1
             }
         }
 
