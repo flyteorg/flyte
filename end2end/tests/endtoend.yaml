@@ -11,7 +11,7 @@ spec:
     command:
     - bash
     - -c
-    image: docker.io/lyft/flytetester:a209af564de84976ce269b57ec6b0b75918fa19b
+    image: docker.io/lyft/flytetester:260155814c08c933a6cee189af894fc835d9ecb9
     imagePullPolicy: IfNotPresent
     name: flytetester
     resources:
