@@ -2166,7 +2166,6 @@ export const flyteidl = $root.flyteidl = (() => {
                         return "onFailure: enum value expected";
                     case 0:
                     case 1:
-                    case 2:
                         break;
                     }
                 return null;
@@ -2177,14 +2176,12 @@ export const flyteidl = $root.flyteidl = (() => {
              * @name flyteidl.core.WorkflowMetadata.OnFailurePolicy
              * @enum {string}
              * @property {number} FAIL_IMMEDIATELY=0 FAIL_IMMEDIATELY value
-             * @property {number} FAIL_AFTER_RUNNING_NODES_COMPLETE=1 FAIL_AFTER_RUNNING_NODES_COMPLETE value
-             * @property {number} FAIL_AFTER_EXECUTABLE_NODES_COMPLETE=2 FAIL_AFTER_EXECUTABLE_NODES_COMPLETE value
+             * @property {number} FAIL_AFTER_EXECUTABLE_NODES_COMPLETE=1 FAIL_AFTER_EXECUTABLE_NODES_COMPLETE value
              */
             WorkflowMetadata.OnFailurePolicy = (function() {
                 const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "FAIL_IMMEDIATELY"] = 0;
-                values[valuesById[1] = "FAIL_AFTER_RUNNING_NODES_COMPLETE"] = 1;
-                values[valuesById[2] = "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE"] = 2;
+                values[valuesById[1] = "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE"] = 1;
                 return values;
             })();
 

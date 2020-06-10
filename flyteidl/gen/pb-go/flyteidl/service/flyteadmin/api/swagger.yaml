@@ -2459,18 +2459,13 @@ definitions:
     description: "- FAIL_IMMEDIATELY: FAIL_IMMEDIATELY instructs the system to fail\
       \ as soon as a node fails in the workflow. It'll automatically\nabort all currently\
       \ running nodes and clean up resources before finally marking the workflow executions\
-      \ as\nfailed.\n - FAIL_AFTER_RUNNING_NODES_COMPLETE: FAIL_AFTER_RUNNING_NODES_COMPLETE\
-      \ instructs the system not to schedule new nodes to run but to wait for all\n\
-      currently running nodes to finish executing before cleaning up resources and\
-      \ marking the workflow execution\nas failed.\n - FAIL_AFTER_EXECUTABLE_NODES_COMPLETE:\
-      \ FAIL_AFTER_EXECUTABLE_NODES_COMPLETE instructs the system to make as much\
-      \ progress as it can. The system will\nnot alter the dependencies of the execution\
-      \ graph so any node that depend on the failed node will not be run.\nOther nodes\
-      \ that will be executed to completion before cleaning up resources and marking\
-      \ the workflow\nexecution as failed."
+      \ as\nfailed.\n - FAIL_AFTER_EXECUTABLE_NODES_COMPLETE: FAIL_AFTER_EXECUTABLE_NODES_COMPLETE\
+      \ instructs the system to make as much progress as it can. The system will\n\
+      not alter the dependencies of the execution graph so any node that depend on\
+      \ the failed node will not be run.\nOther nodes that will be executed to completion\
+      \ before cleaning up resources and marking the workflow\nexecution as failed."
     enum:
     - "FAIL_IMMEDIATELY"
-    - "FAIL_AFTER_RUNNING_NODES_COMPLETE"
     - "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE"
     default: "FAIL_IMMEDIATELY"
   adminAbortMetadata:

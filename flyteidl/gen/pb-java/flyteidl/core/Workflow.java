@@ -10357,25 +10357,15 @@ public final class Workflow {
       FAIL_IMMEDIATELY(0),
       /**
        * <pre>
-       * FAIL_AFTER_RUNNING_NODES_COMPLETE instructs the system not to schedule new nodes to run but to wait for all
-       * currently running nodes to finish executing before cleaning up resources and marking the workflow execution
-       * as failed.
-       * </pre>
-       *
-       * <code>FAIL_AFTER_RUNNING_NODES_COMPLETE = 1;</code>
-       */
-      FAIL_AFTER_RUNNING_NODES_COMPLETE(1),
-      /**
-       * <pre>
        * FAIL_AFTER_EXECUTABLE_NODES_COMPLETE instructs the system to make as much progress as it can. The system will
        * not alter the dependencies of the execution graph so any node that depend on the failed node will not be run.
        * Other nodes that will be executed to completion before cleaning up resources and marking the workflow
        * execution as failed.
        * </pre>
        *
-       * <code>FAIL_AFTER_EXECUTABLE_NODES_COMPLETE = 2;</code>
+       * <code>FAIL_AFTER_EXECUTABLE_NODES_COMPLETE = 1;</code>
        */
-      FAIL_AFTER_EXECUTABLE_NODES_COMPLETE(2),
+      FAIL_AFTER_EXECUTABLE_NODES_COMPLETE(1),
       UNRECOGNIZED(-1),
       ;
 
@@ -10391,25 +10381,15 @@ public final class Workflow {
       public static final int FAIL_IMMEDIATELY_VALUE = 0;
       /**
        * <pre>
-       * FAIL_AFTER_RUNNING_NODES_COMPLETE instructs the system not to schedule new nodes to run but to wait for all
-       * currently running nodes to finish executing before cleaning up resources and marking the workflow execution
-       * as failed.
-       * </pre>
-       *
-       * <code>FAIL_AFTER_RUNNING_NODES_COMPLETE = 1;</code>
-       */
-      public static final int FAIL_AFTER_RUNNING_NODES_COMPLETE_VALUE = 1;
-      /**
-       * <pre>
        * FAIL_AFTER_EXECUTABLE_NODES_COMPLETE instructs the system to make as much progress as it can. The system will
        * not alter the dependencies of the execution graph so any node that depend on the failed node will not be run.
        * Other nodes that will be executed to completion before cleaning up resources and marking the workflow
        * execution as failed.
        * </pre>
        *
-       * <code>FAIL_AFTER_EXECUTABLE_NODES_COMPLETE = 2;</code>
+       * <code>FAIL_AFTER_EXECUTABLE_NODES_COMPLETE = 1;</code>
        */
-      public static final int FAIL_AFTER_EXECUTABLE_NODES_COMPLETE_VALUE = 2;
+      public static final int FAIL_AFTER_EXECUTABLE_NODES_COMPLETE_VALUE = 1;
 
 
       public final int getNumber() {
@@ -10431,8 +10411,7 @@ public final class Workflow {
       public static OnFailurePolicy forNumber(int value) {
         switch (value) {
           case 0: return FAIL_IMMEDIATELY;
-          case 1: return FAIL_AFTER_RUNNING_NODES_COMPLETE;
-          case 2: return FAIL_AFTER_EXECUTABLE_NODES_COMPLETE;
+          case 1: return FAIL_AFTER_EXECUTABLE_NODES_COMPLETE;
           default: return null;
         }
       }
@@ -14611,25 +14590,24 @@ public final class Workflow {
       "flyteidl.core.TaskNodeH\000\0224\n\rworkflow_nod" +
       "e\030\007 \001(\0132\033.flyteidl.core.WorkflowNodeH\000\0220" +
       "\n\013branch_node\030\010 \001(\0132\031.flyteidl.core.Bran" +
-      "chNodeH\000B\010\n\006target\"\204\002\n\020WorkflowMetadata\022" +
+      "chNodeH\000B\010\n\006target\"\335\001\n\020WorkflowMetadata\022" +
       "1\n\016queuing_budget\030\001 \001(\0132\031.google.protobu" +
       "f.Duration\022C\n\non_failure\030\002 \001(\0162/.flyteid" +
       "l.core.WorkflowMetadata.OnFailurePolicy\"" +
-      "x\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDIATELY\020\000" +
-      "\022%\n!FAIL_AFTER_RUNNING_NODES_COMPLETE\020\001\022" +
-      "(\n$FAIL_AFTER_EXECUTABLE_NODES_COMPLETE\020" +
-      "\002\"1\n\030WorkflowMetadataDefaults\022\025\n\rinterru" +
-      "ptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002id\030" +
-      "\001 \001(\0132\031.flyteidl.core.Identifier\0221\n\010meta" +
-      "data\030\002 \001(\0132\037.flyteidl.core.WorkflowMetad" +
-      "ata\0220\n\tinterface\030\003 \001(\0132\035.flyteidl.core.T" +
-      "ypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl." +
-      "core.Node\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.co" +
-      "re.Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyte" +
-      "idl.core.Node\022B\n\021metadata_defaults\030\007 \001(\013" +
-      "2\'.flyteidl.core.WorkflowMetadataDefault" +
-      "sB2Z0github.com/lyft/flyteidl/gen/pb-go/" +
-      "flyteidl/coreb\006proto3"
+      "Q\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDIATELY\020\000" +
+      "\022(\n$FAIL_AFTER_EXECUTABLE_NODES_COMPLETE" +
+      "\020\001\"1\n\030WorkflowMetadataDefaults\022\025\n\rinterr" +
+      "uptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002id" +
+      "\030\001 \001(\0132\031.flyteidl.core.Identifier\0221\n\010met" +
+      "adata\030\002 \001(\0132\037.flyteidl.core.WorkflowMeta" +
+      "data\0220\n\tinterface\030\003 \001(\0132\035.flyteidl.core." +
+      "TypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl" +
+      ".core.Node\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.c" +
+      "ore.Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyt" +
+      "eidl.core.Node\022B\n\021metadata_defaults\030\007 \001(" +
+      "\0132\'.flyteidl.core.WorkflowMetadataDefaul" +
+      "tsB2Z0github.com/lyft/flyteidl/gen/pb-go" +
+      "/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
