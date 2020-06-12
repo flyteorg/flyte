@@ -1,0 +1,8 @@
+flytekit[sidecar,schema]==0.8.2
+pytest
+statsd
+opencv-python==3.4.4.19
+k8s-proto>=0.0.2
+# TODO: Remove this - installing 1.28 (in Linux) for some reason is incredibly slow
+grpcio==1.27.2
+ipython

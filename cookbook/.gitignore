@@ -1,0 +1,5 @@
+_build
+_pb_output/
+.bash_history
+.cache/
+.ipython/

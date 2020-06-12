@@ -10,6 +10,7 @@ from flytekit.sdk.tasks import python_task, outputs, inputs
 from flytekit.sdk.types import Types
 from flytekit.sdk.workflow import workflow_class, Output, Input
 
+
 @inputs(image_location=Types.String)
 @outputs(parsed_image=Types.Blob)
 @python_task
