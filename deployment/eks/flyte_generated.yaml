@@ -603,7 +603,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:9b60ed0c11482f09681877c1c2834665578c1146
+        image: docker.io/lyft/flyteadmin:d9ad04e3e0fef8d4e986cc7d42eefdce784f560b
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
