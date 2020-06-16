@@ -93,6 +93,8 @@ type Query struct {
 	ExternalLocation  string                   `json:"externalLocation"`
 }
 
+const PrestoSource = "flyte"
+
 // This is the main state iteration
 func HandleExecutionState(
 	ctx context.Context,
@@ -296,6 +298,11 @@ func GetNextQuery(
 		if err != nil {
 			return Query{}, err
 		}
+		var user = getUser(ctx, prestoCfg.DefaultUser)
+
+		if prestoCfg.UseNamespaceAsUser {
+			user = tCtx.TaskExecutionMetadata().GetNamespace()
+		}
 
 		statement = fmt.Sprintf(`CREATE TABLE hive.flyte_temporary_tables."%s_temp" AS %s`, tempTableName, statement)
 
@@ -305,8 +312,8 @@ func GetNextQuery(
 				RoutingGroup: resolveRoutingGroup(ctx, routingGroup, prestoCfg),
 				Catalog:      catalog,
 				Schema:       schema,
-				Source:       "flyte",
-				User:         getUser(ctx, prestoCfg.DefaultUser),
+				Source:       PrestoSource,
+				User:         user,
 			},
 			TempTableName:     tempTableName + "_temp",
 			ExternalTableName: tempTableName + "_external",
