@@ -44,6 +44,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "environment"), defaultConfig.Environment.String(), "Environment endpoint for Presto to use")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultRoutingGroup"), defaultConfig.DefaultRoutingGroup, "Default Presto routing group")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultUser"), defaultConfig.DefaultUser, "Default Presto user")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "useNamespaceAsUser"), defaultConfig.UseNamespaceAsUser, "Use the K8s namespace as the user")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "refreshCacheConfig.name"), defaultConfig.RefreshCacheConfig.Name, "The name of the rate limiter")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "refreshCacheConfig.syncPeriod"), defaultConfig.RefreshCacheConfig.SyncPeriod.String(), "The duration to wait before the cache is refreshed again")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "refreshCacheConfig.workers"), defaultConfig.RefreshCacheConfig.Workers, "Number of parallel workers to refresh the cache")

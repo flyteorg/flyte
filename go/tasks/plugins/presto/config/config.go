@@ -76,6 +76,7 @@ var (
 		Environment:         URLMustParse(""),
 		DefaultRoutingGroup: "adhoc",
 		DefaultUser:         "flyte-default-user",
+		UseNamespaceAsUser:  true,
 		RoutingGroupConfigs: []RoutingGroupConfig{{Name: "adhoc", Limit: 100}, {Name: "etl", Limit: 25}},
 		RefreshCacheConfig: RefreshCacheConfig{
 			Name:         "presto",
@@ -101,6 +102,7 @@ type Config struct {
 	Environment            config.URL           `json:"environment" pflag:",Environment endpoint for Presto to use"`
 	DefaultRoutingGroup    string               `json:"defaultRoutingGroup" pflag:",Default Presto routing group"`
 	DefaultUser            string               `json:"defaultUser" pflag:",Default Presto user"`
+	UseNamespaceAsUser     bool                 `json:"useNamespaceAsUser" pflag:",Use the K8s namespace as the user"`
 	RoutingGroupConfigs    []RoutingGroupConfig `json:"routingGroupConfigs" pflag:"-,A list of cluster configs. Each of the configs corresponds to a service cluster"`
 	RefreshCacheConfig     RefreshCacheConfig   `json:"refreshCacheConfig" pflag:"Refresh cache config"`
 	ReadRateLimiterConfig  RateLimiterConfig    `json:"readRateLimiterConfig" pflag:"Rate limiter config for read requests going to Presto"`
