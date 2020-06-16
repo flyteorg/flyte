@@ -26,7 +26,7 @@ After you've built an image with your updated task code, create an execution usi
 
 
      my_single_task_execution = my_task.launch(project="my_flyte_projext", domain="development", inputs={'plant': 'ficus'})
-     print("Created {}".format(my_task_exec.id))
+     print("Created {}".format(my_single_task_execution.id))
 
 Just like workflow executions, you can optionally pass a user-defined name, labels, annotations, and/or notifications when launching a single task.
 
