@@ -12,5 +12,6 @@ Flyte Features
     notifications
     labels_annotations
     launchplans
-    task_cache
     roles
+    single_task_execution
+    task_cache
