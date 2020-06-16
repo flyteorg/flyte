@@ -1,6 +1,10 @@
 .PHONY: kustomize
-kustomize: generate-validation
+kustomize:
 	bash script/kustomize.sh
+
+.PHONY: generate-validation
+generate-validation:
+	bash script/generate_wf_crd_validation.sh
 
 .PHONY: deploy_sandbox
 deploy_sandbox:
@@ -31,6 +35,3 @@ generate-docs: generate-dependent-repo-docs
 generate-dependent-repo-docs:
 	@FLYTEKIT_VERSION=0.8.1 FLYTEIDL_VERSION=0.17.32 ./script/update_ref_docs.sh
 
-.PHONY: generate-validation
-generate-validation:
-	bash script/generate_wf_crd_validation.sh
