@@ -1,2 +1,2 @@
 resources:
-- wf_crd.yaml
+- wf_crd_with_validation_generated.yaml
