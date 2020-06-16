@@ -30,7 +30,7 @@ After you've built an image with your updated task code, create an execution usi
 
 Just like workflow executions, you can optionally pass a user-defined name, labels, annotations, and/or notifications when launching a single task.
 
-The type of ``my_single_task_execution`` is `SdkWorkflowExecution <https://github.com/lyft/flytekit/blob/1926b1285591ae941d7fc9bd4c2e4391c5c1b21b/flytekit/common/workflow_execution.py#L14>_`
+The type of ``my_single_task_execution`` is `SdkWorkflowExecution <https://github.com/lyft/flytekit/blob/1926b1285591ae941d7fc9bd4c2e4391c5c1b21b/flytekit/common/workflow_execution.py#L14>`_
 and has the full set of methods and functionality available for conventional WorkflowExecutions.
 
 
@@ -64,9 +64,9 @@ Previously registered tasks can also be launched from the command-line using :re
 Monitoring single task executions in the Flyte console
 ======================================================
 
-Single task executions don't have yet have native support in the Flyte console but they're accessible using the same URLs as ordinary workflow executions.
+Single task executions don't yet have native support in the Flyte console but they're accessible using the same URLs as ordinary workflow executions.
 
-For example, for a console hosted example.com you can visit example.com/console/projects/<my_project>/domains/<my_domain>/executions/<execution_name> to track the progress of 
+For example, for a console hosted example.com you can visit ``example.com/console/projects/<my_project>/domains/<my_domain>/executions/<execution_name>`` to track the progress of 
 your execution. Log links and status changes will be available as your execution progresses.
 
 
