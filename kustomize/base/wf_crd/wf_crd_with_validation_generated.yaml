@@ -19,9 +19,7 @@ spec:
     openAPIV3Schema:
       description: 'FlyteWorkflow: represents one Execution Workflow object'
       properties:
-        acceptedAt:
-          description: Specifies the time when the workflow has been accepted into
-            the system.
+        acceptedAt: {}
         activeDeadlineSeconds:
           description: StartTime before the system will actively try to mark it failed
             and kill associated containers. Value must be a positive integer.
@@ -74,134 +72,130 @@ spec:
             id:
               type: string
             nodes:
-              additionalProperties:
-                properties:
-                  activeDeadline:
-                    description: StartTime before the system will actively try to
-                      mark it failed and kill associated containers. Value must be
-                      a positive integer. This includes time spent waiting in the
-                      queue.
-                  affinity: {}
-                  branch:
-                    properties:
-                      else:
-                        type: string
-                      elseFail:
-                        type: object
-                      elseIf:
-                        items: {}
-                        type: array
-                      if:
-                        properties:
-                          condition:
-                            type: object
-                          then:
-                            type: string
-                        required:
-                        - condition
-                        - then
-                        type: object
-                    required:
-                    - if
-                    type: object
-                  config: {}
-                  executionDeadline: {}
-                  hostname:
-                    description: Specifies the hostname of the Pod If not specified,
-                      the pod's hostname will be set to a system-defined value.
-                    type: string
-                  id:
-                    type: string
-                  imagePullSecrets:
-                    description: 'ImagePullSecrets is an optional list of references
-                      to secrets in the same namespace to use for pulling any of the
-                      images used by this PodSpec. If specified, these secrets will
-                      be passed to individual puller implementations for them to use.
-                      For example, in the case of docker, only DockerConfig type secrets
-                      are honored. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod'
-                    items: {}
-                    type: array
-                  inputBindings:
-                    items:
-                      type: object
-                    type: array
-                  interruptible:
-                    description: The value set to True means task is OK with getting
-                      interrupted
-                    type: boolean
-                  kind:
-                    type: string
-                  outputAlias:
-                    items:
-                      properties:
-                        alias:
-                          description: A workflow-level unique alias that downstream
-                            nodes can refer to in their input.
-                          type: string
-                        var:
-                          description: Must match one of the output variable names
-                            on a node.
-                          type: string
-                      type: object
-                    type: array
-                  resources: {}
-                  retry:
-                    description: Strategy to be used to Retry a node that is in RetryableFailure
-                      state
-                    properties:
-                      minAttempts:
-                        description: MinAttempts implies the atleast n attempts to
-                          try this node before giving up. The atleast here is because
-                          we may fail to write the attempt information and end up
-                          retrying again. Also `0` and `1` both mean atleast one attempt
-                          will be done. 0 is a degenerate case.
-                        format: int32
-                        type: integer
-                    required:
-                    - minAttempts
-                    type: object
-                  schedulerName:
-                    description: If specified, the pod will be dispatched by specified
-                      scheduler. If not specified, the pod will be dispatched by default
-                      scheduler.
-                    type: string
-                  securityContext: {}
-                  subdomain:
-                    description: If specified, the fully qualified Pod hostname will
-                      be "<hostname>.<subdomain>.<pod namespace>.svc.<cluster domain>".
-                      If not specified, the pod will not have a domainname at all.
-                    type: string
-                  task:
-                    type: string
-                  tolerations:
-                    description: If specified, the pod's tolerations.
-                    items: {}
-                    type: array
-                  workflow:
-                    properties:
-                      launchPlanRefId:
-                        type: object
-                      subWorkflowRef:
-                        description: 'We currently want the SubWorkflow to be completely
-                          contained in the node. this is because We use the node status
-                          to store the information of the execution. Important Note:
-                          This may cause a bloat in case we use the same SubWorkflow
-                          in multiple nodes. The recommended technique for that is
-                          to use launch plan refs. This is because we will end up
-                          executing the launch plan refs as disparate executions in
-                          Flyte propeller. This is potentially better as it prevents
-                          us from hitting the storage limit in etcd Workflow *WorkflowSpec
-                          `json:"workflow,omitempty"`'
-                        type: string
-                    type: object
-                required:
-                - id
-                - kind
-                type: object
+              additionalProperties: {}
               type: object
             onFailure:
-              description: Defines a single node to execute in case the system determined
-                the Workflow has failed.
+              properties:
+                activeDeadline:
+                  description: StartTime before the system will actively try to mark
+                    it failed and kill associated containers. Value must be a positive
+                    integer. This includes time spent waiting in the queue.
+                affinity: {}
+                branch:
+                  properties:
+                    else:
+                      type: string
+                    elseFail:
+                      type: object
+                    elseIf:
+                      items: {}
+                      type: array
+                    if:
+                      properties:
+                        condition:
+                          type: object
+                        then:
+                          type: string
+                      required:
+                      - condition
+                      - then
+                      type: object
+                  required:
+                  - if
+                  type: object
+                config: {}
+                executionDeadline: {}
+                hostname:
+                  description: Specifies the hostname of the Pod If not specified,
+                    the pod's hostname will be set to a system-defined value.
+                  type: string
+                id:
+                  type: string
+                imagePullSecrets:
+                  description: 'ImagePullSecrets is an optional list of references
+                    to secrets in the same namespace to use for pulling any of the
+                    images used by this PodSpec. If specified, these secrets will
+                    be passed to individual puller implementations for them to use.
+                    For example, in the case of docker, only DockerConfig type secrets
+                    are honored. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod'
+                  items: {}
+                  type: array
+                inputBindings:
+                  items:
+                    type: object
+                  type: array
+                interruptible:
+                  description: The value set to True means task is OK with getting
+                    interrupted
+                  type: boolean
+                kind:
+                  type: string
+                outputAlias:
+                  items:
+                    properties:
+                      alias:
+                        description: A workflow-level unique alias that downstream
+                          nodes can refer to in their input.
+                        type: string
+                      var:
+                        description: Must match one of the output variable names on
+                          a node.
+                        type: string
+                    type: object
+                  type: array
+                resources: {}
+                retry:
+                  description: Strategy to be used to Retry a node that is in RetryableFailure
+                    state
+                  properties:
+                    minAttempts:
+                      description: MinAttempts implies the atleast n attempts to try
+                        this node before giving up. The atleast here is because we
+                        may fail to write the attempt information and end up retrying
+                        again. Also `0` and `1` both mean atleast one attempt will
+                        be done. 0 is a degenerate case.
+                      format: int32
+                      type: integer
+                  required:
+                  - minAttempts
+                  type: object
+                schedulerName:
+                  description: If specified, the pod will be dispatched by specified
+                    scheduler. If not specified, the pod will be dispatched by default
+                    scheduler.
+                  type: string
+                securityContext: {}
+                subdomain:
+                  description: If specified, the fully qualified Pod hostname will
+                    be "<hostname>.<subdomain>.<pod namespace>.svc.<cluster domain>".
+                    If not specified, the pod will not have a domainname at all.
+                  type: string
+                task:
+                  type: string
+                tolerations:
+                  description: If specified, the pod's tolerations.
+                  items: {}
+                  type: array
+                workflow:
+                  properties:
+                    launchPlanRefId:
+                      type: object
+                    subWorkflowRef:
+                      description: 'We currently want the SubWorkflow to be completely
+                        contained in the node. this is because We use the node status
+                        to store the information of the execution. Important Note:
+                        This may cause a bloat in case we use the same SubWorkflow
+                        in multiple nodes. The recommended technique for that is to
+                        use launch plan refs. This is because we will end up executing
+                        the launch plan refs as disparate executions in Flyte propeller.
+                        This is potentially better as it prevents us from hitting
+                        the storage limit in etcd Workflow *WorkflowSpec `json:"workflow,omitempty"`'
+                      type: string
+                  type: object
+              required:
+              - id
+              - kind
+              type: object
             outputBindings:
               description: Defines the data links used to construct the final outputs
                 of the workflow. Bindings will typically refer to specific outputs

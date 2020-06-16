@@ -11,6 +11,7 @@ status:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
+  creationTimestamp: null
   name: flyteworkflows.flyte.lyft.com
 spec:
   group: flyte.lyft.com
@@ -21,6 +22,311 @@ spec:
     - fly
     singular: flyteworkflow
   scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      description: 'FlyteWorkflow: represents one Execution Workflow object'
+      properties:
+        acceptedAt: {}
+        activeDeadlineSeconds:
+          description: StartTime before the system will actively try to mark it failed
+            and kill associated containers. Value must be a positive integer.
+          format: int64
+          type: integer
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        executionId:
+          type: object
+        inputs:
+          type: object
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata: {}
+        node-defaults:
+          properties:
+            interruptible:
+              description: Default behaviour for Interruptible for nodes unless explicitly
+                set at the node level.
+              type: boolean
+          type: object
+        serviceAccountName:
+          description: 'ServiceAccountName is the name of the ServiceAccount to use
+            to run this pod. More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/'
+          type: string
+        spec:
+          description: WorkflowSpec is the spec for the actual Flyte Workflow (DAG)
+          properties:
+            connections:
+              properties:
+                downstreamEdges:
+                  additionalProperties:
+                    items:
+                      type: string
+                    type: array
+                  type: object
+                upstreamEdges:
+                  additionalProperties:
+                    items:
+                      type: string
+                    type: array
+                  type: object
+              type: object
+            id:
+              type: string
+            nodes:
+              additionalProperties: {}
+              type: object
+            onFailure:
+              properties:
+                activeDeadline:
+                  description: StartTime before the system will actively try to mark
+                    it failed and kill associated containers. Value must be a positive
+                    integer. This includes time spent waiting in the queue.
+                affinity: {}
+                branch:
+                  properties:
+                    else:
+                      type: string
+                    elseFail:
+                      type: object
+                    elseIf:
+                      items: {}
+                      type: array
+                    if:
+                      properties:
+                        condition:
+                          type: object
+                        then:
+                          type: string
+                      required:
+                      - condition
+                      - then
+                      type: object
+                  required:
+                  - if
+                  type: object
+                config: {}
+                executionDeadline: {}
+                hostname:
+                  description: Specifies the hostname of the Pod If not specified,
+                    the pod's hostname will be set to a system-defined value.
+                  type: string
+                id:
+                  type: string
+                imagePullSecrets:
+                  description: 'ImagePullSecrets is an optional list of references
+                    to secrets in the same namespace to use for pulling any of the
+                    images used by this PodSpec. If specified, these secrets will
+                    be passed to individual puller implementations for them to use.
+                    For example, in the case of docker, only DockerConfig type secrets
+                    are honored. More info: https://kubernetes.io/docs/concepts/containers/images#specifying-imagepullsecrets-on-a-pod'
+                  items: {}
+                  type: array
+                inputBindings:
+                  items:
+                    type: object
+                  type: array
+                interruptible:
+                  description: The value set to True means task is OK with getting
+                    interrupted
+                  type: boolean
+                kind:
+                  type: string
+                outputAlias:
+                  items:
+                    properties:
+                      alias:
+                        description: A workflow-level unique alias that downstream
+                          nodes can refer to in their input.
+                        type: string
+                      var:
+                        description: Must match one of the output variable names on
+                          a node.
+                        type: string
+                    type: object
+                  type: array
+                resources: {}
+                retry:
+                  description: Strategy to be used to Retry a node that is in RetryableFailure
+                    state
+                  properties:
+                    minAttempts:
+                      description: MinAttempts implies the atleast n attempts to try
+                        this node before giving up. The atleast here is because we
+                        may fail to write the attempt information and end up retrying
+                        again. Also `0` and `1` both mean atleast one attempt will
+                        be done. 0 is a degenerate case.
+                      format: int32
+                      type: integer
+                  required:
+                  - minAttempts
+                  type: object
+                schedulerName:
+                  description: If specified, the pod will be dispatched by specified
+                    scheduler. If not specified, the pod will be dispatched by default
+                    scheduler.
+                  type: string
+                securityContext: {}
+                subdomain:
+                  description: If specified, the fully qualified Pod hostname will
+                    be "<hostname>.<subdomain>.<pod namespace>.svc.<cluster domain>".
+                    If not specified, the pod will not have a domainname at all.
+                  type: string
+                task:
+                  type: string
+                tolerations:
+                  description: If specified, the pod's tolerations.
+                  items: {}
+                  type: array
+                workflow:
+                  properties:
+                    launchPlanRefId:
+                      type: object
+                    subWorkflowRef:
+                      description: 'We currently want the SubWorkflow to be completely
+                        contained in the node. this is because We use the node status
+                        to store the information of the execution. Important Note:
+                        This may cause a bloat in case we use the same SubWorkflow
+                        in multiple nodes. The recommended technique for that is to
+                        use launch plan refs. This is because we will end up executing
+                        the launch plan refs as disparate executions in Flyte propeller.
+                        This is potentially better as it prevents us from hitting
+                        the storage limit in etcd Workflow *WorkflowSpec `json:"workflow,omitempty"`'
+                      type: string
+                  type: object
+              required:
+              - id
+              - kind
+              type: object
+            outputBindings:
+              description: Defines the data links used to construct the final outputs
+                of the workflow. Bindings will typically refer to specific outputs
+                of a subset of the nodes executed in the Workflow. When executing
+                the end-node, the execution engine will traverse these bindings and
+                assemble the final set of outputs of the workflow.
+              items: {}
+              type: array
+            outputs:
+              type: object
+          required:
+          - id
+          - nodes
+          - connections
+          type: object
+        status:
+          properties:
+            dataDir:
+              type: string
+            error:
+              description: Wrapper around core.Execution error. Execution Error has
+                a protobuf enum and hence needs to be wrapped by custom marshaller
+              type: object
+            failedAttempts:
+              description: Number of Attempts completed with rounds resulting in error.
+                this is used to cap out poison pill workflows that spin in an error
+                loop. The value should be set at the global level and will be enforced.
+                At the end of the retries the workflow will fail
+              format: int64
+              type: integer
+            lastUpdatedAt: {}
+            message:
+              type: string
+            nodeStatus:
+              additionalProperties:
+                properties:
+                  attempts:
+                    format: int64
+                    type: integer
+                  branchStatus:
+                    properties:
+                      finalNodeId:
+                        type: string
+                      phase:
+                        format: int32
+                        type: integer
+                    required:
+                    - phase
+                    - finalNodeId
+                    type: object
+                  cached:
+                    type: boolean
+                  dynamicNodeStatus:
+                    properties:
+                      error: {}
+                      phase:
+                        format: int32
+                        type: integer
+                      reason:
+                        type: string
+                    required:
+                    - phase
+                    type: object
+                  error:
+                    description: In case of Failing/Failed Phase, an execution error
+                      can be optionally associated with the Node
+                  laStartedAt: {}
+                  lastUpdatedAt: {}
+                  message:
+                    type: string
+                  parentNode:
+                    description: This is useful only for branch nodes. If this is
+                      set, then it can be used to determine if execution can proceed
+                    type: string
+                  phase:
+                    format: int32
+                    type: integer
+                  queuedAt: {}
+                  startedAt: {}
+                  stoppedAt: {}
+                  subNodeStatus:
+                    additionalProperties: {}
+                    type: object
+                  systemFailures:
+                    format: int64
+                    type: integer
+                  workflowNodeStatus:
+                    properties:
+                      executionError: {}
+                      phase:
+                        format: int32
+                        type: integer
+                    required:
+                    - phase
+                    - executionError
+                    type: object
+                required:
+                - phase
+                - attempts
+                - cached
+                type: object
+              type: object
+            outputRef:
+              type: string
+            phase:
+              format: int32
+              type: integer
+            startedAt: {}
+            stoppedAt: {}
+          required:
+          - phase
+          type: object
+        subWorkflows:
+          additionalProperties: {}
+          type: object
+        tasks:
+          additionalProperties:
+            type: object
+          type: object
+      required:
+      - spec
+      - executionId
+      - tasks
+      type: object
   version: v1alpha1
 ---
 apiVersion: v1
