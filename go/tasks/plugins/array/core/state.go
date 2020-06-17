@@ -167,7 +167,7 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 
 	switch p, version := state.GetPhase(); p {
 	case PhaseStart:
-		phaseInfo = core.PhaseInfoInitializing(t, core.DefaultPhaseVersion, state.GetReason())
+		phaseInfo = core.PhaseInfoInitializing(t, core.DefaultPhaseVersion, state.GetReason(), &core.TaskInfo{OccurredAt: &t})
 
 	case PhasePreLaunch:
 		version := GetPhaseVersionOffset(p, 1) + version

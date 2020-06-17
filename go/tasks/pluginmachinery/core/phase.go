@@ -156,8 +156,9 @@ func PhaseInfoQueued(t time.Time, version uint32, reason string) PhaseInfo {
 	return pi
 }
 
-func PhaseInfoInitializing(t time.Time, version uint32, reason string) PhaseInfo {
-	pi := phaseInfo(PhaseInitializing, version, nil, &TaskInfo{OccurredAt: &t})
+func PhaseInfoInitializing(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
+
+	pi := phaseInfo(PhaseInitializing, version, nil, info)
 	pi.reason = reason
 	return pi
 }
