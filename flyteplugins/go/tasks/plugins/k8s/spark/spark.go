@@ -213,7 +213,13 @@ func getEventInfoForSpark(sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, 
 	customInfoMap := make(map[string]string)
 
 	logConfig := logs.GetLogConfig()
-	if logConfig.IsKubernetesEnabled && sj.Status.DriverInfo.PodName != "" {
+
+	state := sj.Status.AppState.State
+	isQueued := state == sparkOp.NewState ||
+		state == sparkOp.PendingSubmissionState ||
+		state == sparkOp.SubmittedState
+
+	if logConfig.IsKubernetesEnabled && !isQueued && sj.Status.DriverInfo.PodName != "" {
 		k8sLog, err := logUtils.NewKubernetesLogPlugin(logConfig.KubernetesURL).GetTaskLog(
 			sj.Status.DriverInfo.PodName,
 			sj.Namespace,
@@ -227,7 +233,7 @@ func getEventInfoForSpark(sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, 
 		taskLogs = append(taskLogs, &k8sLog)
 	}
 
-	if logConfig.IsCloudwatchEnabled {
+	if logConfig.IsCloudwatchEnabled && !isQueued {
 		cwUserLogs := core.TaskLog{
 			Uri: fmt.Sprintf(
 				"https://console.aws.amazon.com/cloudwatch/home?region=%s#logStream:group=%s;prefix=var.log.containers.%s;streamFilter=typeLogStreamPrefix",
@@ -246,6 +252,14 @@ func getEventInfoForSpark(sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, 
 			Name:          "System Logs (via Cloudwatch)",
 			MessageFormat: core.TaskLog_JSON,
 		}
+
+		taskLogs = append(taskLogs, &cwUserLogs)
+		taskLogs = append(taskLogs, &cwSystemLogs)
+
+	}
+
+	if logConfig.IsCloudwatchEnabled {
+
 		allUserLogs := core.TaskLog{
 			Uri: fmt.Sprintf(
 				"https://console.aws.amazon.com/cloudwatch/home?region=%s#logStream:group=%s;prefix=var.log.containers.%s;streamFilter=typeLogStreamPrefix",
@@ -255,8 +269,6 @@ func getEventInfoForSpark(sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, 
 			Name:          "Spark-Submit/All User Logs (via Cloudwatch)",
 			MessageFormat: core.TaskLog_JSON,
 		}
-		taskLogs = append(taskLogs, &cwUserLogs)
-		taskLogs = append(taskLogs, &cwSystemLogs)
 		taskLogs = append(taskLogs, &allUserLogs)
 	}
 
@@ -303,8 +315,10 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 
 	occurredAt := time.Now()
 	switch app.Status.AppState.State {
-	case sparkOp.NewState, sparkOp.SubmittedState, sparkOp.PendingSubmissionState:
-		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "job submitted"), nil
+	case sparkOp.NewState:
+		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "job queued"), nil
+	case sparkOp.SubmittedState, sparkOp.PendingSubmissionState:
+		return pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job submitted", info), nil
 	case sparkOp.FailedSubmissionState:
 		reason := fmt.Sprintf("Spark Job  Submission Failed with Error: %s", app.Status.AppState.ErrorMessage)
 		return pluginsCore.PhaseInfoRetryableFailure(errors.DownstreamSystemError, reason, info), nil
