@@ -310,6 +310,38 @@ func (_m *ExecutionContext) GetNamespace() string {
 	return r0
 }
 
+type ExecutionContext_GetOnFailurePolicy struct {
+	*mock.Call
+}
+
+func (_m ExecutionContext_GetOnFailurePolicy) Return(_a0 v1alpha1.WorkflowOnFailurePolicy) *ExecutionContext_GetOnFailurePolicy {
+	return &ExecutionContext_GetOnFailurePolicy{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutionContext) OnGetOnFailurePolicy() *ExecutionContext_GetOnFailurePolicy {
+	c := _m.On("GetOnFailurePolicy")
+	return &ExecutionContext_GetOnFailurePolicy{Call: c}
+}
+
+func (_m *ExecutionContext) OnGetOnFailurePolicyMatch(matchers ...interface{}) *ExecutionContext_GetOnFailurePolicy {
+	c := _m.On("GetOnFailurePolicy", matchers...)
+	return &ExecutionContext_GetOnFailurePolicy{Call: c}
+}
+
+// GetOnFailurePolicy provides a mock function with given fields:
+func (_m *ExecutionContext) GetOnFailurePolicy() v1alpha1.WorkflowOnFailurePolicy {
+	ret := _m.Called()
+
+	var r0 v1alpha1.WorkflowOnFailurePolicy
+	if rf, ok := ret.Get(0).(func() v1alpha1.WorkflowOnFailurePolicy); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.WorkflowOnFailurePolicy)
+	}
+
+	return r0
+}
+
 type ExecutionContext_GetOwnerReference struct {
 	*mock.Call
 }

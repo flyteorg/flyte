@@ -2,7 +2,11 @@ package v1alpha1
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"time"
+
+	"github.com/golang/protobuf/proto"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -151,6 +155,32 @@ func (b BranchNodePhase) String() string {
 		return "BranchEvalFailed"
 	}
 	return "Undefined"
+}
+
+// Failure Handling Policy
+type WorkflowOnFailurePolicy core.WorkflowMetadata_OnFailurePolicy
+
+func (in WorkflowOnFailurePolicy) MarshalJSON() ([]byte, error) {
+	return json.Marshal(proto.EnumName(core.WorkflowMetadata_OnFailurePolicy_name, int32(in)))
+}
+
+func (in *WorkflowOnFailurePolicy) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return fmt.Errorf("WorkflowOnFailurePolicy should be a string, got %s", data)
+	}
+
+	var err error
+	*in, err = WorkflowOnFailurePolicyString(s)
+	return err
+}
+
+func WorkflowOnFailurePolicyString(policy string) (WorkflowOnFailurePolicy, error) {
+	if val, found := core.WorkflowMetadata_OnFailurePolicy_value[policy]; found {
+		return WorkflowOnFailurePolicy(val), nil
+	}
+
+	return WorkflowOnFailurePolicy(0), fmt.Errorf("%s does not belong to WorkflowOnFailurePolicy values", policy)
 }
 
 // TaskType is a dynamic enumeration, that is defined by configuration
@@ -386,6 +416,7 @@ type ExecutableSubWorkflow interface {
 	GetNodes() []NodeID
 	GetConnections() *Connections
 	GetOutputs() *OutputVarMap
+	GetOnFailurePolicy() WorkflowOnFailurePolicy
 }
 
 // Meta provides an interface to retrieve labels, annotations and other concepts that are declared only once

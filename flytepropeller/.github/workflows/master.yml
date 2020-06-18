@@ -11,6 +11,9 @@ jobs:
     outputs:
       version: ${{ steps.bump-version.outputs.tag }}
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
       - name: Bump version and push tag
         id: bump-version
         uses: anothrNick/github-tag-action@1.17.2

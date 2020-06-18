@@ -463,7 +463,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		}
 
 		var err *v1alpha1.ExecutionError
-		if p == v1alpha1.NodePhaseFailing {
+		if p == v1alpha1.NodePhaseFailing || p == v1alpha1.NodePhaseFailed {
 			err = &v1alpha1.ExecutionError{ExecutionError: &core.ExecutionError{Code: "test", Message: "test"}}
 		}
 		ns := &v1alpha1.NodeStatus{
@@ -544,6 +544,11 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockN2Status.OnGetTaskNodeStatus().Return(nil)
 			mockN2Status.On("ClearDynamicNodeStatus").Return(nil)
 			mockN2Status.OnGetAttempts().Return(uint32(0))
+			if expectedN2Phase == v1alpha1.NodePhaseFailed {
+				mockN2Status.OnGetExecutionError().Return(&core.ExecutionError{
+					Message: "Expected Failure",
+				})
+			}
 
 			mockNode := &mocks.ExecutableNode{}
 			mockNode.OnGetID().Return(nodeN2)
@@ -567,6 +572,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockN0Status := &mocks.ExecutableNodeStatus{}
 			mockN0Status.OnGetPhase().Return(n0Phase)
 			mockN0Status.OnGetAttempts().Return(uint32(0))
+			mockN0Status.OnGetExecutionError().Return(nil)
 
 			mockN0Status.OnIsDirty().Return(false)
 			mockN0Status.OnGetParentTaskID().Return(nil)
@@ -592,6 +598,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockWf.OnGetTask(taskID).Return(tk, nil)
 			mockWf.OnGetLabels().Return(make(map[string]string))
 			mockWf.OnIsInterruptible().Return(false)
+			mockWf.OnGetOnFailurePolicy().Return(v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY))
 			mockWfStatus.OnGetDataDir().Return(storage.DataReference("x"))
 			mockWfStatus.OnConstructNodeDataDirMatch(mock.Anything, mock.Anything, mock.Anything).Return("x", nil)
 			return mockWf, mockN2Status
@@ -606,7 +613,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			expectedError     bool
 			updateCalled      bool
 		}{
-			{"notYetStarted->notYetStarted", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, v1alpha1.NodePhaseNotYetStarted, executors.NodePhaseFailed, false, false},
+			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, v1alpha1.NodePhaseSkipped, executors.NodePhaseFailed, false, false},
 			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSkipped, v1alpha1.NodePhaseSkipped, executors.NodePhaseSuccess, false, true},
 			{"notYetStarted->queued", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseQueued, executors.NodePhasePending, false, true},
 		}
