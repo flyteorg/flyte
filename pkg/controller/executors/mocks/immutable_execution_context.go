@@ -276,6 +276,38 @@ func (_m *ImmutableExecutionContext) GetNamespace() string {
 	return r0
 }
 
+type ImmutableExecutionContext_GetOnFailurePolicy struct {
+	*mock.Call
+}
+
+func (_m ImmutableExecutionContext_GetOnFailurePolicy) Return(_a0 v1alpha1.WorkflowOnFailurePolicy) *ImmutableExecutionContext_GetOnFailurePolicy {
+	return &ImmutableExecutionContext_GetOnFailurePolicy{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ImmutableExecutionContext) OnGetOnFailurePolicy() *ImmutableExecutionContext_GetOnFailurePolicy {
+	c := _m.On("GetOnFailurePolicy")
+	return &ImmutableExecutionContext_GetOnFailurePolicy{Call: c}
+}
+
+func (_m *ImmutableExecutionContext) OnGetOnFailurePolicyMatch(matchers ...interface{}) *ImmutableExecutionContext_GetOnFailurePolicy {
+	c := _m.On("GetOnFailurePolicy", matchers...)
+	return &ImmutableExecutionContext_GetOnFailurePolicy{Call: c}
+}
+
+// GetOnFailurePolicy provides a mock function with given fields:
+func (_m *ImmutableExecutionContext) GetOnFailurePolicy() v1alpha1.WorkflowOnFailurePolicy {
+	ret := _m.Called()
+
+	var r0 v1alpha1.WorkflowOnFailurePolicy
+	if rf, ok := ret.Get(0).(func() v1alpha1.WorkflowOnFailurePolicy); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.WorkflowOnFailurePolicy)
+	}
+
+	return r0
+}
+
 type ImmutableExecutionContext_GetOwnerReference struct {
 	*mock.Call
 }

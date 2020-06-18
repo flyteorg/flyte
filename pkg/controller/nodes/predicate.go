@@ -75,7 +75,9 @@ func CanExecute(ctx context.Context, dag executors.DAGStructure, nl executors.No
 			continue
 		}
 
-		if upstreamNodeStatus.GetPhase() == v1alpha1.NodePhaseSkipped {
+		if upstreamNodeStatus.GetPhase() == v1alpha1.NodePhaseSkipped ||
+			upstreamNodeStatus.GetPhase() == v1alpha1.NodePhaseFailed ||
+			upstreamNodeStatus.GetPhase() == v1alpha1.NodePhaseTimedOut {
 			skipped = true
 		} else if upstreamNodeStatus.GetPhase() != v1alpha1.NodePhaseSucceeded {
 			return PredicatePhaseNotReady, nil

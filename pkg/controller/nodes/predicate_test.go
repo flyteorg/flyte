@@ -282,7 +282,7 @@ func TestCanExecute(t *testing.T) {
 
 		p, err := CanExecute(ctx, mockWf, mockWf, mockNode)
 		assert.NoError(t, err)
-		assert.Equal(t, PredicatePhaseNotReady, p)
+		assert.Equal(t, PredicatePhaseSkip, p)
 	})
 
 	// Branch node tests

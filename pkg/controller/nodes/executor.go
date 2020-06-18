@@ -526,6 +526,8 @@ func (c *nodeExecutor) handleDownstream(ctx context.Context, execContext executo
 	// Else if any one is running then Downstream is still running
 	allCompleted := true
 	partialNodeCompletion := false
+	onFailurePolicy := execContext.GetOnFailurePolicy()
+	stateOnComplete := executors.NodeStatusComplete
 	for _, downstreamNodeName := range downstreamNodes {
 		downstreamNode, ok := nl.GetNode(downstreamNodeName)
 		if !ok {
@@ -535,35 +537,47 @@ func (c *nodeExecutor) handleDownstream(ctx context.Context, execContext executo
 				Kind:    core.ExecutionError_SYSTEM,
 			}), nil
 		}
+
 		state, err := c.RecursiveNodeHandler(ctx, execContext, dag, nl, downstreamNode)
 		if err != nil {
 			return executors.NodeStatusUndefined, err
 		}
-		if state.HasFailed() {
-			logger.Debugf(ctx, "Some downstream node has failed, %s", state.Err)
-			return state, nil
-		}
-		if state.HasTimedOut() {
-			logger.Debugf(ctx, "Some downstream node has timedout")
-			return state, nil
-		}
-		if !state.IsComplete() {
+
+		if state.HasFailed() || state.HasTimedOut() {
+			logger.Debugf(ctx, "Some downstream node has failed. Failed: [%v]. TimedOut: [%v]. Error: [%s]", state.HasFailed(), state.HasTimedOut(), state.Err)
+			if onFailurePolicy == v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE) {
+				// If the failure policy allows other nodes to continue running, do not exit the loop,
+				// Keep track of the last failed state in the loop since it'll be the one to return.
+				// TODO: If multiple nodes fail (which this mode allows), consolidate/summarize failure states in one.
+				stateOnComplete = state
+			} else {
+				return state, nil
+			}
+		} else if !state.IsComplete() {
+			// A Failed/Timedout node is implicitly considered "complete" this means none of the downstream nodes from
+			// that node will ever be allowed to run.
+			// This else block, therefore, deals with all other states. IsComplete will return true if and only if this
+			// node as well as all of its downstream nodes have finished executing with success statuses. Otherwise we
+			// mark this node's state as not completed to ensure we will visit it again later.
 			allCompleted = false
 		}
 
 		if state.PartiallyComplete() {
-			// This implies that one of the downstream nodes has completed and workflow is ready for propagation
+			// This implies that one of the downstream nodes has just succeeded and workflow is ready for propagation
 			// We do not propagate in current cycle to make it possible to store the state between transitions
 			partialNodeCompletion = true
 		}
 	}
+
 	if allCompleted {
 		logger.Debugf(ctx, "All downstream nodes completed")
-		return executors.NodeStatusComplete, nil
+		return stateOnComplete, nil
 	}
+
 	if partialNodeCompletion {
 		return executors.NodeStatusSuccess, nil
 	}
+
 	return executors.NodeStatusPending, nil
 }
 
@@ -602,7 +616,10 @@ func canHandleNode(phase v1alpha1.NodePhase) bool {
 		phase == v1alpha1.NodePhaseSucceeding
 }
 
-func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
+func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext,
+	dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (
+	executors.NodeStatus, error) {
+
 	currentNodeCtx := contextutils.WithNodeID(ctx, currentNode.GetID())
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 	nodePhase := nodeStatus.GetPhase()
@@ -643,26 +660,35 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext exe
 		if err != nil {
 			return executors.NodeStatusUndefined, err
 		}
+
 		return c.handleNode(currentNodeCtx, dag, nCtx, h)
 
 		// TODO we can optimize skip state handling by iterating down the graph and marking all as skipped
 		// Currently we treat either Skip or Success the same way. In this approach only one node will be skipped
 		// at a time. As we iterate down, further nodes will be skipped
 	} else if nodePhase == v1alpha1.NodePhaseSucceeded || nodePhase == v1alpha1.NodePhaseSkipped {
+		logger.Debugf(currentNodeCtx, "Node has [%v], traversing downstream.", nodePhase)
 		return c.handleDownstream(ctx, execContext, dag, nl, currentNode)
 	} else if nodePhase == v1alpha1.NodePhaseFailed {
-		// This should not happen
-		logger.Debugf(currentNodeCtx, "Node Failed")
-		return executors.NodeStatusFailed(&core.ExecutionError{
-			Code:    "InternalError",
-			Message: "Node failed",
-			Kind:    core.ExecutionError_SYSTEM,
-		}), nil
+		logger.Debugf(currentNodeCtx, "Node has failed, traversing downstream.")
+		_, err := c.handleDownstream(ctx, execContext, dag, nl, currentNode)
+		if err != nil {
+			return executors.NodeStatusUndefined, err
+		}
+
+		return executors.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
 	} else if nodePhase == v1alpha1.NodePhaseTimedOut {
-		logger.Debugf(currentNodeCtx, "Node Timed Out")
+		logger.Debugf(currentNodeCtx, "Node has timed out, traversing downstream.")
+		_, err := c.handleDownstream(ctx, execContext, dag, nl, currentNode)
+		if err != nil {
+			return executors.NodeStatusUndefined, err
+		}
+
 		return executors.NodeStatusTimedOut, nil
 	}
-	return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, currentNode.GetID(), "Should never reach here")
+
+	return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, currentNode.GetID(),
+		"Should never reach here. Current Phase: %v", nodePhase)
 }
 
 func (c *nodeExecutor) FinalizeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) error {

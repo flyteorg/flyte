@@ -228,6 +228,38 @@ func (_m *ExecutableSubWorkflow) GetOnFailureNode() v1alpha1.ExecutableNode {
 	return r0
 }
 
+type ExecutableSubWorkflow_GetOnFailurePolicy struct {
+	*mock.Call
+}
+
+func (_m ExecutableSubWorkflow_GetOnFailurePolicy) Return(_a0 v1alpha1.WorkflowOnFailurePolicy) *ExecutableSubWorkflow_GetOnFailurePolicy {
+	return &ExecutableSubWorkflow_GetOnFailurePolicy{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableSubWorkflow) OnGetOnFailurePolicy() *ExecutableSubWorkflow_GetOnFailurePolicy {
+	c := _m.On("GetOnFailurePolicy")
+	return &ExecutableSubWorkflow_GetOnFailurePolicy{Call: c}
+}
+
+func (_m *ExecutableSubWorkflow) OnGetOnFailurePolicyMatch(matchers ...interface{}) *ExecutableSubWorkflow_GetOnFailurePolicy {
+	c := _m.On("GetOnFailurePolicy", matchers...)
+	return &ExecutableSubWorkflow_GetOnFailurePolicy{Call: c}
+}
+
+// GetOnFailurePolicy provides a mock function with given fields:
+func (_m *ExecutableSubWorkflow) GetOnFailurePolicy() v1alpha1.WorkflowOnFailurePolicy {
+	ret := _m.Called()
+
+	var r0 v1alpha1.WorkflowOnFailurePolicy
+	if rf, ok := ret.Get(0).(func() v1alpha1.WorkflowOnFailurePolicy); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.WorkflowOnFailurePolicy)
+	}
+
+	return r0
+}
+
 type ExecutableSubWorkflow_GetOutputBindings struct {
 	*mock.Call
 }

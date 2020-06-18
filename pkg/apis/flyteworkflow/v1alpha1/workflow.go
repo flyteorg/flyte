@@ -191,6 +191,10 @@ type WorkflowSpec struct {
 	// refer to specific outputs of a subset of the nodes executed in the Workflow. When executing the end-node,
 	// the execution engine will traverse these bindings and assemble the final set of outputs of the workflow.
 	OutputBindings []*Binding `json:"outputBindings,omitempty"`
+
+	// Defines the policy for handling failures whether it's to fail immediately, or let the nodes run
+	// to completion.
+	OnFailurePolicy WorkflowOnFailurePolicy `json:"onFailurePolicy,omitempty"`
 }
 
 func (in *WorkflowSpec) StartNode() ExecutableNode {
@@ -220,6 +224,10 @@ func (in *WorkflowSpec) FromNode(name NodeID) ([]NodeID, error) {
 
 	downstreamNodes := in.Connections.DownstreamEdges[name]
 	return downstreamNodes, nil
+}
+
+func (in *WorkflowSpec) GetOnFailurePolicy() WorkflowOnFailurePolicy {
+	return in.OnFailurePolicy
 }
 
 func (in *WorkflowSpec) GetOutputs() *OutputVarMap {
