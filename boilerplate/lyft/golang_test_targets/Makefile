@@ -50,4 +50,3 @@ test_unit_visual:
 .PHONY: test_unit_codecov
 test_unit_codecov:
 	go test ./... -race -coverprofile=coverage.txt -covermode=atomic
-	curl -s https://codecov.io/bash > codecov_bash.sh && bash codecov_bash.sh
