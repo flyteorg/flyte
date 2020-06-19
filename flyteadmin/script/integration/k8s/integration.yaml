@@ -6,7 +6,7 @@ metadata:
     iam.amazonaws.com/permitted: ".*"
 spec:
   finalizers:
-  - kubernetes
+    - kubernetes
 status:
   phase: Active
 
@@ -31,7 +31,7 @@ spec:
     kind: FlyteWorkflow
     # shortNames allow shorter string to match your resource on the CLI
     shortNames:
-    - fly
+      - fly
   scope: Namespaced
 
 ---
@@ -45,9 +45,9 @@ metadata:
 spec:
   storageClassName: manual
   capacity:
-    storage: 64Mi
+    storage: 128Mi
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   hostPath:
     path: "/mnt/postgres"
 ---
@@ -59,10 +59,10 @@ metadata:
 spec:
   storageClassName: manual
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 64Mi
+      storage: 128Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -79,18 +79,18 @@ spec:
         app: postgres
     spec:
       volumes:
-      - name: postgres-storage
-        persistentVolumeClaim:
-          claimName: postgres-local-volume-claim
-      containers:
-      - image: "postgres:10.1"
-        name: postgres
-        ports:
-        - containerPort: 5432
-          name: postgres
-        volumeMounts:
         - name: postgres-storage
-          mountPath: /var/lib/postgresql/data
+          persistentVolumeClaim:
+            claimName: postgres-local-volume-claim
+      containers:
+        - image: "postgres:10.1"
+          name: postgres
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
 ---
 apiVersion: v1
 kind: Service
@@ -99,7 +99,7 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - port: 5432
+    - port: 5432
   selector:
     app: postgres
 
@@ -116,7 +116,7 @@ spec:
   capacity:
     storage: 128Mi
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   hostPath:
     path: "/minio"
 ---
@@ -128,7 +128,7 @@ metadata:
 spec:
   storageClassName: minio
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 128Mi
@@ -148,26 +148,26 @@ spec:
         app: minio
     spec:
       volumes:
-      - name: minio-storage
-        persistentVolumeClaim:
-          claimName: minio-volume-claim
-      containers:
-      - image: "minio/minio:edge"
-        name: minio
-        env:
-        - name: MINIO_ACCESS_KEY
-          value: minio
-        - name: MINIO_SECRET_KEY
-          value: miniostorage
-        args:
-        - server
-        - /data
-        ports:
-        - containerPort: 9000
-          name: minio
-        volumeMounts:
         - name: minio-storage
-          mountPath: /data
+          persistentVolumeClaim:
+            claimName: minio-volume-claim
+      containers:
+        - image: "minio/minio:edge"
+          name: minio
+          env:
+            - name: MINIO_ACCESS_KEY
+              value: minio
+            - name: MINIO_SECRET_KEY
+              value: miniostorage
+          args:
+            - server
+            - /data
+          ports:
+            - containerPort: 9000
+              name: minio
+          volumeMounts:
+            - name: minio-storage
+              mountPath: /data
 ---
 apiVersion: v1
 kind: Service
@@ -176,7 +176,7 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - port: 9000
+    - port: 9000
   selector:
     app: minio
 
@@ -191,9 +191,9 @@ spec:
   selector:
     app: flyteadmin
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8088
+    - protocol: TCP
+      port: 80
+      targetPort: 8088
 
 ---
 # Role for flyteadmin
@@ -204,19 +204,19 @@ metadata:
   name: flyteadmin
   namespace: flyte
 rules:
-#Allow Access to all resources under flyte
-- apiGroups:
-  - flyte.lyft.com
-  resources:
-  - flytegraphs
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - delete
-  - patch
+  #Allow Access to all resources under flyte
+  - apiGroups:
+      - flyte.lyft.com
+    resources:
+      - flytegraphs
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+      - patch
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -229,9 +229,9 @@ roleRef:
   kind: Role
   name: fyteadmin
 subjects:
-- kind: ServiceAccount
-  name: flyteadmin
-  namespace: flyte
+  - kind: ServiceAccount
+    name: flyteadmin
+    namespace: flyte
 
 ---
 kind: ConfigMap
@@ -379,55 +379,55 @@ spec:
         app: flyteadmin
     spec:
       volumes:
-      - name: shared-data
-        emptyDir: {}
-      - name: config-volume
-        configMap:
-          name: flyte-admin-config
-          items:
-          - key: development.integration
-            path: flyteadmin_config.yaml
-      imagePullSecrets:
-      - name: dockerhub
-      initContainers:
-      - name: check-db-ready
-        image: postgres:10.1
-        command: ['sh', '-c',
-                  'until pg_isready -h postgres -p 5432;
-          do echo waiting for database; sleep 2; done;']
-      - name: run-migrations
-        image: flyteadmin:test
-        imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                  "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "run"]
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/flyte/config
-      - name: seed-projects
-        image: flyteadmin:test
-        imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                  "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "seed-projects",
-                  "project", "admintests", "flytekit"]
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/flyte/config
-      containers:
-      - name: flyteadmin
-        image: flyteadmin:test
-        imagePullPolicy: IfNotPresent
-        securityContext:
-          privileged: true
-        readinessProbe:
-          httpGet:
-            path: /healthcheck
-            port: 8088
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                  "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "serve"]
-        ports:
-        - containerPort: 8088
-        volumeMounts:
         - name: shared-data
-          mountPath: /srv/flyte
+          emptyDir: {}
         - name: config-volume
-          mountPath: /etc/flyte/config
+          configMap:
+            name: flyte-admin-config
+            items:
+              - key: development.integration
+                path: flyteadmin_config.yaml
+      imagePullSecrets:
+        - name: dockerhub
+      initContainers:
+        - name: check-db-ready
+          image: postgres:10.1
+          command: ['sh', '-c',
+                    'until pg_isready -h postgres -p 5432;
+          do echo waiting for database; sleep 2; done;']
+        - name: run-migrations
+          image: flyteadmin:test
+          imagePullPolicy: IfNotPresent
+          command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "run"]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+        - name: seed-projects
+          image: flyteadmin:test
+          imagePullPolicy: IfNotPresent
+          command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "seed-projects",
+                    "project", "admintests", "flytekit"]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+      containers:
+        - name: flyteadmin
+          image: flyteadmin:test
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8088
+          command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "serve"]
+          ports:
+            - containerPort: 8088
+          volumeMounts:
+            - name: shared-data
+              mountPath: /srv/flyte
+            - name: config-volume
+              mountPath: /etc/flyte/config

@@ -1,3 +1,8 @@
+## Read then delete
+- Make sure to use a concise title for the pull-request.
+- Use #patch, #minor or #major in the pull-request title to bump the corresponding version. Otherwise, the patch version
+will be bumped. [More details](https://github.com/marketplace/actions/github-tag-bump)
+
 # TL;DR
 _Please replace this text with a description of what this PR accomplishes._
 

@@ -1,6 +1,7 @@
 export REPOSITORY=flyteadmin
 include boilerplate/lyft/docker_build/Makefile
 include boilerplate/lyft/golang_test_targets/Makefile
+include boilerplate/lyft/end2end/Makefile
 
 .PHONY: update_boilerplate
 update_boilerplate:
@@ -13,6 +14,10 @@ integration:
 .PHONY: k8s_integration
 k8s_integration:
 	@script/integration/launch.sh
+
+.PHONY: k8s_integration_execute
+k8s_integration_execute:
+	@script/integration/execute.sh
 
 .PHONY: compile
 compile:
