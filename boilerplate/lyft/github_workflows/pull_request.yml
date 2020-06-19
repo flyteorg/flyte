@@ -1,0 +1,65 @@
+name: Pull Request
+
+on:
+  pull_request
+
+jobs:
+  build-and-end2end:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Push Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+          image_name: ${{ secrets.flytegithub_repo }}/flyteadmin
+          image_tag: ${{ github.sha }}
+          push_git_tag: true
+          registry: docker.pkg.github.com
+      - uses: engineerd/setup-kind@v0.4.0
+      - name: End2End
+        env:
+          DOCKER_USERNAME: ${{ github.actor }}
+          DOCKER_PASSWORD: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          kubectl cluster-info
+          kubectl get pods -n kube-system
+          echo "current-context:" $(kubectl config current-context)
+          echo "environment-kubeconfig:" ${KUBECONFIG}
+          ADMIN=${{ secrets.flytegithub_repo }}/flyteadmin:${{ github.sha }} make end2end_execute
+  push-dockerhub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Push Docker Image to Dockerhub
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ secrets.DOCKERHUB_USERNAME }}"
+          password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+          image_name: ${{ secrets.DOCKERHUB_IMAGE_NAME }}
+          image_tag: ${{ github.sha }}
+          push_git_tag: true
+          build_extra_args: "--compress=true"
+  tests-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Unit Tests
+        uses: cedrickring/golang-action@1.5.2
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make install && make test_unit_codecov
+      - name: Push CodeCov
+        uses: codecov/codecov-action@v1
+        with:
+          file: coverage.txt
+          flags: unittests
+          fail_ci_if_error: true
+      - name: Lint
+        uses: cedrickring/golang-action@1.5.2
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make install && make lint

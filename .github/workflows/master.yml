@@ -1,0 +1,88 @@
+name: Master
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bump-version.outputs.tag }}
+    steps:
+      - name: Bump version and push tag
+        id: bump-version
+        uses: anothrNick/github-tag-action@1.17.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: patch
+  push-github-end2end:
+    runs-on: ubuntu-latest
+    needs: bump-version
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Push Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+          image_name: ${{ secrets.flytegithub_repo }}/flyteadmin
+          image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
+          push_git_tag: true
+          registry: docker.pkg.github.com
+          build_extra_args: "--compress=true"
+      - uses: engineerd/setup-kind@v0.4.0
+      - name: End2End
+        env:
+          DOCKER_USERNAME: ${{ github.actor }}
+          DOCKER_PASSWORD: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          kubectl cluster-info
+          kubectl get pods -n kube-system
+          echo "current-context:" $(kubectl config current-context)
+          echo "environment-kubeconfig:" ${KUBECONFIG}
+          PROPELLER=${{ secrets.flytegithub_repo }}/flyteadmin:${{ github.sha }} make end2end_execute
+  push-dockerhub:
+    runs-on: ubuntu-latest
+    needs: bump-version
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Push Docker Image to Dockerhub
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ secrets.DOCKERHUB_USERNAME }}"
+          password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+          image_name: ${{ secrets.DOCKERHUB_IMAGE_NAME }}
+          image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
+          push_git_tag: true
+          build_extra_args: "--compress=true"
+  tests-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Unit Tests
+        uses: cedrickring/golang-action@1.5.2
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make install && make test_unit_codecov
+      - name: Push CodeCov
+        uses: codecov/codecov-action@v1
+        with:
+          file: coverage.txt
+          flags: unittests
+          fail_ci_if_error: true
+      - name: Lint
+        uses: cedrickring/golang-action@1.5.2
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make install && make lint

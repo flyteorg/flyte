@@ -8,3 +8,4 @@ vendor/
 node_modules/
 
 .virtualgo
+boilerplate/lyft/end2end/tmp
