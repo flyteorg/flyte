@@ -6,7 +6,7 @@
 //		}
 // f.Ready() // can be checked for completion
 // f.Get() .. will block till the given sub-routine returns
-package data
+package futures
 
 import (
 	"context"
