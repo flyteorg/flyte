@@ -14,3 +14,4 @@ Flyte Features
     launchplans
     task_cache
     roles
+    single_task_execution
