@@ -17,10 +17,10 @@ const (
 	containerTaskType = "container"
 )
 
-type containerTaskExecutor struct {
+type Plugin struct {
 }
 
-func (containerTaskExecutor) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, r k8s.Resource) (pluginsCore.PhaseInfo, error) {
+func (Plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, r k8s.Resource) (pluginsCore.PhaseInfo, error) {
 
 	pod := r.(*v1.Pod)
 
@@ -53,7 +53,7 @@ func (containerTaskExecutor) GetTaskPhase(ctx context.Context, pluginContext k8s
 }
 
 // Creates a new Pod that will Exit on completion. The pods have no retries by design
-func (containerTaskExecutor) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (k8s.Resource, error) {
+func (Plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (k8s.Resource, error) {
 
 	podSpec, err := flytek8s.ToK8sPodSpec(ctx, taskCtx.TaskExecutionMetadata(), taskCtx.TaskReader(), taskCtx.InputReader(), taskCtx.OutputWriter())
 	if err != nil {
@@ -68,7 +68,7 @@ func (containerTaskExecutor) BuildResource(ctx context.Context, taskCtx pluginsC
 	return pod, nil
 }
 
-func (containerTaskExecutor) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (k8s.Resource, error) {
+func (Plugin) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (k8s.Resource, error) {
 	return flytek8s.BuildIdentityPod(), nil
 }
 
@@ -78,7 +78,7 @@ func init() {
 			ID:                  containerTaskType,
 			RegisteredTaskTypes: []pluginsCore.TaskType{containerTaskType},
 			ResourceToWatch:     &v1.Pod{},
-			Plugin:              containerTaskExecutor{},
+			Plugin:              Plugin{},
 			IsDefault:           true,
 		})
 }

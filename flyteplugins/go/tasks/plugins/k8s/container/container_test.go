@@ -97,7 +97,7 @@ func dummyContainerTaskContext(resources *v1.ResourceRequirements, command []str
 }
 
 func TestContainerTaskExecutor_BuildIdentityResource(t *testing.T) {
-	c := containerTaskExecutor{}
+	c := Plugin{}
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
 	r, err := c.BuildIdentityResource(context.TODO(), taskMetadata)
 	assert.NoError(t, err)
@@ -108,7 +108,7 @@ func TestContainerTaskExecutor_BuildIdentityResource(t *testing.T) {
 }
 
 func TestContainerTaskExecutor_BuildResource(t *testing.T) {
-	c := containerTaskExecutor{}
+	c := Plugin{}
 	command := []string{"command"}
 	args := []string{"{{.Input}}"}
 	taskCtx := dummyContainerTaskContext(resourceRequirements, command, args)
@@ -133,7 +133,7 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 }
 
 func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
-	c := containerTaskExecutor{}
+	c := Plugin{}
 	j := &v1.Pod{
 		Status: v1.PodStatus{},
 	}

@@ -42,7 +42,7 @@ type Future interface {
 	GetResponseError() error
 }
 
-// Catalog Upload future to represent async process of uploading catalog artifacts.
+// Catalog Sidecar future to represent async process of uploading catalog artifacts.
 type UploadFuture interface {
 	Future
 }
