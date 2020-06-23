@@ -24,8 +24,8 @@ require (
 	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/lyft/datacatalog v0.2.1
 	github.com/lyft/flyteidl v0.17.34
-	github.com/lyft/flyteplugins v0.3.34
-	github.com/lyft/flytestdlib v0.3.7
+	github.com/lyft/flyteplugins v0.3.35
+	github.com/lyft/flytestdlib v0.3.9
 	github.com/magiconair/properties v1.8.1
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
@@ -35,7 +35,7 @@ require (
 	github.com/prometheus/procfs v0.0.10 // indirect
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.6.1
 	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	gomodules.xyz/jsonpatch/v2 v2.1.0 // indirect
