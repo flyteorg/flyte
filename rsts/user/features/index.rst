@@ -14,3 +14,4 @@ Flyte Features
     launchplans
     task_cache
     roles
+    on_failure_policy
