@@ -23,15 +23,16 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/lib/pq v1.3.0
 	github.com/lyft/flyteidl v0.17.34
-	github.com/lyft/flytepropeller v0.2.62
-	github.com/lyft/flytestdlib v0.3.7
+	github.com/lyft/flyteplugins v0.3.35 // indirect
+	github.com/lyft/flytepropeller v0.2.64
+	github.com/lyft/flytestdlib v0.3.9
 	github.com/magiconair/properties v1.8.1
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.5.0
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.6.1
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	google.golang.org/grpc v1.28.0
 	gopkg.in/gormigrate.v1 v1.6.0
