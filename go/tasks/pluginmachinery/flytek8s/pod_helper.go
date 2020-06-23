@@ -27,7 +27,11 @@ func ToK8sPodSpec(ctx context.Context, taskExecutionMetadata pluginsCore.TaskExe
 		logger.Warnf(ctx, "failed to read task information when trying to construct Pod, err: %s", err.Error())
 		return nil, err
 	}
-	c, err := ToK8sContainer(ctx, taskExecutionMetadata, task.GetContainer(), inputs, outputPaths)
+	if task.GetContainer() == nil {
+		logger.Errorf(ctx, "Default Pod creation logic works for default container in the task template only.")
+		return nil, fmt.Errorf("container not specified in task template")
+	}
+	c, err := ToK8sContainer(ctx, taskExecutionMetadata, task.GetContainer(), task.Interface, inputs, outputPaths)
 	if err != nil {
 		return nil, err
 	}
@@ -46,15 +50,20 @@ func ToK8sPodSpec(ctx context.Context, taskExecutionMetadata pluginsCore.TaskExe
 			SchedulerName:      config.GetK8sPluginConfig().SchedulerName,
 		}, nil
 	}
-	return &v1.PodSpec{
+	pod := &v1.PodSpec{
 		// We could specify Scheduler, Affinity, nodename etc
 		RestartPolicy:      v1.RestartPolicyNever,
 		Containers:         containers,
 		Tolerations:        GetPodTolerations(taskExecutionMetadata.IsInterruptible(), c.Resources),
 		ServiceAccountName: taskExecutionMetadata.GetK8sServiceAccount(),
 		SchedulerName:      config.GetK8sPluginConfig().SchedulerName,
-	}, nil
+	}
 
+	if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, pod, task.GetInterface(), taskExecutionMetadata, inputs, outputPaths, task.GetContainer().GetDataConfig()); err != nil {
+		return nil, err
+	}
+
+	return pod, nil
 }
 
 func BuildPodWithSpec(podSpec *v1.PodSpec) *v1.Pod {
@@ -202,7 +211,7 @@ func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 
 func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
 	code = "UnknownError"
-	message = "Container/Pod failed. No message received from kubernetes."
+	message = "Pod failed. No message received from kubernetes."
 	if len(status.Reason) > 0 {
 		code = status.Reason
 	}
@@ -228,11 +237,15 @@ func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
 				code = Interrupted
 			}
 
-			message += fmt.Sprintf("\r\nContainer [%v] terminated with exit code (%v). Reason [%v]. Message: [%v].",
-				c.Name,
-				containerState.Terminated.ExitCode,
-				containerState.Terminated.Reason,
-				containerState.Terminated.Message)
+			if containerState.Terminated.ExitCode == 0 {
+				message += fmt.Sprintf("\r\n[%v] terminated with ExitCode 0.", c.Name)
+			} else {
+				message += fmt.Sprintf("\r\n[%v] terminated with exit code (%v). Reason [%v]. Message: \n%v.",
+					c.Name,
+					containerState.Terminated.ExitCode,
+					containerState.Terminated.Reason,
+					containerState.Terminated.Message)
+			}
 		}
 	}
 	return code, message

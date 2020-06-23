@@ -87,11 +87,11 @@ func TestAsyncClientImpl_Upload(t *testing.T) {
 			}
 			gotPutFuture, err := c.Upload(ctx, tt.requests...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AsyncClientImpl.Upload() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AsyncClientImpl.Sidecar() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotPutFuture, tt.wantPutFuture) {
-				t.Errorf("AsyncClientImpl.Upload() = %v, want %v", gotPutFuture, tt.wantPutFuture)
+				t.Errorf("AsyncClientImpl.Sidecar() = %v, want %v", gotPutFuture, tt.wantPutFuture)
 			}
 		})
 	}

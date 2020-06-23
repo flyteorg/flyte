@@ -148,6 +148,8 @@ func TestBuildSidecarResource(t *testing.T) {
 			v1.ResourceStorage: {tolStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
+		DefaultCPURequest:    "1024m",
+		DefaultMemoryRequest: "1024Mi",
 	}))
 	handler := &sidecarResourceHandler{}
 	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
