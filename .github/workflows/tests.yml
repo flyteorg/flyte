@@ -4,25 +4,24 @@ on:
     branches:
     - master
   pull_request:
-    branches:
-    - master
 jobs:
   end-to-end:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        go-version: [1.10]
     steps:
     - uses: actions/checkout@v1
     - name: Kustomize and diff
       run: DELTA_CHECK=true make kustomize
-    - name: Set up Go@${{ matrix.go-version }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{ matrix.go-version }}
-    - name: Run end-to-end tests
-      run: make end2end
+    - uses: engineerd/setup-kind@v0.4.0
+    - name: End2End
+      env:
+        DOCKER_USERNAME: ${{ github.actor }}
+        DOCKER_PASSWORD: "${{ secrets.GITHUB_TOKEN }}"
+      run: |
+        kubectl cluster-info
+        kubectl get pods -n kube-system
+        echo "current-context:" $(kubectl config current-context)
+        echo "environment-kubeconfig:" ${KUBECONFIG}
+        make end2end_execute
   docs:
     runs-on: ubuntu-latest
     strategy:

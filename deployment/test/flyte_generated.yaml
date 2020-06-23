@@ -644,7 +644,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.2.8
+        app.kubernetes.io/version: 0.2.9
     spec:
       containers:
       - command:
@@ -653,7 +653,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.2.8
+        image: docker.io/lyft/flyteadmin:v0.2.9
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -772,7 +772,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.2.45
+        app.kubernetes.io/version: 0.2.63
     spec:
       containers:
       - args:
@@ -785,7 +785,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.2.45
+        image: docker.io/lyft/flytepropeller:v0.2.63
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:

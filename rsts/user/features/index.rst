@@ -15,3 +15,4 @@ Flyte Features
     task_cache
     roles
     single_task_execution
+    on_failure_policy
