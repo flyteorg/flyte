@@ -666,6 +666,7 @@ apiVersion: v1
 data:
   config.yaml: |
     propeller:
+      rawoutput-prefix: s3://my-s3-bucket/
       metadata-prefix: metadata/propeller
       workers: 4
       max-workflow-retries: 30
@@ -734,7 +735,7 @@ data:
           - k8s-array
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-5dd2784gbb
+  name: flyte-propeller-config-97gh25f525
   namespace: flyte
 ---
 apiVersion: v1
@@ -1243,7 +1244,7 @@ spec:
           name: flyte-spark-config-h72bmtggc2
         name: spark-config-volume
       - configMap:
-          name: flyte-propeller-config-5dd2784gbb
+          name: flyte-propeller-config-97gh25f525
         name: config-volume
       - configMap:
           name: flyte-plugin-config-f6t7mt8tkg
