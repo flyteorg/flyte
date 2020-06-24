@@ -16,7 +16,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.2.9
+        app.kubernetes.io/version: 0.2.10
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "10254"
@@ -31,7 +31,7 @@ spec:
           name: flyte-admin-config
       initContainers:
       - name: run-migrations
-        image: docker.io/lyft/flyteadmin:v0.2.9
+        image: docker.io/lyft/flyteadmin:v0.2.10
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "run"]
         volumeMounts:
@@ -39,7 +39,7 @@ spec:
           mountPath: /etc/flyte/config
       containers:
       - name: flyteadmin
-        image: docker.io/lyft/flyteadmin:v0.2.9
+        image: docker.io/lyft/flyteadmin:v0.2.10
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "serve"]
         ports:

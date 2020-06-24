@@ -1,4 +1,5 @@
 propeller:
+  rawoutput-prefix: s3://my-container/
   metadata-prefix: metadata/propeller
   workers: 4
   max-workflow-retries: 30
@@ -28,6 +29,10 @@ propeller:
       type: bucket
       rate: 10
       capacity: 100
+    co-pilot:
+      name: "flyte-copilot-"
+      image: "docker.io/lyft/flytecopilot:v0.3.35"
+      start-timeout: "5s"
 logger:
   show-source: true
   level: 5

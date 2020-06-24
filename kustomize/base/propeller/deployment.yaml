@@ -15,7 +15,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.2.63
+        app.kubernetes.io/version: 0.2.64
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "10254"
@@ -31,7 +31,7 @@ spec:
           name: flyte-plugin-config
       containers:
       - name: flytepropeller
-        image: docker.io/lyft/flytepropeller:v0.2.63
+        image: docker.io/lyft/flytepropeller:v0.2.64
         command:
         - flytepropeller
         args:

@@ -483,6 +483,7 @@ apiVersion: v1
 data:
   config.yaml: |
     propeller:
+      rawoutput-prefix: s3://my-container/
       metadata-prefix: metadata/propeller
       workers: 4
       max-workflow-retries: 30
@@ -512,6 +513,10 @@ data:
           type: bucket
           rate: 10
           capacity: 100
+        co-pilot:
+          name: "flyte-copilot-"
+          image: "docker.io/lyft/flytecopilot:v0.3.35"
+          start-timeout: "5s"
     logger:
       show-source: true
       level: 5
@@ -540,7 +545,7 @@ data:
           - k8s-array
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-hd7h56fg47
+  name: flyte-propeller-config-454bgc289d
   namespace: flyte
 ---
 apiVersion: v1
@@ -644,7 +649,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.2.9
+        app.kubernetes.io/version: 0.2.10
     spec:
       containers:
       - command:
@@ -653,7 +658,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.2.9
+        image: docker.io/lyft/flyteadmin:v0.2.10
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -772,7 +777,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.2.63
+        app.kubernetes.io/version: 0.2.64
     spec:
       containers:
       - args:
@@ -785,7 +790,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.2.63
+        image: docker.io/lyft/flytepropeller:v0.2.64
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -803,7 +808,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-hd7h56fg47
+          name: flyte-propeller-config-454bgc289d
         name: config-volume
       - configMap:
           name: flyte-plugin-config-b525btf774

@@ -653,15 +653,20 @@ data:
           - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
           - FLYTE_AWS_ACCESS_KEY_ID: minio
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        co-pilot:
+          name: "flyte-copilot-"
+          image: "docker.io/lyft/flytecopilot:v0.3.35"
+          start-timeout: "30s"
 kind: ConfigMap
 metadata:
-  name: flyte-plugin-config-b525btf774
+  name: flyte-plugin-config-f6t7mt8tkg
   namespace: flyte
 ---
 apiVersion: v1
 data:
   config.yaml: |
     propeller:
+      rawoutput-prefix: s3://my-s3-bucket/
       metadata-prefix: metadata/propeller
       workers: 4
       max-workflow-retries: 30
@@ -730,7 +735,7 @@ data:
           - k8s-array
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-5dd2784gbb
+  name: flyte-propeller-config-97gh25f525
   namespace: flyte
 ---
 apiVersion: v1
@@ -1024,7 +1029,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.2.9
+        app.kubernetes.io/version: 0.2.10
     spec:
       containers:
       - command:
@@ -1033,7 +1038,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.2.9
+        image: docker.io/lyft/flyteadmin:v0.2.10
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -1191,7 +1196,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.2.63
+        app.kubernetes.io/version: 0.2.64
     spec:
       containers:
       - args:
@@ -1206,7 +1211,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.2.63
+        image: docker.io/lyft/flytepropeller:v0.2.64
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -1239,10 +1244,10 @@ spec:
           name: flyte-spark-config-h72bmtggc2
         name: spark-config-volume
       - configMap:
-          name: flyte-propeller-config-5dd2784gbb
+          name: flyte-propeller-config-97gh25f525
         name: config-volume
       - configMap:
-          name: flyte-plugin-config-b525btf774
+          name: flyte-plugin-config-f6t7mt8tkg
         name: plugin-config-volume
 ---
 apiVersion: apps/v1
