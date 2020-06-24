@@ -40,6 +40,9 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 	// Create a single backOffManager for all the plugins
 	backOffController := backoff.NewController(ctx)
 
+	// Create a single resource monitor object for all plugins to use
+	monitorIndex := k8s.NewResourceMonitorIndex()
+
 	k8sPlugins := pr.GetK8sPlugins()
 	for i := range k8sPlugins {
 		kpe := k8sPlugins[i]
@@ -52,7 +55,7 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 				ID:                  id,
 				RegisteredTaskTypes: kpe.RegisteredTaskTypes,
 				LoadPlugin: func(ctx context.Context, iCtx core.SetupContext) (plugin core.Plugin, e error) {
-					return k8s.NewPluginManagerWithBackOff(ctx, iCtx, kpe, backOffController)
+					return k8s.NewPluginManagerWithBackOff(ctx, iCtx, kpe, backOffController, monitorIndex)
 				},
 				IsDefault: kpe.IsDefault,
 			})

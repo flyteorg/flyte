@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	listers "github.com/lyft/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
@@ -62,7 +64,7 @@ func (m mockWFLister) List(_ labels.Selector) (ret []*v1alpha1.FlyteWorkflow, er
 
 func TestResourceLevelMonitor_collect(t *testing.T) {
 	scope := promutils.NewScope("testscope")
-	g := scope.MustNewGaugeVec("unittest", "testing", "project", "domain")
+	g := labeled.NewGauge("unittest", "testing", scope)
 	lm := &ResourceLevelMonitor{
 		Scope:          scope,
 		CollectorTimer: scope.MustNewStopWatch("collection_cycle", "Measures how long it takes to run a collection", time.Millisecond),
@@ -74,10 +76,10 @@ func TestResourceLevelMonitor_collect(t *testing.T) {
 	var expected = `
 		# HELP testscope:unittest testing
 		# TYPE testscope:unittest gauge
-		testscope:unittest{domain="dev",project="proj"} 2
-		testscope:unittest{domain="dev",project="proj2"} 1
+		testscope:unittest{domain="dev",project="proj", task="",wf=""} 2
+		testscope:unittest{domain="dev",project="proj2", task="",wf=""} 1
 	`
 
-	err := testutil.CollectAndCompare(g, strings.NewReader(expected))
+	err := testutil.CollectAndCompare(g.GaugeVec, strings.NewReader(expected))
 	assert.NoError(t, err)
 }

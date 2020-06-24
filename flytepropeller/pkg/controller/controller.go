@@ -5,6 +5,8 @@ import (
 	"runtime/pprof"
 	"time"
 
+	"github.com/lyft/flytestdlib/promutils/labeled"
+
 	"github.com/lyft/flytestdlib/contextutils"
 	"k8s.io/apimachinery/pkg/labels"
 
@@ -193,7 +195,7 @@ type ResourceLevelMonitor struct {
 
 	// System Observability: This is a labeled gauge that emits the current number of FlyteWorkflow objects in the informer. It is used
 	// to monitor current levels. It currently only splits by project/domain, not workflow status.
-	levels *prometheus.GaugeVec
+	levels labeled.Gauge
 
 	// The thing that we want to measure the current levels of
 	lister lister.FlyteWorkflowLister
@@ -235,15 +237,10 @@ func (r *ResourceLevelMonitor) collect(ctx context.Context) {
 	counts := r.countList(ctx, workflows)
 
 	// Emit labeled metrics, for each project/domain combination. This can be aggregated later with Prometheus queries.
-	metricKeys := []contextutils.Key{contextutils.ProjectKey, contextutils.DomainKey}
 	for project, val := range counts {
 		for domain, num := range val {
 			tempContext := contextutils.WithProjectDomain(ctx, project, domain)
-			gauge, err := r.levels.GetMetricWith(contextutils.Values(tempContext, metricKeys...))
-			if err != nil {
-				panic(err)
-			}
-			gauge.Set(float64(num))
+			r.levels.Set(tempContext, float64(num))
 		}
 	}
 }
@@ -271,9 +268,8 @@ func NewResourceLevelMonitor(scope promutils.Scope, lister lister.FlyteWorkflowL
 	return &ResourceLevelMonitor{
 		Scope:          scope,
 		CollectorTimer: scope.MustNewStopWatch("collection_cycle", "Measures how long it takes to run a collection", time.Millisecond),
-		levels: scope.MustNewGaugeVec("flyteworkflow", "Current FlyteWorkflow levels",
-			contextutils.ProjectKey.String(), contextutils.DomainKey.String()),
-		lister: lister,
+		levels:         labeled.NewGauge("flyteworkflow", "Current FlyteWorkflow levels per instance of propeller", scope),
+		lister:         lister,
 	}
 }
 

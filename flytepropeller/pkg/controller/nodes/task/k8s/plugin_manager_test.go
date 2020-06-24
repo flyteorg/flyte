@@ -98,7 +98,7 @@ func ExampleNewPluginManager() {
 		RegisteredTaskTypes: []pluginsCore.TaskType{"container"},
 		ResourceToWatch:     &v1.Pod{},
 		Plugin:              k8sSampleHandler{},
-	})
+	}, NewResourceMonitorIndex())
 	if err == nil {
 		fmt.Printf("Created executor: %v\n", exec.GetID())
 	} else {
@@ -192,7 +192,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		})
+		}, NewResourceMonitorIndex())
 		assert.NoError(t, err)
 
 		transition, err := pluginManager.Handle(ctx, tctx)
@@ -220,7 +220,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		})
+		}, NewResourceMonitorIndex())
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
@@ -254,7 +254,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		})
+		}, NewResourceMonitorIndex())
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
@@ -287,7 +287,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		})
+		}, NewResourceMonitorIndex())
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
@@ -339,7 +339,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		}, backOffController)
+		}, backOffController, NewResourceMonitorIndex())
 
 		assert.NoError(t, err)
 		transition, err := pluginManager.Handle(ctx, tctx)
@@ -381,7 +381,7 @@ func TestPluginManager_Abort(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		})
+		}, NewResourceMonitorIndex())
 		assert.NotNil(t, res)
 		assert.NoError(t, err)
 
@@ -401,7 +401,7 @@ func TestPluginManager_Abort(t *testing.T) {
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
 			Plugin:          mockResourceHandler,
-		})
+		}, NewResourceMonitorIndex())
 		assert.NotNil(t, res)
 		assert.NoError(t, err)
 
@@ -522,7 +522,7 @@ func TestPluginManager_Handle_CheckResourceStatus(t *testing.T) {
 				ID:              "x",
 				ResourceToWatch: &v1.Pod{},
 				Plugin:          mockResourceHandler,
-			})
+			}, NewResourceMonitorIndex())
 			assert.NotNil(t, res)
 			assert.NoError(t, err)
 
@@ -576,6 +576,24 @@ func TestAddObjectMetadata(t *testing.T) {
 	assert.Equal(t, l, o.GetLabels())
 }
 
+func TestResourceManagerConstruction(t *testing.T) {
+	ctx := context.Background()
+	sCtx := &pluginsCoreMock.SetupContext{}
+	fakeKubeClient := mocks.NewFakeKubeClient()
+	sCtx.On("KubeClient").Return(fakeKubeClient)
+
+	scope := promutils.NewScope("test:plugin_manager")
+	index := NewResourceMonitorIndex()
+	gvk, err := getPluginGvk(&v1.Pod{})
+	assert.NoError(t, err)
+	assert.Equal(t, gvk.Kind, "Pod")
+	si, err := getPluginSharedInformer(sCtx, &v1.Pod{})
+	assert.NotNil(t, si)
+	assert.NoError(t, err)
+	rm := index.GetOrCreateResourceLevelMonitor(ctx, scope, si, gvk)
+	assert.NotNil(t, rm)
+}
+
 func init() {
-	labeled.SetMetricKeys(contextutils.NamespaceKey)
+	labeled.SetMetricKeys(contextutils.ProjectKey)
 }
