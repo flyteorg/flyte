@@ -29,10 +29,6 @@ propeller:
       type: bucket
       rate: 10
       capacity: 100
-    co-pilot:
-      name: "flyte-copilot-"
-      image: "docker.io/lyft/flytecopilot:v0.3.35"
-      start-timeout: "5s"
 logger:
   show-source: true
   level: 5

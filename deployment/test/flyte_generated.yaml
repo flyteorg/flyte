@@ -464,7 +464,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  config.yaml: |
+  config.yaml: |+
     plugins:
       logs:
         kubernetes-enabled: true
@@ -474,9 +474,14 @@ data:
           - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
           - FLYTE_AWS_ACCESS_KEY_ID: minio
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        co-pilot:
+          name: "flyte-copilot-"
+          image: "docker.io/lyft/flytecopilot:v0.3.35"
+          start-timeout: "5s"
+
 kind: ConfigMap
 metadata:
-  name: flyte-plugin-config-b525btf774
+  name: flyte-plugin-config-ckftmk9b6k
   namespace: flyte
 ---
 apiVersion: v1
@@ -513,10 +518,6 @@ data:
           type: bucket
           rate: 10
           capacity: 100
-        co-pilot:
-          name: "flyte-copilot-"
-          image: "docker.io/lyft/flytecopilot:v0.3.35"
-          start-timeout: "5s"
     logger:
       show-source: true
       level: 5
@@ -545,7 +546,7 @@ data:
           - k8s-array
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-454bgc289d
+  name: flyte-propeller-config-2m8ffmc746
   namespace: flyte
 ---
 apiVersion: v1
@@ -808,10 +809,10 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-454bgc289d
+          name: flyte-propeller-config-2m8ffmc746
         name: config-volume
       - configMap:
-          name: flyte-plugin-config-b525btf774
+          name: flyte-plugin-config-ckftmk9b6k
         name: plugin-config-volume
 ---
 apiVersion: apps/v1
