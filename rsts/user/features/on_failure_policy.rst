@@ -1,4 +1,4 @@
-.. _on-failuire-policy:
+.. _on-failure-policy:
 
 On Failure Policy
 #################
