@@ -1,6 +1,6 @@
 # Flyte V0.4.0
 
-## Changes since v0.4.0
+## Changes since v0.3.0
 
 ### Core Platform
 - Single Task Execution support (API only, no flytekit yet)
