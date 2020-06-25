@@ -1,7 +1,10 @@
-.. _on-failuire-policy:
+.. _on-failure-policy:
+
+On Failure Policy
+#################
 
 What is it
-==========
+----------
 
 The default behavior for when a node fails in a workflow is to immediately abort the entire workflow. The reasoning behind this thinking
 is to avoid wasting resources since the workflow will end up failing anyway. There are certain cases however, when it's desired for the
