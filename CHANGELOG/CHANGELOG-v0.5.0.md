@@ -1,4 +1,4 @@
-# Flyte V0.5.0
+# Flyte v0.5.0
 
 ## Infrastructure
 - Moved CI/CD to Github Actions
