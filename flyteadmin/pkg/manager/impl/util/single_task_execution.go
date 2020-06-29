@@ -31,6 +31,8 @@ var defaultTimeout = ptypes.DurationProto(24 * time.Hour)
 
 const systemNamePrefix = ".flytegen.%s"
 
+const noInputNodeID = ""
+
 func generateNodeNameFromTask(taskName string) string {
 	if len(taskName) >= maxNodeIDLength {
 		taskName = taskName[len(taskName)-maxNodeIDLength:]
@@ -48,42 +50,7 @@ func generateWorkflowNameFromTask(taskName string) string {
 	return fmt.Sprintf(systemNamePrefix, taskName)
 }
 
-func getBinding(literal *core.Literal) *core.BindingData {
-	if literal.GetScalar() != nil {
-		return &core.BindingData{
-			Value: &core.BindingData_Scalar{
-				Scalar: literal.GetScalar(),
-			},
-		}
-	} else if literal.GetCollection() != nil {
-		bindings := make([]*core.BindingData, len(literal.GetCollection().Literals))
-		for idx, subLiteral := range literal.GetCollection().Literals {
-			bindings[idx] = getBinding(subLiteral)
-		}
-		return &core.BindingData{
-			Value: &core.BindingData_Collection{
-				Collection: &core.BindingDataCollection{
-					Bindings: bindings,
-				},
-			},
-		}
-	} else if literal.GetMap() != nil {
-		bindings := make(map[string]*core.BindingData)
-		for key, subLiteral := range literal.GetMap().Literals {
-			bindings[key] = getBinding(subLiteral)
-		}
-		return &core.BindingData{
-			Value: &core.BindingData_Map{
-				Map: &core.BindingDataMap{
-					Bindings: bindings,
-				},
-			},
-		}
-	}
-	return nil
-}
-
-func generateBindingsFromOutputs(outputs core.VariableMap, nodeID string) []*core.Binding {
+func generateBindings(outputs core.VariableMap, nodeID string) []*core.Binding {
 	bindings := make([]*core.Binding, 0, len(outputs.Variables))
 	for key := range outputs.Variables {
 		binding := &core.Binding{
@@ -101,87 +68,6 @@ func generateBindingsFromOutputs(outputs core.VariableMap, nodeID string) []*cor
 		bindings = append(bindings, binding)
 	}
 	return bindings
-}
-
-func generateBindingsFromInputs(inputTemplate core.VariableMap, inputs core.LiteralMap) ([]*core.Binding, error) {
-	bindings := make([]*core.Binding, 0, len(inputTemplate.Variables))
-	for key, val := range inputTemplate.Variables {
-		binding := &core.Binding{
-			Var: key,
-		}
-		var bindingData core.BindingData
-		if val.Type.GetSimple() != core.SimpleType_NONE {
-			if inputs.Literals[key] != nil {
-				bindingData = core.BindingData{
-					Value: &core.BindingData_Scalar{
-						Scalar: inputs.Literals[key].GetScalar(),
-					},
-				}
-			}
-
-		} else if val.Type.GetSchema() != nil {
-			if inputs.Literals[key] != nil && inputs.Literals[key].GetScalar() != nil {
-				bindingData = core.BindingData{
-					Value: &core.BindingData_Scalar{
-						Scalar: &core.Scalar{
-							Value: &core.Scalar_Schema{
-								Schema: inputs.Literals[key].GetScalar().GetSchema(),
-							},
-						},
-					},
-				}
-			}
-		} else if val.Type.GetCollectionType() != nil {
-			if inputs.Literals[key] != nil && inputs.Literals[key].GetCollection() != nil &&
-				inputs.Literals[key].GetCollection().GetLiterals() != nil {
-				collectionBindings := make([]*core.BindingData, len(inputs.Literals[key].GetCollection().GetLiterals()))
-				for idx, literal := range inputs.Literals[key].GetCollection().GetLiterals() {
-					collectionBindings[idx] = getBinding(literal)
-
-				}
-				bindingData = core.BindingData{
-					Value: &core.BindingData_Collection{
-						Collection: &core.BindingDataCollection{
-							Bindings: collectionBindings,
-						},
-					},
-				}
-			}
-		} else if val.Type.GetMapValueType() != nil {
-			if inputs.Literals[key] != nil && inputs.Literals[key].GetMap() != nil &&
-				inputs.Literals[key].GetMap().Literals != nil {
-				bindingDataMap := make(map[string]*core.BindingData)
-				for k, v := range inputs.Literals[key].GetMap().Literals {
-					bindingDataMap[k] = getBinding(v)
-				}
-
-				bindingData = core.BindingData{
-					Value: &core.BindingData_Map{
-						Map: &core.BindingDataMap{
-							Bindings: bindingDataMap,
-						},
-					},
-				}
-			}
-		} else if val.Type.GetBlob() != nil {
-			if inputs.Literals[key] != nil && inputs.Literals[key].GetScalar() != nil {
-				bindingData = core.BindingData{
-					Value: &core.BindingData_Scalar{
-						Scalar: &core.Scalar{
-							Value: &core.Scalar_Blob{
-								Blob: inputs.Literals[key].GetScalar().GetBlob(),
-							},
-						},
-					},
-				}
-			}
-		} else {
-			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "Unrecognized value type [%+v]", val.GetType())
-		}
-		binding.Binding = &bindingData
-		bindings = append(bindings, binding)
-	}
-	return bindings, nil
 }
 
 func CreateOrGetWorkflowModel(
@@ -207,17 +93,6 @@ func CreateOrGetWorkflowModel(
 			return nil, err
 		}
 		// If we got this far, there is no existing workflow. Create a skeleton one now.
-		var requestInputs = core.LiteralMap{
-			Literals: make(map[string]*core.Literal),
-		}
-		if request.Inputs != nil {
-			requestInputs = *request.Inputs
-		}
-		generatedInputs, err := generateBindingsFromInputs(*task.Closure.CompiledTask.Template.Interface.Inputs, requestInputs)
-		if err != nil {
-			logger.Warningf(ctx, "Failed to generate requestInputs from task input bindings: %v", err)
-			return nil, err
-		}
 		workflowSpec := admin.WorkflowSpec{
 			Template: &core.WorkflowTemplate{
 				Id:        &workflowIdentifier,
@@ -230,7 +105,7 @@ func CreateOrGetWorkflowModel(
 							Retries: &defaultRetryStrategy,
 							Timeout: defaultTimeout,
 						},
-						Inputs: generatedInputs,
+						Inputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Inputs, noInputNodeID),
 						Target: &core.Node_TaskNode{
 							TaskNode: &core.TaskNode{
 								Reference: &core.TaskNode_ReferenceId{
@@ -241,7 +116,7 @@ func CreateOrGetWorkflowModel(
 					},
 				},
 
-				Outputs: generateBindingsFromOutputs(*task.Closure.CompiledTask.Template.Interface.Outputs, generateNodeNameFromTask(taskIdentifier.Name)),
+				Outputs: generateBindings(*task.Closure.CompiledTask.Template.Interface.Outputs, generateNodeNameFromTask(taskIdentifier.Name)),
 			},
 		}
 
