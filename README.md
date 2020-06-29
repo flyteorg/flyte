@@ -99,6 +99,7 @@ Resources that would help you get a better understanding of Flyte.
 - Lyft Rideshare
 - Lyft L5 autonomous
 - Juno
+- Spotify
 
 # Changelogs
 [Changelogs](CHANGELOG/README.md)
