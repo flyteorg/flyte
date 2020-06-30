@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](http://github.com/lyft/flyteconsole/compare/v0.5.3...v0.6.0) (2020-06-30)
+
+
+### Features
+
+* Adding automatic image building and release management ([#69](http://github.com/lyft/flyteconsole/issues/69)) ([90362e2](http://github.com/lyft/flyteconsole/commit/90362e2fe5ef9a12ca3826ce66793df09c79a906))
+
 # [0.6.0](http://github.com/lyft/flyteconsole/compare/v0.5.2...v0.6.0) (2020-05-13)
 
 
