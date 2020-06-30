@@ -11,7 +11,7 @@ import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { TaskExecutionDetails } from './TaskExecutionDetails';
 import { TaskExecutionError } from './TaskExecutionError';
 import { TaskExecutionLogs } from './TaskExecutionLogs';
-import { getUniqueTaskExecutionName } from './utils';
+import { formatRetryAttempt } from './utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
     detailsLink: {
@@ -43,7 +43,7 @@ export const TaskExecutionsListItem: React.FC<TaskExecutionsListItemProps> = ({
     const styles = useStyles();
     const { closure, isParent } = taskExecution;
     const { error } = closure;
-    const headerText = getUniqueTaskExecutionName(taskExecution);
+    const headerText = formatRetryAttempt(taskExecution.id.retryAttempt);
     const taskHasStarted = closure.phase >= TaskExecutionPhase.QUEUED;
     return (
         <div className={commonStyles.detailsPanelCard}>

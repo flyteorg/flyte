@@ -7,6 +7,8 @@ import {
 import { TaskExecution, TaskExecutionIdentifier } from 'models';
 import * as React from 'react';
 import { executionRefreshIntervalMs } from '../constants';
+import { ExecutionDataCacheContext } from '../contexts';
+import { useExecutionDataCache } from '../useExecutionDataCache';
 import { taskExecutionIsTerminal } from '../utils';
 import { TaskExecutionDetailsAppBarContent } from './TaskExecutionDetailsAppBarContent';
 import { TaskExecutionNodes } from './TaskExecutionNodes';
@@ -58,6 +60,7 @@ function routeParamsToTaskExecutionId(
 
 export const TaskExecutionDetailsContainer: React.FC<TaskExecutionDetailsProps> = props => {
     const taskExecutionId = routeParamsToTaskExecutionId(props);
+    const dataCache = useExecutionDataCache();
     const taskExecution = useTaskExecution(taskExecutionId);
 
     useDataRefresher(taskExecutionId, taskExecution, refreshConfig);
@@ -67,7 +70,9 @@ export const TaskExecutionDetailsContainer: React.FC<TaskExecutionDetailsProps> 
             <TaskExecutionDetailsAppBarContent
                 taskExecution={taskExecution.value}
             />
-            <TaskExecutionNodes taskExecution={taskExecution.value} />
+            <ExecutionDataCacheContext.Provider value={dataCache}>
+                <TaskExecutionNodes taskExecution={taskExecution.value} />
+            </ExecutionDataCacheContext.Provider>
         </WaitForData>
     );
 };

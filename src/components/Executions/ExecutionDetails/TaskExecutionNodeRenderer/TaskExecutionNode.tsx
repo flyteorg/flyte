@@ -6,7 +6,7 @@ import { TaskNodeRenderer } from 'components/WorkflowGraph/TaskNodeRenderer';
 import { NodeExecutionPhase } from 'models/Execution/enums';
 import { DAGNode } from 'models/Graph';
 
-import { NodeExecutionsContext } from '../contexts';
+import { NodeExecutionsContext } from '../../contexts';
 import { StatusIndicator } from './StatusIndicator';
 
 /** Renders DAGNodes with colors based on their node type, as well as dots to

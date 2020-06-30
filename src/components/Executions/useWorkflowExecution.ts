@@ -9,18 +9,20 @@ import {
 
 import { useAPIContext } from 'components/data/apiContext';
 import { maxBlobDownloadSizeBytes } from 'components/Literals/constants';
-import { FetchableData, FetchableExecution } from './types';
-import { useFetchableData } from './useFetchableData';
+import { FetchableData, FetchableExecution } from '../hooks/types';
+import { useFetchableData } from '../hooks/useFetchableData';
+import { ExecutionDataCache } from './types';
 
 /** A hook for fetching a WorkflowExecution */
 export function useWorkflowExecution(
-    id: WorkflowExecutionIdentifier
+    id: WorkflowExecutionIdentifier,
+    dataCache: ExecutionDataCache
 ): FetchableExecution {
     const fetchable = useFetchableData<Execution, WorkflowExecutionIdentifier>(
         {
             debugName: 'Execution',
             defaultValue: {} as Execution,
-            doFetch: id => getExecution(id)
+            doFetch: id => dataCache.getWorkflowExecution(id)
         },
         id
     );

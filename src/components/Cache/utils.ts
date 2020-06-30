@@ -6,5 +6,6 @@ import * as objectHash from 'object-hash';
 export function getCacheKey(id: any[] | object | string) {
     return typeof id === 'string' || typeof id === 'symbol'
         ? id
-        : objectHash(id);
+        : // We only want to compare own properties, not .__proto__, .constructor, etc.
+          objectHash(id, { respectType: false });
 }

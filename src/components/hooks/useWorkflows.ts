@@ -12,7 +12,9 @@ import { usePagination } from './usePagination';
 export function useWorkflows(scope: IdentifierScope, config: RequestConfig) {
     const { listWorkflows } = useAPIContext();
     return usePagination<Workflow, IdentifierScope>(
-        { ...config, cacheItems: true, fetchArg: scope },
+        // Workflows are not full records when listed, so don't
+        // cache them
+        { ...config, cacheItems: false, fetchArg: scope },
         listWorkflows
     );
 }

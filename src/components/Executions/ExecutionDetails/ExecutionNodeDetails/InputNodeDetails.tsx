@@ -6,7 +6,7 @@ import { NodeDetailsProps } from 'components/WorkflowGraph';
 import { useStyles as useBaseStyles } from 'components/WorkflowGraph/NodeDetails/styles';
 
 import { LiteralMapViewer } from 'components/Literals';
-import { ExecutionContext } from '../contexts';
+import { ExecutionContext } from '../../contexts';
 
 /** Details panel renderer for the start/input node in a graph. Displays the
  * top level `WorkflowExecution` inputs.

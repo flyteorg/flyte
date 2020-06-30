@@ -1,11 +1,5 @@
-import {
-    ExecutionData,
-    getNodeExecution,
-    getNodeExecutionData,
-    NodeExecution,
-    NodeExecutionIdentifier
-} from 'models';
-
+import { useAPIContext } from 'components/data/apiContext';
+import { ExecutionData, NodeExecution, NodeExecutionIdentifier } from 'models';
 import { FetchableData } from './types';
 import { useFetchableData } from './useFetchableData';
 
@@ -13,6 +7,7 @@ import { useFetchableData } from './useFetchableData';
 export function useNodeExecution(
     id: NodeExecutionIdentifier
 ): FetchableData<NodeExecution> {
+    const { getNodeExecution } = useAPIContext();
     return useFetchableData<NodeExecution, NodeExecutionIdentifier>(
         {
             debugName: 'NodeExecution',
@@ -27,6 +22,7 @@ export function useNodeExecution(
 export function useNodeExecutionData(
     id: NodeExecutionIdentifier
 ): FetchableData<ExecutionData> {
+    const { getNodeExecutionData } = useAPIContext();
     return useFetchableData<ExecutionData, NodeExecutionIdentifier>(
         {
             debugName: 'NodeExecutionData',

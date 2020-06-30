@@ -1,20 +1,13 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
-import axios from 'axios';
-// tslint:disable-next-line:import-name
-import AxiosMockAdapter from 'axios-mock-adapter';
-import { mapNodeExecutionDetails } from 'components/Executions/utils';
-import { NavBar } from 'components/Navigation';
-import { Admin } from 'flyteidl';
-import { encodeProtoPayload } from 'models';
-import {
-    createMockWorkflow,
-    createMockWorkflowClosure
-} from 'models/__mocks__/workflowData';
-import { createMockNodeExecutions } from 'models/Execution/__mocks__/mockNodeExecutionsData';
-import { createMockTaskExecutionsListResponse } from 'models/Execution/__mocks__/mockTaskExecutionsData';
-import { mockTasks } from 'models/Task/__mocks__/mockTaskData';
+import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
+import { APIContext } from 'components/data/apiContext';
+import { createMockExecutionEntities } from 'components/Executions/__mocks__/createMockExecutionEntities';
+import { ExecutionDataCacheContext } from 'components/Executions/contexts';
+import { createExecutionDataCache } from 'components/Executions/useExecutionDataCache';
+import { keyBy } from 'lodash';
+import { createMockTaskExecutionForNodeExecution } from 'models/Execution/__mocks__/mockTaskExecutionsData';
 import * as React from 'react';
 import {
     NodeExecutionsTable,
@@ -32,25 +25,59 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const {
-    executions: mockExecutions,
-    nodes: mockNodes
-} = createMockNodeExecutions(10);
+    nodes,
+    nodeExecutions,
+    workflow,
+    workflowExecution
+} = createMockExecutionEntities({
+    workflowName: 'SampleWorkflow',
+    nodeExecutionCount: 10
+});
 
-const mockWorkflow = createMockWorkflow('SampleWorkflow');
-const mockWorkflowClosure = createMockWorkflowClosure();
-const compiledWorkflow = mockWorkflowClosure.compiledWorkflow!;
-const {
-    primary: { template },
-    tasks
-} = compiledWorkflow;
-template.nodes = template.nodes.concat(mockNodes);
-compiledWorkflow.tasks = tasks.concat(mockTasks);
-mockWorkflow.closure = mockWorkflowClosure;
+const nodesById = keyBy(nodes, n => n.id);
+const nodesWithChildren = {
+    [nodes[0].id]: true,
+    [nodes[1].id]: true
+};
+const nodeRetryAttempts = {
+    [nodes[1].id]: 2
+};
+
+const apiContext = mockAPIContextValue({
+    getExecution: () => Promise.resolve(workflowExecution),
+    getNodeExecutionData: () => Promise.resolve({ inputs: {}, outputs: {} }),
+    listTaskExecutions: nodeExecutionId => {
+        const length = nodeRetryAttempts[nodeExecutionId.nodeId] || 1;
+        const entities = Array.from({ length }, (_, retryAttempt) =>
+            createMockTaskExecutionForNodeExecution(
+                nodeExecutionId,
+                nodesById[nodeExecutionId.nodeId],
+                retryAttempt,
+                { isParent: !!nodesWithChildren[nodeExecutionId.nodeId] }
+            )
+        );
+        return Promise.resolve({ entities });
+    },
+    listTaskExecutionChildren: ({ retryAttempt }) =>
+        Promise.resolve({
+            entities: nodeExecutions.slice(0, 2).map(ne => ({
+                ...ne,
+                id: {
+                    ...ne.id,
+                    nodeId: `${ne.id.nodeId}_${retryAttempt}`
+                }
+            }))
+        }),
+    getWorkflow: () => Promise.resolve(workflow)
+});
+const dataCache = createExecutionDataCache(apiContext);
+dataCache.insertWorkflow(workflow);
+dataCache.insertWorkflowExecutionReference(workflowExecution.id, workflow.id);
 
 const fetchAction = action('fetch');
 
 const props: NodeExecutionsTableProps = {
-    value: mapNodeExecutionDetails(mockExecutions, mockWorkflow),
+    value: nodeExecutions,
     lastError: null,
     loading: false,
     moreItemsAvailable: false,
@@ -59,26 +86,15 @@ const props: NodeExecutionsTableProps = {
 
 const stories = storiesOf('Tables/NodeExecutionsTable', module);
 stories.addDecorator(story => {
-    React.useEffect(() => {
-        const executionsResponse = createMockTaskExecutionsListResponse(3);
-        const mock = new AxiosMockAdapter(axios);
-        mock.onGet(/.*\/task_executions\/.*/).reply(() => [
-            200,
-            encodeProtoPayload(executionsResponse, Admin.TaskExecutionList),
-            { 'Content-Type': 'application/octet-stream' }
-        ]);
-        return () => mock.restore();
-    });
     return (
-        <>
-            <div className={useStyles().container}>{story()}</div>
-        </>
+        <APIContext.Provider value={apiContext}>
+            <ExecutionDataCacheContext.Provider value={dataCache}>
+                <div className={useStyles().container}>{story()}</div>
+            </ExecutionDataCacheContext.Provider>
+        </APIContext.Provider>
     );
 });
 stories.add('Basic', () => <NodeExecutionsTable {...props} />);
-stories.add('With more items available', () => (
-    <NodeExecutionsTable {...props} moreItemsAvailable={true} />
-));
 stories.add('With no items', () => (
     <NodeExecutionsTable {...props} value={[]} />
 ));

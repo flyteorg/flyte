@@ -53,6 +53,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         marginLeft: theme.spacing(2),
         marginRight: theme.spacing(2),
         textAlign: 'left'
+    },
+    row: {
+        paddingLeft: theme.spacing(2)
     }
 }));
 
@@ -199,7 +202,14 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
         const { error } = execution.closure;
 
         return (
-            <div className={classnames(tableStyles.row)} style={style}>
+            <div
+                className={classnames(
+                    tableStyles.row,
+                    styles.row,
+                    tableStyles.borderBottom
+                )}
+                style={style}
+            >
                 <div className={tableStyles.rowColumns}>
                     {columns.map(
                         ({ className, key: columnKey, cellRenderer }) => (

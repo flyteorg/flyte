@@ -2,9 +2,9 @@ import * as classnames from 'classnames';
 import { DetailsPanel, ListProps } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import * as scrollbarSize from 'dom-helpers/util/scrollbarSize';
+import { NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
 import { NodeExecutionDetails } from '../ExecutionDetails/NodeExecutionDetails';
-import { DetailedNodeExecution } from '../types';
 import { NodeExecutionsTableContext } from './contexts';
 import { ExecutionsTableHeader } from './ExecutionsTableHeader';
 import { generateColumns } from './nodeExecutionColumns';
@@ -13,8 +13,7 @@ import { NoExecutionsContent } from './NoExecutionsContent';
 import { useColumnStyles, useExecutionTableStyles } from './styles';
 import { useNodeExecutionsTableState } from './useNodeExecutionsTableState';
 
-export interface NodeExecutionsTableProps
-    extends ListProps<DetailedNodeExecution> {}
+export interface NodeExecutionsTableProps extends ListProps<NodeExecution> {}
 
 const scrollbarPadding = scrollbarSize();
 
@@ -36,13 +35,14 @@ export const NodeExecutionsTable: React.FC<NodeExecutionsTableProps> = props => 
 
     const onCloseDetailsPanel = () => state.setSelectedExecution(null);
 
-    const rowProps = { columns, state, onHeightChange: () => {} };
+    const rowProps = { state, onHeightChange: () => {} };
     const content =
         state.executions.length > 0 ? (
-            state.executions.map(execution => {
+            state.executions.map((execution, index) => {
                 return (
                     <NodeExecutionRow
                         {...rowProps}
+                        index={index}
                         key={execution.cacheKey}
                         execution={execution}
                     />
@@ -63,7 +63,7 @@ export const NodeExecutionsTable: React.FC<NodeExecutionsTableProps> = props => 
                 columns={columns}
                 scrollbarPadding={scrollbarPadding}
             />
-            <NodeExecutionsTableContext.Provider value={state}>
+            <NodeExecutionsTableContext.Provider value={{ columns, state }}>
                 <div className={tableStyles.scrollContainer}>{content}</div>
             </NodeExecutionsTableContext.Provider>
             <DetailsPanel

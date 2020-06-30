@@ -35,6 +35,9 @@ const useStyles = makeStyles((theme: Theme) => {
         content: {
             overflowY: 'auto'
         },
+        displayId: {
+            marginBottom: theme.spacing(1)
+        },
         header: {
             borderBottom: `${theme.spacing(1)}px solid ${theme.palette.divider}`
         },
@@ -60,8 +63,7 @@ const useStyles = makeStyles((theme: Theme) => {
         title: {
             alignItems: 'flex-start',
             display: 'flex',
-            justifyContent: 'space-between',
-            marginBottom: theme.spacing(1)
+            justifyContent: 'space-between'
         }
     };
 });
@@ -188,6 +190,16 @@ export const NodeExecutionDetails: React.FC<NodeExecutionDetailsProps> = ({
                         >
                             <Close />
                         </IconButton>
+                    </Typography>
+                    <Typography
+                        className={classnames(
+                            commonStyles.textWrapped,
+                            styles.displayId
+                        )}
+                        variant="subtitle1"
+                        color="textSecondary"
+                    >
+                        {execution.displayId}
                     </Typography>
                     {statusContent}
                     <ExecutionTypeDetails execution={execution} />

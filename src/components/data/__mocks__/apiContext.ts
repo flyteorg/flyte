@@ -12,7 +12,9 @@ export function mockAPIContextValue(
     >(
         (out, key) =>
             Object.assign(out, {
-                [key]: () => Promise.reject(` ${key} not implemented`)
+                [key]: () => {
+                    throw new Error(` ${key} not implemented`);
+                }
             }),
         {} as APIContextValue
     );

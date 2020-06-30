@@ -4,6 +4,7 @@ import { WaitForData } from 'components/common';
 import { useTabState } from 'components/hooks/useTabState';
 import { Execution } from 'models';
 import * as React from 'react';
+import { NodeExecutionsRequestConfigContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
 import { NodeExecutionsTable } from '../Tables/NodeExecutionsTable';
@@ -43,10 +44,11 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
     const filterState = useNodeExecutionFiltersState();
     const tabState = useTabState(tabIds, tabIds.nodes);
 
-    const { workflow, nodeExecutions } = useWorkflowExecutionState(
-        execution,
-        filterState.appliedFilters
-    );
+    const {
+        workflow,
+        nodeExecutions,
+        nodeExecutionsRequestConfig
+    } = useWorkflowExecutionState(execution, filterState.appliedFilters);
 
     return (
         <WaitForData {...workflow}>
@@ -61,10 +63,14 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
                             <ExecutionFilters {...filterState} />
                         </div>
                         <WaitForData {...nodeExecutions}>
-                            <NodeExecutionsTable
-                                {...nodeExecutions}
-                                moreItemsAvailable={false}
-                            />
+                            <NodeExecutionsRequestConfigContext.Provider
+                                value={nodeExecutionsRequestConfig}
+                            >
+                                <NodeExecutionsTable
+                                    {...nodeExecutions}
+                                    moreItemsAvailable={false}
+                                />
+                            </NodeExecutionsRequestConfigContext.Provider>
                         </WaitForData>
                     </>
                 )}

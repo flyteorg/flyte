@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { ExecutionContext } from '../ExecutionDetails/contexts';
+import { ExecutionContext } from '../contexts';
 
 /** Holds state for `TerminateExecutionForm` */
 export function useTerminateExecutionState(onClose: () => void) {

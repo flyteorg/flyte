@@ -14,7 +14,7 @@ import {
     TaskNodeDetails
 } from 'components/WorkflowGraph';
 import { useStyles as useBaseStyles } from 'components/WorkflowGraph/NodeDetails/styles';
-import { NodeExecutionsContext } from '../contexts';
+import { NodeExecutionsContext } from '../../contexts';
 import { NodeExecutionData } from '../NodeExecutionData';
 import { NodeExecutionInputs } from '../NodeExecutionInputs';
 import { NodeExecutionOutputs } from '../NodeExecutionOutputs';

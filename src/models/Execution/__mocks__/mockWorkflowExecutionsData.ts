@@ -4,14 +4,11 @@ import { cloneDeep, random } from 'lodash';
 import * as Long from 'long';
 import { WorkflowExecutionPhase } from '../enums';
 import { Execution } from '../types';
+import { mockWorkflowExecutionId } from './constants';
 import { sampleError } from './sampleExecutionError';
 
 export const mockWorkflowExecutionResponse: Admin.IExecution = {
-    id: {
-        project: 'flytekit',
-        domain: 'development',
-        name: 'ABC456'
-    },
+    id: mockWorkflowExecutionId,
     spec: {
         launchPlan: {
             resourceType: Core.ResourceType.LAUNCH_PLAN,

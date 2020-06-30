@@ -1,5 +1,4 @@
 import { millisecondsToDuration } from 'common/utils';
-import { Admin } from 'flyteidl';
 import {
     subSecondString,
     unknownValueString,
@@ -10,10 +9,10 @@ import {
     dateFromNow,
     dateWithFromNow,
     ensureUrlWithProtocol,
-    fixedRateToString,
     formatDate,
     formatDateLocalTimezone,
     formatDateUTC,
+    leftPaddedNumber,
     millisecondsToHMS,
     protobufDurationToHMS
 } from '../formatters';
@@ -174,6 +173,27 @@ describe('ensureUrlWithProtocol', () => {
     cases.forEach(([input, expected]) =>
         it(`should produce ${expected} with input ${input}`, () => {
             expect(ensureUrlWithProtocol(input)).toEqual(expected);
+        })
+    );
+});
+
+describe('leftPaddedNumber', () => {
+    const cases: [number, number, string][] = [
+        [1, 0, '1'],
+        [10, 0, '10'],
+        [0, 1, '0'],
+        [0, 2, '00'],
+        [1, 1, '1'],
+        [1, 2, '01'],
+        [1, 3, '001'],
+        [10, 1, '10'],
+        [10, 2, '10'],
+        [10, 3, '010']
+    ];
+
+    cases.forEach(([value, width, expected]) =>
+        it(`should produce ${expected} with input (${value}, ${width})`, () => {
+            expect(leftPaddedNumber(value, width)).toEqual(expected);
         })
     );
 });

@@ -1,12 +1,12 @@
 import { SectionHeader, WaitForData } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
-import { useWorkflowExecutionData } from 'components/hooks';
 import { LiteralMapViewer, RemoteLiteralMapViewer } from 'components/Literals';
 import { NodeDetailsProps } from 'components/WorkflowGraph';
 import { useStyles as useBaseStyles } from 'components/WorkflowGraph/NodeDetails/styles';
 import { emptyLiteralMapBlob, Execution } from 'models';
 import * as React from 'react';
-import { ExecutionContext } from '../contexts';
+import { ExecutionContext } from '../../contexts';
+import { useWorkflowExecutionData } from '../../useWorkflowExecution';
 
 const RemoteExecutionOutputs: React.FC<{ execution: Execution }> = ({
     execution

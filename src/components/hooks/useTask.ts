@@ -1,5 +1,4 @@
 import { useAPIContext } from 'components/data/apiContext';
-import { NotFoundError } from 'errors';
 import {
     Identifier,
     IdentifierScope,
@@ -11,22 +10,20 @@ import { FetchableData } from './types';
 import { useFetchableData } from './useFetchableData';
 import { usePagination } from './usePagination';
 
-/** A hook for fetching a Task template */
+/** A hook for fetching a Task template. TaskTemplates may have already been
+ * fetched as part of retrieving a Workflow. If not, we can retrieve the Task
+ * directly and read the template from there.
+ */
 export function useTaskTemplate(id: Identifier): FetchableData<TaskTemplate> {
+    const { getTask } = useAPIContext();
     return useFetchableData<TaskTemplate, Identifier>(
         {
+            // Tasks are immutable
             useCache: true,
             debugName: 'TaskTemplate',
             defaultValue: {} as TaskTemplate,
-            // Fetching the parent workflow should insert these into the cache
-            // for us. If we get to this point, something went wrong.
-            doFetch: () =>
-                Promise.reject(
-                    new NotFoundError(
-                        'Task template',
-                        'No template has been loaded for this task'
-                    )
-                )
+            doFetch: async taskId =>
+                (await getTask(taskId)).closure.compiledTask.template
         },
         id
     );

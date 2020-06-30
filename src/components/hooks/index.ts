@@ -10,7 +10,6 @@ export * from './useRemoteLiteralMap';
 export * from './useTask';
 export * from './useTaskExecution';
 export * from './useWorkflow';
-export * from './useWorkflowExecution';
 export * from './useWorkflowExecutions';
 export * from './useWorkflows';
 export * from './useWorkflowSchedules';

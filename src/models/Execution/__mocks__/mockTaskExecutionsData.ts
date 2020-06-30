@@ -1,18 +1,38 @@
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
-import { Admin, Core } from 'flyteidl';
+import { Admin } from 'flyteidl';
 import { cloneDeep } from 'lodash';
-import { NodeExecutionPhase, TaskExecutionPhase } from '../enums';
-import { TaskExecution } from '../types';
+import { TaskLog } from 'models/Common/types';
+import { CompiledNode } from 'models/Node/types';
+import { TaskExecutionPhase } from '../enums';
+import {
+    NodeExecutionIdentifier,
+    TaskExecution,
+    TaskExecutionClosure
+} from '../types';
 import { sampleError } from './sampleExecutionError';
 
-const sampleLogs: Core.ITaskLog[] = [
+const sampleLogs: TaskLog[] = [
     { name: 'Kubernetes Logs', uri: 'http://localhost/k8stasklog' },
     { name: 'User Logs', uri: 'http://localhost/containerlog' },
     { name: 'AWS Batch Logs', uri: 'http://localhost/awsbatchlog' },
     { name: 'Other Custom Logs', uri: 'http://localhost/customlog' }
 ];
 
+const inputUri = 's3://path/to/my/inputs.pb';
+
+function createClosure(): TaskExecutionClosure {
+    return {
+        phase: TaskExecutionPhase.SUCCEEDED,
+        startedAt: dateToTimestamp(new Date(Date.now() - 1000 * 60 * 10)),
+        createdAt: dateToTimestamp(new Date(Date.now() - 1000 * 60 * 10)),
+        duration: millisecondsToDuration(1000 * 60 * 60 * 1.251),
+        outputUri: 's3://path/to/my/outputs.pb',
+        logs: [...sampleLogs]
+    };
+}
+
 export const mockTaskExecutionResponse: Admin.ITaskExecution = {
+    inputUri,
     id: {
         nodeExecutionId: {
             executionId: {
@@ -30,18 +50,31 @@ export const mockTaskExecutionResponse: Admin.ITaskExecution = {
             version: 'abcdef'
         }
     },
-    inputUri: 's3://path/to/my/inputs.pb',
-    closure: {
-        phase: TaskExecutionPhase.SUCCEEDED,
-        startedAt: dateToTimestamp(new Date(Date.now() - 1000 * 60 * 10)),
-        createdAt: dateToTimestamp(new Date(Date.now() - 1000 * 60 * 10)),
-        duration: millisecondsToDuration(1000 * 60 * 60 * 1.251),
-        outputUri: 's3://path/to/my/outputs.pb',
-        logs: [...sampleLogs]
-    }
+    closure: createClosure()
 };
 
 export const mockExecution = mockTaskExecutionResponse as TaskExecution;
+
+export function createMockTaskExecutionForNodeExecution(
+    nodeExecutionId: NodeExecutionIdentifier,
+    node: CompiledNode,
+    retryAttempt: number,
+    overrides?: Partial<TaskExecution>
+): TaskExecution {
+    return {
+        ...{
+            inputUri,
+            id: {
+                nodeExecutionId,
+                retryAttempt,
+                taskId: node.taskNode!.referenceId
+            },
+            isParent: false,
+            closure: createClosure()
+        },
+        ...overrides
+    };
+}
 
 export const createMockTaskExecutionsListResponse = (length: number) => {
     return {

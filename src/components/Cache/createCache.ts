@@ -14,9 +14,9 @@ function hasId(value: Object): value is HasIdObject {
  * strictly equal (===). The cache provides methods for getting/setting values
  * by key and for merging values or arrays of values with any existing items.
  */
-export interface ValueCache {
+export interface ValueCache<ValueType = object> {
     /** Retrieve an item by key */
-    get(key: EntityKey): object | undefined;
+    get(key: EntityKey): ValueType | undefined;
     /** Check existence of an item by key */
     has(key: EntityKey): boolean;
     /** Merge an array of values. If the items have an `id` property, its value
@@ -30,9 +30,9 @@ export interface ValueCache {
      * performed. For arrays, the value is _replaced_.
      * @returns The merged value
      */
-    mergeValue(key: EntityKey, value: object): object;
+    mergeValue(key: EntityKey, value: ValueType): ValueType;
     /** Set an item value by key. Replaces any existing value. */
-    set(key: EntityKey, value: object): object;
+    set(key: EntityKey, value: ValueType): ValueType;
 }
 
 type Cacheable = object | any[];

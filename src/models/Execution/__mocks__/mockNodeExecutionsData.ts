@@ -5,15 +5,12 @@ import { CompiledNode } from 'models/Node';
 import { mockNodes } from 'models/Node/__mocks__/mockNodeData';
 import { NodeExecutionPhase } from '../enums';
 import { NodeExecution } from '../types';
+import { mockWorkflowExecutionId } from './constants';
 import { sampleError } from './sampleExecutionError';
 
 export const mockNodeExecutionResponse: Admin.INodeExecution = {
     id: {
-        executionId: {
-            project: 'flytekit',
-            domain: 'development',
-            name: '4a580545ce6344fc9950'
-        },
+        executionId: mockWorkflowExecutionId,
         nodeId: 'DefaultNodeId'
     },
     inputUri: 's3://path/to/my/inputs.pb',

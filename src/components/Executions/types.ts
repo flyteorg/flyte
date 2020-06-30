@@ -1,4 +1,20 @@
-import { NodeExecution, TaskExecution } from 'models/Execution/types';
+import {
+    CompiledNode,
+    GloballyUniqueNode,
+    Identifier,
+    NodeId,
+    RequestConfig,
+    Workflow,
+    WorkflowId
+} from 'models';
+import {
+    Execution,
+    NodeExecution,
+    NodeExecutionIdentifier,
+    TaskExecution,
+    TaskExecutionIdentifier,
+    WorkflowExecutionIdentifier
+} from 'models/Execution/types';
 import { TaskTemplate } from 'models/Task/types';
 
 export interface ExecutionPhaseConstants {
@@ -22,6 +38,15 @@ export enum NodeExecutionDisplayType {
     WaitableTask = 'Waitable Task'
 }
 
+export interface UniqueNodeId {
+    workflowId: WorkflowId;
+    nodeId: string;
+}
+export interface NodeInformation {
+    id: UniqueNodeId;
+    node: CompiledNode;
+}
+
 /** An interface combining a NodeExecution with data pulled from the
  * corresponding Workflow Node structure.
  */
@@ -34,4 +59,47 @@ export interface DetailedNodeExecution extends NodeExecution {
 
 export interface DetailedTaskExecution extends TaskExecution {
     cacheKey: string;
+}
+
+export interface NodeExecutionGroup {
+    name: string;
+    nodeExecutions: NodeExecution[];
+}
+
+export interface DetailedNodeExecutionGroup extends NodeExecutionGroup {
+    nodeExecutions: DetailedNodeExecution[];
+}
+
+export interface ExecutionDataCache {
+    getNode(id: NodeId): GloballyUniqueNode | undefined;
+    getNodeForNodeExecution(
+        nodeExecutionId: NodeExecutionIdentifier
+    ): GloballyUniqueNode | null | undefined;
+    getNodeExecutions(
+        workflowExecutionId: WorkflowExecutionIdentifier,
+        config: RequestConfig
+    ): Promise<NodeExecution[]>;
+    getTaskExecutions(
+        nodeExecutionId: NodeExecutionIdentifier
+    ): Promise<TaskExecution[]>;
+    getTaskExecutionChildren: (
+        taskExecutionId: TaskExecutionIdentifier,
+        config: RequestConfig
+    ) => Promise<NodeExecution[]>;
+    getTaskTemplate: (taskId: Identifier) => TaskTemplate | undefined;
+    getWorkflow: (workflowId: Identifier) => Promise<Workflow>;
+    getWorkflowExecution: (
+        executionId: WorkflowExecutionIdentifier
+    ) => Promise<Execution>;
+    getWorkflowIdForWorkflowExecution: (
+        executionId: WorkflowExecutionIdentifier
+    ) => Promise<WorkflowId>;
+    insertExecution(execution: Execution): void;
+    insertNodes(nodes: GloballyUniqueNode[]): void;
+    insertTaskTemplates(templates: TaskTemplate[]): void;
+    insertWorkflow(workflow: Workflow): void;
+    insertWorkflowExecutionReference(
+        executionId: WorkflowExecutionIdentifier,
+        workflowId: WorkflowId
+    ): void;
 }

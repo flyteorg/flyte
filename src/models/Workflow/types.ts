@@ -5,6 +5,7 @@ import { CompiledTask } from 'models/Task';
 
 /** Holds information about all nodes existing in a Workflow graph */
 export interface WorkflowTemplate extends Core.IWorkflowTemplate {
+    id: Identifier;
     interface?: TypedInterface;
     nodes: CompiledNode[];
 }

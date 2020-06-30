@@ -1,5 +1,6 @@
 import { log } from 'common/log';
-import { FetchableData, useWorkflowExecutionInputs } from 'components/hooks';
+import { useWorkflowExecutionInputs } from 'components/Executions/useWorkflowExecution';
+import { FetchableData } from 'components/hooks';
 import { Execution, Variable } from 'models';
 import { useEffect, useState } from 'react';
 import { InitialLaunchParameters, LiteralValueMap } from './types';

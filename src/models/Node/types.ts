@@ -45,3 +45,13 @@ export interface ConnectionSet extends Core.IConnectionSet {
     downstream: Record<string, CompiledNodeConnection>;
     upstream: Record<string, CompiledNodeConnection>;
 }
+
+export interface NodeId {
+    workflowId: Identifier;
+    nodeId: string;
+}
+
+export interface GloballyUniqueNode {
+    id: NodeId;
+    node: CompiledNode;
+}

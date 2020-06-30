@@ -1,5 +1,7 @@
+import { Spacing } from '@material-ui/core/styles/createSpacing';
 import { measureText } from 'components/common/utils';
 import { TaskLog } from 'models';
+import { nameColumnLeftMarginGridWidth } from './styles';
 
 interface MeasuredTaskLog extends TaskLog {
     width: number;
@@ -34,4 +36,11 @@ export function splitLogLinksAtWidth(
         }
     );
     return [taken, left];
+}
+
+export function calculateNodeExecutionRowLeftSpacing(
+    level: number,
+    spacing: Spacing
+) {
+    return spacing(nameColumnLeftMarginGridWidth + 3 * level);
 }

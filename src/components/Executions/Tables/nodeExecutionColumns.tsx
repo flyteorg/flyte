@@ -49,7 +49,14 @@ export function generateColumns(
 ): NodeExecutionColumnDefinition[] {
     return [
         {
-            cellRenderer: props => <NodeExecutionName {...props} />,
+            cellRenderer: props => (
+                <>
+                    <NodeExecutionName {...props} />
+                    <Typography variant="subtitle1" color="textSecondary">
+                        {props.execution.displayId}
+                    </Typography>
+                </>
+            ),
             className: styles.columnName,
             key: 'name',
             label: 'node'

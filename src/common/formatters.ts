@@ -144,3 +144,12 @@ export function ensureUrlWithProtocol(url: string): string {
     }
     return url;
 }
+
+/** Formats a number into a string with leading zeros to ensure a consistent
+ * width.
+ * Example: 1 will be '01'
+ *          10 will be '10'
+ */
+export function leftPaddedNumber(value: number, length: number): string {
+    return value.toString().padStart(length, '0');
+}

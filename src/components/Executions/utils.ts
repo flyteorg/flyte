@@ -1,3 +1,13 @@
+import { log } from 'common/log';
+import { durationToMilliseconds, timestampToDate } from 'common/utils';
+import { getCacheKey } from 'components/Cache';
+import {
+    endNodeId,
+    Identifier,
+    startNodeId,
+    TaskTemplate,
+    TaskType
+} from 'models';
 import {
     BaseExecutionClosure,
     Execution,
@@ -7,27 +17,11 @@ import {
     terminalNodeExecutionStates,
     terminalTaskExecutionStates
 } from 'models/Execution';
-
 import {
     NodeExecutionPhase,
     TaskExecutionPhase,
     WorkflowExecutionPhase
 } from 'models/Execution/enums';
-
-import { log } from 'common/log';
-import { durationToMilliseconds, timestampToDate } from 'common/utils';
-import { getCacheKey } from 'components/Cache';
-import { extractTaskTemplates } from 'components/hooks/utils';
-import { keyBy } from 'lodash';
-import {
-    CompiledNode,
-    endNodeId,
-    Identifier,
-    startNodeId,
-    TaskTemplate,
-    TaskType,
-    Workflow
-} from 'models';
 import {
     nodeExecutionPhaseConstants,
     taskExecutionPhaseConstants,
@@ -36,6 +30,7 @@ import {
 } from './constants';
 import {
     DetailedNodeExecution,
+    ExecutionDataCache,
     ExecutionPhaseConstants,
     NodeExecutionDisplayType
 } from './types';
@@ -114,96 +109,81 @@ export const taskExecutionIsTerminal = (taskExecution: TaskExecution) =>
     taskExecution.closure &&
     terminalTaskExecutionStates.includes(taskExecution.closure.phase);
 
+/** Populates a NodeExecution with extended information read from an `ExecutionDataCache` */
+export function populateNodeExecutionDetails(
+    nodeExecution: NodeExecution,
+    dataCache: ExecutionDataCache
+) {
+    const { nodeId } = nodeExecution.id;
+    const cacheKey = getCacheKey(nodeExecution.id);
+    const nodeInfo = dataCache.getNodeForNodeExecution(nodeExecution.id);
+
+    let displayId = nodeId;
+    let displayType = NodeExecutionDisplayType.Unknown;
+    let taskTemplate: TaskTemplate | undefined = undefined;
+
+    if (nodeInfo == null) {
+        return { ...nodeExecution, cacheKey, displayId, displayType };
+    }
+    const { node } = nodeInfo;
+
+    if (node.branchNode) {
+        displayId = nodeId;
+        displayType = NodeExecutionDisplayType.BranchNode;
+    } else if (node.taskNode) {
+        displayType = NodeExecutionDisplayType.UnknownTask;
+        taskTemplate = dataCache.getTaskTemplate(node.taskNode.referenceId);
+
+        if (!taskTemplate) {
+            displayType = NodeExecutionDisplayType.UnknownTask;
+        } else {
+            displayId = taskTemplate.id.name;
+            displayType =
+                taskTypeToNodeExecutionDisplayType[
+                    taskTemplate.type as TaskType
+                ];
+            if (!displayType) {
+                displayType = NodeExecutionDisplayType.UnknownTask;
+            }
+        }
+    } else if (node.workflowNode) {
+        displayType = NodeExecutionDisplayType.Workflow;
+        const { launchplanRef, subWorkflowRef } = node.workflowNode;
+        const identifier = (launchplanRef
+            ? launchplanRef
+            : subWorkflowRef) as Identifier;
+        if (!identifier) {
+            log.warn(`Unexpected workflow node with no ref: ${nodeId}`);
+        } else {
+            displayId = identifier.name;
+        }
+    }
+
+    return {
+        ...nodeExecution,
+        cacheKey,
+        displayId,
+        displayType,
+        taskTemplate
+    };
+}
+
 /** Assigns display information to NodeExecutions. Each NodeExecution has an
- * associated `nodeId`. If a `Workflow` is provided, node/task information will
- * be pulled from the workflow closure to determine the node type.
+ * associated `nodeId`. Extended details are populated using the provided `ExecutionDataCache`
  */
 export function mapNodeExecutionDetails(
     executions: NodeExecution[],
-    workflow?: Workflow
+    dataCache: ExecutionDataCache
 ) {
-    let nodesById: Dictionary<CompiledNode> = {};
-    let taskTemplates: Dictionary<TaskTemplate> = {};
-
-    if (workflow) {
-        if (!workflow.closure) {
-            throw new Error('Workflow has no closure');
-        }
-        if (!workflow.closure.compiledWorkflow) {
-            throw new Error('Workflow closure missing a compiled workflow');
-        }
-
-        taskTemplates = keyBy(extractTaskTemplates(workflow), t =>
-            getCacheKey(t.id)
-        );
-        nodesById = keyBy(
-            workflow.closure.compiledWorkflow.primary.template.nodes,
-            'id'
-        );
-    }
-
     return executions
         .filter(execution => {
             // Exclude the start/end nodes from the renderered list
             const { nodeId } = execution.id;
             return !(nodeId === startNodeId || nodeId === endNodeId);
         })
-        .map<DetailedNodeExecution>(execution => {
-            const { nodeId } = execution.id;
-            const node = nodesById[nodeId];
-            const cacheKey = getCacheKey(execution.id);
-            let displayId = nodeId;
-            let displayType = NodeExecutionDisplayType.Unknown;
-            let taskTemplate: TaskTemplate | undefined = undefined;
-
-            if (!node) {
-                return { ...execution, cacheKey, displayId, displayType };
-            }
-
-            if (node.branchNode) {
-                displayId = nodeId;
-                displayType = NodeExecutionDisplayType.BranchNode;
-            } else if (node.taskNode) {
-                displayType = NodeExecutionDisplayType.UnknownTask;
-                taskTemplate =
-                    taskTemplates[getCacheKey(node.taskNode.referenceId)];
-
-                if (!taskTemplate) {
-                    log.warn(
-                        `Unexpected missing workflow task for node ${nodeId}`
-                    );
-                    displayType = NodeExecutionDisplayType.UnknownTask;
-                } else {
-                    displayId = taskTemplate.id.name;
-                    displayType =
-                        taskTypeToNodeExecutionDisplayType[
-                            taskTemplate.type as TaskType
-                        ];
-                    if (!displayType) {
-                        displayType = NodeExecutionDisplayType.UnknownTask;
-                    }
-                }
-            } else if (node.workflowNode) {
-                displayType = NodeExecutionDisplayType.Workflow;
-                const { launchplanRef, subWorkflowRef } = node.workflowNode;
-                const identifier = (launchplanRef
-                    ? launchplanRef
-                    : subWorkflowRef) as Identifier;
-                if (!identifier) {
-                    log.warn(`Unexpected workflow node with no ref: ${nodeId}`);
-                } else {
-                    displayId = identifier.name;
-                }
-            }
-
-            return {
-                ...execution,
-                cacheKey,
-                displayId,
-                displayType,
-                taskTemplate
-            };
-        });
+        .map<DetailedNodeExecution>(execution =>
+            populateNodeExecutionDetails(execution, dataCache)
+        );
 }
 
 interface GetExecutionDurationMSArgs {

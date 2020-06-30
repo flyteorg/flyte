@@ -35,7 +35,10 @@ export interface RetryStrategy extends Core.IRetryStrategy {}
 export interface RuntimeMetadata extends Core.IRuntimeMetadata {}
 export interface Schedule extends Admin.ISchedule {}
 export type MessageFormat = Core.TaskLog.MessageFormat;
-export type TaskLog = RequiredNonNullable<Core.ITaskLog>;
+export interface TaskLog extends Core.ITaskLog {
+    name: string;
+    uri: string;
+}
 
 /*** Literals ****/
 export interface Binary extends RequiredNonNullable<Core.IBinary> {}

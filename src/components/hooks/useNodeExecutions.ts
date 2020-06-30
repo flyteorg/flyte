@@ -1,7 +1,6 @@
+import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import {
     limits,
-    listNodeExecutions,
-    listTaskExecutionChildren,
     NodeExecution,
     RequestConfig,
     TaskExecutionIdentifier,
@@ -19,10 +18,15 @@ interface TaskExecutionChildrenFetchData {
     config: RequestConfig;
 }
 
-const doFetchNodeExecutions = async ({
-    id,
-    config
-}: NodeExecutionsFetchData) => {
+/** Fetches a list of `NodeExecution`s which are children of a WorkflowExecution.
+ * This function is meant to be consumed by hooks which are composing data.
+ * If you're calling it from a component, consider using `useNodeExecutions` instead.
+ */
+export const fetchNodeExecutions = async (
+    { id, config }: NodeExecutionsFetchData,
+    apiContext: APIContextValue
+) => {
+    const { listNodeExecutions } = apiContext;
     const { entities } = await listNodeExecutions(id, {
         ...config,
         limit: limits.NONE
@@ -37,20 +41,26 @@ export function useNodeExecutions(
     id: WorkflowExecutionIdentifier,
     config: RequestConfig
 ) {
+    const apiContext = useAPIContext();
     return useFetchableData<NodeExecution[], NodeExecutionsFetchData>(
         {
             debugName: 'NodeExecutions',
             defaultValue: [],
-            doFetch: doFetchNodeExecutions
+            doFetch: data => fetchNodeExecutions(data, apiContext)
         },
         { id, config }
     );
 }
 
-const doFetchTaskExecutionChildren = async ({
-    taskExecutionId,
-    config
-}: TaskExecutionChildrenFetchData) => {
+/** Fetches a list of `NodeExecution`s which are children of the given `TaskExecution`.
+ * This function is meant to be consumed by hooks which are composing data.
+ * If you're calling it from a component, consider using `useTaskExecutionChildren` instead.
+ */
+export const fetchTaskExecutionChildren = async (
+    { taskExecutionId, config }: TaskExecutionChildrenFetchData,
+    apiContext: APIContextValue
+) => {
+    const { listTaskExecutionChildren } = apiContext;
     const { entities } = await listTaskExecutionChildren(taskExecutionId, {
         ...config,
         limit: limits.NONE
@@ -63,11 +73,12 @@ export function useTaskExecutionChildren(
     taskExecutionId: TaskExecutionIdentifier,
     config: RequestConfig
 ) {
+    const apiContext = useAPIContext();
     return useFetchableData<NodeExecution[], TaskExecutionChildrenFetchData>(
         {
             debugName: 'TaskExecutionChildren',
             defaultValue: [],
-            doFetch: doFetchTaskExecutionChildren
+            doFetch: data => fetchTaskExecutionChildren(data, apiContext)
         },
         { taskExecutionId, config }
     );

@@ -1,21 +1,24 @@
 import { Tab, Tabs } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { WaitForData } from 'components/common';
-import { useDataRefresher, useTaskExecutionChildren } from 'components/hooks';
+import { useDataRefresher, useFetchableData } from 'components/hooks';
 import { useTabState } from 'components/hooks/useTabState';
 import { every } from 'lodash';
 import {
     executionSortFields,
     limits,
+    NodeExecution,
+    RequestConfig,
     SortDirection,
-    TaskExecution
+    TaskExecution,
+    TaskExecutionIdentifier
 } from 'models';
 import * as React from 'react';
 import { executionRefreshIntervalMs, nodeExecutionIsTerminal } from '..';
+import { ExecutionDataCacheContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
 import { NodeExecutionsTable } from '../Tables/NodeExecutionsTable';
-import { useDetailedNodeExecutions } from '../useDetailedNodeExecutions';
 import { taskExecutionIsTerminal } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -41,6 +44,28 @@ const tabIds = {
     nodes: 'nodes'
 };
 
+interface UseCachedTaskExecutionChildrenArgs {
+    config: RequestConfig;
+    id: TaskExecutionIdentifier;
+}
+function useCachedTaskExecutionChildren(
+    args: UseCachedTaskExecutionChildrenArgs
+) {
+    const dataCache = React.useContext(ExecutionDataCacheContext);
+    return useFetchableData<
+        NodeExecution[],
+        UseCachedTaskExecutionChildrenArgs
+    >(
+        {
+            debugName: 'CachedTaskExecutionChildren',
+            defaultValue: [],
+            doFetch: ({ id, config }) =>
+                dataCache.getTaskExecutionChildren(id, config)
+        },
+        args
+    );
+}
+
 /** Contains the content for viewing child NodeExecutions for a TaskExecution */
 export const TaskExecutionNodes: React.FC<TaskExecutionNodesProps> = ({
     taskExecution
@@ -52,13 +77,14 @@ export const TaskExecutionNodes: React.FC<TaskExecutionNodesProps> = ({
         key: executionSortFields.createdAt,
         direction: SortDirection.ASCENDING
     };
-    const nodeExecutions = useDetailedNodeExecutions(
-        useTaskExecutionChildren(taskExecution.id, {
+    const nodeExecutions = useCachedTaskExecutionChildren({
+        id: taskExecution.id,
+        config: {
             sort,
             limit: limits.NONE,
             filter: filterState.appliedFilters
-        })
-    );
+        }
+    });
 
     // We will continue to refresh the node executions list as long
     // as either the parent execution or any child is non-terminal
