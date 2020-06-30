@@ -891,6 +891,27 @@ task or launch plan specified by {project, domain, name} across all versions of 
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.update_project_domain_attributes">
+<code class="sig-name descname">update_project_domain_attributes</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">matching_attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.update_project_domain_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.update_project_domain_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets custom attributes for a project and domain combination.
+:param Text project:
+:param Text domain:
+:param flytekit.models.MatchingAttributes matching_attributes:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.update_workflow_attributes">
+<code class="sig-name descname">update_workflow_attributes</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">workflow</em>, <em class="sig-param">matching_attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.update_workflow_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.update_workflow_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets custom attributes for a project, domain, and workflow combination.
+:param Text project:
+:param Text domain:
+:param Text workflow:
+:param flytekit.models.MatchingAttributes matching_attributes:
+:return:</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -1212,6 +1233,24 @@ be explicit as opposed to inferred from the environment or a configuration file.
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.update_named_entity">
 <code class="sig-name descname">update_named_entity</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.update_named_entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.update_named_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
+:param args:
+:param kwargs:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.raw.RawSynchronousFlyteClient.update_project_domain_attributes">
+<code class="sig-name descname">update_project_domain_attributes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.update_project_domain_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.update_project_domain_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
+:param args:
+:param kwargs:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.raw.RawSynchronousFlyteClient.update_workflow_attributes">
+<code class="sig-name descname">update_workflow_attributes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.update_workflow_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.update_workflow_attributes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
 :param args:
 :param kwargs:

@@ -14,3 +14,4 @@ Flyte Task Types
     spark
     dynamic
     sidecar
+    pytorch

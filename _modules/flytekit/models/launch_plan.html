@@ -216,6 +216,7 @@
 <div class="viewcode-block" id="Auth"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.Auth">[docs]</a><span class="k">class</span> <span class="nc">Auth</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assumable_iam_role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        DEPRECATED. Do not use. Use flytekit.models.common.AuthRole instead</span>
 <span class="sd">        At most one of assumable_iam_role or kubernetes_service_account can be set.</span>
 <span class="sd">        :param Text assumable_iam_role: IAM identity with set permissions policies.</span>
 <span class="sd">        :param Text kubernetes_service_account: Provides an identity for workflow execution resources. Flyte deployment</span>
@@ -266,7 +267,7 @@
 
 <div class="viewcode-block" id="LaunchPlanSpec"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanSpec">[docs]</a><span class="k">class</span> <span class="nc">LaunchPlanSpec</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_id</span><span class="p">,</span> <span class="n">entity_metadata</span><span class="p">,</span> <span class="n">default_inputs</span><span class="p">,</span> <span class="n">fixed_inputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">annotations</span><span class="p">,</span> <span class="n">auth</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_id</span><span class="p">,</span> <span class="n">entity_metadata</span><span class="p">,</span> <span class="n">default_inputs</span><span class="p">,</span> <span class="n">fixed_inputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">annotations</span><span class="p">,</span> <span class="n">auth_role</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The spec for a Launch Plan.</span>
 
@@ -278,7 +279,7 @@
 <span class="sd">            Any custom kubernetes labels to apply to workflows executed by this launch plan.</span>
 <span class="sd">        :param flyteidl.admin.common_pb2.Annotations annotations:</span>
 <span class="sd">            Any custom kubernetes annotations to apply to workflows executed by this launch plan.</span>
-<span class="sd">        :param flytekit.models.launch_plan.Auth auth: The auth method with which to execute the workflow.</span>
+<span class="sd">        :param flytekit.models.common.Auth auth_role: The auth method with which to execute the workflow.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_id</span> <span class="o">=</span> <span class="n">workflow_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_entity_metadata</span> <span class="o">=</span> <span class="n">entity_metadata</span>
@@ -286,7 +287,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_inputs</span> <span class="o">=</span> <span class="n">fixed_inputs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="o">=</span> <span class="n">labels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_annotations</span> <span class="o">=</span> <span class="n">annotations</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">auth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_auth_role</span> <span class="o">=</span> <span class="n">auth_role</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">workflow_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -336,12 +337,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annotations</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">auth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">auth_role</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The authorization method with which to execute the workflow.</span>
-<span class="sd">        :return: flytekit.models.launch_plan.Auth</span>
+<span class="sd">        :return: flytekit.models.common.Auth</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth_role</span>
 
 <div class="viewcode-block" id="LaunchPlanSpec.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanSpec.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -354,7 +355,7 @@
             <span class="n">fixed_inputs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_inputs</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">annotations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">annotations</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">auth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">auth_role</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_role</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LaunchPlanSpec.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanSpec.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -370,7 +371,7 @@
             <span class="n">fixed_inputs</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">fixed_inputs</span><span class="p">),</span>
             <span class="n">labels</span><span class="o">=</span><span class="n">_common</span><span class="o">.</span><span class="n">Labels</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">labels</span><span class="p">),</span>
             <span class="n">annotations</span><span class="o">=</span><span class="n">_common</span><span class="o">.</span><span class="n">Annotations</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">annotations</span><span class="p">),</span>
-            <span class="n">auth</span><span class="o">=</span><span class="n">Auth</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">auth</span><span class="p">),</span>
+            <span class="n">auth_role</span><span class="o">=</span><span class="n">_common</span><span class="o">.</span><span class="n">AuthRole</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">auth_role</span><span class="p">),</span>
         <span class="p">)</span></div></div>
 
 

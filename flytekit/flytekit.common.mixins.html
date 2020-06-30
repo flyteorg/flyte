@@ -255,17 +255,38 @@ out. If not set or set to None, this method will wait for infinite.</p></li>
 </dd></dl>
 
 </div>
-<div class="section" id="module-flytekit.common.mixins.executable">
-<span id="flytekit-common-mixins-executable-module"></span><h2>flytekit.common.mixins.executable module<a class="headerlink" href="#module-flytekit.common.mixins.executable" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-flytekit.common.mixins.hash">
+<span id="flytekit-common-mixins-hash-module"></span><h2>flytekit.common.mixins.hash module<a class="headerlink" href="#module-flytekit.common.mixins.hash" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="flytekit.common.mixins.executable.ExecutableEntity">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.executable.</code><code class="sig-name descname">ExecutableEntity</code><a class="reference internal" href="../_modules/flytekit/common/mixins/executable.html#ExecutableEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.executable.ExecutableEntity" title="Permalink to this definition">¶</a></dt>
+<dt id="flytekit.common.mixins.hash.HashOnReferenceMixin">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.hash.</code><code class="sig-name descname">HashOnReferenceMixin</code><a class="reference internal" href="../_modules/flytekit/common/mixins/hash.html#HashOnReferenceMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.hash.HashOnReferenceMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-flytekit.common.mixins.launchable">
+<span id="flytekit-common-mixins-launchable-module"></span><h2>flytekit.common.mixins.launchable module<a class="headerlink" href="#module-flytekit.common.mixins.launchable" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.common.mixins.launchable.LaunchableEntity">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.launchable.</code><code class="sig-name descname">LaunchableEntity</code><a class="reference internal" href="../_modules/flytekit/common/mixins/launchable.html#LaunchableEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.launchable.LaunchableEntity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="method">
-<dt id="flytekit.common.mixins.executable.ExecutableEntity.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/executable.html#ExecutableEntity.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.executable.ExecutableEntity.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executes the entity and returns the execution identifier.  This version of execution is meant for when
-inputs are specified as Python native types/structures.</p>
+<dt id="flytekit.common.mixins.launchable.LaunchableEntity.execute">
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/launchable.html#LaunchableEntity.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.launchable.LaunchableEntity.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.mixins.launchable.LaunchableEntity.execute_with_literals">
+<code class="sig-name descname">execute_with_literals</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">literal_inputs</em>, <em class="sig-param">name=None</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/launchable.html#LaunchableEntity.execute_with_literals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.launchable.LaunchableEntity.execute_with_literals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.mixins.launchable.LaunchableEntity.launch">
+<code class="sig-name descname">launch</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/launchable.html#LaunchableEntity.launch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.launchable.LaunchableEntity.launch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a remote execution from the entity and returns the execution identifier.
+This version of launch is meant for when inputs are specified as Python native types/structures.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -289,8 +310,8 @@ notifications.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="flytekit.common.mixins.executable.ExecutableEntity.execute_with_literals">
-<em class="property">abstract </em><code class="sig-name descname">execute_with_literals</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">literal_inputs</em>, <em class="sig-param">name=None</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/executable.html#ExecutableEntity.execute_with_literals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.executable.ExecutableEntity.execute_with_literals" title="Permalink to this definition">¶</a></dt>
+<dt id="flytekit.common.mixins.launchable.LaunchableEntity.launch_with_literals">
+<em class="property">abstract </em><code class="sig-name descname">launch_with_literals</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">literal_inputs</em>, <em class="sig-param">name=None</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/launchable.html#LaunchableEntity.launch_with_literals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.launchable.LaunchableEntity.launch_with_literals" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes the entity and returns the execution identifier.  This version of execution is meant for when
 you already have a LiteralMap of inputs.</p>
 <dl class="field-list simple">
@@ -309,20 +330,11 @@ notifications.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.WorkflowExecutionIdentifier" title="flytekit.models.core.identifier.WorkflowExecutionIdentifier">flytekit.models.core.identifier.WorkflowExecutionIdentifier</a></p>
+<dd class="field-even"><p>flytekit.models.core.identifier.WorkflowExecutionIdentifier:</p>
 </dd>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
-</div>
-<div class="section" id="module-flytekit.common.mixins.hash">
-<span id="flytekit-common-mixins-hash-module"></span><h2>flytekit.common.mixins.hash module<a class="headerlink" href="#module-flytekit.common.mixins.hash" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="flytekit.common.mixins.hash.HashOnReferenceMixin">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.hash.</code><code class="sig-name descname">HashOnReferenceMixin</code><a class="reference internal" href="../_modules/flytekit/common/mixins/hash.html#HashOnReferenceMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.hash.HashOnReferenceMixin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 </dd></dl>
 
 </div>

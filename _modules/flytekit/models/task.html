@@ -174,7 +174,6 @@
 
 
 <div class="viewcode-block" id="Resources"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.Resources">[docs]</a><span class="k">class</span> <span class="nc">Resources</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
 <div class="viewcode-block" id="Resources.ResourceName"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.Resources.ResourceName">[docs]</a>    <span class="k">class</span> <span class="nc">ResourceName</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">UNKNOWN</span>
         <span class="n">CPU</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">CPU</span>
@@ -270,7 +269,6 @@
 
 
 <div class="viewcode-block" id="RuntimeMetadata"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.RuntimeMetadata">[docs]</a><span class="k">class</span> <span class="nc">RuntimeMetadata</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
 <div class="viewcode-block" id="RuntimeMetadata.RuntimeType"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.RuntimeMetadata.RuntimeType">[docs]</a>    <span class="k">class</span> <span class="nc">RuntimeType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="n">OTHER</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">FLYTE_SDK</span> <span class="o">=</span> <span class="mi">1</span></div>
@@ -335,7 +333,8 @@
 
 <div class="viewcode-block" id="TaskMetadata"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.TaskMetadata">[docs]</a><span class="k">class</span> <span class="nc">TaskMetadata</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">discoverable</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">interruptible</span><span class="p">,</span> <span class="n">discovery_version</span><span class="p">,</span> <span class="n">deprecated_error_message</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">discoverable</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">interruptible</span><span class="p">,</span> <span class="n">discovery_version</span><span class="p">,</span>
+                 <span class="n">deprecated_error_message</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Information needed at runtime to determine behavior such as whether or not outputs are discoverable, timeouts,</span>
 <span class="sd">        and retries.</span>
@@ -808,7 +807,7 @@
             <span class="n">application_type</span> <span class="o">=</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">R</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span> <span class="n">application_type</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="n">application_type</span><span class="p">,</span>
             <span class="n">spark_conf</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">sparkConf</span><span class="p">,</span>
             <span class="n">application_file</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">mainApplicationFile</span><span class="p">,</span>
             <span class="n">main_class</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">mainClass</span><span class="p">,</span>
@@ -817,20 +816,96 @@
         <span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="IOStrategy"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.IOStrategy">[docs]</a><span class="k">class</span> <span class="nc">IOStrategy</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provides methods to manage data in and out of the Raw container using Download Modes. This can only be used if DataLoadingConfig is enabled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DOWNLOAD_MODE_EAGER</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="o">.</span><span class="n">DOWNLOAD_EAGER</span>
+    <span class="n">DOWNLOAD_MODE_STREAM</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="o">.</span><span class="n">DOWNLOAD_STREAM</span>
+    <span class="n">DOWNLOAD_MODE_NO_DOWNLOAD</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="o">.</span><span class="n">DO_NOT_DOWNLOAD</span>
+
+    <span class="n">UPLOAD_MODE_EAGER</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="o">.</span><span class="n">UPLOAD_EAGER</span>
+    <span class="n">UPLOAD_MODE_ON_EXIT</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="o">.</span><span class="n">UPLOAD_ON_EXIT</span>
+    <span class="n">UPLOAD_MODE_NO_UPLOAD</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="o">.</span><span class="n">DO_NOT_UPLOAD</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">download_mode</span><span class="p">:</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="o">.</span><span class="n">DownloadMode</span><span class="o">=</span><span class="n">DOWNLOAD_MODE_EAGER</span><span class="p">,</span>
+                 <span class="n">upload_mode</span><span class="p">:</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="o">.</span><span class="n">UploadMode</span><span class="o">=</span><span class="n">UPLOAD_MODE_ON_EXIT</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_download_mode</span> <span class="o">=</span> <span class="n">download_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_upload_mode</span> <span class="o">=</span> <span class="n">upload_mode</span>
+
+<div class="viewcode-block" id="IOStrategy.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.IOStrategy.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="p">(</span>
+            <span class="n">download_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_download_mode</span><span class="p">,</span>
+            <span class="n">upload_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_upload_mode</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="IOStrategy.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.IOStrategy.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">:</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">IOStrategy</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pb2_object</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">download_mode</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">download_mode</span><span class="p">,</span>
+            <span class="n">upload_mode</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">upload_mode</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DataLoadingConfig"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.DataLoadingConfig">[docs]</a><span class="k">class</span> <span class="nc">DataLoadingConfig</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+    <span class="n">LITERALMAP_FORMAT_PROTO</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="o">.</span><span class="n">PROTO</span>
+    <span class="n">LITERALMAP_FORMAT_JSON</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="o">.</span><span class="n">JSON</span>
+    <span class="n">LITERALMAP_FORMAT_YAML</span> <span class="o">=</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="o">.</span><span class="n">YAML</span>
+    <span class="n">_LITERALMAP_FORMATS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="n">LITERALMAP_FORMAT_JSON</span><span class="p">,</span> <span class="n">LITERALMAP_FORMAT_PROTO</span><span class="p">,</span> <span class="n">LITERALMAP_FORMAT_YAML</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="nb">format</span><span class="p">:</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="o">.</span><span class="n">LiteralMapFormat</span> <span class="o">=</span> <span class="n">LITERALMAP_FORMAT_PROTO</span><span class="p">,</span> <span class="n">io_strategy</span><span class="p">:</span> <span class="n">IOStrategy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LITERALMAP_FORMATS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Metadata format </span><span class="si">{}</span><span class="s2"> not supported. Should be one of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_LITERALMAP_FORMATS</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_path</span> <span class="o">=</span> <span class="n">input_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="n">output_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_enabled</span> <span class="o">=</span> <span class="n">enabled</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_format</span> <span class="o">=</span> <span class="nb">format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_io_strategy</span> <span class="o">=</span> <span class="n">io_strategy</span>
+
+<div class="viewcode-block" id="DataLoadingConfig.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.DataLoadingConfig.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="p">(</span>
+            <span class="n">input_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_input_path</span><span class="p">,</span>
+            <span class="n">output_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_format</span><span class="p">,</span>
+            <span class="n">enabled</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_enabled</span><span class="p">,</span>
+            <span class="n">io_strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_io_strategy</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_io_strategy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataLoadingConfig.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.DataLoadingConfig.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2</span><span class="p">:</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="p">):</span>
+        <span class="c1"># TODO use python 3.7+ only and then https://stackoverflow.com/questions/33533148/how-do-i-specify-that-the-return-type-of-a-method-is-the-same-as-the-class-itsel -&gt; DataLoadingConfig:</span>
+        <span class="k">if</span> <span class="n">pb2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">input_path</span><span class="o">=</span><span class="n">pb2</span><span class="o">.</span><span class="n">input_path</span><span class="p">,</span>
+            <span class="n">output_path</span><span class="o">=</span><span class="n">pb2</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span>
+            <span class="n">enabled</span><span class="o">=</span><span class="n">pb2</span><span class="o">.</span><span class="n">enabled</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="n">pb2</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
+            <span class="n">io_strategy</span><span class="o">=</span><span class="n">IOStrategy</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2</span><span class="o">.</span><span class="n">io_strategy</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;io_strategy&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
 <div class="viewcode-block" id="Container"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.Container">[docs]</a><span class="k">class</span> <span class="nc">Container</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">data_loading_config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This defines a container target.  It will execute the appropriate command line on the appropriate image with</span>
-<span class="sd">        the given configurations.</span>
+<span class="sd">           This defines a container target.  It will execute the appropriate command line on the appropriate image with</span>
+<span class="sd">           the given configurations.</span>
 
-<span class="sd">        :param Text image: The fully-qualified identifier for the image.</span>
-<span class="sd">        :param list[Text] command: A list of &#39;words&#39; for the command.  i.e. [&#39;aws&#39;, &#39;s3&#39;, &#39;ls&#39;]</span>
-<span class="sd">        :param list[Text] args: A list of arguments for the command.  i.e. [&#39;s3://some/path&#39;, &#39;/tmp/local/path&#39;]</span>
-<span class="sd">        :param Resources resources: A definition of requisite compute resources.</span>
-<span class="sd">        :param dict[Text, Text] env: A definition of key-value pairs for environment variables.</span>
-<span class="sd">        :param dict[Text, Text] config: A definition of configuration key-value pairs.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">           :param Text image: The fully-qualified identifier for the image.</span>
+<span class="sd">           :param list[Text] command: A list of &#39;words&#39; for the command.  i.e. [&#39;aws&#39;, &#39;s3&#39;, &#39;ls&#39;]</span>
+<span class="sd">           :param list[Text] args: A list of arguments for the command.  i.e. [&#39;s3://some/path&#39;, &#39;/tmp/local/path&#39;]</span>
+<span class="sd">           :param Resources resources: A definition of requisite compute resources.</span>
+<span class="sd">           :param dict[Text, Text] env: A definition of key-value pairs for environment variables.</span>
+<span class="sd">           :param dict[Text, Text] config: A definition of configuration key-value pairs.</span>
+<span class="sd">           :type DataLoadingConfig data_loading_config: object</span>
+<span class="sd">           &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_loading_config</span> <span class="o">=</span> <span class="n">data_loading_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="n">image</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_command</span> <span class="o">=</span> <span class="n">command</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_args</span> <span class="o">=</span> <span class="n">args</span>
@@ -888,6 +963,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_loading_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: DataLoadingConfig</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_loading_config</span>
+
 <div class="viewcode-block" id="Container.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.Container.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.tasks_pb2.Container</span>
@@ -898,7 +980,8 @@
             <span class="n">args</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
             <span class="n">resources</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">env</span><span class="o">=</span><span class="p">[</span><span class="n">_literals_pb2</span><span class="o">.</span><span class="n">KeyValuePair</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)],</span>
-            <span class="n">config</span><span class="o">=</span><span class="p">[</span><span class="n">_literals_pb2</span><span class="o">.</span><span class="n">KeyValuePair</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)]</span>
+            <span class="n">config</span><span class="o">=</span><span class="p">[</span><span class="n">_literals_pb2</span><span class="o">.</span><span class="n">KeyValuePair</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)],</span>
+            <span class="n">data_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data_loading_config</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_loading_config</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Container.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.Container.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -913,7 +996,9 @@
             <span class="n">args</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">args</span><span class="p">,</span>
             <span class="n">resources</span><span class="o">=</span><span class="n">Resources</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">resources</span><span class="p">),</span>
             <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="n">kv</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="n">kv</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">kv</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">env</span><span class="p">},</span>
-            <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="n">kv</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="n">kv</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">kv</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">config</span><span class="p">}</span>
+            <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="n">kv</span><span class="o">.</span><span class="n">key</span><span class="p">:</span> <span class="n">kv</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">kv</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">config</span><span class="p">},</span>
+            <span class="n">data_loading_config</span><span class="o">=</span><span class="n">DataLoadingConfig</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">data_config</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;data_config&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 

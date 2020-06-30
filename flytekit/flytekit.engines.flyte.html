@@ -338,11 +338,17 @@ type of kind LaunchPlan.</p>
 <dl class="class">
 <dt id="flytekit.engines.flyte.engine.FlyteLaunchPlan">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.engines.flyte.engine.</code><code class="sig-name descname">FlyteLaunchPlan</code><span class="sig-paren">(</span><em class="sig-param">sdk_launch_plan</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/flyte/engine.html#FlyteLaunchPlan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.flyte.engine.FlyteLaunchPlan" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="flytekit.engines.html#flytekit.engines.common.BaseLaunchPlanExecutor" title="flytekit.engines.common.BaseLaunchPlanExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.engines.common.BaseLaunchPlanExecutor</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="flytekit.engines.html#flytekit.engines.common.BaseLaunchPlanLauncher" title="flytekit.engines.common.BaseLaunchPlanLauncher"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.engines.common.BaseLaunchPlanLauncher</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.engines.flyte.engine.FlyteLaunchPlan.execute">
 <code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">inputs</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/flyte/engine.html#FlyteLaunchPlan.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.flyte.engine.FlyteLaunchPlan.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executes the launch plan.
+<dd><p>Deprecated. Use launch instead.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.engines.flyte.engine.FlyteLaunchPlan.launch">
+<code class="sig-name descname">launch</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">inputs</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/flyte/engine.html#FlyteLaunchPlan.launch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.flyte.engine.FlyteLaunchPlan.launch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a workflow execution using parameters specified in the launch plan.
 :param Text project:
 :param Text domain:
 :param Text name:
@@ -453,6 +459,32 @@ type of kind LaunchPlan.</p>
 :param flytekit.models.literals.LiteralMap inputs:
 :param dict[Text, Text] context:
 :rtype: dict[Text, flytekit.models.common.FlyteIdlEntity]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.engines.flyte.engine.FlyteTask.launch">
+<code class="sig-name descname">launch</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name=None</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em>, <em class="sig-param">auth_role=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/flyte/engine.html#FlyteTask.launch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.flyte.engine.FlyteTask.launch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the task as a single task execution and returns the identifier.
+:param Text project:
+:param Text domain:
+:param Text name:
+:param flytekit.models.literals.LiteralMap inputs: The inputs to pass
+:param list[flytekit.models.common.Notification] notification_overrides: If specified, override the</p>
+<blockquote>
+<div><p>notifications.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label_overrides</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.common.Labels" title="flytekit.models.common.Labels"><em>flytekit.models.common.Labels</em></a>) – </p></li>
+<li><p><strong>annotation_overrides</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.common.Annotations" title="flytekit.models.common.Annotations"><em>flytekit.models.common.Annotations</em></a>) – </p></li>
+<li><p><strong>auth_role</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.common.AuthRole" title="flytekit.models.common.AuthRole"><em>flytekit.models.common.AuthRole</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.models.html#flytekit.models.execution.Execution" title="flytekit.models.execution.Execution">flytekit.models.execution.Execution</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">

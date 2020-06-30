@@ -163,14 +163,15 @@
 <span class="kn">from</span> <span class="nn">flytekit.common.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span><span class="p">,</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span><span class="p">,</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span><span class="p">,</span> <span class="n">executable</span> <span class="k">as</span> <span class="n">_executable_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span><span class="p">,</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span><span class="p">,</span> <span class="n">launchable</span> <span class="k">as</span> <span class="n">_launchable_mixin</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span><span class="p">,</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span><span class="p">,</span> <span class="n">auth</span> <span class="k">as</span> <span class="n">_auth_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span><span class="p">,</span> <span class="n">auth</span> <span class="k">as</span> <span class="n">_auth_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan_models</span><span class="p">,</span> <span class="n">schedule</span> <span class="k">as</span> <span class="n">_schedule_model</span><span class="p">,</span> <span class="n">interface</span> <span class="k">as</span> \
     <span class="n">_interface_models</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span><span class="p">,</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_models</span>
 <span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
+<span class="kn">from</span> <span class="nn">deprecated</span> <span class="k">import</span> <span class="n">deprecated</span> <span class="k">as</span> <span class="n">_deprecated</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">import</span> <span class="nn">uuid</span> <span class="k">as</span> <span class="nn">_uuid</span>
@@ -180,7 +181,7 @@
     <span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span>
         <span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span>
         <span class="n">_launch_plan_models</span><span class="o">.</span><span class="n">LaunchPlanSpec</span><span class="p">,</span>
-        <span class="n">_executable_mixin</span><span class="o">.</span><span class="n">ExecutableEntity</span><span class="p">,</span>
+        <span class="n">_launchable_mixin</span><span class="o">.</span><span class="n">LaunchableEntity</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -209,7 +210,7 @@
             <span class="n">entity_metadata</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">entity_metadata</span><span class="p">,</span>
             <span class="n">labels</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span>
             <span class="n">annotations</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">annotations</span><span class="p">,</span>
-            <span class="n">auth</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">auth</span><span class="p">,</span>
+            <span class="n">auth_role</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">auth_role</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkLaunchPlan.fetch"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.fetch">[docs]</a>    <span class="nd">@classmethod</span>
@@ -258,11 +259,11 @@
             <span class="k">return</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">auth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">auth_role</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: flytekit.models.LaunchPlan.Auth</span>
+<span class="sd">        :rtype: flytekit.models.common.AuthRole</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">fixed_auth</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SdkLaunchPlan</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">auth</span>
+        <span class="n">fixed_auth</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SdkLaunchPlan</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">auth_role</span>
         <span class="k">if</span> <span class="n">fixed_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>\
                 <span class="p">(</span><span class="n">fixed_auth</span><span class="o">.</span><span class="n">assumable_iam_role</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">fixed_auth</span><span class="o">.</span><span class="n">kubernetes_service_account</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">fixed_auth</span>
@@ -274,8 +275,8 @@
             <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using deprecated `role` from config. &quot;</span>
                              <span class="s2">&quot;Please update your config to use `assumable_iam_role` instead&quot;</span><span class="p">)</span>
             <span class="n">assumable_iam_role</span> <span class="o">=</span> <span class="n">_sdk_config</span><span class="o">.</span><span class="n">ROLE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">_launch_plan_models</span><span class="o">.</span><span class="n">Auth</span><span class="p">(</span><span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">assumable_iam_role</span><span class="p">,</span>
-                                        <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">kubernetes_service_account</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span><span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">assumable_iam_role</span><span class="p">,</span>
+                                       <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">kubernetes_service_account</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -330,9 +331,18 @@
             <span class="p">}</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="SdkLaunchPlan.execute_with_literals"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.execute_with_literals">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+<div class="viewcode-block" id="SdkLaunchPlan.execute_with_literals"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.execute_with_literals">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Use launch_with_literals instead&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;0.9.0&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">execute_with_literals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">literal_inputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                               <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deprecated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">launch_with_literals</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">literal_inputs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="p">,</span> <span class="n">label_overrides</span><span class="p">,</span>
+                                         <span class="n">annotation_overrides</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SdkLaunchPlan.launch_with_literals"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.launch_with_literals">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+    <span class="k">def</span> <span class="nf">launch_with_literals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">literal_inputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the launch plan and returns the execution identifier.  This version of execution is meant for when</span>
 <span class="sd">        you already have a LiteralMap of inputs.</span>
@@ -351,7 +361,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Kubernetes requires names starting with an alphabet for some resources.</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;f&quot;</span> <span class="o">+</span> <span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">19</span><span class="p">]</span>
-        <span class="n">execution</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+        <span class="n">execution</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
             <span class="n">project</span><span class="p">,</span>
             <span class="n">domain</span><span class="p">,</span>
             <span class="n">name</span><span class="p">,</span>
@@ -416,7 +426,7 @@
             <span class="n">notifications</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">auth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">auth_role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.workflow.SdkWorkflow sdk_workflow:</span>
@@ -431,16 +441,16 @@
 <span class="sd">        :param flytekit.models.common.Annotations annotations: Any custom kubernetes annotations to apply to workflows</span>
 <span class="sd">            executed by this launch plan.</span>
 <span class="sd">            Any custom kubernetes annotations to apply to workflows executed by this launch plan.</span>
-<span class="sd">        :param flytekit.models.launch_plan.Auth auth: The auth method with which to execute the workflow.</span>
+<span class="sd">        :param flytekit.models.common.Authrole auth_role: The auth method with which to execute the workflow.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">role</span> <span class="ow">and</span> <span class="n">auth</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="ow">and</span> <span class="n">auth_role</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot set both role and auth. Role is deprecated, use auth instead.&quot;</span><span class="p">)</span>
 
         <span class="n">fixed_inputs</span> <span class="o">=</span> <span class="n">fixed_inputs</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="n">default_inputs</span> <span class="o">=</span> <span class="n">default_inputs</span> <span class="ow">or</span> <span class="p">{}</span>
 
         <span class="k">if</span> <span class="n">role</span><span class="p">:</span>
-            <span class="n">auth</span> <span class="o">=</span> <span class="n">_launch_plan_models</span><span class="o">.</span><span class="n">Auth</span><span class="p">(</span><span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">role</span><span class="p">)</span>
+            <span class="n">auth_role</span> <span class="o">=</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span><span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">role</span><span class="p">)</span>
 
         <span class="c1"># The constructor for SdkLaunchPlan sets the id to None anyways so we don&#39;t bother passing in an ID. The ID</span>
         <span class="c1"># should be set in one of three places,</span>
@@ -464,7 +474,7 @@
             <span class="p">),</span>
             <span class="n">labels</span> <span class="ow">or</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">Labels</span><span class="p">({}),</span>
             <span class="n">annotations</span> <span class="ow">or</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">Annotations</span><span class="p">({}),</span>
-            <span class="n">auth</span><span class="p">,</span>
+            <span class="n">auth_role</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="n">_interface</span><span class="o">.</span><span class="n">TypedInterface</span><span class="p">(</span>
             <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">default_inputs</span><span class="p">)},</span>

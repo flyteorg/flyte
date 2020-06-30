@@ -172,8 +172,7 @@
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_models</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> \
-    <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_models</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_models</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
@@ -502,8 +501,8 @@
 
         <span class="k">if</span> <span class="n">role</span><span class="p">:</span>
             <span class="n">assumable_iam_role</span> <span class="o">=</span> <span class="n">role</span>
-        <span class="n">auth</span> <span class="o">=</span> <span class="n">_launch_plan_models</span><span class="o">.</span><span class="n">Auth</span><span class="p">(</span><span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">assumable_iam_role</span><span class="p">,</span>
-                                        <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">kubernetes_service_account</span><span class="p">)</span>
+        <span class="n">auth_role</span> <span class="o">=</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span><span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">assumable_iam_role</span><span class="p">,</span>
+                                            <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">kubernetes_service_account</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span> <span class="ow">or</span> <span class="n">_launch_plan</span><span class="o">.</span><span class="n">SdkRunnableLaunchPlan</span><span class="p">)(</span>
             <span class="n">sdk_workflow</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
@@ -516,7 +515,7 @@
             <span class="n">notifications</span><span class="o">=</span><span class="n">notifications</span><span class="p">,</span>
             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
             <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span>
-            <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">,</span>
+            <span class="n">auth_role</span><span class="o">=</span><span class="n">auth_role</span><span class="p">,</span>
         <span class="p">)</span></div>
 
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -614,16 +613,17 @@
     <span class="k">return</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">nodes</span>
 
 
-<div class="viewcode-block" id="build_sdk_workflow_from_metaclass"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.build_sdk_workflow_from_metaclass">[docs]</a><span class="k">def</span> <span class="nf">build_sdk_workflow_from_metaclass</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">queuing_budget</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="build_sdk_workflow_from_metaclass"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.build_sdk_workflow_from_metaclass">[docs]</a><span class="k">def</span> <span class="nf">build_sdk_workflow_from_metaclass</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">queuing_budget</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param T metaclass:</span>
 <span class="sd">    :param cls: This is the class that will be instantiated from the inputs, outputs, and nodes.  This will be used</span>
 <span class="sd">        by users extending the base Flyte programming model. If set, it must be a subclass of SdkWorkflow.</span>
 <span class="sd">    :param queuing_budget datetime.timedelta: [Optional] Budget that specifies the amount of time a workflow can be queued up for execution.</span>
+<span class="sd">    :param on_failure flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy: [Optional] The execution policy when the workflow detects a failure.</span>
 <span class="sd">    :rtype: SdkWorkflow</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">nodes</span> <span class="o">=</span> <span class="n">_discover_workflow_components</span><span class="p">(</span><span class="n">metaclass</span><span class="p">)</span>
-    <span class="n">metadata</span> <span class="o">=</span> <span class="n">_workflow_models</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="p">(</span><span class="n">queuing_budget</span><span class="p">)</span> <span class="k">if</span> <span class="n">queuing_budget</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">_workflow_models</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="p">(</span><span class="n">queuing_budget</span><span class="o">=</span><span class="n">queuing_budget</span> <span class="k">if</span> <span class="n">queuing_budget</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="n">on_failure</span> <span class="k">if</span> <span class="n">on_failure</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span> <span class="ow">or</span> <span class="n">SdkWorkflow</span><span class="p">)(</span>
         <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">)],</span>
         <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">)],</span>

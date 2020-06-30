@@ -52,6 +52,14 @@ flytekit.common.tasks.pytorch\_task module
    :undoc-members:
    :show-inheritance:
 
+flytekit.common.tasks.raw\_container module
+-------------------------------------------
+
+.. automodule:: flytekit.common.tasks.raw_container
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 flytekit.common.tasks.sdk\_dynamic module
 -----------------------------------------
 

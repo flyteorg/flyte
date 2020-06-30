@@ -214,7 +214,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose_string</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(</span><span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
 <div class="viewcode-block" id="FlyteIdlEntity.short_string"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.FlyteIdlEntity.short_string">[docs]</a>    <span class="k">def</span> <span class="nf">short_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -579,6 +579,59 @@
 <span class="sd">        :rtype: UrlBlob</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">pb</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="nb">bytes</span><span class="o">=</span><span class="n">pb</span><span class="o">.</span><span class="n">bytes</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="AuthRole"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.AuthRole">[docs]</a><span class="k">class</span> <span class="nc">AuthRole</span><span class="p">(</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assumable_iam_role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        At most one of assumable_iam_role or kubernetes_service_account can be set.</span>
+<span class="sd">        :param Text assumable_iam_role: IAM identity with set permissions policies.</span>
+<span class="sd">        :param Text kubernetes_service_account: Provides an identity for workflow execution resources. Flyte deployment</span>
+<span class="sd">            administrators are responsible for handling permissions as they relate to the service account.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">assumable_iam_role</span> <span class="ow">and</span> <span class="n">kubernetes_service_account</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only one of assumable_iam_role or kubernetes_service_account can be set&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assumable_iam_role</span> <span class="o">=</span> <span class="n">assumable_iam_role</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kubernetes_service_account</span> <span class="o">=</span> <span class="n">kubernetes_service_account</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">assumable_iam_role</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The IAM role to execute the workflow with</span>
+<span class="sd">        :rtype: Text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assumable_iam_role</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kubernetes_service_account</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The kubernetes service account to execute the workflow with</span>
+<span class="sd">        :rtype: Text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kubernetes_service_account</span>
+
+<div class="viewcode-block" id="AuthRole.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.AuthRole.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flyteidl.admin.launch_plan_pb2.Auth</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_common_pb2</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span>
+            <span class="n">assumable_iam_role</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">assumable_iam_role</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">assumable_iam_role</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kubernetes_service_account</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kubernetes_service_account</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="AuthRole.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.AuthRole.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param flyteidl.admin.launch_plan_pb2.Auth pb2_object:</span>
+<span class="sd">        :rtype: Auth</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">assumable_iam_role</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;assumable_iam_role&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">kubernetes_service_account</span> <span class="k">if</span>
+            <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;kubernetes_service_account&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
 </pre></div>
 
            </div>
