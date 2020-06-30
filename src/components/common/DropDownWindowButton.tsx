@@ -76,7 +76,7 @@ export const DropDownWindowButton: React.FC<DropDownWindowButtonProps> = ({
                     horizontal: 'right'
                 }}
             >
-                {showWindow ? renderContent(closeForm) : null}
+                {showingWindow ? renderContent(closeForm) : null}
             </Popover>
         </div>
     );

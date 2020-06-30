@@ -78,7 +78,7 @@ describe('getWorkflowExecutionTimingMS', () => {
         expect(firstResult).not.toBeNull();
 
         // Force a tick so new Date() will return a different value
-        await waitFor(0);
+        await waitFor(10);
         const secondResult = getWorkflowExecutionTimingMS(execution);
         expect(secondResult).not.toBeNull();
         expect(firstResult!.duration).toBeLessThan(secondResult!.duration);
@@ -126,7 +126,7 @@ describe('getNodeExecutionTimingMS', () => {
         expect(firstResult).not.toBeNull();
 
         // Force a tick so new Date() will return a different value
-        await waitFor(0);
+        await waitFor(10);
         const secondResult = getNodeExecutionTimingMS(execution);
         expect(secondResult).not.toBeNull();
         expect(firstResult!.duration).toBeLessThan(secondResult!.duration);
@@ -174,7 +174,7 @@ describe('getTaskExecutionTimingMS', () => {
         expect(firstResult).not.toBeNull();
 
         // Force a tick so new Date() will return a different value
-        await waitFor(0);
+        await waitFor(10);
         const secondResult = getTaskExecutionTimingMS(execution);
         expect(secondResult).not.toBeNull();
         expect(firstResult!.duration).toBeLessThan(secondResult!.duration);

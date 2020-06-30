@@ -4,3 +4,7 @@ overrides:
   - files: "*.json"
     options:
       tabWidth: 2
+  - files: ["*.yml", "*.yaml"]
+    options:
+      singleQuote: false
+      tabWidth: 2

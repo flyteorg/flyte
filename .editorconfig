@@ -20,7 +20,7 @@ insert_final_newline = true
 [*.json]
 indent_size = 2
 
-[*.yaml]
+[*.{yaml,yml}]
 indent_size = 2
 
 [*.md]

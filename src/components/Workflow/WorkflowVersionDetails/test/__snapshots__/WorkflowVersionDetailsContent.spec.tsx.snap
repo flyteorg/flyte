@@ -17,10 +17,10 @@ Array [
     </p>
   </header>,
   <header
-    className="makeStyles-container-33"
+    className="makeStyles-container-3"
   >
     <h6
-      className="MuiTypography-root makeStyles-title-34 MuiTypography-h6"
+      className="MuiTypography-root makeStyles-title-4 MuiTypography-h6"
     >
       Workflow Graph
     </h6>
