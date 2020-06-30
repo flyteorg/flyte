@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](http://github.com/lyft/flyteconsole/compare/v0.6.0...v0.7.0) (2020-06-30)
+
+
+### Features
+
+* improve user experience for nested NodeExecutions ([#77](http://github.com/lyft/flyteconsole/issues/77)) ([58ed1a4](http://github.com/lyft/flyteconsole/commit/58ed1a4176afeb0c13c34cf0cced13efa91ea7b4)), closes [#70](http://github.com/lyft/flyteconsole/issues/70) [#72](http://github.com/lyft/flyteconsole/issues/72) [#75](http://github.com/lyft/flyteconsole/issues/75) [#76](http://github.com/lyft/flyteconsole/issues/76)
+
 # [0.6.0](http://github.com/lyft/flyteconsole/compare/v0.5.3...v0.6.0) (2020-06-30)
 
 
