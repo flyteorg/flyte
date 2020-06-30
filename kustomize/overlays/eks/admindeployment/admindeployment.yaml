@@ -12,7 +12,7 @@ spec:
           name: clusterresource-template 
       initContainers:
       - name: run-migrations
-        image: docker.io/lyft/flyteadmin:v0.2.8
+        image: docker.io/lyft/flyteadmin:v0.2.11
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
                   "migrate", "run"]
@@ -20,7 +20,7 @@ spec:
         - name: config-volume
           mountPath: /etc/flyte/config
       - name: seed-projects
-        image: docker.io/lyft/flyteadmin:v0.2.8
+        image: docker.io/lyft/flyteadmin:v0.2.11
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
                   "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
@@ -28,7 +28,7 @@ spec:
         - name: config-volume
           mountPath: /etc/flyte/config
       - name: sync-cluster-resources
-        image: docker.io/lyft/flyteadmin:v0.2.8
+        image: docker.io/lyft/flyteadmin:v0.2.11
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
         volumeMounts:
