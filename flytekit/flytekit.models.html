@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models package &mdash; Flyte 0.4.0 documentation</title>
+  <title>flytekit.models package &mdash; Flyte 0.5.0 documentation</title>
   
 
   
@@ -321,6 +321,49 @@ requires processing of all input data. This has to be a positive number.</p>
 <dt id="flytekit.models.common.Annotations.values">
 <em class="property">property </em><code class="sig-name descname">values</code><a class="headerlink" href="#flytekit.models.common.Annotations.values" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.common.AuthRole">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.common.</code><code class="sig-name descname">AuthRole</code><span class="sig-paren">(</span><em class="sig-param">assumable_iam_role=None</em>, <em class="sig-param">kubernetes_service_account=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/common.html#AuthRole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.common.AuthRole" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.common.AuthRole.assumable_iam_role">
+<em class="property">property </em><code class="sig-name descname">assumable_iam_role</code><a class="headerlink" href="#flytekit.models.common.AuthRole.assumable_iam_role" title="Permalink to this definition">¶</a></dt>
+<dd><p>The IAM role to execute the workflow with
+:rtype: Text</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.common.AuthRole.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/common.html#AuthRole.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.common.AuthRole.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> (<em>flyteidl.admin.launch_plan_pb2.Auth</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.launch_plan.Auth" title="flytekit.models.launch_plan.Auth">Auth</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.common.AuthRole.kubernetes_service_account">
+<em class="property">property </em><code class="sig-name descname">kubernetes_service_account</code><a class="headerlink" href="#flytekit.models.common.AuthRole.kubernetes_service_account" title="Permalink to this definition">¶</a></dt>
+<dd><p>The kubernetes service account to execute the workflow with
+:rtype: Text</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.common.AuthRole.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/common.html#AuthRole.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.common.AuthRole.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.admin.launch_plan_pb2.Auth</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -1028,7 +1071,7 @@ requires processing of all input data. This has to be a positive number.</p>
 
 <dl class="class">
 <dt id="flytekit.models.execution.ExecutionSpec">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.execution.</code><code class="sig-name descname">ExecutionSpec</code><span class="sig-paren">(</span><em class="sig-param">launch_plan</em>, <em class="sig-param">metadata</em>, <em class="sig-param">notifications=None</em>, <em class="sig-param">disable_all=None</em>, <em class="sig-param">labels=None</em>, <em class="sig-param">annotations=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#ExecutionSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.ExecutionSpec" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.execution.</code><code class="sig-name descname">ExecutionSpec</code><span class="sig-paren">(</span><em class="sig-param">launch_plan</em>, <em class="sig-param">metadata</em>, <em class="sig-param">notifications=None</em>, <em class="sig-param">disable_all=None</em>, <em class="sig-param">labels=None</em>, <em class="sig-param">annotations=None</em>, <em class="sig-param">auth_role=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/execution.html#ExecutionSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.execution.ExecutionSpec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.models.execution.ExecutionSpec.annotations">
@@ -1036,6 +1079,16 @@ requires processing of all input data. This has to be a positive number.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#flytekit.models.common.Annotations" title="flytekit.models.common.Annotations">flytekit.models.common.Annotations</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.execution.ExecutionSpec.auth_role">
+<em class="property">property </em><code class="sig-name descname">auth_role</code><a class="headerlink" href="#flytekit.models.execution.ExecutionSpec.auth_role" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#flytekit.models.common.AuthRole" title="flytekit.models.common.AuthRole">flytekit.models.common.AuthRole</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1832,7 +1885,7 @@ requires processing of all input data. This has to be a positive number.</p>
 
 <dl class="class">
 <dt id="flytekit.models.launch_plan.LaunchPlanSpec">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.launch_plan.</code><code class="sig-name descname">LaunchPlanSpec</code><span class="sig-paren">(</span><em class="sig-param">workflow_id</em>, <em class="sig-param">entity_metadata</em>, <em class="sig-param">default_inputs</em>, <em class="sig-param">fixed_inputs</em>, <em class="sig-param">labels</em>, <em class="sig-param">annotations</em>, <em class="sig-param">auth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/launch_plan.html#LaunchPlanSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.launch_plan.LaunchPlanSpec" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.launch_plan.</code><code class="sig-name descname">LaunchPlanSpec</code><span class="sig-paren">(</span><em class="sig-param">workflow_id</em>, <em class="sig-param">entity_metadata</em>, <em class="sig-param">default_inputs</em>, <em class="sig-param">fixed_inputs</em>, <em class="sig-param">labels</em>, <em class="sig-param">annotations</em>, <em class="sig-param">auth_role</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/launch_plan.html#LaunchPlanSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.launch_plan.LaunchPlanSpec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.models.launch_plan.LaunchPlanSpec.annotations">
@@ -1842,10 +1895,10 @@ requires processing of all input data. This has to be a positive number.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="flytekit.models.launch_plan.LaunchPlanSpec.auth">
-<em class="property">property </em><code class="sig-name descname">auth</code><a class="headerlink" href="#flytekit.models.launch_plan.LaunchPlanSpec.auth" title="Permalink to this definition">¶</a></dt>
+<dt id="flytekit.models.launch_plan.LaunchPlanSpec.auth_role">
+<em class="property">property </em><code class="sig-name descname">auth_role</code><a class="headerlink" href="#flytekit.models.launch_plan.LaunchPlanSpec.auth_role" title="Permalink to this definition">¶</a></dt>
 <dd><p>The authorization method with which to execute the workflow.
-:return: flytekit.models.launch_plan.Auth</p>
+:return: flytekit.models.common.Auth</p>
 </dd></dl>
 
 <dl class="method">
@@ -2718,6 +2771,173 @@ requires processing of all input data. This has to be a positive number.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-flytekit.models.matchable_resource">
+<span id="flytekit-models-matchable-resource-module"></span><h2>flytekit.models.matchable_resource module<a class="headerlink" href="#module-flytekit.models.matchable_resource" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.models.matchable_resource.ClusterResourceAttributes">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.matchable_resource.</code><code class="sig-name descname">ClusterResourceAttributes</code><span class="sig-paren">(</span><em class="sig-param">attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#ClusterResourceAttributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.ClusterResourceAttributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.ClusterResourceAttributes.attributes">
+<em class="property">property </em><code class="sig-name descname">attributes</code><a class="headerlink" href="#flytekit.models.matchable_resource.ClusterResourceAttributes.attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom resource attributes which will be applied in cluster resource management
+:rtype: dict[Text, Text]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.ClusterResourceAttributes.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#ClusterResourceAttributes.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.ClusterResourceAttributes.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> (<em>flyteidl.admin.matchable_resource_pb2.ClusterResourceAttributes</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.matchable_resource.ClusterResourceAttributes" title="flytekit.models.matchable_resource.ClusterResourceAttributes">ClusterResourceAttributes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.ClusterResourceAttributes.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#ClusterResourceAttributes.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.ClusterResourceAttributes.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.admin.matchable_resource_pb2.ClusterResourceAttributes</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.matchable_resource.ExecutionClusterLabel">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.matchable_resource.</code><code class="sig-name descname">ExecutionClusterLabel</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#ExecutionClusterLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.ExecutionClusterLabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.ExecutionClusterLabel.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#ExecutionClusterLabel.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.ExecutionClusterLabel.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> (<em>flyteidl.admin.matchable_resource_pb2.ExecutionClusterLabel</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.matchable_resource.ExecutionClusterLabel" title="flytekit.models.matchable_resource.ExecutionClusterLabel">ExecutionClusterLabel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.ExecutionClusterLabel.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#ExecutionClusterLabel.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.ExecutionClusterLabel.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.admin.matchable_resource_pb2.ExecutionClusterLabel</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.ExecutionClusterLabel.value">
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#flytekit.models.matchable_resource.ExecutionClusterLabel.value" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Text</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.matchable_resource.ExecutionQueueAttributes">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.matchable_resource.</code><code class="sig-name descname">ExecutionQueueAttributes</code><span class="sig-paren">(</span><em class="sig-param">tags</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#ExecutionQueueAttributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.ExecutionQueueAttributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.ExecutionQueueAttributes.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#ExecutionQueueAttributes.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.ExecutionQueueAttributes.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> (<em>flyteidl.admin.matchable_resource_pb2.ExecutionQueueAttributes</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.matchable_resource.ExecutionQueueAttributes" title="flytekit.models.matchable_resource.ExecutionQueueAttributes">ExecutionQueueAttributes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.ExecutionQueueAttributes.tags">
+<em class="property">property </em><code class="sig-name descname">tags</code><a class="headerlink" href="#flytekit.models.matchable_resource.ExecutionQueueAttributes.tags" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[Text]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.ExecutionQueueAttributes.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#ExecutionQueueAttributes.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.ExecutionQueueAttributes.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.admin.matchable_resource_pb2.ExecutionQueueAttributes</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.matchable_resource.MatchingAttributes">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.matchable_resource.</code><code class="sig-name descname">MatchingAttributes</code><span class="sig-paren">(</span><em class="sig-param">cluster_resource_attributes=None</em>, <em class="sig-param">execution_queue_attributes=None</em>, <em class="sig-param">execution_cluster_label=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#MatchingAttributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.MatchingAttributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.MatchingAttributes.cluster_resource_attributes">
+<em class="property">property </em><code class="sig-name descname">cluster_resource_attributes</code><a class="headerlink" href="#flytekit.models.matchable_resource.MatchingAttributes.cluster_resource_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).
+:rtype: ClusterResourceAttributes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.MatchingAttributes.execution_cluster_label">
+<em class="property">property </em><code class="sig-name descname">execution_cluster_label</code><a class="headerlink" href="#flytekit.models.matchable_resource.MatchingAttributes.execution_cluster_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Label value to determine where the execution will be run.
+:rtype: ExecutionClusterLabel</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.MatchingAttributes.execution_queue_attributes">
+<em class="property">property </em><code class="sig-name descname">execution_queue_attributes</code><a class="headerlink" href="#flytekit.models.matchable_resource.MatchingAttributes.execution_queue_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tags used for assigning execution queues for tasks.
+:rtype: ExecutionQueueAttributes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.MatchingAttributes.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#MatchingAttributes.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.MatchingAttributes.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> (<em>flyteidl.admin.matchable_resource_pb2.MatchingAttributes</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.matchable_resource.MatchingAttributes" title="flytekit.models.matchable_resource.MatchingAttributes">MatchingAttributes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.matchable_resource.MatchingAttributes.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/matchable_resource.html#MatchingAttributes.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.matchable_resource.MatchingAttributes.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>flyteidl.admin.matchable_resource_pb2.MatchingAttributes</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-flytekit.models.named_entity">
 <span id="flytekit-models-named-entity-module"></span><h2>flytekit.models.named_entity module<a class="headerlink" href="#module-flytekit.models.named_entity" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -3461,7 +3681,7 @@ requires processing of all input data. This has to be a positive number.</p>
 
 <dl class="class">
 <dt id="flytekit.models.task.Container">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">Container</code><span class="sig-paren">(</span><em class="sig-param">image</em>, <em class="sig-param">command</em>, <em class="sig-param">args</em>, <em class="sig-param">resources</em>, <em class="sig-param">env</em>, <em class="sig-param">config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#Container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.Container" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">Container</code><span class="sig-paren">(</span><em class="sig-param">image</em>, <em class="sig-param">command</em>, <em class="sig-param">args</em>, <em class="sig-param">resources</em>, <em class="sig-param">env</em>, <em class="sig-param">config</em>, <em class="sig-param">data_loading_config=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#Container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.Container" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.models.task.Container.args">
@@ -3493,6 +3713,16 @@ requires processing of all input data. This has to be a positive number.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>[Text, Text]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.task.Container.data_loading_config">
+<em class="property">property </em><code class="sig-name descname">data_loading_config</code><a class="headerlink" href="#flytekit.models.task.Container.data_loading_config" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#flytekit.models.task.DataLoadingConfig" title="flytekit.models.task.DataLoadingConfig">DataLoadingConfig</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -3547,6 +3777,84 @@ requires processing of all input data. This has to be a positive number.</p>
 </dd>
 </dl>
 </dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.task.DataLoadingConfig">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">DataLoadingConfig</code><span class="sig-paren">(</span><em class="sig-param">input_path: str</em>, <em class="sig-param">output_path: str</em>, <em class="sig-param">enabled: bool = True</em>, <em class="sig-param">format: &lt;google.protobuf.internal.enum_type_wrapper.EnumTypeWrapper object at 0x7fed39e4b080&gt; = 2</em>, <em class="sig-param">io_strategy: flytekit.models.task.IOStrategy = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#DataLoadingConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.DataLoadingConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="attribute">
+<dt id="flytekit.models.task.DataLoadingConfig.LITERALMAP_FORMAT_JSON">
+<code class="sig-name descname">LITERALMAP_FORMAT_JSON</code><em class="property"> = 0</em><a class="headerlink" href="#flytekit.models.task.DataLoadingConfig.LITERALMAP_FORMAT_JSON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.models.task.DataLoadingConfig.LITERALMAP_FORMAT_PROTO">
+<code class="sig-name descname">LITERALMAP_FORMAT_PROTO</code><em class="property"> = 2</em><a class="headerlink" href="#flytekit.models.task.DataLoadingConfig.LITERALMAP_FORMAT_PROTO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.models.task.DataLoadingConfig.LITERALMAP_FORMAT_YAML">
+<code class="sig-name descname">LITERALMAP_FORMAT_YAML</code><em class="property"> = 1</em><a class="headerlink" href="#flytekit.models.task.DataLoadingConfig.LITERALMAP_FORMAT_YAML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.task.DataLoadingConfig.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2: flyteidl.core.tasks_pb2.DataLoadingConfig</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#DataLoadingConfig.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.DataLoadingConfig.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.task.DataLoadingConfig.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; flyteidl.core.tasks_pb2.DataLoadingConfig<a class="reference internal" href="../_modules/flytekit/models/task.html#DataLoadingConfig.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.DataLoadingConfig.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.task.IOStrategy">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">IOStrategy</code><span class="sig-paren">(</span><em class="sig-param">download_mode: &lt;google.protobuf.internal.enum_type_wrapper.EnumTypeWrapper object at 0x7fed39e47f98&gt; = 0</em>, <em class="sig-param">upload_mode: &lt;google.protobuf.internal.enum_type_wrapper.EnumTypeWrapper object at 0x7fed39e47fd0&gt; = 0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#IOStrategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.IOStrategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<p>Provides methods to manage data in and out of the Raw container using Download Modes. This can only be used if DataLoadingConfig is enabled.</p>
+<dl class="attribute">
+<dt id="flytekit.models.task.IOStrategy.DOWNLOAD_MODE_EAGER">
+<code class="sig-name descname">DOWNLOAD_MODE_EAGER</code><em class="property"> = 0</em><a class="headerlink" href="#flytekit.models.task.IOStrategy.DOWNLOAD_MODE_EAGER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.models.task.IOStrategy.DOWNLOAD_MODE_NO_DOWNLOAD">
+<code class="sig-name descname">DOWNLOAD_MODE_NO_DOWNLOAD</code><em class="property"> = 2</em><a class="headerlink" href="#flytekit.models.task.IOStrategy.DOWNLOAD_MODE_NO_DOWNLOAD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.models.task.IOStrategy.DOWNLOAD_MODE_STREAM">
+<code class="sig-name descname">DOWNLOAD_MODE_STREAM</code><em class="property"> = 1</em><a class="headerlink" href="#flytekit.models.task.IOStrategy.DOWNLOAD_MODE_STREAM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.models.task.IOStrategy.UPLOAD_MODE_EAGER">
+<code class="sig-name descname">UPLOAD_MODE_EAGER</code><em class="property"> = 1</em><a class="headerlink" href="#flytekit.models.task.IOStrategy.UPLOAD_MODE_EAGER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.models.task.IOStrategy.UPLOAD_MODE_NO_UPLOAD">
+<code class="sig-name descname">UPLOAD_MODE_NO_UPLOAD</code><em class="property"> = 2</em><a class="headerlink" href="#flytekit.models.task.IOStrategy.UPLOAD_MODE_NO_UPLOAD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.models.task.IOStrategy.UPLOAD_MODE_ON_EXIT">
+<code class="sig-name descname">UPLOAD_MODE_ON_EXIT</code><em class="property"> = 0</em><a class="headerlink" href="#flytekit.models.task.IOStrategy.UPLOAD_MODE_ON_EXIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.task.IOStrategy.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object: flyteidl.core.tasks_pb2.IOStrategy</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#IOStrategy.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.IOStrategy.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.task.IOStrategy.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; flyteidl.core.tasks_pb2.IOStrategy<a class="reference internal" href="../_modules/flytekit/models/task.html#IOStrategy.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.IOStrategy.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

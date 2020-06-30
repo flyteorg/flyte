@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core.workflow &mdash; Flyte 0.4.0 documentation</title>
+  <title>flytekit.models.core.workflow &mdash; Flyte 0.5.0 documentation</title>
   
 
   
@@ -604,13 +604,34 @@
 
 <div class="viewcode-block" id="WorkflowMetadata"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadata">[docs]</a><span class="k">class</span> <span class="nc">WorkflowMetadata</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queuing_budget</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="WorkflowMetadata.OnFailurePolicy"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy">[docs]</a>    <span class="k">class</span> <span class="nc">OnFailurePolicy</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Defines the execution behavior of the workflow when a failure is detected.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            FAIL_IMMEDIATELY                        Instructs the system to fail as soon as a node fails in the</span>
+<span class="sd">                                                    workflow. It&#39;ll automatically abort all currently running nodes and</span>
+<span class="sd">                                                    clean up resources before finally marking the workflow executions as failed.</span>
+
+<span class="sd">            FAIL_AFTER_EXECUTABLE_NODES_COMPLETE    Instructs the system to make as much progress as it can. The system</span>
+<span class="sd">                                                    will not alter the dependencies of the execution graph so any node </span>
+<span class="sd">                                                    that depend on the failed node will not be run. Other nodes that will</span>
+<span class="sd">                                                    be executed to completion before cleaning up resources and marking</span>
+<span class="sd">                                                    the workflow execution as failed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">FAIL_IMMEDIATELY</span> <span class="o">=</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="o">.</span><span class="n">FAIL_IMMEDIATELY</span>        
+        <span class="n">FAIL_AFTER_EXECUTABLE_NODES_COMPLETE</span> <span class="o">=</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="o">.</span><span class="n">FAIL_AFTER_EXECUTABLE_NODES_COMPLETE</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queuing_budget</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Metadata for the workflow.</span>
 <span class="sd">        </span>
 <span class="sd">        :param queuing_budget datetime.timedelta: [Optional] Budget that specifies the amount of time a workflow can be queued up for execution.</span>
+<span class="sd">        :param on_failure flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy: [Optional] The execution policy when the workflow detects a failure.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_queuing_budget</span> <span class="o">=</span> <span class="n">queuing_budget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_failure</span> <span class="o">=</span> <span class="n">on_failure</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">queuing_budget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -619,6 +640,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queuing_budget</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">on_failure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_on_failure</span>
+
 <div class="viewcode-block" id="WorkflowMetadata.to_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadata.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.workflow_pb2.WorkflowMetadata</span>
@@ -626,6 +654,8 @@
         <span class="n">workflow_metadata</span> <span class="o">=</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queuing_budget</span><span class="p">:</span>
             <span class="n">workflow_metadata</span><span class="o">.</span><span class="n">queuing_budget</span><span class="o">.</span><span class="n">FromTimedelta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queuing_budget</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_failure</span><span class="p">:</span>
+            <span class="n">workflow_metadata</span><span class="o">.</span><span class="n">on_failure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_failure</span>
         <span class="k">return</span> <span class="n">workflow_metadata</span></div>
 
 <div class="viewcode-block" id="WorkflowMetadata.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadata.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -634,7 +664,10 @@
 <span class="sd">        :param flyteidl.core.workflow_pb2.WorkflowMetadata pb2_object:</span>
 <span class="sd">        :rtype: WorkflowMetadata</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">queuing_budget</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">queuing_budget</span><span class="o">.</span><span class="n">ToTimedelta</span><span class="p">())</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">queuing_budget</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">queuing_budget</span><span class="o">.</span><span class="n">ToTimedelta</span><span class="p">()</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">queuing_budget</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">on_failure</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">on_failure</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">on_failure</span> <span class="k">else</span> <span class="n">WorkflowMetadata</span><span class="o">.</span><span class="n">OnFailurePolicy</span><span class="o">.</span><span class="n">FAIL_IMMEDIATELY</span>
+        <span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="WorkflowMetadataDefaults"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadataDefaults">[docs]</a><span class="k">class</span> <span class="nc">WorkflowMetadataDefaults</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 

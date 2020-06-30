@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.execution &mdash; Flyte 0.4.0 documentation</title>
+  <title>flytekit.models.execution &mdash; Flyte 0.5.0 documentation</title>
   
 
   
@@ -234,7 +234,7 @@
 <div class="viewcode-block" id="ExecutionSpec"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.ExecutionSpec">[docs]</a><span class="k">class</span> <span class="nc">ExecutionSpec</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">launch_plan</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">notifications</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disable_all</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auth_role</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.identifier.Identifier launch_plan: Launch plan unique identifier to execute</span>
 <span class="sd">        :param ExecutionMetadata metadata: The metadata to be associated with this execution</span>
@@ -242,6 +242,7 @@
 <span class="sd">        :param bool disable_all: If true, all notifications should be disabled.</span>
 <span class="sd">        :param flytekit.models.common.Labels labels: Labels to apply to the execution.</span>
 <span class="sd">        :param flytekit.models.common.Annotations annotations: Annotations to apply to the execution</span>
+<span class="sd">        :param flytekit.models.common.AuthRole auth_role: The authorization method with which to execute the workflow.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_launch_plan</span> <span class="o">=</span> <span class="n">launch_plan</span>
@@ -250,6 +251,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_disable_all</span> <span class="o">=</span> <span class="n">disable_all</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="o">=</span> <span class="n">labels</span> <span class="ow">or</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">Labels</span><span class="p">({})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_annotations</span> <span class="o">=</span> <span class="n">annotations</span> <span class="ow">or</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">Annotations</span><span class="p">({})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_auth_role</span> <span class="o">=</span> <span class="n">auth_role</span> <span class="ow">or</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -294,6 +296,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annotations</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">auth_role</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flytekit.models.common.AuthRole</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth_role</span>
+
 <div class="viewcode-block" id="ExecutionSpec.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.ExecutionSpec.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.execution_pb2.ExecutionSpec</span>
@@ -305,6 +314,7 @@
             <span class="n">disable_all</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">disable_all</span><span class="p">,</span>
             <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">annotations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">annotations</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">auth_role</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_auth_role</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_role</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ExecutionSpec.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.execution.ExecutionSpec.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -320,6 +330,7 @@
             <span class="n">disable_all</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">disable_all</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;disable_all&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">labels</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">Labels</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">labels</span><span class="p">),</span>
             <span class="n">annotations</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">Annotations</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">annotations</span><span class="p">),</span>
+            <span class="n">auth_role</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">AuthRole</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">auth_role</span><span class="p">),</span>
         <span class="p">)</span></div></div>
 
 

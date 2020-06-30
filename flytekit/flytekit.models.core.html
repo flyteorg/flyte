@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core package &mdash; Flyte 0.4.0 documentation</title>
+  <title>flytekit.models.core package &mdash; Flyte 0.5.0 documentation</title>
   
 
   
@@ -1789,8 +1789,38 @@ an implicit dependency on any node that appears in inputs field.
 
 <dl class="class">
 <dt id="flytekit.models.core.workflow.WorkflowMetadata">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.core.workflow.</code><code class="sig-name descname">WorkflowMetadata</code><span class="sig-paren">(</span><em class="sig-param">queuing_budget=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadata" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.core.workflow.</code><code class="sig-name descname">WorkflowMetadata</code><span class="sig-paren">(</span><em class="sig-param">queuing_budget=None</em>, <em class="sig-param">on_failure=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="class">
+<dt id="flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy">
+<em class="property">class </em><code class="sig-name descname">OnFailurePolicy</code><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowMetadata.OnFailurePolicy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Defines the execution behavior of the workflow when a failure is detected.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><dl class="simple">
+<dt>FAIL_IMMEDIATELY                        Instructs the system to fail as soon as a node fails in the</dt><dd><p>workflow. It’ll automatically abort all currently running nodes and
+clean up resources before finally marking the workflow executions as failed.</p>
+</dd>
+<dt>FAIL_AFTER_EXECUTABLE_NODES_COMPLETE    Instructs the system to make as much progress as it can. The system</dt><dd><p>will not alter the dependencies of the execution graph so any node 
+that depend on the failed node will not be run. Other nodes that will
+be executed to completion before cleaning up resources and marking
+the workflow execution as failed.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy.FAIL_AFTER_EXECUTABLE_NODES_COMPLETE">
+<code class="sig-name descname">FAIL_AFTER_EXECUTABLE_NODES_COMPLETE</code><em class="property"> = 1</em><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy.FAIL_AFTER_EXECUTABLE_NODES_COMPLETE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy.FAIL_IMMEDIATELY">
+<code class="sig-name descname">FAIL_IMMEDIATELY</code><em class="property"> = 0</em><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy.FAIL_IMMEDIATELY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="method">
 <dt id="flytekit.models.core.workflow.WorkflowMetadata.from_flyte_idl">
 <em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowMetadata.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadata.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
@@ -1800,6 +1830,16 @@ an implicit dependency on any node that appears in inputs field.
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="#flytekit.models.core.workflow.WorkflowMetadata" title="flytekit.models.core.workflow.WorkflowMetadata">WorkflowMetadata</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.core.workflow.WorkflowMetadata.on_failure">
+<em class="property">property </em><code class="sig-name descname">on_failure</code><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadata.on_failure" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy" title="flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy">flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy</a></p>
 </dd>
 </dl>
 </dd></dl>

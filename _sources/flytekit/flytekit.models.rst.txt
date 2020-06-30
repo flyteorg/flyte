@@ -76,6 +76,14 @@ flytekit.models.literals module
    :undoc-members:
    :show-inheritance:
 
+flytekit.models.matchable\_resource module
+------------------------------------------
+
+.. automodule:: flytekit.models.matchable_resource
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 flytekit.models.named\_entity module
 ------------------------------------
 

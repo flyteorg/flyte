@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.task &mdash; Flyte 0.4.0 documentation</title>
+  <title>flytekit.common.tasks.task &mdash; Flyte 0.5.0 documentation</title>
   
 
   
@@ -162,15 +162,23 @@
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interfaces</span><span class="p">,</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span><span class="p">,</span> <span class="n">struct_pb2</span> <span class="k">as</span> <span class="n">_struct</span>
+
+<span class="kn">import</span> <span class="nn">hashlib</span> <span class="k">as</span> <span class="nn">_hashlib</span>
+<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">interface</span> <span class="k">as</span> <span class="n">_interfaces</span><span class="p">,</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span><span class="p">,</span> <span class="n">workflow_execution</span> <span class="k">as</span> <span class="n">_workflow_execution</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span><span class="p">,</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span><span class="p">,</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span><span class="p">,</span> <span class="n">launchable</span> <span class="k">as</span> <span class="n">_launchable_mixin</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_model</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_model</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span><span class="p">,</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 
 
 <div class="viewcode-block" id="SdkTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask">[docs]</a><span class="k">class</span> <span class="nc">SdkTask</span><span class="p">(</span>
@@ -179,6 +187,7 @@
         <span class="n">_hash_mixin</span><span class="o">.</span><span class="n">HashOnReferenceMixin</span><span class="p">,</span>
         <span class="n">_task_model</span><span class="o">.</span><span class="n">TaskTemplate</span><span class="p">,</span>
         <span class="n">_registerable</span><span class="o">.</span><span class="n">RegisterableEntity</span><span class="p">,</span>
+        <span class="n">_launchable_mixin</span><span class="o">.</span><span class="n">LaunchableEntity</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">):</span>
 
@@ -409,7 +418,101 @@
         <span class="k">return</span> <span class="s2">&quot;Flyte </span><span class="si">{task_type}</span><span class="s2">: </span><span class="si">{interface}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">task_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
             <span class="n">interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_python_std_input_map_to_literal_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param dict[Text,Any] inputs: A dictionary of Python standard inputs that will be type-checked and compiled</span>
+<span class="sd">            to a LiteralMap</span>
+<span class="sd">        :rtype: flytekit.models.literals.LiteralMap</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="p">})</span>
+
+    <span class="k">def</span> <span class="nf">_produce_deterministic_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param Text version:</span>
+<span class="sd">        :return Text:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">data_loading_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Only in the case of raw container tasks (which are the only valid tasks with container definitions that</span>
+            <span class="c1"># can assign a client-side task version) their data config will be None.</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Client-side task versions are not supported for </span><span class="si">{}</span><span class="s2"> task type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">version</span>
+        <span class="n">custom</span> <span class="o">=</span> <span class="n">_json_format</span><span class="o">.</span><span class="n">Parse</span><span class="p">(</span><span class="n">_json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">custom</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">_struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">())</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">custom</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="c1"># The task body is the entirety of the task template MINUS the identifier. The identifier is omitted because</span>
+        <span class="c1"># 1) this method is used to compute the version portion of the identifier and</span>
+        <span class="c1"># 2 ) the SDK will actually generate a unique name on every task instantiation which is not great for</span>
+        <span class="c1"># the reproducibility this method attempts.</span>
+        <span class="n">task_body</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(</span><span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(</span><span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">custom</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">task_body</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SdkTask.register_and_launch"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.register_and_launch">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+    <span class="k">def</span> <span class="nf">register_and_launch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param Text project: The project in which to register and launch this task.</span>
+<span class="sd">        :param Text domain: The domain in which to register and launch this task.</span>
+<span class="sd">        :param Text name: The name to give this task.</span>
+<span class="sd">        :param Text version: The version in which to register this task</span>
+<span class="sd">        :param dict[Text, Any] inputs: A dictionary of Python standard inputs that will be type-checked, then compiled</span>
+<span class="sd">            to a LiteralMap.</span>
+
+<span class="sd">        :rtype: flytekit.common.workflow_execution.SdkWorkflowExecution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_produce_deterministic_version</span><span class="p">(</span><span class="n">version</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">auto_assign_name</span><span class="p">()</span>
+                <span class="n">generated_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_platform_valid_name</span>
+            <span class="k">except</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">:</span>
+                <span class="c1"># If we&#39;re not able to assign a platform valid name, use the deterministically-produced version instead.</span>
+                <span class="n">generated_name</span> <span class="o">=</span> <span class="n">version</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="k">if</span> <span class="n">name</span> <span class="k">else</span> <span class="n">generated_name</span>
+        <span class="n">id_to_register</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">TASK</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">old_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">id_to_register</span>
+            <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">id_to_register</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">old_id</span>
+            <span class="k">raise</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SdkTask.launch_with_literals"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.launch_with_literals">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+    <span class="k">def</span> <span class="nf">launch_with_literals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">literal_inputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launches a single task execution and returns the execution identifier.</span>
+<span class="sd">        :param Text project:</span>
+<span class="sd">        :param Text domain:</span>
+<span class="sd">        :param flytekit.models.literals.LiteralMap literal_inputs: Inputs to the execution.</span>
+<span class="sd">        :param Text name: [Optional] If specified, an execution will be created with this name.  Note: the name must</span>
+<span class="sd">            be unique within the context of the project and domain.</span>
+<span class="sd">        :param list[flytekit.common.notifications.Notification] notification_overrides: [Optional] If specified, these</span>
+<span class="sd">            are the notifications that will be honored for this execution.  An empty list signals to disable all</span>
+<span class="sd">            notifications.</span>
+<span class="sd">        :param flytekit.models.common.Labels label_overrides:</span>
+<span class="sd">        :param flytekit.models.common.Annotations annotation_overrides:</span>
+<span class="sd">        :rtype: flytekit.common.workflow_execution.SdkWorkflowExecution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">execution</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+            <span class="n">project</span><span class="p">,</span>
+            <span class="n">domain</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="n">literal_inputs</span><span class="p">,</span>
+            <span class="n">notification_overrides</span><span class="o">=</span><span class="n">notification_overrides</span><span class="p">,</span>
+            <span class="n">label_overrides</span><span class="o">=</span><span class="n">label_overrides</span><span class="p">,</span>
+            <span class="n">annotation_overrides</span><span class="o">=</span><span class="n">annotation_overrides</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_workflow_execution</span><span class="o">.</span><span class="n">SdkWorkflowExecution</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">execution</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

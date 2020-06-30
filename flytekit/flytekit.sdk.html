@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk package &mdash; Flyte 0.4.0 documentation</title>
+  <title>flytekit.sdk package &mdash; Flyte 0.5.0 documentation</title>
   
 
   
@@ -2267,7 +2267,7 @@ executing–either by being downloaded from an accessible remote location like s
 
 <dl class="function">
 <dt id="flytekit.sdk.workflow.workflow">
-<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow</code><span class="sig-paren">(</span><em class="sig-param">nodes</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">outputs=None</em>, <em class="sig-param">cls=None</em>, <em class="sig-param">queuing_budget=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow</code><span class="sig-paren">(</span><em class="sig-param">nodes</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">outputs=None</em>, <em class="sig-param">cls=None</em>, <em class="sig-param">queuing_budget=None</em>, <em class="sig-param">on_failure=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function provides a user-friendly interface for authoring workflows.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_a</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Tell me something&quot;</span><span class="p">)</span>
@@ -2303,6 +2303,7 @@ executing–either by being downloaded from an accessible remote location like s
 by users extending the base Flyte programming model. If set, it must be a subclass of
 <a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.workflow.SdkWorkflow</span></code></a>.</p></li>
 <li><p><strong>datetime.timedelta</strong> (<em>queuing_budget</em>) – [Optional] Budget that specifies the amount of time a workflow can be queued up for execution.</p></li>
+<li><p><strong>flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy</strong> (<em>on_failure</em>) – [Optional] The execution policy when the workflow detects a failure.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -2313,7 +2314,7 @@ by users extending the base Flyte programming model. If set, it must be a subcla
 
 <dl class="function">
 <dt id="flytekit.sdk.workflow.workflow_class">
-<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow_class</code><span class="sig-paren">(</span><em class="sig-param">_workflow_metaclass=None</em>, <em class="sig-param">cls=None</em>, <em class="sig-param">queuing_budget=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow_class" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow_class</code><span class="sig-paren">(</span><em class="sig-param">_workflow_metaclass=None</em>, <em class="sig-param">cls=None</em>, <em class="sig-param">queuing_budget=None</em>, <em class="sig-param">on_failure=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a decorator for wrapping class definitions into workflows.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@workflow_class</span>
@@ -2335,6 +2336,7 @@ wrapped by this decorator.</p></li>
 by users extending the base Flyte programming model. If set, it must be a subclass of
 <a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.workflow.SdkWorkflow</span></code></a>.</p></li>
 <li><p><strong>datetime.timedelta</strong> (<em>queuing_budget</em>) – [Optional] Budget that specifies the amount of time a workflow can be queued up for execution.</p></li>
+<li><p><strong>flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy</strong> (<em>on_failure</em>) – [Optional] The execution policy when the workflow detects a failure.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>

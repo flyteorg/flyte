@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks package &mdash; Flyte 0.4.0 documentation</title>
+  <title>flytekit.common.tasks package &mdash; Flyte 0.5.0 documentation</title>
   
 
   
@@ -436,6 +436,55 @@ the wrapped function.
 </dd></dl>
 
 </div>
+<div class="section" id="module-flytekit.common.tasks.raw_container">
+<span id="flytekit-common-tasks-raw-container-module"></span><h2>flytekit.common.tasks.raw_container module<a class="headerlink" href="#module-flytekit.common.tasks.raw_container" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.common.tasks.raw_container.SdkRawContainerTask">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.raw_container.</code><code class="sig-name descname">SdkRawContainerTask</code><span class="sig-paren">(</span><em class="sig-param">inputs: Dict[str, flytekit.common.types.base_sdk_types.FlyteSdkType], image: str, outputs: Dict[str, flytekit.common.types.base_sdk_types.FlyteSdkType] = None, input_data_dir: str = None, output_data_dir: str = None, metadata_format: int = 0, io_strategy: flytekit.models.task.IOStrategy = None, command: List[str] = None, args: List[str] = None, storage_request: str = None, cpu_request: str = None, gpu_request: str = None, memory_request: str = None, storage_limit: str = None, cpu_limit: str = None, gpu_limit: str = None, memory_limit: str = None, environment: Dict[str, str] = None, interruptible: bool = False, discoverable: bool = False, discovery_version: str = None, retries: int = 1, timeout: datetime.timedelta = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/raw_container.html#SdkRawContainerTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.raw_container.SdkRawContainerTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.task.SdkTask" title="flytekit.common.tasks.task.SdkTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.task.SdkTask</span></code></a></p>
+<p>Use this task when you want to run an arbitrary container as a task (e.g. external tools, binaries compiled
+separately as a container completely separate from the container where your Flyte workflow is defined.</p>
+<dl class="attribute">
+<dt id="flytekit.common.tasks.raw_container.SdkRawContainerTask.METADATA_FORMAT_JSON">
+<code class="sig-name descname">METADATA_FORMAT_JSON</code><em class="property"> = 0</em><a class="headerlink" href="#flytekit.common.tasks.raw_container.SdkRawContainerTask.METADATA_FORMAT_JSON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.common.tasks.raw_container.SdkRawContainerTask.METADATA_FORMAT_PROTO">
+<code class="sig-name descname">METADATA_FORMAT_PROTO</code><em class="property"> = 2</em><a class="headerlink" href="#flytekit.common.tasks.raw_container.SdkRawContainerTask.METADATA_FORMAT_PROTO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.common.tasks.raw_container.SdkRawContainerTask.METADATA_FORMAT_YAML">
+<code class="sig-name descname">METADATA_FORMAT_YAML</code><em class="property"> = 1</em><a class="headerlink" href="#flytekit.common.tasks.raw_container.SdkRawContainerTask.METADATA_FORMAT_YAML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.tasks.raw_container.SdkRawContainerTask.add_inputs">
+<code class="sig-name descname">add_inputs</code><span class="sig-paren">(</span><em class="sig-param">inputs: Dict[str, flytekit.models.interface.Variable]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/raw_container.html#SdkRawContainerTask.add_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.raw_container.SdkRawContainerTask.add_inputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the inputs to this task.  This can be called multiple times, but it will fail if an input with a given
+name is added more than once, a name collides with an output, or if the name doesn’t exist as an arg name in
+the wrapped function.
+:param dict[Text, flytekit.models.interface.Variable] inputs: names and variables</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.tasks.raw_container.SdkRawContainerTask.add_outputs">
+<code class="sig-name descname">add_outputs</code><span class="sig-paren">(</span><em class="sig-param">outputs: Dict[str, flytekit.models.interface.Variable]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/raw_container.html#SdkRawContainerTask.add_outputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.raw_container.SdkRawContainerTask.add_outputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the inputs to this task.  This can be called multiple times, but it will fail if an input with a given
+name is added more than once, a name collides with an output, or if the name doesn’t exist as an arg name in
+the wrapped function.
+:param dict[Text, flytekit.models.interface.Variable] outputs: names and variables</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="flytekit.common.tasks.raw_container.types_to_variable">
+<code class="sig-prename descclassname">flytekit.common.tasks.raw_container.</code><code class="sig-name descname">types_to_variable</code><span class="sig-paren">(</span><em class="sig-param">t: Dict[str, flytekit.common.types.base_sdk_types.FlyteSdkType]</em><span class="sig-paren">)</span> &#x2192; Dict[str, flytekit.models.interface.Variable]<a class="reference internal" href="../_modules/flytekit/common/tasks/raw_container.html#types_to_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.raw_container.types_to_variable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
 <div class="section" id="module-flytekit.common.tasks.sdk_dynamic">
 <span id="flytekit-common-tasks-sdk-dynamic-module"></span><h2>flytekit.common.tasks.sdk_dynamic module<a class="headerlink" href="#module-flytekit.common.tasks.sdk_dynamic" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -813,7 +862,7 @@ workflow.  Where as local engine will merely feed the outputs directly into the 
 <dl class="class">
 <dt id="flytekit.common.tasks.task.SdkTask">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.task.</code><code class="sig-name descname">SdkTask</code><span class="sig-paren">(</span><em class="sig-param">type</em>, <em class="sig-param">metadata</em>, <em class="sig-param">interface</em>, <em class="sig-param">custom</em>, <em class="sig-param">container=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/task.html#SdkTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="flytekit.common.mixins.html#flytekit.common.mixins.hash.HashOnReferenceMixin" title="flytekit.common.mixins.hash.HashOnReferenceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.mixins.hash.HashOnReferenceMixin</span></code></a>, <a class="reference internal" href="flytekit.models.html#flytekit.models.task.TaskTemplate" title="flytekit.models.task.TaskTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.task.TaskTemplate</span></code></a>, <a class="reference internal" href="flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity" title="flytekit.common.mixins.registerable.RegisterableEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.mixins.registerable.RegisterableEntity</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="flytekit.common.mixins.html#flytekit.common.mixins.hash.HashOnReferenceMixin" title="flytekit.common.mixins.hash.HashOnReferenceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.mixins.hash.HashOnReferenceMixin</span></code></a>, <a class="reference internal" href="flytekit.models.html#flytekit.models.task.TaskTemplate" title="flytekit.models.task.TaskTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.task.TaskTemplate</span></code></a>, <a class="reference internal" href="flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity" title="flytekit.common.mixins.registerable.RegisterableEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.mixins.registerable.RegisterableEntity</span></code></a>, <a class="reference internal" href="flytekit.common.mixins.html#flytekit.common.mixins.launchable.LaunchableEntity" title="flytekit.common.mixins.launchable.LaunchableEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.mixins.launchable.LaunchableEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.common.tasks.task.SdkTask.add_inputs">
 <code class="sig-name descname">add_inputs</code><span class="sig-paren">(</span><em class="sig-param">inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/task.html#SdkTask.add_inputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.add_inputs" title="Permalink to this definition">¶</a></dt>
@@ -883,6 +932,33 @@ the wrapped function.
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.common.tasks.task.SdkTask.launch_with_literals">
+<code class="sig-name descname">launch_with_literals</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">literal_inputs</em>, <em class="sig-param">name=None</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/task.html#SdkTask.launch_with_literals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.launch_with_literals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launches a single task execution and returns the execution identifier.
+:param Text project:
+:param Text domain:
+:param flytekit.models.literals.LiteralMap literal_inputs: Inputs to the execution.
+:param Text name: [Optional] If specified, an execution will be created with this name.  Note: the name must</p>
+<blockquote>
+<div><p>be unique within the context of the project and domain.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>notification_overrides</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.common.html#flytekit.common.notifications.Notification" title="flytekit.common.notifications.Notification"><em>flytekit.common.notifications.Notification</em></a><em>]</em>) – [Optional] If specified, these
+are the notifications that will be honored for this execution.  An empty list signals to disable all
+notifications.</p></li>
+<li><p><strong>label_overrides</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.common.Labels" title="flytekit.models.common.Labels"><em>flytekit.models.common.Labels</em></a>) – </p></li>
+<li><p><strong>annotation_overrides</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.common.Annotations" title="flytekit.models.common.Annotations"><em>flytekit.models.common.Annotations</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.common.html#flytekit.common.workflow_execution.SdkWorkflowExecution" title="flytekit.common.workflow_execution.SdkWorkflowExecution">flytekit.common.workflow_execution.SdkWorkflowExecution</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.common.tasks.task.SdkTask.promote_from_model">
 <em class="property">classmethod </em><code class="sig-name descname">promote_from_model</code><span class="sig-paren">(</span><em class="sig-param">base_model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/task.html#SdkTask.promote_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.promote_from_model" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -906,6 +982,26 @@ the wrapped function.
 <li><p><strong>name</strong> (<em>Text</em>) – The name to give this task.</p></li>
 <li><p><strong>version</strong> (<em>Text</em>) – The version in which to register this task.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.tasks.task.SdkTask.register_and_launch">
+<code class="sig-name descname">register_and_launch</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name=None</em>, <em class="sig-param">version=None</em>, <em class="sig-param">inputs=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/task.html#SdkTask.register_and_launch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.task.SdkTask.register_and_launch" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<em>Text</em>) – The project in which to register and launch this task.</p></li>
+<li><p><strong>domain</strong> (<em>Text</em>) – The domain in which to register and launch this task.</p></li>
+<li><p><strong>name</strong> (<em>Text</em>) – The name to give this task.</p></li>
+<li><p><strong>version</strong> (<em>Text</em>) – The version in which to register this task</p></li>
+<li><p><strong>Any</strong><strong>] </strong><strong>inputs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em>) – A dictionary of Python standard inputs that will be type-checked, then compiled
+to a LiteralMap.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.common.html#flytekit.common.workflow_execution.SdkWorkflowExecution" title="flytekit.common.workflow_execution.SdkWorkflowExecution">flytekit.common.workflow_execution.SdkWorkflowExecution</a></p>
 </dd>
 </dl>
 </dd></dl>

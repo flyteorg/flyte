@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients.friendly &mdash; Flyte 0.4.0 documentation</title>
+  <title>flytekit.clients.friendly &mdash; Flyte 0.5.0 documentation</title>
   
 
   
@@ -162,7 +162,8 @@
 
 <span class="kn">from</span> <span class="nn">flyteidl.admin</span> <span class="k">import</span> <span class="n">task_pb2</span> <span class="k">as</span> <span class="n">_task_pb2</span><span class="p">,</span> <span class="n">common_pb2</span> <span class="k">as</span> <span class="n">_common_pb2</span><span class="p">,</span> <span class="n">workflow_pb2</span> <span class="k">as</span> <span class="n">_workflow_pb2</span><span class="p">,</span> \
     <span class="n">launch_plan_pb2</span> <span class="k">as</span> <span class="n">_launch_plan_pb2</span><span class="p">,</span> <span class="n">execution_pb2</span> <span class="k">as</span> <span class="n">_execution_pb2</span><span class="p">,</span> <span class="n">node_execution_pb2</span> <span class="k">as</span> <span class="n">_node_execution_pb2</span><span class="p">,</span> \
-    <span class="n">task_execution_pb2</span> <span class="k">as</span> <span class="n">_task_execution_pb2</span><span class="p">,</span> <span class="n">project_pb2</span> <span class="k">as</span> <span class="n">_project_pb2</span>
+    <span class="n">task_execution_pb2</span> <span class="k">as</span> <span class="n">_task_execution_pb2</span><span class="p">,</span> <span class="n">project_pb2</span> <span class="k">as</span> <span class="n">_project_pb2</span><span class="p">,</span> <span class="n">project_domain_attributes_pb2</span> <span class="k">as</span> \
+    <span class="n">_project_domain_attributes_pb2</span><span class="p">,</span> <span class="n">workflow_attributes_pb2</span> <span class="k">as</span> <span class="n">_workflow_attributes_pb2</span>
 <span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">identifier_pb2</span> <span class="k">as</span> <span class="n">_identifier_pb2</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.clients.raw</span> <span class="k">import</span> <span class="n">RawSynchronousFlyteClient</span> <span class="k">as</span> <span class="n">_RawSynchronousFlyteClient</span>
@@ -1041,6 +1042,50 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">register_project</span><span class="p">(</span>
             <span class="n">_project_pb2</span><span class="o">.</span><span class="n">ProjectRegisterRequest</span><span class="p">(</span>
                 <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+    <span class="c1">####################################################################################################################</span>
+    <span class="c1">#</span>
+    <span class="c1">#  Matching Attributes Endpoints</span>
+    <span class="c1">#</span>
+    <span class="c1">####################################################################################################################</span>
+
+<div class="viewcode-block" id="SynchronousFlyteClient.update_project_domain_attributes"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.update_project_domain_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">update_project_domain_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">matching_attributes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets custom attributes for a project and domain combination.</span>
+<span class="sd">        :param Text project:</span>
+<span class="sd">        :param Text domain:</span>
+<span class="sd">        :param flytekit.models.MatchingAttributes matching_attributes:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update_project_domain_attributes</span><span class="p">(</span>
+            <span class="n">_project_domain_attributes_pb2</span><span class="o">.</span><span class="n">ProjectDomainAttributesUpdateRequest</span><span class="p">(</span>
+                <span class="n">attributes</span><span class="o">=</span><span class="n">_project_domain_attributes_pb2</span><span class="o">.</span><span class="n">ProjectDomainAttributes</span><span class="p">(</span>
+                    <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+                    <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+                    <span class="n">matching_attributes</span><span class="o">=</span><span class="n">matching_attributes</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SynchronousFlyteClient.update_workflow_attributes"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.update_workflow_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">update_workflow_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">workflow</span><span class="p">,</span> <span class="n">matching_attributes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets custom attributes for a project, domain, and workflow combination.</span>
+<span class="sd">        :param Text project:</span>
+<span class="sd">        :param Text domain:</span>
+<span class="sd">        :param Text workflow:</span>
+<span class="sd">        :param flytekit.models.MatchingAttributes matching_attributes:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update_workflow_attributes</span><span class="p">(</span>
+            <span class="n">_workflow_attributes_pb2</span><span class="o">.</span><span class="n">WorkflowAttributesUpdateRequest</span><span class="p">(</span>
+                <span class="n">attributes</span><span class="o">=</span><span class="n">_workflow_attributes_pb2</span><span class="o">.</span><span class="n">WorkflowAttributes</span><span class="p">(</span>
+                    <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+                    <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+                    <span class="n">workflow</span><span class="o">=</span><span class="n">workflow</span><span class="p">,</span>
+                    <span class="n">matching_attributes</span><span class="o">=</span><span class="n">matching_attributes</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+                <span class="p">)</span>
             <span class="p">)</span>
         <span class="p">)</span></div></div>
 </pre></div>

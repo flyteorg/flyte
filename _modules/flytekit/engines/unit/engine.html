@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.engines.unit.engine &mdash; Flyte 0.4.0 documentation</title>
+  <title>flytekit.engines.unit.engine &mdash; Flyte 0.5.0 documentation</title>
   
 
   
@@ -284,7 +284,11 @@
         <span class="k">return</span> <span class="n">outputs</span>
 
 <div class="viewcode-block" id="UnitTestEngineTask.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.UnitTestEngineTask.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;You cannot register unit test tasks.&quot;</span><span class="p">)</span></div></div>
+        <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;You cannot register unit test tasks.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnitTestEngineTask.launch"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.UnitTestEngineTask.launch">[docs]</a>    <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auth_role</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;You cannot launch unit test tasks.&quot;</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ReturnOutputsTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.ReturnOutputsTask">[docs]</a><span class="k">class</span> <span class="nc">ReturnOutputsTask</span><span class="p">(</span><span class="n">UnitTestEngineTask</span><span class="p">):</span>
