@@ -2,6 +2,7 @@ import { Tab, Tabs } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { WaitForData } from 'components/common';
 import { useTabState } from 'components/hooks/useTabState';
+import { secondaryBackgroundColor } from 'components/Theme';
 import { Execution } from 'models';
 import * as React from 'react';
 import { NodeExecutionsRequestConfigContext } from '../contexts';
@@ -23,6 +24,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         minHeight: 0
     },
     tabs: {
+        background: secondaryBackgroundColor,
         paddingLeft: theme.spacing(3.5)
     }
 }));

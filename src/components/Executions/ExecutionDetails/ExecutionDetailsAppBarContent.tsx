@@ -2,8 +2,7 @@ import { Button, Dialog, Link, Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import * as classnames from 'classnames';
-import { formatDateUTC, protobufDurationToHMS } from 'common/formatters';
-import { timestampToDate } from 'common/utils';
+import { navbarGridHeight } from 'common/layout';
 import { useCommonStyles } from 'components/common/styles';
 import { useLocationState } from 'components/hooks/useLocationState';
 import { NavBarContent } from 'components/Navigation/NavBarContent';
@@ -19,9 +18,6 @@ import { executionIsTerminal } from '../utils';
 import { RelaunchExecutionForm } from './RelaunchExecutionForm';
 
 const useStyles = makeStyles((theme: Theme) => {
-    const actionsMinWidth = theme.spacing(34);
-    const badgeWidth = theme.spacing(11);
-    const maxDetailsWidth = `calc(100% - ${actionsMinWidth + badgeWidth}px)`;
     return {
         actions: {
             alignItems: 'center',
@@ -41,25 +37,13 @@ const useStyles = makeStyles((theme: Theme) => {
             flex: '1 1 auto',
             maxWidth: '100%'
         },
-        detailsContainer: {
+        titleContainer: {
             alignItems: 'center',
             display: 'flex',
             flex: '0 1 auto',
-            justifyContent: 'space-between',
-            maxWidth: maxDetailsWidth
-        },
-        detailItem: {
-            flexShrink: 0,
-            marginLeft: theme.spacing(2)
-        },
-        detailLabel: {
-            fontSize: smallFontSize,
-            lineHeight: 1.25
-        },
-        detailValue: {
-            fontSize: '0.875rem',
-            fontWeight: 'bold',
-            lineHeight: '1.1875rem'
+            flexDirection: 'column',
+            maxHeight: theme.spacing(navbarGridHeight),
+            overflow: 'hidden'
         },
         inputsOutputsLink: {
             color: interactiveTextDisabledColor
@@ -69,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) => {
         },
         title: {
             flex: '0 1 auto',
-            overflow: 'hidden'
+            marginLeft: theme.spacing(2)
         },
         version: {
             flex: '0 1 auto',
@@ -77,12 +61,6 @@ const useStyles = makeStyles((theme: Theme) => {
         }
     };
 });
-
-interface DetailItem {
-    className?: string;
-    label: React.ReactNode;
-    value: React.ReactNode;
-}
 
 /** Renders information about a given Execution into the NavBar */
 export const ExecutionDetailsAppBarContent: React.FC<{
@@ -94,7 +72,7 @@ export const ExecutionDetailsAppBarContent: React.FC<{
     const [showRelaunchForm, setShowRelaunchForm] = React.useState(false);
 
     const { domain, name, project } = execution.id;
-    const { duration, startedAt, phase, workflowId } = execution.closure;
+    const { phase, workflowId } = execution.closure;
 
     const {
         backLink = Routes.WorkflowDetails.makeUrl(
@@ -135,28 +113,6 @@ export const ExecutionDetailsAppBarContent: React.FC<{
         <TerminateExecutionButton className={styles.actionButton} />
     );
 
-    const details: DetailItem[] = [
-        {
-            className: styles.title,
-            label: `${project}/${domain}/${workflowId.name}`,
-            value: name
-        },
-        { label: 'Domain', value: domain },
-        {
-            className: styles.version,
-            label: 'Version',
-            value: workflowId.version
-        },
-        {
-            label: 'Time',
-            value: startedAt ? formatDateUTC(timestampToDate(startedAt)) : ''
-        },
-        {
-            label: 'Duration',
-            value: duration ? protobufDurationToHMS(duration) : ''
-        }
-    ];
-
     return (
         <>
             <NavBarContent>
@@ -165,34 +121,19 @@ export const ExecutionDetailsAppBarContent: React.FC<{
                         <ArrowBack />
                     </RouterLink>
                     <ExecutionStatusBadge phase={phase} type="workflow" />
-                    <div className={styles.detailsContainer}>
-                        {details.map(({ className, label, value }, idx) => (
-                            <div
-                                className={classnames(
-                                    styles.detailItem,
-                                    className
-                                )}
-                                key={idx}
-                            >
-                                <Typography
-                                    className={classnames(
-                                        styles.detailLabel,
-                                        commonStyles.truncateText
-                                    )}
-                                    variant="body1"
-                                >
-                                    {label}
-                                </Typography>
-                                <div
-                                    className={classnames(
-                                        styles.detailValue,
-                                        commonStyles.truncateText
-                                    )}
-                                >
-                                    {value}
-                                </div>
-                            </div>
-                        ))}
+                    <div className={styles.titleContainer}>
+                        <Typography
+                            variant="body1"
+                            className={classnames(
+                                styles.title,
+                                commonStyles.textWrapped
+                            )}
+                        >
+                            <span>
+                                {`${project}/${domain}/${workflowId.name}/`}
+                                <strong>{`${name}`}</strong>
+                            </span>
+                        </Typography>
                     </div>
                     <div className={styles.actions}>
                         <Link

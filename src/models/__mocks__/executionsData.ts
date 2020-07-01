@@ -72,7 +72,10 @@ export function generateExecutionMetadata(): ExecutionMetadata {
     return {
         mode: ExecutionMode.MANUAL,
         nesting: 0,
-        principal: 'human'
+        principal: 'human',
+        systemMetadata: {
+            executionCluster: 'flyte'
+        }
     };
 }
 
