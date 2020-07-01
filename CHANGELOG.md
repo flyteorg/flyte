@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.2](http://github.com/lyft/flyteconsole/compare/v0.7.1...v0.7.2) (2020-07-01)
+
+
+### Bug Fixes
+
+* show dashed lines for empty values instead of removing them ([#79](http://github.com/lyft/flyteconsole/issues/79)) ([0eaaecd](http://github.com/lyft/flyteconsole/commit/0eaaecd2f7c5cf7e2ed33bebaf4f3a4fc57ba697))
+
 ## [0.7.1](http://github.com/lyft/flyteconsole/compare/v0.7.0...v0.7.1) (2020-07-01)
 
 
