@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.1](http://github.com/lyft/flyteconsole/compare/v0.7.0...v0.7.1) (2020-07-01)
+
+
+### Bug Fixes
+
+* Expose cluster information for Workflow Executions ([#78](http://github.com/lyft/flyteconsole/issues/78)) ([d43a1e3](http://github.com/lyft/flyteconsole/commit/d43a1e393ef7b0651f9774460e3d7166a3b57f17))
+
 # [0.7.0](http://github.com/lyft/flyteconsole/compare/v0.6.0...v0.7.0) (2020-06-30)
 
 
