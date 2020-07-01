@@ -1,7 +1,7 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import * as classnames from 'classnames';
-import { unknownValueString } from 'common/constants';
+import { dashedValueString } from 'common/constants';
 import { formatDateUTC, protobufDurationToHMS } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
@@ -66,7 +66,7 @@ export const ExecutionMetadata: React.FC<{
     const { domain } = execution.id;
     const { duration, error, startedAt, workflowId } = execution.closure;
     const { systemMetadata } = execution.spec.metadata;
-    const cluster = systemMetadata?.executionCluster ?? unknownValueString;
+    const cluster = systemMetadata?.executionCluster ?? dashedValueString;
 
     const details: DetailItem[] = [
         { label: ExecutionMetadataLabels.domain, value: domain },
@@ -78,20 +78,20 @@ export const ExecutionMetadata: React.FC<{
         {
             label: ExecutionMetadataLabels.cluster,
             value: cluster
+        },
+        {
+            label: ExecutionMetadataLabels.time,
+            value: startedAt
+                ? formatDateUTC(timestampToDate(startedAt))
+                : dashedValueString
+        },
+        {
+            label: ExecutionMetadataLabels.duration,
+            value: duration
+                ? protobufDurationToHMS(duration)
+                : dashedValueString
         }
     ];
-    if (startedAt) {
-        details.push({
-            label: ExecutionMetadataLabels.time,
-            value: formatDateUTC(timestampToDate(startedAt))
-        });
-    }
-    if (duration) {
-        details.push({
-            label: ExecutionMetadataLabels.duration,
-            value: protobufDurationToHMS(duration)
-        });
-    }
 
     return (
         <div className={styles.container}>

@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { unknownValueString } from 'common/constants';
+import { dashedValueString } from 'common/constants';
 import { Execution } from 'models';
 import { createMockExecution } from 'models/__mocks__/executionsData';
 import * as React from 'react';
@@ -7,6 +7,8 @@ import { ExecutionMetadataLabels } from '../constants';
 import { ExecutionMetadata } from '../ExecutionMetadata';
 
 const clusterTestId = `metadata-${ExecutionMetadataLabels.cluster}`;
+const startTimeTestId = `metadata-${ExecutionMetadataLabels.time}`;
+const durationTestId = `metadata-${ExecutionMetadataLabels.duration}`;
 
 describe('ExecutionMetadata', () => {
     let execution: Execution;
@@ -28,31 +30,31 @@ describe('ExecutionMetadata', () => {
         );
     });
 
-    it('shows unknown string for cluster if no metadata', () => {
+    it('shows empty string for cluster if no metadata', () => {
         delete execution.spec.metadata.systemMetadata;
         const { getByTestId } = renderMetadata();
-        expect(getByTestId(clusterTestId)).toHaveTextContent(
-            unknownValueString
-        );
+        expect(getByTestId(clusterTestId)).toHaveTextContent(dashedValueString);
     });
 
-    it('shows unknown string for cluster if no cluster name', () => {
+    it('shows empty string for cluster if no cluster name', () => {
         delete execution.spec.metadata.systemMetadata?.executionCluster;
         const { getByTestId } = renderMetadata();
-        expect(getByTestId(clusterTestId)).toHaveTextContent(
-            unknownValueString
+        expect(getByTestId(clusterTestId)).toHaveTextContent(dashedValueString);
+    });
+
+    it('shows empty string for start time if not available', () => {
+        delete execution.closure.startedAt;
+        const { getByTestId } = renderMetadata();
+        expect(getByTestId(startTimeTestId)).toHaveTextContent(
+            dashedValueString
         );
     });
 
-    it('does not show start time if not available', () => {
-        delete execution.closure.startedAt;
-        const { queryByText } = renderMetadata();
-        expect(queryByText(ExecutionMetadataLabels.time)).toBeNull;
-    });
-
-    it('does not show duration if not available', () => {
+    it('shows empty string for duration if not available', () => {
         delete execution.closure.duration;
-        const { queryByText } = renderMetadata();
-        expect(queryByText(ExecutionMetadataLabels.duration)).toBeNull;
+        const { getByTestId } = renderMetadata();
+        expect(getByTestId(durationTestId)).toHaveTextContent(
+            dashedValueString
+        );
     });
 });

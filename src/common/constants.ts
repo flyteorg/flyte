@@ -10,6 +10,7 @@ export const detailsPanelId = 'details-panel';
 export const navBarContentId = 'nav-bar-content';
 
 export const unknownValueString = '(unknown)';
+export const dashedValueString = '----';
 export const noDescriptionString = '(No description)';
 export const noneString = '(none)';
 export const noExecutionsFoundString = 'No executions found.';
