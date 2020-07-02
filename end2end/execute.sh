@@ -28,12 +28,14 @@ function wait_for_flyte_deploys() {
     echo "waiting for flyte deploy to complete..."
     echo ""
 
+    kubectl -n flyte rollout status deployment postgres
+    echo ""
+    kubectl -n flyte rollout status deployment minio
+    echo ""
     # wait for flyteadmin deployment to complete
     kubectl -n flyte rollout status deployment flyteadmin
     echo ""
     kubectl -n flyte rollout status deployment flytepropeller
-    echo ""
-    kubectl -n flyte rollout status deployment minio
     echo ""
     kubectl -n heptio-contour rollout status deployment contour
     echo ""
