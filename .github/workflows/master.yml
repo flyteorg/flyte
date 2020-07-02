@@ -45,7 +45,7 @@ jobs:
           kubectl get pods -n kube-system
           echo "current-context:" $(kubectl config current-context)
           echo "environment-kubeconfig:" ${KUBECONFIG}
-          PROPELLER=${{ secrets.flytegithub_repo }}/flyteadmin:${{ github.sha }} make end2end_execute
+          ADMIN=${{ secrets.flytegithub_repo }}/flyteadmin:${{ github.sha }} make end2end_execute
   push-dockerhub:
     runs-on: ubuntu-latest
     needs: bump-version
