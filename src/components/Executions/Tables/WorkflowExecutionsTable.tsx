@@ -11,12 +11,13 @@ import {
 } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { DataList, DataListRef } from 'components';
+import { getCacheKey } from 'components/Cache';
 import { ListProps } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import { Execution } from 'models';
 import { WorkflowExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
-import { ListRowRenderer } from 'react-virtualized';
+import { ListRowProps, ListRowRenderer } from 'react-virtualized';
 import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { getWorkflowExecutionTimingMS } from '../utils';
@@ -168,6 +169,59 @@ function generateColumns(
     ];
 }
 
+interface WorkflowExecutionRowProps extends ListRowProps {
+    columns: WorkflowExecutionColumnDefinition[];
+    errorExpanded: boolean;
+    execution: Execution;
+    onExpandCollapseError(expanded: boolean): void;
+    state: ReturnType<typeof useWorkflowExecutionsTableState>;
+}
+
+const WorkflowExecutionRow: React.FC<WorkflowExecutionRowProps> = ({
+    columns,
+    errorExpanded,
+    execution,
+    onExpandCollapseError,
+    state,
+    style
+}) => {
+    const { error } = execution.closure;
+    const tableStyles = useExecutionTableStyles();
+    const styles = useStyles();
+
+    return (
+        <div
+            className={classnames(
+                tableStyles.row,
+                styles.row,
+                tableStyles.borderBottom
+            )}
+            style={style}
+        >
+            <div className={tableStyles.rowColumns}>
+                {columns.map(({ className, key: columnKey, cellRenderer }) => (
+                    <div
+                        key={columnKey}
+                        className={classnames(tableStyles.rowColumn, className)}
+                    >
+                        {cellRenderer({
+                            execution,
+                            state
+                        })}
+                    </div>
+                ))}
+            </div>
+            {error ? (
+                <ExpandableExecutionError
+                    onExpandCollapse={onExpandCollapseError}
+                    initialExpansionState={errorExpanded}
+                    error={error}
+                />
+            ) : null}
+        </div>
+    );
+};
+
 export interface WorkflowExecutionsTableProps extends ListProps<Execution> {}
 
 /** Renders a table of WorkflowExecution records. Executions with errors will
@@ -175,11 +229,20 @@ export interface WorkflowExecutionsTableProps extends ListProps<Execution> {}
  */
 export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = props => {
     const executions = props.value;
+    const [expandedErrors, setExpandedErrors] = React.useState<
+        Dictionary<boolean>
+    >({});
     const state = useWorkflowExecutionsTableState();
     const commonStyles = useCommonStyles();
     const styles = useStyles();
     const tableStyles = useExecutionTableStyles();
     const listRef = React.useRef<DataListRef>(null);
+
+    // Reset error expansion states whenever list changes
+    React.useEffect(() => {
+        setExpandedErrors({});
+    }, [executions]);
+
     // Memoizing columns so they won't be re-generated unless the styles change
     const columns = React.useMemo(() => generateColumns(styles, tableStyles), [
         styles,
@@ -197,44 +260,24 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
     // Custom renderer to allow us to append error content to executions which
     // are in a failed state
     const rowRenderer: ListRowRenderer = rowProps => {
-        const { index: rowIndex, style } = rowProps;
-        const execution = executions[rowIndex];
-        const { error } = execution.closure;
-
+        const execution = executions[rowProps.index];
+        const cacheKey = getCacheKey(execution.id);
+        const onExpandCollapseError = (expanded: boolean) => {
+            setExpandedErrors(currentExpandedErrors => ({
+                ...currentExpandedErrors,
+                [cacheKey]: expanded
+            }));
+            recomputeRow(rowProps.index);
+        };
         return (
-            <div
-                className={classnames(
-                    tableStyles.row,
-                    styles.row,
-                    tableStyles.borderBottom
-                )}
-                style={style}
-            >
-                <div className={tableStyles.rowColumns}>
-                    {columns.map(
-                        ({ className, key: columnKey, cellRenderer }) => (
-                            <div
-                                key={columnKey}
-                                className={classnames(
-                                    tableStyles.rowColumn,
-                                    className
-                                )}
-                            >
-                                {cellRenderer({
-                                    execution,
-                                    state
-                                })}
-                            </div>
-                        )
-                    )}
-                </div>
-                {error ? (
-                    <ExpandableExecutionError
-                        onExpandCollapse={recomputeRow.bind(null, rowIndex)}
-                        error={error}
-                    />
-                ) : null}
-            </div>
+            <WorkflowExecutionRow
+                {...rowProps}
+                columns={columns}
+                execution={execution}
+                errorExpanded={!!expandedErrors[cacheKey]}
+                onExpandCollapseError={onExpandCollapseError}
+                state={state}
+            />
         );
     };
 

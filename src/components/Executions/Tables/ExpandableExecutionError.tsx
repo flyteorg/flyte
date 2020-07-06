@@ -8,13 +8,15 @@ import { useExecutionTableStyles } from './styles';
  */
 export const ExpandableExecutionError: React.FC<{
     error: ExecutionError;
-    onExpandCollapse?(): void;
-}> = ({ error, onExpandCollapse }) => {
+    initialExpansionState?: boolean;
+    onExpandCollapse?(expanded: boolean): void;
+}> = ({ error, initialExpansionState = false, onExpandCollapse }) => {
     const styles = useExecutionTableStyles();
     return (
         <div className={styles.errorContainer}>
             <ExpandableMonospaceText
                 onExpandCollapse={onExpandCollapse}
+                initialExpansionState={initialExpansionState}
                 text={error.message}
             />
         </div>
