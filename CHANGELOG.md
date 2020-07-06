@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.3](http://github.com/lyft/flyteconsole/compare/v0.7.2...v0.7.3) (2020-07-06)
+
+
+### Bug Fixes
+
+* prevents collapsing of execution errors when scrolled out of view ([#80](http://github.com/lyft/flyteconsole/issues/80)) ([ba39c1c](http://github.com/lyft/flyteconsole/commit/ba39c1c9c0783d69aee48de2f1b666879472e6b8))
+
 ## [0.7.2](http://github.com/lyft/flyteconsole/compare/v0.7.1...v0.7.2) (2020-07-01)
 
 
