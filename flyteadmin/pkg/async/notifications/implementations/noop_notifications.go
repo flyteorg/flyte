@@ -39,9 +39,8 @@ func NewNoopPublish() interfaces.Publisher {
 
 type NoopProcess struct{}
 
-func (n *NoopProcess) StartProcessing() error {
+func (n *NoopProcess) StartProcessing() {
 	logger.Debug(context.Background(), "call to noop start processing.")
-	return nil
 }
 
 func (n *NoopProcess) StopProcessing() error {

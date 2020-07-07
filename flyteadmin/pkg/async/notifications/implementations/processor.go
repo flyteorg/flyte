@@ -2,6 +2,9 @@ package implementations
 
 import (
 	"context"
+	"time"
+
+	"github.com/lyft/flyteadmin/pkg/async"
 
 	"github.com/lyft/flyteadmin/pkg/async/notifications/interfaces"
 
@@ -38,7 +41,16 @@ type Processor struct {
 // Currently only email is the supported notification because slack and pagerduty both use
 // email client to trigger those notifications.
 // When Pagerduty and other notifications are supported, a publisher per type should be created.
-func (p *Processor) StartProcessing() error {
+func (p *Processor) StartProcessing() {
+	for {
+		logger.Warningf(context.Background(), "Starting notifications processor")
+		err := p.run()
+		logger.Errorf(context.Background(), "error with running processor err: [%v] ", err)
+		time.Sleep(async.RetryDelay)
+	}
+}
+
+func (p *Processor) run() error {
 	var emailMessage admin.EmailMessage
 	var err error
 	for msg := range p.sub.Start() {

@@ -41,13 +41,13 @@ func TestProcessor_StartProcessing(t *testing.T) {
 	mockEmailer.SetSendEmailFunc(sendEmailValidationFunc)
 	// TODO Add test for metric inc for number of messages processed.
 	// Assert 1 message processed and 1 total.
-	assert.Nil(t, testProcessor.StartProcessing())
+	assert.Nil(t, testProcessor.(*Processor).run())
 }
 
 func TestProcessor_StartProcessingNoMessages(t *testing.T) {
 	initializeProcessor()
 	// Expect no errors are returned.
-	assert.Nil(t, testProcessor.StartProcessing())
+	assert.Nil(t, testProcessor.(*Processor).run())
 	// TODO add test for metric inc() for number of messages processed.
 	// Assert 0 messages processed and 0 total.
 }
@@ -59,7 +59,7 @@ func TestProcessor_StartProcessingNoNotificationMessage(t *testing.T) {
 	}
 	initializeProcessor()
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testMessage)
-	assert.Nil(t, testProcessor.StartProcessing())
+	assert.Nil(t, testProcessor.(*Processor).run())
 	// TODO add test for metric inc() for number of messages processed.
 	// Assert 1 messages error and 1 total.
 }
@@ -72,7 +72,7 @@ func TestProcessor_StartProcessingMessageWrongDataType(t *testing.T) {
 	}
 	initializeProcessor()
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testMessage)
-	assert.Nil(t, testProcessor.StartProcessing())
+	assert.Nil(t, testProcessor.(*Processor).run())
 	// TODO add test for metric inc() for number of messages processed.
 	// Assert 1 messages error and 1 total.
 }
@@ -85,7 +85,7 @@ func TestProcessor_StartProcessingBase64DecodeError(t *testing.T) {
 	}
 	initializeProcessor()
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testMessage)
-	assert.Nil(t, testProcessor.StartProcessing())
+	assert.Nil(t, testProcessor.(*Processor).run())
 	// TODO add test for metric inc() for number of messages processed.
 	// Assert 1 messages error and 1 total.
 }
@@ -99,7 +99,7 @@ func TestProcessor_StartProcessingProtoMarshallError(t *testing.T) {
 	}
 	initializeProcessor()
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testMessage)
-	assert.Nil(t, testProcessor.StartProcessing())
+	assert.Nil(t, testProcessor.(*Processor).run())
 	// TODO add test for metric inc() for number of messages processed.
 	// Assert 1 messages error and 1 total.
 }
@@ -110,7 +110,7 @@ func TestProcessor_StartProcessingError(t *testing.T) {
 	// The error set by GivenErrError is returned by Err().
 	// Err() is checked before Run() returning.
 	testSubscriber.GivenErrError = ret
-	assert.Equal(t, ret, testProcessor.StartProcessing())
+	assert.Equal(t, ret, testProcessor.(*Processor).run())
 }
 
 func TestProcessor_StartProcessingEmailError(t *testing.T) {
@@ -124,7 +124,7 @@ func TestProcessor_StartProcessingEmailError(t *testing.T) {
 
 	// Even if there is an error in sending an email StartProcessing will return no errors.
 	// TODO: Once stats have been added check for an email error stat.
-	assert.Nil(t, testProcessor.StartProcessing())
+	assert.Nil(t, testProcessor.(*Processor).run())
 }
 
 func TestProcessor_StopProcessing(t *testing.T) {

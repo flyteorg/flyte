@@ -283,8 +283,9 @@ func TestRun(t *testing.T) {
 			}, nil
 		})
 	testExecutor := newWorkflowExecutorForTest(&testSubscriber, &testExecutionManager, launchPlanManager)
-	testExecutor.Run()
+	err := testExecutor.run()
 	assert.Len(t, messages, messagesSeen)
+	assert.Nil(t, err)
 }
 
 func TestStop(t *testing.T) {

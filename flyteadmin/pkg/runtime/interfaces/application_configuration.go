@@ -84,16 +84,16 @@ type WorkflowExecutorConfig struct {
 	// The account id (according to whichever cloud provider scheme is used) that has permission to read from the above
 	// queue.
 	AccountID string `json:"accountId"`
-	// Specifies the number of times to attempt recreating a workflow executor client should there be any disruptions.
-	ReconnectAttempts int `json:"reconnectAttempts"`
-	// Specifies the time interval to wait before attempting to reconnect the workflow executor client.
-	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
 // This configuration is the base configuration for all scheduler-related set-up.
 type SchedulerConfig struct {
 	EventSchedulerConfig   EventSchedulerConfig   `json:"eventScheduler"`
 	WorkflowExecutorConfig WorkflowExecutorConfig `json:"workflowExecutor"`
+	// Specifies the number of times to attempt recreating a workflow executor client should there be any disruptions.
+	ReconnectAttempts int `json:"reconnectAttempts"`
+	// Specifies the time interval to wait before attempting to reconnect the workflow executor client.
+	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
 // Configuration specific to setting up signed urls.
@@ -149,6 +149,10 @@ type NotificationsConfig struct {
 	NotificationsPublisherConfig NotificationsPublisherConfig `json:"publisher"`
 	NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
 	NotificationsEmailerConfig   NotificationsEmailerConfig   `json:"emailer"`
+	// Number of times to attempt recreating a notifications processor client should there be any disruptions.
+	ReconnectAttempts int `json:"reconnectAttempts"`
+	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
+	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
 // Domains are always globally set in the application config, whereas individual projects can be individually registered.

@@ -2,6 +2,9 @@ package notifications
 
 import (
 	"context"
+	"time"
+
+	"github.com/lyft/flyteadmin/pkg/async"
 
 	"github.com/lyft/flyteadmin/pkg/async/notifications/implementations"
 	"github.com/lyft/flyteadmin/pkg/async/notifications/interfaces"
@@ -60,6 +63,8 @@ func GetEmailer(config runtimeInterfaces.NotificationsConfig, scope promutils.Sc
 }
 
 func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) interfaces.Processor {
+	reconnectAttempts := config.ReconnectAttempts
+	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
 	var sub pubsub.Subscriber
 	var emailer interfaces.Emailer
 	switch config.Type {
@@ -73,11 +78,15 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 			ConsumeBase64: &enable64decoding,
 		}
 		sqsConfig.Region = config.Region
-		process, err := gizmoAWS.NewSubscriber(sqsConfig)
+		var err error
+		err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
+			sub, err = gizmoAWS.NewSubscriber(sqsConfig)
+			return err
+		})
+
 		if err != nil {
 			panic(err)
 		}
-		sub = process
 		emailer = GetEmailer(config, scope)
 	case common.Local:
 		fallthrough
@@ -90,6 +99,8 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 }
 
 func NewNotificationsPublisher(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) interfaces.Publisher {
+	reconnectAttempts := config.ReconnectAttempts
+	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
 	switch config.Type {
 	case common.AWS:
 		snsConfig := gizmoAWS.SNSConfig{
@@ -100,8 +111,15 @@ func NewNotificationsPublisher(config runtimeInterfaces.NotificationsConfig, sco
 		} else {
 			snsConfig.Region = config.Region
 		}
-		publisher, err := gizmoAWS.NewPublisher(snsConfig)
-		// Any errors initiating Publisher with Amazon configurations results in a failed start up.
+
+		var publisher pubsub.Publisher
+		var err error
+		err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
+			publisher, err = gizmoAWS.NewPublisher(snsConfig)
+			return err
+		})
+
+		// Any persistent errors initiating Publisher with Amazon configurations results in a failed start up.
 		if err != nil {
 			panic(err)
 		}
@@ -111,7 +129,13 @@ func NewNotificationsPublisher(config runtimeInterfaces.NotificationsConfig, sco
 			Topic: config.NotificationsPublisherConfig.TopicName,
 		}
 		pubsubConfig.ProjectID = config.GCPConfig.ProjectID
-		publisher, err := gizmoGCP.NewPublisher(context.TODO(), pubsubConfig)
+		var publisher pubsub.MultiPublisher
+		var err error
+		err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
+			publisher, err = gizmoGCP.NewPublisher(context.TODO(), pubsubConfig)
+			return err
+		})
+
 		if err != nil {
 			panic(err)
 		}

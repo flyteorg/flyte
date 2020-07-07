@@ -2,6 +2,9 @@ package schedule
 
 import (
 	"context"
+	"time"
+
+	"github.com/lyft/flyteadmin/pkg/async"
 
 	gizmoConfig "github.com/NYTimes/gizmo/pubsub/aws"
 	"github.com/aws/aws-sdk-go/aws"
@@ -17,10 +20,9 @@ import (
 )
 
 type WorkflowSchedulerConfig struct {
-	Retries                int
-	EventSchedulerConfig   runtimeInterfaces.EventSchedulerConfig
-	WorkflowExecutorConfig runtimeInterfaces.WorkflowExecutorConfig
-	Scope                  promutils.Scope
+	Retries         int
+	SchedulerConfig runtimeInterfaces.SchedulerConfig
+	Scope           promutils.Scope
 }
 
 type WorkflowScheduler interface {
@@ -44,12 +46,12 @@ func (w *workflowScheduler) GetWorkflowExecutor(
 	launchPlanManager managerInterfaces.LaunchPlanInterface) interfaces.WorkflowExecutor {
 	if w.workflowExecutor == nil {
 		sqsConfig := gizmoConfig.SQSConfig{
-			QueueName:           w.cfg.WorkflowExecutorConfig.ScheduleQueueName,
-			QueueOwnerAccountID: w.cfg.WorkflowExecutorConfig.AccountID,
+			QueueName:           w.cfg.SchedulerConfig.WorkflowExecutorConfig.ScheduleQueueName,
+			QueueOwnerAccountID: w.cfg.SchedulerConfig.WorkflowExecutorConfig.AccountID,
 		}
-		sqsConfig.Region = w.cfg.WorkflowExecutorConfig.Region
+		sqsConfig.Region = w.cfg.SchedulerConfig.WorkflowExecutorConfig.Region
 		w.workflowExecutor = awsSchedule.NewWorkflowExecutor(
-			sqsConfig, executionManager, launchPlanManager, w.cfg.Scope.NewSubScope("workflow_executor"))
+			sqsConfig, w.cfg.SchedulerConfig, executionManager, launchPlanManager, w.cfg.Scope.NewSubScope("workflow_executor"))
 	}
 	return w.workflowExecutor
 }
@@ -58,26 +60,33 @@ func NewWorkflowScheduler(cfg WorkflowSchedulerConfig) WorkflowScheduler {
 	var eventScheduler interfaces.EventScheduler
 	var workflowExecutor interfaces.WorkflowExecutor
 
-	switch cfg.EventSchedulerConfig.Scheme {
+	switch cfg.SchedulerConfig.EventSchedulerConfig.Scheme {
 	case common.AWS:
-		awsConfig := aws.NewConfig().WithRegion(cfg.WorkflowExecutorConfig.Region).WithMaxRetries(cfg.Retries)
-		sess, err := session.NewSession(awsConfig)
+		awsConfig := aws.NewConfig().WithRegion(cfg.SchedulerConfig.WorkflowExecutorConfig.Region).WithMaxRetries(cfg.Retries)
+		var sess *session.Session
+		var err error
+		err = async.Retry(cfg.SchedulerConfig.ReconnectAttempts,
+			time.Duration(cfg.SchedulerConfig.ReconnectDelaySeconds)*time.Second, func() error {
+				sess, err = session.NewSession(awsConfig)
+				return err
+			})
+
 		if err != nil {
 			panic(err)
 		}
 		eventScheduler = awsSchedule.NewCloudWatchScheduler(
-			cfg.EventSchedulerConfig.ScheduleRole, cfg.EventSchedulerConfig.TargetName, sess, awsConfig,
+			cfg.SchedulerConfig.EventSchedulerConfig.ScheduleRole, cfg.SchedulerConfig.EventSchedulerConfig.TargetName, sess, awsConfig,
 			cfg.Scope.NewSubScope("cloudwatch_scheduler"))
 	case common.Local:
 		fallthrough
 	default:
 		logger.Infof(context.Background(),
 			"Using default noop event scheduler implementation for cloud provider type [%s]",
-			cfg.EventSchedulerConfig.Scheme)
+			cfg.SchedulerConfig.EventSchedulerConfig.Scheme)
 		eventScheduler = noop.NewNoopEventScheduler()
 	}
 
-	switch cfg.WorkflowExecutorConfig.Scheme {
+	switch cfg.SchedulerConfig.WorkflowExecutorConfig.Scheme {
 	case common.AWS:
 		// Do nothing, this special case depends on the execution manager and launch plan manager having been
 		// initialized and is handled in GetWorkflowExecutor.
@@ -87,7 +96,7 @@ func NewWorkflowScheduler(cfg WorkflowSchedulerConfig) WorkflowScheduler {
 	default:
 		logger.Infof(context.Background(),
 			"Using default noop workflow executor implementation for cloud provider type [%s]",
-			cfg.EventSchedulerConfig.Scheme)
+			cfg.SchedulerConfig.EventSchedulerConfig.Scheme)
 		workflowExecutor = noop.NewWorkflowExecutor()
 	}
 	return &workflowScheduler{
