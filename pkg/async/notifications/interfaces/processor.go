@@ -8,7 +8,7 @@ type Processor interface {
 	// If the channel closes gracefully, no error will be returned.
 	// If the underlying channel experiences errors,
 	// an error is returned and the channel is closed.
-	StartProcessing() error
+	StartProcessing()
 
 	// This should be invoked when the application is shutting down.
 	// If StartProcessing() returned an error, StopProcessing() will return an error because
