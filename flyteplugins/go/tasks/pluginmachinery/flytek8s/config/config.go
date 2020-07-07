@@ -93,7 +93,7 @@ type FlyteCoPilotConfig struct {
 	OutputVolumeName string `json:"output-vol-name" pflag:",Name of the data volume that is created for storing outputs"`
 	// Time for which the sidecar container should wait after starting up, for the primary process to appear. If it does not show up in this time
 	// the process will be assumed to be dead or in a terminal condition and will trigger an abort.
-	StartTimeout config2.Duration `json:"start-timeout" pflag:",Time for which the sidecar should wait on startup before assuming the primary container to have failed startup."`
+	StartTimeout config2.Duration `json:"start-timeout" pflag:"-,Time for which the sidecar should wait on startup before assuming the primary container to have failed startup."`
 	// Resources for CoPilot Containers
 	CPU     string `json:"cpu" pflag:",Used to set cpu for co-pilot containers"`
 	Memory  string `json:"memory" pflag:",Used to set memory for co-pilot containers"`

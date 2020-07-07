@@ -45,10 +45,14 @@ func (cfg K8sPluginConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-cpus"), *new(string), "Defines a default value for cpu for containers if not specified.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "default-memory"), *new(string), "Defines a default value for memory for containers if not specified.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "scheduler-name"), *new(string), "Defines scheduler name.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.name"), *new(string), "Flyte co-pilot sidecar container name prefix. (additional bits will be added after this)")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.image"), *new(string), "Flyte co-pilot Docker Image FQN")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.default-input-path"), *new(string), "Default path where the volume should be mounted")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.default-output-path"), *new(string), "Default path where the volume should be mounted")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.input-vol-name"), *new(string), "Name of the data volume that is created for storing inputs")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.output-vol-name"), *new(string), "Name of the data volume that is created for storing outputs")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.cpu"), *new(string), "Used to set cpu for co-pilot containers")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.memory"), *new(string), "Used to set memory for co-pilot containers")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.storage"), *new(string), "Default storage limit for individual inputs / outputs")
 	return cmdFlags
 }
