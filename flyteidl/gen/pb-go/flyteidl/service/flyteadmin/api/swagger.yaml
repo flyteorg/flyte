@@ -976,7 +976,8 @@ paths:
           \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
           \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
           \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
-          \ K8s cluster label to be used for execution to be run"
+          \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
+          \ Configures default quality of service when undefined in an execution spec."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -985,6 +986,7 @@ paths:
         - "CLUSTER_RESOURCE"
         - "EXECUTION_QUEUE"
         - "EXECUTION_CLUSTER_LABEL"
+        - "QUALITY_OF_SERVICE_SPECIFICATION"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -1330,7 +1332,8 @@ paths:
           \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
           \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
           \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
-          \ K8s cluster label to be used for execution to be run"
+          \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
+          \ Configures default quality of service when undefined in an execution spec."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1339,6 +1342,7 @@ paths:
         - "CLUSTER_RESOURCE"
         - "EXECUTION_QUEUE"
         - "EXECUTION_CLUSTER_LABEL"
+        - "QUALITY_OF_SERVICE_SPECIFICATION"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -1933,7 +1937,8 @@ paths:
           \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
           \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
           \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
-          \ K8s cluster label to be used for execution to be run"
+          \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
+          \ Configures default quality of service when undefined in an execution spec."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1942,6 +1947,7 @@ paths:
         - "CLUSTER_RESOURCE"
         - "EXECUTION_QUEUE"
         - "EXECUTION_CLUSTER_LABEL"
+        - "QUALITY_OF_SERVICE_SPECIFICATION"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -2389,6 +2395,15 @@ definitions:
     - "UPLOAD_EAGER"
     - "DO_NOT_UPLOAD"
     default: "UPLOAD_ON_EXIT"
+  QualityOfServiceTier:
+    type: "string"
+    description: " - UNDEFINED: Default: no quality of service specified."
+    enum:
+    - "UNDEFINED"
+    - "HIGH"
+    - "MEDIUM"
+    - "LOW"
+    default: "UNDEFINED"
   ResourcesResourceEntry:
     type: "object"
     properties:
@@ -2660,6 +2675,10 @@ definitions:
           nesting: 0
           system_metadata:
             execution_cluster: "execution_cluster"
+        quality_of_service:
+          tier: {}
+          spec:
+            queueing_budget: "queueing_budget"
         disable_all: true
         inputs:
           literals: {}
@@ -2959,6 +2978,10 @@ definitions:
             nesting: 0
             system_metadata:
               execution_cluster: "execution_cluster"
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
           disable_all: true
           inputs:
             literals: {}
@@ -3089,6 +3112,10 @@ definitions:
             nesting: 0
             system_metadata:
               execution_cluster: "execution_cluster"
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
           disable_all: true
           inputs:
             literals: {}
@@ -3244,6 +3271,9 @@ definitions:
       auth_role:
         description: "Optional: auth override to apply this execution."
         $ref: "#/definitions/adminAuthRole"
+      quality_of_service:
+        description: "Indicates the runtime priority of the execution."
+        $ref: "#/definitions/coreQualityOfService"
     description: "An ExecutionSpec encompasses all data used to launch this execution.\
       \ The Spec does not change over the lifetime\nof an execution as it progresses\
       \ across phase changes.."
@@ -3271,6 +3301,10 @@ definitions:
         nesting: 0
         system_metadata:
           execution_cluster: "execution_cluster"
+      quality_of_service:
+        tier: {}
+        spec:
+          queueing_budget: "queueing_budget"
       disable_all: true
       inputs:
         literals: {}
@@ -3502,6 +3536,10 @@ definitions:
         fixed_inputs:
           literals: {}
         role: "role"
+        quality_of_service:
+          tier: {}
+          spec:
+            queueing_budget: "queueing_budget"
         auth:
           kubernetes_service_account: "kubernetes_service_account"
           assumable_iam_role: "assumable_iam_role"
@@ -3909,6 +3947,10 @@ definitions:
           fixed_inputs:
             literals: {}
           role: "role"
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
           auth:
             kubernetes_service_account: "kubernetes_service_account"
             assumable_iam_role: "assumable_iam_role"
@@ -4155,6 +4197,10 @@ definitions:
           fixed_inputs:
             literals: {}
           role: "role"
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
           auth:
             kubernetes_service_account: "kubernetes_service_account"
             assumable_iam_role: "assumable_iam_role"
@@ -4362,6 +4408,9 @@ definitions:
         $ref: "#/definitions/adminAuth"
       auth_role:
         $ref: "#/definitions/adminAuthRole"
+      quality_of_service:
+        description: "Indicates the runtime priority of the execution."
+        $ref: "#/definitions/coreQualityOfService"
     description: "User-provided launch plan definition and configuration values."
     example:
       workflow_id:
@@ -4373,6 +4422,10 @@ definitions:
       fixed_inputs:
         literals: {}
       role: "role"
+      quality_of_service:
+        tier: {}
+        spec:
+          queueing_budget: "queueing_budget"
       auth:
         kubernetes_service_account: "kubernetes_service_account"
         assumable_iam_role: "assumable_iam_role"
@@ -4539,6 +4592,10 @@ definitions:
         domain: "domain"
         project: "project"
         attributes:
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -4564,6 +4621,10 @@ definitions:
         domain: "domain"
         project: "project"
         attributes:
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -4620,6 +4681,10 @@ definitions:
       domain: "domain"
       project: "project"
       attributes:
+        quality_of_service:
+          tier: {}
+          spec:
+            queueing_budget: "queueing_budget"
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -4647,12 +4712,14 @@ definitions:
       \ Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE:\
       \ Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE:\
       \ Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL:\
-      \ Configures the K8s cluster label to be used for execution to be run"
+      \ Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
+      \ Configures default quality of service when undefined in an execution spec."
     enum:
     - "TASK_RESOURCE"
     - "CLUSTER_RESOURCE"
     - "EXECUTION_QUEUE"
     - "EXECUTION_CLUSTER_LABEL"
+    - "QUALITY_OF_SERVICE_SPECIFICATION"
     default: "TASK_RESOURCE"
   adminMatchingAttributes:
     type: "object"
@@ -4665,9 +4732,15 @@ definitions:
         $ref: "#/definitions/adminExecutionQueueAttributes"
       execution_cluster_label:
         $ref: "#/definitions/adminExecutionClusterLabel"
+      quality_of_service:
+        $ref: "#/definitions/coreQualityOfService"
     description: "Generic container for encapsulating all types of the above attributes\
       \ messages."
     example:
+      quality_of_service:
+        tier: {}
+        spec:
+          queueing_budget: "queueing_budget"
       cluster_resource_attributes:
         attributes:
           key: "attributes"
@@ -5099,6 +5172,10 @@ definitions:
       domain: "domain"
       project: "project"
       matching_attributes:
+        quality_of_service:
+          tier: {}
+          spec:
+            queueing_budget: "queueing_budget"
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -5143,6 +5220,10 @@ definitions:
         domain: "domain"
         project: "project"
         matching_attributes:
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -6240,7 +6321,10 @@ definitions:
                     bindings: {}
               metadata:
                 on_failure: {}
-                queuing_budget: "queuing_budget"
+                quality_of_service:
+                  tier: {}
+                  spec:
+                    queueing_budget: "queueing_budget"
               failure_node:
                 branch_node:
                   if_else:
@@ -7063,7 +7147,10 @@ definitions:
                     bindings: {}
               metadata:
                 on_failure: {}
-                queuing_budget: "queuing_budget"
+                quality_of_service:
+                  tier: {}
+                  spec:
+                    queueing_budget: "queueing_budget"
               failure_node:
                 branch_node:
                   if_else:
@@ -8136,7 +8223,10 @@ definitions:
                     bindings: {}
               metadata:
                 on_failure: {}
-                queuing_budget: "queuing_budget"
+                quality_of_service:
+                  tier: {}
+                  spec:
+                    queueing_budget: "queueing_budget"
               failure_node:
                 branch_node:
                   if_else:
@@ -8873,6 +8963,10 @@ definitions:
       domain: "domain"
       project: "project"
       matching_attributes:
+        quality_of_service:
+          tier: {}
+          spec:
+            queueing_budget: "queueing_budget"
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -8921,6 +9015,10 @@ definitions:
         domain: "domain"
         project: "project"
         matching_attributes:
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -9072,7 +9170,10 @@ definitions:
                   bindings: {}
             metadata:
               on_failure: {}
-              queuing_budget: "queuing_budget"
+              quality_of_service:
+                tier: {}
+                spec:
+                  queueing_budget: "queueing_budget"
             failure_node:
               branch_node:
                 if_else:
@@ -9895,7 +9996,10 @@ definitions:
                   bindings: {}
             metadata:
               on_failure: {}
-              queuing_budget: "queuing_budget"
+              quality_of_service:
+                tier: {}
+                spec:
+                  queueing_budget: "queueing_budget"
             failure_node:
               branch_node:
                 if_else:
@@ -10968,7 +11072,10 @@ definitions:
                   bindings: {}
             metadata:
               on_failure: {}
-              queuing_budget: "queuing_budget"
+              quality_of_service:
+                tier: {}
+                spec:
+                  queueing_budget: "queueing_budget"
             failure_node:
               branch_node:
                 if_else:
@@ -11860,7 +11967,10 @@ definitions:
                       bindings: {}
                 metadata:
                   on_failure: {}
-                  queuing_budget: "queuing_budget"
+                  quality_of_service:
+                    tier: {}
+                    spec:
+                      queueing_budget: "queueing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -12683,7 +12793,10 @@ definitions:
                       bindings: {}
                 metadata:
                   on_failure: {}
-                  queuing_budget: "queuing_budget"
+                  quality_of_service:
+                    tier: {}
+                    spec:
+                      queueing_budget: "queueing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -13756,7 +13869,10 @@ definitions:
                       bindings: {}
                 metadata:
                   on_failure: {}
-                  queuing_budget: "queuing_budget"
+                  quality_of_service:
+                    tier: {}
+                    spec:
+                      queueing_budget: "queueing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -14589,7 +14705,10 @@ definitions:
                       bindings: {}
                 metadata:
                   on_failure: {}
-                  queuing_budget: "queuing_budget"
+                  quality_of_service:
+                    tier: {}
+                    spec:
+                      queueing_budget: "queueing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -15412,7 +15531,10 @@ definitions:
                       bindings: {}
                 metadata:
                   on_failure: {}
-                  queuing_budget: "queuing_budget"
+                  quality_of_service:
+                    tier: {}
+                    spec:
+                      queueing_budget: "queueing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -16485,7 +16607,10 @@ definitions:
                       bindings: {}
                 metadata:
                   on_failure: {}
-                  queuing_budget: "queuing_budget"
+                  quality_of_service:
+                    tier: {}
+                    spec:
+                      queueing_budget: "queueing_budget"
                 failure_node:
                   branch_node:
                     if_else:
@@ -17845,7 +17970,10 @@ definitions:
               bindings: {}
         metadata:
           on_failure: {}
-          queuing_budget: "queuing_budget"
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
         failure_node:
           branch_node:
             if_else:
@@ -18695,7 +18823,10 @@ definitions:
                 bindings: {}
           metadata:
             on_failure: {}
-            queuing_budget: "queuing_budget"
+            quality_of_service:
+              tier: {}
+              spec:
+                queueing_budget: "queueing_budget"
           failure_node:
             branch_node:
               if_else:
@@ -19518,7 +19649,10 @@ definitions:
                 bindings: {}
           metadata:
             on_failure: {}
-            queuing_budget: "queuing_budget"
+            quality_of_service:
+              tier: {}
+              spec:
+                queueing_budget: "queueing_budget"
           failure_node:
             branch_node:
               if_else:
@@ -20591,7 +20725,10 @@ definitions:
                 bindings: {}
           metadata:
             on_failure: {}
-            queuing_budget: "queuing_budget"
+            quality_of_service:
+              tier: {}
+              spec:
+                queueing_budget: "queueing_budget"
           failure_node:
             branch_node:
               if_else:
@@ -22389,6 +22526,27 @@ definitions:
       boolean: true
       float_value: 1.4658129805029452
       integer: "integer"
+  coreQualityOfService:
+    type: "object"
+    properties:
+      tier:
+        $ref: "#/definitions/QualityOfServiceTier"
+      spec:
+        $ref: "#/definitions/coreQualityOfServiceSpec"
+    description: "Indicates the priority of an execution."
+    example:
+      tier: {}
+      spec:
+        queueing_budget: "queueing_budget"
+  coreQualityOfServiceSpec:
+    type: "object"
+    properties:
+      queueing_budget:
+        type: "string"
+        description: "Indicates how much queueing delay an execution can tolerate."
+    description: "Represents customized execution run-time attributes."
+    example:
+      queueing_budget: "queueing_budget"
   coreResourceType:
     type: "string"
     description: "Indicates a resource type within Flyte."
@@ -22983,9 +23141,9 @@ definitions:
   coreWorkflowMetadata:
     type: "object"
     properties:
-      queuing_budget:
-        type: "string"
-        description: "Total wait time a workflow can be delayed by queueing."
+      quality_of_service:
+        description: "Indicates the runtime priority of workflow executions."
+        $ref: "#/definitions/coreQualityOfService"
       on_failure:
         description: "Defines how the system should behave when a failure is detected\
           \ in the workflow execution."
@@ -22994,7 +23152,10 @@ definitions:
       \ does not change the final outputs of the workflow."
     example:
       on_failure: {}
-      queuing_budget: "queuing_budget"
+      quality_of_service:
+        tier: {}
+        spec:
+          queueing_budget: "queueing_budget"
   coreWorkflowMetadataDefaults:
     type: "object"
     properties:
@@ -23180,7 +23341,10 @@ definitions:
             bindings: {}
       metadata:
         on_failure: {}
-        queuing_budget: "queuing_budget"
+        quality_of_service:
+          tier: {}
+          spec:
+            queueing_budget: "queueing_budget"
       failure_node:
         branch_node:
           if_else:

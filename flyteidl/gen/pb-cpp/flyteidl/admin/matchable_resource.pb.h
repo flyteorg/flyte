@@ -35,6 +35,8 @@
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "flyteidl/admin/common.pb.h"
+#include "flyteidl/core/execution.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto
@@ -108,12 +110,13 @@ enum MatchableResource {
   CLUSTER_RESOURCE = 1,
   EXECUTION_QUEUE = 2,
   EXECUTION_CLUSTER_LABEL = 3,
+  QUALITY_OF_SERVICE_SPECIFICATION = 4,
   MatchableResource_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   MatchableResource_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool MatchableResource_IsValid(int value);
 const MatchableResource MatchableResource_MIN = TASK_RESOURCE;
-const MatchableResource MatchableResource_MAX = EXECUTION_CLUSTER_LABEL;
+const MatchableResource MatchableResource_MAX = QUALITY_OF_SERVICE_SPECIFICATION;
 const int MatchableResource_ARRAYSIZE = MatchableResource_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MatchableResource_descriptor();
@@ -848,6 +851,7 @@ class MatchingAttributes final :
     kClusterResourceAttributes = 2,
     kExecutionQueueAttributes = 3,
     kExecutionClusterLabel = 4,
+    kQualityOfService = 5,
     TARGET_NOT_SET = 0,
   };
 
@@ -950,6 +954,15 @@ class MatchingAttributes final :
   ::flyteidl::admin::ExecutionClusterLabel* mutable_execution_cluster_label();
   void set_allocated_execution_cluster_label(::flyteidl::admin::ExecutionClusterLabel* execution_cluster_label);
 
+  // .flyteidl.core.QualityOfService quality_of_service = 5;
+  bool has_quality_of_service() const;
+  void clear_quality_of_service();
+  static const int kQualityOfServiceFieldNumber = 5;
+  const ::flyteidl::core::QualityOfService& quality_of_service() const;
+  ::flyteidl::core::QualityOfService* release_quality_of_service();
+  ::flyteidl::core::QualityOfService* mutable_quality_of_service();
+  void set_allocated_quality_of_service(::flyteidl::core::QualityOfService* quality_of_service);
+
   void clear_target();
   TargetCase target_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.admin.MatchingAttributes)
@@ -959,6 +972,7 @@ class MatchingAttributes final :
   void set_has_cluster_resource_attributes();
   void set_has_execution_queue_attributes();
   void set_has_execution_cluster_label();
+  void set_has_quality_of_service();
 
   inline bool has_target() const;
   inline void clear_has_target();
@@ -970,6 +984,7 @@ class MatchingAttributes final :
     ::flyteidl::admin::ClusterResourceAttributes* cluster_resource_attributes_;
     ::flyteidl::admin::ExecutionQueueAttributes* execution_queue_attributes_;
     ::flyteidl::admin::ExecutionClusterLabel* execution_cluster_label_;
+    ::flyteidl::core::QualityOfService* quality_of_service_;
   } target_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -2030,6 +2045,41 @@ inline ::flyteidl::admin::ExecutionClusterLabel* MatchingAttributes::mutable_exe
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchingAttributes.execution_cluster_label)
   return target_.execution_cluster_label_;
+}
+
+// .flyteidl.core.QualityOfService quality_of_service = 5;
+inline bool MatchingAttributes::has_quality_of_service() const {
+  return target_case() == kQualityOfService;
+}
+inline void MatchingAttributes::set_has_quality_of_service() {
+  _oneof_case_[0] = kQualityOfService;
+}
+inline ::flyteidl::core::QualityOfService* MatchingAttributes::release_quality_of_service() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchingAttributes.quality_of_service)
+  if (has_quality_of_service()) {
+    clear_has_target();
+      ::flyteidl::core::QualityOfService* temp = target_.quality_of_service_;
+    target_.quality_of_service_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::QualityOfService& MatchingAttributes::quality_of_service() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchingAttributes.quality_of_service)
+  return has_quality_of_service()
+      ? *target_.quality_of_service_
+      : *reinterpret_cast< ::flyteidl::core::QualityOfService*>(&::flyteidl::core::_QualityOfService_default_instance_);
+}
+inline ::flyteidl::core::QualityOfService* MatchingAttributes::mutable_quality_of_service() {
+  if (!has_quality_of_service()) {
+    clear_target();
+    set_has_quality_of_service();
+    target_.quality_of_service_ = CreateMaybeMessage< ::flyteidl::core::QualityOfService >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchingAttributes.quality_of_service)
+  return target_.quality_of_service_;
 }
 
 inline bool MatchingAttributes::has_target() const {

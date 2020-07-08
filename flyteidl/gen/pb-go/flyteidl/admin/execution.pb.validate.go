@@ -1209,6 +1209,16 @@ func (m *ExecutionSpec) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetQualityOfService()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExecutionSpecValidationError{
+				field:  "QualityOfService",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.NotificationOverrides.(type) {
 
 	case *ExecutionSpec_Notifications:

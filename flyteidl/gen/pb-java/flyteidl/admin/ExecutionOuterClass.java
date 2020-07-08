@@ -14897,6 +14897,31 @@ public final class ExecutionOuterClass {
      */
     flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder();
 
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+     */
+    boolean hasQualityOfService();
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+     */
+    flyteidl.core.Execution.QualityOfService getQualityOfService();
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+     */
+    flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder();
+
     public flyteidl.admin.ExecutionOuterClass.ExecutionSpec.NotificationOverridesCase getNotificationOverridesCase();
   }
   /**
@@ -15036,6 +15061,19 @@ public final class ExecutionOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(authRole_);
                 authRole_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 138: {
+              flyteidl.core.Execution.QualityOfService.Builder subBuilder = null;
+              if (qualityOfService_ != null) {
+                subBuilder = qualityOfService_.toBuilder();
+              }
+              qualityOfService_ = input.readMessage(flyteidl.core.Execution.QualityOfService.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(qualityOfService_);
+                qualityOfService_ = subBuilder.buildPartial();
               }
 
               break;
@@ -15367,6 +15405,39 @@ public final class ExecutionOuterClass {
       return getAuthRole();
     }
 
+    public static final int QUALITY_OF_SERVICE_FIELD_NUMBER = 17;
+    private flyteidl.core.Execution.QualityOfService qualityOfService_;
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+     */
+    public boolean hasQualityOfService() {
+      return qualityOfService_ != null;
+    }
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+     */
+    public flyteidl.core.Execution.QualityOfService getQualityOfService() {
+      return qualityOfService_ == null ? flyteidl.core.Execution.QualityOfService.getDefaultInstance() : qualityOfService_;
+    }
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+     */
+    public flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder() {
+      return getQualityOfService();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -15405,6 +15476,9 @@ public final class ExecutionOuterClass {
       }
       if (authRole_ != null) {
         output.writeMessage(16, getAuthRole());
+      }
+      if (qualityOfService_ != null) {
+        output.writeMessage(17, getQualityOfService());
       }
       unknownFields.writeTo(output);
     }
@@ -15447,6 +15521,10 @@ public final class ExecutionOuterClass {
       if (authRole_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(16, getAuthRole());
+      }
+      if (qualityOfService_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(17, getQualityOfService());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -15492,6 +15570,11 @@ public final class ExecutionOuterClass {
       if (hasAuthRole()) {
         if (!getAuthRole()
             .equals(other.getAuthRole())) return false;
+      }
+      if (hasQualityOfService() != other.hasQualityOfService()) return false;
+      if (hasQualityOfService()) {
+        if (!getQualityOfService()
+            .equals(other.getQualityOfService())) return false;
       }
       if (!getNotificationOverridesCase().equals(other.getNotificationOverridesCase())) return false;
       switch (notificationOverridesCase_) {
@@ -15540,6 +15623,10 @@ public final class ExecutionOuterClass {
       if (hasAuthRole()) {
         hash = (37 * hash) + AUTH_ROLE_FIELD_NUMBER;
         hash = (53 * hash) + getAuthRole().hashCode();
+      }
+      if (hasQualityOfService()) {
+        hash = (37 * hash) + QUALITY_OF_SERVICE_FIELD_NUMBER;
+        hash = (53 * hash) + getQualityOfService().hashCode();
       }
       switch (notificationOverridesCase_) {
         case 5:
@@ -15728,6 +15815,12 @@ public final class ExecutionOuterClass {
           authRole_ = null;
           authRoleBuilder_ = null;
         }
+        if (qualityOfServiceBuilder_ == null) {
+          qualityOfService_ = null;
+        } else {
+          qualityOfService_ = null;
+          qualityOfServiceBuilder_ = null;
+        }
         notificationOverridesCase_ = 0;
         notificationOverrides_ = null;
         return this;
@@ -15796,6 +15889,11 @@ public final class ExecutionOuterClass {
         } else {
           result.authRole_ = authRoleBuilder_.build();
         }
+        if (qualityOfServiceBuilder_ == null) {
+          result.qualityOfService_ = qualityOfService_;
+        } else {
+          result.qualityOfService_ = qualityOfServiceBuilder_.build();
+        }
         result.notificationOverridesCase_ = notificationOverridesCase_;
         onBuilt();
         return result;
@@ -15862,6 +15960,9 @@ public final class ExecutionOuterClass {
         }
         if (other.hasAuthRole()) {
           mergeAuthRole(other.getAuthRole());
+        }
+        if (other.hasQualityOfService()) {
+          mergeQualityOfService(other.getQualityOfService());
         }
         switch (other.getNotificationOverridesCase()) {
           case NOTIFICATIONS: {
@@ -17068,6 +17169,159 @@ public final class ExecutionOuterClass {
           authRole_ = null;
         }
         return authRoleBuilder_;
+      }
+
+      private flyteidl.core.Execution.QualityOfService qualityOfService_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Execution.QualityOfService, flyteidl.core.Execution.QualityOfService.Builder, flyteidl.core.Execution.QualityOfServiceOrBuilder> qualityOfServiceBuilder_;
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+       */
+      public boolean hasQualityOfService() {
+        return qualityOfServiceBuilder_ != null || qualityOfService_ != null;
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+       */
+      public flyteidl.core.Execution.QualityOfService getQualityOfService() {
+        if (qualityOfServiceBuilder_ == null) {
+          return qualityOfService_ == null ? flyteidl.core.Execution.QualityOfService.getDefaultInstance() : qualityOfService_;
+        } else {
+          return qualityOfServiceBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+       */
+      public Builder setQualityOfService(flyteidl.core.Execution.QualityOfService value) {
+        if (qualityOfServiceBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          qualityOfService_ = value;
+          onChanged();
+        } else {
+          qualityOfServiceBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+       */
+      public Builder setQualityOfService(
+          flyteidl.core.Execution.QualityOfService.Builder builderForValue) {
+        if (qualityOfServiceBuilder_ == null) {
+          qualityOfService_ = builderForValue.build();
+          onChanged();
+        } else {
+          qualityOfServiceBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+       */
+      public Builder mergeQualityOfService(flyteidl.core.Execution.QualityOfService value) {
+        if (qualityOfServiceBuilder_ == null) {
+          if (qualityOfService_ != null) {
+            qualityOfService_ =
+              flyteidl.core.Execution.QualityOfService.newBuilder(qualityOfService_).mergeFrom(value).buildPartial();
+          } else {
+            qualityOfService_ = value;
+          }
+          onChanged();
+        } else {
+          qualityOfServiceBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+       */
+      public Builder clearQualityOfService() {
+        if (qualityOfServiceBuilder_ == null) {
+          qualityOfService_ = null;
+          onChanged();
+        } else {
+          qualityOfService_ = null;
+          qualityOfServiceBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+       */
+      public flyteidl.core.Execution.QualityOfService.Builder getQualityOfServiceBuilder() {
+        
+        onChanged();
+        return getQualityOfServiceFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+       */
+      public flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder() {
+        if (qualityOfServiceBuilder_ != null) {
+          return qualityOfServiceBuilder_.getMessageOrBuilder();
+        } else {
+          return qualityOfService_ == null ?
+              flyteidl.core.Execution.QualityOfService.getDefaultInstance() : qualityOfService_;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 17;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Execution.QualityOfService, flyteidl.core.Execution.QualityOfService.Builder, flyteidl.core.Execution.QualityOfServiceOrBuilder> 
+          getQualityOfServiceFieldBuilder() {
+        if (qualityOfServiceBuilder_ == null) {
+          qualityOfServiceBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Execution.QualityOfService, flyteidl.core.Execution.QualityOfService.Builder, flyteidl.core.Execution.QualityOfServiceOrBuilder>(
+                  getQualityOfService(),
+                  getParentForChildren(),
+                  isClean());
+          qualityOfService_ = null;
+        }
+        return qualityOfServiceBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -20148,7 +20402,7 @@ public final class ExecutionOuterClass {
       "CHEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016" +
       "CHILD_WORKFLOW\020\004\"G\n\020NotificationList\0223\n\r" +
       "notifications\030\001 \003(\0132\034.flyteidl.admin.Not" +
-      "ification\"\234\003\n\rExecutionSpec\022.\n\013launch_pl" +
+      "ification\"\331\003\n\rExecutionSpec\022.\n\013launch_pl" +
       "an\030\001 \001(\0132\031.flyteidl.core.Identifier\022-\n\006i" +
       "nputs\030\002 \001(\0132\031.flyteidl.core.LiteralMapB\002" +
       "\030\001\0223\n\010metadata\030\003 \001(\0132!.flyteidl.admin.Ex" +
@@ -20157,18 +20411,20 @@ public final class ExecutionOuterClass {
       "sable_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyt" +
       "eidl.admin.Labels\0220\n\013annotations\030\010 \001(\0132\033" +
       ".flyteidl.admin.Annotations\022+\n\tauth_role" +
-      "\030\020 \001(\0132\030.flyteidl.admin.AuthRoleB\030\n\026noti" +
-      "fication_overridesJ\004\010\004\020\005\"b\n\031ExecutionTer" +
-      "minateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.cor" +
-      "e.WorkflowExecutionIdentifier\022\r\n\005cause\030\002" +
-      " \001(\t\"\034\n\032ExecutionTerminateResponse\"Y\n\037Wo" +
-      "rkflowExecutionGetDataRequest\0226\n\002id\030\001 \001(" +
-      "\0132*.flyteidl.core.WorkflowExecutionIdent" +
-      "ifier\"u\n WorkflowExecutionGetDataRespons" +
-      "e\022(\n\007outputs\030\001 \001(\0132\027.flyteidl.admin.UrlB" +
-      "lob\022\'\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.Url" +
-      "BlobB3Z1github.com/lyft/flyteidl/gen/pb-" +
-      "go/flyteidl/adminb\006proto3"
+      "\030\020 \001(\0132\030.flyteidl.admin.AuthRole\022;\n\022qual" +
+      "ity_of_service\030\021 \001(\0132\037.flyteidl.core.Qua" +
+      "lityOfServiceB\030\n\026notification_overridesJ" +
+      "\004\010\004\020\005\"b\n\031ExecutionTerminateRequest\0226\n\002id" +
+      "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution" +
+      "Identifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTe" +
+      "rminateResponse\"Y\n\037WorkflowExecutionGetD" +
+      "ataRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.W" +
+      "orkflowExecutionIdentifier\"u\n WorkflowEx" +
+      "ecutionGetDataResponse\022(\n\007outputs\030\001 \001(\0132" +
+      "\027.flyteidl.admin.UrlBlob\022\'\n\006inputs\030\002 \001(\013" +
+      "2\027.flyteidl.admin.UrlBlobB3Z1github.com/" +
+      "lyft/flyteidl/gen/pb-go/flyteidl/adminb\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20265,7 +20521,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionSpec_descriptor,
-        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "AuthRole", "NotificationOverrides", });
+        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "AuthRole", "QualityOfService", "NotificationOverrides", });
     internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor =
       getDescriptor().getMessageTypes().get(13);
     internal_static_flyteidl_admin_ExecutionTerminateRequest_fieldAccessorTable = new

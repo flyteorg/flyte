@@ -3,6 +3,9 @@ syntax = "proto3";
 package flyteidl.admin;
 option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
 
+import "flyteidl/admin/common.proto";
+import "flyteidl/core/execution.proto";
+
 // Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
 // based on matching tags.
 enum MatchableResource {
@@ -17,6 +20,9 @@ enum MatchableResource {
 
   // Configures the K8s cluster label to be used for execution to be run
   EXECUTION_CLUSTER_LABEL = 3;
+
+  // Configures default quality of service when undefined in an execution spec.
+  QUALITY_OF_SERVICE_SPECIFICATION = 4;
 }
 
 message TaskResourceSpec {
@@ -62,6 +68,8 @@ message MatchingAttributes {
     ExecutionQueueAttributes execution_queue_attributes = 3;
 
     ExecutionClusterLabel execution_cluster_label = 4;
+
+    core.QualityOfService quality_of_service = 5;
   }
 }
 

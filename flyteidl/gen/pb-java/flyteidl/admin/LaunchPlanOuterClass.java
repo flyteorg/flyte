@@ -4478,6 +4478,31 @@ public final class LaunchPlanOuterClass {
      * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
      */
     flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder();
+
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+     */
+    boolean hasQualityOfService();
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+     */
+    flyteidl.core.Execution.QualityOfService getQualityOfService();
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+     */
+    flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder();
   }
   /**
    * <pre>
@@ -4629,6 +4654,19 @@ public final class LaunchPlanOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(authRole_);
                 authRole_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 130: {
+              flyteidl.core.Execution.QualityOfService.Builder subBuilder = null;
+              if (qualityOfService_ != null) {
+                subBuilder = qualityOfService_.toBuilder();
+              }
+              qualityOfService_ = input.readMessage(flyteidl.core.Execution.QualityOfService.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(qualityOfService_);
+                qualityOfService_ = subBuilder.buildPartial();
               }
 
               break;
@@ -4959,6 +4997,39 @@ public final class LaunchPlanOuterClass {
       return getAuthRole();
     }
 
+    public static final int QUALITY_OF_SERVICE_FIELD_NUMBER = 16;
+    private flyteidl.core.Execution.QualityOfService qualityOfService_;
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+     */
+    public boolean hasQualityOfService() {
+      return qualityOfService_ != null;
+    }
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+     */
+    public flyteidl.core.Execution.QualityOfService getQualityOfService() {
+      return qualityOfService_ == null ? flyteidl.core.Execution.QualityOfService.getDefaultInstance() : qualityOfService_;
+    }
+    /**
+     * <pre>
+     * Indicates the runtime priority of the execution. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+     */
+    public flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder() {
+      return getQualityOfService();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -4999,6 +5070,9 @@ public final class LaunchPlanOuterClass {
       }
       if (authRole_ != null) {
         output.writeMessage(9, getAuthRole());
+      }
+      if (qualityOfService_ != null) {
+        output.writeMessage(16, getQualityOfService());
       }
       unknownFields.writeTo(output);
     }
@@ -5043,6 +5117,10 @@ public final class LaunchPlanOuterClass {
       if (authRole_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(9, getAuthRole());
+      }
+      if (qualityOfService_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(16, getQualityOfService());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5101,6 +5179,11 @@ public final class LaunchPlanOuterClass {
         if (!getAuthRole()
             .equals(other.getAuthRole())) return false;
       }
+      if (hasQualityOfService() != other.hasQualityOfService()) return false;
+      if (hasQualityOfService()) {
+        if (!getQualityOfService()
+            .equals(other.getQualityOfService())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5145,6 +5228,10 @@ public final class LaunchPlanOuterClass {
       if (hasAuthRole()) {
         hash = (37 * hash) + AUTH_ROLE_FIELD_NUMBER;
         hash = (53 * hash) + getAuthRole().hashCode();
+      }
+      if (hasQualityOfService()) {
+        hash = (37 * hash) + QUALITY_OF_SERVICE_FIELD_NUMBER;
+        hash = (53 * hash) + getQualityOfService().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -5333,6 +5420,12 @@ public final class LaunchPlanOuterClass {
           authRole_ = null;
           authRoleBuilder_ = null;
         }
+        if (qualityOfServiceBuilder_ == null) {
+          qualityOfService_ = null;
+        } else {
+          qualityOfService_ = null;
+          qualityOfServiceBuilder_ = null;
+        }
         return this;
       }
 
@@ -5399,6 +5492,11 @@ public final class LaunchPlanOuterClass {
           result.authRole_ = authRole_;
         } else {
           result.authRole_ = authRoleBuilder_.build();
+        }
+        if (qualityOfServiceBuilder_ == null) {
+          result.qualityOfService_ = qualityOfService_;
+        } else {
+          result.qualityOfService_ = qualityOfServiceBuilder_.build();
         }
         onBuilt();
         return result;
@@ -5475,6 +5573,9 @@ public final class LaunchPlanOuterClass {
         }
         if (other.hasAuthRole()) {
           mergeAuthRole(other.getAuthRole());
+        }
+        if (other.hasQualityOfService()) {
+          mergeQualityOfService(other.getQualityOfService());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -6780,6 +6881,159 @@ public final class LaunchPlanOuterClass {
           authRole_ = null;
         }
         return authRoleBuilder_;
+      }
+
+      private flyteidl.core.Execution.QualityOfService qualityOfService_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Execution.QualityOfService, flyteidl.core.Execution.QualityOfService.Builder, flyteidl.core.Execution.QualityOfServiceOrBuilder> qualityOfServiceBuilder_;
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+       */
+      public boolean hasQualityOfService() {
+        return qualityOfServiceBuilder_ != null || qualityOfService_ != null;
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+       */
+      public flyteidl.core.Execution.QualityOfService getQualityOfService() {
+        if (qualityOfServiceBuilder_ == null) {
+          return qualityOfService_ == null ? flyteidl.core.Execution.QualityOfService.getDefaultInstance() : qualityOfService_;
+        } else {
+          return qualityOfServiceBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+       */
+      public Builder setQualityOfService(flyteidl.core.Execution.QualityOfService value) {
+        if (qualityOfServiceBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          qualityOfService_ = value;
+          onChanged();
+        } else {
+          qualityOfServiceBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+       */
+      public Builder setQualityOfService(
+          flyteidl.core.Execution.QualityOfService.Builder builderForValue) {
+        if (qualityOfServiceBuilder_ == null) {
+          qualityOfService_ = builderForValue.build();
+          onChanged();
+        } else {
+          qualityOfServiceBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+       */
+      public Builder mergeQualityOfService(flyteidl.core.Execution.QualityOfService value) {
+        if (qualityOfServiceBuilder_ == null) {
+          if (qualityOfService_ != null) {
+            qualityOfService_ =
+              flyteidl.core.Execution.QualityOfService.newBuilder(qualityOfService_).mergeFrom(value).buildPartial();
+          } else {
+            qualityOfService_ = value;
+          }
+          onChanged();
+        } else {
+          qualityOfServiceBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+       */
+      public Builder clearQualityOfService() {
+        if (qualityOfServiceBuilder_ == null) {
+          qualityOfService_ = null;
+          onChanged();
+        } else {
+          qualityOfService_ = null;
+          qualityOfServiceBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+       */
+      public flyteidl.core.Execution.QualityOfService.Builder getQualityOfServiceBuilder() {
+        
+        onChanged();
+        return getQualityOfServiceFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+       */
+      public flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder() {
+        if (qualityOfServiceBuilder_ != null) {
+          return qualityOfServiceBuilder_.getMessageOrBuilder();
+        } else {
+          return qualityOfService_ == null ?
+              flyteidl.core.Execution.QualityOfService.getDefaultInstance() : qualityOfService_;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates the runtime priority of the execution. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Execution.QualityOfService, flyteidl.core.Execution.QualityOfService.Builder, flyteidl.core.Execution.QualityOfServiceOrBuilder> 
+          getQualityOfServiceFieldBuilder() {
+        if (qualityOfServiceBuilder_ == null) {
+          qualityOfServiceBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Execution.QualityOfService, flyteidl.core.Execution.QualityOfService.Builder, flyteidl.core.Execution.QualityOfServiceOrBuilder>(
+                  getQualityOfService(),
+                  getParentForChildren(),
+                  isClean());
+          qualityOfService_ = null;
+        }
+        return qualityOfServiceBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -12779,55 +13033,57 @@ public final class LaunchPlanOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n flyteidl/admin/launch_plan.proto\022\016flyt" +
-      "eidl.admin\032\034flyteidl/core/literals.proto" +
-      "\032\036flyteidl/core/identifier.proto\032\035flytei" +
-      "dl/core/interface.proto\032\035flyteidl/admin/" +
-      "schedule.proto\032\033flyteidl/admin/common.pr" +
-      "oto\032\037google/protobuf/timestamp.proto\"n\n\027" +
-      "LaunchPlanCreateRequest\022%\n\002id\030\001 \001(\0132\031.fl" +
-      "yteidl.core.Identifier\022,\n\004spec\030\002 \001(\0132\036.f" +
-      "lyteidl.admin.LaunchPlanSpec\"\032\n\030LaunchPl" +
-      "anCreateResponse\"\225\001\n\nLaunchPlan\022%\n\002id\030\001 " +
-      "\001(\0132\031.flyteidl.core.Identifier\022,\n\004spec\030\002" +
-      " \001(\0132\036.flyteidl.admin.LaunchPlanSpec\0222\n\007" +
-      "closure\030\003 \001(\0132!.flyteidl.admin.LaunchPla" +
-      "nClosure\"Q\n\016LaunchPlanList\0220\n\014launch_pla" +
-      "ns\030\001 \003(\0132\032.flyteidl.admin.LaunchPlan\022\r\n\005" +
-      "token\030\002 \001(\t\"T\n\004Auth\022\034\n\022assumable_iam_rol" +
-      "e\030\001 \001(\tH\000\022$\n\032kubernetes_service_account\030" +
-      "\002 \001(\tH\000B\010\n\006method\"\244\003\n\016LaunchPlanSpec\022.\n\013" +
-      "workflow_id\030\001 \001(\0132\031.flyteidl.core.Identi" +
-      "fier\022;\n\017entity_metadata\030\002 \001(\0132\".flyteidl" +
-      ".admin.LaunchPlanMetadata\0223\n\016default_inp" +
-      "uts\030\003 \001(\0132\033.flyteidl.core.ParameterMap\022/" +
-      "\n\014fixed_inputs\030\004 \001(\0132\031.flyteidl.core.Lit" +
-      "eralMap\022\020\n\004role\030\005 \001(\tB\002\030\001\022&\n\006labels\030\006 \001(" +
-      "\0132\026.flyteidl.admin.Labels\0220\n\013annotations" +
-      "\030\007 \001(\0132\033.flyteidl.admin.Annotations\022&\n\004a" +
-      "uth\030\010 \001(\0132\024.flyteidl.admin.AuthB\002\030\001\022+\n\ta" +
-      "uth_role\030\t \001(\0132\030.flyteidl.admin.AuthRole" +
-      "\"\217\002\n\021LaunchPlanClosure\022.\n\005state\030\001 \001(\0162\037." +
-      "flyteidl.admin.LaunchPlanState\0224\n\017expect" +
-      "ed_inputs\030\002 \001(\0132\033.flyteidl.core.Paramete" +
-      "rMap\0224\n\020expected_outputs\030\003 \001(\0132\032.flyteid" +
-      "l.core.VariableMap\022.\n\ncreated_at\030\004 \001(\0132\032" +
-      ".google.protobuf.Timestamp\022.\n\nupdated_at" +
-      "\030\005 \001(\0132\032.google.protobuf.Timestamp\"u\n\022La" +
-      "unchPlanMetadata\022*\n\010schedule\030\001 \001(\0132\030.fly" +
-      "teidl.admin.Schedule\0223\n\rnotifications\030\002 " +
-      "\003(\0132\034.flyteidl.admin.Notification\"p\n\027Lau" +
-      "nchPlanUpdateRequest\022%\n\002id\030\001 \001(\0132\031.flyte" +
-      "idl.core.Identifier\022.\n\005state\030\002 \001(\0162\037.fly" +
-      "teidl.admin.LaunchPlanState\"\032\n\030LaunchPla" +
-      "nUpdateResponse\"L\n\027ActiveLaunchPlanReque" +
-      "st\0221\n\002id\030\001 \001(\0132%.flyteidl.admin.NamedEnt" +
-      "ityIdentifier\"\203\001\n\033ActiveLaunchPlanListRe" +
-      "quest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r" +
-      "\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030" +
-      "\005 \001(\0132\024.flyteidl.admin.Sort*+\n\017LaunchPla" +
-      "nState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTIVE\020\001B3Z1gith" +
-      "ub.com/lyft/flyteidl/gen/pb-go/flyteidl/" +
-      "adminb\006proto3"
+      "eidl.admin\032\035flyteidl/core/execution.prot" +
+      "o\032\034flyteidl/core/literals.proto\032\036flyteid" +
+      "l/core/identifier.proto\032\035flyteidl/core/i" +
+      "nterface.proto\032\035flyteidl/admin/schedule." +
+      "proto\032\033flyteidl/admin/common.proto\032\037goog" +
+      "le/protobuf/timestamp.proto\"n\n\027LaunchPla" +
+      "nCreateRequest\022%\n\002id\030\001 \001(\0132\031.flyteidl.co" +
+      "re.Identifier\022,\n\004spec\030\002 \001(\0132\036.flyteidl.a" +
+      "dmin.LaunchPlanSpec\"\032\n\030LaunchPlanCreateR" +
+      "esponse\"\225\001\n\nLaunchPlan\022%\n\002id\030\001 \001(\0132\031.fly" +
+      "teidl.core.Identifier\022,\n\004spec\030\002 \001(\0132\036.fl" +
+      "yteidl.admin.LaunchPlanSpec\0222\n\007closure\030\003" +
+      " \001(\0132!.flyteidl.admin.LaunchPlanClosure\"" +
+      "Q\n\016LaunchPlanList\0220\n\014launch_plans\030\001 \003(\0132" +
+      "\032.flyteidl.admin.LaunchPlan\022\r\n\005token\030\002 \001" +
+      "(\t\"T\n\004Auth\022\034\n\022assumable_iam_role\030\001 \001(\tH\000" +
+      "\022$\n\032kubernetes_service_account\030\002 \001(\tH\000B\010" +
+      "\n\006method\"\341\003\n\016LaunchPlanSpec\022.\n\013workflow_" +
+      "id\030\001 \001(\0132\031.flyteidl.core.Identifier\022;\n\017e" +
+      "ntity_metadata\030\002 \001(\0132\".flyteidl.admin.La" +
+      "unchPlanMetadata\0223\n\016default_inputs\030\003 \001(\013" +
+      "2\033.flyteidl.core.ParameterMap\022/\n\014fixed_i" +
+      "nputs\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022\020" +
+      "\n\004role\030\005 \001(\tB\002\030\001\022&\n\006labels\030\006 \001(\0132\026.flyte" +
+      "idl.admin.Labels\0220\n\013annotations\030\007 \001(\0132\033." +
+      "flyteidl.admin.Annotations\022&\n\004auth\030\010 \001(\013" +
+      "2\024.flyteidl.admin.AuthB\002\030\001\022+\n\tauth_role\030" +
+      "\t \001(\0132\030.flyteidl.admin.AuthRole\022;\n\022quali" +
+      "ty_of_service\030\020 \001(\0132\037.flyteidl.core.Qual" +
+      "ityOfService\"\217\002\n\021LaunchPlanClosure\022.\n\005st" +
+      "ate\030\001 \001(\0162\037.flyteidl.admin.LaunchPlanSta" +
+      "te\0224\n\017expected_inputs\030\002 \001(\0132\033.flyteidl.c" +
+      "ore.ParameterMap\0224\n\020expected_outputs\030\003 \001" +
+      "(\0132\032.flyteidl.core.VariableMap\022.\n\ncreate" +
+      "d_at\030\004 \001(\0132\032.google.protobuf.Timestamp\022." +
+      "\n\nupdated_at\030\005 \001(\0132\032.google.protobuf.Tim" +
+      "estamp\"u\n\022LaunchPlanMetadata\022*\n\010schedule" +
+      "\030\001 \001(\0132\030.flyteidl.admin.Schedule\0223\n\rnoti" +
+      "fications\030\002 \003(\0132\034.flyteidl.admin.Notific" +
+      "ation\"p\n\027LaunchPlanUpdateRequest\022%\n\002id\030\001" +
+      " \001(\0132\031.flyteidl.core.Identifier\022.\n\005state" +
+      "\030\002 \001(\0162\037.flyteidl.admin.LaunchPlanState\"" +
+      "\032\n\030LaunchPlanUpdateResponse\"L\n\027ActiveLau" +
+      "nchPlanRequest\0221\n\002id\030\001 \001(\0132%.flyteidl.ad" +
+      "min.NamedEntityIdentifier\"\203\001\n\033ActiveLaun" +
+      "chPlanListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006do" +
+      "main\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t" +
+      "\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort*" +
+      "+\n\017LaunchPlanState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTI" +
+      "VE\020\001B3Z1github.com/lyft/flyteidl/gen/pb-" +
+      "go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -12840,6 +13096,7 @@ public final class LaunchPlanOuterClass {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          flyteidl.core.Execution.getDescriptor(),
           flyteidl.core.Literals.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           flyteidl.core.Interface.getDescriptor(),
@@ -12882,7 +13139,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_LaunchPlanSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LaunchPlanSpec_descriptor,
-        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", });
+        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "QualityOfService", });
     internal_static_flyteidl_admin_LaunchPlanClosure_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_LaunchPlanClosure_fieldAccessorTable = new
@@ -12919,6 +13176,7 @@ public final class LaunchPlanOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor,
         new java.lang.String[] { "Project", "Domain", "Limit", "Token", "SortBy", });
+    flyteidl.core.Execution.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Interface.getDescriptor();

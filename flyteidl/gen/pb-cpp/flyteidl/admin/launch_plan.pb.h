@@ -32,6 +32,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "flyteidl/core/execution.pb.h"
 #include "flyteidl/core/literals.pb.h"
 #include "flyteidl/core/identifier.pb.h"
 #include "flyteidl/core/interface.pb.h"
@@ -975,6 +976,15 @@ class LaunchPlanSpec final :
   ::flyteidl::admin::AuthRole* mutable_auth_role();
   void set_allocated_auth_role(::flyteidl::admin::AuthRole* auth_role);
 
+  // .flyteidl.core.QualityOfService quality_of_service = 16;
+  bool has_quality_of_service() const;
+  void clear_quality_of_service();
+  static const int kQualityOfServiceFieldNumber = 16;
+  const ::flyteidl::core::QualityOfService& quality_of_service() const;
+  ::flyteidl::core::QualityOfService* release_quality_of_service();
+  ::flyteidl::core::QualityOfService* mutable_quality_of_service();
+  void set_allocated_quality_of_service(::flyteidl::core::QualityOfService* quality_of_service);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.LaunchPlanSpec)
  private:
   class HasBitSetters;
@@ -989,6 +999,7 @@ class LaunchPlanSpec final :
   ::flyteidl::admin::Annotations* annotations_;
   ::flyteidl::admin::Auth* auth_;
   ::flyteidl::admin::AuthRole* auth_role_;
+  ::flyteidl::core::QualityOfService* quality_of_service_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
 };
@@ -2754,6 +2765,51 @@ inline void LaunchPlanSpec::set_allocated_auth_role(::flyteidl::admin::AuthRole*
   }
   auth_role_ = auth_role;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.auth_role)
+}
+
+// .flyteidl.core.QualityOfService quality_of_service = 16;
+inline bool LaunchPlanSpec::has_quality_of_service() const {
+  return this != internal_default_instance() && quality_of_service_ != nullptr;
+}
+inline const ::flyteidl::core::QualityOfService& LaunchPlanSpec::quality_of_service() const {
+  const ::flyteidl::core::QualityOfService* p = quality_of_service_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.LaunchPlanSpec.quality_of_service)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::QualityOfService*>(
+      &::flyteidl::core::_QualityOfService_default_instance_);
+}
+inline ::flyteidl::core::QualityOfService* LaunchPlanSpec::release_quality_of_service() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.LaunchPlanSpec.quality_of_service)
+  
+  ::flyteidl::core::QualityOfService* temp = quality_of_service_;
+  quality_of_service_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::QualityOfService* LaunchPlanSpec::mutable_quality_of_service() {
+  
+  if (quality_of_service_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::QualityOfService>(GetArenaNoVirtual());
+    quality_of_service_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.LaunchPlanSpec.quality_of_service)
+  return quality_of_service_;
+}
+inline void LaunchPlanSpec::set_allocated_quality_of_service(::flyteidl::core::QualityOfService* quality_of_service) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(quality_of_service_);
+  }
+  if (quality_of_service) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      quality_of_service = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, quality_of_service, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  quality_of_service_ = quality_of_service;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.quality_of_service)
 }
 
 // -------------------------------------------------------------------

@@ -24,6 +24,7 @@ from flyteadmin.models.admin_launch_plan_metadata import AdminLaunchPlanMetadata
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_parameter_map import CoreParameterMap  # noqa: F401,E501
+from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
 
 
 class AdminLaunchPlanSpec(object):
@@ -48,7 +49,8 @@ class AdminLaunchPlanSpec(object):
         'labels': 'AdminLabels',
         'annotations': 'AdminAnnotations',
         'auth': 'AdminAuth',
-        'auth_role': 'AdminAuthRole'
+        'auth_role': 'AdminAuthRole',
+        'quality_of_service': 'CoreQualityOfService'
     }
 
     attribute_map = {
@@ -60,10 +62,11 @@ class AdminLaunchPlanSpec(object):
         'labels': 'labels',
         'annotations': 'annotations',
         'auth': 'auth',
-        'auth_role': 'auth_role'
+        'auth_role': 'auth_role',
+        'quality_of_service': 'quality_of_service'
     }
 
-    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None):  # noqa: E501
+    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, quality_of_service=None):  # noqa: E501
         """AdminLaunchPlanSpec - a model defined in Swagger"""  # noqa: E501
 
         self._workflow_id = None
@@ -75,6 +78,7 @@ class AdminLaunchPlanSpec(object):
         self._annotations = None
         self._auth = None
         self._auth_role = None
+        self._quality_of_service = None
         self.discriminator = None
 
         if workflow_id is not None:
@@ -95,6 +99,8 @@ class AdminLaunchPlanSpec(object):
             self.auth = auth
         if auth_role is not None:
             self.auth_role = auth_role
+        if quality_of_service is not None:
+            self.quality_of_service = quality_of_service
 
     @property
     def workflow_id(self):
@@ -290,6 +296,29 @@ class AdminLaunchPlanSpec(object):
         """
 
         self._auth_role = auth_role
+
+    @property
+    def quality_of_service(self):
+        """Gets the quality_of_service of this AdminLaunchPlanSpec.  # noqa: E501
+
+        Indicates the runtime priority of the execution.  # noqa: E501
+
+        :return: The quality_of_service of this AdminLaunchPlanSpec.  # noqa: E501
+        :rtype: CoreQualityOfService
+        """
+        return self._quality_of_service
+
+    @quality_of_service.setter
+    def quality_of_service(self, quality_of_service):
+        """Sets the quality_of_service of this AdminLaunchPlanSpec.
+
+        Indicates the runtime priority of the execution.  # noqa: E501
+
+        :param quality_of_service: The quality_of_service of this AdminLaunchPlanSpec.  # noqa: E501
+        :type: CoreQualityOfService
+        """
+
+        self._quality_of_service = quality_of_service
 
     def to_dict(self):
         """Returns the model properties as a dict"""
