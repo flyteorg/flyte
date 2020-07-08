@@ -17,6 +17,7 @@ configMapGenerator:
 # Files are read in alphabetical order. To ensure that we create the namespace first, prefix the file name with "aa".
     - clusterresource-templates/aa_namespace.yaml
     - clusterresource-templates/ab_project-resource-quota.yaml
+    - clusterresource-templates/ac_project-copilot-dataconfig.yaml
 
 patches:
 - admindeployment.yaml
