@@ -4007,6 +4007,1625 @@ public final class Execution {
 
   }
 
+  public interface QualityOfServiceSpecOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.QualityOfServiceSpec)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Indicates how much queueing delay an execution can tolerate.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+     */
+    boolean hasQueueingBudget();
+    /**
+     * <pre>
+     * Indicates how much queueing delay an execution can tolerate.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+     */
+    com.google.protobuf.Duration getQueueingBudget();
+    /**
+     * <pre>
+     * Indicates how much queueing delay an execution can tolerate.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+     */
+    com.google.protobuf.DurationOrBuilder getQueueingBudgetOrBuilder();
+  }
+  /**
+   * <pre>
+   * Represents customized execution run-time attributes.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.QualityOfServiceSpec}
+   */
+  public  static final class QualityOfServiceSpec extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.QualityOfServiceSpec)
+      QualityOfServiceSpecOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use QualityOfServiceSpec.newBuilder() to construct.
+    private QualityOfServiceSpec(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private QualityOfServiceSpec() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private QualityOfServiceSpec(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              com.google.protobuf.Duration.Builder subBuilder = null;
+              if (queueingBudget_ != null) {
+                subBuilder = queueingBudget_.toBuilder();
+              }
+              queueingBudget_ = input.readMessage(com.google.protobuf.Duration.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(queueingBudget_);
+                queueingBudget_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Execution.internal_static_flyteidl_core_QualityOfServiceSpec_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Execution.internal_static_flyteidl_core_QualityOfServiceSpec_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Execution.QualityOfServiceSpec.class, flyteidl.core.Execution.QualityOfServiceSpec.Builder.class);
+    }
+
+    public static final int QUEUEING_BUDGET_FIELD_NUMBER = 1;
+    private com.google.protobuf.Duration queueingBudget_;
+    /**
+     * <pre>
+     * Indicates how much queueing delay an execution can tolerate.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+     */
+    public boolean hasQueueingBudget() {
+      return queueingBudget_ != null;
+    }
+    /**
+     * <pre>
+     * Indicates how much queueing delay an execution can tolerate.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+     */
+    public com.google.protobuf.Duration getQueueingBudget() {
+      return queueingBudget_ == null ? com.google.protobuf.Duration.getDefaultInstance() : queueingBudget_;
+    }
+    /**
+     * <pre>
+     * Indicates how much queueing delay an execution can tolerate.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+     */
+    public com.google.protobuf.DurationOrBuilder getQueueingBudgetOrBuilder() {
+      return getQueueingBudget();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (queueingBudget_ != null) {
+        output.writeMessage(1, getQueueingBudget());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (queueingBudget_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getQueueingBudget());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Execution.QualityOfServiceSpec)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Execution.QualityOfServiceSpec other = (flyteidl.core.Execution.QualityOfServiceSpec) obj;
+
+      if (hasQueueingBudget() != other.hasQueueingBudget()) return false;
+      if (hasQueueingBudget()) {
+        if (!getQueueingBudget()
+            .equals(other.getQueueingBudget())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasQueueingBudget()) {
+        hash = (37 * hash) + QUEUEING_BUDGET_FIELD_NUMBER;
+        hash = (53 * hash) + getQueueingBudget().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Execution.QualityOfServiceSpec parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Execution.QualityOfServiceSpec prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Represents customized execution run-time attributes.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.QualityOfServiceSpec}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.QualityOfServiceSpec)
+        flyteidl.core.Execution.QualityOfServiceSpecOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Execution.internal_static_flyteidl_core_QualityOfServiceSpec_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Execution.internal_static_flyteidl_core_QualityOfServiceSpec_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Execution.QualityOfServiceSpec.class, flyteidl.core.Execution.QualityOfServiceSpec.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Execution.QualityOfServiceSpec.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (queueingBudgetBuilder_ == null) {
+          queueingBudget_ = null;
+        } else {
+          queueingBudget_ = null;
+          queueingBudgetBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Execution.internal_static_flyteidl_core_QualityOfServiceSpec_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Execution.QualityOfServiceSpec getDefaultInstanceForType() {
+        return flyteidl.core.Execution.QualityOfServiceSpec.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Execution.QualityOfServiceSpec build() {
+        flyteidl.core.Execution.QualityOfServiceSpec result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Execution.QualityOfServiceSpec buildPartial() {
+        flyteidl.core.Execution.QualityOfServiceSpec result = new flyteidl.core.Execution.QualityOfServiceSpec(this);
+        if (queueingBudgetBuilder_ == null) {
+          result.queueingBudget_ = queueingBudget_;
+        } else {
+          result.queueingBudget_ = queueingBudgetBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Execution.QualityOfServiceSpec) {
+          return mergeFrom((flyteidl.core.Execution.QualityOfServiceSpec)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Execution.QualityOfServiceSpec other) {
+        if (other == flyteidl.core.Execution.QualityOfServiceSpec.getDefaultInstance()) return this;
+        if (other.hasQueueingBudget()) {
+          mergeQueueingBudget(other.getQueueingBudget());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Execution.QualityOfServiceSpec parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Execution.QualityOfServiceSpec) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private com.google.protobuf.Duration queueingBudget_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> queueingBudgetBuilder_;
+      /**
+       * <pre>
+       * Indicates how much queueing delay an execution can tolerate.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+       */
+      public boolean hasQueueingBudget() {
+        return queueingBudgetBuilder_ != null || queueingBudget_ != null;
+      }
+      /**
+       * <pre>
+       * Indicates how much queueing delay an execution can tolerate.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+       */
+      public com.google.protobuf.Duration getQueueingBudget() {
+        if (queueingBudgetBuilder_ == null) {
+          return queueingBudget_ == null ? com.google.protobuf.Duration.getDefaultInstance() : queueingBudget_;
+        } else {
+          return queueingBudgetBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Indicates how much queueing delay an execution can tolerate.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+       */
+      public Builder setQueueingBudget(com.google.protobuf.Duration value) {
+        if (queueingBudgetBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          queueingBudget_ = value;
+          onChanged();
+        } else {
+          queueingBudgetBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates how much queueing delay an execution can tolerate.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+       */
+      public Builder setQueueingBudget(
+          com.google.protobuf.Duration.Builder builderForValue) {
+        if (queueingBudgetBuilder_ == null) {
+          queueingBudget_ = builderForValue.build();
+          onChanged();
+        } else {
+          queueingBudgetBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates how much queueing delay an execution can tolerate.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+       */
+      public Builder mergeQueueingBudget(com.google.protobuf.Duration value) {
+        if (queueingBudgetBuilder_ == null) {
+          if (queueingBudget_ != null) {
+            queueingBudget_ =
+              com.google.protobuf.Duration.newBuilder(queueingBudget_).mergeFrom(value).buildPartial();
+          } else {
+            queueingBudget_ = value;
+          }
+          onChanged();
+        } else {
+          queueingBudgetBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates how much queueing delay an execution can tolerate.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+       */
+      public Builder clearQueueingBudget() {
+        if (queueingBudgetBuilder_ == null) {
+          queueingBudget_ = null;
+          onChanged();
+        } else {
+          queueingBudget_ = null;
+          queueingBudgetBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates how much queueing delay an execution can tolerate.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+       */
+      public com.google.protobuf.Duration.Builder getQueueingBudgetBuilder() {
+        
+        onChanged();
+        return getQueueingBudgetFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Indicates how much queueing delay an execution can tolerate.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+       */
+      public com.google.protobuf.DurationOrBuilder getQueueingBudgetOrBuilder() {
+        if (queueingBudgetBuilder_ != null) {
+          return queueingBudgetBuilder_.getMessageOrBuilder();
+        } else {
+          return queueingBudget_ == null ?
+              com.google.protobuf.Duration.getDefaultInstance() : queueingBudget_;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates how much queueing delay an execution can tolerate.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration queueing_budget = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> 
+          getQueueingBudgetFieldBuilder() {
+        if (queueingBudgetBuilder_ == null) {
+          queueingBudgetBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder>(
+                  getQueueingBudget(),
+                  getParentForChildren(),
+                  isClean());
+          queueingBudget_ = null;
+        }
+        return queueingBudgetBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.QualityOfServiceSpec)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.QualityOfServiceSpec)
+    private static final flyteidl.core.Execution.QualityOfServiceSpec DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Execution.QualityOfServiceSpec();
+    }
+
+    public static flyteidl.core.Execution.QualityOfServiceSpec getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<QualityOfServiceSpec>
+        PARSER = new com.google.protobuf.AbstractParser<QualityOfServiceSpec>() {
+      @java.lang.Override
+      public QualityOfServiceSpec parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new QualityOfServiceSpec(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<QualityOfServiceSpec> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<QualityOfServiceSpec> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Execution.QualityOfServiceSpec getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface QualityOfServiceOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.QualityOfService)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.flyteidl.core.QualityOfService.Tier tier = 1;</code>
+     */
+    int getTierValue();
+    /**
+     * <code>.flyteidl.core.QualityOfService.Tier tier = 1;</code>
+     */
+    flyteidl.core.Execution.QualityOfService.Tier getTier();
+
+    /**
+     * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+     */
+    boolean hasSpec();
+    /**
+     * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+     */
+    flyteidl.core.Execution.QualityOfServiceSpec getSpec();
+    /**
+     * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+     */
+    flyteidl.core.Execution.QualityOfServiceSpecOrBuilder getSpecOrBuilder();
+
+    public flyteidl.core.Execution.QualityOfService.DesignationCase getDesignationCase();
+  }
+  /**
+   * <pre>
+   * Indicates the priority of an execution.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.QualityOfService}
+   */
+  public  static final class QualityOfService extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.QualityOfService)
+      QualityOfServiceOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use QualityOfService.newBuilder() to construct.
+    private QualityOfService(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private QualityOfService() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private QualityOfService(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 8: {
+              int rawValue = input.readEnum();
+              designationCase_ = 1;
+              designation_ = rawValue;
+              break;
+            }
+            case 18: {
+              flyteidl.core.Execution.QualityOfServiceSpec.Builder subBuilder = null;
+              if (designationCase_ == 2) {
+                subBuilder = ((flyteidl.core.Execution.QualityOfServiceSpec) designation_).toBuilder();
+              }
+              designation_ =
+                  input.readMessage(flyteidl.core.Execution.QualityOfServiceSpec.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Execution.QualityOfServiceSpec) designation_);
+                designation_ = subBuilder.buildPartial();
+              }
+              designationCase_ = 2;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Execution.internal_static_flyteidl_core_QualityOfService_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Execution.internal_static_flyteidl_core_QualityOfService_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Execution.QualityOfService.class, flyteidl.core.Execution.QualityOfService.Builder.class);
+    }
+
+    /**
+     * Protobuf enum {@code flyteidl.core.QualityOfService.Tier}
+     */
+    public enum Tier
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <pre>
+       * Default: no quality of service specified.
+       * </pre>
+       *
+       * <code>UNDEFINED = 0;</code>
+       */
+      UNDEFINED(0),
+      /**
+       * <code>HIGH = 1;</code>
+       */
+      HIGH(1),
+      /**
+       * <code>MEDIUM = 2;</code>
+       */
+      MEDIUM(2),
+      /**
+       * <code>LOW = 3;</code>
+       */
+      LOW(3),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <pre>
+       * Default: no quality of service specified.
+       * </pre>
+       *
+       * <code>UNDEFINED = 0;</code>
+       */
+      public static final int UNDEFINED_VALUE = 0;
+      /**
+       * <code>HIGH = 1;</code>
+       */
+      public static final int HIGH_VALUE = 1;
+      /**
+       * <code>MEDIUM = 2;</code>
+       */
+      public static final int MEDIUM_VALUE = 2;
+      /**
+       * <code>LOW = 3;</code>
+       */
+      public static final int LOW_VALUE = 3;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static Tier valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static Tier forNumber(int value) {
+        switch (value) {
+          case 0: return UNDEFINED;
+          case 1: return HIGH;
+          case 2: return MEDIUM;
+          case 3: return LOW;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<Tier>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          Tier> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<Tier>() {
+              public Tier findValueByNumber(int number) {
+                return Tier.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return flyteidl.core.Execution.QualityOfService.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final Tier[] VALUES = values();
+
+      public static Tier valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private Tier(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:flyteidl.core.QualityOfService.Tier)
+    }
+
+    private int designationCase_ = 0;
+    private java.lang.Object designation_;
+    public enum DesignationCase
+        implements com.google.protobuf.Internal.EnumLite {
+      TIER(1),
+      SPEC(2),
+      DESIGNATION_NOT_SET(0);
+      private final int value;
+      private DesignationCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static DesignationCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static DesignationCase forNumber(int value) {
+        switch (value) {
+          case 1: return TIER;
+          case 2: return SPEC;
+          case 0: return DESIGNATION_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public DesignationCase
+    getDesignationCase() {
+      return DesignationCase.forNumber(
+          designationCase_);
+    }
+
+    public static final int TIER_FIELD_NUMBER = 1;
+    /**
+     * <code>.flyteidl.core.QualityOfService.Tier tier = 1;</code>
+     */
+    public int getTierValue() {
+      if (designationCase_ == 1) {
+        return (java.lang.Integer) designation_;
+      }
+      return 0;
+    }
+    /**
+     * <code>.flyteidl.core.QualityOfService.Tier tier = 1;</code>
+     */
+    public flyteidl.core.Execution.QualityOfService.Tier getTier() {
+      if (designationCase_ == 1) {
+        @SuppressWarnings("deprecation")
+        flyteidl.core.Execution.QualityOfService.Tier result = flyteidl.core.Execution.QualityOfService.Tier.valueOf(
+            (java.lang.Integer) designation_);
+        return result == null ? flyteidl.core.Execution.QualityOfService.Tier.UNRECOGNIZED : result;
+      }
+      return flyteidl.core.Execution.QualityOfService.Tier.UNDEFINED;
+    }
+
+    public static final int SPEC_FIELD_NUMBER = 2;
+    /**
+     * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+     */
+    public boolean hasSpec() {
+      return designationCase_ == 2;
+    }
+    /**
+     * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+     */
+    public flyteidl.core.Execution.QualityOfServiceSpec getSpec() {
+      if (designationCase_ == 2) {
+         return (flyteidl.core.Execution.QualityOfServiceSpec) designation_;
+      }
+      return flyteidl.core.Execution.QualityOfServiceSpec.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+     */
+    public flyteidl.core.Execution.QualityOfServiceSpecOrBuilder getSpecOrBuilder() {
+      if (designationCase_ == 2) {
+         return (flyteidl.core.Execution.QualityOfServiceSpec) designation_;
+      }
+      return flyteidl.core.Execution.QualityOfServiceSpec.getDefaultInstance();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (designationCase_ == 1) {
+        output.writeEnum(1, ((java.lang.Integer) designation_));
+      }
+      if (designationCase_ == 2) {
+        output.writeMessage(2, (flyteidl.core.Execution.QualityOfServiceSpec) designation_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (designationCase_ == 1) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(1, ((java.lang.Integer) designation_));
+      }
+      if (designationCase_ == 2) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, (flyteidl.core.Execution.QualityOfServiceSpec) designation_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Execution.QualityOfService)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Execution.QualityOfService other = (flyteidl.core.Execution.QualityOfService) obj;
+
+      if (!getDesignationCase().equals(other.getDesignationCase())) return false;
+      switch (designationCase_) {
+        case 1:
+          if (getTierValue()
+              != other.getTierValue()) return false;
+          break;
+        case 2:
+          if (!getSpec()
+              .equals(other.getSpec())) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      switch (designationCase_) {
+        case 1:
+          hash = (37 * hash) + TIER_FIELD_NUMBER;
+          hash = (53 * hash) + getTierValue();
+          break;
+        case 2:
+          hash = (37 * hash) + SPEC_FIELD_NUMBER;
+          hash = (53 * hash) + getSpec().hashCode();
+          break;
+        case 0:
+        default:
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Execution.QualityOfService parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Execution.QualityOfService parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Execution.QualityOfService prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Indicates the priority of an execution.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.QualityOfService}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.QualityOfService)
+        flyteidl.core.Execution.QualityOfServiceOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Execution.internal_static_flyteidl_core_QualityOfService_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Execution.internal_static_flyteidl_core_QualityOfService_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Execution.QualityOfService.class, flyteidl.core.Execution.QualityOfService.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Execution.QualityOfService.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        designationCase_ = 0;
+        designation_ = null;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Execution.internal_static_flyteidl_core_QualityOfService_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Execution.QualityOfService getDefaultInstanceForType() {
+        return flyteidl.core.Execution.QualityOfService.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Execution.QualityOfService build() {
+        flyteidl.core.Execution.QualityOfService result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Execution.QualityOfService buildPartial() {
+        flyteidl.core.Execution.QualityOfService result = new flyteidl.core.Execution.QualityOfService(this);
+        if (designationCase_ == 1) {
+          result.designation_ = designation_;
+        }
+        if (designationCase_ == 2) {
+          if (specBuilder_ == null) {
+            result.designation_ = designation_;
+          } else {
+            result.designation_ = specBuilder_.build();
+          }
+        }
+        result.designationCase_ = designationCase_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Execution.QualityOfService) {
+          return mergeFrom((flyteidl.core.Execution.QualityOfService)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Execution.QualityOfService other) {
+        if (other == flyteidl.core.Execution.QualityOfService.getDefaultInstance()) return this;
+        switch (other.getDesignationCase()) {
+          case TIER: {
+            setTierValue(other.getTierValue());
+            break;
+          }
+          case SPEC: {
+            mergeSpec(other.getSpec());
+            break;
+          }
+          case DESIGNATION_NOT_SET: {
+            break;
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Execution.QualityOfService parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Execution.QualityOfService) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int designationCase_ = 0;
+      private java.lang.Object designation_;
+      public DesignationCase
+          getDesignationCase() {
+        return DesignationCase.forNumber(
+            designationCase_);
+      }
+
+      public Builder clearDesignation() {
+        designationCase_ = 0;
+        designation_ = null;
+        onChanged();
+        return this;
+      }
+
+
+      /**
+       * <code>.flyteidl.core.QualityOfService.Tier tier = 1;</code>
+       */
+      public int getTierValue() {
+        if (designationCase_ == 1) {
+          return ((java.lang.Integer) designation_).intValue();
+        }
+        return 0;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService.Tier tier = 1;</code>
+       */
+      public Builder setTierValue(int value) {
+        designationCase_ = 1;
+        designation_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService.Tier tier = 1;</code>
+       */
+      public flyteidl.core.Execution.QualityOfService.Tier getTier() {
+        if (designationCase_ == 1) {
+          @SuppressWarnings("deprecation")
+          flyteidl.core.Execution.QualityOfService.Tier result = flyteidl.core.Execution.QualityOfService.Tier.valueOf(
+              (java.lang.Integer) designation_);
+          return result == null ? flyteidl.core.Execution.QualityOfService.Tier.UNRECOGNIZED : result;
+        }
+        return flyteidl.core.Execution.QualityOfService.Tier.UNDEFINED;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService.Tier tier = 1;</code>
+       */
+      public Builder setTier(flyteidl.core.Execution.QualityOfService.Tier value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        designationCase_ = 1;
+        designation_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService.Tier tier = 1;</code>
+       */
+      public Builder clearTier() {
+        if (designationCase_ == 1) {
+          designationCase_ = 0;
+          designation_ = null;
+          onChanged();
+        }
+        return this;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Execution.QualityOfServiceSpec, flyteidl.core.Execution.QualityOfServiceSpec.Builder, flyteidl.core.Execution.QualityOfServiceSpecOrBuilder> specBuilder_;
+      /**
+       * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+       */
+      public boolean hasSpec() {
+        return designationCase_ == 2;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+       */
+      public flyteidl.core.Execution.QualityOfServiceSpec getSpec() {
+        if (specBuilder_ == null) {
+          if (designationCase_ == 2) {
+            return (flyteidl.core.Execution.QualityOfServiceSpec) designation_;
+          }
+          return flyteidl.core.Execution.QualityOfServiceSpec.getDefaultInstance();
+        } else {
+          if (designationCase_ == 2) {
+            return specBuilder_.getMessage();
+          }
+          return flyteidl.core.Execution.QualityOfServiceSpec.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+       */
+      public Builder setSpec(flyteidl.core.Execution.QualityOfServiceSpec value) {
+        if (specBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          designation_ = value;
+          onChanged();
+        } else {
+          specBuilder_.setMessage(value);
+        }
+        designationCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+       */
+      public Builder setSpec(
+          flyteidl.core.Execution.QualityOfServiceSpec.Builder builderForValue) {
+        if (specBuilder_ == null) {
+          designation_ = builderForValue.build();
+          onChanged();
+        } else {
+          specBuilder_.setMessage(builderForValue.build());
+        }
+        designationCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+       */
+      public Builder mergeSpec(flyteidl.core.Execution.QualityOfServiceSpec value) {
+        if (specBuilder_ == null) {
+          if (designationCase_ == 2 &&
+              designation_ != flyteidl.core.Execution.QualityOfServiceSpec.getDefaultInstance()) {
+            designation_ = flyteidl.core.Execution.QualityOfServiceSpec.newBuilder((flyteidl.core.Execution.QualityOfServiceSpec) designation_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            designation_ = value;
+          }
+          onChanged();
+        } else {
+          if (designationCase_ == 2) {
+            specBuilder_.mergeFrom(value);
+          }
+          specBuilder_.setMessage(value);
+        }
+        designationCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+       */
+      public Builder clearSpec() {
+        if (specBuilder_ == null) {
+          if (designationCase_ == 2) {
+            designationCase_ = 0;
+            designation_ = null;
+            onChanged();
+          }
+        } else {
+          if (designationCase_ == 2) {
+            designationCase_ = 0;
+            designation_ = null;
+          }
+          specBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+       */
+      public flyteidl.core.Execution.QualityOfServiceSpec.Builder getSpecBuilder() {
+        return getSpecFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+       */
+      public flyteidl.core.Execution.QualityOfServiceSpecOrBuilder getSpecOrBuilder() {
+        if ((designationCase_ == 2) && (specBuilder_ != null)) {
+          return specBuilder_.getMessageOrBuilder();
+        } else {
+          if (designationCase_ == 2) {
+            return (flyteidl.core.Execution.QualityOfServiceSpec) designation_;
+          }
+          return flyteidl.core.Execution.QualityOfServiceSpec.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfServiceSpec spec = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Execution.QualityOfServiceSpec, flyteidl.core.Execution.QualityOfServiceSpec.Builder, flyteidl.core.Execution.QualityOfServiceSpecOrBuilder> 
+          getSpecFieldBuilder() {
+        if (specBuilder_ == null) {
+          if (!(designationCase_ == 2)) {
+            designation_ = flyteidl.core.Execution.QualityOfServiceSpec.getDefaultInstance();
+          }
+          specBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Execution.QualityOfServiceSpec, flyteidl.core.Execution.QualityOfServiceSpec.Builder, flyteidl.core.Execution.QualityOfServiceSpecOrBuilder>(
+                  (flyteidl.core.Execution.QualityOfServiceSpec) designation_,
+                  getParentForChildren(),
+                  isClean());
+          designation_ = null;
+        }
+        designationCase_ = 2;
+        onChanged();;
+        return specBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.QualityOfService)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.QualityOfService)
+    private static final flyteidl.core.Execution.QualityOfService DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Execution.QualityOfService();
+    }
+
+    public static flyteidl.core.Execution.QualityOfService getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<QualityOfService>
+        PARSER = new com.google.protobuf.AbstractParser<QualityOfService>() {
+      @java.lang.Override
+      public QualityOfService parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new QualityOfService(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<QualityOfService> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<QualityOfService> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Execution.QualityOfService getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_WorkflowExecution_descriptor;
   private static final 
@@ -4032,6 +5651,16 @@ public final class Execution {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_TaskLog_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_QualityOfServiceSpec_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_QualityOfServiceSpec_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_QualityOfService_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_QualityOfService_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -4063,8 +5692,15 @@ public final class Execution {
       "ormat\030\003 \001(\0162$.flyteidl.core.TaskLog.Mess" +
       "ageFormat\022&\n\003ttl\030\004 \001(\0132\031.google.protobuf" +
       ".Duration\"/\n\rMessageFormat\022\013\n\007UNKNOWN\020\000\022" +
-      "\007\n\003CSV\020\001\022\010\n\004JSON\020\002B2Z0github.com/lyft/fl" +
-      "yteidl/gen/pb-go/flyteidl/coreb\006proto3"
+      "\007\n\003CSV\020\001\022\010\n\004JSON\020\002\"J\n\024QualityOfServiceSp" +
+      "ec\0222\n\017queueing_budget\030\001 \001(\0132\031.google.pro" +
+      "tobuf.Duration\"\302\001\n\020QualityOfService\0224\n\004t" +
+      "ier\030\001 \001(\0162$.flyteidl.core.QualityOfServi" +
+      "ce.TierH\000\0223\n\004spec\030\002 \001(\0132#.flyteidl.core." +
+      "QualityOfServiceSpecH\000\"4\n\004Tier\022\r\n\tUNDEFI" +
+      "NED\020\000\022\010\n\004HIGH\020\001\022\n\n\006MEDIUM\020\002\022\007\n\003LOW\020\003B\r\n\013" +
+      "designationB2Z0github.com/lyft/flyteidl/" +
+      "gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4109,6 +5745,18 @@ public final class Execution {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskLog_descriptor,
         new java.lang.String[] { "Uri", "Name", "MessageFormat", "Ttl", });
+    internal_static_flyteidl_core_QualityOfServiceSpec_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_flyteidl_core_QualityOfServiceSpec_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_QualityOfServiceSpec_descriptor,
+        new java.lang.String[] { "QueueingBudget", });
+    internal_static_flyteidl_core_QualityOfService_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_flyteidl_core_QualityOfService_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_QualityOfService_descriptor,
+        new java.lang.String[] { "Tier", "Spec", "Designation", });
     com.google.protobuf.DurationProto.getDescriptor();
   }
 

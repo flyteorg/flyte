@@ -459,6 +459,18 @@ func (m *MatchingAttributes) Validate() error {
 			}
 		}
 
+	case *MatchingAttributes_QualityOfService:
+
+		if v, ok := interface{}(m.GetQualityOfService()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MatchingAttributesValidationError{
+					field:  "QualityOfService",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil

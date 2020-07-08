@@ -56,6 +56,14 @@ public final class MatchableResourceOuterClass {
      * <code>EXECUTION_CLUSTER_LABEL = 3;</code>
      */
     EXECUTION_CLUSTER_LABEL(3),
+    /**
+     * <pre>
+     * Configures default quality of service when undefined in an execution spec.
+     * </pre>
+     *
+     * <code>QUALITY_OF_SERVICE_SPECIFICATION = 4;</code>
+     */
+    QUALITY_OF_SERVICE_SPECIFICATION(4),
     UNRECOGNIZED(-1),
     ;
 
@@ -91,6 +99,14 @@ public final class MatchableResourceOuterClass {
      * <code>EXECUTION_CLUSTER_LABEL = 3;</code>
      */
     public static final int EXECUTION_CLUSTER_LABEL_VALUE = 3;
+    /**
+     * <pre>
+     * Configures default quality of service when undefined in an execution spec.
+     * </pre>
+     *
+     * <code>QUALITY_OF_SERVICE_SPECIFICATION = 4;</code>
+     */
+    public static final int QUALITY_OF_SERVICE_SPECIFICATION_VALUE = 4;
 
 
     public final int getNumber() {
@@ -115,6 +131,7 @@ public final class MatchableResourceOuterClass {
         case 1: return CLUSTER_RESOURCE;
         case 2: return EXECUTION_QUEUE;
         case 3: return EXECUTION_CLUSTER_LABEL;
+        case 4: return QUALITY_OF_SERVICE_SPECIFICATION;
         default: return null;
       }
     }
@@ -4056,6 +4073,19 @@ public final class MatchableResourceOuterClass {
      */
     flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabelOrBuilder getExecutionClusterLabelOrBuilder();
 
+    /**
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+     */
+    boolean hasQualityOfService();
+    /**
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+     */
+    flyteidl.core.Execution.QualityOfService getQualityOfService();
+    /**
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+     */
+    flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder();
+
     public flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.TargetCase getTargetCase();
   }
   /**
@@ -4157,6 +4187,20 @@ public final class MatchableResourceOuterClass {
               targetCase_ = 4;
               break;
             }
+            case 42: {
+              flyteidl.core.Execution.QualityOfService.Builder subBuilder = null;
+              if (targetCase_ == 5) {
+                subBuilder = ((flyteidl.core.Execution.QualityOfService) target_).toBuilder();
+              }
+              target_ =
+                  input.readMessage(flyteidl.core.Execution.QualityOfService.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Execution.QualityOfService) target_);
+                target_ = subBuilder.buildPartial();
+              }
+              targetCase_ = 5;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -4197,6 +4241,7 @@ public final class MatchableResourceOuterClass {
       CLUSTER_RESOURCE_ATTRIBUTES(2),
       EXECUTION_QUEUE_ATTRIBUTES(3),
       EXECUTION_CLUSTER_LABEL(4),
+      QUALITY_OF_SERVICE(5),
       TARGET_NOT_SET(0);
       private final int value;
       private TargetCase(int value) {
@@ -4216,6 +4261,7 @@ public final class MatchableResourceOuterClass {
           case 2: return CLUSTER_RESOURCE_ATTRIBUTES;
           case 3: return EXECUTION_QUEUE_ATTRIBUTES;
           case 4: return EXECUTION_CLUSTER_LABEL;
+          case 5: return QUALITY_OF_SERVICE;
           case 0: return TARGET_NOT_SET;
           default: return null;
         }
@@ -4335,6 +4381,32 @@ public final class MatchableResourceOuterClass {
       return flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel.getDefaultInstance();
     }
 
+    public static final int QUALITY_OF_SERVICE_FIELD_NUMBER = 5;
+    /**
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+     */
+    public boolean hasQualityOfService() {
+      return targetCase_ == 5;
+    }
+    /**
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+     */
+    public flyteidl.core.Execution.QualityOfService getQualityOfService() {
+      if (targetCase_ == 5) {
+         return (flyteidl.core.Execution.QualityOfService) target_;
+      }
+      return flyteidl.core.Execution.QualityOfService.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+     */
+    public flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder() {
+      if (targetCase_ == 5) {
+         return (flyteidl.core.Execution.QualityOfService) target_;
+      }
+      return flyteidl.core.Execution.QualityOfService.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -4361,6 +4433,9 @@ public final class MatchableResourceOuterClass {
       if (targetCase_ == 4) {
         output.writeMessage(4, (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_);
       }
+      if (targetCase_ == 5) {
+        output.writeMessage(5, (flyteidl.core.Execution.QualityOfService) target_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -4385,6 +4460,10 @@ public final class MatchableResourceOuterClass {
       if (targetCase_ == 4) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, (flyteidl.admin.MatchableResourceOuterClass.ExecutionClusterLabel) target_);
+      }
+      if (targetCase_ == 5) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, (flyteidl.core.Execution.QualityOfService) target_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -4419,6 +4498,10 @@ public final class MatchableResourceOuterClass {
           if (!getExecutionClusterLabel()
               .equals(other.getExecutionClusterLabel())) return false;
           break;
+        case 5:
+          if (!getQualityOfService()
+              .equals(other.getQualityOfService())) return false;
+          break;
         case 0:
         default:
       }
@@ -4449,6 +4532,10 @@ public final class MatchableResourceOuterClass {
         case 4:
           hash = (37 * hash) + EXECUTION_CLUSTER_LABEL_FIELD_NUMBER;
           hash = (53 * hash) + getExecutionClusterLabel().hashCode();
+          break;
+        case 5:
+          hash = (37 * hash) + QUALITY_OF_SERVICE_FIELD_NUMBER;
+          hash = (53 * hash) + getQualityOfService().hashCode();
           break;
         case 0:
         default:
@@ -4646,6 +4733,13 @@ public final class MatchableResourceOuterClass {
             result.target_ = executionClusterLabelBuilder_.build();
           }
         }
+        if (targetCase_ == 5) {
+          if (qualityOfServiceBuilder_ == null) {
+            result.target_ = target_;
+          } else {
+            result.target_ = qualityOfServiceBuilder_.build();
+          }
+        }
         result.targetCase_ = targetCase_;
         onBuilt();
         return result;
@@ -4710,6 +4804,10 @@ public final class MatchableResourceOuterClass {
           }
           case EXECUTION_CLUSTER_LABEL: {
             mergeExecutionClusterLabel(other.getExecutionClusterLabel());
+            break;
+          }
+          case QUALITY_OF_SERVICE: {
+            mergeQualityOfService(other.getQualityOfService());
             break;
           }
           case TARGET_NOT_SET: {
@@ -5302,6 +5400,142 @@ public final class MatchableResourceOuterClass {
         targetCase_ = 4;
         onChanged();;
         return executionClusterLabelBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Execution.QualityOfService, flyteidl.core.Execution.QualityOfService.Builder, flyteidl.core.Execution.QualityOfServiceOrBuilder> qualityOfServiceBuilder_;
+      /**
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+       */
+      public boolean hasQualityOfService() {
+        return targetCase_ == 5;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+       */
+      public flyteidl.core.Execution.QualityOfService getQualityOfService() {
+        if (qualityOfServiceBuilder_ == null) {
+          if (targetCase_ == 5) {
+            return (flyteidl.core.Execution.QualityOfService) target_;
+          }
+          return flyteidl.core.Execution.QualityOfService.getDefaultInstance();
+        } else {
+          if (targetCase_ == 5) {
+            return qualityOfServiceBuilder_.getMessage();
+          }
+          return flyteidl.core.Execution.QualityOfService.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+       */
+      public Builder setQualityOfService(flyteidl.core.Execution.QualityOfService value) {
+        if (qualityOfServiceBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          target_ = value;
+          onChanged();
+        } else {
+          qualityOfServiceBuilder_.setMessage(value);
+        }
+        targetCase_ = 5;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+       */
+      public Builder setQualityOfService(
+          flyteidl.core.Execution.QualityOfService.Builder builderForValue) {
+        if (qualityOfServiceBuilder_ == null) {
+          target_ = builderForValue.build();
+          onChanged();
+        } else {
+          qualityOfServiceBuilder_.setMessage(builderForValue.build());
+        }
+        targetCase_ = 5;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+       */
+      public Builder mergeQualityOfService(flyteidl.core.Execution.QualityOfService value) {
+        if (qualityOfServiceBuilder_ == null) {
+          if (targetCase_ == 5 &&
+              target_ != flyteidl.core.Execution.QualityOfService.getDefaultInstance()) {
+            target_ = flyteidl.core.Execution.QualityOfService.newBuilder((flyteidl.core.Execution.QualityOfService) target_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            target_ = value;
+          }
+          onChanged();
+        } else {
+          if (targetCase_ == 5) {
+            qualityOfServiceBuilder_.mergeFrom(value);
+          }
+          qualityOfServiceBuilder_.setMessage(value);
+        }
+        targetCase_ = 5;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+       */
+      public Builder clearQualityOfService() {
+        if (qualityOfServiceBuilder_ == null) {
+          if (targetCase_ == 5) {
+            targetCase_ = 0;
+            target_ = null;
+            onChanged();
+          }
+        } else {
+          if (targetCase_ == 5) {
+            targetCase_ = 0;
+            target_ = null;
+          }
+          qualityOfServiceBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+       */
+      public flyteidl.core.Execution.QualityOfService.Builder getQualityOfServiceBuilder() {
+        return getQualityOfServiceFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+       */
+      public flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder() {
+        if ((targetCase_ == 5) && (qualityOfServiceBuilder_ != null)) {
+          return qualityOfServiceBuilder_.getMessageOrBuilder();
+        } else {
+          if (targetCase_ == 5) {
+            return (flyteidl.core.Execution.QualityOfService) target_;
+          }
+          return flyteidl.core.Execution.QualityOfService.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Execution.QualityOfService, flyteidl.core.Execution.QualityOfService.Builder, flyteidl.core.Execution.QualityOfServiceOrBuilder> 
+          getQualityOfServiceFieldBuilder() {
+        if (qualityOfServiceBuilder_ == null) {
+          if (!(targetCase_ == 5)) {
+            target_ = flyteidl.core.Execution.QualityOfService.getDefaultInstance();
+          }
+          qualityOfServiceBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Execution.QualityOfService, flyteidl.core.Execution.QualityOfService.Builder, flyteidl.core.Execution.QualityOfServiceOrBuilder>(
+                  (flyteidl.core.Execution.QualityOfService) target_,
+                  getParentForChildren(),
+                  isClean());
+          target_ = null;
+        }
+        targetCase_ = 5;
+        onChanged();;
+        return qualityOfServiceBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -7883,40 +8117,44 @@ public final class MatchableResourceOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\'flyteidl/admin/matchable_resource.prot" +
-      "o\022\016flyteidl.admin\"M\n\020TaskResourceSpec\022\013\n" +
-      "\003cpu\030\001 \001(\t\022\013\n\003gpu\030\002 \001(\t\022\016\n\006memory\030\003 \001(\t\022" +
-      "\017\n\007storage\030\004 \001(\t\"~\n\026TaskResourceAttribut" +
-      "es\0222\n\010defaults\030\001 \001(\0132 .flyteidl.admin.Ta" +
-      "skResourceSpec\0220\n\006limits\030\002 \001(\0132 .flyteid" +
-      "l.admin.TaskResourceSpec\"\235\001\n\031ClusterReso" +
-      "urceAttributes\022M\n\nattributes\030\001 \003(\01329.fly" +
-      "teidl.admin.ClusterResourceAttributes.At" +
-      "tributesEntry\0321\n\017AttributesEntry\022\013\n\003key\030" +
-      "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"(\n\030ExecutionQue" +
-      "ueAttributes\022\014\n\004tags\030\001 \003(\t\"&\n\025ExecutionC" +
-      "lusterLabel\022\r\n\005value\030\001 \001(\t\"\326\002\n\022MatchingA" +
-      "ttributes\022J\n\030task_resource_attributes\030\001 " +
-      "\001(\0132&.flyteidl.admin.TaskResourceAttribu" +
-      "tesH\000\022P\n\033cluster_resource_attributes\030\002 \001" +
-      "(\0132).flyteidl.admin.ClusterResourceAttri" +
-      "butesH\000\022N\n\032execution_queue_attributes\030\003 " +
-      "\001(\0132(.flyteidl.admin.ExecutionQueueAttri" +
-      "butesH\000\022H\n\027execution_cluster_label\030\004 \001(\013" +
-      "2%.flyteidl.admin.ExecutionClusterLabelH" +
-      "\000B\010\n\006target\"\242\001\n MatchableAttributesConfi" +
-      "guration\0226\n\nattributes\030\001 \001(\0132\".flyteidl." +
-      "admin.MatchingAttributes\022\016\n\006domain\030\002 \001(\t" +
-      "\022\017\n\007project\030\003 \001(\t\022\020\n\010workflow\030\004 \001(\t\022\023\n\013l" +
-      "aunch_plan\030\005 \001(\t\"Z\n\036ListMatchableAttribu" +
-      "tesRequest\0228\n\rresource_type\030\001 \001(\0162!.flyt" +
-      "eidl.admin.MatchableResource\"k\n\037ListMatc" +
-      "hableAttributesResponse\022H\n\016configuration" +
-      "s\030\001 \003(\01320.flyteidl.admin.MatchableAttrib" +
-      "utesConfiguration*n\n\021MatchableResource\022\021" +
-      "\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_RESOURCE\020\001\022" +
-      "\023\n\017EXECUTION_QUEUE\020\002\022\033\n\027EXECUTION_CLUSTE" +
-      "R_LABEL\020\003B3Z1github.com/lyft/flyteidl/ge" +
-      "n/pb-go/flyteidl/adminb\006proto3"
+      "o\022\016flyteidl.admin\032\033flyteidl/admin/common" +
+      ".proto\032\035flyteidl/core/execution.proto\"M\n" +
+      "\020TaskResourceSpec\022\013\n\003cpu\030\001 \001(\t\022\013\n\003gpu\030\002 " +
+      "\001(\t\022\016\n\006memory\030\003 \001(\t\022\017\n\007storage\030\004 \001(\t\"~\n\026" +
+      "TaskResourceAttributes\0222\n\010defaults\030\001 \001(\013" +
+      "2 .flyteidl.admin.TaskResourceSpec\0220\n\006li" +
+      "mits\030\002 \001(\0132 .flyteidl.admin.TaskResource" +
+      "Spec\"\235\001\n\031ClusterResourceAttributes\022M\n\nat" +
+      "tributes\030\001 \003(\01329.flyteidl.admin.ClusterR" +
+      "esourceAttributes.AttributesEntry\0321\n\017Att" +
+      "ributesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
+      ":\0028\001\"(\n\030ExecutionQueueAttributes\022\014\n\004tags" +
+      "\030\001 \003(\t\"&\n\025ExecutionClusterLabel\022\r\n\005value" +
+      "\030\001 \001(\t\"\225\003\n\022MatchingAttributes\022J\n\030task_re" +
+      "source_attributes\030\001 \001(\0132&.flyteidl.admin" +
+      ".TaskResourceAttributesH\000\022P\n\033cluster_res" +
+      "ource_attributes\030\002 \001(\0132).flyteidl.admin." +
+      "ClusterResourceAttributesH\000\022N\n\032execution" +
+      "_queue_attributes\030\003 \001(\0132(.flyteidl.admin" +
+      ".ExecutionQueueAttributesH\000\022H\n\027execution" +
+      "_cluster_label\030\004 \001(\0132%.flyteidl.admin.Ex" +
+      "ecutionClusterLabelH\000\022=\n\022quality_of_serv" +
+      "ice\030\005 \001(\0132\037.flyteidl.core.QualityOfServi" +
+      "ceH\000B\010\n\006target\"\242\001\n MatchableAttributesCo" +
+      "nfiguration\0226\n\nattributes\030\001 \001(\0132\".flytei" +
+      "dl.admin.MatchingAttributes\022\016\n\006domain\030\002 " +
+      "\001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010workflow\030\004 \001(\t\022\023" +
+      "\n\013launch_plan\030\005 \001(\t\"Z\n\036ListMatchableAttr" +
+      "ibutesRequest\0228\n\rresource_type\030\001 \001(\0162!.f" +
+      "lyteidl.admin.MatchableResource\"k\n\037ListM" +
+      "atchableAttributesResponse\022H\n\016configurat" +
+      "ions\030\001 \003(\01320.flyteidl.admin.MatchableAtt" +
+      "ributesConfiguration*\224\001\n\021MatchableResour" +
+      "ce\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_RESOURC" +
+      "E\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022\033\n\027EXECUTION_CL" +
+      "USTER_LABEL\020\003\022$\n QUALITY_OF_SERVICE_SPEC" +
+      "IFICATION\020\004B3Z1github.com/lyft/flyteidl/" +
+      "gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -7929,6 +8167,8 @@ public final class MatchableResourceOuterClass {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          flyteidl.admin.Common.getDescriptor(),
+          flyteidl.core.Execution.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_admin_TaskResourceSpec_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -7971,7 +8211,7 @@ public final class MatchableResourceOuterClass {
     internal_static_flyteidl_admin_MatchingAttributes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_MatchingAttributes_descriptor,
-        new java.lang.String[] { "TaskResourceAttributes", "ClusterResourceAttributes", "ExecutionQueueAttributes", "ExecutionClusterLabel", "Target", });
+        new java.lang.String[] { "TaskResourceAttributes", "ClusterResourceAttributes", "ExecutionQueueAttributes", "ExecutionClusterLabel", "QualityOfService", "Target", });
     internal_static_flyteidl_admin_MatchableAttributesConfiguration_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_MatchableAttributesConfiguration_fieldAccessorTable = new
@@ -7990,6 +8230,8 @@ public final class MatchableResourceOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ListMatchableAttributesResponse_descriptor,
         new java.lang.String[] { "Configurations", });
+    flyteidl.admin.Common.getDescriptor();
+    flyteidl.core.Execution.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

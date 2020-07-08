@@ -385,3 +385,164 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TaskLogValidationError{}
+
+// Validate checks the field values on QualityOfServiceSpec with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *QualityOfServiceSpec) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetQueueingBudget()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QualityOfServiceSpecValidationError{
+				field:  "QueueingBudget",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// QualityOfServiceSpecValidationError is the validation error returned by
+// QualityOfServiceSpec.Validate if the designated constraints aren't met.
+type QualityOfServiceSpecValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QualityOfServiceSpecValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QualityOfServiceSpecValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QualityOfServiceSpecValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QualityOfServiceSpecValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QualityOfServiceSpecValidationError) ErrorName() string {
+	return "QualityOfServiceSpecValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e QualityOfServiceSpecValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQualityOfServiceSpec.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QualityOfServiceSpecValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QualityOfServiceSpecValidationError{}
+
+// Validate checks the field values on QualityOfService with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *QualityOfService) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.Designation.(type) {
+
+	case *QualityOfService_Tier_:
+		// no validation rules for Tier
+
+	case *QualityOfService_Spec:
+
+		if v, ok := interface{}(m.GetSpec()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return QualityOfServiceValidationError{
+					field:  "Spec",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// QualityOfServiceValidationError is the validation error returned by
+// QualityOfService.Validate if the designated constraints aren't met.
+type QualityOfServiceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QualityOfServiceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QualityOfServiceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QualityOfServiceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QualityOfServiceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QualityOfServiceValidationError) ErrorName() string { return "QualityOfServiceValidationError" }
+
+// Error satisfies the builtin error interface
+func (e QualityOfServiceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQualityOfService.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QualityOfServiceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QualityOfServiceValidationError{}

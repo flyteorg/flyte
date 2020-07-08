@@ -17,6 +17,7 @@
 #include <google/protobuf/port_def.inc>
 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_BooleanExpression_flyteidl_2fcore_2fcondition_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Identifier_flyteidl_2fcore_2fidentifier_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_TypedInterface_flyteidl_2fcore_2finterface_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_RetryStrategy_flyteidl_2fcore_2fliterals_2eproto;
@@ -199,7 +200,7 @@ static void InitDefaultsWorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto() {
 
 ::google::protobuf::internal::SCCInfo<1> scc_info_WorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsWorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto}, {
-      &scc_info_Duration_google_2fprotobuf_2fduration_2eproto.base,}};
+      &scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto.base,}};
 
 static void InitDefaultsWorkflowMetadataDefaults_flyteidl_2fcore_2fworkflow_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -325,7 +326,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fworkflow_2eproto:
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata, queuing_budget_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata, quality_of_service_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadata, on_failure_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::WorkflowMetadataDefaults, _internal_metadata_),
@@ -382,74 +383,76 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto[] =
   "\n\034flyteidl/core/workflow.proto\022\rflyteidl"
-  ".core\032\035flyteidl/core/condition.proto\032\036fl"
-  "yteidl/core/identifier.proto\032\035flyteidl/c"
-  "ore/interface.proto\032\034flyteidl/core/liter"
-  "als.proto\032\031flyteidl/core/types.proto\032\036go"
-  "ogle/protobuf/duration.proto\"f\n\007IfBlock\022"
-  "3\n\tcondition\030\001 \001(\0132 .flyteidl.core.Boole"
-  "anExpression\022&\n\tthen_node\030\002 \001(\0132\023.flytei"
-  "dl.core.Node\"\266\001\n\013IfElseBlock\022$\n\004case\030\001 \001"
-  "(\0132\026.flyteidl.core.IfBlock\022%\n\005other\030\002 \003("
-  "\0132\026.flyteidl.core.IfBlock\022(\n\telse_node\030\003"
-  " \001(\0132\023.flyteidl.core.NodeH\000\022%\n\005error\030\004 \001"
-  "(\0132\024.flyteidl.core.ErrorH\000B\t\n\007default\"9\n"
-  "\nBranchNode\022+\n\007if_else\030\001 \001(\0132\032.flyteidl."
-  "core.IfElseBlock\"J\n\010TaskNode\0221\n\014referenc"
-  "e_id\030\001 \001(\0132\031.flyteidl.core.IdentifierH\000B"
-  "\013\n\treference\"\207\001\n\014WorkflowNode\0223\n\016launchp"
-  "lan_ref\030\001 \001(\0132\031.flyteidl.core.Identifier"
-  "H\000\0225\n\020sub_workflow_ref\030\002 \001(\0132\031.flyteidl."
-  "core.IdentifierH\000B\013\n\treference\"\247\001\n\014NodeM"
-  "etadata\022\014\n\004name\030\001 \001(\t\022*\n\007timeout\030\004 \001(\0132\031"
-  ".google.protobuf.Duration\022-\n\007retries\030\005 \001"
-  "(\0132\034.flyteidl.core.RetryStrategy\022\027\n\rinte"
-  "rruptible\030\006 \001(\010H\000B\025\n\023interruptible_value"
-  "\"#\n\005Alias\022\013\n\003var\030\001 \001(\t\022\r\n\005alias\030\002 \001(\t\"\322\002"
-  "\n\004Node\022\n\n\002id\030\001 \001(\t\022-\n\010metadata\030\002 \001(\0132\033.f"
-  "lyteidl.core.NodeMetadata\022&\n\006inputs\030\003 \003("
-  "\0132\026.flyteidl.core.Binding\022\031\n\021upstream_no"
-  "de_ids\030\004 \003(\t\022,\n\016output_aliases\030\005 \003(\0132\024.f"
-  "lyteidl.core.Alias\022,\n\ttask_node\030\006 \001(\0132\027."
-  "flyteidl.core.TaskNodeH\000\0224\n\rworkflow_nod"
-  "e\030\007 \001(\0132\033.flyteidl.core.WorkflowNodeH\000\0220"
-  "\n\013branch_node\030\010 \001(\0132\031.flyteidl.core.Bran"
-  "chNodeH\000B\010\n\006target\"\335\001\n\020WorkflowMetadata\022"
-  "1\n\016queuing_budget\030\001 \001(\0132\031.google.protobu"
-  "f.Duration\022C\n\non_failure\030\002 \001(\0162/.flyteid"
-  "l.core.WorkflowMetadata.OnFailurePolicy\""
-  "Q\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDIATELY\020\000"
-  "\022(\n$FAIL_AFTER_EXECUTABLE_NODES_COMPLETE"
-  "\020\001\"1\n\030WorkflowMetadataDefaults\022\025\n\rinterr"
-  "uptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002id"
-  "\030\001 \001(\0132\031.flyteidl.core.Identifier\0221\n\010met"
-  "adata\030\002 \001(\0132\037.flyteidl.core.WorkflowMeta"
-  "data\0220\n\tinterface\030\003 \001(\0132\035.flyteidl.core."
-  "TypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl"
-  ".core.Node\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.c"
-  "ore.Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyt"
-  "eidl.core.Node\022B\n\021metadata_defaults\030\007 \001("
-  "\0132\'.flyteidl.core.WorkflowMetadataDefaul"
-  "tsB2Z0github.com/lyft/flyteidl/gen/pb-go"
-  "/flyteidl/coreb\006proto3"
+  ".core\032\035flyteidl/core/condition.proto\032\035fl"
+  "yteidl/core/execution.proto\032\036flyteidl/co"
+  "re/identifier.proto\032\035flyteidl/core/inter"
+  "face.proto\032\034flyteidl/core/literals.proto"
+  "\032\031flyteidl/core/types.proto\032\036google/prot"
+  "obuf/duration.proto\"f\n\007IfBlock\0223\n\tcondit"
+  "ion\030\001 \001(\0132 .flyteidl.core.BooleanExpress"
+  "ion\022&\n\tthen_node\030\002 \001(\0132\023.flyteidl.core.N"
+  "ode\"\266\001\n\013IfElseBlock\022$\n\004case\030\001 \001(\0132\026.flyt"
+  "eidl.core.IfBlock\022%\n\005other\030\002 \003(\0132\026.flyte"
+  "idl.core.IfBlock\022(\n\telse_node\030\003 \001(\0132\023.fl"
+  "yteidl.core.NodeH\000\022%\n\005error\030\004 \001(\0132\024.flyt"
+  "eidl.core.ErrorH\000B\t\n\007default\"9\n\nBranchNo"
+  "de\022+\n\007if_else\030\001 \001(\0132\032.flyteidl.core.IfEl"
+  "seBlock\"J\n\010TaskNode\0221\n\014reference_id\030\001 \001("
+  "\0132\031.flyteidl.core.IdentifierH\000B\013\n\trefere"
+  "nce\"\207\001\n\014WorkflowNode\0223\n\016launchplan_ref\030\001"
+  " \001(\0132\031.flyteidl.core.IdentifierH\000\0225\n\020sub"
+  "_workflow_ref\030\002 \001(\0132\031.flyteidl.core.Iden"
+  "tifierH\000B\013\n\treference\"\247\001\n\014NodeMetadata\022\014"
+  "\n\004name\030\001 \001(\t\022*\n\007timeout\030\004 \001(\0132\031.google.p"
+  "rotobuf.Duration\022-\n\007retries\030\005 \001(\0132\034.flyt"
+  "eidl.core.RetryStrategy\022\027\n\rinterruptible"
+  "\030\006 \001(\010H\000B\025\n\023interruptible_value\"#\n\005Alias"
+  "\022\013\n\003var\030\001 \001(\t\022\r\n\005alias\030\002 \001(\t\"\322\002\n\004Node\022\n\n"
+  "\002id\030\001 \001(\t\022-\n\010metadata\030\002 \001(\0132\033.flyteidl.c"
+  "ore.NodeMetadata\022&\n\006inputs\030\003 \003(\0132\026.flyte"
+  "idl.core.Binding\022\031\n\021upstream_node_ids\030\004 "
+  "\003(\t\022,\n\016output_aliases\030\005 \003(\0132\024.flyteidl.c"
+  "ore.Alias\022,\n\ttask_node\030\006 \001(\0132\027.flyteidl."
+  "core.TaskNodeH\000\0224\n\rworkflow_node\030\007 \001(\0132\033"
+  ".flyteidl.core.WorkflowNodeH\000\0220\n\013branch_"
+  "node\030\010 \001(\0132\031.flyteidl.core.BranchNodeH\000B"
+  "\010\n\006target\"\347\001\n\020WorkflowMetadata\022;\n\022qualit"
+  "y_of_service\030\001 \001(\0132\037.flyteidl.core.Quali"
+  "tyOfService\022C\n\non_failure\030\002 \001(\0162/.flytei"
+  "dl.core.WorkflowMetadata.OnFailurePolicy"
+  "\"Q\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDIATELY\020"
+  "\000\022(\n$FAIL_AFTER_EXECUTABLE_NODES_COMPLET"
+  "E\020\001\"1\n\030WorkflowMetadataDefaults\022\025\n\rinter"
+  "ruptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002i"
+  "d\030\001 \001(\0132\031.flyteidl.core.Identifier\0221\n\010me"
+  "tadata\030\002 \001(\0132\037.flyteidl.core.WorkflowMet"
+  "adata\0220\n\tinterface\030\003 \001(\0132\035.flyteidl.core"
+  ".TypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.flyteid"
+  "l.core.Node\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl."
+  "core.Binding\022)\n\014failure_node\030\006 \001(\0132\023.fly"
+  "teidl.core.Node\022B\n\021metadata_defaults\030\007 \001"
+  "(\0132\'.flyteidl.core.WorkflowMetadataDefau"
+  "ltsB2Z0github.com/lyft/flyteidl/gen/pb-g"
+  "o/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fworkflow_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fworkflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto,
-  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 2022,
+  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 2063,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[6] =
+  static constexpr ::google::protobuf::internal::InitFunc deps[7] =
   {
     ::AddDescriptors_flyteidl_2fcore_2fcondition_2eproto,
+    ::AddDescriptors_flyteidl_2fcore_2fexecution_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fidentifier_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2finterface_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fliterals_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2ftypes_2eproto,
     ::AddDescriptors_google_2fprotobuf_2fduration_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2fworkflow_2eproto, deps, 6);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2fworkflow_2eproto, deps, 7);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -4153,26 +4156,26 @@ void Node::InternalSwap(Node* other) {
 // ===================================================================
 
 void WorkflowMetadata::InitAsDefaultInstance() {
-  ::flyteidl::core::_WorkflowMetadata_default_instance_._instance.get_mutable()->queuing_budget_ = const_cast< ::google::protobuf::Duration*>(
-      ::google::protobuf::Duration::internal_default_instance());
+  ::flyteidl::core::_WorkflowMetadata_default_instance_._instance.get_mutable()->quality_of_service_ = const_cast< ::flyteidl::core::QualityOfService*>(
+      ::flyteidl::core::QualityOfService::internal_default_instance());
 }
 class WorkflowMetadata::HasBitSetters {
  public:
-  static const ::google::protobuf::Duration& queuing_budget(const WorkflowMetadata* msg);
+  static const ::flyteidl::core::QualityOfService& quality_of_service(const WorkflowMetadata* msg);
 };
 
-const ::google::protobuf::Duration&
-WorkflowMetadata::HasBitSetters::queuing_budget(const WorkflowMetadata* msg) {
-  return *msg->queuing_budget_;
+const ::flyteidl::core::QualityOfService&
+WorkflowMetadata::HasBitSetters::quality_of_service(const WorkflowMetadata* msg) {
+  return *msg->quality_of_service_;
 }
-void WorkflowMetadata::clear_queuing_budget() {
-  if (GetArenaNoVirtual() == nullptr && queuing_budget_ != nullptr) {
-    delete queuing_budget_;
+void WorkflowMetadata::clear_quality_of_service() {
+  if (GetArenaNoVirtual() == nullptr && quality_of_service_ != nullptr) {
+    delete quality_of_service_;
   }
-  queuing_budget_ = nullptr;
+  quality_of_service_ = nullptr;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int WorkflowMetadata::kQueuingBudgetFieldNumber;
+const int WorkflowMetadata::kQualityOfServiceFieldNumber;
 const int WorkflowMetadata::kOnFailureFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -4185,10 +4188,10 @@ WorkflowMetadata::WorkflowMetadata(const WorkflowMetadata& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  if (from.has_queuing_budget()) {
-    queuing_budget_ = new ::google::protobuf::Duration(*from.queuing_budget_);
+  if (from.has_quality_of_service()) {
+    quality_of_service_ = new ::flyteidl::core::QualityOfService(*from.quality_of_service_);
   } else {
-    queuing_budget_ = nullptr;
+    quality_of_service_ = nullptr;
   }
   on_failure_ = from.on_failure_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.WorkflowMetadata)
@@ -4197,9 +4200,9 @@ WorkflowMetadata::WorkflowMetadata(const WorkflowMetadata& from)
 void WorkflowMetadata::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_WorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto.base);
-  ::memset(&queuing_budget_, 0, static_cast<size_t>(
+  ::memset(&quality_of_service_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&on_failure_) -
-      reinterpret_cast<char*>(&queuing_budget_)) + sizeof(on_failure_));
+      reinterpret_cast<char*>(&quality_of_service_)) + sizeof(on_failure_));
 }
 
 WorkflowMetadata::~WorkflowMetadata() {
@@ -4208,7 +4211,7 @@ WorkflowMetadata::~WorkflowMetadata() {
 }
 
 void WorkflowMetadata::SharedDtor() {
-  if (this != internal_default_instance()) delete queuing_budget_;
+  if (this != internal_default_instance()) delete quality_of_service_;
 }
 
 void WorkflowMetadata::SetCachedSize(int size) const {
@@ -4226,10 +4229,10 @@ void WorkflowMetadata::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  if (GetArenaNoVirtual() == nullptr && queuing_budget_ != nullptr) {
-    delete queuing_budget_;
+  if (GetArenaNoVirtual() == nullptr && quality_of_service_ != nullptr) {
+    delete quality_of_service_;
   }
-  queuing_budget_ = nullptr;
+  quality_of_service_ = nullptr;
   on_failure_ = 0;
   _internal_metadata_.Clear();
 }
@@ -4247,13 +4250,13 @@ const char* WorkflowMetadata::_InternalParse(const char* begin, const char* end,
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .google.protobuf.Duration queuing_budget = 1;
+      // .flyteidl.core.QualityOfService quality_of_service = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        parser_till_end = ::google::protobuf::Duration::_InternalParse;
-        object = msg->mutable_queuing_budget();
+        parser_till_end = ::flyteidl::core::QualityOfService::_InternalParse;
+        object = msg->mutable_quality_of_service();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -4298,11 +4301,11 @@ bool WorkflowMetadata::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .google.protobuf.Duration queuing_budget = 1;
+      // .flyteidl.core.QualityOfService quality_of_service = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_queuing_budget()));
+               input, mutable_quality_of_service()));
         } else {
           goto handle_unusual;
         }
@@ -4350,10 +4353,10 @@ void WorkflowMetadata::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .google.protobuf.Duration queuing_budget = 1;
-  if (this->has_queuing_budget()) {
+  // .flyteidl.core.QualityOfService quality_of_service = 1;
+  if (this->has_quality_of_service()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, HasBitSetters::queuing_budget(this), output);
+      1, HasBitSetters::quality_of_service(this), output);
   }
 
   // .flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;
@@ -4375,11 +4378,11 @@ void WorkflowMetadata::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .google.protobuf.Duration queuing_budget = 1;
-  if (this->has_queuing_budget()) {
+  // .flyteidl.core.QualityOfService quality_of_service = 1;
+  if (this->has_quality_of_service()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        1, HasBitSetters::queuing_budget(this), target);
+        1, HasBitSetters::quality_of_service(this), target);
   }
 
   // .flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;
@@ -4409,11 +4412,11 @@ size_t WorkflowMetadata::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .google.protobuf.Duration queuing_budget = 1;
-  if (this->has_queuing_budget()) {
+  // .flyteidl.core.QualityOfService quality_of_service = 1;
+  if (this->has_quality_of_service()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *queuing_budget_);
+        *quality_of_service_);
   }
 
   // .flyteidl.core.WorkflowMetadata.OnFailurePolicy on_failure = 2;
@@ -4449,8 +4452,8 @@ void WorkflowMetadata::MergeFrom(const WorkflowMetadata& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.has_queuing_budget()) {
-    mutable_queuing_budget()->::google::protobuf::Duration::MergeFrom(from.queuing_budget());
+  if (from.has_quality_of_service()) {
+    mutable_quality_of_service()->::flyteidl::core::QualityOfService::MergeFrom(from.quality_of_service());
   }
   if (from.on_failure() != 0) {
     set_on_failure(from.on_failure());
@@ -4482,7 +4485,7 @@ void WorkflowMetadata::Swap(WorkflowMetadata* other) {
 void WorkflowMetadata::InternalSwap(WorkflowMetadata* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(queuing_budget_, other->queuing_budget_);
+  swap(quality_of_service_, other->quality_of_service_);
   swap(on_failure_, other->on_failure_);
 }
 

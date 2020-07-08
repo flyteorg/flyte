@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl.admin;
 option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
 
+import "flyteidl/core/execution.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/interface.proto";
@@ -91,6 +92,9 @@ message LaunchPlanSpec {
     Auth auth                             = 8 [deprecated=true];
 
     AuthRole auth_role                    = 9;
+
+    // Indicates the runtime priority of the execution. 
+    core.QualityOfService quality_of_service   = 16;
 }
 
 // Values computed by the flyte platform after launch plan registration.

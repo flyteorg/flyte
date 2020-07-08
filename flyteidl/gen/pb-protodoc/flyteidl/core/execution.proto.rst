@@ -339,3 +339,89 @@ CSV
 JSON
   ⁣
   
+
+.. _api_msg_flyteidl.core.QualityOfServiceSpec:
+
+flyteidl.core.QualityOfServiceSpec
+----------------------------------
+
+`[flyteidl.core.QualityOfServiceSpec proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L91>`_
+
+Represents customized execution run-time attributes.
+
+.. code-block:: json
+
+  {
+    "queueing_budget": "{...}"
+  }
+
+.. _api_field_flyteidl.core.QualityOfServiceSpec.queueing_budget:
+
+queueing_budget
+  (:ref:`google.protobuf.Duration <api_msg_google.protobuf.Duration>`) Indicates how much queueing delay an execution can tolerate.
+  
+  
+
+
+.. _api_msg_flyteidl.core.QualityOfService:
+
+flyteidl.core.QualityOfService
+------------------------------
+
+`[flyteidl.core.QualityOfService proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L99>`_
+
+Indicates the priority of an execution.
+
+.. code-block:: json
+
+  {
+    "tier": "...",
+    "spec": "{...}"
+  }
+
+.. _api_field_flyteidl.core.QualityOfService.tier:
+
+tier
+  (:ref:`flyteidl.core.QualityOfService.Tier <api_enum_flyteidl.core.QualityOfService.Tier>`) 
+  
+  
+  Only one of :ref:`tier <api_field_flyteidl.core.QualityOfService.tier>`, :ref:`spec <api_field_flyteidl.core.QualityOfService.spec>` may be set.
+  
+.. _api_field_flyteidl.core.QualityOfService.spec:
+
+spec
+  (:ref:`flyteidl.core.QualityOfServiceSpec <api_msg_flyteidl.core.QualityOfServiceSpec>`) 
+  
+  
+  Only one of :ref:`tier <api_field_flyteidl.core.QualityOfService.tier>`, :ref:`spec <api_field_flyteidl.core.QualityOfService.spec>` may be set.
+  
+
+.. _api_enum_flyteidl.core.QualityOfService.Tier:
+
+Enum flyteidl.core.QualityOfService.Tier
+----------------------------------------
+
+`[flyteidl.core.QualityOfService.Tier proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L100>`_
+
+
+.. _api_enum_value_flyteidl.core.QualityOfService.Tier.UNDEFINED:
+
+UNDEFINED
+  *(DEFAULT)* ⁣Default: no quality of service specified.
+  
+  
+.. _api_enum_value_flyteidl.core.QualityOfService.Tier.HIGH:
+
+HIGH
+  ⁣
+  
+.. _api_enum_value_flyteidl.core.QualityOfService.Tier.MEDIUM:
+
+MEDIUM
+  ⁣
+  
+.. _api_enum_value_flyteidl.core.QualityOfService.Tier.LOW:
+
+LOW
+  ⁣
+  

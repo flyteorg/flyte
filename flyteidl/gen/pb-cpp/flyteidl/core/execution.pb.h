@@ -43,7 +43,7 @@ struct TableStruct_flyteidl_2fcore_2fexecution_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[5]
+  static const ::google::protobuf::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -58,6 +58,12 @@ extern ExecutionErrorDefaultTypeInternal _ExecutionError_default_instance_;
 class NodeExecution;
 class NodeExecutionDefaultTypeInternal;
 extern NodeExecutionDefaultTypeInternal _NodeExecution_default_instance_;
+class QualityOfService;
+class QualityOfServiceDefaultTypeInternal;
+extern QualityOfServiceDefaultTypeInternal _QualityOfService_default_instance_;
+class QualityOfServiceSpec;
+class QualityOfServiceSpecDefaultTypeInternal;
+extern QualityOfServiceSpecDefaultTypeInternal _QualityOfServiceSpec_default_instance_;
 class TaskExecution;
 class TaskExecutionDefaultTypeInternal;
 extern TaskExecutionDefaultTypeInternal _TaskExecution_default_instance_;
@@ -73,6 +79,8 @@ namespace google {
 namespace protobuf {
 template<> ::flyteidl::core::ExecutionError* Arena::CreateMaybeMessage<::flyteidl::core::ExecutionError>(Arena*);
 template<> ::flyteidl::core::NodeExecution* Arena::CreateMaybeMessage<::flyteidl::core::NodeExecution>(Arena*);
+template<> ::flyteidl::core::QualityOfService* Arena::CreateMaybeMessage<::flyteidl::core::QualityOfService>(Arena*);
+template<> ::flyteidl::core::QualityOfServiceSpec* Arena::CreateMaybeMessage<::flyteidl::core::QualityOfServiceSpec>(Arena*);
 template<> ::flyteidl::core::TaskExecution* Arena::CreateMaybeMessage<::flyteidl::core::TaskExecution>(Arena*);
 template<> ::flyteidl::core::TaskLog* Arena::CreateMaybeMessage<::flyteidl::core::TaskLog>(Arena*);
 template<> ::flyteidl::core::WorkflowExecution* Arena::CreateMaybeMessage<::flyteidl::core::WorkflowExecution>(Arena*);
@@ -207,6 +215,29 @@ inline bool TaskLog_MessageFormat_Parse(
     const ::std::string& name, TaskLog_MessageFormat* value) {
   return ::google::protobuf::internal::ParseNamedEnum<TaskLog_MessageFormat>(
     TaskLog_MessageFormat_descriptor(), name, value);
+}
+enum QualityOfService_Tier {
+  QualityOfService_Tier_UNDEFINED = 0,
+  QualityOfService_Tier_HIGH = 1,
+  QualityOfService_Tier_MEDIUM = 2,
+  QualityOfService_Tier_LOW = 3,
+  QualityOfService_Tier_QualityOfService_Tier_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  QualityOfService_Tier_QualityOfService_Tier_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool QualityOfService_Tier_IsValid(int value);
+const QualityOfService_Tier QualityOfService_Tier_Tier_MIN = QualityOfService_Tier_UNDEFINED;
+const QualityOfService_Tier QualityOfService_Tier_Tier_MAX = QualityOfService_Tier_LOW;
+const int QualityOfService_Tier_Tier_ARRAYSIZE = QualityOfService_Tier_Tier_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* QualityOfService_Tier_descriptor();
+inline const ::std::string& QualityOfService_Tier_Name(QualityOfService_Tier value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    QualityOfService_Tier_descriptor(), value);
+}
+inline bool QualityOfService_Tier_Parse(
+    const ::std::string& name, QualityOfService_Tier* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<QualityOfService_Tier>(
+    QualityOfService_Tier_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -1006,6 +1037,294 @@ class TaskLog final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fexecution_2eproto;
 };
+// -------------------------------------------------------------------
+
+class QualityOfServiceSpec final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.QualityOfServiceSpec) */ {
+ public:
+  QualityOfServiceSpec();
+  virtual ~QualityOfServiceSpec();
+
+  QualityOfServiceSpec(const QualityOfServiceSpec& from);
+
+  inline QualityOfServiceSpec& operator=(const QualityOfServiceSpec& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  QualityOfServiceSpec(QualityOfServiceSpec&& from) noexcept
+    : QualityOfServiceSpec() {
+    *this = ::std::move(from);
+  }
+
+  inline QualityOfServiceSpec& operator=(QualityOfServiceSpec&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const QualityOfServiceSpec& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const QualityOfServiceSpec* internal_default_instance() {
+    return reinterpret_cast<const QualityOfServiceSpec*>(
+               &_QualityOfServiceSpec_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  void Swap(QualityOfServiceSpec* other);
+  friend void swap(QualityOfServiceSpec& a, QualityOfServiceSpec& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline QualityOfServiceSpec* New() const final {
+    return CreateMaybeMessage<QualityOfServiceSpec>(nullptr);
+  }
+
+  QualityOfServiceSpec* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<QualityOfServiceSpec>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const QualityOfServiceSpec& from);
+  void MergeFrom(const QualityOfServiceSpec& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(QualityOfServiceSpec* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .google.protobuf.Duration queueing_budget = 1;
+  bool has_queueing_budget() const;
+  void clear_queueing_budget();
+  static const int kQueueingBudgetFieldNumber = 1;
+  const ::google::protobuf::Duration& queueing_budget() const;
+  ::google::protobuf::Duration* release_queueing_budget();
+  ::google::protobuf::Duration* mutable_queueing_budget();
+  void set_allocated_queueing_budget(::google::protobuf::Duration* queueing_budget);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.QualityOfServiceSpec)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::Duration* queueing_budget_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fexecution_2eproto;
+};
+// -------------------------------------------------------------------
+
+class QualityOfService final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.QualityOfService) */ {
+ public:
+  QualityOfService();
+  virtual ~QualityOfService();
+
+  QualityOfService(const QualityOfService& from);
+
+  inline QualityOfService& operator=(const QualityOfService& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  QualityOfService(QualityOfService&& from) noexcept
+    : QualityOfService() {
+    *this = ::std::move(from);
+  }
+
+  inline QualityOfService& operator=(QualityOfService&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const QualityOfService& default_instance();
+
+  enum DesignationCase {
+    kTier = 1,
+    kSpec = 2,
+    DESIGNATION_NOT_SET = 0,
+  };
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const QualityOfService* internal_default_instance() {
+    return reinterpret_cast<const QualityOfService*>(
+               &_QualityOfService_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(QualityOfService* other);
+  friend void swap(QualityOfService& a, QualityOfService& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline QualityOfService* New() const final {
+    return CreateMaybeMessage<QualityOfService>(nullptr);
+  }
+
+  QualityOfService* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<QualityOfService>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const QualityOfService& from);
+  void MergeFrom(const QualityOfService& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(QualityOfService* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef QualityOfService_Tier Tier;
+  static const Tier UNDEFINED =
+    QualityOfService_Tier_UNDEFINED;
+  static const Tier HIGH =
+    QualityOfService_Tier_HIGH;
+  static const Tier MEDIUM =
+    QualityOfService_Tier_MEDIUM;
+  static const Tier LOW =
+    QualityOfService_Tier_LOW;
+  static inline bool Tier_IsValid(int value) {
+    return QualityOfService_Tier_IsValid(value);
+  }
+  static const Tier Tier_MIN =
+    QualityOfService_Tier_Tier_MIN;
+  static const Tier Tier_MAX =
+    QualityOfService_Tier_Tier_MAX;
+  static const int Tier_ARRAYSIZE =
+    QualityOfService_Tier_Tier_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Tier_descriptor() {
+    return QualityOfService_Tier_descriptor();
+  }
+  static inline const ::std::string& Tier_Name(Tier value) {
+    return QualityOfService_Tier_Name(value);
+  }
+  static inline bool Tier_Parse(const ::std::string& name,
+      Tier* value) {
+    return QualityOfService_Tier_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.QualityOfService.Tier tier = 1;
+  private:
+  bool has_tier() const;
+  public:
+  void clear_tier();
+  static const int kTierFieldNumber = 1;
+  ::flyteidl::core::QualityOfService_Tier tier() const;
+  void set_tier(::flyteidl::core::QualityOfService_Tier value);
+
+  // .flyteidl.core.QualityOfServiceSpec spec = 2;
+  bool has_spec() const;
+  void clear_spec();
+  static const int kSpecFieldNumber = 2;
+  const ::flyteidl::core::QualityOfServiceSpec& spec() const;
+  ::flyteidl::core::QualityOfServiceSpec* release_spec();
+  ::flyteidl::core::QualityOfServiceSpec* mutable_spec();
+  void set_allocated_spec(::flyteidl::core::QualityOfServiceSpec* spec);
+
+  void clear_designation();
+  DesignationCase designation_case() const;
+  // @@protoc_insertion_point(class_scope:flyteidl.core.QualityOfService)
+ private:
+  class HasBitSetters;
+  void set_has_tier();
+  void set_has_spec();
+
+  inline bool has_designation() const;
+  inline void clear_has_designation();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  union DesignationUnion {
+    DesignationUnion() {}
+    int tier_;
+    ::flyteidl::core::QualityOfServiceSpec* spec_;
+  } designation_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  ::google::protobuf::uint32 _oneof_case_[1];
+
+  friend struct ::TableStruct_flyteidl_2fcore_2fexecution_2eproto;
+};
 // ===================================================================
 
 
@@ -1372,9 +1691,146 @@ inline void TaskLog::set_allocated_ttl(::google::protobuf::Duration* ttl) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskLog.ttl)
 }
 
+// -------------------------------------------------------------------
+
+// QualityOfServiceSpec
+
+// .google.protobuf.Duration queueing_budget = 1;
+inline bool QualityOfServiceSpec::has_queueing_budget() const {
+  return this != internal_default_instance() && queueing_budget_ != nullptr;
+}
+inline const ::google::protobuf::Duration& QualityOfServiceSpec::queueing_budget() const {
+  const ::google::protobuf::Duration* p = queueing_budget_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.QualityOfServiceSpec.queueing_budget)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Duration*>(
+      &::google::protobuf::_Duration_default_instance_);
+}
+inline ::google::protobuf::Duration* QualityOfServiceSpec::release_queueing_budget() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.QualityOfServiceSpec.queueing_budget)
+  
+  ::google::protobuf::Duration* temp = queueing_budget_;
+  queueing_budget_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Duration* QualityOfServiceSpec::mutable_queueing_budget() {
+  
+  if (queueing_budget_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Duration>(GetArenaNoVirtual());
+    queueing_budget_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.QualityOfServiceSpec.queueing_budget)
+  return queueing_budget_;
+}
+inline void QualityOfServiceSpec::set_allocated_queueing_budget(::google::protobuf::Duration* queueing_budget) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(queueing_budget_);
+  }
+  if (queueing_budget) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(queueing_budget)->GetArena();
+    if (message_arena != submessage_arena) {
+      queueing_budget = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, queueing_budget, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  queueing_budget_ = queueing_budget;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.QualityOfServiceSpec.queueing_budget)
+}
+
+// -------------------------------------------------------------------
+
+// QualityOfService
+
+// .flyteidl.core.QualityOfService.Tier tier = 1;
+inline bool QualityOfService::has_tier() const {
+  return designation_case() == kTier;
+}
+inline void QualityOfService::set_has_tier() {
+  _oneof_case_[0] = kTier;
+}
+inline void QualityOfService::clear_tier() {
+  if (has_tier()) {
+    designation_.tier_ = 0;
+    clear_has_designation();
+  }
+}
+inline ::flyteidl::core::QualityOfService_Tier QualityOfService::tier() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.QualityOfService.tier)
+  if (has_tier()) {
+    return static_cast< ::flyteidl::core::QualityOfService_Tier >(designation_.tier_);
+  }
+  return static_cast< ::flyteidl::core::QualityOfService_Tier >(0);
+}
+inline void QualityOfService::set_tier(::flyteidl::core::QualityOfService_Tier value) {
+  if (!has_tier()) {
+    clear_designation();
+    set_has_tier();
+  }
+  designation_.tier_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.QualityOfService.tier)
+}
+
+// .flyteidl.core.QualityOfServiceSpec spec = 2;
+inline bool QualityOfService::has_spec() const {
+  return designation_case() == kSpec;
+}
+inline void QualityOfService::set_has_spec() {
+  _oneof_case_[0] = kSpec;
+}
+inline void QualityOfService::clear_spec() {
+  if (has_spec()) {
+    delete designation_.spec_;
+    clear_has_designation();
+  }
+}
+inline ::flyteidl::core::QualityOfServiceSpec* QualityOfService::release_spec() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.QualityOfService.spec)
+  if (has_spec()) {
+    clear_has_designation();
+      ::flyteidl::core::QualityOfServiceSpec* temp = designation_.spec_;
+    designation_.spec_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::QualityOfServiceSpec& QualityOfService::spec() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.QualityOfService.spec)
+  return has_spec()
+      ? *designation_.spec_
+      : *reinterpret_cast< ::flyteidl::core::QualityOfServiceSpec*>(&::flyteidl::core::_QualityOfServiceSpec_default_instance_);
+}
+inline ::flyteidl::core::QualityOfServiceSpec* QualityOfService::mutable_spec() {
+  if (!has_spec()) {
+    clear_designation();
+    set_has_spec();
+    designation_.spec_ = CreateMaybeMessage< ::flyteidl::core::QualityOfServiceSpec >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.QualityOfService.spec)
+  return designation_.spec_;
+}
+
+inline bool QualityOfService::has_designation() const {
+  return designation_case() != DESIGNATION_NOT_SET;
+}
+inline void QualityOfService::clear_has_designation() {
+  _oneof_case_[0] = DESIGNATION_NOT_SET;
+}
+inline QualityOfService::DesignationCase QualityOfService::designation_case() const {
+  return QualityOfService::DesignationCase(_oneof_case_[0]);
+}
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -1416,6 +1872,11 @@ template <> struct is_proto_enum< ::flyteidl::core::TaskLog_MessageFormat> : ::s
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::TaskLog_MessageFormat>() {
   return ::flyteidl::core::TaskLog_MessageFormat_descriptor();
+}
+template <> struct is_proto_enum< ::flyteidl::core::QualityOfService_Tier> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::QualityOfService_Tier>() {
+  return ::flyteidl::core::QualityOfService_Tier_descriptor();
 }
 
 }  // namespace protobuf
