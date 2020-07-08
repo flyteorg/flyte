@@ -2098,6 +2098,15 @@ class ExecutionSpec final :
   ::flyteidl::admin::AuthRole* mutable_auth_role();
   void set_allocated_auth_role(::flyteidl::admin::AuthRole* auth_role);
 
+  // .flyteidl.core.QualityOfService quality_of_service = 17;
+  bool has_quality_of_service() const;
+  void clear_quality_of_service();
+  static const int kQualityOfServiceFieldNumber = 17;
+  const ::flyteidl::core::QualityOfService& quality_of_service() const;
+  ::flyteidl::core::QualityOfService* release_quality_of_service();
+  ::flyteidl::core::QualityOfService* mutable_quality_of_service();
+  void set_allocated_quality_of_service(::flyteidl::core::QualityOfService* quality_of_service);
+
   // .flyteidl.admin.NotificationList notifications = 5;
   bool has_notifications() const;
   void clear_notifications();
@@ -2134,6 +2143,7 @@ class ExecutionSpec final :
   ::flyteidl::admin::Labels* labels_;
   ::flyteidl::admin::Annotations* annotations_;
   ::flyteidl::admin::AuthRole* auth_role_;
+  ::flyteidl::core::QualityOfService* quality_of_service_;
   union NotificationOverridesUnion {
     NotificationOverridesUnion() {}
     ::flyteidl::admin::NotificationList* notifications_;
@@ -4818,6 +4828,51 @@ inline void ExecutionSpec::set_allocated_auth_role(::flyteidl::admin::AuthRole* 
   }
   auth_role_ = auth_role;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.auth_role)
+}
+
+// .flyteidl.core.QualityOfService quality_of_service = 17;
+inline bool ExecutionSpec::has_quality_of_service() const {
+  return this != internal_default_instance() && quality_of_service_ != nullptr;
+}
+inline const ::flyteidl::core::QualityOfService& ExecutionSpec::quality_of_service() const {
+  const ::flyteidl::core::QualityOfService* p = quality_of_service_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionSpec.quality_of_service)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::QualityOfService*>(
+      &::flyteidl::core::_QualityOfService_default_instance_);
+}
+inline ::flyteidl::core::QualityOfService* ExecutionSpec::release_quality_of_service() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionSpec.quality_of_service)
+  
+  ::flyteidl::core::QualityOfService* temp = quality_of_service_;
+  quality_of_service_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::QualityOfService* ExecutionSpec::mutable_quality_of_service() {
+  
+  if (quality_of_service_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::QualityOfService>(GetArenaNoVirtual());
+    quality_of_service_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionSpec.quality_of_service)
+  return quality_of_service_;
+}
+inline void ExecutionSpec::set_allocated_quality_of_service(::flyteidl::core::QualityOfService* quality_of_service) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(quality_of_service_);
+  }
+  if (quality_of_service) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      quality_of_service = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, quality_of_service, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  quality_of_service_ = quality_of_service;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.quality_of_service)
 }
 
 inline bool ExecutionSpec::has_notification_overrides() const {

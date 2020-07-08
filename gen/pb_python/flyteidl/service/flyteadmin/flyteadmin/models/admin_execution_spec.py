@@ -23,6 +23,7 @@ from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_notification_list import AdminNotificationList  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
+from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
 
 
 class AdminExecutionSpec(object):
@@ -46,7 +47,8 @@ class AdminExecutionSpec(object):
         'disable_all': 'bool',
         'labels': 'AdminLabels',
         'annotations': 'AdminAnnotations',
-        'auth_role': 'AdminAuthRole'
+        'auth_role': 'AdminAuthRole',
+        'quality_of_service': 'CoreQualityOfService'
     }
 
     attribute_map = {
@@ -57,10 +59,11 @@ class AdminExecutionSpec(object):
         'disable_all': 'disable_all',
         'labels': 'labels',
         'annotations': 'annotations',
-        'auth_role': 'auth_role'
+        'auth_role': 'auth_role',
+        'quality_of_service': 'quality_of_service'
     }
 
-    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, auth_role=None):  # noqa: E501
+    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, auth_role=None, quality_of_service=None):  # noqa: E501
         """AdminExecutionSpec - a model defined in Swagger"""  # noqa: E501
 
         self._launch_plan = None
@@ -71,6 +74,7 @@ class AdminExecutionSpec(object):
         self._labels = None
         self._annotations = None
         self._auth_role = None
+        self._quality_of_service = None
         self.discriminator = None
 
         if launch_plan is not None:
@@ -89,6 +93,8 @@ class AdminExecutionSpec(object):
             self.annotations = annotations
         if auth_role is not None:
             self.auth_role = auth_role
+        if quality_of_service is not None:
+            self.quality_of_service = quality_of_service
 
     @property
     def launch_plan(self):
@@ -267,6 +273,29 @@ class AdminExecutionSpec(object):
         """
 
         self._auth_role = auth_role
+
+    @property
+    def quality_of_service(self):
+        """Gets the quality_of_service of this AdminExecutionSpec.  # noqa: E501
+
+        Indicates the runtime priority of the execution.  # noqa: E501
+
+        :return: The quality_of_service of this AdminExecutionSpec.  # noqa: E501
+        :rtype: CoreQualityOfService
+        """
+        return self._quality_of_service
+
+    @quality_of_service.setter
+    def quality_of_service(self, quality_of_service):
+        """Sets the quality_of_service of this AdminExecutionSpec.
+
+        Indicates the runtime priority of the execution.  # noqa: E501
+
+        :param quality_of_service: The quality_of_service of this AdminExecutionSpec.  # noqa: E501
+        :type: CoreQualityOfService
+        """
+
+        self._quality_of_service = quality_of_service
 
     def to_dict(self):
         """Returns the model properties as a dict"""

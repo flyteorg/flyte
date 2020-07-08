@@ -87,3 +87,27 @@ message TaskLog {
     MessageFormat message_format = 3; 
     google.protobuf.Duration ttl = 4;
 }
+
+// Represents customized execution run-time attributes.
+message QualityOfServiceSpec {
+  // Indicates how much queueing delay an execution can tolerate.
+  google.protobuf.Duration queueing_budget = 1;
+
+  // Add future, user-configurable options here
+}
+
+// Indicates the priority of an execution.
+message QualityOfService {
+  enum Tier {
+    // Default: no quality of service specified.
+    UNDEFINED = 0;
+    HIGH = 1;
+    MEDIUM = 2;
+    LOW = 3;
+  }
+
+  oneof designation {
+    Tier tier = 1;
+    QualityOfServiceSpec spec = 2;
+  }
+}

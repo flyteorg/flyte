@@ -26,8 +26,9 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2flaunch_5fplan_2eproto ::googl
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2flaunch_5fplan_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_LaunchPlanMetadata_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2flaunch_5fplan_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_LaunchPlanClosure_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2flaunch_5fplan_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_LaunchPlan_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2flaunch_5fplan_2eproto ::google::protobuf::internal::SCCInfo<8> scc_info_LaunchPlanSpec_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2flaunch_5fplan_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_LaunchPlanSpec_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fschedule_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Schedule_flyteidl_2fadmin_2fschedule_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Identifier_flyteidl_2fcore_2fidentifier_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ParameterMap_flyteidl_2fcore_2finterface_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_VariableMap_flyteidl_2fcore_2finterface_2eproto;
@@ -174,8 +175,8 @@ static void InitDefaultsLaunchPlanSpec_flyteidl_2fadmin_2flaunch_5fplan_2eproto(
   ::flyteidl::admin::LaunchPlanSpec::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<8> scc_info_LaunchPlanSpec_flyteidl_2fadmin_2flaunch_5fplan_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 8, InitDefaultsLaunchPlanSpec_flyteidl_2fadmin_2flaunch_5fplan_2eproto}, {
+::google::protobuf::internal::SCCInfo<9> scc_info_LaunchPlanSpec_flyteidl_2fadmin_2flaunch_5fplan_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 9, InitDefaultsLaunchPlanSpec_flyteidl_2fadmin_2flaunch_5fplan_2eproto}, {
       &scc_info_Identifier_flyteidl_2fcore_2fidentifier_2eproto.base,
       &scc_info_LaunchPlanMetadata_flyteidl_2fadmin_2flaunch_5fplan_2eproto.base,
       &scc_info_ParameterMap_flyteidl_2fcore_2finterface_2eproto.base,
@@ -183,7 +184,8 @@ static void InitDefaultsLaunchPlanSpec_flyteidl_2fadmin_2flaunch_5fplan_2eproto(
       &scc_info_Labels_flyteidl_2fadmin_2fcommon_2eproto.base,
       &scc_info_Annotations_flyteidl_2fadmin_2fcommon_2eproto.base,
       &scc_info_Auth_flyteidl_2fadmin_2flaunch_5fplan_2eproto.base,
-      &scc_info_AuthRole_flyteidl_2fadmin_2fcommon_2eproto.base,}};
+      &scc_info_AuthRole_flyteidl_2fadmin_2fcommon_2eproto.base,
+      &scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto.base,}};
 
 static void InitDefaultsLaunchPlanClosure_flyteidl_2fadmin_2flaunch_5fplan_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -346,6 +348,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2flaunch_5fplan_2e
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::LaunchPlanSpec, annotations_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::LaunchPlanSpec, auth_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::LaunchPlanSpec, auth_role_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::LaunchPlanSpec, quality_of_service_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::LaunchPlanClosure, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -399,12 +402,12 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 20, -1, sizeof(::flyteidl::admin::LaunchPlanList)},
   { 27, -1, sizeof(::flyteidl::admin::Auth)},
   { 35, -1, sizeof(::flyteidl::admin::LaunchPlanSpec)},
-  { 49, -1, sizeof(::flyteidl::admin::LaunchPlanClosure)},
-  { 59, -1, sizeof(::flyteidl::admin::LaunchPlanMetadata)},
-  { 66, -1, sizeof(::flyteidl::admin::LaunchPlanUpdateRequest)},
-  { 73, -1, sizeof(::flyteidl::admin::LaunchPlanUpdateResponse)},
-  { 78, -1, sizeof(::flyteidl::admin::ActiveLaunchPlanRequest)},
-  { 84, -1, sizeof(::flyteidl::admin::ActiveLaunchPlanListRequest)},
+  { 50, -1, sizeof(::flyteidl::admin::LaunchPlanClosure)},
+  { 60, -1, sizeof(::flyteidl::admin::LaunchPlanMetadata)},
+  { 67, -1, sizeof(::flyteidl::admin::LaunchPlanUpdateRequest)},
+  { 74, -1, sizeof(::flyteidl::admin::LaunchPlanUpdateResponse)},
+  { 79, -1, sizeof(::flyteidl::admin::ActiveLaunchPlanRequest)},
+  { 85, -1, sizeof(::flyteidl::admin::ActiveLaunchPlanListRequest)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -430,65 +433,68 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_flyteidl_2fadmin_2flaunch_5fplan_2eproto[] =
   "\n flyteidl/admin/launch_plan.proto\022\016flyt"
-  "eidl.admin\032\034flyteidl/core/literals.proto"
-  "\032\036flyteidl/core/identifier.proto\032\035flytei"
-  "dl/core/interface.proto\032\035flyteidl/admin/"
-  "schedule.proto\032\033flyteidl/admin/common.pr"
-  "oto\032\037google/protobuf/timestamp.proto\"n\n\027"
-  "LaunchPlanCreateRequest\022%\n\002id\030\001 \001(\0132\031.fl"
-  "yteidl.core.Identifier\022,\n\004spec\030\002 \001(\0132\036.f"
-  "lyteidl.admin.LaunchPlanSpec\"\032\n\030LaunchPl"
-  "anCreateResponse\"\225\001\n\nLaunchPlan\022%\n\002id\030\001 "
-  "\001(\0132\031.flyteidl.core.Identifier\022,\n\004spec\030\002"
-  " \001(\0132\036.flyteidl.admin.LaunchPlanSpec\0222\n\007"
-  "closure\030\003 \001(\0132!.flyteidl.admin.LaunchPla"
-  "nClosure\"Q\n\016LaunchPlanList\0220\n\014launch_pla"
-  "ns\030\001 \003(\0132\032.flyteidl.admin.LaunchPlan\022\r\n\005"
-  "token\030\002 \001(\t\"T\n\004Auth\022\034\n\022assumable_iam_rol"
-  "e\030\001 \001(\tH\000\022$\n\032kubernetes_service_account\030"
-  "\002 \001(\tH\000B\010\n\006method\"\244\003\n\016LaunchPlanSpec\022.\n\013"
-  "workflow_id\030\001 \001(\0132\031.flyteidl.core.Identi"
-  "fier\022;\n\017entity_metadata\030\002 \001(\0132\".flyteidl"
-  ".admin.LaunchPlanMetadata\0223\n\016default_inp"
-  "uts\030\003 \001(\0132\033.flyteidl.core.ParameterMap\022/"
-  "\n\014fixed_inputs\030\004 \001(\0132\031.flyteidl.core.Lit"
-  "eralMap\022\020\n\004role\030\005 \001(\tB\002\030\001\022&\n\006labels\030\006 \001("
-  "\0132\026.flyteidl.admin.Labels\0220\n\013annotations"
-  "\030\007 \001(\0132\033.flyteidl.admin.Annotations\022&\n\004a"
-  "uth\030\010 \001(\0132\024.flyteidl.admin.AuthB\002\030\001\022+\n\ta"
-  "uth_role\030\t \001(\0132\030.flyteidl.admin.AuthRole"
-  "\"\217\002\n\021LaunchPlanClosure\022.\n\005state\030\001 \001(\0162\037."
-  "flyteidl.admin.LaunchPlanState\0224\n\017expect"
-  "ed_inputs\030\002 \001(\0132\033.flyteidl.core.Paramete"
-  "rMap\0224\n\020expected_outputs\030\003 \001(\0132\032.flyteid"
-  "l.core.VariableMap\022.\n\ncreated_at\030\004 \001(\0132\032"
-  ".google.protobuf.Timestamp\022.\n\nupdated_at"
-  "\030\005 \001(\0132\032.google.protobuf.Timestamp\"u\n\022La"
-  "unchPlanMetadata\022*\n\010schedule\030\001 \001(\0132\030.fly"
-  "teidl.admin.Schedule\0223\n\rnotifications\030\002 "
-  "\003(\0132\034.flyteidl.admin.Notification\"p\n\027Lau"
-  "nchPlanUpdateRequest\022%\n\002id\030\001 \001(\0132\031.flyte"
-  "idl.core.Identifier\022.\n\005state\030\002 \001(\0162\037.fly"
-  "teidl.admin.LaunchPlanState\"\032\n\030LaunchPla"
-  "nUpdateResponse\"L\n\027ActiveLaunchPlanReque"
-  "st\0221\n\002id\030\001 \001(\0132%.flyteidl.admin.NamedEnt"
-  "ityIdentifier\"\203\001\n\033ActiveLaunchPlanListRe"
-  "quest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r"
-  "\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030"
-  "\005 \001(\0132\024.flyteidl.admin.Sort*+\n\017LaunchPla"
-  "nState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTIVE\020\001B3Z1gith"
-  "ub.com/lyft/flyteidl/gen/pb-go/flyteidl/"
-  "adminb\006proto3"
+  "eidl.admin\032\035flyteidl/core/execution.prot"
+  "o\032\034flyteidl/core/literals.proto\032\036flyteid"
+  "l/core/identifier.proto\032\035flyteidl/core/i"
+  "nterface.proto\032\035flyteidl/admin/schedule."
+  "proto\032\033flyteidl/admin/common.proto\032\037goog"
+  "le/protobuf/timestamp.proto\"n\n\027LaunchPla"
+  "nCreateRequest\022%\n\002id\030\001 \001(\0132\031.flyteidl.co"
+  "re.Identifier\022,\n\004spec\030\002 \001(\0132\036.flyteidl.a"
+  "dmin.LaunchPlanSpec\"\032\n\030LaunchPlanCreateR"
+  "esponse\"\225\001\n\nLaunchPlan\022%\n\002id\030\001 \001(\0132\031.fly"
+  "teidl.core.Identifier\022,\n\004spec\030\002 \001(\0132\036.fl"
+  "yteidl.admin.LaunchPlanSpec\0222\n\007closure\030\003"
+  " \001(\0132!.flyteidl.admin.LaunchPlanClosure\""
+  "Q\n\016LaunchPlanList\0220\n\014launch_plans\030\001 \003(\0132"
+  "\032.flyteidl.admin.LaunchPlan\022\r\n\005token\030\002 \001"
+  "(\t\"T\n\004Auth\022\034\n\022assumable_iam_role\030\001 \001(\tH\000"
+  "\022$\n\032kubernetes_service_account\030\002 \001(\tH\000B\010"
+  "\n\006method\"\341\003\n\016LaunchPlanSpec\022.\n\013workflow_"
+  "id\030\001 \001(\0132\031.flyteidl.core.Identifier\022;\n\017e"
+  "ntity_metadata\030\002 \001(\0132\".flyteidl.admin.La"
+  "unchPlanMetadata\0223\n\016default_inputs\030\003 \001(\013"
+  "2\033.flyteidl.core.ParameterMap\022/\n\014fixed_i"
+  "nputs\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022\020"
+  "\n\004role\030\005 \001(\tB\002\030\001\022&\n\006labels\030\006 \001(\0132\026.flyte"
+  "idl.admin.Labels\0220\n\013annotations\030\007 \001(\0132\033."
+  "flyteidl.admin.Annotations\022&\n\004auth\030\010 \001(\013"
+  "2\024.flyteidl.admin.AuthB\002\030\001\022+\n\tauth_role\030"
+  "\t \001(\0132\030.flyteidl.admin.AuthRole\022;\n\022quali"
+  "ty_of_service\030\020 \001(\0132\037.flyteidl.core.Qual"
+  "ityOfService\"\217\002\n\021LaunchPlanClosure\022.\n\005st"
+  "ate\030\001 \001(\0162\037.flyteidl.admin.LaunchPlanSta"
+  "te\0224\n\017expected_inputs\030\002 \001(\0132\033.flyteidl.c"
+  "ore.ParameterMap\0224\n\020expected_outputs\030\003 \001"
+  "(\0132\032.flyteidl.core.VariableMap\022.\n\ncreate"
+  "d_at\030\004 \001(\0132\032.google.protobuf.Timestamp\022."
+  "\n\nupdated_at\030\005 \001(\0132\032.google.protobuf.Tim"
+  "estamp\"u\n\022LaunchPlanMetadata\022*\n\010schedule"
+  "\030\001 \001(\0132\030.flyteidl.admin.Schedule\0223\n\rnoti"
+  "fications\030\002 \003(\0132\034.flyteidl.admin.Notific"
+  "ation\"p\n\027LaunchPlanUpdateRequest\022%\n\002id\030\001"
+  " \001(\0132\031.flyteidl.core.Identifier\022.\n\005state"
+  "\030\002 \001(\0162\037.flyteidl.admin.LaunchPlanState\""
+  "\032\n\030LaunchPlanUpdateResponse\"L\n\027ActiveLau"
+  "nchPlanRequest\0221\n\002id\030\001 \001(\0132%.flyteidl.ad"
+  "min.NamedEntityIdentifier\"\203\001\n\033ActiveLaun"
+  "chPlanListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006do"
+  "main\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t"
+  "\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort*"
+  "+\n\017LaunchPlanState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTI"
+  "VE\020\001B3Z1github.com/lyft/flyteidl/gen/pb-"
+  "go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2flaunch_5fplan_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2flaunch_5fplan_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2flaunch_5fplan_2eproto,
-  "flyteidl/admin/launch_plan.proto", &assign_descriptors_table_flyteidl_2fadmin_2flaunch_5fplan_2eproto, 1973,
+  "flyteidl/admin/launch_plan.proto", &assign_descriptors_table_flyteidl_2fadmin_2flaunch_5fplan_2eproto, 2065,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2flaunch_5fplan_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[6] =
+  static constexpr ::google::protobuf::internal::InitFunc deps[7] =
   {
+    ::AddDescriptors_flyteidl_2fcore_2fexecution_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fliterals_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fidentifier_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2finterface_2eproto,
@@ -496,7 +502,7 @@ void AddDescriptors_flyteidl_2fadmin_2flaunch_5fplan_2eproto() {
     ::AddDescriptors_flyteidl_2fadmin_2fcommon_2eproto,
     ::AddDescriptors_google_2fprotobuf_2ftimestamp_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fadmin_2flaunch_5fplan_2eproto, deps, 6);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fadmin_2flaunch_5fplan_2eproto, deps, 7);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -2297,6 +2303,8 @@ void LaunchPlanSpec::InitAsDefaultInstance() {
       ::flyteidl::admin::Auth::internal_default_instance());
   ::flyteidl::admin::_LaunchPlanSpec_default_instance_._instance.get_mutable()->auth_role_ = const_cast< ::flyteidl::admin::AuthRole*>(
       ::flyteidl::admin::AuthRole::internal_default_instance());
+  ::flyteidl::admin::_LaunchPlanSpec_default_instance_._instance.get_mutable()->quality_of_service_ = const_cast< ::flyteidl::core::QualityOfService*>(
+      ::flyteidl::core::QualityOfService::internal_default_instance());
 }
 class LaunchPlanSpec::HasBitSetters {
  public:
@@ -2308,6 +2316,7 @@ class LaunchPlanSpec::HasBitSetters {
   static const ::flyteidl::admin::Annotations& annotations(const LaunchPlanSpec* msg);
   static const ::flyteidl::admin::Auth& auth(const LaunchPlanSpec* msg);
   static const ::flyteidl::admin::AuthRole& auth_role(const LaunchPlanSpec* msg);
+  static const ::flyteidl::core::QualityOfService& quality_of_service(const LaunchPlanSpec* msg);
 };
 
 const ::flyteidl::core::Identifier&
@@ -2341,6 +2350,10 @@ LaunchPlanSpec::HasBitSetters::auth(const LaunchPlanSpec* msg) {
 const ::flyteidl::admin::AuthRole&
 LaunchPlanSpec::HasBitSetters::auth_role(const LaunchPlanSpec* msg) {
   return *msg->auth_role_;
+}
+const ::flyteidl::core::QualityOfService&
+LaunchPlanSpec::HasBitSetters::quality_of_service(const LaunchPlanSpec* msg) {
+  return *msg->quality_of_service_;
 }
 void LaunchPlanSpec::clear_workflow_id() {
   if (GetArenaNoVirtual() == nullptr && workflow_id_ != nullptr) {
@@ -2378,6 +2391,12 @@ void LaunchPlanSpec::clear_auth_role() {
   }
   auth_role_ = nullptr;
 }
+void LaunchPlanSpec::clear_quality_of_service() {
+  if (GetArenaNoVirtual() == nullptr && quality_of_service_ != nullptr) {
+    delete quality_of_service_;
+  }
+  quality_of_service_ = nullptr;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int LaunchPlanSpec::kWorkflowIdFieldNumber;
 const int LaunchPlanSpec::kEntityMetadataFieldNumber;
@@ -2388,6 +2407,7 @@ const int LaunchPlanSpec::kLabelsFieldNumber;
 const int LaunchPlanSpec::kAnnotationsFieldNumber;
 const int LaunchPlanSpec::kAuthFieldNumber;
 const int LaunchPlanSpec::kAuthRoleFieldNumber;
+const int LaunchPlanSpec::kQualityOfServiceFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 LaunchPlanSpec::LaunchPlanSpec()
@@ -2443,6 +2463,11 @@ LaunchPlanSpec::LaunchPlanSpec(const LaunchPlanSpec& from)
   } else {
     auth_role_ = nullptr;
   }
+  if (from.has_quality_of_service()) {
+    quality_of_service_ = new ::flyteidl::core::QualityOfService(*from.quality_of_service_);
+  } else {
+    quality_of_service_ = nullptr;
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.LaunchPlanSpec)
 }
 
@@ -2451,8 +2476,8 @@ void LaunchPlanSpec::SharedCtor() {
       &scc_info_LaunchPlanSpec_flyteidl_2fadmin_2flaunch_5fplan_2eproto.base);
   role_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&workflow_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&auth_role_) -
-      reinterpret_cast<char*>(&workflow_id_)) + sizeof(auth_role_));
+      reinterpret_cast<char*>(&quality_of_service_) -
+      reinterpret_cast<char*>(&workflow_id_)) + sizeof(quality_of_service_));
 }
 
 LaunchPlanSpec::~LaunchPlanSpec() {
@@ -2470,6 +2495,7 @@ void LaunchPlanSpec::SharedDtor() {
   if (this != internal_default_instance()) delete annotations_;
   if (this != internal_default_instance()) delete auth_;
   if (this != internal_default_instance()) delete auth_role_;
+  if (this != internal_default_instance()) delete quality_of_service_;
 }
 
 void LaunchPlanSpec::SetCachedSize(int size) const {
@@ -2520,6 +2546,10 @@ void LaunchPlanSpec::Clear() {
     delete auth_role_;
   }
   auth_role_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && quality_of_service_ != nullptr) {
+    delete quality_of_service_;
+  }
+  quality_of_service_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -2656,6 +2686,19 @@ const char* LaunchPlanSpec::_InternalParse(const char* begin, const char* end, v
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
+      // .flyteidl.core.QualityOfService quality_of_service = 16;
+      case 16: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 130) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::QualityOfService::_InternalParse;
+        object = msg->mutable_quality_of_service();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -2686,7 +2729,7 @@ bool LaunchPlanSpec::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   // @@protoc_insertion_point(parse_start:flyteidl.admin.LaunchPlanSpec)
   for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(16383u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
@@ -2793,6 +2836,17 @@ bool LaunchPlanSpec::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.core.QualityOfService quality_of_service = 16;
+      case 16: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (130 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_quality_of_service()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2878,6 +2932,12 @@ void LaunchPlanSpec::SerializeWithCachedSizes(
       9, HasBitSetters::auth_role(this), output);
   }
 
+  // .flyteidl.core.QualityOfService quality_of_service = 16;
+  if (this->has_quality_of_service()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      16, HasBitSetters::quality_of_service(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -2956,6 +3016,13 @@ void LaunchPlanSpec::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         9, HasBitSetters::auth_role(this), target);
+  }
+
+  // .flyteidl.core.QualityOfService quality_of_service = 16;
+  if (this->has_quality_of_service()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        16, HasBitSetters::quality_of_service(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3042,6 +3109,13 @@ size_t LaunchPlanSpec::ByteSizeLong() const {
         *auth_role_);
   }
 
+  // .flyteidl.core.QualityOfService quality_of_service = 16;
+  if (this->has_quality_of_service()) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *quality_of_service_);
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -3097,6 +3171,9 @@ void LaunchPlanSpec::MergeFrom(const LaunchPlanSpec& from) {
   if (from.has_auth_role()) {
     mutable_auth_role()->::flyteidl::admin::AuthRole::MergeFrom(from.auth_role());
   }
+  if (from.has_quality_of_service()) {
+    mutable_quality_of_service()->::flyteidl::core::QualityOfService::MergeFrom(from.quality_of_service());
+  }
 }
 
 void LaunchPlanSpec::CopyFrom(const ::google::protobuf::Message& from) {
@@ -3134,6 +3211,7 @@ void LaunchPlanSpec::InternalSwap(LaunchPlanSpec* other) {
   swap(annotations_, other->annotations_);
   swap(auth_, other->auth_);
   swap(auth_role_, other->auth_role_);
+  swap(quality_of_service_, other->quality_of_service_);
 }
 
 ::google::protobuf::Metadata LaunchPlanSpec::GetMetadata() const {

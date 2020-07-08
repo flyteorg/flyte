@@ -5,6 +5,7 @@ package flyteidl.core;
 option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core";
 
 import "flyteidl/core/condition.proto";
+import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/interface.proto";
 import "flyteidl/core/literals.proto";
@@ -128,8 +129,8 @@ message Node {
 
 // Metadata for the entire workflow. Defines execution behavior that does not change the final outputs of the workflow.
 message WorkflowMetadata {
-    // Total wait time a workflow can be delayed by queueing.
-    google.protobuf.Duration queuing_budget = 1;
+    // Indicates the runtime priority of workflow executions. 
+    QualityOfService quality_of_service = 1;
 
     // Failure Handling Strategy
     enum OnFailurePolicy {

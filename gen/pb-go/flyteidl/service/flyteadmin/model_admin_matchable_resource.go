@@ -8,7 +8,7 @@
  */
 
 package flyteadmin
-// AdminMatchableResource : Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes based on matching tags.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run
+// AdminMatchableResource : Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes based on matching tags.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.
 type AdminMatchableResource string
 
 // List of adminMatchableResource
@@ -17,4 +17,5 @@ const (
 	AdminMatchableResourceCLUSTER_RESOURCE AdminMatchableResource = "CLUSTER_RESOURCE"
 	AdminMatchableResourceEXECUTION_QUEUE AdminMatchableResource = "EXECUTION_QUEUE"
 	AdminMatchableResourceEXECUTION_CLUSTER_LABEL AdminMatchableResource = "EXECUTION_CLUSTER_LABEL"
+	AdminMatchableResourceQUALITY_OF_SERVICE_SPECIFICATION AdminMatchableResource = "QUALITY_OF_SERVICE_SPECIFICATION"
 )

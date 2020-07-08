@@ -1141,7 +1141,7 @@
         "parameters": [
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1149,7 +1149,8 @@
               "TASK_RESOURCE",
               "CLUSTER_RESOURCE",
               "EXECUTION_QUEUE",
-              "EXECUTION_CLUSTER_LABEL"
+              "EXECUTION_CLUSTER_LABEL",
+              "QUALITY_OF_SERVICE_SPECIFICATION"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -1553,7 +1554,7 @@
           },
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1561,7 +1562,8 @@
               "TASK_RESOURCE",
               "CLUSTER_RESOURCE",
               "EXECUTION_QUEUE",
-              "EXECUTION_CLUSTER_LABEL"
+              "EXECUTION_CLUSTER_LABEL",
+              "QUALITY_OF_SERVICE_SPECIFICATION"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -2250,7 +2252,7 @@
           },
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2258,7 +2260,8 @@
               "TASK_RESOURCE",
               "CLUSTER_RESOURCE",
               "EXECUTION_QUEUE",
-              "EXECUTION_CLUSTER_LABEL"
+              "EXECUTION_CLUSTER_LABEL",
+              "QUALITY_OF_SERVICE_SPECIFICATION"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -2746,6 +2749,17 @@
       "description": "- UPLOAD_ON_EXIT: All data will be uploaded after the main container exits\n - UPLOAD_EAGER: Data will be uploaded as it appears. Refer to protocol specification for details\n - DO_NOT_UPLOAD: Data will not be uploaded, only references will be written",
       "title": "Mode to use for uploading"
     },
+    "QualityOfServiceTier": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ],
+      "default": "UNDEFINED",
+      "description": " - UNDEFINED: Default: no quality of service specified."
+    },
     "ResourcesResourceEntry": {
       "type": "object",
       "properties": {
@@ -3153,6 +3167,10 @@
         "auth_role": {
           "$ref": "#/definitions/adminAuthRole",
           "description": "Optional: auth override to apply this execution."
+        },
+        "quality_of_service": {
+          "$ref": "#/definitions/coreQualityOfService",
+          "description": "Indicates the runtime priority of the execution."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes.."
@@ -3340,6 +3358,10 @@
         },
         "auth_role": {
           "$ref": "#/definitions/adminAuthRole"
+        },
+        "quality_of_service": {
+          "$ref": "#/definitions/coreQualityOfService",
+          "description": "Indicates the runtime priority of the execution."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -3424,10 +3446,11 @@
         "TASK_RESOURCE",
         "CLUSTER_RESOURCE",
         "EXECUTION_QUEUE",
-        "EXECUTION_CLUSTER_LABEL"
+        "EXECUTION_CLUSTER_LABEL",
+        "QUALITY_OF_SERVICE_SPECIFICATION"
       ],
       "default": "TASK_RESOURCE",
-      "description": "Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run"
+      "description": "Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec."
     },
     "adminMatchingAttributes": {
       "type": "object",
@@ -3443,6 +3466,9 @@
         },
         "execution_cluster_label": {
           "$ref": "#/definitions/adminExecutionClusterLabel"
+        },
+        "quality_of_service": {
+          "$ref": "#/definitions/coreQualityOfService"
         }
       },
       "description": "Generic container for encapsulating all types of the above attributes messages."
@@ -4948,6 +4974,28 @@
       },
       "title": "Primitive Types"
     },
+    "coreQualityOfService": {
+      "type": "object",
+      "properties": {
+        "tier": {
+          "$ref": "#/definitions/QualityOfServiceTier"
+        },
+        "spec": {
+          "$ref": "#/definitions/coreQualityOfServiceSpec"
+        }
+      },
+      "description": "Indicates the priority of an execution."
+    },
+    "coreQualityOfServiceSpec": {
+      "type": "object",
+      "properties": {
+        "queueing_budget": {
+          "type": "string",
+          "description": "Indicates how much queueing delay an execution can tolerate."
+        }
+      },
+      "description": "Represents customized execution run-time attributes."
+    },
     "coreResourceType": {
       "type": "string",
       "enum": [
@@ -5266,9 +5314,9 @@
     "coreWorkflowMetadata": {
       "type": "object",
       "properties": {
-        "queuing_budget": {
-          "type": "string",
-          "description": "Total wait time a workflow can be delayed by queueing."
+        "quality_of_service": {
+          "$ref": "#/definitions/coreQualityOfService",
+          "description": "Indicates the runtime priority of workflow executions."
         },
         "on_failure": {
           "$ref": "#/definitions/WorkflowMetadataOnFailurePolicy",
