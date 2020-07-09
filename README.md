@@ -6,7 +6,7 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic)
 ![GitHub milestones Completed](https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic)
-![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/5?style=plastic)
+![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/6?style=plastic)
 ![Twitter Follow](https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
 
@@ -32,6 +32,7 @@ Resources that would help you get a better understanding of Flyte.
 - Kubecon 2019 - Running LargeScale Stateful workloads on Kubernetes at Lyft [video](https://www.youtube.com/watch?v=ECeVQoble0g)
 - re:invent 2019 - Implementing ML workflows with Kubernetes and Amazon Sagemaker  [video](https://youtu.be/G-wzIQQJKaE)
 - Cloud-native machine learning at Lyft with AWS Batch and Amazon EKS [video](https://youtu.be/n_rRb8u1GSM)
+- OSS + ELC NA 2020 [splash](https://ossna2020.sched.com/event/313cec91aa38a430a25f9571039874b8)
 
 ## Blog Posts
  1. [Introducing Flyte: A Cloud Native Machine Learning and Data Processing Platform](https://eng.lyft.com/introducing-flyte-cloud-native-machine-learning-and-data-processing-platform-fb2bb3046a59)
@@ -53,7 +54,7 @@ Resources that would help you get a better understanding of Flyte.
  - Workflows features
   * Multiple Schedules for every workflow
   * Parallel step execution
-  * Extensible Backend to add customized plugin experiences
+  * Extensible Backend to add customized plugin experiences (with simplified User experiences)
   * Arbitrary container execution
   * Branching
   * Inline Subworkflows (a workflow can be embeded within one node of the top level workflow)
@@ -61,6 +62,7 @@ Resources that would help you get a better understanding of Flyte.
   * Array Tasks (map some function over a large dataset, controlled execution of 1000's of containers)
   * Dynamic Workflow creation and execution - with runtime type safety
   * Container side plugins with first class support in python
+  * PreAlpha: Arbitrary flytekit less containers supported (RawContainer)
  - Maintain an inventory of tasks and workflows
  - Record history of all executions and executions (as long as they follow convention) are completely repeatable
  - Multi Cloud support (AWS, GCP and others)
@@ -75,10 +77,9 @@ Resources that would help you get a better understanding of Flyte.
  - Written in Golang and optimized for performance
 
 ## Coming Soon
+ - Golang CLI - flytectl
  - Reactive pipelines
- - Golang CLI
  - Grafana templates (user/system observability)
- - Arbitrary flytekit less container support
  - More integrations
 
 # Available Plugins
@@ -89,16 +90,18 @@ Resources that would help you get a better understanding of Flyte.
  - K8s Spark (native pyspark and java/scala)
  - Qubole Hive
  - Presto Queries
- - Pytorch Operator
+ - Distributed Pytorch (K8s Native) - Pytorch Operator
 
 ## Coming soon
  - Sagemaker
  - Flink-K8s
+ - Distributed Tensorflow (K8s Native) - TFOperator
+ - Papermill Notebook execution
 
 # Current Usage 
 - Lyft Rideshare
 - Lyft L5 autonomous
-- Juno
+- Lyft Mapping (Minsk + EU)
 - Spotify
 
 # Changelogs
