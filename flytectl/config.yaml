@@ -1,0 +1,6 @@
+admin:
+  endpoint: http://localhost:30082
+  insecure: true
+logger:
+  show-source: true
+  level: 1

@@ -1,0 +1,3 @@
+admin:
+  endpoint: http://localhost:30082
+  insecure: true

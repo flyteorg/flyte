@@ -1,0 +1,6 @@
+dist/
+.idea
+vendor
+bin
+.DS_Store
+_test
