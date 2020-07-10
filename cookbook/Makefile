@@ -37,6 +37,3 @@ serialize_sandbox: docker_push
 enter_sandbox: docker_build
 	docker run -e PROJECT=${PROJECT} -v `pwd`:/root -it docker.io/lyft/flytecookbook:${VERSION} bash
 
-.PHONY: book
-book:
-	@docker run -t -v `pwd`:/base lyft/docbuilder:v2.2.0 sphinx-build -E -b html /base/ /base/_build

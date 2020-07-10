@@ -1,0 +1,1 @@
+# Accessing data from Hive
