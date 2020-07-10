@@ -5,7 +5,7 @@
 * 2. [Overview](#Overview)
 * 3. [Flyte Component Statuses](#FlyteComponentStatuses)
 * 4. [SDK design in Flytekit](#SDKdesigninFlytekit)
-	* 4.1. [Defining a Simple Training Job (status: alpha version is working)](#DefiningaSimpleTrainingJobstatus:alphaversionisworking)
+	* 4.1. [Defining a Simple Training Job](#DefiningaSimpleTrainingJobstatus)
 	* 4.2. [Defining a Custom Training Job (Work-in-progress)](#DefiningaCustomTrainingJobWork-in-progress)
 	* 4.3. [Defining a simple Hyperparameter Tuning Job](#DefiningasimpleHyperparameterTuningJob)
 	* 4.4. [Invoking Training Jobs Task and Hyperparameter Tuning Jobs Task](#InvokingTrainingJobsTaskandHyperparameterTuningJobsTask)
@@ -70,7 +70,7 @@ Statuses of the *alpha version* of the important Flyte components:
 In this section, we will demonstrate our Flytekit interface that users will use
 in Flyte to compose tasks running SageMaker jobs.
 
-###  4.1. <a name='DefiningaSimpleTrainingJobstatus:alphaversionisworking'></a>Defining a Simple Training Job (status: alpha version is working)
+###  4.1. <a name='DefiningaSimpleTrainingJobstatus'></a>Defining a Simple Training Job
 
 Users can leverage SageMaker's powerful built-in algorithms easily without
 needing to write any function or logic. They can simply define a
