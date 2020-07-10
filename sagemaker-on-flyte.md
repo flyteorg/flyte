@@ -37,7 +37,7 @@ write it in Flyte's [issue](https://github.com/lyft/flyte/issues) page.
 
 ## Flyte Component Statuses
 
-Statuses of the alpha version of the important Flyte components:
+Statuses of the *alpha version* of the important Flyte components:
 
 | Flyte component \ Functionality  | simple TrainingJob task | simple HPOJob task | custom TrainingJob task |
 | -------------------------------- | ----------------------- | ------------------ | ----------------------- |
