@@ -1,4 +1,4 @@
-from workflows.recipe_3.tasks import generic_type_task
+from recipes.types.generic import generic_type_task
 
 
 def test_generic_task():

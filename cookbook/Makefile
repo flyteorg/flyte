@@ -37,3 +37,7 @@ serialize_sandbox: docker_push
 enter_sandbox: docker_build
 	docker run -e PROJECT=${PROJECT} -v `pwd`:/root -it docker.io/lyft/flytecookbook:${VERSION} bash
 
+.PHONY: run_tests
+run_tests: 
+	export PYTHONPATH=.:$(PYTHONPATH)
+	pytest tests/recipes/
