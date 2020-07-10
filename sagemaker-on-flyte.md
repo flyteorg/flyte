@@ -1,13 +1,33 @@
 # SageMaker on Flyte -- Launching SageMaker TrainingJob and HPOJob from Flyte [Alpha]
 
-[[TOC]]
+<!-- vscode-markdown-toc -->
+* 1. [Disclaimer](#Disclaimer)
+* 2. [Overview](#Overview)
+* 3. [Flyte Component Statuses](#FlyteComponentStatuses)
+* 4. [SDK design in Flytekit](#SDKdesigninFlytekit)
+	* 4.1. [Defining a Simple Training Job (status: alpha version is working)](#DefiningaSimpleTrainingJobstatus:alphaversionisworking)
+	* 4.2. [Defining a Custom Training Job (Work-in-progress)](#DefiningaCustomTrainingJobWork-in-progress)
+	* 4.3. [Defining a simple Hyperparameter Tuning Job](#DefiningasimpleHyperparameterTuningJob)
+	* 4.4. [Invoking Training Jobs Task and Hyperparameter Tuning Jobs Task](#InvokingTrainingJobsTaskandHyperparameterTuningJobsTask)
+	* 4.5. [Examples](#Examples)
+* 5. [Related Pull Requests](#RelatedPullRequests)
+	* 5.1. [`flyteidl`](#flyteidl)
+	* 5.2. [`flytekit`](#flytekit)
+	* 5.3. [`flyteplugins`](#flyteplugins)
+	* 5.4. [`flytepropeller`](#flytepropeller)
 
-## Disclaimer
+<!-- vscode-markdown-toc-config
+	numbering=true
+	autoSave=true
+	/vscode-markdown-toc-config -->
+<!-- /vscode-markdown-toc -->
+
+##  1. <a name='Disclaimer'></a>Disclaimer
 🚧 ** This is currently an Alpha version of the proposal and implementation. The
 interface and the functionalities are not finalized and are still subject to
 change.** 🚧
 
-## Overview
+##  2. <a name='Overview'></a>Overview
 
 AWS SageMaker provides an elastic infrastructure for users to train models for a
 wide spectrum of state-of-the-art machine learning algorithms and frameworks on
@@ -35,7 +55,7 @@ feedback that will improve the integration between Flyte and SageMaker and make
 Flyte more powerful and easier to use. If you have one, please feel free to
 write it in Flyte's [issue](https://github.com/lyft/flyte/issues) page.
 
-## Flyte Component Statuses
+##  3. <a name='FlyteComponentStatuses'></a>Flyte Component Statuses
 
 Statuses of the *alpha version* of the important Flyte components:
 
@@ -45,12 +65,12 @@ Statuses of the *alpha version* of the important Flyte components:
 | Flytekit (Python SDK)            | :heavy_check_mark:      | :heavy_check_mark: | :construction:          |
 | Flyteplugins (GO Plugins)        | :heavy_check_mark:      | :heavy_check_mark: | :construction:          |
 
-## SDK design in Flytekit
+##  4. <a name='SDKdesigninFlytekit'></a>SDK design in Flytekit
 
 In this section, we will demonstrate our Flytekit interface that users will use
 in Flyte to compose tasks running SageMaker jobs.
 
-### Defining a Simple Training Job (status: alpha version is working)
+###  4.1. <a name='DefiningaSimpleTrainingJobstatus:alphaversionisworking'></a>Defining a Simple Training Job (status: alpha version is working)
 
 Users can leverage SageMaker's powerful built-in algorithms easily without
 needing to write any function or logic. They can simply define a
@@ -81,7 +101,7 @@ xgboost_simple_train_task = training_job_task.SdkSimpleTrainingJobTask(
 
 ```
 
-### Defining a Custom Training Job (Work-in-progress)
+###  4.2. <a name='DefiningaCustomTrainingJobWork-in-progress'></a>Defining a Custom Training Job (Work-in-progress)
 
 Users can also define a custom training job by using the
 `@custom_training_job_task` decorator. With a custom training job, users can write complicated
@@ -144,7 +164,7 @@ def custom_xgboost_training_job_task(
     custom_output1.set(my_model.evals_result())
 ```
 
-### Defining a simple Hyperparameter Tuning Job
+###  4.3. <a name='DefiningasimpleHyperparameterTuningJob'></a>Defining a simple Hyperparameter Tuning Job
 
 SageMaker-on-Flyte also supports easy chaining between a TrainingJob task and a
 hpo job. After users define a TrainingJob task, he/she may want to apply
@@ -178,7 +198,7 @@ xgboost_hpo_task = hpo_job_task.SdkSimpleHPOJobTask(
 )
 ```
 
-### Invoking Training Jobs Task and Hyperparameter Tuning Jobs Task
+###  4.4. <a name='InvokingTrainingJobsTaskandHyperparameterTuningJobsTask'></a>Invoking Training Jobs Task and Hyperparameter Tuning Jobs Task
 
 Invoking Training Job Tasks and HPO Job Tasks from inside a Flyte workflow is
 pretty much the same as invoking other types of tasks. You should be able to
@@ -251,7 +271,7 @@ class SageMakerSimpleWorkflow(object):
 
 ```
 
-### Examples
+###  4.5. <a name='Examples'></a>Examples
 
 A working alpha can be found in this following [jupyter notebook example](https://github.com/lyft/flytekit/blob/345e057e5840af39a1d156d157d008bd65d23451/sample-notebooks/sagemaker-hpo.ipynb).
 
@@ -269,20 +289,20 @@ requirements:
    Flyte deployment
 
 
-## Related Pull Requests
-### `flyteidl`
+##  5. <a name='RelatedPullRequests'></a>Related Pull Requests
+###  5.1. <a name='flyteidl'></a>`flyteidl`
 
 - https://github.com/lyft/flyteidl/pull/66
 
-### `flytekit`
+###  5.2. <a name='flytekit'></a>`flytekit`
 
 - https://github.com/lyft/flytekit/pull/120
 - https://github.com/lyft/flytekit/pull/123
 
-### `flyteplugins`
+###  5.3. <a name='flyteplugins'></a>`flyteplugins`
 
 - https://github.com/lyft/flyteplugins/pull/100
 
-### `flytepropeller`
+###  5.4. <a name='flytepropeller'></a>`flytepropeller`
 
 - https://github.com/lyft/flytepropeller/pull/163
