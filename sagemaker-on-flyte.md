@@ -42,8 +42,8 @@ Statuses of the alpha version of the important Flyte components:
 | Flyte component \ Functionality  | simple TrainingJob task | simple HPOJob task | custom TrainingJob task |
 | -------------------------------- | ----------------------- | ------------------ | ----------------------- |
 | FlyteIDL (Proto Msg definitions) | :heavy_check_mark:      | :heavy_check_mark: | :heavy_check_mark:      |
-| Flytekit (Python SDK)            | :heavy_check_mark:      | :heavy_check_mark: | :white_check_mark:      |
-| Flyteplugins (GO Plugins)        | :heavy_check_mark:      | :heavy_check_mark: | :white_check_mark:      |
+| Flytekit (Python SDK)            | :heavy_check_mark:      | :heavy_check_mark: | :construction:          |
+| Flyteplugins (GO Plugins)        | :heavy_check_mark:      | :heavy_check_mark: | :construction:          |
 
 ## SDK design in Flytekit
 
