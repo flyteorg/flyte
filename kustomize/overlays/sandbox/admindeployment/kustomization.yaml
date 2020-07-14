@@ -18,6 +18,8 @@ configMapGenerator:
     - clusterresource-templates/aa_namespace.yaml
     - clusterresource-templates/ab_project-resource-quota.yaml
     - clusterresource-templates/ac_project-copilot-dataconfig.yaml
-
+    - clusterresource-templates/ad_spark-role.yaml
+    - clusterresource-templates/ae_spark-service-account.yaml
+    - clusterresource-templates/af_spark-role-binding.yaml
 patches:
 - admindeployment.yaml
