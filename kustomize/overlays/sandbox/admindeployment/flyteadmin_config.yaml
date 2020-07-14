@@ -47,10 +47,6 @@ task_resources:
     cpu: 2
     memory: 2G
     storage: 20Mi
-task_type_whitelist:
-  spark:
-    - project: flytekit
-    - project: flytetester
 domains:
   - id: development
     name: development
@@ -68,12 +64,12 @@ cluster_resources:
           value: "4000Mi"
     staging:
       - projectQuotaCpu:
-          value: "1"
+          value: "2"
       - projectQuotaMemory:
-          value: "2000Mi"
+          value: "3000Mi"
     development:
       - projectQuotaCpu:
-          value: "1"
+          value: "2"
       - projectQuotaMemory:
-          value: "2000Mi"
+          value: "3000Mi"
   refresh: 5m
