@@ -389,9 +389,44 @@ data:
           type: minio
           container: my-s3-bucket
           enable-multicontainer: true
+  ad_spark-role.yaml: |
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: Role
+    metadata:
+      name: spark-role
+      namespace: {{ namespace }}
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - pods
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - services
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      verbs:
+      - '*'
+  ae_spark-service-account.yaml: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: spark
+      namespace: {{ namespace }}
+  af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1beta1\nkind:
+    RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace
+    }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n-
+    kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-9mbg4b2fhc
+  name: clusterresource-template-kf62ttf64k
   namespace: flyte
 ---
 apiVersion: v1
@@ -446,10 +481,6 @@ data:
         cpu: 2
         memory: 2G
         storage: 20Mi
-    task_type_whitelist:
-      spark:
-        - project: flytekit
-        - project: flytetester
     domains:
       - id: development
         name: development
@@ -467,18 +498,18 @@ data:
               value: "4000Mi"
         staging:
           - projectQuotaCpu:
-              value: "1"
+              value: "2"
           - projectQuotaMemory:
-              value: "2000Mi"
+              value: "3000Mi"
         development:
           - projectQuotaCpu:
-              value: "1"
+              value: "2"
           - projectQuotaMemory:
-              value: "2000Mi"
+              value: "3000Mi"
       refresh: 5m
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-dtcg25hb22
+  name: flyte-admin-config-dd2th9h4k5
   namespace: flyte
 ---
 apiVersion: v1
@@ -769,12 +800,12 @@ spec:
       serviceAccountName: flyteadmin
       volumes:
       - configMap:
-          name: clusterresource-template-9mbg4b2fhc
+          name: clusterresource-template-kf62ttf64k
         name: resource-templates
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-dtcg25hb22
+          name: flyte-admin-config-dd2th9h4k5
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1068,10 +1099,10 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-9mbg4b2fhc
+              name: clusterresource-template-kf62ttf64k
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-dtcg25hb22
+              name: flyte-admin-config-dd2th9h4k5
             name: config-volume
   schedule: '*/1 * * * *'
 ---
