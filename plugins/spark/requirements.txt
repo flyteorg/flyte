@@ -1,0 +1,1 @@
+flytekit[spark]==0.10.3
