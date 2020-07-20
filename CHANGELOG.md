@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](http://github.com/lyft/flyteconsole/compare/v0.7.3...v0.8.0) (2020-07-20)
+
+
+### Features
+
+* 0.8.0 release ([#87](http://github.com/lyft/flyteconsole/issues/87)) ([65f2a81](http://github.com/lyft/flyteconsole/commit/65f2a8102a5cdbf2456868502dc3e7628cfc1433)), closes [#81](http://github.com/lyft/flyteconsole/issues/81) [#82](http://github.com/lyft/flyteconsole/issues/82) [#84](http://github.com/lyft/flyteconsole/issues/84) [#86](http://github.com/lyft/flyteconsole/issues/86)
+
 ## [0.7.3](http://github.com/lyft/flyteconsole/compare/v0.7.2...v0.7.3) (2020-07-06)
 
 
