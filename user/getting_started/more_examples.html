@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Optional Components &mdash; Flyte 0.5.0 documentation</title>
+  <title>Want more example to Deep Dive &mdash; Flyte 0.5.0 documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Configuring customizable resources" href="managing_customizable_resources.html" />
-    <link rel="prev" title="Scaling Beyond Kubernetes" href="multi_cluster.html" /> 
+    <link rel="next" title="Flyte Concepts" href="../concepts/index.html" />
+    <link rel="prev" title="Writing Your First Workflow" href="create_first.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,25 +83,19 @@
               <p class="caption"><span class="caption-text">Flyte Documentation</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../introduction/index.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">User docs</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Administrator Docs</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../architecture.html">Architecture</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="index.html">Installing Flyte</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l3"><a class="reference internal" href="production.html">Handling Production Load</a></li>
-<li class="toctree-l3"><a class="reference internal" href="multi_cluster.html">Scaling Beyond Kubernetes</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Optional Components</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#scheduling">Scheduling</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">User docs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Getting Started</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="examples.html">Quick Start Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="create_first.html">Writing Your First Workflow</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Want more example to Deep Dive</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#data-catalog">Data Catalog</a></li>
-<li class="toctree-l3"><a class="reference internal" href="managing_customizable_resources.html">Configuring customizable resources</a></li>
-<li class="toctree-l3"><a class="reference internal" href="configure/index.html">Configure Flyte backend</a></li>
-<li class="toctree-l3"><a class="reference internal" href="authentication.html">Authentication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../concepts/index.html">Flyte Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../features/index.html">Flyte Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tasktypes/index.html">Flyte Task Types</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../administrator/index.html">Administrator Docs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributor/index.html">Contributor Docs</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Flyte User cookbook and examples (Github)</span></p>
@@ -161,17 +155,17 @@
     
       <li><a href="../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../index.html">Administrator Docs</a> &raquo;</li>
+          <li><a href="../index.html">User docs</a> &raquo;</li>
         
-          <li><a href="index.html">Installing Flyte</a> &raquo;</li>
+          <li><a href="index.html">Getting Started</a> &raquo;</li>
         
-      <li>Optional Components</li>
+      <li>Want more example to Deep Dive</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/administrator/install/optional_components.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/user/getting_started/more_examples.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -184,19 +178,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="optional-components">
-<span id="install-dependencies"></span><h1>Optional Components<a class="headerlink" href="#optional-components" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="scheduling">
-<h2>Scheduling<a class="headerlink" href="#scheduling" title="Permalink to this headline">¶</a></h2>
-<p>Scheduling component of Flyte allows workflows to run at a configured cadence.
-Currently, Flyte does not have a built in cron style scheduler.
-It uses external services to manage these schedules and launch executions of scheduled workflows at specific intervals.</p>
-</div>
-</div>
-<div class="section" id="data-catalog">
-<h1>Data Catalog<a class="headerlink" href="#data-catalog" title="Permalink to this headline">¶</a></h1>
-<p>The Data Catalog component enables features like <em>Data Provenance</em>, <em>Data Lineage</em> and <em>Data Caching</em>.
-Data Catalog is enabled in Flyte by default.</p>
+  <div class="section" id="want-more-example-to-deep-dive">
+<span id="getting-started-more-examples"></span><h1>Want more example to Deep Dive<a class="headerlink" href="#want-more-example-to-deep-dive" title="Permalink to this headline">¶</a></h1>
+<p>Getting started Guide and your first Workflow is just a tip of the iceberg. To understand and dive deeper and find a set of examples, we recommend going through
+<a class="reference external" href="https://github.com/lyft/flytesnacks/blob/master/README.md">FlyteSnacks</a>. We are working on this as a interactive tutorial that you can run locally on your laptop. Make sure that your laptop is setup to run
+Flyte.</p>
 </div>
 
 
@@ -207,10 +193,10 @@ Data Catalog is enabled in Flyte by default.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="managing_customizable_resources.html" class="btn btn-neutral float-right" title="Configuring customizable resources" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../concepts/index.html" class="btn btn-neutral float-right" title="Flyte Concepts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="multi_cluster.html" class="btn btn-neutral float-left" title="Scaling Beyond Kubernetes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="create_first.html" class="btn btn-neutral float-left" title="Writing Your First Workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

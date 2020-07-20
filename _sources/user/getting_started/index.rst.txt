@@ -14,3 +14,4 @@ Getting Started
 
    examples
    create_first
+   more_examples 
