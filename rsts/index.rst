@@ -18,7 +18,8 @@ Welcome to the documentation hub for Flyte.
    :caption: Flyte User cookbook and examples (Github)
    :maxdepth: 1
    :name: examplesdoctoc
-   FlyteSnacks: Examples & Cookbook <https://github.com/lyft/flytesnacks/README.md>
+
+   FlyteSnacks - Examples & Cookbook <https://github.com/lyft/flytesnacks/blob/master/README.md>
 
 .. toctree::
    :caption: Generated Documentation from Source
