@@ -56,7 +56,11 @@
 				}
 			},
 			"name": "dshm"
-		}]
+		}],
+		"tolerations": [{
+		    "key": "my toleration key",
+		    "value": "my toleration value"
+        }]
 	},
 	"primaryContainerName": "a container"
 }
