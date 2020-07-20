@@ -68,6 +68,13 @@ export interface Literal extends Core.Literal {
     scalar?: Scalar;
 }
 
+/** A Core.ILiteral guaranteed to have all subproperties necessary to specify
+ * a Blob.
+ */
+export interface BlobLiteral extends Core.ILiteral {
+    scalar: BlobScalar;
+}
+
 export interface LiteralCollection
     extends RequiredNonNullable<Core.ILiteralCollection> {}
 
@@ -80,6 +87,9 @@ export interface LiteralMapBlob extends Admin.ILiteralMapBlob {
 export interface Scalar extends Core.IScalar {
     primitive?: Primitive;
     value: keyof Core.IScalar;
+}
+export interface BlobScalar extends Core.IScalar {
+    blob: Blob;
 }
 
 export interface Schema extends Core.ISchema {

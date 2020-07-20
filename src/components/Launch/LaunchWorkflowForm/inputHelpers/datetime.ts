@@ -3,7 +3,7 @@ import { Core, Protobuf } from 'flyteidl';
 import { utc as moment } from 'moment';
 import { InputValue } from '../types';
 import { allowedDateFormats, primitiveLiteralPaths } from './constants';
-import { ConverterInput, InputHelper } from './types';
+import { ConverterInput, InputHelper, InputValidatorParams } from './types';
 import { extractLiteralWithCheck } from './utils';
 
 function parseDate(value: InputValue) {
@@ -27,7 +27,7 @@ function toLiteral({ value }: ConverterInput): Core.ILiteral {
     };
 }
 
-function validate({ value }: ConverterInput) {
+function validate({ value }: InputValidatorParams) {
     const parsed = parseDate(value);
     if (Number.isNaN(parsed.getTime())) {
         throw new Error('Value is not a valid Date');

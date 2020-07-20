@@ -1,9 +1,9 @@
 import { Core } from 'flyteidl';
-import { InputType, InputTypeDefinition, InputValue } from '../types';
+import { InputTypeDefinition, InputValue } from '../types';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
 import { parseJSON } from './parseJson';
-import { ConverterInput, InputHelper } from './types';
+import { ConverterInput, InputHelper, InputValidatorParams } from './types';
 import { collectionChildToString } from './utils';
 
 const missingSubTypeError = 'Unexpected missing subtype for collection';
@@ -81,7 +81,7 @@ function toLiteral({
     };
 }
 
-function validate({ value }: ConverterInput) {
+function validate({ value }: InputValidatorParams) {
     if (typeof value !== 'string') {
         throw new Error('Value must be a string');
     }

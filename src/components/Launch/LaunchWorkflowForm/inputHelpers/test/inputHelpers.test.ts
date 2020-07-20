@@ -1,4 +1,6 @@
 import { Core } from 'flyteidl';
+import * as Long from 'long';
+import { BlobDimensionality } from 'models';
 import { primitiveLiteral } from '../../__mocks__/utils';
 import { InputProps, InputType } from '../../types';
 import { literalNone } from '../constants';
@@ -12,6 +14,8 @@ import { collectionChildToString } from '../utils';
 import {
     literalTestCases,
     literalToInputTestCases,
+    supportedPrimitives,
+    unsupportedTypes,
     validityTestCases
 } from './testCases';
 
@@ -51,39 +55,28 @@ describe('literalToInputValue', () => {
     describe('Primitives', () => {
         literalToInputTestCases.map(([type, input, output]) =>
             it(`should correctly convert ${type}: ${JSON.stringify(
-                input.scalar!.primitive
-            )}`, () => {
-                const result = literalToInputValue({ type }, input);
-                expect(result).toEqual(output);
-            })
+                input
+            )}`, () =>
+                expect(literalToInputValue({ type }, input)).toEqual(output))
         );
 
-        [
-            InputType.Collection,
-            InputType.Datetime,
-            InputType.Duration,
-            InputType.Float,
-            InputType.Integer,
-            InputType.String
-        ].map(type =>
-            it(`should convert None value for ${type} to undefined`, () => {
+        supportedPrimitives.map(type =>
+            it(`should convert None value for ${type} to undefined`, () =>
                 expect(
                     literalToInputValue({ type }, literalNone())
-                ).toBeUndefined();
-            })
+                ).toBeUndefined())
         );
 
-        it('should correctly convert noneType to undefined', () => {
+        it('should correctly convert noneType to undefined', () =>
             expect(
                 literalToInputValue({ type: InputType.None }, literalNone())
-            ).toEqual(undefined);
-        });
+            ).toEqual(undefined));
     });
 
     describe('Collections', () => {
-        literalToInputTestCases.map(([type, input, output]) =>
+        literalToInputTestCases.map(([type, input, output]) => {
             it(`should correctly convert collection of ${type}: ${JSON.stringify(
-                input.scalar!.primitive
+                input
             )}`, () => {
                 const collection: Core.ILiteral = {
                     collection: {
@@ -98,8 +91,8 @@ describe('literalToInputValue', () => {
                     collection
                 );
                 expect(result).toEqual(expectedString);
-            })
-        );
+            });
+        });
 
         it('should return empty for noneType literals', () => {
             const collection: Core.ILiteral = {
@@ -134,13 +127,15 @@ describe('literalToInputValue', () => {
 });
 
 describe('inputToLiteral', () => {
-    describe('Primitives', () => {
-        literalTestCases.map(([type, input, output]) =>
-            it(`should correctly convert ${type}: ${input} (${typeof input})`, () => {
-                const result = inputToLiteral(makeSimpleInput(type, input));
-                expect(result.scalar!.primitive).toEqual(output);
-            })
-        );
+    describe('Scalars', () => {
+        literalTestCases.map(([type, input, output]) => {
+            it(`should correctly convert ${type}: ${JSON.stringify(
+                input
+            )} (${typeof input})`, () =>
+                expect(inputToLiteral(makeSimpleInput(type, input))).toEqual(
+                    output
+                ));
+        });
     });
 
     describe('Collections', () => {
@@ -148,44 +143,40 @@ describe('inputToLiteral', () => {
             let value: any;
             if (['boolean', 'number'].includes(typeof input)) {
                 value = input;
+            } else if (input == null) {
+                value = 'null';
+            } else if (typeof input === 'string' || Long.isLong(input)) {
+                value = `"${input}"`;
             } else if (input instanceof Date) {
                 value = `"${input.toISOString()}"`;
             } else {
-                value = `"${input}"`;
+                value = JSON.stringify(input);
             }
 
-            it(`should correctly convert collection of type ${type}: [${value}] (${typeof input})`, () => {
+            it(`should correctly convert collection of type ${type}: [${JSON.stringify(
+                value
+            )}] (${typeof input})`, () => {
                 const result = inputToLiteral(
                     makeCollectionInput(type, `[${value}]`)
                 );
-                expect(
-                    result.collection!.literals![0].scalar!.primitive
-                ).toEqual(output);
+                expect(result.collection!.literals![0]).toEqual(output);
             });
 
-            it(`should correctly convert nested collection of type ${type}: [[${value}]] (${typeof input})`, () => {
+            it(`should correctly convert nested collection of type ${type}: [[${JSON.stringify(
+                value
+            )}]] (${typeof input})`, () => {
                 const result = inputToLiteral(
                     makeNestedCollectionInput(type, `[[${value}]]`)
                 );
                 expect(
                     result.collection!.literals![0].collection!.literals![0]
-                        .scalar!.primitive
                 ).toEqual(output);
             });
         });
     });
 
     describe('Unsupported Types', () => {
-        [
-            InputType.Binary,
-            InputType.Blob,
-            InputType.Error,
-            InputType.Map,
-            InputType.None,
-            InputType.Schema,
-            InputType.Struct,
-            InputType.Unknown
-        ].map(type =>
+        unsupportedTypes.map(type =>
             it(`should return empty value for type: ${type}`, () => {
                 expect(
                     inputToLiteral(makeSimpleInput(type, '')).scalar
@@ -212,13 +203,17 @@ function generateValidityTests(
     { valid, invalid }: { valid: any[]; invalid: any[] }
 ) {
     valid.map(value =>
-        it(`should treat ${value} (${typeof value}) as valid`, () => {
+        it(`should treat ${JSON.stringify(
+            value
+        )} (${typeof value}) as valid`, () => {
             const input = makeSimpleInput(type, value);
             expect(() => validateInput(input)).not.toThrowError();
         })
     );
     invalid.map(value =>
-        it(`should treat ${value} (${typeof value}) as invalid`, () => {
+        it(`should treat ${JSON.stringify(
+            value
+        )} (${typeof value}) as invalid`, () => {
             const input = makeSimpleInput(type, value);
             expect(() => validateInput(input)).toThrowError();
         })
@@ -227,6 +222,10 @@ function generateValidityTests(
 describe('validateInput', () => {
     describe('boolean', () => {
         generateValidityTests(InputType.Boolean, validityTestCases.boolean);
+    });
+
+    describe('blob', () => {
+        generateValidityTests(InputType.Blob, validityTestCases.blob);
     });
 
     describe('datetime', () => {
@@ -249,11 +248,21 @@ describe('validateInput', () => {
         generateValidityTests(InputType.String, validityTestCases.string);
     });
 
-    it('should throw errors for missing required values', () => {
+    it('should throw errors for missing required simple values', () => {
         const [type, input] = literalTestCases[0];
         const simpleInput = makeSimpleInput(type, input);
         simpleInput.required = true;
         delete simpleInput.value;
+        expect(() => validateInput(simpleInput)).toThrowError();
+    });
+
+    it('should throw errors for missing required Blob values', () => {
+        // URI is the only required, user-provided value with no default
+        const simpleInput = makeSimpleInput(InputType.Blob, {
+            format: 'csv',
+            dimensionality: BlobDimensionality.SINGLE
+        });
+        simpleInput.required = true;
         expect(() => validateInput(simpleInput)).toThrowError();
     });
 

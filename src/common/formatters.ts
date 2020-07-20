@@ -71,7 +71,7 @@ export function millisecondsToHMS(valueMS: number): string {
     }
 
     if (valueMS < 1000) {
-        return subSecondString;
+        return `${valueMS}ms`;
     }
 
     const duration = moment.duration(valueMS);

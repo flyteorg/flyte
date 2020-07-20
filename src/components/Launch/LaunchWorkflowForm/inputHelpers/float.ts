@@ -1,7 +1,7 @@
 import { Core } from 'flyteidl';
 import { InputValue } from '../types';
 import { primitiveLiteralPaths } from './constants';
-import { ConverterInput, InputHelper } from './types';
+import { ConverterInput, InputHelper, InputValidatorParams } from './types';
 import { extractLiteralWithCheck } from './utils';
 
 function fromLiteral(literal: Core.ILiteral): InputValue {
@@ -29,7 +29,7 @@ export function isValidFloat(value: InputValue): boolean {
     return false;
 }
 
-function validate({ value }: ConverterInput) {
+function validate({ value }: InputValidatorParams) {
     if (!isValidFloat(value)) {
         throw new Error('Value is not a valid floating point number');
     }

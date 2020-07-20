@@ -2,7 +2,7 @@ import { Core } from 'flyteidl';
 import * as Long from 'long';
 import { InputValue } from '../types';
 import { primitiveLiteralPaths } from './constants';
-import { ConverterInput, InputHelper } from './types';
+import { ConverterInput, InputHelper, InputValidatorParams } from './types';
 import { extractLiteralWithCheck } from './utils';
 
 const integerRegexPattern = /^-?[0-9]+$/;
@@ -35,7 +35,7 @@ export function isValidInteger(value: InputValue): boolean {
     return false;
 }
 
-function validate({ value }: ConverterInput) {
+function validate({ value }: InputValidatorParams) {
     if (!isValidInteger(value)) {
         throw new Error('Value is not a valid integer');
     }

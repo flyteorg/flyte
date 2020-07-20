@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { BlobInput } from './BlobInput';
 import { CollectionInput } from './CollectionInput';
 import { SimpleInput } from './SimpleInput';
 import { useStyles } from './styles';
@@ -14,6 +15,8 @@ import { useFormInputsState } from './useFormInputsState';
 function getComponentForInput(input: InputProps, showErrors: boolean) {
     const props = { ...input, error: showErrors ? input.error : undefined };
     switch (input.typeDefinition.type) {
+        case InputType.Blob:
+            return <BlobInput {...props} />;
         case InputType.Collection:
             return <CollectionInput {...props} />;
         case InputType.Map:

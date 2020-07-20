@@ -1,5 +1,5 @@
 import { Core } from 'flyteidl';
-import { InputTypeDefinition, InputValue } from '../types';
+import { InputProps, InputTypeDefinition, InputValue } from '../types';
 
 export interface ConverterInput {
     value: InputValue;
@@ -13,10 +13,18 @@ export type LiteralToInputConterterFn = (
     literal: Core.ILiteral,
     typeDefinition: InputTypeDefinition
 ) => InputValue | undefined;
+
+export type ValidationParams = Pick<
+    InputProps,
+    'initialValue' | 'name' | 'required' | 'typeDefinition' | 'value'
+>;
+
+export type InputValidatorParams = ValidationParams & { value: InputValue };
+
 export interface InputHelper {
     defaultValue?: InputValue;
     toLiteral: InputToLiteralConverterFn;
     fromLiteral: LiteralToInputConterterFn;
     /** Will throw in the case of a failed validation */
-    validate: (input: ConverterInput) => void;
+    validate: (params: InputValidatorParams) => void;
 }

@@ -1,7 +1,7 @@
 import { Core } from 'flyteidl';
 import { InputValue } from '../types';
 import { primitiveLiteralPaths } from './constants';
-import { ConverterInput, InputHelper } from './types';
+import { ConverterInput, InputHelper, InputValidatorParams } from './types';
 import { extractLiteralWithCheck } from './utils';
 
 function fromLiteral(literal: Core.ILiteral): InputValue {
@@ -16,7 +16,7 @@ function toLiteral({ value }: ConverterInput): Core.ILiteral {
     return { scalar: { primitive: { stringValue } } };
 }
 
-function validate({ value }: ConverterInput) {
+function validate({ value }: InputValidatorParams) {
     if (typeof value !== 'string') {
         throw new Error('Value is not a string');
     }

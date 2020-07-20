@@ -24,7 +24,7 @@ export const mutedPrimaryTextColor = '#4A4A4A';
 export const tableHeaderColor = COLOR_SPECTRUM.gray40.color;
 export const tablePlaceholderColor = COLOR_SPECTRUM.gray40.color;
 
-export const selectedActionColor = primaryColor;
+export const selectedActionColor = COLOR_SPECTRUM.gray10.color;
 
 export const warningHighlightColor = COLOR_SPECTRUM.sunset50.color;
 export const cautionHighlightColor = COLOR_SPECTRUM.amber50.color;

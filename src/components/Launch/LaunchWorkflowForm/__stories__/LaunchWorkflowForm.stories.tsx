@@ -31,10 +31,12 @@ import {
     SimpleVariableKey
 } from '../__mocks__/mockInputs';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
+import { binaryInputName, errorInputName } from '../test/constants';
 import { useExecutionLaunchConfiguration } from '../useExecutionLaunchConfiguration';
 import { getWorkflowInputs } from '../utils';
 
 const booleanInputName = 'simpleBoolean';
+const blobInputName = 'simpleBlob';
 const stringInputName = 'simpleString';
 const integerInputName = 'simpleInteger';
 const submitAction = action('createWorkflowExecution');
@@ -167,6 +169,7 @@ stories.add('Required Inputs', () => {
     parameters[stringInputName].required = true;
     parameters[integerInputName].required = true;
     parameters[booleanInputName].required = true;
+    parameters[blobInputName].required = true;
     return renderForm({ mocks });
 });
 stories.add('Default Values', () => {
@@ -199,4 +202,11 @@ stories.add('Launched from Execution', () => {
         id: mockWorkflowExecutionResponse.id
     } as Execution;
     return renderForm({ mocks, execution });
+});
+stories.add('Unsupported Required Values', () => {
+    const mocks = generateMocks(mockSimpleVariables);
+    const parameters = mocks.mockLaunchPlan.closure!.expectedInputs.parameters;
+    parameters[binaryInputName].required = true;
+    parameters[errorInputName].required = true;
+    return renderForm({ mocks });
 });

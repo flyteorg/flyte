@@ -102,8 +102,8 @@ describe('formatDateLocalTimezone', () => {
 const millisecondToHMSTestCases: [number, string][] = [
     [-1, unknownValueString],
     [0, zeroSecondsString],
-    [1, subSecondString],
-    [999, subSecondString],
+    [1, '1ms'],
+    [999, '999ms'],
     [1000, '1s'],
     [60000, '1m'],
     [61000, '1m 1s'],

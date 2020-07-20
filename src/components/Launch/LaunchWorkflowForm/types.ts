@@ -1,6 +1,8 @@
 import { FetchableData, MultiFetchableState } from 'components/hooks';
 import { Core } from 'flyteidl';
+import { isObject } from 'lodash';
 import {
+    BlobDimensionality,
     Identifier,
     LaunchPlan,
     NamedEntityIdentifier,
@@ -42,6 +44,7 @@ export interface LaunchWorkflowFormState {
     selectedWorkflow?: SearchableSelectorOption<WorkflowId>;
     showErrors: boolean;
     submissionState: FetchableData<WorkflowExecutionIdentifier>;
+    unsupportedRequiredInputs: ParsedInput[];
     workflowName: string;
     workflowOptionsLoadingState: MultiFetchableState;
     workflowSelectorOptions: SearchableSelectorOption<WorkflowId>[];
@@ -74,7 +77,17 @@ export interface InputTypeDefinition {
     subtype?: InputTypeDefinition;
 }
 
-export type InputValue = string | number | boolean | Date;
+export interface ObjectValue {
+    type: InputType;
+}
+
+export interface BlobValue {
+    dimensionality: BlobDimensionality | string;
+    format?: string;
+    uri: string;
+}
+
+export type InputValue = string | number | boolean | Date | BlobValue;
 export type InputChangeHandler = (newValue: InputValue) => void;
 
 export interface InputProps {

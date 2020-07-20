@@ -1,4 +1,5 @@
 import { InputType } from '../types';
+import { blobHelper } from './blob';
 import { booleanHelper } from './boolean';
 import { collectionHelper } from './collection';
 import { datetimeHelper } from './datetime';
@@ -14,7 +15,7 @@ const unsupportedHelper = noneHelper;
 /** Maps an `InputType` to a function which will convert its value into a `Literal` */
 const inputHelpers: Record<InputType, InputHelper> = {
     [InputType.Binary]: noneHelper,
-    [InputType.Blob]: unsupportedHelper,
+    [InputType.Blob]: blobHelper,
     [InputType.Boolean]: booleanHelper,
     [InputType.Collection]: collectionHelper,
     [InputType.Datetime]: datetimeHelper,

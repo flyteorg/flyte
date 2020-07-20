@@ -30,6 +30,7 @@ import {
     ParsedInput
 } from './types';
 import {
+    getUnsupportedRequiredInputs,
     launchPlansToSearchableSelectorOptions,
     workflowsToSearchableSelectorOptions
 } from './utils';
@@ -248,6 +249,11 @@ export function useLaunchWorkflowFormState({
 
     const [parsedInputs, setParsedInputs] = useState<ParsedInput[]>([]);
 
+    const unsupportedRequiredInputs = useMemo(
+        () => getUnsupportedRequiredInputs(parsedInputs),
+        [parsedInputs]
+    );
+
     // Any time the inputs change (even if it's just re-ordering), we must
     // change the form key so that the inputs component will re-mount.
     const formKey = useMemo<string>(() => {
@@ -421,6 +427,7 @@ export function useLaunchWorkflowFormState({
         selectedWorkflow,
         showErrors,
         submissionState,
+        unsupportedRequiredInputs,
         workflowName,
         workflowOptionsLoadingState,
         workflowSelectorOptions,

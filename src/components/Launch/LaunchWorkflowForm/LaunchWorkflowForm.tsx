@@ -16,12 +16,13 @@ import {
     workflowSortFields
 } from 'models';
 import * as React from 'react';
-import { formStrings } from './constants';
+import { formStrings, unsupportedRequiredInputsString } from './constants';
 import { InputValueCacheContext } from './inputValueCache';
 import { LaunchWorkflowFormInputs } from './LaunchWorkflowFormInputs';
 import { SearchableSelector } from './SearchableSelector';
 import { useStyles } from './styles';
 import { LaunchWorkflowFormProps } from './types';
+import { UnsupportedRequiredInputsError } from './UnsupportedRequiredInputsError';
 import { useLaunchWorkflowFormState } from './useLaunchWorkflowFormState';
 import { workflowsToSearchableSelectorOptions } from './utils';
 
@@ -66,6 +67,11 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
         event.preventDefault();
         state.onSubmit();
     };
+
+    const preventSubmit =
+        submissionState.loading ||
+        !state.inputLoadingState.hasLoaded ||
+        state.unsupportedRequiredInputs.length > 0;
 
     return (
         <InputValueCacheContext.Provider value={state.inputValueCache}>
@@ -114,12 +120,18 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                             {...state.inputLoadingState}
                         >
                             <section title={formStrings.inputs}>
-                                <LaunchWorkflowFormInputs
-                                    key={state.formKey}
-                                    inputs={state.inputs}
-                                    ref={state.formInputsRef}
-                                    showErrors={state.showErrors}
-                                />
+                                {state.unsupportedRequiredInputs.length > 0 ? (
+                                    <UnsupportedRequiredInputsError
+                                        inputs={state.unsupportedRequiredInputs}
+                                    />
+                                ) : (
+                                    <LaunchWorkflowFormInputs
+                                        key={state.formKey}
+                                        inputs={state.inputs}
+                                        ref={state.formInputsRef}
+                                        showErrors={state.showErrors}
+                                    />
+                                )}
                             </section>
                         </WaitForData>
                     ) : null}
@@ -143,10 +155,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                     </Button>
                     <Button
                         color="primary"
-                        disabled={
-                            submissionState.loading ||
-                            !state.inputLoadingState.hasLoaded
-                        }
+                        disabled={preventSubmit}
                         id="launch-workflow-submit"
                         onClick={submit}
                         type="submit"

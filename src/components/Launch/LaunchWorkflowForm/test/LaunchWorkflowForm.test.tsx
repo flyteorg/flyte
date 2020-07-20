@@ -34,13 +34,19 @@ import * as React from 'react';
 import { delayedPromise, pendingPromise } from 'test/utils';
 import {
     createMockWorkflowInputsInterface,
-    mockSimpleVariables
+    mockSimpleVariables,
+    simpleVariableDefaults
 } from '../__mocks__/mockInputs';
-import { formStrings } from '../constants';
+import {
+    cannotLaunchWorkflowString,
+    formStrings,
+    requiredInputSuffix
+} from '../constants';
 import { LaunchWorkflowForm } from '../LaunchWorkflowForm';
 import { InitialLaunchParameters, LaunchWorkflowFormProps } from '../types';
 import { createInputCacheKey, getInputDefintionForLiteralType } from '../utils';
 import {
+    binaryInputName,
     booleanInputName,
     integerInputName,
     stringInputName,
@@ -746,6 +752,82 @@ describe('LaunchWorkflowForm', () => {
                     expect.anything()
                 );
             });
+        });
+    });
+
+    describe('With Unsupported Required Inputs', () => {
+        beforeEach(() => {
+            variables = mockSimpleVariables;
+            createMocks();
+            // Binary is currently unsupported, setting the binary input to
+            // required and removing the default value will trigger our use case
+            const parameters = mockLaunchPlans[0].closure!.expectedInputs
+                .parameters;
+            parameters[binaryInputName].required = true;
+            delete parameters[binaryInputName].default;
+            mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[0]);
+        });
+
+        it('should render error message', async () => {
+            const { getByText } = renderForm();
+            const errorElement = await waitFor(() =>
+                getByText(cannotLaunchWorkflowString)
+            );
+            expect(errorElement).toBeInTheDocument();
+        });
+
+        it('should show unsupported inputs', async () => {
+            const { getByText } = renderForm();
+            const inputElement = await waitFor(() =>
+                getByText(binaryInputName, { exact: false })
+            );
+            expect(inputElement).toBeInTheDocument();
+        });
+
+        it('should print input labels without decoration', async () => {
+            const { getByText } = renderForm();
+            const inputElement = await waitFor(() =>
+                getByText(binaryInputName, { exact: false })
+            );
+            expect(inputElement.textContent).not.toContain(requiredInputSuffix);
+        });
+
+        it('should disable submission', async () => {
+            const { getByRole } = renderForm();
+
+            const submitButton = await waitFor(() =>
+                getByRole('button', { name: formStrings.submit })
+            );
+
+            expect(submitButton).toBeDisabled();
+        });
+
+        it('should not show error if launch plan has default value', async () => {
+            mockLaunchPlans[0].closure!.expectedInputs.parameters[
+                binaryInputName
+            ].default = simpleVariableDefaults.simpleBinary as Literal;
+            const { queryByText } = renderForm();
+            await waitFor(() => queryByText(binaryInputName, { exact: false }));
+            expect(queryByText(cannotLaunchWorkflowString)).toBeNull();
+        });
+
+        it('should not show error if initial value is provided', async () => {
+            const parameters = mockLaunchPlans[0].closure!.expectedInputs
+                .parameters;
+            const values = new Map();
+            const cacheKey = createInputCacheKey(
+                binaryInputName,
+                getInputDefintionForLiteralType(
+                    parameters[binaryInputName].var.type
+                )
+            );
+            values.set(cacheKey, simpleVariableDefaults.simpleBinary);
+            const { queryByText } = renderForm({
+                initialParameters: { values }
+            });
+
+            await waitFor(() => queryByText(binaryInputName, { exact: false }));
+            expect(queryByText(cannotLaunchWorkflowString)).toBeNull();
         });
     });
 });

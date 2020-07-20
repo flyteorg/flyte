@@ -99,3 +99,20 @@ export function sortedObjectKeys(
 ): ReturnType<typeof Object.keys> {
     return Object.keys(object).sort((a, b) => a.localeCompare(b));
 }
+
+/**
+ * Helper function for exhaustive checks of discriminated unions.
+ * https://basarat.gitbooks.io/typescript/docs/types/discriminated-unions.html
+ */
+export function assertNever(
+    value: never,
+    { noThrow }: { noThrow?: boolean } = {}
+): never {
+    if (noThrow) {
+        return value;
+    }
+
+    throw new Error(
+        `Unhandled discriminated union member: ${JSON.stringify(value)}`
+    );
+}

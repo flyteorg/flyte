@@ -3,6 +3,7 @@ import { Core } from 'flyteidl';
 import { InputProps, InputTypeDefinition, InputValue } from '../types';
 import { literalNone } from './constants';
 import { getHelperForInput } from './getHelperForInput';
+import { InputValidatorParams, ValidationParams } from './types';
 
 type ToLiteralParams = Pick<
     InputProps,
@@ -56,20 +57,12 @@ export function literalToInputValue(
     }
 }
 
-type ValidationParams = Pick<
-    InputProps,
-    'initialValue' | 'name' | 'required' | 'typeDefinition' | 'value'
->;
 /** Validates a given InputValue based on rules for the provided type. Returns
  * void if no errors, throws an error otherwise.
  */
-export function validateInput({
-    initialValue,
-    name,
-    required,
-    typeDefinition,
-    value
-}: ValidationParams) {
+export function validateInput(params: ValidationParams) {
+    const { initialValue, name, required, typeDefinition, value } = params;
+    const { validate } = getHelperForInput(typeDefinition.type);
     if (value == null) {
         if (required && initialValue == null) {
             throw new ValueError(name, 'Value is required');
@@ -77,9 +70,8 @@ export function validateInput({
         return;
     }
 
-    const { validate } = getHelperForInput(typeDefinition.type);
     try {
-        validate({ value, typeDefinition });
+        validate(params as InputValidatorParams);
     } catch (e) {
         const error = e as Error;
         throw new ValueError(name, error.message);

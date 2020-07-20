@@ -1,5 +1,6 @@
 import { sortedObjectEntries } from 'common/utils';
 import { LaunchPlan, Workflow } from 'models';
+import { requiredInputSuffix } from './constants';
 import { LiteralValueMap, ParsedInput } from './types';
 import {
     createInputCacheKey,
@@ -36,7 +37,9 @@ export function getInputs(
             parameter.var.type
         );
         const typeLabel = formatLabelWithType(name, typeDefinition);
-        const label = required ? `${typeLabel}*` : typeLabel;
+        const label = required
+            ? `${typeLabel}${requiredInputSuffix}`
+            : typeLabel;
         const inputKey = createInputCacheKey(name, typeDefinition);
         const defaultVaue =
             parameter.default != null ? parameter.default : undefined;

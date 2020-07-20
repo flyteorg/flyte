@@ -3,7 +3,7 @@ import { Core, Protobuf } from 'flyteidl';
 import { InputValue } from '../types';
 import { primitiveLiteralPaths } from './constants';
 import { isValidFloat } from './float';
-import { ConverterInput, InputHelper } from './types';
+import { ConverterInput, InputHelper, InputValidatorParams } from './types';
 import { extractLiteralWithCheck } from './utils';
 
 function fromLiteral(literal: Core.ILiteral): InputValue {
@@ -23,7 +23,7 @@ function toLiteral({ value }: ConverterInput): Core.ILiteral {
     };
 }
 
-function validate({ value }: ConverterInput) {
+function validate({ value }: InputValidatorParams) {
     if (!isValidFloat(value)) {
         throw new Error('Value is not a valid duration');
     }

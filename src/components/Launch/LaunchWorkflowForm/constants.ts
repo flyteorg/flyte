@@ -1,5 +1,5 @@
-import { SimpleType } from 'models';
-import { InputType } from './types';
+import { BlobDimensionality, SimpleType } from 'models';
+import { BlobValue, InputType } from './types';
 
 export const launchPlansTableRowHeight = 40;
 export const launchPlansTableColumnWidths = {
@@ -25,7 +25,7 @@ export const formStrings = {
 /** Maps any valid InputType enum to a display string */
 export const typeLabels: { [k in InputType]: string } = {
     [InputType.Binary]: 'binary',
-    [InputType.Blob]: 'blob',
+    [InputType.Blob]: 'file/blob',
     [InputType.Boolean]: 'boolean',
     [InputType.Collection]: '',
     [InputType.Datetime]: 'datetime - UTC',
@@ -54,3 +54,14 @@ export const simpleTypeToInputType: { [k in SimpleType]: InputType } = {
     [SimpleType.STRING]: InputType.String,
     [SimpleType.STRUCT]: InputType.Struct
 };
+
+export const defaultBlobValue: BlobValue = {
+    uri: '',
+    dimensionality: BlobDimensionality.SINGLE
+};
+
+export const requiredInputSuffix = '*';
+export const cannotLaunchWorkflowString = 'Workflow cannot be launched';
+export const unsupportedRequiredInputsString = `This Workflow version contains one or more required inputs which are not supported by Flyte Console and do not have default values specified in the Workflow definition or the selected Launch Plan.\n\nYou can launch this Workflow version with the Flyte CLI or by selecting a Launch Plan which provides values for the unsupported inputs.\n\nThe required inputs are :`;
+export const blobUriHelperText = '(required) location of the data';
+export const blobFormatHelperText = '(optional) csv, parquet, etc...';

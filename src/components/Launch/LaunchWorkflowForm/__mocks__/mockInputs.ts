@@ -2,7 +2,12 @@ import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Core } from 'flyteidl';
 import { mapValues } from 'lodash';
 import * as Long from 'long';
-import { SimpleType, TypedInterface, Variable } from 'models/Common';
+import {
+    BlobDimensionality,
+    SimpleType,
+    TypedInterface,
+    Variable
+} from 'models/Common';
 import { literalNone } from '../inputHelpers/constants';
 import { primitiveLiteral } from './utils';
 
@@ -23,6 +28,7 @@ export type SimpleVariableKey =
     | 'simpleInteger'
     | 'simpleFloat'
     | 'simpleBoolean'
+    | 'simpleBlob'
     | 'simpleDuration'
     | 'simpleDatetime'
     | 'simpleBinary'
@@ -39,11 +45,14 @@ export const mockSimpleVariables: Record<SimpleVariableKey, Variable> = {
     simpleDatetime: simpleType(SimpleType.DATETIME, 'a simple datetime value'),
     simpleBinary: simpleType(SimpleType.BINARY, 'a simple binary value'),
     simpleError: simpleType(SimpleType.ERROR, 'a simple error value'),
-    simpleStruct: simpleType(SimpleType.STRUCT, 'a simple struct value')
+    simpleStruct: simpleType(SimpleType.STRUCT, 'a simple struct value'),
+    simpleBlob: {
+        description: 'a simple single-dimensional blob',
+        type: { blob: { dimensionality: BlobDimensionality.SINGLE } }
+    }
     // schema: {},
     // collection: {},
-    // mapValue: {},
-    // blob: {}
+    // mapValue: {}
 };
 
 export const simpleVariableDefaults: Record<
@@ -63,7 +72,20 @@ export const simpleVariableDefaults: Record<
     simpleError: literalNone(),
     simpleFloat: primitiveLiteral({ floatValue: 1.5 }),
     simpleInteger: primitiveLiteral({ integer: Long.fromNumber(12345) }),
-    simpleStruct: literalNone()
+    simpleStruct: literalNone(),
+    simpleBlob: {
+        scalar: {
+            blob: {
+                uri: 's3://someBlobUri/goesHere',
+                metadata: {
+                    type: {
+                        format: 'csv',
+                        dimensionality: BlobDimensionality.SINGLE
+                    }
+                }
+            }
+        }
+    }
 };
 
 export const mockCollectionVariables: Record<string, Variable> = mapValues(
