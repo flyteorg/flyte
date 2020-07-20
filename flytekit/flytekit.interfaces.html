@@ -87,6 +87,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../administrator/index.html">Administrator Docs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributor/index.html">Contributor Docs</a></li>
 </ul>
+<p class="caption"><span class="caption-text">Flyte User cookbook and examples (Github)</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/lyft/flytesnacks/blob/master/README.md">FlyteSnacks - Examples &amp; Cookbook</a></li>
+</ul>
 <p class="caption"><span class="caption-text">Generated Documentation from Source</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../flyteidl/index.html">Flyte Language and API specification</a></li>
@@ -242,7 +246,7 @@
 <span id="flytekit-interfaces-random-module"></span><h2>flytekit.interfaces.random module<a class="headerlink" href="#module-flytekit.interfaces.random" title="Permalink to this headline">¶</a></h2>
 <dl class="data">
 <dt id="flytekit.interfaces.random.random">
-<code class="sig-prename descclassname">flytekit.interfaces.random.</code><code class="sig-name descname">random</code><em class="property"> = &lt;random.Random object at 0x2b9ff08&gt;</em><a class="headerlink" href="#flytekit.interfaces.random.random" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.interfaces.random.</code><code class="sig-name descname">random</code><em class="property"> = &lt;random.Random object at 0x1792be8&gt;</em><a class="headerlink" href="#flytekit.interfaces.random.random" title="Permalink to this definition">¶</a></dt>
 <dd><p>An instance of the global random number generator used by flytekit.  Flytekit maintains it’s own random instance
 to ensure that calls to random.seed(…) do not affect the pseudo-random behavior of flytekit. This random should be
 used by flytekit components in all cases where random.random would have been used. Components who want additional
