@@ -29,7 +29,7 @@ type sidecarResourceHandler struct{}
 
 // This method handles templatizing primary container input args, env variables and adds a GPU toleration to the pod
 // spec if necessary.
-func validateAndFinalizeContainers(
+func validateAndFinalizePod(
 	ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, primaryContainerName string, pod k8sv1.Pod) (*k8sv1.Pod, error) {
 	var hasPrimaryContainer bool
 
@@ -61,7 +61,11 @@ func validateAndFinalizeContainers(
 
 	}
 	pod.Spec.Containers = finalizedContainers
-	pod.Spec.Tolerations = flytek8s.GetPodTolerations(taskCtx.TaskExecutionMetadata().IsInterruptible(), resReqs...)
+	if pod.Spec.Tolerations == nil {
+		pod.Spec.Tolerations = make([]k8sv1.Toleration, 0)
+	}
+	pod.Spec.Tolerations = append(
+		flytek8s.GetPodTolerations(taskCtx.TaskExecutionMetadata().IsInterruptible(), resReqs...), pod.Spec.Tolerations...)
 	if taskCtx.TaskExecutionMetadata().IsInterruptible() && len(config.GetK8sPluginConfig().InterruptibleNodeSelector) > 0 {
 		pod.Spec.NodeSelector = config.GetK8sPluginConfig().InterruptibleNodeSelector
 	}
@@ -90,7 +94,7 @@ func (sidecarResourceHandler) BuildResource(ctx context.Context, taskCtx plugins
 	// We want to Also update the serviceAccount to the serviceaccount of the workflow
 	pod.Spec.ServiceAccountName = taskCtx.TaskExecutionMetadata().GetK8sServiceAccount()
 
-	pod, err = validateAndFinalizeContainers(ctx, taskCtx, sidecarJob.PrimaryContainerName, *pod)
+	pod, err = validateAndFinalizePod(ctx, taskCtx, sidecarJob.PrimaryContainerName, *pod)
 	if err != nil {
 		return nil, err
 	}
