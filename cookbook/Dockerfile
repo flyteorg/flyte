@@ -31,8 +31,6 @@ COPY . /root
 RUN cp ${VENV}/bin/flytekit_venv /usr/local/bin/
 RUN chmod a+x /usr/local/bin/flytekit_venv
 
-#RUN ${VENV}/bin/pip install /root/flytekit-0.7.0b2.tar.gz
-
 # This tag is supplied by the build script and will be used to determine the version
 # when registering tasks, workflows, and launch plans
 ARG tag

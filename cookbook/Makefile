@@ -3,39 +3,49 @@
 IMAGE_NAME=flytecookbook
 VERSION=$(shell ./version.sh)
 
+# If the REGISTRY environment variable has been set, that means the image name will not just be tagged as
+#   flytecookbook:<sha> but rather,
+#   docker.io/lyft/flytecookbook:<sha> or whatever your REGISTRY is.
+ifneq ($(origin REGISTRY), undefined)
+	FULL_IMAGE_NAME = ${REGISTRY}/${IMAGE_NAME}
+else
+	FULL_IMAGE_NAME = ${IMAGE_NAME}
+endif
+
 # The Flyte project that we want to register under
 PROJECT=flytesnacks
-REGISTRY=docker.io/lyft
 
 .PHONY: docker_build
 docker_build:
-	NOPUSH=1 REGISTRY=${REGISTRY} IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh .
+	NOPUSH=1 IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh .
 
-.PHONY: docker_build
+# This should only be used by Admins to push images to the public Dockerhub repo. Make sure you
+# specify REGISTRY=docker.io/lyft before the make command otherwise this won't actually push
+.PHONY: docker_push
 docker_push:
-	IMAGE_NAME=${IMAGE_NAME} REGISTRY=${REGISTRY} flytekit_build_image.sh .
+	IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh .
 
 .PHONY: in_container_register_sandbox
 in_container_register_sandbox:
 	pyflyte -p ${PROJECT} -d development --config /root/sandbox.config register workflows
 
 .PHONY: register_sandbox
-register_sandbox: docker_push
-	docker run docker.io/lyft/flytecookbook:${VERSION} /usr/local/bin/flytekit_venv make in_container_register_sandbox
+register_sandbox: docker_build
+	docker run ${FULL_IMAGE_NAME}:${VERSION} /usr/local/bin/flytekit_venv make in_container_register_sandbox
 
 .PHONY: in_container_serialize_sandbox
 in_container_serialize_sandbox:
 	pyflyte -p ${PROJECT} -d development --config /root/sandbox.config serialize workflows -f /tmp/output
 
-# TODO: Get rid of the backticks in the future
 .PHONY: serialize_sandbox
-serialize_sandbox: docker_push
-	mkdir `pwd`/_pb_output || true
-	docker run -v `pwd`/_pb_output:/tmp/output docker.io/lyft/flytecookbook:${VERSION} make in_container_serialize_sandbox
+serialize_sandbox: docker_build
+	echo ${CURDIR}
+	mkdir ${CURDIR}/_pb_output || true
+	docker run -v ${CURDIR}/_pb_output:/tmp/output ${FULL_IMAGE_NAME}:${VERSION} make in_container_serialize_sandbox
 
 .PHONY: enter_sandbox
 enter_sandbox: docker_build
-	docker run -e PROJECT=${PROJECT} -v `pwd`:/root -it docker.io/lyft/flytecookbook:${VERSION} bash
+	docker run -e PROJECT=${PROJECT} -v `pwd`:/root -it ${FULL_IMAGE_NAME}:${VERSION} bash
 
 .PHONY: run_tests
 run_tests: 
