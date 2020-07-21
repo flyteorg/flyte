@@ -83,7 +83,7 @@ Execution flytesnacks:development:f696cca32ffa44513b25
 Error:
 		Code: USER:Unknown
 		Message:
-			Traceback (most recent call last):				      File "/opt/venv/lib/python3.6/site-packages/flytekit/common/exceptions/scopes.py", line 206, in user_entry_point		        return wrapped(*args, **kwargs)		      File "/root/recipes/interaction/interaction.py", line 34, in rotate		        raise Exception("User signaled failure")				Message:				    User signaled failure				User error.
+			Traceback (most recent call last):				      File "/opt/venv/lib/python3.6/site-packages/flytekit/common/exceptions/scopes.py", line 206, in user_entry_point		        return wrapped(*args, **kwargs)		      File "/root/recipes/interaction/tasks.py", line 34, in rotate		        raise Exception("User signaled failure")				Message:				    User signaled failure				User error.
 
 	Node Executions:
 
@@ -116,7 +116,7 @@ Error:
 Error:
 				Code: USER:Unknown
 				Message:
-					Traceback (most recent call last):				      File "/opt/venv/lib/python3.6/site-packages/flytekit/common/exceptions/scopes.py", line 206, in user_entry_point		        return wrapped(*args, **kwargs)		      File "/root/recipes/interaction/interaction.py", line 34, in rotate		        raise Exception("User signaled failure")		Message:				    User signaled failure				User error.
+					Traceback (most recent call last):				      File "/opt/venv/lib/python3.6/site-packages/flytekit/common/exceptions/scopes.py", line 206, in user_entry_point		        return wrapped(*args, **kwargs)		      File "/root/recipes/interaction/tasks.py", line 34, in rotate		        raise Exception("User signaled failure")		Message:				    User signaled failure				User error.
 
 			Task Executions:
 
@@ -167,4 +167,5 @@ This CLI has a special function called relaunch
 ## Part 5: Launch a new execution using partial outputs of a previous execution
 ### Jupyter Notebook
 Only jupyter way is the easy to use way. This is possible to do through the UI, but that would be copy pasting the previous outputs.
-[Exhibit: part_1=2.ipynb](part_2.ipynb)
+
+[Exhibit: part_2.ipynb](part_2.ipynb)
