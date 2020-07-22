@@ -1270,6 +1270,13 @@ paths:
         - "ASCENDING"
         x-exportParamName: "SortByDirection"
         x-optionalDataType: "String"
+      - name: "unique_parent_id"
+        in: "query"
+        description: "Unique identifier of the parent node in the execution\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "UniqueParentId"
+        x-optionalDataType: "String"
       responses:
         200:
           description: "A successful response."
@@ -4991,7 +4998,10 @@ definitions:
     description: "Request structure to retrieve a list of node execution entities."
     example:
       node_executions:
-      - metadata: {}
+      - metadata:
+          retry_group: "retry_group"
+          is_parent_node: true
+          spec_node_id: "spec_node_id"
         input_uri: "input_uri"
         id:
           execution_id:
@@ -5016,7 +5026,10 @@ definitions:
             kind: {}
             message: "message"
             error_uri: "error_uri"
-      - metadata: {}
+      - metadata:
+          retry_group: "retry_group"
+          is_parent_node: true
+          spec_node_id: "spec_node_id"
         input_uri: "input_uri"
         id:
           execution_id:
@@ -5044,7 +5057,24 @@ definitions:
       token: "token"
   adminNodeExecutionMetaData:
     type: "object"
+    properties:
+      retry_group:
+        type: "string"
+        description: "Node executions are grouped depending on retries of the parent\n\
+          Retry group is unique within the context of a parent node."
+      is_parent_node:
+        type: "boolean"
+        format: "boolean"
+        title: "Boolean flag indicating if the node has child nodes under it"
+      spec_node_id:
+        type: "string"
+        title: "Node id of the node in the original workflow\nThis maps to value of\
+          \ WorkflowTemplate.nodes[X].id"
     title: "Represents additional attributes related to a Node Execution"
+    example:
+      retry_group: "retry_group"
+      is_parent_node: true
+      spec_node_id: "spec_node_id"
   adminNotification:
     type: "object"
     properties:
@@ -24078,8 +24108,30 @@ definitions:
       workflow_node_metadata:
         $ref: "#/definitions/flyteidleventWorkflowNodeMetadata"
       parent_task_metadata:
-        description: "Specifies which task (if any) launched this node."
+        description: "[To be deprecated] Specifies which task (if any) launched this\
+          \ node."
         $ref: "#/definitions/eventParentTaskExecutionMetadata"
+      parent_node_metadata:
+        description: "Specifies the parent node of the current node execution. Node\
+          \ executions at level zero will not have a parent node."
+        $ref: "#/definitions/eventParentNodeExecutionMetadata"
+      retry_group:
+        type: "string"
+        title: "Retry group to indicate grouping of nodes by retries"
+      spec_node_id:
+        type: "string"
+        title: "Identifier of the node in the original workflow/graph\nThis maps to\
+          \ value of WorkflowTemplate.nodes[X].id"
+      node_name:
+        type: "string"
+        title: "Friendly readable name for the node"
+  eventParentNodeExecutionMetadata:
+    type: "object"
+    properties:
+      node_id:
+        type: "string"
+        title: "Unique identifier of the parent node id within the execution\nThis\
+          \ is value of core.NodeExecutionIdentifier.node_id of the parent node"
   eventParentTaskExecutionMetadata:
     type: "object"
     properties:
@@ -24185,7 +24237,10 @@ definitions:
       \ execution.\nThe same task can be called repeatedly in a single workflow but\
       \ each node is unique."
     example:
-      metadata: {}
+      metadata:
+        retry_group: "retry_group"
+        is_parent_node: true
+        spec_node_id: "spec_node_id"
       input_uri: "input_uri"
       id:
         execution_id:

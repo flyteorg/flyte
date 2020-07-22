@@ -31,14 +31,96 @@ class AdminNodeExecutionMetaData(object):
                             and the value is json key in definition.
     """
     swagger_types = {
+        'retry_group': 'str',
+        'is_parent_node': 'bool',
+        'spec_node_id': 'str'
     }
 
     attribute_map = {
+        'retry_group': 'retry_group',
+        'is_parent_node': 'is_parent_node',
+        'spec_node_id': 'spec_node_id'
     }
 
-    def __init__(self):  # noqa: E501
+    def __init__(self, retry_group=None, is_parent_node=None, spec_node_id=None):  # noqa: E501
         """AdminNodeExecutionMetaData - a model defined in Swagger"""  # noqa: E501
+
+        self._retry_group = None
+        self._is_parent_node = None
+        self._spec_node_id = None
         self.discriminator = None
+
+        if retry_group is not None:
+            self.retry_group = retry_group
+        if is_parent_node is not None:
+            self.is_parent_node = is_parent_node
+        if spec_node_id is not None:
+            self.spec_node_id = spec_node_id
+
+    @property
+    def retry_group(self):
+        """Gets the retry_group of this AdminNodeExecutionMetaData.  # noqa: E501
+
+        Node executions are grouped depending on retries of the parent Retry group is unique within the context of a parent node.  # noqa: E501
+
+        :return: The retry_group of this AdminNodeExecutionMetaData.  # noqa: E501
+        :rtype: str
+        """
+        return self._retry_group
+
+    @retry_group.setter
+    def retry_group(self, retry_group):
+        """Sets the retry_group of this AdminNodeExecutionMetaData.
+
+        Node executions are grouped depending on retries of the parent Retry group is unique within the context of a parent node.  # noqa: E501
+
+        :param retry_group: The retry_group of this AdminNodeExecutionMetaData.  # noqa: E501
+        :type: str
+        """
+
+        self._retry_group = retry_group
+
+    @property
+    def is_parent_node(self):
+        """Gets the is_parent_node of this AdminNodeExecutionMetaData.  # noqa: E501
+
+
+        :return: The is_parent_node of this AdminNodeExecutionMetaData.  # noqa: E501
+        :rtype: bool
+        """
+        return self._is_parent_node
+
+    @is_parent_node.setter
+    def is_parent_node(self, is_parent_node):
+        """Sets the is_parent_node of this AdminNodeExecutionMetaData.
+
+
+        :param is_parent_node: The is_parent_node of this AdminNodeExecutionMetaData.  # noqa: E501
+        :type: bool
+        """
+
+        self._is_parent_node = is_parent_node
+
+    @property
+    def spec_node_id(self):
+        """Gets the spec_node_id of this AdminNodeExecutionMetaData.  # noqa: E501
+
+
+        :return: The spec_node_id of this AdminNodeExecutionMetaData.  # noqa: E501
+        :rtype: str
+        """
+        return self._spec_node_id
+
+    @spec_node_id.setter
+    def spec_node_id(self, spec_node_id):
+        """Sets the spec_node_id of this AdminNodeExecutionMetaData.
+
+
+        :param spec_node_id: The spec_node_id of this AdminNodeExecutionMetaData.  # noqa: E501
+        :type: str
+        """
+
+        self._spec_node_id = spec_node_id
 
     def to_dict(self):
         """Returns the model properties as a dict"""

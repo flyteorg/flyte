@@ -151,6 +151,8 @@ func (m *NodeExecutionListRequest) Validate() error {
 		}
 	}
 
+	// no validation rules for UniqueParentId
+
 	return nil
 }
 
@@ -408,6 +410,12 @@ func (m *NodeExecutionMetaData) Validate() error {
 	if m == nil {
 		return nil
 	}
+
+	// no validation rules for RetryGroup
+
+	// no validation rules for IsParentNode
+
+	// no validation rules for SpecNodeId
 
 	return nil
 }

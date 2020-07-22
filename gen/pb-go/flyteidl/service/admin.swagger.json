@@ -1477,6 +1477,13 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          },
+          {
+            "name": "unique_parent_id",
+            "description": "Unique identifier of the parent node in the execution\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -3673,6 +3680,21 @@
     },
     "adminNodeExecutionMetaData": {
       "type": "object",
+      "properties": {
+        "retry_group": {
+          "type": "string",
+          "description": "Node executions are grouped depending on retries of the parent\nRetry group is unique within the context of a parent node."
+        },
+        "is_parent_node": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Boolean flag indicating if the node has child nodes under it"
+        },
+        "spec_node_id": {
+          "type": "string",
+          "title": "Node id of the node in the original workflow\nThis maps to value of WorkflowTemplate.nodes[X].id"
+        }
+      },
       "title": "Represents additional attributes related to a Node Execution"
     },
     "adminNotification": {
@@ -5425,7 +5447,32 @@
         },
         "parent_task_metadata": {
           "$ref": "#/definitions/eventParentTaskExecutionMetadata",
-          "description": "Specifies which task (if any) launched this node."
+          "description": "[To be deprecated] Specifies which task (if any) launched this node."
+        },
+        "parent_node_metadata": {
+          "$ref": "#/definitions/eventParentNodeExecutionMetadata",
+          "description": "Specifies the parent node of the current node execution. Node executions at level zero will not have a parent node."
+        },
+        "retry_group": {
+          "type": "string",
+          "title": "Retry group to indicate grouping of nodes by retries"
+        },
+        "spec_node_id": {
+          "type": "string",
+          "title": "Identifier of the node in the original workflow/graph\nThis maps to value of WorkflowTemplate.nodes[X].id"
+        },
+        "node_name": {
+          "type": "string",
+          "title": "Friendly readable name for the node"
+        }
+      }
+    },
+    "eventParentNodeExecutionMetadata": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "title": "Unique identifier of the parent node id within the execution\nThis is value of core.NodeExecutionIdentifier.node_id of the parent node"
         }
       }
     },
