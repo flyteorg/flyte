@@ -10,24 +10,26 @@ import (
 )
 
 type ExecuteWorkflowInput struct {
-	ExecutionID *core.WorkflowExecutionIdentifier
-	WfClosure   core.CompiledWorkflowClosure
-	Inputs      *core.LiteralMap
-	Reference   admin.LaunchPlan
-	AcceptedAt  time.Time
-	Labels      map[string]string
-	Annotations map[string]string
+	ExecutionID    *core.WorkflowExecutionIdentifier
+	WfClosure      core.CompiledWorkflowClosure
+	Inputs         *core.LiteralMap
+	Reference      admin.LaunchPlan
+	AcceptedAt     time.Time
+	Labels         map[string]string
+	Annotations    map[string]string
+	QueueingBudget time.Duration
 }
 
 type ExecuteTaskInput struct {
-	ExecutionID   *core.WorkflowExecutionIdentifier
-	WfClosure     core.CompiledWorkflowClosure
-	Inputs        *core.LiteralMap
-	ReferenceName string
-	Auth          *admin.AuthRole
-	AcceptedAt    time.Time
-	Labels        map[string]string
-	Annotations   map[string]string
+	ExecutionID    *core.WorkflowExecutionIdentifier
+	WfClosure      core.CompiledWorkflowClosure
+	Inputs         *core.LiteralMap
+	ReferenceName  string
+	Auth           *admin.AuthRole
+	AcceptedAt     time.Time
+	Labels         map[string]string
+	Annotations    map[string]string
+	QueueingBudget time.Duration
 }
 
 type TerminateWorkflowInput struct {

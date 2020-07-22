@@ -122,6 +122,12 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
 	flyteWf.Annotations = annotations
 
+	/*
+		TODO(katrogan): uncomment once propeller has updated the flyte workflow CRD.
+		queueingBudgetSeconds := int64(input.QueueingBudget.Seconds())
+		flyteWf.QueuingBudgetSeconds = &queueingBudgetSeconds
+	*/
+
 	executionTargetSpec := executioncluster.ExecutionTargetSpec{
 		Project:     input.ExecutionID.Project,
 		Domain:      input.ExecutionID.Domain,
@@ -190,6 +196,12 @@ func (c *FlytePropeller) ExecuteTask(ctx context.Context, input interfaces.Execu
 	flyteWf.Labels = labels
 	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
 	flyteWf.Annotations = annotations
+
+	/*
+		TODO(katrogan): uncomment once propeller has updated the flyte workflow CRD.
+		queueingBudgetSeconds := int64(input.QueueingBudget.Seconds())
+		flyteWf.QueuingBudgetSeconds = &queueingBudgetSeconds
+	*/
 
 	executionTargetSpec := executioncluster.ExecutionTargetSpec{
 		Project:     input.ExecutionID.Project,

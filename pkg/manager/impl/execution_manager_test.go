@@ -35,6 +35,7 @@ import (
 	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
+	runtimeIFaceMocks "github.com/lyft/flyteadmin/pkg/runtime/interfaces/mocks"
 	runtimeMocks "github.com/lyft/flyteadmin/pkg/runtime/mocks"
 	workflowengineInterfaces "github.com/lyft/flyteadmin/pkg/workflowengine/interfaces"
 	workflowengineMocks "github.com/lyft/flyteadmin/pkg/workflowengine/mocks"
@@ -217,12 +218,32 @@ func TestCreateExecution(t *testing.T) {
 				"annotation3": "3",
 				"annotation4": "4",
 			}, inputs.Annotations)
+			assert.EqualValues(t, 10*time.Minute, inputs.QueueingBudget)
 			return &workflowengineInterfaces.ExecutionInfo{
 				Cluster: testCluster,
 			}, nil
 		})
+	qosProvider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
+	qosProvider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]core.QualityOfServiceSpec{
+		core.QualityOfService_HIGH: {
+			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
+		},
+		core.QualityOfService_MEDIUM: {
+			QueueingBudget: ptypes.DurationProto(20 * time.Minute),
+		},
+		core.QualityOfService_LOW: {
+			QueueingBudget: ptypes.DurationProto(30 * time.Minute),
+		},
+	})
+
+	qosProvider.OnGetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
+		"domain": core.QualityOfService_HIGH,
+	})
+
+	mockConfig := getMockExecutionsConfigProvider()
+	mockConfig.(*runtimeMocks.MockConfigurationProvider).AddQualityOfServiceConfiguration(qosProvider)
 	execManager := NewExecutionManager(
-		repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockExecutor,
+		repository, mockConfig, getMockStorageForExecTest(context.Background()), mockExecutor,
 		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil)
 	request := testutils.GetExecutionRequest()
 	request.Spec.Metadata = &admin.ExecutionMetadata{
@@ -2449,7 +2470,10 @@ func TestSetDefaults(t *testing.T) {
 	mockConfig := runtimeMocks.NewMockConfigurationProvider(
 		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, &taskConfig,
 		runtimeMocks.NewMockWhitelistConfiguration(), nil)
-	setCompiledTaskDefaults(context.Background(), mockConfig, task, repositoryMocks.NewMockRepository(), "workflow")
+	execManager := NewExecutionManager(
+		repositoryMocks.NewMockRepository(), mockConfig, getMockStorageForExecTest(context.Background()), workflowengineMocks.NewMockExecutor(),
+		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil)
+	execManager.(*ExecutionManager).setCompiledTaskDefaults(context.Background(), task, "workflow")
 	assert.True(t, proto.Equal(
 		&core.Container{
 			Resources: &core.Resources{
@@ -2515,7 +2539,10 @@ func TestSetDefaults_MissingDefaults(t *testing.T) {
 	mockConfig := runtimeMocks.NewMockConfigurationProvider(
 		testutils.GetApplicationConfigWithDefaultDomains(), nil, nil, &taskConfig,
 		runtimeMocks.NewMockWhitelistConfiguration(), nil)
-	setCompiledTaskDefaults(context.Background(), mockConfig, task, repositoryMocks.NewMockRepository(), "workflow")
+	execManager := NewExecutionManager(
+		repositoryMocks.NewMockRepository(), mockConfig, getMockStorageForExecTest(context.Background()), workflowengineMocks.NewMockExecutor(),
+		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil)
+	execManager.(*ExecutionManager).setCompiledTaskDefaults(context.Background(), task, "workflow")
 	assert.True(t, proto.Equal(
 		&core.Container{
 			Resources: &core.Resources{
