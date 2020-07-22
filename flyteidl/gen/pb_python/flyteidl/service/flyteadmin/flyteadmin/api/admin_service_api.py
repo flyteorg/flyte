@@ -3518,6 +3518,7 @@ class AdminServiceApi(object):
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str unique_parent_id: Unique identifier of the parent node in the execution +optional.
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3547,12 +3548,13 @@ class AdminServiceApi(object):
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str unique_parent_id: Unique identifier of the parent node in the execution +optional.
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['workflow_execution_id_project', 'workflow_execution_id_domain', 'workflow_execution_id_name', 'limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params = ['workflow_execution_id_project', 'workflow_execution_id_domain', 'workflow_execution_id_name', 'limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction', 'unique_parent_id']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -3601,6 +3603,8 @@ class AdminServiceApi(object):
             query_params.append(('sort_by.key', params['sort_by_key']))  # noqa: E501
         if 'sort_by_direction' in params:
             query_params.append(('sort_by.direction', params['sort_by_direction']))  # noqa: E501
+        if 'unique_parent_id' in params:
+            query_params.append(('unique_parent_id', params['unique_parent_id']))  # noqa: E501
 
         header_params = {}
 

@@ -35,6 +35,10 @@ message NodeExecutionListRequest {
     // Sort ordering.
     // +optional
     Sort sort_by    = 5;
+
+    // Unique identifier of the parent node in the execution
+    // +optional
+    string unique_parent_id = 6;
 }
 
 // Represents a request structure to retrieve a list of node execution entities launched by a specific task.
@@ -79,6 +83,16 @@ message NodeExecution {
 
 // Represents additional attributes related to a Node Execution
 message NodeExecutionMetaData {
+    // Node executions are grouped depending on retries of the parent
+    // Retry group is unique within the context of a parent node.
+    string retry_group = 1;
+
+    // Boolean flag indicating if the node has child nodes under it
+    bool is_parent_node = 2;
+
+    // Node id of the node in the original workflow
+    // This maps to value of WorkflowTemplate.nodes[X].id
+    string spec_node_id = 3;
 }
 
 // Request structure to retrieve a list of node execution entities.

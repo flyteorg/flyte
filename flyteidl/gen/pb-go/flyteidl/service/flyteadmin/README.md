@@ -239,6 +239,7 @@ Class | Method | HTTP request | Description
  - [CoreWorkflowTemplate](docs/CoreWorkflowTemplate.md)
  - [DataLoadingConfigLiteralMapFormat](docs/DataLoadingConfigLiteralMapFormat.md)
  - [EventNodeExecutionEvent](docs/EventNodeExecutionEvent.md)
+ - [EventParentNodeExecutionMetadata](docs/EventParentNodeExecutionMetadata.md)
  - [EventParentTaskExecutionMetadata](docs/EventParentTaskExecutionMetadata.md)
  - [EventTaskExecutionEvent](docs/EventTaskExecutionEvent.md)
  - [EventWorkflowExecutionEvent](docs/EventWorkflowExecutionEvent.md)
