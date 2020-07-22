@@ -344,6 +344,20 @@ class NodeExecutionListRequest final :
   ::std::string* release_filters();
   void set_allocated_filters(::std::string* filters);
 
+  // string unique_parent_id = 6;
+  void clear_unique_parent_id();
+  static const int kUniqueParentIdFieldNumber = 6;
+  const ::std::string& unique_parent_id() const;
+  void set_unique_parent_id(const ::std::string& value);
+  #if LANG_CXX11
+  void set_unique_parent_id(::std::string&& value);
+  #endif
+  void set_unique_parent_id(const char* value);
+  void set_unique_parent_id(const char* value, size_t size);
+  ::std::string* mutable_unique_parent_id();
+  ::std::string* release_unique_parent_id();
+  void set_allocated_unique_parent_id(::std::string* unique_parent_id);
+
   // .flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 1;
   bool has_workflow_execution_id() const;
   void clear_workflow_execution_id();
@@ -375,6 +389,7 @@ class NodeExecutionListRequest final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr token_;
   ::google::protobuf::internal::ArenaStringPtr filters_;
+  ::google::protobuf::internal::ArenaStringPtr unique_parent_id_;
   ::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution_id_;
   ::flyteidl::admin::Sort* sort_by_;
   ::google::protobuf::uint32 limit_;
@@ -790,11 +805,48 @@ class NodeExecutionMetaData final :
 
   // accessors -------------------------------------------------------
 
+  // string retry_group = 1;
+  void clear_retry_group();
+  static const int kRetryGroupFieldNumber = 1;
+  const ::std::string& retry_group() const;
+  void set_retry_group(const ::std::string& value);
+  #if LANG_CXX11
+  void set_retry_group(::std::string&& value);
+  #endif
+  void set_retry_group(const char* value);
+  void set_retry_group(const char* value, size_t size);
+  ::std::string* mutable_retry_group();
+  ::std::string* release_retry_group();
+  void set_allocated_retry_group(::std::string* retry_group);
+
+  // string spec_node_id = 3;
+  void clear_spec_node_id();
+  static const int kSpecNodeIdFieldNumber = 3;
+  const ::std::string& spec_node_id() const;
+  void set_spec_node_id(const ::std::string& value);
+  #if LANG_CXX11
+  void set_spec_node_id(::std::string&& value);
+  #endif
+  void set_spec_node_id(const char* value);
+  void set_spec_node_id(const char* value, size_t size);
+  ::std::string* mutable_spec_node_id();
+  ::std::string* release_spec_node_id();
+  void set_allocated_spec_node_id(::std::string* spec_node_id);
+
+  // bool is_parent_node = 2;
+  void clear_is_parent_node();
+  static const int kIsParentNodeFieldNumber = 2;
+  bool is_parent_node() const;
+  void set_is_parent_node(bool value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.NodeExecutionMetaData)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr retry_group_;
+  ::google::protobuf::internal::ArenaStringPtr spec_node_id_;
+  bool is_parent_node_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fnode_5fexecution_2eproto;
 };
@@ -1778,6 +1830,59 @@ inline void NodeExecutionListRequest::set_allocated_sort_by(::flyteidl::admin::S
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionListRequest.sort_by)
 }
 
+// string unique_parent_id = 6;
+inline void NodeExecutionListRequest::clear_unique_parent_id() {
+  unique_parent_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NodeExecutionListRequest::unique_parent_id() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionListRequest.unique_parent_id)
+  return unique_parent_id_.GetNoArena();
+}
+inline void NodeExecutionListRequest::set_unique_parent_id(const ::std::string& value) {
+  
+  unique_parent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NodeExecutionListRequest.unique_parent_id)
+}
+#if LANG_CXX11
+inline void NodeExecutionListRequest::set_unique_parent_id(::std::string&& value) {
+  
+  unique_parent_id_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NodeExecutionListRequest.unique_parent_id)
+}
+#endif
+inline void NodeExecutionListRequest::set_unique_parent_id(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  unique_parent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NodeExecutionListRequest.unique_parent_id)
+}
+inline void NodeExecutionListRequest::set_unique_parent_id(const char* value, size_t size) {
+  
+  unique_parent_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NodeExecutionListRequest.unique_parent_id)
+}
+inline ::std::string* NodeExecutionListRequest::mutable_unique_parent_id() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NodeExecutionListRequest.unique_parent_id)
+  return unique_parent_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NodeExecutionListRequest::release_unique_parent_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NodeExecutionListRequest.unique_parent_id)
+  
+  return unique_parent_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NodeExecutionListRequest::set_allocated_unique_parent_id(::std::string* unique_parent_id) {
+  if (unique_parent_id != nullptr) {
+    
+  } else {
+    
+  }
+  unique_parent_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), unique_parent_id);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionListRequest.unique_parent_id)
+}
+
 // -------------------------------------------------------------------
 
 // NodeExecutionForTaskListRequest
@@ -2199,6 +2304,126 @@ inline void NodeExecution::set_allocated_metadata(::flyteidl::admin::NodeExecuti
 // -------------------------------------------------------------------
 
 // NodeExecutionMetaData
+
+// string retry_group = 1;
+inline void NodeExecutionMetaData::clear_retry_group() {
+  retry_group_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NodeExecutionMetaData::retry_group() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionMetaData.retry_group)
+  return retry_group_.GetNoArena();
+}
+inline void NodeExecutionMetaData::set_retry_group(const ::std::string& value) {
+  
+  retry_group_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NodeExecutionMetaData.retry_group)
+}
+#if LANG_CXX11
+inline void NodeExecutionMetaData::set_retry_group(::std::string&& value) {
+  
+  retry_group_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NodeExecutionMetaData.retry_group)
+}
+#endif
+inline void NodeExecutionMetaData::set_retry_group(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  retry_group_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NodeExecutionMetaData.retry_group)
+}
+inline void NodeExecutionMetaData::set_retry_group(const char* value, size_t size) {
+  
+  retry_group_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NodeExecutionMetaData.retry_group)
+}
+inline ::std::string* NodeExecutionMetaData::mutable_retry_group() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NodeExecutionMetaData.retry_group)
+  return retry_group_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NodeExecutionMetaData::release_retry_group() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NodeExecutionMetaData.retry_group)
+  
+  return retry_group_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NodeExecutionMetaData::set_allocated_retry_group(::std::string* retry_group) {
+  if (retry_group != nullptr) {
+    
+  } else {
+    
+  }
+  retry_group_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), retry_group);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionMetaData.retry_group)
+}
+
+// bool is_parent_node = 2;
+inline void NodeExecutionMetaData::clear_is_parent_node() {
+  is_parent_node_ = false;
+}
+inline bool NodeExecutionMetaData::is_parent_node() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionMetaData.is_parent_node)
+  return is_parent_node_;
+}
+inline void NodeExecutionMetaData::set_is_parent_node(bool value) {
+  
+  is_parent_node_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NodeExecutionMetaData.is_parent_node)
+}
+
+// string spec_node_id = 3;
+inline void NodeExecutionMetaData::clear_spec_node_id() {
+  spec_node_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NodeExecutionMetaData::spec_node_id() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionMetaData.spec_node_id)
+  return spec_node_id_.GetNoArena();
+}
+inline void NodeExecutionMetaData::set_spec_node_id(const ::std::string& value) {
+  
+  spec_node_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NodeExecutionMetaData.spec_node_id)
+}
+#if LANG_CXX11
+inline void NodeExecutionMetaData::set_spec_node_id(::std::string&& value) {
+  
+  spec_node_id_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NodeExecutionMetaData.spec_node_id)
+}
+#endif
+inline void NodeExecutionMetaData::set_spec_node_id(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  spec_node_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NodeExecutionMetaData.spec_node_id)
+}
+inline void NodeExecutionMetaData::set_spec_node_id(const char* value, size_t size) {
+  
+  spec_node_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NodeExecutionMetaData.spec_node_id)
+}
+inline ::std::string* NodeExecutionMetaData::mutable_spec_node_id() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NodeExecutionMetaData.spec_node_id)
+  return spec_node_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NodeExecutionMetaData::release_spec_node_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NodeExecutionMetaData.spec_node_id)
+  
+  return spec_node_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NodeExecutionMetaData::set_allocated_spec_node_id(::std::string* spec_node_id) {
+  if (spec_node_id != nullptr) {
+    
+  } else {
+    
+  }
+  spec_node_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), spec_node_id);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionMetaData.spec_node_id)
+}
 
 // -------------------------------------------------------------------
 

@@ -4763,6 +4763,18 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent parentTaskMetadata */
             parentTaskMetadata?: (flyteidl.event.IParentTaskExecutionMetadata|null);
+
+            /** NodeExecutionEvent parentNodeMetadata */
+            parentNodeMetadata?: (flyteidl.event.IParentNodeExecutionMetadata|null);
+
+            /** NodeExecutionEvent retryGroup */
+            retryGroup?: (string|null);
+
+            /** NodeExecutionEvent specNodeId */
+            specNodeId?: (string|null);
+
+            /** NodeExecutionEvent nodeName */
+            nodeName?: (string|null);
         }
 
         /** Represents a NodeExecutionEvent. */
@@ -4800,6 +4812,18 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent parentTaskMetadata. */
             public parentTaskMetadata?: (flyteidl.event.IParentTaskExecutionMetadata|null);
+
+            /** NodeExecutionEvent parentNodeMetadata. */
+            public parentNodeMetadata?: (flyteidl.event.IParentNodeExecutionMetadata|null);
+
+            /** NodeExecutionEvent retryGroup. */
+            public retryGroup: string;
+
+            /** NodeExecutionEvent specNodeId. */
+            public specNodeId: string;
+
+            /** NodeExecutionEvent nodeName. */
+            public nodeName: string;
 
             /** NodeExecutionEvent outputResult. */
             public outputResult?: ("outputUri"|"error");
@@ -4938,6 +4962,58 @@ export namespace flyteidl {
 
             /**
              * Verifies a ParentTaskExecutionMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ParentNodeExecutionMetadata. */
+        interface IParentNodeExecutionMetadata {
+
+            /** ParentNodeExecutionMetadata nodeId */
+            nodeId?: (string|null);
+        }
+
+        /** Represents a ParentNodeExecutionMetadata. */
+        class ParentNodeExecutionMetadata implements IParentNodeExecutionMetadata {
+
+            /**
+             * Constructs a new ParentNodeExecutionMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IParentNodeExecutionMetadata);
+
+            /** ParentNodeExecutionMetadata nodeId. */
+            public nodeId: string;
+
+            /**
+             * Creates a new ParentNodeExecutionMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ParentNodeExecutionMetadata instance
+             */
+            public static create(properties?: flyteidl.event.IParentNodeExecutionMetadata): flyteidl.event.ParentNodeExecutionMetadata;
+
+            /**
+             * Encodes the specified ParentNodeExecutionMetadata message. Does not implicitly {@link flyteidl.event.ParentNodeExecutionMetadata.verify|verify} messages.
+             * @param message ParentNodeExecutionMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IParentNodeExecutionMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ParentNodeExecutionMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ParentNodeExecutionMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ParentNodeExecutionMetadata;
+
+            /**
+             * Verifies a ParentNodeExecutionMetadata message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -9421,6 +9497,9 @@ export namespace flyteidl {
 
             /** NodeExecutionListRequest sortBy */
             sortBy?: (flyteidl.admin.ISort|null);
+
+            /** NodeExecutionListRequest uniqueParentId */
+            uniqueParentId?: (string|null);
         }
 
         /** Represents a NodeExecutionListRequest. */
@@ -9446,6 +9525,9 @@ export namespace flyteidl {
 
             /** NodeExecutionListRequest sortBy. */
             public sortBy?: (flyteidl.admin.ISort|null);
+
+            /** NodeExecutionListRequest uniqueParentId. */
+            public uniqueParentId: string;
 
             /**
              * Creates a new NodeExecutionListRequest instance using the specified properties.
@@ -9628,6 +9710,15 @@ export namespace flyteidl {
 
         /** Properties of a NodeExecutionMetaData. */
         interface INodeExecutionMetaData {
+
+            /** NodeExecutionMetaData retryGroup */
+            retryGroup?: (string|null);
+
+            /** NodeExecutionMetaData isParentNode */
+            isParentNode?: (boolean|null);
+
+            /** NodeExecutionMetaData specNodeId */
+            specNodeId?: (string|null);
         }
 
         /** Represents a NodeExecutionMetaData. */
@@ -9638,6 +9729,15 @@ export namespace flyteidl {
              * @param [properties] Properties to set
              */
             constructor(properties?: flyteidl.admin.INodeExecutionMetaData);
+
+            /** NodeExecutionMetaData retryGroup. */
+            public retryGroup: string;
+
+            /** NodeExecutionMetaData isParentNode. */
+            public isParentNode: boolean;
+
+            /** NodeExecutionMetaData specNodeId. */
+            public specNodeId: string;
 
             /**
              * Creates a new NodeExecutionMetaData instance using the specified properties.
