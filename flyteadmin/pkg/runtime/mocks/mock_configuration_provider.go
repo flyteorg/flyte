@@ -1,6 +1,10 @@
 package mocks
 
-import "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
+import (
+	"github.com/lyft/flyteadmin/pkg/runtime/interfaces"
+	ifaceMocks "github.com/lyft/flyteadmin/pkg/runtime/interfaces/mocks"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+)
 
 type MockConfigurationProvider struct {
 	applicationConfiguration            interfaces.ApplicationConfiguration
@@ -11,6 +15,7 @@ type MockConfigurationProvider struct {
 	registrationValidationConfiguration interfaces.RegistrationValidationConfiguration
 	clusterResourceConfiguration        interfaces.ClusterResourceConfiguration
 	namespaceMappingConfiguration       interfaces.NamespaceMappingConfiguration
+	qualityOfServiceConfiguration       interfaces.QualityOfServiceConfiguration
 }
 
 func (p *MockConfigurationProvider) ApplicationConfiguration() interfaces.ApplicationConfiguration {
@@ -57,6 +62,14 @@ func (p *MockConfigurationProvider) AddNamespaceMappingConfiguration(config inte
 	p.namespaceMappingConfiguration = config
 }
 
+func (p *MockConfigurationProvider) QualityOfServiceConfiguration() interfaces.QualityOfServiceConfiguration {
+	return p.qualityOfServiceConfiguration
+}
+
+func (p *MockConfigurationProvider) AddQualityOfServiceConfiguration(config interfaces.QualityOfServiceConfiguration) {
+	p.qualityOfServiceConfiguration = config
+}
+
 func NewMockConfigurationProvider(
 	applicationConfiguration interfaces.ApplicationConfiguration,
 	queueConfiguration interfaces.QueueConfiguration,
@@ -64,6 +77,11 @@ func NewMockConfigurationProvider(
 	taskResourceConfiguration interfaces.TaskResourceConfiguration,
 	whitelistConfiguration interfaces.WhitelistConfiguration,
 	namespaceMappingConfiguration interfaces.NamespaceMappingConfiguration) interfaces.Configuration {
+
+	mockQualityOfServiceConfiguration := &ifaceMocks.QualityOfServiceConfiguration{}
+	mockQualityOfServiceConfiguration.OnGetDefaultTiers().Return(make(map[string]core.QualityOfService_Tier))
+	mockQualityOfServiceConfiguration.OnGetTierExecutionValues().Return(make(map[core.QualityOfService_Tier]core.QualityOfServiceSpec))
+
 	return &MockConfigurationProvider{
 		applicationConfiguration:      applicationConfiguration,
 		queueConfiguration:            queueConfiguration,
@@ -71,5 +89,6 @@ func NewMockConfigurationProvider(
 		taskResourceConfiguration:     taskResourceConfiguration,
 		whitelistConfiguration:        whitelistConfiguration,
 		namespaceMappingConfiguration: namespaceMappingConfiguration,
+		qualityOfServiceConfiguration: mockQualityOfServiceConfiguration,
 	}
 }

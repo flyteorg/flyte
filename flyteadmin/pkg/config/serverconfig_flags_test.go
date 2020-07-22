@@ -605,6 +605,72 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_security.oauth.disableForHttp", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vBool, err := cmdFlags.GetBool("security.oauth.disableForHttp"); err == nil {
+				assert.Equal(t, bool(defaultServerConfig.Security.Oauth.DisableForHTTP), vBool)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("security.oauth.disableForHttp", testValue)
+			if vBool, err := cmdFlags.GetBool("security.oauth.disableForHttp"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.Security.Oauth.DisableForHTTP)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_security.oauth.disableForGrpc", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vBool, err := cmdFlags.GetBool("security.oauth.disableForGrpc"); err == nil {
+				assert.Equal(t, bool(defaultServerConfig.Security.Oauth.DisableForGrpc), vBool)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("security.oauth.disableForGrpc", testValue)
+			if vBool, err := cmdFlags.GetBool("security.oauth.disableForGrpc"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.Security.Oauth.DisableForGrpc)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_security.auditAccess", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vBool, err := cmdFlags.GetBool("security.auditAccess"); err == nil {
+				assert.Equal(t, bool(defaultServerConfig.Security.AuditAccess), vBool)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("security.auditAccess", testValue)
+			if vBool, err := cmdFlags.GetBool("security.auditAccess"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.Security.AuditAccess)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_security.allowCors", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
@@ -665,6 +731,50 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("security.allowedHeaders", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("security.allowedHeaders"); err == nil {
 				testDecodeSlice_ServerConfig(t, join_ServerConfig(vStringSlice, ","), &actual.Security.AllowedHeaders)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_thirdPartyConfig.flyteClient.clientId", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("thirdPartyConfig.flyteClient.clientId"); err == nil {
+				assert.Equal(t, string(defaultServerConfig.ThirdPartyConfig.FlyteClientConfig.ClientID), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("thirdPartyConfig.flyteClient.clientId", testValue)
+			if vString, err := cmdFlags.GetString("thirdPartyConfig.flyteClient.clientId"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vString), &actual.ThirdPartyConfig.FlyteClientConfig.ClientID)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_thirdPartyConfig.flyteClient.redirectUri", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("thirdPartyConfig.flyteClient.redirectUri"); err == nil {
+				assert.Equal(t, string(defaultServerConfig.ThirdPartyConfig.FlyteClientConfig.RedirectURI), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("thirdPartyConfig.flyteClient.redirectUri", testValue)
+			if vString, err := cmdFlags.GetString("thirdPartyConfig.flyteClient.redirectUri"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vString), &actual.ThirdPartyConfig.FlyteClientConfig.RedirectURI)
 
 			} else {
 				assert.FailNow(t, err.Error())

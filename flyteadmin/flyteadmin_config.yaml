@@ -159,3 +159,16 @@ cluster_resources:
       valueFrom:
         env: SHELL
   refresh: 3s
+qualityOfService:
+  tierExecutionValues:
+    LOW:
+      queueingBudget: 30m
+    MEDIUM:
+      queueingBudget: 10m
+    HIGH:
+      queueingBudget: 1m
+    # By default UNDEFINED has no queueing budget when it is omitted from the configuration
+  defaultTiers:
+    development: LOW
+    staging: MEDIUM
+    # by default production has an UNDEFINED tier when it is omitted from the configuration

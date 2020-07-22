@@ -71,18 +71,20 @@ type executionUserMetrics struct {
 }
 
 type ExecutionManager struct {
-	db                 repositories.RepositoryInterface
-	config             runtimeInterfaces.Configuration
-	storageClient      *storage.DataStore
-	workflowExecutor   workflowengineInterfaces.Executor
-	queueAllocator     executions.QueueAllocator
-	_clock             clock.Clock
-	systemMetrics      executionSystemMetrics
-	userMetrics        executionUserMetrics
-	notificationClient notificationInterfaces.Publisher
-	urlData            dataInterfaces.RemoteURLInterface
-	workflowManager    interfaces.WorkflowInterface
-	namedEntityManager interfaces.NamedEntityInterface
+	db                        repositories.RepositoryInterface
+	config                    runtimeInterfaces.Configuration
+	storageClient             *storage.DataStore
+	workflowExecutor          workflowengineInterfaces.Executor
+	queueAllocator            executions.QueueAllocator
+	_clock                    clock.Clock
+	systemMetrics             executionSystemMetrics
+	userMetrics               executionUserMetrics
+	notificationClient        notificationInterfaces.Publisher
+	urlData                   dataInterfaces.RemoteURLInterface
+	workflowManager           interfaces.WorkflowInterface
+	namedEntityManager        interfaces.NamedEntityInterface
+	resourceManager           interfaces.ResourceInterface
+	qualityOfServiceAllocator executions.QualityOfServiceAllocator
 }
 
 func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
@@ -264,9 +266,7 @@ func assignResourcesIfUnset(ctx context.Context, identifier *core.Identifier,
 // Note: The system will assign a system-default value for request but for limit it will deduce it from the request
 // itself => Limit := Min([Some-Multiplier X Request], System-Max). For now we are using a multiplier of 1. In
 // general we recommend the users to set limits close to requests for more predictability in the system.
-func setCompiledTaskDefaults(ctx context.Context, config runtimeInterfaces.Configuration,
-	task *core.CompiledTask, db repositories.RepositoryInterface, workflowName string) {
-	resourceManager := resources.NewResourceManager(db, config.ApplicationConfiguration())
+func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *core.CompiledTask, workflowName string) {
 	if task == nil {
 		logger.Warningf(ctx, "Can't set default resources for nil task.")
 		return
@@ -276,7 +276,7 @@ func setCompiledTaskDefaults(ctx context.Context, config runtimeInterfaces.Confi
 		logger.Debugf(ctx, "Not setting default resources for task [%+v], no container resources found to check", task)
 		return
 	}
-	resource, err := resourceManager.GetResource(ctx, interfaces.ResourceRequest{
+	resource, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
 		Project:      task.Template.Id.Project,
 		Domain:       task.Template.Id.Domain,
 		Workflow:     workflowName,
@@ -293,7 +293,7 @@ func setCompiledTaskDefaults(ctx context.Context, config runtimeInterfaces.Confi
 		taskResourceSpec = resource.Attributes.GetTaskResourceAttributes().Defaults
 	}
 	task.Template.GetContainer().Resources.Requests = assignResourcesIfUnset(
-		ctx, task.Template.Id, config.TaskResourceConfiguration().GetDefaults(), task.Template.GetContainer().Resources.Requests,
+		ctx, task.Template.Id, m.config.TaskResourceConfiguration().GetDefaults(), task.Template.GetContainer().Resources.Requests,
 		taskResourceSpec)
 
 	logger.Debugf(ctx, "Assigning task resource limits for [%+v]", task.Template.Id)
@@ -371,7 +371,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	// Dynamically assign task resource defaults.
 	for _, task := range workflow.Closure.CompiledWorkflow.Tasks {
-		setCompiledTaskDefaults(ctx, m.config, task, m.db, name)
+		m.setCompiledTaskDefaults(ctx, task, name)
 	}
 
 	// Dynamically assign execution queues.
@@ -385,13 +385,23 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	if err != nil {
 		return nil, nil, err
 	}
+	qualityOfService, err := m.qualityOfServiceAllocator.GetQualityOfService(ctx, executions.GetQualityOfServiceInput{
+		Workflow:               &workflow,
+		LaunchPlan:             launchPlan,
+		ExecutionCreateRequest: &request,
+	})
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get quality of service for [%+v] with error: %v", workflowExecutionID, err)
+		return nil, nil, err
+	}
 	executeTaskInputs := workflowengineInterfaces.ExecuteTaskInput{
-		ExecutionID:   &workflowExecutionID,
-		WfClosure:     *workflow.Closure.CompiledWorkflow,
-		Inputs:        request.Inputs,
-		ReferenceName: taskIdentifier.Name,
-		AcceptedAt:    requestedAt,
-		Auth:          request.Spec.AuthRole,
+		ExecutionID:    &workflowExecutionID,
+		WfClosure:      *workflow.Closure.CompiledWorkflow,
+		Inputs:         request.Inputs,
+		ReferenceName:  taskIdentifier.Name,
+		AcceptedAt:     requestedAt,
+		Auth:           request.Spec.AuthRole,
+		QueueingBudget: qualityOfService.QueuingBudget,
 	}
 	if request.Spec.Labels != nil {
 		executeTaskInputs.Labels = request.Spec.Labels.Values
@@ -523,7 +533,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	// Dynamically assign task resource defaults.
 	for _, task := range workflow.Closure.CompiledWorkflow.Tasks {
-		setCompiledTaskDefaults(ctx, m.config, task, m.db, name)
+		m.setCompiledTaskDefaults(ctx, task, name)
 	}
 
 	// Dynamically assign execution queues.
@@ -538,13 +548,24 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, err
 	}
 
+	qualityOfService, err := m.qualityOfServiceAllocator.GetQualityOfService(ctx, executions.GetQualityOfServiceInput{
+		Workflow:               workflow,
+		LaunchPlan:             launchPlan,
+		ExecutionCreateRequest: &request,
+	})
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get quality of service for [%+v] with error: %v", workflowExecutionID, err)
+		return nil, nil, err
+	}
+
 	// TODO: Reduce CRD size and use offloaded input URI to blob store instead.
 	executeWorkflowInputs := workflowengineInterfaces.ExecuteWorkflowInput{
-		ExecutionID: &workflowExecutionID,
-		WfClosure:   *workflow.Closure.CompiledWorkflow,
-		Inputs:      executionInputs,
-		Reference:   *launchPlan,
-		AcceptedAt:  requestedAt,
+		ExecutionID:    &workflowExecutionID,
+		WfClosure:      *workflow.Closure.CompiledWorkflow,
+		Inputs:         executionInputs,
+		Reference:      *launchPlan,
+		AcceptedAt:     requestedAt,
+		QueueingBudget: qualityOfService.QueuingBudget,
 	}
 	err = m.addLabelsAndAnnotations(request.Spec, &executeWorkflowInputs)
 	if err != nil {
@@ -1214,18 +1235,22 @@ func NewExecutionManager(
 		ScheduledExecutionDelays:   make(map[string]map[string]*promutils.StopWatch),
 		WorkflowExecutionDurations: make(map[string]map[string]*promutils.StopWatch),
 	}
+
+	resourceManager := resources.NewResourceManager(db, config.ApplicationConfiguration())
 	return &ExecutionManager{
-		db:                 db,
-		config:             config,
-		storageClient:      storageClient,
-		workflowExecutor:   workflowExecutor,
-		queueAllocator:     queueAllocator,
-		_clock:             clock.New(),
-		systemMetrics:      systemMetrics,
-		userMetrics:        userMetrics,
-		notificationClient: publisher,
-		urlData:            urlData,
-		workflowManager:    workflowManager,
-		namedEntityManager: namedEntityManager,
+		db:                        db,
+		config:                    config,
+		storageClient:             storageClient,
+		workflowExecutor:          workflowExecutor,
+		queueAllocator:            queueAllocator,
+		_clock:                    clock.New(),
+		systemMetrics:             systemMetrics,
+		userMetrics:               userMetrics,
+		notificationClient:        publisher,
+		urlData:                   urlData,
+		workflowManager:           workflowManager,
+		namedEntityManager:        namedEntityManager,
+		resourceManager:           resourceManager,
+		qualityOfServiceAllocator: executions.NewQualityOfServiceAllocator(config, resourceManager),
 	}
 }
