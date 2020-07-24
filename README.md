@@ -103,6 +103,7 @@ Resources that would help you get a better understanding of Flyte.
 - Lyft L5 autonomous
 - Lyft Mapping (Minsk + EU)
 - Spotify
+- [Freenome](https://www.freenome.com/)
 
 # Changelogs
 [Changelogs](CHANGELOG/README.md)
