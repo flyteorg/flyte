@@ -21,7 +21,7 @@ type Client_Get struct {
 	*mock.Call
 }
 
-func (_m Client_Get) Return(_a0 io.OutputReader, _a1 error) *Client_Get {
+func (_m Client_Get) Return(_a0 catalog.Entry, _a1 error) *Client_Get {
 	return &Client_Get{Call: _m.Call.Return(_a0, _a1)}
 }
 
@@ -36,16 +36,14 @@ func (_m *Client) OnGetMatch(matchers ...interface{}) *Client_Get {
 }
 
 // Get provides a mock function with given fields: ctx, key
-func (_m *Client) Get(ctx context.Context, key catalog.Key) (io.OutputReader, error) {
+func (_m *Client) Get(ctx context.Context, key catalog.Key) (catalog.Entry, error) {
 	ret := _m.Called(ctx, key)
 
-	var r0 io.OutputReader
-	if rf, ok := ret.Get(0).(func(context.Context, catalog.Key) io.OutputReader); ok {
+	var r0 catalog.Entry
+	if rf, ok := ret.Get(0).(func(context.Context, catalog.Key) catalog.Entry); ok {
 		r0 = rf(ctx, key)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(io.OutputReader)
-		}
+		r0 = ret.Get(0).(catalog.Entry)
 	}
 
 	var r1 error
@@ -62,8 +60,8 @@ type Client_Put struct {
 	*mock.Call
 }
 
-func (_m Client_Put) Return(_a0 error) *Client_Put {
-	return &Client_Put{Call: _m.Call.Return(_a0)}
+func (_m Client_Put) Return(_a0 catalog.Status, _a1 error) *Client_Put {
+	return &Client_Put{Call: _m.Call.Return(_a0, _a1)}
 }
 
 func (_m *Client) OnPut(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) *Client_Put {
@@ -77,15 +75,22 @@ func (_m *Client) OnPutMatch(matchers ...interface{}) *Client_Put {
 }
 
 // Put provides a mock function with given fields: ctx, key, reader, metadata
-func (_m *Client) Put(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) error {
+func (_m *Client) Put(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
 	ret := _m.Called(ctx, key, reader, metadata)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, catalog.Key, io.OutputReader, catalog.Metadata) error); ok {
+	var r0 catalog.Status
+	if rf, ok := ret.Get(0).(func(context.Context, catalog.Key, io.OutputReader, catalog.Metadata) catalog.Status); ok {
 		r0 = rf(ctx, key, reader, metadata)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(catalog.Status)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, catalog.Key, io.OutputReader, catalog.Metadata) error); ok {
+		r1 = rf(ctx, key, reader, metadata)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
