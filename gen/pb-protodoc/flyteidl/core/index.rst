@@ -12,6 +12,7 @@ of the various entities in Flyte as well as the type system.
 	:caption: core
 	:name: coretoc
 
+	catalog.proto
 	compiler.proto
 	condition.proto
 	dynamic_job.proto

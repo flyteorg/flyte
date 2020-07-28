@@ -18,8 +18,8 @@
 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fevent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_EventErrorAlreadyInTerminalState_flyteidl_2fadmin_2fevent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fevent_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_WorkflowExecutionEvent_flyteidl_2fevent_2fevent_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fevent_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_NodeExecutionEvent_flyteidl_2fevent_2fevent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fevent_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_TaskExecutionEvent_flyteidl_2fevent_2fevent_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fevent_2eproto ::google::protobuf::internal::SCCInfo<7> scc_info_NodeExecutionEvent_flyteidl_2fevent_2fevent_2eproto;
 namespace flyteidl {
 namespace admin {
 class EventErrorAlreadyInTerminalStateDefaultTypeInternal {

@@ -199,7 +199,7 @@
           },
           {
             "name": "task_execution_id.task_id.resource_type",
-            "description": "Identifies the specific type of resource that this identifer corresponds to.",
+            "description": "Identifies the specific type of resource that this identifer corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
             "in": "query",
             "required": false,
             "type": "string",
@@ -207,7 +207,8 @@
               "UNSPECIFIED",
               "TASK",
               "WORKFLOW",
-              "LAUNCH_PLAN"
+              "LAUNCH_PLAN",
+              "DATASET"
             ],
             "default": "UNSPECIFIED"
           },
@@ -421,7 +422,7 @@
           },
           {
             "name": "id.task_id.resource_type",
-            "description": "Identifies the specific type of resource that this identifer corresponds to.",
+            "description": "Identifies the specific type of resource that this identifer corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
             "in": "query",
             "required": false,
             "type": "string",
@@ -429,7 +430,8 @@
               "UNSPECIFIED",
               "TASK",
               "WORKFLOW",
-              "LAUNCH_PLAN"
+              "LAUNCH_PLAN",
+              "DATASET"
             ],
             "default": "UNSPECIFIED"
           }
@@ -1055,7 +1057,7 @@
           },
           {
             "name": "id.resource_type",
-            "description": "Identifies the specific type of resource that this identifer corresponds to.",
+            "description": "Identifies the specific type of resource that this identifer corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1063,7 +1065,8 @@
               "UNSPECIFIED",
               "TASK",
               "WORKFLOW",
-              "LAUNCH_PLAN"
+              "LAUNCH_PLAN",
+              "DATASET"
             ],
             "default": "UNSPECIFIED"
           }
@@ -1182,7 +1185,8 @@
               "UNSPECIFIED",
               "TASK",
               "WORKFLOW",
-              "LAUNCH_PLAN"
+              "LAUNCH_PLAN",
+              "DATASET"
             ]
           },
           {
@@ -1233,7 +1237,8 @@
               "UNSPECIFIED",
               "TASK",
               "WORKFLOW",
-              "LAUNCH_PLAN"
+              "LAUNCH_PLAN",
+              "DATASET"
             ]
           },
           {
@@ -1293,7 +1298,8 @@
               "UNSPECIFIED",
               "TASK",
               "WORKFLOW",
-              "LAUNCH_PLAN"
+              "LAUNCH_PLAN",
+              "DATASET"
             ]
           },
           {
@@ -1738,7 +1744,7 @@
           },
           {
             "name": "id.task_id.resource_type",
-            "description": "Identifies the specific type of resource that this identifer corresponds to.",
+            "description": "Identifies the specific type of resource that this identifer corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1746,7 +1752,8 @@
               "UNSPECIFIED",
               "TASK",
               "WORKFLOW",
-              "LAUNCH_PLAN"
+              "LAUNCH_PLAN",
+              "DATASET"
             ],
             "default": "UNSPECIFIED"
           }
@@ -2157,7 +2164,7 @@
           },
           {
             "name": "id.resource_type",
-            "description": "Identifies the specific type of resource that this identifer corresponds to.",
+            "description": "Identifies the specific type of resource that this identifer corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2165,7 +2172,8 @@
               "UNSPECIFIED",
               "TASK",
               "WORKFLOW",
-              "LAUNCH_PLAN"
+              "LAUNCH_PLAN",
+              "DATASET"
             ],
             "default": "UNSPECIFIED"
           }
@@ -2638,7 +2646,7 @@
           },
           {
             "name": "id.resource_type",
-            "description": "Identifies the specific type of resource that this identifer corresponds to.",
+            "description": "Identifies the specific type of resource that this identifer corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2646,7 +2654,8 @@
               "UNSPECIFIED",
               "TASK",
               "WORKFLOW",
-              "LAUNCH_PLAN"
+              "LAUNCH_PLAN",
+              "DATASET"
             ],
             "default": "UNSPECIFIED"
           }
@@ -3627,6 +3636,9 @@
         },
         "workflow_node_metadata": {
           "$ref": "#/definitions/flyteidladminWorkflowNodeMetadata"
+        },
+        "task_node_metadata": {
+          "$ref": "#/definitions/flyteidladminTaskNodeMetadata"
         }
       },
       "description": "Container for node execution details and results."
@@ -4427,6 +4439,51 @@
       },
       "description": "BranchNode is a special node that alter the flow of the workflow graph. It allows the control flow to branch at\nruntime based on a series of conditions that get evaluated on various parameters (e.g. inputs, primtives)."
     },
+    "coreCatalogArtifactTag": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "title": "Artifact ID is generated name"
+        },
+        "name": {
+          "type": "string",
+          "title": "Flyte computes the tag automatically, as the hash of the values"
+        }
+      }
+    },
+    "coreCatalogCacheStatus": {
+      "type": "string",
+      "enum": [
+        "CACHE_DISABLED",
+        "CACHE_MISS",
+        "CACHE_HIT",
+        "CACHE_POPULATED",
+        "CACHE_LOOKUP_FAILURE",
+        "CACHE_PUT_FAILURE"
+      ],
+      "default": "CACHE_DISABLED",
+      "description": "- CACHE_DISABLED: Used to indicate that caching was disabled\n - CACHE_MISS: Used to indicate that the cache lookup resulted in no matches\n - CACHE_HIT: used to indicate that the associated artifact was a result of a previous execution\n - CACHE_POPULATED: used to indicate that the resultant artifact was added to the cache\n - CACHE_LOOKUP_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_PUT_FAILURE: Used to indicate that cache lookup failed because of an error",
+      "title": "Indicates the status of CatalogCaching. The reason why this is not embeded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future"
+    },
+    "coreCatalogMetadata": {
+      "type": "object",
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/definitions/coreIdentifier",
+          "title": "Dataset ID in the catalog"
+        },
+        "artifact_tag": {
+          "$ref": "#/definitions/coreCatalogArtifactTag",
+          "title": "Artifact tag in the catalog"
+        },
+        "source_task_execution": {
+          "$ref": "#/definitions/coreTaskExecutionIdentifier",
+          "title": "Today we only support TaskExecutionIdentifier as a source, as catalog caching only works for task executions"
+        }
+      },
+      "title": "Catalog artifact information with specific metadata"
+    },
     "coreComparisonExpression": {
       "type": "object",
       "properties": {
@@ -5024,10 +5081,11 @@
         "UNSPECIFIED",
         "TASK",
         "WORKFLOW",
-        "LAUNCH_PLAN"
+        "LAUNCH_PLAN",
+        "DATASET"
       ],
       "default": "UNSPECIFIED",
-      "description": "Indicates a resource type within Flyte."
+      "description": "Indicates a resource type within Flyte.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects"
     },
     "coreResources": {
       "type": "object",
@@ -5445,6 +5503,9 @@
         "workflow_node_metadata": {
           "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
         },
+        "task_node_metadata": {
+          "$ref": "#/definitions/flyteidleventTaskNodeMetadata"
+        },
         "parent_task_metadata": {
           "$ref": "#/definitions/eventParentTaskExecutionMetadata",
           "description": "[To be deprecated] Specifies which task (if any) launched this node."
@@ -5618,6 +5679,20 @@
       },
       "description": "Encapsulates all details for a single task execution entity.\nA task execution represents an instantiated task, including all inputs and additional\nmetadata as well as computed results included state, outputs, and duration-based attributes."
     },
+    "flyteidladminTaskNodeMetadata": {
+      "type": "object",
+      "properties": {
+        "cache_status": {
+          "$ref": "#/definitions/coreCatalogCacheStatus",
+          "description": "Captures the status of caching for this execution."
+        },
+        "catalog_key": {
+          "$ref": "#/definitions/coreCatalogMetadata",
+          "title": "This structure carries the catalog artifact information"
+        }
+      },
+      "title": "Metadata for the case in which the node is a TaskNode"
+    },
     "flyteidladminWorkflowNodeMetadata": {
       "type": "object",
       "properties": {
@@ -5638,6 +5713,19 @@
         }
       },
       "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
+    },
+    "flyteidleventTaskNodeMetadata": {
+      "type": "object",
+      "properties": {
+        "cache_status": {
+          "$ref": "#/definitions/coreCatalogCacheStatus",
+          "description": "Captures the status of caching for this execution."
+        },
+        "catalog_key": {
+          "$ref": "#/definitions/coreCatalogMetadata",
+          "title": "This structure carries the catalog artifact information"
+        }
+      }
     },
     "flyteidleventWorkflowNodeMetadata": {
       "type": "object",

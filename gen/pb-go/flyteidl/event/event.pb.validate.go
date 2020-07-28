@@ -38,6 +38,8 @@ var (
 
 	_ = core.NodeExecution_Phase(0)
 
+	_ = core.CatalogCacheStatus(0)
+
 	_ = core.TaskExecution_Phase(0)
 )
 
@@ -247,6 +249,18 @@ func (m *NodeExecutionEvent) Validate() error {
 			}
 		}
 
+	case *NodeExecutionEvent_TaskNodeMetadata:
+
+		if v, ok := interface{}(m.GetTaskNodeMetadata()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NodeExecutionEventValidationError{
+					field:  "TaskNodeMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
@@ -384,6 +398,83 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WorkflowNodeMetadataValidationError{}
+
+// Validate checks the field values on TaskNodeMetadata with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *TaskNodeMetadata) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for CacheStatus
+
+	if v, ok := interface{}(m.GetCatalogKey()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskNodeMetadataValidationError{
+				field:  "CatalogKey",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// TaskNodeMetadataValidationError is the validation error returned by
+// TaskNodeMetadata.Validate if the designated constraints aren't met.
+type TaskNodeMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskNodeMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskNodeMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskNodeMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskNodeMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskNodeMetadataValidationError) ErrorName() string { return "TaskNodeMetadataValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TaskNodeMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskNodeMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskNodeMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskNodeMetadataValidationError{}
 
 // Validate checks the field values on ParentTaskExecutionMetadata with the
 // rules defined in the proto definition for this message. If any rules are
