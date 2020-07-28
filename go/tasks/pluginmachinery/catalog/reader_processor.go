@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+
 	"github.com/lyft/flyteplugins/go/tasks/errors"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/lyft/flytestdlib/logger"
+
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue"
 )
@@ -57,14 +60,18 @@ func (p ReaderProcessor) Process(ctx context.Context, workItem workqueue.WorkIte
 		return workqueue.WorkStatusFailed, err
 	}
 
-	if op == nil {
+	if op.status.GetCacheStatus() == core.CatalogCacheStatus_CACHE_LOOKUP_FAILURE {
+		return workqueue.WorkStatusFailed, errors.Errorf(errors.DownstreamSystemError, "failed to lookup cache")
+	}
+
+	if op.status.GetCacheStatus() == core.CatalogCacheStatus_CACHE_MISS || op.GetOutputs() == nil {
 		wi.cached = false
 		return workqueue.WorkStatusSucceeded, nil
 	}
 
 	// TODO: Check task interface, if it has outputs but literalmap is empty (or not matching output), error.
 	logger.Debugf(ctx, "Persisting output to %v", wi.outputsWriter.GetOutputPath())
-	err = wi.outputsWriter.Put(ctx, op)
+	err = wi.outputsWriter.Put(ctx, op.GetOutputs())
 	if err != nil {
 		err = errors.Wrapf("CausedBy", err, "Failed to persist cached output for Key: %v.", wi.key)
 		logger.Warnf(ctx, "Cache write to output writer failed: %v", err)

@@ -7,7 +7,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.2
 	github.com/imdario/mergo v0.3.9 // indirect
-	github.com/lyft/flyteidl v0.17.32
+	github.com/lyft/flyteidl v0.17.38
 	github.com/lyft/flyteplugins v0.3.29
 	github.com/lyft/flytestdlib v0.3.9
 	github.com/mitchellh/go-ps v1.0.0
