@@ -30,6 +30,7 @@ class CoreResourceType(object):
     TASK = "TASK"
     WORKFLOW = "WORKFLOW"
     LAUNCH_PLAN = "LAUNCH_PLAN"
+    DATASET = "DATASET"
 
     """
     Attributes:

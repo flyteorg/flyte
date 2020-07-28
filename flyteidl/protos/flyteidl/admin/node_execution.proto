@@ -5,6 +5,7 @@ option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/admin/common.proto";
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/catalog.proto";
 import "flyteidl/core/identifier.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
@@ -133,12 +134,21 @@ message NodeExecutionClosure {
     // for ex: if this is a workflow node, we store information for the launched workflow.
     oneof target_metadata {
         WorkflowNodeMetadata workflow_node_metadata = 8;
+        TaskNodeMetadata task_node_metadata = 9;
     }
 }
 
 // Metadata for a WorkflowNode
 message WorkflowNodeMetadata {
     core.WorkflowExecutionIdentifier executionId        = 1;
+}
+
+// Metadata for the case in which the node is a TaskNode
+message TaskNodeMetadata {
+    // Captures the status of caching for this execution.
+    core.CatalogCacheStatus cache_status = 1;
+    // This structure carries the catalog artifact information
+    core.CatalogMetadata catalog_key = 2;
 }
 
 // Request structure to fetch inputs and output urls for a node execution.

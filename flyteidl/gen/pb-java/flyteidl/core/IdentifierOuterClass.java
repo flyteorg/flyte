@@ -39,6 +39,16 @@ public final class IdentifierOuterClass {
      * <code>LAUNCH_PLAN = 3;</code>
      */
     LAUNCH_PLAN(3),
+    /**
+     * <pre>
+     * A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.
+     * Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects 
+     * in a similar manner to other Flyte objects
+     * </pre>
+     *
+     * <code>DATASET = 4;</code>
+     */
+    DATASET(4),
     UNRECOGNIZED(-1),
     ;
 
@@ -58,6 +68,16 @@ public final class IdentifierOuterClass {
      * <code>LAUNCH_PLAN = 3;</code>
      */
     public static final int LAUNCH_PLAN_VALUE = 3;
+    /**
+     * <pre>
+     * A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.
+     * Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects 
+     * in a similar manner to other Flyte objects
+     * </pre>
+     *
+     * <code>DATASET = 4;</code>
+     */
+    public static final int DATASET_VALUE = 4;
 
 
     public final int getNumber() {
@@ -82,6 +102,7 @@ public final class IdentifierOuterClass {
         case 1: return TASK;
         case 2: return WORKFLOW;
         case 3: return LAUNCH_PLAN;
+        case 4: return DATASET;
         default: return null;
       }
     }
@@ -3996,10 +4017,10 @@ public final class IdentifierOuterClass {
       "sk_id\030\001 \001(\0132\031.flyteidl.core.Identifier\022A" +
       "\n\021node_execution_id\030\002 \001(\0132&.flyteidl.cor" +
       "e.NodeExecutionIdentifier\022\025\n\rretry_attem" +
-      "pt\030\003 \001(\r*H\n\014ResourceType\022\017\n\013UNSPECIFIED\020" +
+      "pt\030\003 \001(\r*U\n\014ResourceType\022\017\n\013UNSPECIFIED\020" +
       "\000\022\010\n\004TASK\020\001\022\014\n\010WORKFLOW\020\002\022\017\n\013LAUNCH_PLAN" +
-      "\020\003B2Z0github.com/lyft/flyteidl/gen/pb-go" +
-      "/flyteidl/coreb\006proto3"
+      "\020\003\022\013\n\007DATASET\020\004B2Z0github.com/lyft/flyte" +
+      "idl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

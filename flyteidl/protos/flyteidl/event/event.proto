@@ -6,6 +6,7 @@ option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/event";
 
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
+import "flyteidl/core/catalog.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
 
@@ -60,6 +61,7 @@ message NodeExecutionEvent {
     // on the node type
     oneof target_metadata {
         WorkflowNodeMetadata workflow_node_metadata = 8;
+        TaskNodeMetadata task_node_metadata = 14;
     }
 
     // [To be deprecated] Specifies which task (if any) launched this node.
@@ -83,6 +85,14 @@ message NodeExecutionEvent {
 message WorkflowNodeMetadata {
     core.WorkflowExecutionIdentifier execution_id = 1;
 }
+
+message TaskNodeMetadata {
+    // Captures the status of caching for this execution.
+    core.CatalogCacheStatus cache_status = 1;
+    // This structure carries the catalog artifact information
+    core.CatalogMetadata catalog_key = 2;
+}
+
 
 message ParentTaskExecutionMetadata {
     core.TaskExecutionIdentifier id = 1;

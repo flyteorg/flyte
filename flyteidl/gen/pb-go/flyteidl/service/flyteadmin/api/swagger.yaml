@@ -171,7 +171,12 @@ paths:
       - name: "task_execution_id.task_id.resource_type"
         in: "query"
         description: "Identifies the specific type of resource that this identifer\
-          \ corresponds to."
+          \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
+          \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
+          \ a compilation of multiple individual objects.\nEventually all Catalog\
+          \ objects should be modeled similar to Flyte Objects. The Dataset entities\
+          \ makes it possible for the UI  and CLI to act on the objects \nin a similar\
+          \ manner to other Flyte objects"
         required: false
         type: "string"
         default: "UNSPECIFIED"
@@ -180,6 +185,7 @@ paths:
         - "TASK"
         - "WORKFLOW"
         - "LAUNCH_PLAN"
+        - "DATASET"
         x-exportParamName: "TaskExecutionIdTaskIdResourceType"
         x-optionalDataType: "String"
       - name: "limit"
@@ -363,7 +369,12 @@ paths:
       - name: "id.task_id.resource_type"
         in: "query"
         description: "Identifies the specific type of resource that this identifer\
-          \ corresponds to."
+          \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
+          \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
+          \ a compilation of multiple individual objects.\nEventually all Catalog\
+          \ objects should be modeled similar to Flyte Objects. The Dataset entities\
+          \ makes it possible for the UI  and CLI to act on the objects \nin a similar\
+          \ manner to other Flyte objects"
         required: false
         type: "string"
         default: "UNSPECIFIED"
@@ -372,6 +383,7 @@ paths:
         - "TASK"
         - "WORKFLOW"
         - "LAUNCH_PLAN"
+        - "DATASET"
         x-exportParamName: "IdTaskIdResourceType"
         x-optionalDataType: "String"
       responses:
@@ -897,7 +909,12 @@ paths:
       - name: "id.resource_type"
         in: "query"
         description: "Identifies the specific type of resource that this identifer\
-          \ corresponds to."
+          \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
+          \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
+          \ a compilation of multiple individual objects.\nEventually all Catalog\
+          \ objects should be modeled similar to Flyte Objects. The Dataset entities\
+          \ makes it possible for the UI  and CLI to act on the objects \nin a similar\
+          \ manner to other Flyte objects"
         required: false
         type: "string"
         default: "UNSPECIFIED"
@@ -906,6 +923,7 @@ paths:
         - "TASK"
         - "WORKFLOW"
         - "LAUNCH_PLAN"
+        - "DATASET"
         x-exportParamName: "IdResourceType"
         x-optionalDataType: "String"
       responses:
@@ -1010,6 +1028,7 @@ paths:
         - "TASK"
         - "WORKFLOW"
         - "LAUNCH_PLAN"
+        - "DATASET"
         x-exportParamName: "ResourceType"
       - name: "id.project"
         in: "path"
@@ -1053,6 +1072,7 @@ paths:
         - "TASK"
         - "WORKFLOW"
         - "LAUNCH_PLAN"
+        - "DATASET"
         x-exportParamName: "ResourceType"
       - name: "id.project"
         in: "path"
@@ -1103,6 +1123,7 @@ paths:
         - "TASK"
         - "WORKFLOW"
         - "LAUNCH_PLAN"
+        - "DATASET"
         x-exportParamName: "ResourceType"
       - name: "project"
         in: "path"
@@ -1481,7 +1502,12 @@ paths:
       - name: "id.task_id.resource_type"
         in: "query"
         description: "Identifies the specific type of resource that this identifer\
-          \ corresponds to."
+          \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
+          \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
+          \ a compilation of multiple individual objects.\nEventually all Catalog\
+          \ objects should be modeled similar to Flyte Objects. The Dataset entities\
+          \ makes it possible for the UI  and CLI to act on the objects \nin a similar\
+          \ manner to other Flyte objects"
         required: false
         type: "string"
         default: "UNSPECIFIED"
@@ -1490,6 +1516,7 @@ paths:
         - "TASK"
         - "WORKFLOW"
         - "LAUNCH_PLAN"
+        - "DATASET"
         x-exportParamName: "IdTaskIdResourceType"
         x-optionalDataType: "String"
       responses:
@@ -1859,7 +1886,12 @@ paths:
       - name: "id.resource_type"
         in: "query"
         description: "Identifies the specific type of resource that this identifer\
-          \ corresponds to."
+          \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
+          \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
+          \ a compilation of multiple individual objects.\nEventually all Catalog\
+          \ objects should be modeled similar to Flyte Objects. The Dataset entities\
+          \ makes it possible for the UI  and CLI to act on the objects \nin a similar\
+          \ manner to other Flyte objects"
         required: false
         type: "string"
         default: "UNSPECIFIED"
@@ -1868,6 +1900,7 @@ paths:
         - "TASK"
         - "WORKFLOW"
         - "LAUNCH_PLAN"
+        - "DATASET"
         x-exportParamName: "IdResourceType"
         x-optionalDataType: "String"
       responses:
@@ -2281,7 +2314,12 @@ paths:
       - name: "id.resource_type"
         in: "query"
         description: "Identifies the specific type of resource that this identifer\
-          \ corresponds to."
+          \ corresponds to.\n\n - DATASET: A dataset represents an entity modeled\
+          \ in Flyte DataCatalog. A Dataset is also a versioned entity and can be\
+          \ a compilation of multiple individual objects.\nEventually all Catalog\
+          \ objects should be modeled similar to Flyte Objects. The Dataset entities\
+          \ makes it possible for the UI  and CLI to act on the objects \nin a similar\
+          \ manner to other Flyte objects"
         required: false
         type: "string"
         default: "UNSPECIFIED"
@@ -2290,6 +2328,7 @@ paths:
         - "TASK"
         - "WORKFLOW"
         - "LAUNCH_PLAN"
+        - "DATASET"
         x-exportParamName: "IdResourceType"
         x-optionalDataType: "String"
       responses:
@@ -4935,6 +4974,8 @@ definitions:
         description: "Time at which the node execution was last updated."
       workflow_node_metadata:
         $ref: "#/definitions/flyteidladminWorkflowNodeMetadata"
+      task_node_metadata:
+        $ref: "#/definitions/flyteidladminTaskNodeMetadata"
     description: "Container for node execution details and results."
     example:
       phase: {}
@@ -4945,6 +4986,32 @@ definitions:
           name: "name"
           project: "project"
       updated_at: "2000-01-23T04:56:07.000+00:00"
+      task_node_metadata:
+        catalog_key:
+          source_task_execution:
+            task_id:
+              domain: "domain"
+              resource_type: {}
+              name: "name"
+              project: "project"
+              version: "version"
+            node_execution_id:
+              execution_id:
+                domain: "domain"
+                name: "name"
+                project: "project"
+              node_id: "node_id"
+            retry_attempt: 0
+          dataset_id:
+            domain: "domain"
+            resource_type: {}
+            name: "name"
+            project: "project"
+            version: "version"
+          artifact_tag:
+            name: "name"
+            artifact_id: "artifact_id"
+        cache_status: {}
       output_uri: "output_uri"
       started_at: "2000-01-23T04:56:07.000+00:00"
       created_at: "2000-01-23T04:56:07.000+00:00"
@@ -5018,6 +5085,32 @@ definitions:
               name: "name"
               project: "project"
           updated_at: "2000-01-23T04:56:07.000+00:00"
+          task_node_metadata:
+            catalog_key:
+              source_task_execution:
+                task_id:
+                  domain: "domain"
+                  resource_type: {}
+                  name: "name"
+                  project: "project"
+                  version: "version"
+                node_execution_id:
+                  execution_id:
+                    domain: "domain"
+                    name: "name"
+                    project: "project"
+                  node_id: "node_id"
+                retry_attempt: 0
+              dataset_id:
+                domain: "domain"
+                resource_type: {}
+                name: "name"
+                project: "project"
+                version: "version"
+              artifact_tag:
+                name: "name"
+                artifact_id: "artifact_id"
+            cache_status: {}
           output_uri: "output_uri"
           started_at: "2000-01-23T04:56:07.000+00:00"
           created_at: "2000-01-23T04:56:07.000+00:00"
@@ -5046,6 +5139,32 @@ definitions:
               name: "name"
               project: "project"
           updated_at: "2000-01-23T04:56:07.000+00:00"
+          task_node_metadata:
+            catalog_key:
+              source_task_execution:
+                task_id:
+                  domain: "domain"
+                  resource_type: {}
+                  name: "name"
+                  project: "project"
+                  version: "version"
+                node_execution_id:
+                  execution_id:
+                    domain: "domain"
+                    name: "name"
+                    project: "project"
+                  node_id: "node_id"
+                retry_attempt: 0
+              dataset_id:
+                domain: "domain"
+                resource_type: {}
+                name: "name"
+                project: "project"
+                version: "version"
+              artifact_tag:
+                name: "name"
+                artifact_id: "artifact_id"
+            cache_status: {}
           output_uri: "output_uri"
           started_at: "2000-01-23T04:56:07.000+00:00"
           created_at: "2000-01-23T04:56:07.000+00:00"
@@ -17716,6 +17835,76 @@ definitions:
                   integer: "integer"
                 var: "var"
               operator: {}
+  coreCatalogArtifactTag:
+    type: "object"
+    properties:
+      artifact_id:
+        type: "string"
+        title: "Artifact ID is generated name"
+      name:
+        type: "string"
+        title: "Flyte computes the tag automatically, as the hash of the values"
+    example:
+      name: "name"
+      artifact_id: "artifact_id"
+  coreCatalogCacheStatus:
+    type: "string"
+    title: "Indicates the status of CatalogCaching. The reason why this is not embeded\
+      \ in TaskNodeMetadata is, that we may use for other types of nodes as well in\
+      \ the future"
+    description: "- CACHE_DISABLED: Used to indicate that caching was disabled\n -\
+      \ CACHE_MISS: Used to indicate that the cache lookup resulted in no matches\n\
+      \ - CACHE_HIT: used to indicate that the associated artifact was a result of\
+      \ a previous execution\n - CACHE_POPULATED: used to indicate that the resultant\
+      \ artifact was added to the cache\n - CACHE_LOOKUP_FAILURE: Used to indicate\
+      \ that cache lookup failed because of an error\n - CACHE_PUT_FAILURE: Used to\
+      \ indicate that cache lookup failed because of an error"
+    enum:
+    - "CACHE_DISABLED"
+    - "CACHE_MISS"
+    - "CACHE_HIT"
+    - "CACHE_POPULATED"
+    - "CACHE_LOOKUP_FAILURE"
+    - "CACHE_PUT_FAILURE"
+    default: "CACHE_DISABLED"
+  coreCatalogMetadata:
+    type: "object"
+    properties:
+      dataset_id:
+        title: "Dataset ID in the catalog"
+        $ref: "#/definitions/coreIdentifier"
+      artifact_tag:
+        title: "Artifact tag in the catalog"
+        $ref: "#/definitions/coreCatalogArtifactTag"
+      source_task_execution:
+        title: "Today we only support TaskExecutionIdentifier as a source, as catalog\
+          \ caching only works for task executions"
+        $ref: "#/definitions/coreTaskExecutionIdentifier"
+    title: "Catalog artifact information with specific metadata"
+    example:
+      source_task_execution:
+        task_id:
+          domain: "domain"
+          resource_type: {}
+          name: "name"
+          project: "project"
+          version: "version"
+        node_execution_id:
+          execution_id:
+            domain: "domain"
+            name: "name"
+            project: "project"
+          node_id: "node_id"
+        retry_attempt: 0
+      dataset_id:
+        domain: "domain"
+        resource_type: {}
+        name: "name"
+        project: "project"
+        version: "version"
+      artifact_tag:
+        name: "name"
+        artifact_id: "artifact_id"
   coreComparisonExpression:
     type: "object"
     properties:
@@ -22579,12 +22768,18 @@ definitions:
       queueing_budget: "queueing_budget"
   coreResourceType:
     type: "string"
-    description: "Indicates a resource type within Flyte."
+    description: "Indicates a resource type within Flyte.\n\n - DATASET: A dataset\
+      \ represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned\
+      \ entity and can be a compilation of multiple individual objects.\nEventually\
+      \ all Catalog objects should be modeled similar to Flyte Objects. The Dataset\
+      \ entities makes it possible for the UI  and CLI to act on the objects \nin\
+      \ a similar manner to other Flyte objects"
     enum:
     - "UNSPECIFIED"
     - "TASK"
     - "WORKFLOW"
     - "LAUNCH_PLAN"
+    - "DATASET"
     default: "UNSPECIFIED"
   coreResources:
     type: "object"
@@ -24107,6 +24302,8 @@ definitions:
         $ref: "#/definitions/coreExecutionError"
       workflow_node_metadata:
         $ref: "#/definitions/flyteidleventWorkflowNodeMetadata"
+      task_node_metadata:
+        $ref: "#/definitions/flyteidleventTaskNodeMetadata"
       parent_task_metadata:
         description: "[To be deprecated] Specifies which task (if any) launched this\
           \ node."
@@ -24257,6 +24454,32 @@ definitions:
             name: "name"
             project: "project"
         updated_at: "2000-01-23T04:56:07.000+00:00"
+        task_node_metadata:
+          catalog_key:
+            source_task_execution:
+              task_id:
+                domain: "domain"
+                resource_type: {}
+                name: "name"
+                project: "project"
+                version: "version"
+              node_execution_id:
+                execution_id:
+                  domain: "domain"
+                  name: "name"
+                  project: "project"
+                node_id: "node_id"
+              retry_attempt: 0
+            dataset_id:
+              domain: "domain"
+              resource_type: {}
+              name: "name"
+              project: "project"
+              version: "version"
+            artifact_tag:
+              name: "name"
+              artifact_id: "artifact_id"
+          cache_status: {}
         output_uri: "output_uri"
         started_at: "2000-01-23T04:56:07.000+00:00"
         created_at: "2000-01-23T04:56:07.000+00:00"
@@ -24334,6 +24557,42 @@ definitions:
           name: "name"
           uri: "uri"
           ttl: "ttl"
+  flyteidladminTaskNodeMetadata:
+    type: "object"
+    properties:
+      cache_status:
+        description: "Captures the status of caching for this execution."
+        $ref: "#/definitions/coreCatalogCacheStatus"
+      catalog_key:
+        title: "This structure carries the catalog artifact information"
+        $ref: "#/definitions/coreCatalogMetadata"
+    title: "Metadata for the case in which the node is a TaskNode"
+    example:
+      catalog_key:
+        source_task_execution:
+          task_id:
+            domain: "domain"
+            resource_type: {}
+            name: "name"
+            project: "project"
+            version: "version"
+          node_execution_id:
+            execution_id:
+              domain: "domain"
+              name: "name"
+              project: "project"
+            node_id: "node_id"
+          retry_attempt: 0
+        dataset_id:
+          domain: "domain"
+          resource_type: {}
+          name: "name"
+          project: "project"
+          version: "version"
+        artifact_tag:
+          name: "name"
+          artifact_id: "artifact_id"
+      cache_status: {}
   flyteidladminWorkflowNodeMetadata:
     type: "object"
     properties:
@@ -24362,6 +24621,15 @@ definitions:
         - name: "name"
           type: {}
       uri: "uri"
+  flyteidleventTaskNodeMetadata:
+    type: "object"
+    properties:
+      cache_status:
+        description: "Captures the status of caching for this execution."
+        $ref: "#/definitions/coreCatalogCacheStatus"
+      catalog_key:
+        title: "This structure carries the catalog artifact information"
+        $ref: "#/definitions/coreCatalogMetadata"
   flyteidleventWorkflowNodeMetadata:
     type: "object"
     properties:

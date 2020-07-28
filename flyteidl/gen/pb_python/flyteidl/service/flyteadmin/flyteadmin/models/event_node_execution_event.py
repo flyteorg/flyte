@@ -21,6 +21,7 @@ from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionId
 from flyteadmin.models.core_node_execution_phase import CoreNodeExecutionPhase  # noqa: F401,E501
 from flyteadmin.models.event_parent_node_execution_metadata import EventParentNodeExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.event_parent_task_execution_metadata import EventParentTaskExecutionMetadata  # noqa: F401,E501
+from flyteadmin.models.flyteidlevent_task_node_metadata import FlyteidleventTaskNodeMetadata  # noqa: F401,E501
 from flyteadmin.models.flyteidlevent_workflow_node_metadata import FlyteidleventWorkflowNodeMetadata  # noqa: F401,E501
 
 
@@ -46,6 +47,7 @@ class EventNodeExecutionEvent(object):
         'output_uri': 'str',
         'error': 'CoreExecutionError',
         'workflow_node_metadata': 'FlyteidleventWorkflowNodeMetadata',
+        'task_node_metadata': 'FlyteidleventTaskNodeMetadata',
         'parent_task_metadata': 'EventParentTaskExecutionMetadata',
         'parent_node_metadata': 'EventParentNodeExecutionMetadata',
         'retry_group': 'str',
@@ -62,6 +64,7 @@ class EventNodeExecutionEvent(object):
         'output_uri': 'output_uri',
         'error': 'error',
         'workflow_node_metadata': 'workflow_node_metadata',
+        'task_node_metadata': 'task_node_metadata',
         'parent_task_metadata': 'parent_task_metadata',
         'parent_node_metadata': 'parent_node_metadata',
         'retry_group': 'retry_group',
@@ -69,7 +72,7 @@ class EventNodeExecutionEvent(object):
         'node_name': 'node_name'
     }
 
-    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, output_uri=None, error=None, workflow_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None):  # noqa: E501
+    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, output_uri=None, error=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None):  # noqa: E501
         """EventNodeExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -80,6 +83,7 @@ class EventNodeExecutionEvent(object):
         self._output_uri = None
         self._error = None
         self._workflow_node_metadata = None
+        self._task_node_metadata = None
         self._parent_task_metadata = None
         self._parent_node_metadata = None
         self._retry_group = None
@@ -103,6 +107,8 @@ class EventNodeExecutionEvent(object):
             self.error = error
         if workflow_node_metadata is not None:
             self.workflow_node_metadata = workflow_node_metadata
+        if task_node_metadata is not None:
+            self.task_node_metadata = task_node_metadata
         if parent_task_metadata is not None:
             self.parent_task_metadata = parent_task_metadata
         if parent_node_metadata is not None:
@@ -285,6 +291,27 @@ class EventNodeExecutionEvent(object):
         """
 
         self._workflow_node_metadata = workflow_node_metadata
+
+    @property
+    def task_node_metadata(self):
+        """Gets the task_node_metadata of this EventNodeExecutionEvent.  # noqa: E501
+
+
+        :return: The task_node_metadata of this EventNodeExecutionEvent.  # noqa: E501
+        :rtype: FlyteidleventTaskNodeMetadata
+        """
+        return self._task_node_metadata
+
+    @task_node_metadata.setter
+    def task_node_metadata(self, task_node_metadata):
+        """Sets the task_node_metadata of this EventNodeExecutionEvent.
+
+
+        :param task_node_metadata: The task_node_metadata of this EventNodeExecutionEvent.  # noqa: E501
+        :type: FlyteidleventTaskNodeMetadata
+        """
+
+        self._task_node_metadata = task_node_metadata
 
     @property
     def parent_task_metadata(self):

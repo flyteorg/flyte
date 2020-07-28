@@ -178,15 +178,15 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fidentifier_2eproto[] =
   "sk_id\030\001 \001(\0132\031.flyteidl.core.Identifier\022A"
   "\n\021node_execution_id\030\002 \001(\0132&.flyteidl.cor"
   "e.NodeExecutionIdentifier\022\025\n\rretry_attem"
-  "pt\030\003 \001(\r*H\n\014ResourceType\022\017\n\013UNSPECIFIED\020"
+  "pt\030\003 \001(\r*U\n\014ResourceType\022\017\n\013UNSPECIFIED\020"
   "\000\022\010\n\004TASK\020\001\022\014\n\010WORKFLOW\020\002\022\017\n\013LAUNCH_PLAN"
-  "\020\003B2Z0github.com/lyft/flyteidl/gen/pb-go"
-  "/flyteidl/coreb\006proto3"
+  "\020\003\022\013\n\007DATASET\020\004B2Z0github.com/lyft/flyte"
+  "idl/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fidentifier_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fidentifier_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fidentifier_2eproto,
-  "flyteidl/core/identifier.proto", &assign_descriptors_table_flyteidl_2fcore_2fidentifier_2eproto, 662,
+  "flyteidl/core/identifier.proto", &assign_descriptors_table_flyteidl_2fcore_2fidentifier_2eproto, 675,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fidentifier_2eproto() {
@@ -210,6 +210,7 @@ bool ResourceType_IsValid(int value) {
     case 1:
     case 2:
     case 3:
+    case 4:
       return true;
     default:
       return false;
