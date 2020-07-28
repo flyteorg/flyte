@@ -81,12 +81,13 @@ enum ResourceType {
   TASK = 1,
   WORKFLOW = 2,
   LAUNCH_PLAN = 3,
+  DATASET = 4,
   ResourceType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   ResourceType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool ResourceType_IsValid(int value);
 const ResourceType ResourceType_MIN = UNSPECIFIED;
-const ResourceType ResourceType_MAX = LAUNCH_PLAN;
+const ResourceType ResourceType_MAX = DATASET;
 const int ResourceType_ARRAYSIZE = ResourceType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* ResourceType_descriptor();

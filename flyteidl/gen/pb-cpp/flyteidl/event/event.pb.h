@@ -33,6 +33,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/execution.pb.h"
 #include "flyteidl/core/identifier.pb.h"
+#include "flyteidl/core/catalog.pb.h"
 #include <google/protobuf/timestamp.pb.h>
 #include <google/protobuf/struct.pb.h>
 // @@protoc_insertion_point(includes)
@@ -45,7 +46,7 @@ struct TableStruct_flyteidl_2fevent_2fevent_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[6]
+  static const ::google::protobuf::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -66,6 +67,9 @@ extern ParentTaskExecutionMetadataDefaultTypeInternal _ParentTaskExecutionMetada
 class TaskExecutionEvent;
 class TaskExecutionEventDefaultTypeInternal;
 extern TaskExecutionEventDefaultTypeInternal _TaskExecutionEvent_default_instance_;
+class TaskNodeMetadata;
+class TaskNodeMetadataDefaultTypeInternal;
+extern TaskNodeMetadataDefaultTypeInternal _TaskNodeMetadata_default_instance_;
 class WorkflowExecutionEvent;
 class WorkflowExecutionEventDefaultTypeInternal;
 extern WorkflowExecutionEventDefaultTypeInternal _WorkflowExecutionEvent_default_instance_;
@@ -80,6 +84,7 @@ template<> ::flyteidl::event::NodeExecutionEvent* Arena::CreateMaybeMessage<::fl
 template<> ::flyteidl::event::ParentNodeExecutionMetadata* Arena::CreateMaybeMessage<::flyteidl::event::ParentNodeExecutionMetadata>(Arena*);
 template<> ::flyteidl::event::ParentTaskExecutionMetadata* Arena::CreateMaybeMessage<::flyteidl::event::ParentTaskExecutionMetadata>(Arena*);
 template<> ::flyteidl::event::TaskExecutionEvent* Arena::CreateMaybeMessage<::flyteidl::event::TaskExecutionEvent>(Arena*);
+template<> ::flyteidl::event::TaskNodeMetadata* Arena::CreateMaybeMessage<::flyteidl::event::TaskNodeMetadata>(Arena*);
 template<> ::flyteidl::event::WorkflowExecutionEvent* Arena::CreateMaybeMessage<::flyteidl::event::WorkflowExecutionEvent>(Arena*);
 template<> ::flyteidl::event::WorkflowNodeMetadata* Arena::CreateMaybeMessage<::flyteidl::event::WorkflowNodeMetadata>(Arena*);
 }  // namespace protobuf
@@ -322,6 +327,7 @@ class NodeExecutionEvent final :
 
   enum TargetMetadataCase {
     kWorkflowNodeMetadata = 8,
+    kTaskNodeMetadata = 14,
     TARGET_METADATA_NOT_SET = 0,
   };
 
@@ -535,6 +541,15 @@ class NodeExecutionEvent final :
   ::flyteidl::event::WorkflowNodeMetadata* mutable_workflow_node_metadata();
   void set_allocated_workflow_node_metadata(::flyteidl::event::WorkflowNodeMetadata* workflow_node_metadata);
 
+  // .flyteidl.event.TaskNodeMetadata task_node_metadata = 14;
+  bool has_task_node_metadata() const;
+  void clear_task_node_metadata();
+  static const int kTaskNodeMetadataFieldNumber = 14;
+  const ::flyteidl::event::TaskNodeMetadata& task_node_metadata() const;
+  ::flyteidl::event::TaskNodeMetadata* release_task_node_metadata();
+  ::flyteidl::event::TaskNodeMetadata* mutable_task_node_metadata();
+  void set_allocated_task_node_metadata(::flyteidl::event::TaskNodeMetadata* task_node_metadata);
+
   void clear_output_result();
   OutputResultCase output_result_case() const;
   void clear_target_metadata();
@@ -545,6 +560,7 @@ class NodeExecutionEvent final :
   void set_has_output_uri();
   void set_has_error();
   void set_has_workflow_node_metadata();
+  void set_has_task_node_metadata();
 
   inline bool has_output_result() const;
   inline void clear_has_output_result();
@@ -571,6 +587,7 @@ class NodeExecutionEvent final :
   union TargetMetadataUnion {
     TargetMetadataUnion() {}
     ::flyteidl::event::WorkflowNodeMetadata* workflow_node_metadata_;
+    ::flyteidl::event::TaskNodeMetadata* task_node_metadata_;
   } target_metadata_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[2];
@@ -694,6 +711,128 @@ class WorkflowNodeMetadata final :
 };
 // -------------------------------------------------------------------
 
+class TaskNodeMetadata final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.event.TaskNodeMetadata) */ {
+ public:
+  TaskNodeMetadata();
+  virtual ~TaskNodeMetadata();
+
+  TaskNodeMetadata(const TaskNodeMetadata& from);
+
+  inline TaskNodeMetadata& operator=(const TaskNodeMetadata& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  TaskNodeMetadata(TaskNodeMetadata&& from) noexcept
+    : TaskNodeMetadata() {
+    *this = ::std::move(from);
+  }
+
+  inline TaskNodeMetadata& operator=(TaskNodeMetadata&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const TaskNodeMetadata& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const TaskNodeMetadata* internal_default_instance() {
+    return reinterpret_cast<const TaskNodeMetadata*>(
+               &_TaskNodeMetadata_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  void Swap(TaskNodeMetadata* other);
+  friend void swap(TaskNodeMetadata& a, TaskNodeMetadata& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline TaskNodeMetadata* New() const final {
+    return CreateMaybeMessage<TaskNodeMetadata>(nullptr);
+  }
+
+  TaskNodeMetadata* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<TaskNodeMetadata>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const TaskNodeMetadata& from);
+  void MergeFrom(const TaskNodeMetadata& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(TaskNodeMetadata* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.CatalogMetadata catalog_key = 2;
+  bool has_catalog_key() const;
+  void clear_catalog_key();
+  static const int kCatalogKeyFieldNumber = 2;
+  const ::flyteidl::core::CatalogMetadata& catalog_key() const;
+  ::flyteidl::core::CatalogMetadata* release_catalog_key();
+  ::flyteidl::core::CatalogMetadata* mutable_catalog_key();
+  void set_allocated_catalog_key(::flyteidl::core::CatalogMetadata* catalog_key);
+
+  // .flyteidl.core.CatalogCacheStatus cache_status = 1;
+  void clear_cache_status();
+  static const int kCacheStatusFieldNumber = 1;
+  ::flyteidl::core::CatalogCacheStatus cache_status() const;
+  void set_cache_status(::flyteidl::core::CatalogCacheStatus value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.event.TaskNodeMetadata)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::CatalogMetadata* catalog_key_;
+  int cache_status_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fevent_2fevent_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ParentTaskExecutionMetadata final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.event.ParentTaskExecutionMetadata) */ {
  public:
@@ -732,7 +871,7 @@ class ParentTaskExecutionMetadata final :
                &_ParentTaskExecutionMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   void Swap(ParentTaskExecutionMetadata* other);
   friend void swap(ParentTaskExecutionMetadata& a, ParentTaskExecutionMetadata& b) {
@@ -847,7 +986,7 @@ class ParentNodeExecutionMetadata final :
                &_ParentNodeExecutionMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   void Swap(ParentNodeExecutionMetadata* other);
   friend void swap(ParentNodeExecutionMetadata& a, ParentNodeExecutionMetadata& b) {
@@ -973,7 +1112,7 @@ class TaskExecutionEvent final :
                &_TaskExecutionEvent_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(TaskExecutionEvent* other);
   friend void swap(TaskExecutionEvent& a, TaskExecutionEvent& b) {
@@ -1870,6 +2009,47 @@ inline ::flyteidl::event::WorkflowNodeMetadata* NodeExecutionEvent::mutable_work
   return target_metadata_.workflow_node_metadata_;
 }
 
+// .flyteidl.event.TaskNodeMetadata task_node_metadata = 14;
+inline bool NodeExecutionEvent::has_task_node_metadata() const {
+  return target_metadata_case() == kTaskNodeMetadata;
+}
+inline void NodeExecutionEvent::set_has_task_node_metadata() {
+  _oneof_case_[1] = kTaskNodeMetadata;
+}
+inline void NodeExecutionEvent::clear_task_node_metadata() {
+  if (has_task_node_metadata()) {
+    delete target_metadata_.task_node_metadata_;
+    clear_has_target_metadata();
+  }
+}
+inline ::flyteidl::event::TaskNodeMetadata* NodeExecutionEvent::release_task_node_metadata() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.NodeExecutionEvent.task_node_metadata)
+  if (has_task_node_metadata()) {
+    clear_has_target_metadata();
+      ::flyteidl::event::TaskNodeMetadata* temp = target_metadata_.task_node_metadata_;
+    target_metadata_.task_node_metadata_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::event::TaskNodeMetadata& NodeExecutionEvent::task_node_metadata() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.NodeExecutionEvent.task_node_metadata)
+  return has_task_node_metadata()
+      ? *target_metadata_.task_node_metadata_
+      : *reinterpret_cast< ::flyteidl::event::TaskNodeMetadata*>(&::flyteidl::event::_TaskNodeMetadata_default_instance_);
+}
+inline ::flyteidl::event::TaskNodeMetadata* NodeExecutionEvent::mutable_task_node_metadata() {
+  if (!has_task_node_metadata()) {
+    clear_target_metadata();
+    set_has_task_node_metadata();
+    target_metadata_.task_node_metadata_ = CreateMaybeMessage< ::flyteidl::event::TaskNodeMetadata >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.NodeExecutionEvent.task_node_metadata)
+  return target_metadata_.task_node_metadata_;
+}
+
 // .flyteidl.event.ParentTaskExecutionMetadata parent_task_metadata = 9;
 inline bool NodeExecutionEvent::has_parent_task_metadata() const {
   return this != internal_default_instance() && parent_task_metadata_ != nullptr;
@@ -2196,6 +2376,69 @@ inline void WorkflowNodeMetadata::set_allocated_execution_id(::flyteidl::core::W
   }
   execution_id_ = execution_id;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.WorkflowNodeMetadata.execution_id)
+}
+
+// -------------------------------------------------------------------
+
+// TaskNodeMetadata
+
+// .flyteidl.core.CatalogCacheStatus cache_status = 1;
+inline void TaskNodeMetadata::clear_cache_status() {
+  cache_status_ = 0;
+}
+inline ::flyteidl::core::CatalogCacheStatus TaskNodeMetadata::cache_status() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.TaskNodeMetadata.cache_status)
+  return static_cast< ::flyteidl::core::CatalogCacheStatus >(cache_status_);
+}
+inline void TaskNodeMetadata::set_cache_status(::flyteidl::core::CatalogCacheStatus value) {
+  
+  cache_status_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.event.TaskNodeMetadata.cache_status)
+}
+
+// .flyteidl.core.CatalogMetadata catalog_key = 2;
+inline bool TaskNodeMetadata::has_catalog_key() const {
+  return this != internal_default_instance() && catalog_key_ != nullptr;
+}
+inline const ::flyteidl::core::CatalogMetadata& TaskNodeMetadata::catalog_key() const {
+  const ::flyteidl::core::CatalogMetadata* p = catalog_key_;
+  // @@protoc_insertion_point(field_get:flyteidl.event.TaskNodeMetadata.catalog_key)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::CatalogMetadata*>(
+      &::flyteidl::core::_CatalogMetadata_default_instance_);
+}
+inline ::flyteidl::core::CatalogMetadata* TaskNodeMetadata::release_catalog_key() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.TaskNodeMetadata.catalog_key)
+  
+  ::flyteidl::core::CatalogMetadata* temp = catalog_key_;
+  catalog_key_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::CatalogMetadata* TaskNodeMetadata::mutable_catalog_key() {
+  
+  if (catalog_key_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::CatalogMetadata>(GetArenaNoVirtual());
+    catalog_key_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.TaskNodeMetadata.catalog_key)
+  return catalog_key_;
+}
+inline void TaskNodeMetadata::set_allocated_catalog_key(::flyteidl::core::CatalogMetadata* catalog_key) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(catalog_key_);
+  }
+  if (catalog_key) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      catalog_key = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, catalog_key, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  catalog_key_ = catalog_key;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.event.TaskNodeMetadata.catalog_key)
 }
 
 // -------------------------------------------------------------------
@@ -2804,6 +3047,8 @@ inline TaskExecutionEvent::OutputResultCase TaskExecutionEvent::output_result_ca
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
