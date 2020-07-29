@@ -2,7 +2,9 @@ package datacatalog
 
 import (
 	"context"
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
@@ -20,9 +22,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"time"
-
 	"github.com/golang/protobuf/ptypes"
+
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog/datacatalog/mocks"
 )
 
@@ -68,7 +69,7 @@ var typedInterface = core.TypedInterface{
 }
 
 var sampleKey = catalog.Key{
-	Identifier:     core.Identifier{Project: "project", Domain: "domain", Name: "name"},
+	Identifier:     core.Identifier{ResourceType: core.ResourceType_TASK, Project: "project", Domain: "domain", Name: "name"},
 	TypedInterface: typedInterface,
 	CacheVersion:   "1.0.0",
 }
@@ -119,7 +120,7 @@ func TestCatalog_Get(t *testing.T) {
 		assert.Error(t, err)
 
 		assertGrpcErr(t, err, codes.NotFound)
-		assert.Nil(t, resp)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, resp.GetStatus().GetCacheStatus())
 	})
 
 	t.Run("No results, no Artifact", func(t *testing.T) {
@@ -151,9 +152,9 @@ func TestCatalog_Get(t *testing.T) {
 
 		newKey := sampleKey
 		newKey.InputReader = ir
-		outputs, err := catalogClient.Get(ctx, newKey)
-		assert.Nil(t, outputs)
+		resp, err := catalogClient.Get(ctx, newKey)
 		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, resp.GetStatus().GetCacheStatus())
 	})
 
 	t.Run("Found w/ tag", func(t *testing.T) {
@@ -165,8 +166,27 @@ func TestCatalog_Get(t *testing.T) {
 			client: mockClient,
 		}
 
+		taskID := &core.TaskExecutionIdentifier{
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Name:         sampleKey.Identifier.Name,
+				Project:      sampleKey.Identifier.Project,
+				Domain:       sampleKey.Identifier.Domain,
+				Version:      "ver",
+			},
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Name:    "wf",
+					Project: "p1",
+					Domain:  "d1",
+				},
+				NodeId: "n",
+			},
+			RetryAttempt: 1,
+		}
 		sampleDataSet := &datacatalog.Dataset{
-			Id: datasetID,
+			Id:       datasetID,
+			Metadata: GetDatasetMetadataForSource(taskID),
 		}
 
 		mockClient.On("GetDataset",
@@ -178,10 +198,24 @@ func TestCatalog_Get(t *testing.T) {
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
 
 		sampleArtifact := &datacatalog.Artifact{
-			Id:      "test-artifact",
-			Dataset: sampleDataSet.Id,
-			Data:    []*datacatalog.ArtifactData{sampleArtifactData},
+			Id:       "test-artifact",
+			Dataset:  sampleDataSet.Id,
+			Data:     []*datacatalog.ArtifactData{sampleArtifactData},
+			Metadata: GetArtifactMetadataForSource(taskID),
+			Tags: []*datacatalog.Tag{
+				{
+					Name:       "x",
+					ArtifactId: "y",
+				},
+			},
 		}
+
+		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Name, sampleArtifact.GetMetadata().KeyMap[execNameKey])
+		assert.Equal(t, taskID.NodeExecutionId.NodeId, sampleArtifact.GetMetadata().KeyMap[execNodeIDKey])
+		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Project, sampleArtifact.GetMetadata().KeyMap[execProjectKey])
+		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Domain, sampleArtifact.GetMetadata().KeyMap[execDomainKey])
+		assert.Equal(t, strconv.Itoa(int(taskID.RetryAttempt)), sampleArtifact.GetMetadata().KeyMap[execTaskAttemptKey])
+
 		mockClient.On("GetArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetArtifactRequest) bool {
@@ -195,7 +229,19 @@ func TestCatalog_Get(t *testing.T) {
 		newKey.InputReader = ir
 		resp, err := catalogClient.Get(ctx, newKey)
 		assert.NoError(t, err)
-		assert.NotNil(t, resp)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT.String(), resp.GetStatus().GetCacheStatus().String())
+		assert.NotNil(t, resp.GetStatus().GetMetadata().DatasetId)
+		assert.Equal(t, core.ResourceType_DATASET, resp.GetStatus().GetMetadata().DatasetId.ResourceType)
+		assert.Equal(t, datasetID.Name, resp.GetStatus().GetMetadata().DatasetId.Name)
+		assert.Equal(t, datasetID.Project, resp.GetStatus().GetMetadata().DatasetId.Project)
+		assert.Equal(t, datasetID.Domain, resp.GetStatus().GetMetadata().DatasetId.Domain)
+		assert.Equal(t, datasetID.Version, resp.GetStatus().GetMetadata().DatasetId.Version)
+		assert.NotNil(t, resp.GetStatus().GetMetadata().ArtifactTag)
+		assert.NotNil(t, resp.GetStatus().GetMetadata().SourceExecution)
+		sourceTID := resp.GetStatus().GetMetadata().GetSourceTaskExecution()
+		assert.Equal(t, taskID.TaskId.String(), sourceTID.TaskId.String())
+		assert.Equal(t, taskID.RetryAttempt, sourceTID.RetryAttempt)
+		assert.Equal(t, taskID.NodeExecutionId.String(), sourceTID.NodeExecutionId.String())
 	})
 
 	t.Run("Found expired artifact", func(t *testing.T) {
@@ -241,7 +287,7 @@ func TestCatalog_Get(t *testing.T) {
 		newKey.InputReader = ir
 		resp, err := catalogClient.Get(ctx, newKey)
 		assert.Error(t, err)
-		assert.Nil(t, resp)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, resp.GetStatus().GetCacheStatus())
 
 		getStatus, ok := status.FromError(err)
 		assert.True(t, ok)
@@ -337,7 +383,8 @@ func TestCatalog_Get(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
 
-		v, e, err := resp.Read(ctx)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT.String(), resp.GetStatus().GetCacheStatus().String())
+		v, e, err := resp.GetOutputs().Read(ctx)
 		assert.NoError(t, err)
 		assert.Nil(t, e)
 		assert.Len(t, v.Literals, 0)
@@ -386,13 +433,16 @@ func TestCatalog_Put(t *testing.T) {
 		newKey := sampleKey
 		newKey.InputReader = ir
 		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil)
-		err := discovery.Put(ctx, newKey, or, catalog.Metadata{
+		s, err := discovery.Put(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
 				Name: "test",
 			},
 			TaskExecutionIdentifier: nil,
 		})
 		assert.NoError(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+		assert.Equal(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", s.GetMetadata().ArtifactTag.Name)
 	})
 
 	t.Run("Create new cached execution with no inputs/outputs", func(t *testing.T) {
@@ -424,8 +474,10 @@ func TestCatalog_Put(t *testing.T) {
 				return true
 			}),
 		).Return(&datacatalog.AddTagResponse{}, nil)
-		err := catalogClient.Put(ctx, noInputOutputKey, &mocks2.OutputReader{}, catalog.Metadata{})
+		s, err := catalogClient.Put(ctx, noInputOutputKey, &mocks2.OutputReader{}, catalog.Metadata{})
 		assert.NoError(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
 	})
 
 	t.Run("Create new cached execution with existing dataset", func(t *testing.T) {
@@ -472,7 +524,7 @@ func TestCatalog_Put(t *testing.T) {
 		newKey := sampleKey
 		newKey.InputReader = ir
 		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil)
-		err := discovery.Put(ctx, newKey, or, catalog.Metadata{
+		s, err := discovery.Put(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
 				Name: "test",
 			},
@@ -482,6 +534,8 @@ func TestCatalog_Put(t *testing.T) {
 		assert.True(t, createDatasetCalled)
 		assert.True(t, createArtifactCalled)
 		assert.True(t, addTagCalled)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_POPULATED, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
 	})
 
 }

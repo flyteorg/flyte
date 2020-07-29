@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager"
@@ -337,7 +338,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		})
 
 		tk := &core.TaskTemplate{
-			Id:   nil,
+			Id:   &core.Identifier{ResourceType: core.ResourceType_TASK, Project: "proj", Domain: "dom", Version: "ver"},
 			Type: "test",
 			Metadata: &core.TaskMetadata{
 				Discoverable: false,
@@ -794,18 +795,18 @@ func Test_task_Handle_Catalog(t *testing.T) {
 			c := &pluginCatalogMocks.Client{}
 			if tt.args.catalogFetch {
 				or := &ioMocks.OutputReader{}
-				or.On("Read", mock.Anything).Return(&core.LiteralMap{}, nil, nil)
-				c.On("Get", mock.Anything, mock.Anything).Return(or, nil)
+				or.OnReadMatch(mock.Anything).Return(&core.LiteralMap{}, nil, nil)
+				c.OnGetMatch(mock.Anything, mock.Anything).Return(catalog.NewCatalogEntry(or, catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, nil)), nil)
 			} else {
-				c.On("Get", mock.Anything, mock.Anything).Return(nil, nil)
+				c.OnGetMatch(mock.Anything, mock.Anything).Return(catalog.NewFailedCatalogEntry(catalog.NewStatus(core.CatalogCacheStatus_CACHE_MISS, nil)), nil)
 			}
 			if tt.args.catalogFetchError {
-				c.On("Get", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed to read from catalog"))
+				c.OnGetMatch(mock.Anything, mock.Anything).Return(catalog.Entry{}, fmt.Errorf("failed to read from catalog"))
 			}
 			if tt.args.catalogWriteError {
-				c.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(fmt.Errorf("failed to write to catalog"))
+				c.OnPutMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.Status{}, fmt.Errorf("failed to write to catalog"))
 			} else {
-				c.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+				c.OnPutMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_POPULATED, nil), nil)
 			}
 			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), c, promutils.NewTestScope())
 			assert.NoError(t, err)
@@ -829,7 +830,8 @@ func Test_task_Handle_Catalog(t *testing.T) {
 				assert.Equal(t, uint32(0), state.s.PluginPhaseVersion)
 				if tt.args.catalogFetch {
 					if assert.NotNil(t, got.Info().GetInfo().TaskNodeInfo) {
-						assert.True(t, got.Info().GetInfo().TaskNodeInfo.CacheHit)
+						assert.NotNil(t, got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata)
+						assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CacheStatus)
 					}
 					assert.NotNil(t, got.Info().GetInfo().OutputInfo)
 					s := storage.DataReference("/output-dir/outputs.pb")

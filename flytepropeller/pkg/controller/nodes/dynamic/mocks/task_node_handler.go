@@ -192,8 +192,8 @@ type TaskNodeHandler_ValidateOutputAndCacheAdd struct {
 	*mock.Call
 }
 
-func (_m TaskNodeHandler_ValidateOutputAndCacheAdd) Return(_a0 *io.ExecutionError, _a1 error) *TaskNodeHandler_ValidateOutputAndCacheAdd {
-	return &TaskNodeHandler_ValidateOutputAndCacheAdd{Call: _m.Call.Return(_a0, _a1)}
+func (_m TaskNodeHandler_ValidateOutputAndCacheAdd) Return(_a0 catalog.Status, _a1 *io.ExecutionError, _a2 error) *TaskNodeHandler_ValidateOutputAndCacheAdd {
+	return &TaskNodeHandler_ValidateOutputAndCacheAdd{Call: _m.Call.Return(_a0, _a1, _a2)}
 }
 
 func (_m *TaskNodeHandler) OnValidateOutputAndCacheAdd(ctx context.Context, nodeID string, i io.InputReader, r io.OutputReader, outputCommitter io.OutputWriter, tr core.TaskReader, m catalog.Metadata) *TaskNodeHandler_ValidateOutputAndCacheAdd {
@@ -207,24 +207,31 @@ func (_m *TaskNodeHandler) OnValidateOutputAndCacheAddMatch(matchers ...interfac
 }
 
 // ValidateOutputAndCacheAdd provides a mock function with given fields: ctx, nodeID, i, r, outputCommitter, tr, m
-func (_m *TaskNodeHandler) ValidateOutputAndCacheAdd(ctx context.Context, nodeID string, i io.InputReader, r io.OutputReader, outputCommitter io.OutputWriter, tr core.TaskReader, m catalog.Metadata) (*io.ExecutionError, error) {
+func (_m *TaskNodeHandler) ValidateOutputAndCacheAdd(ctx context.Context, nodeID string, i io.InputReader, r io.OutputReader, outputCommitter io.OutputWriter, tr core.TaskReader, m catalog.Metadata) (catalog.Status, *io.ExecutionError, error) {
 	ret := _m.Called(ctx, nodeID, i, r, outputCommitter, tr, m)
 
-	var r0 *io.ExecutionError
-	if rf, ok := ret.Get(0).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, core.TaskReader, catalog.Metadata) *io.ExecutionError); ok {
+	var r0 catalog.Status
+	if rf, ok := ret.Get(0).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, core.TaskReader, catalog.Metadata) catalog.Status); ok {
 		r0 = rf(ctx, nodeID, i, r, outputCommitter, tr, m)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*io.ExecutionError)
+		r0 = ret.Get(0).(catalog.Status)
+	}
+
+	var r1 *io.ExecutionError
+	if rf, ok := ret.Get(1).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, core.TaskReader, catalog.Metadata) *io.ExecutionError); ok {
+		r1 = rf(ctx, nodeID, i, r, outputCommitter, tr, m)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*io.ExecutionError)
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, core.TaskReader, catalog.Metadata) error); ok {
-		r1 = rf(ctx, nodeID, i, r, outputCommitter, tr, m)
+	var r2 error
+	if rf, ok := ret.Get(2).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, core.TaskReader, catalog.Metadata) error); ok {
+		r2 = rf(ctx, nodeID, i, r, outputCommitter, tr, m)
 	} else {
-		r1 = ret.Error(1)
+		r2 = ret.Error(2)
 	}
 
-	return r0, r1
+	return r0, r1, r2
 }
