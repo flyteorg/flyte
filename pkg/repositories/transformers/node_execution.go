@@ -3,18 +3,20 @@ package transformers
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flytestdlib/logger"
+
+	"github.com/lyft/flyteadmin/pkg/common"
 
 	"github.com/golang/protobuf/proto"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/lyft/flyteadmin/pkg/errors"
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
+
+	"github.com/lyft/flyteadmin/pkg/errors"
+	"github.com/lyft/flyteadmin/pkg/repositories/models"
 )
 
 type ToNodeExecutionModelInput struct {
@@ -152,6 +154,18 @@ func UpdateNodeExecutionModel(
 				ExecutionId: targetExecution,
 			},
 		}
+	}
+
+	// Update TaskNodeMetadata, which includes caching information today.
+	if request.Event.GetTaskNodeMetadata() != nil {
+		st := request.Event.GetTaskNodeMetadata().GetCacheStatus().String()
+		nodeExecutionClosure.TargetMetadata = &admin.NodeExecutionClosure_TaskNodeMetadata{
+			TaskNodeMetadata: &admin.TaskNodeMetadata{
+				CacheStatus: request.Event.GetTaskNodeMetadata().GetCacheStatus(),
+				CatalogKey:  request.Event.GetTaskNodeMetadata().GetCatalogKey(),
+			},
+		}
+		nodeExecutionModel.CacheStatus = &st
 	}
 
 	marshaledClosure, err := proto.Marshal(&nodeExecutionClosure)

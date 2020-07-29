@@ -37,4 +37,6 @@ type NodeExecution struct {
 	ErrorKind *string `gorm:"index"`
 	// Execution Error Code nullable. string value, but finite set determined by the execution engine and plugins
 	ErrorCode *string
+	// If the node is of Type Task, this should always exist for a successful execution, indicating the cache status for the execution
+	CacheStatus *string
 }
