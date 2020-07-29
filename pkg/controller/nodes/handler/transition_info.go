@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/lyft/flytestdlib/storage"
 )
 
@@ -41,9 +42,9 @@ type WorkflowNodeInfo struct {
 type BranchNodeInfo struct {
 }
 
+// Carries any information that should be sent as part of NodeEvents
 type TaskNodeInfo struct {
-	CacheHit bool
-	// TaskPhase etc
+	TaskNodeMetadata *event.TaskNodeMetadata
 }
 
 type OutputInfo struct {
@@ -84,6 +85,16 @@ func (p PhaseInfo) GetInfo() *ExecutionInfo {
 
 func (p PhaseInfo) GetReason() string {
 	return p.reason
+}
+
+func (p PhaseInfo) WithInfo(i *ExecutionInfo) PhaseInfo {
+	return PhaseInfo{
+		p:          p.p,
+		occurredAt: p.occurredAt,
+		err:        p.err,
+		info:       i,
+		reason:     p.reason,
+	}
 }
 
 var PhaseInfoUndefined = PhaseInfo{p: EPhaseUndefined}

@@ -26,7 +26,7 @@ func ToNodeExecOutput(info *handler.OutputInfo) *event.NodeExecutionEvent_Output
 	}
 }
 
-func ToNodeExecTargetMetadata(info *handler.WorkflowNodeInfo) *event.NodeExecutionEvent_WorkflowNodeMetadata {
+func ToNodeExecWorkflowNodeMetadata(info *handler.WorkflowNodeInfo) *event.NodeExecutionEvent_WorkflowNodeMetadata {
 	if info == nil || info.LaunchedWorkflowID == nil {
 		return nil
 	}
@@ -34,6 +34,15 @@ func ToNodeExecTargetMetadata(info *handler.WorkflowNodeInfo) *event.NodeExecuti
 		WorkflowNodeMetadata: &event.WorkflowNodeMetadata{
 			ExecutionId: info.LaunchedWorkflowID,
 		},
+	}
+}
+
+func ToNodeExecTaskNodeMetadata(info *handler.TaskNodeInfo) *event.NodeExecutionEvent_TaskNodeMetadata {
+	if info == nil || info.TaskNodeMetadata == nil {
+		return nil
+	}
+	return &event.NodeExecutionEvent_TaskNodeMetadata{
+		TaskNodeMetadata: info.TaskNodeMetadata,
 	}
 }
 
@@ -82,9 +91,16 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier, info handler
 
 	eInfo := info.GetInfo()
 	if eInfo != nil {
-		v := ToNodeExecTargetMetadata(eInfo.WorkflowNodeInfo)
-		if v != nil {
-			nev.TargetMetadata = v
+		if eInfo.WorkflowNodeInfo != nil {
+			v := ToNodeExecWorkflowNodeMetadata(eInfo.WorkflowNodeInfo)
+			if v != nil {
+				nev.TargetMetadata = v
+			}
+		} else if eInfo.TaskNodeInfo != nil {
+			v := ToNodeExecTaskNodeMetadata(eInfo.TaskNodeInfo)
+			if v != nil {
+				nev.TargetMetadata = v
+			}
 		}
 	}
 	if eInfo != nil && eInfo.OutputInfo != nil {
