@@ -32,8 +32,8 @@ func TestCreateNodeExecution(t *testing.T) {
 	nodeExecutionQuery := GlobalMock.NewMock()
 	nodeExecutionQuery.WithQuery(`INSERT INTO "node_executions" ("id","created_at","updated_at","deleted_at",` +
 		`"execution_project","execution_domain","execution_name","node_id","phase","input_uri","closure","started_at",` +
-		`"node_execution_created_at","node_execution_updated_at","duration","error_kind","error_code") VALUES ` +
-		`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+		`"node_execution_created_at","node_execution_updated_at","duration","error_kind","error_code","cache_status") VALUES ` +
+		`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
 
 	nodeExecutionEventQuery := GlobalMock.NewMock()
 	nodeExecutionEventQuery.WithQuery(`INSERT INTO "node_execution_events" ("created_at","updated_at",` +
