@@ -120,7 +120,22 @@ func (m *VariableMap) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Variables
+	for key, val := range m.GetVariables() {
+		_ = val
+
+		// no validation rules for Variables[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return VariableMapValidationError{
+					field:  fmt.Sprintf("Variables[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }
@@ -365,7 +380,22 @@ func (m *ParameterMap) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Parameters
+	for key, val := range m.GetParameters() {
+		_ = val
+
+		// no validation rules for Parameters[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ParameterMapValidationError{
+					field:  fmt.Sprintf("Parameters[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }

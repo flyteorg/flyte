@@ -44,9 +44,39 @@ func (m *ConnectionSet) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Downstream
+	for key, val := range m.GetDownstream() {
+		_ = val
 
-	// no validation rules for Upstream
+		// no validation rules for Downstream[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ConnectionSetValidationError{
+					field:  fmt.Sprintf("Downstream[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for key, val := range m.GetUpstream() {
+		_ = val
+
+		// no validation rules for Upstream[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ConnectionSetValidationError{
+					field:  fmt.Sprintf("Upstream[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }

@@ -10,6 +10,7 @@ Plugins available in the Flyte system.
 	:caption: plugins
 	:name: pluginstoc
 
+	sagemaker/index
 	array_job.proto
 	presto.proto
 	pytorch.proto
