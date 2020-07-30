@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	sagemakerConfig "github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
+
 	"github.com/lyft/flytestdlib/config"
 	"github.com/lyft/flytestdlib/config/viper"
 	"github.com/stretchr/testify/assert"
@@ -82,5 +84,9 @@ func TestLoadConfig(t *testing.T) {
 	t.Run("spark-config-test", func(t *testing.T) {
 		assert.NotNil(t, spark.GetSparkConfig())
 		assert.NotNil(t, spark.GetSparkConfig().DefaultSparkConfig)
+	})
+
+	t.Run("sagemaker-config-test", func(t *testing.T) {
+		assert.NotNil(t, sagemakerConfig.GetSagemakerConfig())
 	})
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/config"
 )
 
-//go:generate pflags K8sPluginConfig
+//go:generate pflags K8sPluginConfig --default-var=defaultK8sConfig
 
 const k8sPluginConfigSectionKey = "k8s"
 const defaultCPURequest = "1000m"
