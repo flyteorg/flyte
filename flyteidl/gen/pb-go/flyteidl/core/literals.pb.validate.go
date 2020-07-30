@@ -844,7 +844,22 @@ func (m *LiteralMap) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Literals
+	for key, val := range m.GetLiterals() {
+		_ = val
+
+		// no validation rules for Literals[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LiteralMapValidationError{
+					field:  fmt.Sprintf("Literals[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }
@@ -993,7 +1008,22 @@ func (m *BindingDataMap) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Bindings
+	for key, val := range m.GetBindings() {
+		_ = val
+
+		// no validation rules for Bindings[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return BindingDataMapValidationError{
+					field:  fmt.Sprintf("Bindings[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }
