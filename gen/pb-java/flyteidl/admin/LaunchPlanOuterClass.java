@@ -4481,7 +4481,7 @@ public final class LaunchPlanOuterClass {
 
     /**
      * <pre>
-     * Indicates the runtime priority of the execution. 
+     * Indicates the runtime priority of the execution.
      * </pre>
      *
      * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -4489,7 +4489,7 @@ public final class LaunchPlanOuterClass {
     boolean hasQualityOfService();
     /**
      * <pre>
-     * Indicates the runtime priority of the execution. 
+     * Indicates the runtime priority of the execution.
      * </pre>
      *
      * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -4497,12 +4497,25 @@ public final class LaunchPlanOuterClass {
     flyteidl.core.Execution.QualityOfService getQualityOfService();
     /**
      * <pre>
-     * Indicates the runtime priority of the execution. 
+     * Indicates the runtime priority of the execution.
      * </pre>
      *
      * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
      */
     flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder();
+
+    /**
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+     */
+    boolean hasRawOutputDataConfig();
+    /**
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+     */
+    flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig();
+    /**
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+     */
+    flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder();
   }
   /**
    * <pre>
@@ -4667,6 +4680,19 @@ public final class LaunchPlanOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(qualityOfService_);
                 qualityOfService_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 138: {
+              flyteidl.admin.Common.RawOutputDataConfig.Builder subBuilder = null;
+              if (rawOutputDataConfig_ != null) {
+                subBuilder = rawOutputDataConfig_.toBuilder();
+              }
+              rawOutputDataConfig_ = input.readMessage(flyteidl.admin.Common.RawOutputDataConfig.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(rawOutputDataConfig_);
+                rawOutputDataConfig_ = subBuilder.buildPartial();
               }
 
               break;
@@ -5001,7 +5027,7 @@ public final class LaunchPlanOuterClass {
     private flyteidl.core.Execution.QualityOfService qualityOfService_;
     /**
      * <pre>
-     * Indicates the runtime priority of the execution. 
+     * Indicates the runtime priority of the execution.
      * </pre>
      *
      * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -5011,7 +5037,7 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Indicates the runtime priority of the execution. 
+     * Indicates the runtime priority of the execution.
      * </pre>
      *
      * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -5021,13 +5047,34 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Indicates the runtime priority of the execution. 
+     * Indicates the runtime priority of the execution.
      * </pre>
      *
      * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
      */
     public flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder() {
       return getQualityOfService();
+    }
+
+    public static final int RAW_OUTPUT_DATA_CONFIG_FIELD_NUMBER = 17;
+    private flyteidl.admin.Common.RawOutputDataConfig rawOutputDataConfig_;
+    /**
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+     */
+    public boolean hasRawOutputDataConfig() {
+      return rawOutputDataConfig_ != null;
+    }
+    /**
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+     */
+    public flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig() {
+      return rawOutputDataConfig_ == null ? flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance() : rawOutputDataConfig_;
+    }
+    /**
+     * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+     */
+    public flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder() {
+      return getRawOutputDataConfig();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -5073,6 +5120,9 @@ public final class LaunchPlanOuterClass {
       }
       if (qualityOfService_ != null) {
         output.writeMessage(16, getQualityOfService());
+      }
+      if (rawOutputDataConfig_ != null) {
+        output.writeMessage(17, getRawOutputDataConfig());
       }
       unknownFields.writeTo(output);
     }
@@ -5121,6 +5171,10 @@ public final class LaunchPlanOuterClass {
       if (qualityOfService_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(16, getQualityOfService());
+      }
+      if (rawOutputDataConfig_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(17, getRawOutputDataConfig());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5184,6 +5238,11 @@ public final class LaunchPlanOuterClass {
         if (!getQualityOfService()
             .equals(other.getQualityOfService())) return false;
       }
+      if (hasRawOutputDataConfig() != other.hasRawOutputDataConfig()) return false;
+      if (hasRawOutputDataConfig()) {
+        if (!getRawOutputDataConfig()
+            .equals(other.getRawOutputDataConfig())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5232,6 +5291,10 @@ public final class LaunchPlanOuterClass {
       if (hasQualityOfService()) {
         hash = (37 * hash) + QUALITY_OF_SERVICE_FIELD_NUMBER;
         hash = (53 * hash) + getQualityOfService().hashCode();
+      }
+      if (hasRawOutputDataConfig()) {
+        hash = (37 * hash) + RAW_OUTPUT_DATA_CONFIG_FIELD_NUMBER;
+        hash = (53 * hash) + getRawOutputDataConfig().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -5426,6 +5489,12 @@ public final class LaunchPlanOuterClass {
           qualityOfService_ = null;
           qualityOfServiceBuilder_ = null;
         }
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfig_ = null;
+        } else {
+          rawOutputDataConfig_ = null;
+          rawOutputDataConfigBuilder_ = null;
+        }
         return this;
       }
 
@@ -5497,6 +5566,11 @@ public final class LaunchPlanOuterClass {
           result.qualityOfService_ = qualityOfService_;
         } else {
           result.qualityOfService_ = qualityOfServiceBuilder_.build();
+        }
+        if (rawOutputDataConfigBuilder_ == null) {
+          result.rawOutputDataConfig_ = rawOutputDataConfig_;
+        } else {
+          result.rawOutputDataConfig_ = rawOutputDataConfigBuilder_.build();
         }
         onBuilt();
         return result;
@@ -5576,6 +5650,9 @@ public final class LaunchPlanOuterClass {
         }
         if (other.hasQualityOfService()) {
           mergeQualityOfService(other.getQualityOfService());
+        }
+        if (other.hasRawOutputDataConfig()) {
+          mergeRawOutputDataConfig(other.getRawOutputDataConfig());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -6888,7 +6965,7 @@ public final class LaunchPlanOuterClass {
           flyteidl.core.Execution.QualityOfService, flyteidl.core.Execution.QualityOfService.Builder, flyteidl.core.Execution.QualityOfServiceOrBuilder> qualityOfServiceBuilder_;
       /**
        * <pre>
-       * Indicates the runtime priority of the execution. 
+       * Indicates the runtime priority of the execution.
        * </pre>
        *
        * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -6898,7 +6975,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the runtime priority of the execution. 
+       * Indicates the runtime priority of the execution.
        * </pre>
        *
        * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -6912,7 +6989,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the runtime priority of the execution. 
+       * Indicates the runtime priority of the execution.
        * </pre>
        *
        * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -6932,7 +7009,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the runtime priority of the execution. 
+       * Indicates the runtime priority of the execution.
        * </pre>
        *
        * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -6950,7 +7027,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the runtime priority of the execution. 
+       * Indicates the runtime priority of the execution.
        * </pre>
        *
        * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -6972,7 +7049,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the runtime priority of the execution. 
+       * Indicates the runtime priority of the execution.
        * </pre>
        *
        * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -6990,7 +7067,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the runtime priority of the execution. 
+       * Indicates the runtime priority of the execution.
        * </pre>
        *
        * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -7002,7 +7079,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the runtime priority of the execution. 
+       * Indicates the runtime priority of the execution.
        * </pre>
        *
        * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -7017,7 +7094,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the runtime priority of the execution. 
+       * Indicates the runtime priority of the execution.
        * </pre>
        *
        * <code>.flyteidl.core.QualityOfService quality_of_service = 16;</code>
@@ -7034,6 +7111,123 @@ public final class LaunchPlanOuterClass {
           qualityOfService_ = null;
         }
         return qualityOfServiceBuilder_;
+      }
+
+      private flyteidl.admin.Common.RawOutputDataConfig rawOutputDataConfig_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.RawOutputDataConfig, flyteidl.admin.Common.RawOutputDataConfig.Builder, flyteidl.admin.Common.RawOutputDataConfigOrBuilder> rawOutputDataConfigBuilder_;
+      /**
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+       */
+      public boolean hasRawOutputDataConfig() {
+        return rawOutputDataConfigBuilder_ != null || rawOutputDataConfig_ != null;
+      }
+      /**
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+       */
+      public flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig() {
+        if (rawOutputDataConfigBuilder_ == null) {
+          return rawOutputDataConfig_ == null ? flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance() : rawOutputDataConfig_;
+        } else {
+          return rawOutputDataConfigBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+       */
+      public Builder setRawOutputDataConfig(flyteidl.admin.Common.RawOutputDataConfig value) {
+        if (rawOutputDataConfigBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          rawOutputDataConfig_ = value;
+          onChanged();
+        } else {
+          rawOutputDataConfigBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+       */
+      public Builder setRawOutputDataConfig(
+          flyteidl.admin.Common.RawOutputDataConfig.Builder builderForValue) {
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfig_ = builderForValue.build();
+          onChanged();
+        } else {
+          rawOutputDataConfigBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+       */
+      public Builder mergeRawOutputDataConfig(flyteidl.admin.Common.RawOutputDataConfig value) {
+        if (rawOutputDataConfigBuilder_ == null) {
+          if (rawOutputDataConfig_ != null) {
+            rawOutputDataConfig_ =
+              flyteidl.admin.Common.RawOutputDataConfig.newBuilder(rawOutputDataConfig_).mergeFrom(value).buildPartial();
+          } else {
+            rawOutputDataConfig_ = value;
+          }
+          onChanged();
+        } else {
+          rawOutputDataConfigBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+       */
+      public Builder clearRawOutputDataConfig() {
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfig_ = null;
+          onChanged();
+        } else {
+          rawOutputDataConfig_ = null;
+          rawOutputDataConfigBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+       */
+      public flyteidl.admin.Common.RawOutputDataConfig.Builder getRawOutputDataConfigBuilder() {
+        
+        onChanged();
+        return getRawOutputDataConfigFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+       */
+      public flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder() {
+        if (rawOutputDataConfigBuilder_ != null) {
+          return rawOutputDataConfigBuilder_.getMessageOrBuilder();
+        } else {
+          return rawOutputDataConfig_ == null ?
+              flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance() : rawOutputDataConfig_;
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.RawOutputDataConfig, flyteidl.admin.Common.RawOutputDataConfig.Builder, flyteidl.admin.Common.RawOutputDataConfigOrBuilder> 
+          getRawOutputDataConfigFieldBuilder() {
+        if (rawOutputDataConfigBuilder_ == null) {
+          rawOutputDataConfigBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.RawOutputDataConfig, flyteidl.admin.Common.RawOutputDataConfig.Builder, flyteidl.admin.Common.RawOutputDataConfigOrBuilder>(
+                  getRawOutputDataConfig(),
+                  getParentForChildren(),
+                  isClean());
+          rawOutputDataConfig_ = null;
+        }
+        return rawOutputDataConfigBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -13050,7 +13244,7 @@ public final class LaunchPlanOuterClass {
       "\032.flyteidl.admin.LaunchPlan\022\r\n\005token\030\002 \001" +
       "(\t\"T\n\004Auth\022\034\n\022assumable_iam_role\030\001 \001(\tH\000" +
       "\022$\n\032kubernetes_service_account\030\002 \001(\tH\000B\010" +
-      "\n\006method\"\341\003\n\016LaunchPlanSpec\022.\n\013workflow_" +
+      "\n\006method\"\246\004\n\016LaunchPlanSpec\022.\n\013workflow_" +
       "id\030\001 \001(\0132\031.flyteidl.core.Identifier\022;\n\017e" +
       "ntity_metadata\030\002 \001(\0132\".flyteidl.admin.La" +
       "unchPlanMetadata\0223\n\016default_inputs\030\003 \001(\013" +
@@ -13062,28 +13256,30 @@ public final class LaunchPlanOuterClass {
       "2\024.flyteidl.admin.AuthB\002\030\001\022+\n\tauth_role\030" +
       "\t \001(\0132\030.flyteidl.admin.AuthRole\022;\n\022quali" +
       "ty_of_service\030\020 \001(\0132\037.flyteidl.core.Qual" +
-      "ityOfService\"\217\002\n\021LaunchPlanClosure\022.\n\005st" +
-      "ate\030\001 \001(\0162\037.flyteidl.admin.LaunchPlanSta" +
-      "te\0224\n\017expected_inputs\030\002 \001(\0132\033.flyteidl.c" +
-      "ore.ParameterMap\0224\n\020expected_outputs\030\003 \001" +
-      "(\0132\032.flyteidl.core.VariableMap\022.\n\ncreate" +
-      "d_at\030\004 \001(\0132\032.google.protobuf.Timestamp\022." +
-      "\n\nupdated_at\030\005 \001(\0132\032.google.protobuf.Tim" +
-      "estamp\"u\n\022LaunchPlanMetadata\022*\n\010schedule" +
-      "\030\001 \001(\0132\030.flyteidl.admin.Schedule\0223\n\rnoti" +
-      "fications\030\002 \003(\0132\034.flyteidl.admin.Notific" +
-      "ation\"p\n\027LaunchPlanUpdateRequest\022%\n\002id\030\001" +
-      " \001(\0132\031.flyteidl.core.Identifier\022.\n\005state" +
-      "\030\002 \001(\0162\037.flyteidl.admin.LaunchPlanState\"" +
-      "\032\n\030LaunchPlanUpdateResponse\"L\n\027ActiveLau" +
-      "nchPlanRequest\0221\n\002id\030\001 \001(\0132%.flyteidl.ad" +
-      "min.NamedEntityIdentifier\"\203\001\n\033ActiveLaun" +
-      "chPlanListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006do" +
-      "main\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t" +
-      "\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort*" +
-      "+\n\017LaunchPlanState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTI" +
-      "VE\020\001B3Z1github.com/lyft/flyteidl/gen/pb-" +
-      "go/flyteidl/adminb\006proto3"
+      "ityOfService\022C\n\026raw_output_data_config\030\021" +
+      " \001(\0132#.flyteidl.admin.RawOutputDataConfi" +
+      "g\"\217\002\n\021LaunchPlanClosure\022.\n\005state\030\001 \001(\0162\037" +
+      ".flyteidl.admin.LaunchPlanState\0224\n\017expec" +
+      "ted_inputs\030\002 \001(\0132\033.flyteidl.core.Paramet" +
+      "erMap\0224\n\020expected_outputs\030\003 \001(\0132\032.flytei" +
+      "dl.core.VariableMap\022.\n\ncreated_at\030\004 \001(\0132" +
+      "\032.google.protobuf.Timestamp\022.\n\nupdated_a" +
+      "t\030\005 \001(\0132\032.google.protobuf.Timestamp\"u\n\022L" +
+      "aunchPlanMetadata\022*\n\010schedule\030\001 \001(\0132\030.fl" +
+      "yteidl.admin.Schedule\0223\n\rnotifications\030\002" +
+      " \003(\0132\034.flyteidl.admin.Notification\"p\n\027La" +
+      "unchPlanUpdateRequest\022%\n\002id\030\001 \001(\0132\031.flyt" +
+      "eidl.core.Identifier\022.\n\005state\030\002 \001(\0162\037.fl" +
+      "yteidl.admin.LaunchPlanState\"\032\n\030LaunchPl" +
+      "anUpdateResponse\"L\n\027ActiveLaunchPlanRequ" +
+      "est\0221\n\002id\030\001 \001(\0132%.flyteidl.admin.NamedEn" +
+      "tityIdentifier\"\203\001\n\033ActiveLaunchPlanListR" +
+      "equest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022" +
+      "\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by" +
+      "\030\005 \001(\0132\024.flyteidl.admin.Sort*+\n\017LaunchPl" +
+      "anState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTIVE\020\001B3Z1git" +
+      "hub.com/lyft/flyteidl/gen/pb-go/flyteidl" +
+      "/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13139,7 +13335,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_LaunchPlanSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LaunchPlanSpec_descriptor,
-        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "QualityOfService", });
+        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "QualityOfService", "RawOutputDataConfig", });
     internal_static_flyteidl_admin_LaunchPlanClosure_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_LaunchPlanClosure_fieldAccessorTable = new

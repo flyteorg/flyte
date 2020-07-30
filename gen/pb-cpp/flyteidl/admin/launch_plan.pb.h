@@ -985,6 +985,15 @@ class LaunchPlanSpec final :
   ::flyteidl::core::QualityOfService* mutable_quality_of_service();
   void set_allocated_quality_of_service(::flyteidl::core::QualityOfService* quality_of_service);
 
+  // .flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;
+  bool has_raw_output_data_config() const;
+  void clear_raw_output_data_config();
+  static const int kRawOutputDataConfigFieldNumber = 17;
+  const ::flyteidl::admin::RawOutputDataConfig& raw_output_data_config() const;
+  ::flyteidl::admin::RawOutputDataConfig* release_raw_output_data_config();
+  ::flyteidl::admin::RawOutputDataConfig* mutable_raw_output_data_config();
+  void set_allocated_raw_output_data_config(::flyteidl::admin::RawOutputDataConfig* raw_output_data_config);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.LaunchPlanSpec)
  private:
   class HasBitSetters;
@@ -1000,6 +1009,7 @@ class LaunchPlanSpec final :
   ::flyteidl::admin::Auth* auth_;
   ::flyteidl::admin::AuthRole* auth_role_;
   ::flyteidl::core::QualityOfService* quality_of_service_;
+  ::flyteidl::admin::RawOutputDataConfig* raw_output_data_config_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
 };
@@ -2810,6 +2820,51 @@ inline void LaunchPlanSpec::set_allocated_quality_of_service(::flyteidl::core::Q
   }
   quality_of_service_ = quality_of_service;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.quality_of_service)
+}
+
+// .flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;
+inline bool LaunchPlanSpec::has_raw_output_data_config() const {
+  return this != internal_default_instance() && raw_output_data_config_ != nullptr;
+}
+inline const ::flyteidl::admin::RawOutputDataConfig& LaunchPlanSpec::raw_output_data_config() const {
+  const ::flyteidl::admin::RawOutputDataConfig* p = raw_output_data_config_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.LaunchPlanSpec.raw_output_data_config)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::RawOutputDataConfig*>(
+      &::flyteidl::admin::_RawOutputDataConfig_default_instance_);
+}
+inline ::flyteidl::admin::RawOutputDataConfig* LaunchPlanSpec::release_raw_output_data_config() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.LaunchPlanSpec.raw_output_data_config)
+  
+  ::flyteidl::admin::RawOutputDataConfig* temp = raw_output_data_config_;
+  raw_output_data_config_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::RawOutputDataConfig* LaunchPlanSpec::mutable_raw_output_data_config() {
+  
+  if (raw_output_data_config_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::RawOutputDataConfig>(GetArenaNoVirtual());
+    raw_output_data_config_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.LaunchPlanSpec.raw_output_data_config)
+  return raw_output_data_config_;
+}
+inline void LaunchPlanSpec::set_allocated_raw_output_data_config(::flyteidl::admin::RawOutputDataConfig* raw_output_data_config) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(raw_output_data_config_);
+  }
+  if (raw_output_data_config) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      raw_output_data_config = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, raw_output_data_config, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  raw_output_data_config_ = raw_output_data_config;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.raw_output_data_config)
 }
 
 // -------------------------------------------------------------------
