@@ -47,7 +47,7 @@ struct TableStruct_flyteidl_2fadmin_2fcommon_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[23]
+  static const ::google::protobuf::internal::ParseTable schema[24]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -113,6 +113,9 @@ extern ObjectGetRequestDefaultTypeInternal _ObjectGetRequest_default_instance_;
 class PagerDutyNotification;
 class PagerDutyNotificationDefaultTypeInternal;
 extern PagerDutyNotificationDefaultTypeInternal _PagerDutyNotification_default_instance_;
+class RawOutputDataConfig;
+class RawOutputDataConfigDefaultTypeInternal;
+extern RawOutputDataConfigDefaultTypeInternal _RawOutputDataConfig_default_instance_;
 class ResourceListRequest;
 class ResourceListRequestDefaultTypeInternal;
 extern ResourceListRequestDefaultTypeInternal _ResourceListRequest_default_instance_;
@@ -148,6 +151,7 @@ template<> ::flyteidl::admin::NamedEntityUpdateResponse* Arena::CreateMaybeMessa
 template<> ::flyteidl::admin::Notification* Arena::CreateMaybeMessage<::flyteidl::admin::Notification>(Arena*);
 template<> ::flyteidl::admin::ObjectGetRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ObjectGetRequest>(Arena*);
 template<> ::flyteidl::admin::PagerDutyNotification* Arena::CreateMaybeMessage<::flyteidl::admin::PagerDutyNotification>(Arena*);
+template<> ::flyteidl::admin::RawOutputDataConfig* Arena::CreateMaybeMessage<::flyteidl::admin::RawOutputDataConfig>(Arena*);
 template<> ::flyteidl::admin::ResourceListRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ResourceListRequest>(Arena*);
 template<> ::flyteidl::admin::SlackNotification* Arena::CreateMaybeMessage<::flyteidl::admin::SlackNotification>(Arena*);
 template<> ::flyteidl::admin::Sort* Arena::CreateMaybeMessage<::flyteidl::admin::Sort>(Arena*);
@@ -3162,6 +3166,126 @@ class AuthRole final :
 
   friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
 };
+// -------------------------------------------------------------------
+
+class RawOutputDataConfig final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.RawOutputDataConfig) */ {
+ public:
+  RawOutputDataConfig();
+  virtual ~RawOutputDataConfig();
+
+  RawOutputDataConfig(const RawOutputDataConfig& from);
+
+  inline RawOutputDataConfig& operator=(const RawOutputDataConfig& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  RawOutputDataConfig(RawOutputDataConfig&& from) noexcept
+    : RawOutputDataConfig() {
+    *this = ::std::move(from);
+  }
+
+  inline RawOutputDataConfig& operator=(RawOutputDataConfig&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const RawOutputDataConfig& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const RawOutputDataConfig* internal_default_instance() {
+    return reinterpret_cast<const RawOutputDataConfig*>(
+               &_RawOutputDataConfig_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    23;
+
+  void Swap(RawOutputDataConfig* other);
+  friend void swap(RawOutputDataConfig& a, RawOutputDataConfig& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline RawOutputDataConfig* New() const final {
+    return CreateMaybeMessage<RawOutputDataConfig>(nullptr);
+  }
+
+  RawOutputDataConfig* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<RawOutputDataConfig>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const RawOutputDataConfig& from);
+  void MergeFrom(const RawOutputDataConfig& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(RawOutputDataConfig* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string output_location_prefix = 1;
+  void clear_output_location_prefix();
+  static const int kOutputLocationPrefixFieldNumber = 1;
+  const ::std::string& output_location_prefix() const;
+  void set_output_location_prefix(const ::std::string& value);
+  #if LANG_CXX11
+  void set_output_location_prefix(::std::string&& value);
+  #endif
+  void set_output_location_prefix(const char* value);
+  void set_output_location_prefix(const char* value, size_t size);
+  ::std::string* mutable_output_location_prefix();
+  ::std::string* release_output_location_prefix();
+  void set_allocated_output_location_prefix(::std::string* output_location_prefix);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.RawOutputDataConfig)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr output_location_prefix_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
+};
 // ===================================================================
 
 
@@ -5513,9 +5637,68 @@ inline void AuthRole::clear_has_method() {
 inline AuthRole::MethodCase AuthRole::method_case() const {
   return AuthRole::MethodCase(_oneof_case_[0]);
 }
+// -------------------------------------------------------------------
+
+// RawOutputDataConfig
+
+// string output_location_prefix = 1;
+inline void RawOutputDataConfig::clear_output_location_prefix() {
+  output_location_prefix_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& RawOutputDataConfig::output_location_prefix() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.RawOutputDataConfig.output_location_prefix)
+  return output_location_prefix_.GetNoArena();
+}
+inline void RawOutputDataConfig::set_output_location_prefix(const ::std::string& value) {
+  
+  output_location_prefix_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.RawOutputDataConfig.output_location_prefix)
+}
+#if LANG_CXX11
+inline void RawOutputDataConfig::set_output_location_prefix(::std::string&& value) {
+  
+  output_location_prefix_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.RawOutputDataConfig.output_location_prefix)
+}
+#endif
+inline void RawOutputDataConfig::set_output_location_prefix(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  output_location_prefix_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.RawOutputDataConfig.output_location_prefix)
+}
+inline void RawOutputDataConfig::set_output_location_prefix(const char* value, size_t size) {
+  
+  output_location_prefix_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.RawOutputDataConfig.output_location_prefix)
+}
+inline ::std::string* RawOutputDataConfig::mutable_output_location_prefix() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.RawOutputDataConfig.output_location_prefix)
+  return output_location_prefix_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* RawOutputDataConfig::release_output_location_prefix() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.RawOutputDataConfig.output_location_prefix)
+  
+  return output_location_prefix_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void RawOutputDataConfig::set_allocated_output_location_prefix(::std::string* output_location_prefix) {
+  if (output_location_prefix != nullptr) {
+    
+  } else {
+    
+  }
+  output_location_prefix_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), output_location_prefix);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.RawOutputDataConfig.output_location_prefix)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

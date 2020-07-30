@@ -745,6 +745,31 @@ kubernetes_service_account
   Only one of :ref:`assumable_iam_role <api_field_flyteidl.admin.AuthRole.assumable_iam_role>`, :ref:`kubernetes_service_account <api_field_flyteidl.admin.AuthRole.kubernetes_service_account>` may be set.
   
 
+
+.. _api_msg_flyteidl.admin.RawOutputDataConfig:
+
+flyteidl.admin.RawOutputDataConfig
+----------------------------------
+
+`[flyteidl.admin.RawOutputDataConfig proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L249>`_
+
+Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+See https://github.com/lyft/flyte/issues/211 for more background information.
+
+.. code-block:: json
+
+  {
+    "output_location_prefix": "..."
+  }
+
+.. _api_field_flyteidl.admin.RawOutputDataConfig.output_location_prefix:
+
+output_location_prefix
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Prefix for where offloaded data from user workflows will be written
+  e.g. s3://bucket/key or s3://bucket/
+  
+  
+
 .. _api_enum_flyteidl.admin.NamedEntityState:
 
 Enum flyteidl.admin.NamedEntityState

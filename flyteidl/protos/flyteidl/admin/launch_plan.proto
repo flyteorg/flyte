@@ -64,7 +64,6 @@ message Auth {
   }
 }
 
-
 // User-provided launch plan definition and configuration values.
 message LaunchPlanSpec {
     // Reference to the Workflow template that the launch plan references
@@ -93,8 +92,10 @@ message LaunchPlanSpec {
 
     AuthRole auth_role                    = 9;
 
-    // Indicates the runtime priority of the execution. 
+    // Indicates the runtime priority of the execution.
     core.QualityOfService quality_of_service   = 16;
+
+    RawOutputDataConfig raw_output_data_config = 17;
 }
 
 // Values computed by the flyte platform after launch plan registration.

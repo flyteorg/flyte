@@ -10,3 +10,4 @@ dist
 gen/pb_python/flyteidl.egg-info/
 
 .virtualgo
+/build/

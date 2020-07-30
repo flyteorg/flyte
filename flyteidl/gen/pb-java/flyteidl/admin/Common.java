@@ -19757,6 +19757,610 @@ public final class Common {
 
   }
 
+  public interface RawOutputDataConfigOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.RawOutputDataConfig)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Prefix for where offloaded data from user workflows will be written
+     * e.g. s3://bucket/key or s3://bucket/
+     * </pre>
+     *
+     * <code>string output_location_prefix = 1;</code>
+     */
+    java.lang.String getOutputLocationPrefix();
+    /**
+     * <pre>
+     * Prefix for where offloaded data from user workflows will be written
+     * e.g. s3://bucket/key or s3://bucket/
+     * </pre>
+     *
+     * <code>string output_location_prefix = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getOutputLocationPrefixBytes();
+  }
+  /**
+   * <pre>
+   * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+   * See https://github.com/lyft/flyte/issues/211 for more background information.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.RawOutputDataConfig}
+   */
+  public  static final class RawOutputDataConfig extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.RawOutputDataConfig)
+      RawOutputDataConfigOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use RawOutputDataConfig.newBuilder() to construct.
+    private RawOutputDataConfig(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private RawOutputDataConfig() {
+      outputLocationPrefix_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private RawOutputDataConfig(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              outputLocationPrefix_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.Common.internal_static_flyteidl_admin_RawOutputDataConfig_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.Common.internal_static_flyteidl_admin_RawOutputDataConfig_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.Common.RawOutputDataConfig.class, flyteidl.admin.Common.RawOutputDataConfig.Builder.class);
+    }
+
+    public static final int OUTPUT_LOCATION_PREFIX_FIELD_NUMBER = 1;
+    private volatile java.lang.Object outputLocationPrefix_;
+    /**
+     * <pre>
+     * Prefix for where offloaded data from user workflows will be written
+     * e.g. s3://bucket/key or s3://bucket/
+     * </pre>
+     *
+     * <code>string output_location_prefix = 1;</code>
+     */
+    public java.lang.String getOutputLocationPrefix() {
+      java.lang.Object ref = outputLocationPrefix_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        outputLocationPrefix_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Prefix for where offloaded data from user workflows will be written
+     * e.g. s3://bucket/key or s3://bucket/
+     * </pre>
+     *
+     * <code>string output_location_prefix = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOutputLocationPrefixBytes() {
+      java.lang.Object ref = outputLocationPrefix_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        outputLocationPrefix_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getOutputLocationPrefixBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, outputLocationPrefix_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getOutputLocationPrefixBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, outputLocationPrefix_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.Common.RawOutputDataConfig)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.Common.RawOutputDataConfig other = (flyteidl.admin.Common.RawOutputDataConfig) obj;
+
+      if (!getOutputLocationPrefix()
+          .equals(other.getOutputLocationPrefix())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + OUTPUT_LOCATION_PREFIX_FIELD_NUMBER;
+      hash = (53 * hash) + getOutputLocationPrefix().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.Common.RawOutputDataConfig parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.RawOutputDataConfig parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.Common.RawOutputDataConfig prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * See https://github.com/lyft/flyte/issues/211 for more background information.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.RawOutputDataConfig}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.RawOutputDataConfig)
+        flyteidl.admin.Common.RawOutputDataConfigOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_RawOutputDataConfig_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_RawOutputDataConfig_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.Common.RawOutputDataConfig.class, flyteidl.admin.Common.RawOutputDataConfig.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.Common.RawOutputDataConfig.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        outputLocationPrefix_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_RawOutputDataConfig_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.RawOutputDataConfig getDefaultInstanceForType() {
+        return flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.RawOutputDataConfig build() {
+        flyteidl.admin.Common.RawOutputDataConfig result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.RawOutputDataConfig buildPartial() {
+        flyteidl.admin.Common.RawOutputDataConfig result = new flyteidl.admin.Common.RawOutputDataConfig(this);
+        result.outputLocationPrefix_ = outputLocationPrefix_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.Common.RawOutputDataConfig) {
+          return mergeFrom((flyteidl.admin.Common.RawOutputDataConfig)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.Common.RawOutputDataConfig other) {
+        if (other == flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance()) return this;
+        if (!other.getOutputLocationPrefix().isEmpty()) {
+          outputLocationPrefix_ = other.outputLocationPrefix_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.Common.RawOutputDataConfig parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.Common.RawOutputDataConfig) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object outputLocationPrefix_ = "";
+      /**
+       * <pre>
+       * Prefix for where offloaded data from user workflows will be written
+       * e.g. s3://bucket/key or s3://bucket/
+       * </pre>
+       *
+       * <code>string output_location_prefix = 1;</code>
+       */
+      public java.lang.String getOutputLocationPrefix() {
+        java.lang.Object ref = outputLocationPrefix_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          outputLocationPrefix_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Prefix for where offloaded data from user workflows will be written
+       * e.g. s3://bucket/key or s3://bucket/
+       * </pre>
+       *
+       * <code>string output_location_prefix = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOutputLocationPrefixBytes() {
+        java.lang.Object ref = outputLocationPrefix_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          outputLocationPrefix_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Prefix for where offloaded data from user workflows will be written
+       * e.g. s3://bucket/key or s3://bucket/
+       * </pre>
+       *
+       * <code>string output_location_prefix = 1;</code>
+       */
+      public Builder setOutputLocationPrefix(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        outputLocationPrefix_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Prefix for where offloaded data from user workflows will be written
+       * e.g. s3://bucket/key or s3://bucket/
+       * </pre>
+       *
+       * <code>string output_location_prefix = 1;</code>
+       */
+      public Builder clearOutputLocationPrefix() {
+        
+        outputLocationPrefix_ = getDefaultInstance().getOutputLocationPrefix();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Prefix for where offloaded data from user workflows will be written
+       * e.g. s3://bucket/key or s3://bucket/
+       * </pre>
+       *
+       * <code>string output_location_prefix = 1;</code>
+       */
+      public Builder setOutputLocationPrefixBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        outputLocationPrefix_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.RawOutputDataConfig)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.RawOutputDataConfig)
+    private static final flyteidl.admin.Common.RawOutputDataConfig DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.Common.RawOutputDataConfig();
+    }
+
+    public static flyteidl.admin.Common.RawOutputDataConfig getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<RawOutputDataConfig>
+        PARSER = new com.google.protobuf.AbstractParser<RawOutputDataConfig>() {
+      @java.lang.Override
+      public RawOutputDataConfig parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new RawOutputDataConfig(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<RawOutputDataConfig> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RawOutputDataConfig> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.Common.RawOutputDataConfig getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_NamedEntityIdentifier_descriptor;
   private static final 
@@ -19872,6 +20476,11 @@ public final class Common {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_AuthRole_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_RawOutputDataConfig_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_RawOutputDataConfig_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -19941,11 +20550,12 @@ public final class Common {
       "luesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028" +
       "\001\"X\n\010AuthRole\022\034\n\022assumable_iam_role\030\001 \001(" +
       "\tH\000\022$\n\032kubernetes_service_account\030\002 \001(\tH" +
-      "\000B\010\n\006method*\\\n\020NamedEntityState\022\027\n\023NAMED" +
-      "_ENTITY_ACTIVE\020\000\022\031\n\025NAMED_ENTITY_ARCHIVE" +
-      "D\020\001\022\024\n\020SYSTEM_GENERATED\020\002B3Z1github.com/" +
-      "lyft/flyteidl/gen/pb-go/flyteidl/adminb\006" +
-      "proto3"
+      "\000B\010\n\006method\"5\n\023RawOutputDataConfig\022\036\n\026ou" +
+      "tput_location_prefix\030\001 \001(\t*\\\n\020NamedEntit" +
+      "yState\022\027\n\023NAMED_ENTITY_ACTIVE\020\000\022\031\n\025NAMED" +
+      "_ENTITY_ARCHIVED\020\001\022\024\n\020SYSTEM_GENERATED\020\002" +
+      "B3Z1github.com/lyft/flyteidl/gen/pb-go/f" +
+      "lyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20099,6 +20709,12 @@ public final class Common {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_AuthRole_descriptor,
         new java.lang.String[] { "AssumableIamRole", "KubernetesServiceAccount", "Method", });
+    internal_static_flyteidl_admin_RawOutputDataConfig_descriptor =
+      getDescriptor().getMessageTypes().get(21);
+    internal_static_flyteidl_admin_RawOutputDataConfig_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_RawOutputDataConfig_descriptor,
+        new java.lang.String[] { "OutputLocationPrefix", });
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
   }
