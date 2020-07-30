@@ -3589,6 +3589,8 @@ definitions:
         auth:
           kubernetes_service_account: "kubernetes_service_account"
           assumable_iam_role: "assumable_iam_role"
+        raw_output_data_config:
+          output_location_prefix: "output_location_prefix"
         entity_metadata:
           schedule:
             kickoff_time_input_arg: "kickoff_time_input_arg"
@@ -4000,6 +4002,8 @@ definitions:
           auth:
             kubernetes_service_account: "kubernetes_service_account"
             assumable_iam_role: "assumable_iam_role"
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
           entity_metadata:
             schedule:
               kickoff_time_input_arg: "kickoff_time_input_arg"
@@ -4250,6 +4254,8 @@ definitions:
           auth:
             kubernetes_service_account: "kubernetes_service_account"
             assumable_iam_role: "assumable_iam_role"
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
           entity_metadata:
             schedule:
               kickoff_time_input_arg: "kickoff_time_input_arg"
@@ -4457,6 +4463,8 @@ definitions:
       quality_of_service:
         description: "Indicates the runtime priority of the execution."
         $ref: "#/definitions/coreQualityOfService"
+      raw_output_data_config:
+        $ref: "#/definitions/adminRawOutputDataConfig"
     description: "User-provided launch plan definition and configuration values."
     example:
       workflow_id:
@@ -4475,6 +4483,8 @@ definitions:
       auth:
         kubernetes_service_account: "kubernetes_service_account"
         assumable_iam_role: "assumable_iam_role"
+      raw_output_data_config:
+        output_location_prefix: "output_location_prefix"
       entity_metadata:
         schedule:
           kickoff_time_input_arg: "kickoff_time_input_arg"
@@ -5434,6 +5444,18 @@ definitions:
           id: "id"
         description: "description"
         id: "id"
+  adminRawOutputDataConfig:
+    type: "object"
+    properties:
+      output_location_prefix:
+        type: "string"
+        title: "Prefix for where offloaded data from user workflows will be written\n\
+          e.g. s3://bucket/key or s3://bucket/"
+    description: "Encapsulates user settings pertaining to offloaded data (i.e. Blobs,\
+      \ Schema, query data, etc.).\nSee https://github.com/lyft/flyte/issues/211 for\
+      \ more background information."
+    example:
+      output_location_prefix: "output_location_prefix"
   adminSchedule:
     type: "object"
     properties:

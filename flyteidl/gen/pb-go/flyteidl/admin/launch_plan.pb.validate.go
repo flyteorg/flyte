@@ -540,6 +540,16 @@ func (m *LaunchPlanSpec) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetRawOutputDataConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LaunchPlanSpecValidationError{
+				field:  "RawOutputDataConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
