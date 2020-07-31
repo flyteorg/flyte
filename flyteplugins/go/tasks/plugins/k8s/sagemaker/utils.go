@@ -120,6 +120,7 @@ func buildParameterRanges(hpoJobConfig *sagemakerSpec.HyperparameterTuningJobCon
 	}
 
 	for prName, pr := range prMap {
+		scalingTypeString := strings.Title(strings.ToLower(pr.GetContinuousParameterRange().GetScalingType().String()))
 		switch pr.GetParameterRangeType().(type) {
 		case *sagemakerSpec.ParameterRangeOneOf_CategoricalParameterRange:
 			var newElem = commonv1.CategoricalParameterRange{
@@ -133,7 +134,7 @@ func buildParameterRanges(hpoJobConfig *sagemakerSpec.HyperparameterTuningJobCon
 				MaxValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%f", pr.GetContinuousParameterRange().GetMaxValue())),
 				MinValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%f", pr.GetContinuousParameterRange().GetMinValue())),
 				Name:        awssagemaker.ToStringPtr(prName),
-				ScalingType: commonv1.HyperParameterScalingType(pr.GetContinuousParameterRange().GetScalingType().String()),
+				ScalingType: commonv1.HyperParameterScalingType(scalingTypeString),
 			}
 			retValue.ContinuousParameterRanges = append(retValue.ContinuousParameterRanges, newElem)
 
@@ -142,7 +143,7 @@ func buildParameterRanges(hpoJobConfig *sagemakerSpec.HyperparameterTuningJobCon
 				MaxValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%d", pr.GetIntegerParameterRange().GetMaxValue())),
 				MinValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%d", pr.GetIntegerParameterRange().GetMinValue())),
 				Name:        awssagemaker.ToStringPtr(prName),
-				ScalingType: commonv1.HyperParameterScalingType(pr.GetContinuousParameterRange().GetScalingType().String()),
+				ScalingType: commonv1.HyperParameterScalingType(scalingTypeString),
 			}
 			retValue.IntegerParameterRanges = append(retValue.IntegerParameterRanges, newElem)
 		}
