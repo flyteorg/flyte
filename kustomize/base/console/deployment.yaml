@@ -16,14 +16,14 @@ spec:
       labels:
         app: flyteconsole
         app.kubernetes.io/name: flyteconsole
-        app.kubernetes.io/version: 0.5.3
+        app.kubernetes.io/version: 0.8.0
     spec:
       volumes:
       - name: shared-data
         emptyDir: {}
       containers:
       - name: flyteconsole
-        image: docker.io/lyft/flyteconsole:v0.5.3
+        image: docker.io/lyft/flyteconsole:v0.8.0
         # args: []
         ports:
         - containerPort: 8080
