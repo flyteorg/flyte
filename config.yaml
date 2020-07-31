@@ -32,6 +32,8 @@ tasks:
       - container
       - K8S-ARRAY
       - qubole-hive-executor
+      - sagemaker_training
+      - sagemaker_hyperparameter_tuning
 # Sample plugins config
 plugins:
   # All k8s plugins default configuration
@@ -55,6 +57,18 @@ plugins:
       name: "flyte-copilot-"
       image: "flyteplugins:24c62d97452ce83ad6b4fd24e0eea2b4c44ff0c6"
       start-timeout: "5s"
+  sagemaker:
+    roleArn: "arn:aws:iam::123456789012:role/test-development"
+    region: "us-east-1"
+    prebuiltAlgorithms:
+      - name: xgboost
+        regionalConfigs:
+          - region: "us-east-1"
+            versionConfigs:
+              - version: 0.72
+                image: "811284229777.dkr.ecr.us-east-1.amazonaws.com/xgboost:latest"
+              - version: 0.90
+                image: "683313688378.dkr.ecr.us-east-1.amazonaws.com/xgboost:latest"
   # Logging configuration
   logs:
     kubernetes-enabled: true
