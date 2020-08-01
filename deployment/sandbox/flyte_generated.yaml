@@ -1139,7 +1139,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.2.11
+        image: docker.io/lyft/flyteadmin:v0.3.0
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -1155,7 +1155,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: docker.io/lyft/flyteadmin:v0.2.11
+        image: docker.io/lyft/flyteadmin:v0.3.0
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -1168,7 +1168,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.2.11
+        image: docker.io/lyft/flyteadmin:v0.3.0
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -1576,7 +1576,7 @@ spec:
             - /etc/flyte/config/flyteadmin_config.yaml
             - clusterresource
             - sync
-            image: docker.io/lyft/flyteadmin:v0.2.11
+            image: docker.io/lyft/flyteadmin:v0.3.0
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
