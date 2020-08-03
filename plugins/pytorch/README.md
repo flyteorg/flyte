@@ -5,9 +5,9 @@ This demo is built on top of this `example`_
 ## Prerequisites
 
 Before running this make sure that
-    - pytorch plugin is enabled in flytepropeller's config
-    - `Kubeflow pytorch operator`_ is installed in your k8s cluster (you can use `base`_ and configure it in your deploy)
-    - [if using GPU] `GPU device plugin`_ is deployed as well
+- pytorch plugin is enabled in flytepropeller's config
+- `Kubeflow pytorch operator`_ is installed in your k8s cluster (you can use `base`_ and configure it in your deploy)
+- [if using GPU] `GPU device plugin`_ is deployed as well
 
 ## Usage
 
