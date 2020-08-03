@@ -27,7 +27,7 @@ And assert that you have a dependency in your project on
 Usage
 *****
 
-Sidecar accept all arguments that ordinary :ref:`container tasks <container-task-type>` accept. However, sidecar tasks require two additional arguments, ``pod_spec`` and ``primary_container_name``
+Sidecar tasks accept all arguments that ordinary :ref:`container tasks <container-task-type>` accept. However, sidecar tasks require two additional arguments, ``pod_spec`` and ``primary_container_name``
 
 Pod Spec
 ========
