@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core package &mdash; Flyte 0.5.0 documentation</title>
+  <title>flytekit.models.core package &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="flytekit.plugins package" href="flytekit.plugins.html" />
+    <link rel="next" title="flytekit.models.sagemaker package" href="flytekit.models.sagemaker.html" />
     <link rel="prev" title="flytekit.models.admin package" href="flytekit.models.admin.html" /> 
 </head>
 
@@ -1793,7 +1793,7 @@ an implicit dependency on any node that appears in inputs field.
 
 <dl class="class">
 <dt id="flytekit.models.core.workflow.WorkflowMetadata">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.core.workflow.</code><code class="sig-name descname">WorkflowMetadata</code><span class="sig-paren">(</span><em class="sig-param">queuing_budget=None</em>, <em class="sig-param">on_failure=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadata" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.core.workflow.</code><code class="sig-name descname">WorkflowMetadata</code><span class="sig-paren">(</span><em class="sig-param">on_failure=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/core/workflow.html#WorkflowMetadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="class">
 <dt id="flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy">
@@ -1844,16 +1844,6 @@ the workflow execution as failed.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy" title="flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy">flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="flytekit.models.core.workflow.WorkflowMetadata.queuing_budget">
-<em class="property">property </em><code class="sig-name descname">queuing_budget</code><a class="headerlink" href="#flytekit.models.core.workflow.WorkflowMetadata.queuing_budget" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)">datetime.timedelta</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2051,7 +2041,7 @@ to execute successfully in order to bind final outputs.
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="flytekit.plugins.html" class="btn btn-neutral float-right" title="flytekit.plugins package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="flytekit.models.sagemaker.html" class="btn btn-neutral float-right" title="flytekit.models.sagemaker package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="flytekit.models.admin.html" class="btn btn-neutral float-left" title="flytekit.models.admin package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

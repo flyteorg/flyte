@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.literals &mdash; Flyte 0.5.0 documentation</title>
+  <title>flytekit.models.literals &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -281,7 +281,9 @@
 <span class="sd">        This returns whichever field is set.</span>
 <span class="sd">        :rtype: T</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">integer</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_value</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_value</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">boolean</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">datetime</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">integer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">boolean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="Primitive.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.literals.Primitive.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

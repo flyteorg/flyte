@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients.raw &mdash; Flyte 0.5.0 documentation</title>
+  <title>flytekit.clients.raw &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -188,8 +188,8 @@
 <span class="sd">    :return:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_credentials_access</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span><span class="o">.</span><span class="n">refresh_access_token</span><span class="p">()</span>
-    <span class="n">flyte_client</span><span class="o">.</span><span class="n">set_access_token</span><span class="p">(</span><span class="n">_credentials_access</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span><span class="o">.</span><span class="n">credentials</span><span class="o">.</span><span class="n">access_token</span><span class="p">)</span>
+    <span class="n">_credentials_access</span><span class="o">.</span><span class="n">get_client</span><span class="p">(</span><span class="n">flyte_client</span><span class="o">.</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">refresh_access_token</span><span class="p">()</span>
+    <span class="n">flyte_client</span><span class="o">.</span><span class="n">set_access_token</span><span class="p">(</span><span class="n">_credentials_access</span><span class="o">.</span><span class="n">get_client</span><span class="p">(</span><span class="n">flyte_client</span><span class="o">.</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">credentials</span><span class="o">.</span><span class="n">access_token</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_refresh_credentials_basic</span><span class="p">(</span><span class="n">flyte_client</span><span class="p">):</span>
@@ -202,7 +202,7 @@
 <span class="sd">    :param flyte_client: RawSynchronousFlyteClient</span>
 <span class="sd">    :return:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">auth_endpoints</span> <span class="o">=</span> <span class="n">_credentials_access</span><span class="o">.</span><span class="n">get_authorization_endpoints</span><span class="p">()</span>
+    <span class="n">auth_endpoints</span> <span class="o">=</span> <span class="n">_credentials_access</span><span class="o">.</span><span class="n">get_authorization_endpoints</span><span class="p">(</span><span class="n">flyte_client</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
     <span class="n">token_endpoint</span> <span class="o">=</span> <span class="n">auth_endpoints</span><span class="o">.</span><span class="n">token_endpoint</span>
     <span class="n">client_secret</span> <span class="o">=</span> <span class="n">_basic_auth</span><span class="o">.</span><span class="n">get_secret</span><span class="p">()</span>
     <span class="n">_logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Basic authorization flow with client id </span><span class="si">{}</span><span class="s1"> scope </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_CLIENT_ID</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">_SCOPE</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
@@ -292,6 +292,7 @@
 <span class="sd">            service-side of the RPC.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_url</span> <span class="o">=</span> <span class="n">url</span>
 
         <span class="k">if</span> <span class="n">insecure</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span> <span class="o">=</span> <span class="n">_insecure_channel</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">((</span><span class="n">options</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
@@ -305,6 +306,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">_AUTH</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">force_auth_flow</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_url</span>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.set_access_token"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.set_access_token">[docs]</a>    <span class="k">def</span> <span class="nf">set_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">access_token</span><span class="p">):</span>
         <span class="c1"># Always set the header to lower-case regardless of what the config is. The grpc libraries that Admin uses</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common package &mdash; Flyte 0.5.0 documentation</title>
+  <title>flytekit.common package &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -220,6 +220,16 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="flytekit.common.tasks.html">flytekit.common.tasks package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html">flytekit.common.tasks.sagemaker package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.hpo_job_task">flytekit.common.tasks.sagemaker.hpo_job_task module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.training_job_task">flytekit.common.tasks.sagemaker.training_job_task module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.executions">flytekit.common.tasks.executions module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.html#module-flytekit.common.tasks.generic_spark_task">flytekit.common.tasks.generic_spark_task module</a></li>
@@ -430,6 +440,16 @@ engine.</p>
 <dl class="attribute">
 <dt id="flytekit.common.constants.SdkTaskType.RAW_CONTAINER_TASK">
 <code class="sig-name descname">RAW_CONTAINER_TASK</code><em class="property"> = 'raw-container'</em><a class="headerlink" href="#flytekit.common.constants.SdkTaskType.RAW_CONTAINER_TASK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.common.constants.SdkTaskType.SAGEMAKER_HYPERPARAMETER_TUNING_JOB_TASK">
+<code class="sig-name descname">SAGEMAKER_HYPERPARAMETER_TUNING_JOB_TASK</code><em class="property"> = 'sagemaker_hyperparameter_tuning_job_task'</em><a class="headerlink" href="#flytekit.common.constants.SdkTaskType.SAGEMAKER_HYPERPARAMETER_TUNING_JOB_TASK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.common.constants.SdkTaskType.SAGEMAKER_TRAINING_JOB_TASK">
+<code class="sig-name descname">SAGEMAKER_TRAINING_JOB_TASK</code><em class="property"> = 'sagemaker_training_job_task'</em><a class="headerlink" href="#flytekit.common.constants.SdkTaskType.SAGEMAKER_TRAINING_JOB_TASK" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1572,14 +1592,13 @@ for actual registration to Admin.</p>
 
 <dl class="function">
 <dt id="flytekit.common.workflow.build_sdk_workflow_from_metaclass">
-<code class="sig-prename descclassname">flytekit.common.workflow.</code><code class="sig-name descname">build_sdk_workflow_from_metaclass</code><span class="sig-paren">(</span><em class="sig-param">metaclass</em>, <em class="sig-param">queuing_budget=None</em>, <em class="sig-param">on_failure=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#build_sdk_workflow_from_metaclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.build_sdk_workflow_from_metaclass" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.common.workflow.</code><code class="sig-name descname">build_sdk_workflow_from_metaclass</code><span class="sig-paren">(</span><em class="sig-param">metaclass</em>, <em class="sig-param">on_failure=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/workflow.html#build_sdk_workflow_from_metaclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.workflow.build_sdk_workflow_from_metaclass" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>metaclass</strong> (<em>T</em>) – </p></li>
 <li><p><strong>cls</strong> – This is the class that will be instantiated from the inputs, outputs, and nodes.  This will be used
 by users extending the base Flyte programming model. If set, it must be a subclass of SdkWorkflow.</p></li>
-<li><p><strong>datetime.timedelta</strong> (<em>queuing_budget</em>) – [Optional] Budget that specifies the amount of time a workflow can be queued up for execution.</p></li>
 <li><p><strong>flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy</strong> (<em>on_failure</em>) – [Optional] The execution policy when the workflow detects a failure.</p></li>
 </ul>
 </dd>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk.tasks &mdash; Flyte 0.5.0 documentation</title>
+  <title>flytekit.sdk.tasks &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -163,6 +163,7 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
 <span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
+
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_common_constants</span>
@@ -172,8 +173,9 @@
     <span class="n">sidecar_task</span> <span class="k">as</span> <span class="n">_sdk_sidecar_tasks</span><span class="p">,</span> <span class="n">pytorch_task</span> <span class="k">as</span> <span class="n">_sdk_pytorch_tasks</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
-<span class="kn">from</span> <span class="nn">flytekit.sdk.spark_types</span> <span class="k">import</span>  <span class="n">SparkType</span> <span class="k">as</span> <span class="n">_spark_type</span>
+<span class="kn">from</span> <span class="nn">flytekit.contrib.notebook</span> <span class="k">import</span> <span class="n">tasks</span> <span class="k">as</span> <span class="n">_nb_tasks</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.sdk.spark_types</span> <span class="k">import</span> <span class="n">SparkType</span> <span class="k">as</span> <span class="n">_spark_type</span>
 
 
 <div class="viewcode-block" id="inputs"><a class="viewcode-back" href="../../../flytekit/flytekit.sdk.html#flytekit.sdk.tasks.inputs">[docs]</a><span class="k">def</span> <span class="nf">inputs</span><span class="p">(</span><span class="n">_task_template</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -249,7 +251,7 @@
 <span class="sd">    :rtype: flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">apply_outputs_wrapper</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">_sdk_runnable_tasks</span><span class="o">.</span><span class="n">SdkRunnableTask</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">_sdk_runnable_tasks</span><span class="o">.</span><span class="n">SdkRunnableTask</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">_nb_tasks</span><span class="o">.</span><span class="n">SdkNotebookTask</span><span class="p">):</span>
             <span class="n">additional_msg</span> <span class="o">=</span> \
                 <span class="s2">&quot;Outputs can only be applied to a task. Did you forget the task decorator on method &#39;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&#39;?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">task</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>

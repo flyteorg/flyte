@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.configuration &mdash; Flyte 0.5.0 documentation</title>
+  <title>flytekit.configuration &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -161,6 +161,7 @@
             
   <h1>Source code for flytekit.configuration</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
@@ -178,8 +179,11 @@
     <span class="kn">import</span> <span class="nn">flytekit.configuration.internal</span> <span class="k">as</span> <span class="nn">_internal</span>
     <span class="k">if</span> <span class="n">config_file_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">config_file_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Invalid flyte config_file_path </span><span class="si">{}</span><span class="s2"> specified.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">))</span>
         <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">_internal</span><span class="o">.</span><span class="n">CONFIGURATION_PATH</span><span class="o">.</span><span class="n">env_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">config_file_path</span>
     <span class="k">elif</span> <span class="n">_internal</span><span class="o">.</span><span class="n">CONFIGURATION_PATH</span><span class="o">.</span><span class="n">env_var</span> <span class="ow">in</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">_logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Deleting configuration path </span><span class="si">{}</span><span class="s2"> from env&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_internal</span><span class="o">.</span><span class="n">CONFIGURATION_PATH</span><span class="o">.</span><span class="n">env_var</span><span class="p">))</span>
         <span class="k">del</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">_internal</span><span class="o">.</span><span class="n">CONFIGURATION_PATH</span><span class="o">.</span><span class="n">env_var</span><span class="p">]</span>
     <span class="n">_common</span><span class="o">.</span><span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">reset_config</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span></div>
 

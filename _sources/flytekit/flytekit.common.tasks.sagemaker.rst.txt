@@ -1,0 +1,30 @@
+flytekit.common.tasks.sagemaker package
+=======================================
+
+Submodules
+----------
+
+flytekit.common.tasks.sagemaker.hpo\_job\_task module
+-----------------------------------------------------
+
+.. automodule:: flytekit.common.tasks.sagemaker.hpo_job_task
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+flytekit.common.tasks.sagemaker.training\_job\_task module
+----------------------------------------------------------
+
+.. automodule:: flytekit.common.tasks.sagemaker.training_job_task
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: flytekit.common.tasks.sagemaker
+   :members:
+   :undoc-members:
+   :show-inheritance:

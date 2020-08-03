@@ -8,7 +8,7 @@ launch_plan.proto
 flyteidl.admin.LaunchPlanCreateRequest
 --------------------------------------
 
-`[flyteidl.admin.LaunchPlanCreateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L15>`_
+`[flyteidl.admin.LaunchPlanCreateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L16>`_
 
 Request to register a launch plan. A LaunchPlanSpec may include a complete or incomplete set of inputs required
 to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
@@ -40,7 +40,7 @@ spec
 flyteidl.admin.LaunchPlanCreateResponse
 ---------------------------------------
 
-`[flyteidl.admin.LaunchPlanCreateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L23>`_
+`[flyteidl.admin.LaunchPlanCreateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L24>`_
 
 
 .. code-block:: json
@@ -55,7 +55,7 @@ flyteidl.admin.LaunchPlanCreateResponse
 flyteidl.admin.LaunchPlan
 -------------------------
 
-`[flyteidl.admin.LaunchPlan proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L41>`_
+`[flyteidl.admin.LaunchPlan proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L42>`_
 
 A LaunchPlan provides the capability to templatize workflow executions.
 Launch plans simplify associating one or more schedules, inputs and notifications with your workflows.
@@ -92,7 +92,7 @@ closure
 flyteidl.admin.LaunchPlanList
 -----------------------------
 
-`[flyteidl.admin.LaunchPlanList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L49>`_
+`[flyteidl.admin.LaunchPlanList proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L50>`_
 
 Response object for list launch plan requests.
 
@@ -122,7 +122,7 @@ token
 flyteidl.admin.Auth
 -------------------
 
-`[flyteidl.admin.Auth proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L58>`_
+`[flyteidl.admin.Auth proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L59>`_
 
 Defines permissions associated with executions created by this launch plan spec.
 
@@ -156,7 +156,7 @@ kubernetes_service_account
 flyteidl.admin.LaunchPlanSpec
 -----------------------------
 
-`[flyteidl.admin.LaunchPlanSpec proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L67>`_
+`[flyteidl.admin.LaunchPlanSpec proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L68>`_
 
 User-provided launch plan definition and configuration values.
 
@@ -171,7 +171,8 @@ User-provided launch plan definition and configuration values.
     "labels": "{...}",
     "annotations": "{...}",
     "auth": "{...}",
-    "auth_role": "{...}"
+    "auth_role": "{...}",
+    "quality_of_service": "{...}"
   }
 
 .. _api_field_flyteidl.admin.LaunchPlanSpec.workflow_id:
@@ -227,6 +228,12 @@ auth
 auth_role
   (:ref:`flyteidl.admin.AuthRole <api_msg_flyteidl.admin.AuthRole>`) 
   
+.. _api_field_flyteidl.admin.LaunchPlanSpec.quality_of_service:
+
+quality_of_service
+  (:ref:`flyteidl.core.QualityOfService <api_msg_flyteidl.core.QualityOfService>`) Indicates the runtime priority of the execution. 
+  
+  
 
 
 .. _api_msg_flyteidl.admin.LaunchPlanClosure:
@@ -234,7 +241,7 @@ auth_role
 flyteidl.admin.LaunchPlanClosure
 --------------------------------
 
-`[flyteidl.admin.LaunchPlanClosure proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L98>`_
+`[flyteidl.admin.LaunchPlanClosure proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L102>`_
 
 Values computed by the flyte platform after launch plan registration.
 These include expected_inputs required to be present in a CreateExecutionRequest
@@ -287,7 +294,7 @@ updated_at
 flyteidl.admin.LaunchPlanMetadata
 ---------------------------------
 
-`[flyteidl.admin.LaunchPlanMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L117>`_
+`[flyteidl.admin.LaunchPlanMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L121>`_
 
 Additional launch plan attributes included in the LaunchPlanSpec not strictly required to launch
 the reference workflow.
@@ -318,7 +325,7 @@ notifications
 flyteidl.admin.LaunchPlanUpdateRequest
 --------------------------------------
 
-`[flyteidl.admin.LaunchPlanUpdateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L126>`_
+`[flyteidl.admin.LaunchPlanUpdateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L130>`_
 
 Request to set the referenced launch plan state to the configured value.
 
@@ -348,7 +355,7 @@ state
 flyteidl.admin.LaunchPlanUpdateResponse
 ---------------------------------------
 
-`[flyteidl.admin.LaunchPlanUpdateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L135>`_
+`[flyteidl.admin.LaunchPlanUpdateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L139>`_
 
 Purposefully empty, may be populated in the future.
 
@@ -364,7 +371,7 @@ Purposefully empty, may be populated in the future.
 flyteidl.admin.ActiveLaunchPlanRequest
 --------------------------------------
 
-`[flyteidl.admin.ActiveLaunchPlanRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L139>`_
+`[flyteidl.admin.ActiveLaunchPlanRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L143>`_
 
 Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
 
@@ -386,7 +393,7 @@ id
 flyteidl.admin.ActiveLaunchPlanListRequest
 ------------------------------------------
 
-`[flyteidl.admin.ActiveLaunchPlanListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L144>`_
+`[flyteidl.admin.ActiveLaunchPlanListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L148>`_
 
 Represents a request structure to list active launch plans within a project/domain.
 
@@ -439,7 +446,7 @@ sort_by
 Enum flyteidl.admin.LaunchPlanState
 -----------------------------------
 
-`[flyteidl.admin.LaunchPlanState proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L32>`_
+`[flyteidl.admin.LaunchPlanState proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/launch_plan.proto#L33>`_
 
 By default any launch plan regardless of state can be used to launch a workflow execution.
 However, at most one version of a launch plan

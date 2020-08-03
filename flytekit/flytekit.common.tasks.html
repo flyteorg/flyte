@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks package &mdash; Flyte 0.5.0 documentation</title>
+  <title>flytekit.common.tasks package &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="flytekit.common.types package" href="flytekit.common.types.html" />
+    <link rel="next" title="flytekit.common.tasks.sagemaker package" href="flytekit.common.tasks.sagemaker.html" />
     <link rel="prev" title="flytekit.common.mixins package" href="flytekit.common.mixins.html" /> 
 </head>
 
@@ -193,6 +193,20 @@
             
   <div class="section" id="flytekit-common-tasks-package">
 <h1>flytekit.common.tasks package<a class="headerlink" href="#flytekit-common-tasks-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html">flytekit.common.tasks.sagemaker package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.hpo_job_task">flytekit.common.tasks.sagemaker.hpo_job_task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.training_job_task">flytekit.common.tasks.sagemaker.training_job_task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -382,7 +396,7 @@ It will raise an exception if necessary.
 <span id="flytekit-common-tasks-presto-task-module"></span><h2>flytekit.common.tasks.presto_task module<a class="headerlink" href="#module-flytekit.common.tasks.presto_task" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="flytekit.common.tasks.presto_task.SdkPrestoTask">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.presto_task.</code><code class="sig-name descname">SdkPrestoTask</code><span class="sig-paren">(</span><em class="sig-param">statement</em>, <em class="sig-param">output_schema</em>, <em class="sig-param">routing_group=None</em>, <em class="sig-param">catalog=None</em>, <em class="sig-param">schema=None</em>, <em class="sig-param">task_inputs=None</em>, <em class="sig-param">interruptible=False</em>, <em class="sig-param">discoverable=False</em>, <em class="sig-param">discovery_version=None</em>, <em class="sig-param">retries=1</em>, <em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/presto_task.html#SdkPrestoTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.presto_task.SdkPrestoTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.presto_task.</code><code class="sig-name descname">SdkPrestoTask</code><span class="sig-paren">(</span><em class="sig-param">statement</em>, <em class="sig-param">output_schema</em>, <em class="sig-param">routing_group=None</em>, <em class="sig-param">catalog=None</em>, <em class="sig-param">schema=None</em>, <em class="sig-param">task_inputs=None</em>, <em class="sig-param">interruptible=False</em>, <em class="sig-param">discoverable=False</em>, <em class="sig-param">discovery_version=None</em>, <em class="sig-param">retries=1</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">deprecated=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/presto_task.html#SdkPrestoTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.presto_task.SdkPrestoTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.task.SdkTask" title="flytekit.common.tasks.task.SdkTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.task.SdkTask</span></code></a></p>
 <p>This class includes the logic for building a task that executes as a Presto task.</p>
 <dl class="method">
@@ -1055,7 +1069,7 @@ to a LiteralMap.</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="flytekit.common.types.html" class="btn btn-neutral float-right" title="flytekit.common.types package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="flytekit.common.tasks.sagemaker.html" class="btn btn-neutral float-right" title="flytekit.common.tasks.sagemaker package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="flytekit.common.mixins.html" class="btn btn-neutral float-left" title="flytekit.common.mixins package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
