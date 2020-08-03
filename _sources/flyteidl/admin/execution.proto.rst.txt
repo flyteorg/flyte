@@ -569,7 +569,8 @@ of an execution as it progresses across phase changes..
     "disable_all": "...",
     "labels": "{...}",
     "annotations": "{...}",
-    "auth_role": "{...}"
+    "auth_role": "{...}",
+    "quality_of_service": "{...}"
   }
 
 .. _api_field_flyteidl.admin.ExecutionSpec.launch_plan:
@@ -628,6 +629,12 @@ auth_role
   (:ref:`flyteidl.admin.AuthRole <api_msg_flyteidl.admin.AuthRole>`) Optional: auth override to apply this execution.
   
   
+.. _api_field_flyteidl.admin.ExecutionSpec.quality_of_service:
+
+quality_of_service
+  (:ref:`flyteidl.core.QualityOfService <api_msg_flyteidl.core.QualityOfService>`) Indicates the runtime priority of the execution. 
+  
+  
 
 
 .. _api_msg_flyteidl.admin.ExecutionTerminateRequest:
@@ -635,7 +642,7 @@ auth_role
 flyteidl.admin.ExecutionTerminateRequest
 ----------------------------------------
 
-`[flyteidl.admin.ExecutionTerminateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L246>`_
+`[flyteidl.admin.ExecutionTerminateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L248>`_
 
 Request to terminate an in-progress execution.  This action is irreversible.
 If an execution is already terminated, this request will simply be a no-op.
@@ -669,7 +676,7 @@ cause
 flyteidl.admin.ExecutionTerminateResponse
 -----------------------------------------
 
-`[flyteidl.admin.ExecutionTerminateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L254>`_
+`[flyteidl.admin.ExecutionTerminateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L256>`_
 
 
 .. code-block:: json
@@ -684,7 +691,7 @@ flyteidl.admin.ExecutionTerminateResponse
 flyteidl.admin.WorkflowExecutionGetDataRequest
 ----------------------------------------------
 
-`[flyteidl.admin.WorkflowExecutionGetDataRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L259>`_
+`[flyteidl.admin.WorkflowExecutionGetDataRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L261>`_
 
 Request structure to fetch inputs and output urls for an execution.
 
@@ -707,7 +714,7 @@ id
 flyteidl.admin.WorkflowExecutionGetDataResponse
 -----------------------------------------------
 
-`[flyteidl.admin.WorkflowExecutionGetDataResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L265>`_
+`[flyteidl.admin.WorkflowExecutionGetDataResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L267>`_
 
 Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution.
 

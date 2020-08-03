@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>identifier.proto &mdash; Flyte 0.5.0 documentation</title>
+  <title>identifier.proto &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -96,6 +96,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Flyte Language and API specification</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../admin/index.html">Flyte Admin Service entities</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Core Flyte language specification</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="catalog.proto.html">catalog.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiler.proto.html">compiler.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="condition.proto.html">condition.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dynamic_job.proto.html">dynamic_job.proto</a></li>
@@ -199,7 +200,7 @@
 <span id="identifier-proto"></span><h1>identifier.proto<a class="headerlink" href="#api-file-flyteidl-core-identifier-proto" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="flyteidl-core-identifier">
 <span id="api-msg-flyteidl-core-identifier"></span><h2>flyteidl.core.Identifier<a class="headerlink" href="#flyteidl-core-identifier" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/identifier.proto#L15">[flyteidl.core.Identifier proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/identifier.proto#L19">[flyteidl.core.Identifier proto]</a></p>
 <p>Encapsulation of fields that uniquely identifies a Flyte resource.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;resource_type&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -234,7 +235,7 @@ A domain can be considered as a subset within a specific project.</p>
 </div>
 <div class="section" id="flyteidl-core-workflowexecutionidentifier">
 <span id="api-msg-flyteidl-core-workflowexecutionidentifier"></span><h2>flyteidl.core.WorkflowExecutionIdentifier<a class="headerlink" href="#flyteidl-core-workflowexecutionidentifier" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/identifier.proto#L34">[flyteidl.core.WorkflowExecutionIdentifier proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/identifier.proto#L38">[flyteidl.core.WorkflowExecutionIdentifier proto]</a></p>
 <p>Encapsulation of fields that uniquely identifies a Flyte workflow execution</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -259,7 +260,7 @@ A domain can be considered as a subset within a specific project.</p>
 </div>
 <div class="section" id="flyteidl-core-nodeexecutionidentifier">
 <span id="api-msg-flyteidl-core-nodeexecutionidentifier"></span><h2>flyteidl.core.NodeExecutionIdentifier<a class="headerlink" href="#flyteidl-core-nodeexecutionidentifier" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/identifier.proto#L47">[flyteidl.core.NodeExecutionIdentifier proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/identifier.proto#L51">[flyteidl.core.NodeExecutionIdentifier proto]</a></p>
 <p>Encapsulation of fields that identify a Flyte node execution entity.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;node_id&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -278,7 +279,7 @@ A domain can be considered as a subset within a specific project.</p>
 </div>
 <div class="section" id="flyteidl-core-taskexecutionidentifier">
 <span id="api-msg-flyteidl-core-taskexecutionidentifier"></span><h2>flyteidl.core.TaskExecutionIdentifier<a class="headerlink" href="#flyteidl-core-taskexecutionidentifier" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/identifier.proto#L54">[flyteidl.core.TaskExecutionIdentifier proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/identifier.proto#L58">[flyteidl.core.TaskExecutionIdentifier proto]</a></p>
 <p>Encapsulation of fields that identify a Flyte task execution entity.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;task_id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
@@ -318,6 +319,12 @@ A domain can be considered as a subset within a specific project.</p>
 </dl>
 <dl class="simple" id="api-enum-value-flyteidl-core-resourcetype-launch-plan">
 <dt>LAUNCH_PLAN</dt><dd><p>⁣</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-resourcetype-dataset">
+<dt>DATASET</dt><dd><p>⁣A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.
+Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects
+in a similar manner to other Flyte objects</p>
 </dd>
 </dl>
 </div>

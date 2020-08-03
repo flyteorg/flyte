@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>matchable_resource.proto &mdash; Flyte 0.5.0 documentation</title>
+  <title>matchable_resource.proto &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -206,7 +206,7 @@
 <span id="api-file-flyteidl-admin-matchable-resource-proto"></span><h1>matchable_resource.proto<a class="headerlink" href="#matchable-resource-proto" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="flyteidl-admin-taskresourcespec">
 <span id="api-msg-flyteidl-admin-taskresourcespec"></span><h2>flyteidl.admin.TaskResourceSpec<a class="headerlink" href="#flyteidl-admin-taskresourcespec" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L21">[flyteidl.admin.TaskResourceSpec proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L27">[flyteidl.admin.TaskResourceSpec proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;cpu&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;gpu&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -234,7 +234,7 @@
 </div>
 <div class="section" id="flyteidl-admin-taskresourceattributes">
 <span id="api-msg-flyteidl-admin-taskresourceattributes"></span><h2>flyteidl.admin.TaskResourceAttributes<a class="headerlink" href="#flyteidl-admin-taskresourceattributes" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L31">[flyteidl.admin.TaskResourceAttributes proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L37">[flyteidl.admin.TaskResourceAttributes proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;defaults&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;limits&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
@@ -252,7 +252,7 @@
 </div>
 <div class="section" id="flyteidl-admin-clusterresourceattributes">
 <span id="api-msg-flyteidl-admin-clusterresourceattributes"></span><h2>flyteidl.admin.ClusterResourceAttributes<a class="headerlink" href="#flyteidl-admin-clusterresourceattributes" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L37">[flyteidl.admin.ClusterResourceAttributes proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L43">[flyteidl.admin.ClusterResourceAttributes proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;attributes&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
@@ -267,7 +267,7 @@ Map values should be the custom values which get substituted during resource cre
 </div>
 <div class="section" id="flyteidl-admin-executionqueueattributes">
 <span id="api-msg-flyteidl-admin-executionqueueattributes"></span><h2>flyteidl.admin.ExecutionQueueAttributes<a class="headerlink" href="#flyteidl-admin-executionqueueattributes" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L44">[flyteidl.admin.ExecutionQueueAttributes proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L50">[flyteidl.admin.ExecutionQueueAttributes proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[]</span>
 <span class="p">}</span>
@@ -280,7 +280,7 @@ Map values should be the custom values which get substituted during resource cre
 </div>
 <div class="section" id="flyteidl-admin-executionclusterlabel">
 <span id="api-msg-flyteidl-admin-executionclusterlabel"></span><h2>flyteidl.admin.ExecutionClusterLabel<a class="headerlink" href="#flyteidl-admin-executionclusterlabel" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L49">[flyteidl.admin.ExecutionClusterLabel proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L55">[flyteidl.admin.ExecutionClusterLabel proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
 <span class="p">}</span>
@@ -293,40 +293,46 @@ Map values should be the custom values which get substituted during resource cre
 </div>
 <div class="section" id="flyteidl-admin-matchingattributes">
 <span id="api-msg-flyteidl-admin-matchingattributes"></span><h2>flyteidl.admin.MatchingAttributes<a class="headerlink" href="#flyteidl-admin-matchingattributes" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L55">[flyteidl.admin.MatchingAttributes proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L61">[flyteidl.admin.MatchingAttributes proto]</a></p>
 <p>Generic container for encapsulating all types of the above attributes messages.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;task_resource_attributes&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;cluster_resource_attributes&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;execution_queue_attributes&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;execution_cluster_label&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;execution_cluster_label&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;quality_of_service&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <dl id="api-field-flyteidl-admin-matchingattributes-task-resource-attributes">
 <dt>task_resource_attributes</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-admin-taskresourceattributes"><span class="std std-ref">flyteidl.admin.TaskResourceAttributes</span></a>)</p>
-<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-task-resource-attributes"><span class="std std-ref">task_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-cluster-resource-attributes"><span class="std std-ref">cluster_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-queue-attributes"><span class="std std-ref">execution_queue_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-cluster-label"><span class="std std-ref">execution_cluster_label</span></a> may be set.</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-task-resource-attributes"><span class="std std-ref">task_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-cluster-resource-attributes"><span class="std std-ref">cluster_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-queue-attributes"><span class="std std-ref">execution_queue_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-cluster-label"><span class="std std-ref">execution_cluster_label</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-quality-of-service"><span class="std std-ref">quality_of_service</span></a> may be set.</p>
 </dd>
 </dl>
 <dl id="api-field-flyteidl-admin-matchingattributes-cluster-resource-attributes">
 <dt>cluster_resource_attributes</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-admin-clusterresourceattributes"><span class="std std-ref">flyteidl.admin.ClusterResourceAttributes</span></a>)</p>
-<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-task-resource-attributes"><span class="std std-ref">task_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-cluster-resource-attributes"><span class="std std-ref">cluster_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-queue-attributes"><span class="std std-ref">execution_queue_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-cluster-label"><span class="std std-ref">execution_cluster_label</span></a> may be set.</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-task-resource-attributes"><span class="std std-ref">task_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-cluster-resource-attributes"><span class="std std-ref">cluster_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-queue-attributes"><span class="std std-ref">execution_queue_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-cluster-label"><span class="std std-ref">execution_cluster_label</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-quality-of-service"><span class="std std-ref">quality_of_service</span></a> may be set.</p>
 </dd>
 </dl>
 <dl id="api-field-flyteidl-admin-matchingattributes-execution-queue-attributes">
 <dt>execution_queue_attributes</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-admin-executionqueueattributes"><span class="std std-ref">flyteidl.admin.ExecutionQueueAttributes</span></a>)</p>
-<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-task-resource-attributes"><span class="std std-ref">task_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-cluster-resource-attributes"><span class="std std-ref">cluster_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-queue-attributes"><span class="std std-ref">execution_queue_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-cluster-label"><span class="std std-ref">execution_cluster_label</span></a> may be set.</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-task-resource-attributes"><span class="std std-ref">task_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-cluster-resource-attributes"><span class="std std-ref">cluster_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-queue-attributes"><span class="std std-ref">execution_queue_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-cluster-label"><span class="std std-ref">execution_cluster_label</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-quality-of-service"><span class="std std-ref">quality_of_service</span></a> may be set.</p>
 </dd>
 </dl>
 <dl id="api-field-flyteidl-admin-matchingattributes-execution-cluster-label">
 <dt>execution_cluster_label</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-admin-executionclusterlabel"><span class="std std-ref">flyteidl.admin.ExecutionClusterLabel</span></a>)</p>
-<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-task-resource-attributes"><span class="std std-ref">task_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-cluster-resource-attributes"><span class="std std-ref">cluster_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-queue-attributes"><span class="std std-ref">execution_queue_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-cluster-label"><span class="std std-ref">execution_cluster_label</span></a> may be set.</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-task-resource-attributes"><span class="std std-ref">task_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-cluster-resource-attributes"><span class="std std-ref">cluster_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-queue-attributes"><span class="std std-ref">execution_queue_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-cluster-label"><span class="std std-ref">execution_cluster_label</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-quality-of-service"><span class="std std-ref">quality_of_service</span></a> may be set.</p>
+</dd>
+</dl>
+<dl id="api-field-flyteidl-admin-matchingattributes-quality-of-service">
+<dt>quality_of_service</dt><dd><p>(<a class="reference internal" href="../core/execution.proto.html#api-msg-flyteidl-core-qualityofservice"><span class="std std-ref">flyteidl.core.QualityOfService</span></a>)</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-task-resource-attributes"><span class="std std-ref">task_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-cluster-resource-attributes"><span class="std std-ref">cluster_resource_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-queue-attributes"><span class="std std-ref">execution_queue_attributes</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-execution-cluster-label"><span class="std std-ref">execution_cluster_label</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-matchingattributes-quality-of-service"><span class="std std-ref">quality_of_service</span></a> may be set.</p>
 </dd>
 </dl>
 </div>
 <div class="section" id="flyteidl-admin-matchableattributesconfiguration">
 <span id="api-msg-flyteidl-admin-matchableattributesconfiguration"></span><h2>flyteidl.admin.MatchableAttributesConfiguration<a class="headerlink" href="#flyteidl-admin-matchableattributesconfiguration" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L69">[flyteidl.admin.MatchableAttributesConfiguration proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L77">[flyteidl.admin.MatchableAttributesConfiguration proto]</a></p>
 <p>Represents a custom set of attributes applied for either a domain; a domain and project; or
 domain, project and workflow name.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -361,7 +367,7 @@ domain, project and workflow name.</p>
 </div>
 <div class="section" id="flyteidl-admin-listmatchableattributesrequest">
 <span id="api-msg-flyteidl-admin-listmatchableattributesrequest"></span><h2>flyteidl.admin.ListMatchableAttributesRequest<a class="headerlink" href="#flyteidl-admin-listmatchableattributesrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L82">[flyteidl.admin.ListMatchableAttributesRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L90">[flyteidl.admin.ListMatchableAttributesRequest proto]</a></p>
 <p>Request all matching resource attributes.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;resource_type&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
@@ -375,7 +381,7 @@ domain, project and workflow name.</p>
 </div>
 <div class="section" id="flyteidl-admin-listmatchableattributesresponse">
 <span id="api-msg-flyteidl-admin-listmatchableattributesresponse"></span><h2>flyteidl.admin.ListMatchableAttributesResponse<a class="headerlink" href="#flyteidl-admin-listmatchableattributesresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L87">[flyteidl.admin.ListMatchableAttributesResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L95">[flyteidl.admin.ListMatchableAttributesResponse proto]</a></p>
 <p>Response for a request for all matching resource attributes.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;configurations&quot;</span><span class="p">:</span> <span class="p">[]</span>
@@ -389,7 +395,7 @@ domain, project and workflow name.</p>
 </div>
 <div class="section" id="enum-flyteidl-admin-matchableresource">
 <span id="api-enum-flyteidl-admin-matchableresource"></span><h2>Enum flyteidl.admin.MatchableResource<a class="headerlink" href="#enum-flyteidl-admin-matchableresource" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L7">[flyteidl.admin.MatchableResource proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L10">[flyteidl.admin.MatchableResource proto]</a></p>
 <p>Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes
 based on matching tags.</p>
 <dl class="simple" id="api-enum-value-flyteidl-admin-matchableresource-task-resource">
@@ -406,6 +412,10 @@ based on matching tags.</p>
 </dl>
 <dl class="simple" id="api-enum-value-flyteidl-admin-matchableresource-execution-cluster-label">
 <dt>EXECUTION_CLUSTER_LABEL</dt><dd><p>⁣Configures the K8s cluster label to be used for execution to be run</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-admin-matchableresource-quality-of-service-specification">
+<dt>QUALITY_OF_SERVICE_SPECIFICATION</dt><dd><p>⁣Configures default quality of service when undefined in an execution spec.</p>
 </dd>
 </dl>
 </div>

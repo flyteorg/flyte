@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>execution.proto &mdash; Flyte 0.5.0 documentation</title>
+  <title>execution.proto &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -587,7 +587,8 @@ of an execution as it progresses across phase changes..</p>
   <span class="nt">&quot;disable_all&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;annotations&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;auth_role&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;auth_role&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;quality_of_service&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -627,10 +628,14 @@ When this list is empty, the notifications defined for the launch plan will be a
 <dt>auth_role</dt><dd><p>(<a class="reference internal" href="common.proto.html#api-msg-flyteidl-admin-authrole"><span class="std std-ref">flyteidl.admin.AuthRole</span></a>) Optional: auth override to apply this execution.</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-admin-executionspec-quality-of-service">
+<dt>quality_of_service</dt><dd><p>(<a class="reference internal" href="../core/execution.proto.html#api-msg-flyteidl-core-qualityofservice"><span class="std std-ref">flyteidl.core.QualityOfService</span></a>) Indicates the runtime priority of the execution.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-admin-executionterminaterequest">
 <span id="api-msg-flyteidl-admin-executionterminaterequest"></span><h2>flyteidl.admin.ExecutionTerminateRequest<a class="headerlink" href="#flyteidl-admin-executionterminaterequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L246">[flyteidl.admin.ExecutionTerminateRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L248">[flyteidl.admin.ExecutionTerminateRequest proto]</a></p>
 <p>Request to terminate an in-progress execution.  This action is irreversible.
 If an execution is already terminated, this request will simply be a no-op.
 This request will fail if it references a non-existent execution.
@@ -653,14 +658,14 @@ with the optional cause added to the output_result.</p>
 </div>
 <div class="section" id="flyteidl-admin-executionterminateresponse">
 <span id="api-msg-flyteidl-admin-executionterminateresponse"></span><h2>flyteidl.admin.ExecutionTerminateResponse<a class="headerlink" href="#flyteidl-admin-executionterminateresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L254">[flyteidl.admin.ExecutionTerminateResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L256">[flyteidl.admin.ExecutionTerminateResponse proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="flyteidl-admin-workflowexecutiongetdatarequest">
 <span id="api-msg-flyteidl-admin-workflowexecutiongetdatarequest"></span><h2>flyteidl.admin.WorkflowExecutionGetDataRequest<a class="headerlink" href="#flyteidl-admin-workflowexecutiongetdatarequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L259">[flyteidl.admin.WorkflowExecutionGetDataRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L261">[flyteidl.admin.WorkflowExecutionGetDataRequest proto]</a></p>
 <p>Request structure to fetch inputs and output urls for an execution.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
@@ -674,7 +679,7 @@ with the optional cause added to the output_result.</p>
 </div>
 <div class="section" id="flyteidl-admin-workflowexecutiongetdataresponse">
 <span id="api-msg-flyteidl-admin-workflowexecutiongetdataresponse"></span><h2>flyteidl.admin.WorkflowExecutionGetDataResponse<a class="headerlink" href="#flyteidl-admin-workflowexecutiongetdataresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L265">[flyteidl.admin.WorkflowExecutionGetDataResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/execution.proto#L267">[flyteidl.admin.WorkflowExecutionGetDataResponse proto]</a></p>
 <p>Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>

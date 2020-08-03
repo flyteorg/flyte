@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.interfaces.data.gcs.gcs_proxy &mdash; Flyte 0.5.0 documentation</title>
+  <title>flytekit.interfaces.data.gcs.gcs_proxy &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -194,10 +194,25 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_check_binary</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Make sure that the AWS cli is present</span>
+<span class="sd">        Make sure that the `gsutil` cli is present</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_which</span><span class="p">(</span><span class="n">GCSProxy</span><span class="o">.</span><span class="n">_GS_UTIL_CLI</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">_FlyteUserException</span><span class="p">(</span><span class="s1">&#39;gsutil (gcloud cli) not found at Please install.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">_FlyteUserException</span><span class="p">(</span><span class="s2">&quot;gsutil (gcloud cli) not found! Please install.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_maybe_with_gsutil_parallelism</span><span class="p">(</span><span class="o">*</span><span class="n">gsutil_args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if we should run `gsutil` with the `-m` flag that enables</span>
+<span class="sd">        parallelism via multiple threads/processes. Additional tweaking of</span>
+<span class="sd">        this behavior can be achieved via the .boto configuration file. See:</span>
+<span class="sd">        https://cloud.google.com/storage/docs/boto-gsutil</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">GCSProxy</span><span class="o">.</span><span class="n">_GS_UTIL_CLI</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">_gcp_config</span><span class="o">.</span><span class="n">GSUTIL_PARALLELISM</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-m&quot;</span><span class="p">)</span>
+        <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">gsutil_args</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cmd</span>
 
 <div class="viewcode-block" id="GCSProxy.exists"><a class="viewcode-back" href="../../../../../flytekit/flytekit.interfaces.data.gcs.html#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -226,7 +241,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">remote_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;gs://&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not an GS Key. Please use FQN (GS ARN) of the format gs://...&quot;</span><span class="p">)</span>
 
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">GCSProxy</span><span class="o">.</span><span class="n">_GS_UTIL_CLI</span><span class="p">,</span> <span class="s2">&quot;cp&quot;</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">_amend_path</span><span class="p">(</span><span class="n">remote_path</span><span class="p">),</span> <span class="n">local_path</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maybe_with_gsutil_parallelism</span><span class="p">(</span><span class="s2">&quot;cp&quot;</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="n">_amend_path</span><span class="p">(</span><span class="n">remote_path</span><span class="p">),</span> <span class="n">local_path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_update_cmd_config_and_execute</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GCSProxy.download"><a class="viewcode-back" href="../../../../../flytekit/flytekit.interfaces.data.gcs.html#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">local_path</span><span class="p">):</span>
@@ -238,7 +253,8 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not an GS Key. Please use FQN (GS ARN) of the format gs://...&quot;</span><span class="p">)</span>
 
         <span class="n">GCSProxy</span><span class="o">.</span><span class="n">_check_binary</span><span class="p">()</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">GCSProxy</span><span class="o">.</span><span class="n">_GS_UTIL_CLI</span><span class="p">,</span> <span class="s2">&quot;cp&quot;</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">local_path</span><span class="p">]</span>
+
+        <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maybe_with_gsutil_parallelism</span><span class="p">(</span><span class="s2">&quot;cp&quot;</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">local_path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_update_cmd_config_and_execute</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GCSProxy.upload"><a class="viewcode-back" href="../../../../../flytekit/flytekit.interfaces.data.gcs.html#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.upload">[docs]</a>    <span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">to_path</span><span class="p">):</span>
@@ -248,8 +264,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">GCSProxy</span><span class="o">.</span><span class="n">_check_binary</span><span class="p">()</span>
 
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">GCSProxy</span><span class="o">.</span><span class="n">_GS_UTIL_CLI</span><span class="p">,</span> <span class="s2">&quot;cp&quot;</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">to_path</span><span class="p">]</span>
-
+        <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maybe_with_gsutil_parallelism</span><span class="p">(</span><span class="s2">&quot;cp&quot;</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">to_path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_update_cmd_config_and_execute</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GCSProxy.upload_directory"><a class="viewcode-back" href="../../../../../flytekit/flytekit.interfaces.data.gcs.html#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.upload_directory">[docs]</a>    <span class="k">def</span> <span class="nf">upload_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_path</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">):</span>
@@ -262,11 +277,12 @@
 
         <span class="n">GCSProxy</span><span class="o">.</span><span class="n">_check_binary</span><span class="p">()</span>
 
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">GCSProxy</span><span class="o">.</span><span class="n">_GS_UTIL_CLI</span><span class="p">,</span>
-               <span class="s2">&quot;cp&quot;</span><span class="p">,</span>
-               <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
-               <span class="n">_amend_path</span><span class="p">(</span><span class="n">local_path</span><span class="p">),</span>
-               <span class="n">remote_path</span> <span class="k">if</span> <span class="n">remote_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">remote_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maybe_with_gsutil_parallelism</span><span class="p">(</span>
+           <span class="s2">&quot;cp&quot;</span><span class="p">,</span>
+           <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
+           <span class="n">_amend_path</span><span class="p">(</span><span class="n">local_path</span><span class="p">),</span>
+           <span class="n">remote_path</span> <span class="k">if</span> <span class="n">remote_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">remote_path</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">_update_cmd_config_and_execute</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GCSProxy.get_random_path"><a class="viewcode-back" href="../../../../../flytekit/flytekit.interfaces.data.gcs.html#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.get_random_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

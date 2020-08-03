@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+   flytekit.contrib.notebook
    flytekit.contrib.sensors
 
 Module contents

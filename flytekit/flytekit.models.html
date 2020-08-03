@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models package &mdash; Flyte 0.5.0 documentation</title>
+  <title>flytekit.models package &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -213,6 +213,14 @@
 <li class="toctree-l2"><a class="reference internal" href="flytekit.models.core.html#module-flytekit.models.core.types">flytekit.models.core.types module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.models.core.html#module-flytekit.models.core.workflow">flytekit.models.core.workflow module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.models.core.html#module-flytekit.models.core">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="flytekit.models.sagemaker.html">flytekit.models.sagemaker package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.models.sagemaker.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.models.sagemaker.html#module-flytekit.models.sagemaker.hpo_job">flytekit.models.sagemaker.hpo_job module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.models.sagemaker.html#module-flytekit.models.sagemaker.parameter_ranges">flytekit.models.sagemaker.parameter_ranges module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.models.sagemaker.html#module-flytekit.models.sagemaker.training_job">flytekit.models.sagemaker.training_job module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.models.sagemaker.html#module-flytekit.models.sagemaker">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -3786,7 +3794,7 @@ requires processing of all input data. This has to be a positive number.</p>
 
 <dl class="class">
 <dt id="flytekit.models.task.DataLoadingConfig">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">DataLoadingConfig</code><span class="sig-paren">(</span><em class="sig-param">input_path: str</em>, <em class="sig-param">output_path: str</em>, <em class="sig-param">enabled: bool = True</em>, <em class="sig-param">format: &lt;google.protobuf.internal.enum_type_wrapper.EnumTypeWrapper object at 0x7f6bd11f3828&gt; = 2</em>, <em class="sig-param">io_strategy: flytekit.models.task.IOStrategy = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#DataLoadingConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.DataLoadingConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">DataLoadingConfig</code><span class="sig-paren">(</span><em class="sig-param">input_path: str</em>, <em class="sig-param">output_path: str</em>, <em class="sig-param">enabled: bool = True</em>, <em class="sig-param">format: &lt;google.protobuf.internal.enum_type_wrapper.EnumTypeWrapper object at 0x7fb45a682438&gt; = 2</em>, <em class="sig-param">io_strategy: flytekit.models.task.IOStrategy = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#DataLoadingConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.DataLoadingConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="attribute">
 <dt id="flytekit.models.task.DataLoadingConfig.LITERALMAP_FORMAT_JSON">
@@ -3817,7 +3825,7 @@ requires processing of all input data. This has to be a positive number.</p>
 
 <dl class="class">
 <dt id="flytekit.models.task.IOStrategy">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">IOStrategy</code><span class="sig-paren">(</span><em class="sig-param">download_mode: &lt;google.protobuf.internal.enum_type_wrapper.EnumTypeWrapper object at 0x7f6bd11f37b8&gt; = 0</em>, <em class="sig-param">upload_mode: &lt;google.protobuf.internal.enum_type_wrapper.EnumTypeWrapper object at 0x7f6bd11f37f0&gt; = 0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#IOStrategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.IOStrategy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.task.</code><code class="sig-name descname">IOStrategy</code><span class="sig-paren">(</span><em class="sig-param">download_mode: &lt;google.protobuf.internal.enum_type_wrapper.EnumTypeWrapper object at 0x7fb45a682588&gt; = 0</em>, <em class="sig-param">upload_mode: &lt;google.protobuf.internal.enum_type_wrapper.EnumTypeWrapper object at 0x7fb45a6824e0&gt; = 0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/task.html#IOStrategy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.task.IOStrategy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <p>Provides methods to manage data in and out of the Raw container using Download Modes. This can only be used if DataLoadingConfig is enabled.</p>
 <dl class="attribute">

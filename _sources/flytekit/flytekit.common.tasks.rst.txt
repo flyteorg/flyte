@@ -1,6 +1,13 @@
 flytekit.common.tasks package
 =============================
 
+Subpackages
+-----------
+
+.. toctree::
+
+   flytekit.common.tasks.sagemaker
+
 Submodules
 ----------
 

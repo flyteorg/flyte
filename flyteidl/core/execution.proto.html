@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>execution.proto &mdash; Flyte 0.5.0 documentation</title>
+  <title>execution.proto &mdash; Flyte 0.6.0 documentation</title>
   
 
   
@@ -96,6 +96,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Flyte Language and API specification</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../admin/index.html">Flyte Admin Service entities</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Core Flyte language specification</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="catalog.proto.html">catalog.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compiler.proto.html">compiler.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="condition.proto.html">condition.proto</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dynamic_job.proto.html">dynamic_job.proto</a></li>
@@ -111,6 +112,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-core-executionerror-errorkind">Enum flyteidl.core.ExecutionError.ErrorKind</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-tasklog">flyteidl.core.TaskLog</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-core-tasklog-messageformat">Enum flyteidl.core.TaskLog.MessageFormat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-qualityofservicespec">flyteidl.core.QualityOfServiceSpec</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-core-qualityofservice">flyteidl.core.QualityOfService</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-core-qualityofservice-tier">Enum flyteidl.core.QualityOfService.Tier</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="identifier.proto.html">identifier.proto</a></li>
@@ -433,6 +437,61 @@ When our log story is flushed out, we may have more metadata here like log link 
 </dl>
 <dl class="simple" id="api-enum-value-flyteidl-core-tasklog-messageformat-json">
 <dt>JSON</dt><dd><p>⁣</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="flyteidl-core-qualityofservicespec">
+<span id="api-msg-flyteidl-core-qualityofservicespec"></span><h2>flyteidl.core.QualityOfServiceSpec<a class="headerlink" href="#flyteidl-core-qualityofservicespec" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L91">[flyteidl.core.QualityOfServiceSpec proto]</a></p>
+<p>Represents customized execution run-time attributes.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;queueing_budget&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="simple" id="api-field-flyteidl-core-qualityofservicespec-queueing-budget">
+<dt>queueing_budget</dt><dd><p>(<span class="xref std std-ref">google.protobuf.Duration</span>) Indicates how much queueing delay an execution can tolerate.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="flyteidl-core-qualityofservice">
+<span id="api-msg-flyteidl-core-qualityofservice"></span><h2>flyteidl.core.QualityOfService<a class="headerlink" href="#flyteidl-core-qualityofservice" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L99">[flyteidl.core.QualityOfService proto]</a></p>
+<p>Indicates the priority of an execution.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;tier&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;spec&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl id="api-field-flyteidl-core-qualityofservice-tier">
+<dt>tier</dt><dd><p>(<a class="reference internal" href="#api-enum-flyteidl-core-qualityofservice-tier"><span class="std std-ref">flyteidl.core.QualityOfService.Tier</span></a>)</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-core-qualityofservice-tier"><span class="std std-ref">tier</span></a>, <a class="reference internal" href="#api-field-flyteidl-core-qualityofservice-spec"><span class="std std-ref">spec</span></a> may be set.</p>
+</dd>
+</dl>
+<dl id="api-field-flyteidl-core-qualityofservice-spec">
+<dt>spec</dt><dd><p>(<a class="reference internal" href="#api-msg-flyteidl-core-qualityofservicespec"><span class="std std-ref">flyteidl.core.QualityOfServiceSpec</span></a>)</p>
+<p>Only one of <a class="reference internal" href="#api-field-flyteidl-core-qualityofservice-tier"><span class="std std-ref">tier</span></a>, <a class="reference internal" href="#api-field-flyteidl-core-qualityofservice-spec"><span class="std std-ref">spec</span></a> may be set.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="enum-flyteidl-core-qualityofservice-tier">
+<span id="api-enum-flyteidl-core-qualityofservice-tier"></span><h2>Enum flyteidl.core.QualityOfService.Tier<a class="headerlink" href="#enum-flyteidl-core-qualityofservice-tier" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L100">[flyteidl.core.QualityOfService.Tier proto]</a></p>
+<dl class="simple" id="api-enum-value-flyteidl-core-qualityofservice-tier-undefined">
+<dt>UNDEFINED</dt><dd><p><em>(DEFAULT)</em> ⁣Default: no quality of service specified.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-qualityofservice-tier-high">
+<dt>HIGH</dt><dd><p>⁣</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-qualityofservice-tier-medium">
+<dt>MEDIUM</dt><dd><p>⁣</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-core-qualityofservice-tier-low">
+<dt>LOW</dt><dd><p>⁣</p>
 </dd>
 </dl>
 </div>
