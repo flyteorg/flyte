@@ -32,8 +32,8 @@ func TestCreateNodeExecution(t *testing.T) {
 	nodeExecutionQuery := GlobalMock.NewMock()
 	nodeExecutionQuery.WithQuery(`INSERT INTO "node_executions" ("id","created_at","updated_at","deleted_at",` +
 		`"execution_project","execution_domain","execution_name","node_id","phase","input_uri","closure","started_at",` +
-		`"node_execution_created_at","node_execution_updated_at","duration","error_kind","error_code","cache_status") VALUES ` +
-		`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+		`"node_execution_created_at","node_execution_updated_at","duration","node_execution_metadata","parent_id","error_kind","error_code","cache_status") VALUES ` +
+		`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
 
 	nodeExecutionEventQuery := GlobalMock.NewMock()
 	nodeExecutionEventQuery.WithQuery(`INSERT INTO "node_execution_events" ("created_at","updated_at",` +
@@ -53,7 +53,7 @@ func TestCreateNodeExecution(t *testing.T) {
 		Phase:      nodePhase,
 		OccurredAt: nodeStartedAt,
 	}
-
+	parentID := uint(10)
 	nodeExecution := models.NodeExecution{
 		BaseModel: models.BaseModel{
 			ID: 2,
@@ -68,11 +68,13 @@ func TestCreateNodeExecution(t *testing.T) {
 		},
 		Phase:                  nodePhase,
 		Closure:                []byte("closure"),
+		NodeExecutionMetadata:  []byte("closure"),
 		InputURI:               "input uri",
 		StartedAt:              &nodeStartedAt,
 		Duration:               time.Hour,
 		NodeExecutionCreatedAt: &nodeCreatedAt,
 		NodeExecutionUpdatedAt: &nodeCreatedAt,
+		ParentID:               &parentID,
 	}
 	err := nodeExecutionRepo.Create(context.Background(), &nodeExecutionEvent, &nodeExecution)
 	assert.NoError(t, err)
@@ -83,7 +85,6 @@ func TestCreateNodeExecution(t *testing.T) {
 func TestUpdateNodeExecution(t *testing.T) {
 	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
-
 	// Only match on queries that append the name filter
 	nodeExecutionEventQuery := GlobalMock.NewMock()
 	nodeExecutionEventQuery.WithQuery(`INSERT INTO "node_execution_events" ("created_at","updated_at",` +
@@ -146,11 +147,16 @@ func getMockNodeExecutionResponseFromDb(expected models.NodeExecution) map[strin
 	nodeExecution["duration"] = expected.Duration
 	nodeExecution["node_execution_created_at"] = expected.NodeExecutionCreatedAt
 	nodeExecution["node_execution_updated_at"] = expected.NodeExecutionUpdatedAt
+	nodeExecution["parent_id"] = expected.ParentID
+	if expected.NodeExecutionMetadata != nil {
+		nodeExecution["node_execution_metadata"] = expected.NodeExecutionMetadata
+	}
 	return nodeExecution
 }
 
 func TestGetNodeExecution(t *testing.T) {
 	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	parentID := uint(10)
 	expectedNodeExecution := models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: "1",
@@ -167,6 +173,8 @@ func TestGetNodeExecution(t *testing.T) {
 		Duration:               time.Hour,
 		NodeExecutionCreatedAt: &nodeCreatedAt,
 		NodeExecutionUpdatedAt: &nodePlanUpdatedAt,
+		NodeExecutionMetadata:  []byte("NodeExecutionMetadata"),
+		ParentID:               &parentID,
 	}
 
 	nodeExecutions := make([]map[string]interface{}, 0)
@@ -174,7 +182,6 @@ func TestGetNodeExecution(t *testing.T) {
 	nodeExecutions = append(nodeExecutions, nodeExecution)
 
 	GlobalMock := mocket.Catcher.Reset()
-
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "node_executions"  WHERE "node_executions"."deleted_at" IS NULL AND ` +
 			`(("node_executions"."execution_project" = execution_project) AND ("node_executions"."execution_domain" ` +
@@ -300,11 +307,12 @@ func TestListNodeExecutionsForExecution(t *testing.T) {
 				Name:    "1",
 			},
 		},
-		Phase:     nodePhase,
-		Closure:   []byte("closure"),
-		InputURI:  "input uri",
-		StartedAt: &nodeStartedAt,
-		Duration:  time.Hour,
+		Phase:                 nodePhase,
+		Closure:               []byte("closure"),
+		InputURI:              "input uri",
+		StartedAt:             &nodeStartedAt,
+		Duration:              time.Hour,
+		NodeExecutionMetadata: []byte("NodeExecutionMetadata"),
 	})
 	nodeExecutions = append(nodeExecutions, nodeExecution)
 
@@ -337,6 +345,9 @@ func TestListNodeExecutionsForExecution(t *testing.T) {
 		assert.Equal(t, "input uri", nodeExecution.InputURI)
 		assert.Equal(t, nodeStartedAt, *nodeExecution.StartedAt)
 		assert.Equal(t, time.Hour, nodeExecution.Duration)
+		assert.Equal(t, []byte("NodeExecutionMetadata"), nodeExecution.NodeExecutionMetadata)
+		assert.Empty(t, nodeExecution.ChildNodeExecutions)
+		assert.Empty(t, nodeExecution.ParentID)
 	}
 }
 

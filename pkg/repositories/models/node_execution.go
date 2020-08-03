@@ -29,9 +29,17 @@ type NodeExecution struct {
 	NodeExecutionUpdatedAt *time.Time
 	Duration               time.Duration
 	NodeExecutionEvents    []NodeExecutionEvent
+	// Metadata about the node execution.
+	NodeExecutionMetadata []byte
+	// Parent that spawned this node execution - value is empty for executions at level 0
+	ParentID *uint `sql:"default:null"`
+	// List of child node executions - for cases like Dynamic task, sub workflow, etc
+	ChildNodeExecutions []NodeExecution `gorm:"foreignkey:ParentID"`
 	// The task execution (if any) which launched this node execution.
+	// TO BE DEPRECATED - as we have now introduced ParentID
 	ParentTaskExecutionID uint `sql:"default:null" gorm:"index"`
 	// The workflow execution (if any) which this node execution launched
+	// NOTE: LaunchedExecution[foreignkey:ParentNodeExecutionID] refers to Workflow execution launched and is different from ParentID
 	LaunchedExecution Execution `gorm:"foreignkey:ParentNodeExecutionID"`
 	// Execution Error Kind. nullable, can be one of core.ExecutionError_ErrorKind
 	ErrorKind *string `gorm:"index"`
