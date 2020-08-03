@@ -16,5 +16,6 @@
 - Sagemaker Support for Builtin Algorithms with simplified API
 
 ## Flytekit
-Support for Spark 3
-Basic notebook task support via Papermill
+- Support for Spark 3
+- Papermill based notebook task support for - Python and Spark (basic input and output types)
+- Simplified Sagemaker Interface for leveraging Builtin Algorithms
