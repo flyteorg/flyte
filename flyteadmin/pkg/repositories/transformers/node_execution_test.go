@@ -27,6 +27,12 @@ var closure = &admin.NodeExecutionClosure{
 	Duration:  ptypes.DurationProto(duration),
 }
 var closureBytes, _ = proto.Marshal(closure)
+var nodeExecutionMetadata = admin.NodeExecutionMetaData{
+	IsParentNode: false,
+	RetryGroup:   "r",
+	SpecNodeId:   "sp",
+}
+var nodeExecutionMetadataBytes, _ = proto.Marshal(&nodeExecutionMetadata)
 
 var childExecutionID = &core.WorkflowExecutionIdentifier{
 	Project: "p",
@@ -154,6 +160,7 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 		StartedAt:              &occurredAt,
 		NodeExecutionCreatedAt: &occurredAt,
 		NodeExecutionUpdatedAt: &occurredAt,
+		NodeExecutionMetadata:  []byte{},
 		ParentTaskExecutionID:  8,
 	}, nodeExecutionModel)
 }
@@ -260,8 +267,52 @@ func TestFromNodeExecutionModel(t *testing.T) {
 				Name:    "name",
 			},
 		},
-		Phase:    "NodeExecutionPhase_NODE_PHASE_RUNNING",
-		Closure:  closureBytes,
+		Phase:                 "NodeExecutionPhase_NODE_PHASE_RUNNING",
+		Closure:               closureBytes,
+		NodeExecutionMetadata: nodeExecutionMetadataBytes,
+		InputURI:              "input uri",
+		Duration:              duration,
+	})
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&admin.NodeExecution{
+		Id:       &nodeExecutionIdentifier,
+		InputUri: "input uri",
+		Closure:  closure,
+		Metadata: &nodeExecutionMetadata,
+	}, nodeExecution))
+}
+
+func TestFromNodeExecutionModelWithChildren(t *testing.T) {
+	nodeExecutionIdentifier := core.NodeExecutionIdentifier{
+		NodeId: "nodey",
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+	}
+	nodeExecution, err := FromNodeExecutionModel(models.NodeExecution{
+		NodeExecutionKey: models.NodeExecutionKey{
+			NodeID: "nodey",
+			ExecutionKey: models.ExecutionKey{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+		},
+		Phase:                 "NodeExecutionPhase_NODE_PHASE_RUNNING",
+		Closure:               closureBytes,
+		NodeExecutionMetadata: nodeExecutionMetadataBytes,
+		ChildNodeExecutions: []models.NodeExecution{
+			{NodeExecutionKey: models.NodeExecutionKey{
+				NodeID: "nodec1",
+				ExecutionKey: models.ExecutionKey{
+					Project: "project",
+					Domain:  "domain",
+					Name:    "name",
+				},
+			}},
+		},
 		InputURI: "input uri",
 		Duration: duration,
 	})
@@ -270,6 +321,11 @@ func TestFromNodeExecutionModel(t *testing.T) {
 		Id:       &nodeExecutionIdentifier,
 		InputUri: "input uri",
 		Closure:  closure,
+		Metadata: &admin.NodeExecutionMetaData{
+			IsParentNode: true,
+			RetryGroup:   "r",
+			SpecNodeId:   "sp",
+		},
 	}, nodeExecution))
 }
 
@@ -284,10 +340,11 @@ func TestFromNodeExecutionModels(t *testing.T) {
 					Name:    "name",
 				},
 			},
-			Phase:    "NodeExecutionPhase_NODE_PHASE_RUNNING",
-			Closure:  closureBytes,
-			InputURI: "input uri",
-			Duration: duration,
+			Phase:                 "NodeExecutionPhase_NODE_PHASE_RUNNING",
+			Closure:               closureBytes,
+			NodeExecutionMetadata: nodeExecutionMetadataBytes,
+			InputURI:              "input uri",
+			Duration:              duration,
 		},
 	})
 	assert.Nil(t, err)
@@ -303,5 +360,6 @@ func TestFromNodeExecutionModels(t *testing.T) {
 		},
 		InputUri: "input uri",
 		Closure:  closure,
+		Metadata: &nodeExecutionMetadata,
 	}, nodeExecutions[0]))
 }

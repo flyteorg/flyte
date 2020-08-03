@@ -22,6 +22,7 @@ import (
 type ToNodeExecutionModelInput struct {
 	Request               *admin.NodeExecutionEventRequest
 	ParentTaskExecutionID uint
+	ParentID              *uint
 }
 
 func addNodeRunningState(request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
@@ -92,6 +93,11 @@ func CreateNodeExecutionModel(input ToNodeExecutionModelInput) (*models.NodeExec
 		UpdatedAt: input.Request.Event.OccurredAt,
 	}
 
+	nodeExecutionMetadata := admin.NodeExecutionMetaData{
+		RetryGroup: input.Request.Event.RetryGroup,
+		SpecNodeId: input.Request.Event.SpecNodeId,
+	}
+
 	if input.Request.Event.Phase == core.NodeExecution_RUNNING {
 		err := addNodeRunningState(input.Request, nodeExecution, &closure)
 		if err != nil {
@@ -109,7 +115,13 @@ func CreateNodeExecutionModel(input ToNodeExecutionModelInput) (*models.NodeExec
 		return nil, errors.NewFlyteAdminErrorf(
 			codes.Internal, "failed to marshal node execution closure with error: %v", err)
 	}
+	marshaledNodeExecutionMetadata, err := proto.Marshal(&nodeExecutionMetadata)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(
+			codes.Internal, "failed to marshal node execution metadata with error: %v", err)
+	}
 	nodeExecution.Closure = marshaledClosure
+	nodeExecution.NodeExecutionMetadata = marshaledNodeExecutionMetadata
 	nodeExecutionCreatedAt, err := ptypes.Timestamp(input.Request.Event.OccurredAt)
 	if err != nil {
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read event timestamp")
@@ -119,6 +131,7 @@ func CreateNodeExecutionModel(input ToNodeExecutionModelInput) (*models.NodeExec
 	if input.Request.Event.ParentTaskMetadata != nil {
 		nodeExecution.ParentTaskExecutionID = input.ParentTaskExecutionID
 	}
+	nodeExecution.ParentID = input.ParentID
 	return nodeExecution, nil
 }
 
@@ -134,6 +147,7 @@ func UpdateNodeExecutionModel(
 	nodeExecutionModel.Phase = request.Event.Phase.String()
 	nodeExecutionClosure.Phase = request.Event.Phase
 	nodeExecutionClosure.UpdatedAt = request.Event.OccurredAt
+
 	if request.Event.Phase == core.NodeExecution_RUNNING {
 		err := addNodeRunningState(request, nodeExecutionModel, &nodeExecutionClosure)
 		if err != nil {
@@ -173,6 +187,7 @@ func UpdateNodeExecutionModel(
 		return errors.NewFlyteAdminErrorf(
 			codes.Internal, "failed to marshal node execution closure with error: %v", err)
 	}
+
 	nodeExecutionModel.Closure = marshaledClosure
 	updatedAt, err := ptypes.Timestamp(request.Event.OccurredAt)
 	if err != nil {
@@ -189,6 +204,14 @@ func FromNodeExecutionModel(nodeExecutionModel models.NodeExecution) (*admin.Nod
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal closure")
 	}
 
+	var nodeExecutionMetadata admin.NodeExecutionMetaData
+	err = proto.Unmarshal(nodeExecutionModel.NodeExecutionMetadata, &nodeExecutionMetadata)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal nodeExecutionMetadata")
+	}
+	if len(nodeExecutionModel.ChildNodeExecutions) > 0 {
+		nodeExecutionMetadata.IsParentNode = true
+	}
 	return &admin.NodeExecution{
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: nodeExecutionModel.NodeID,
@@ -200,6 +223,7 @@ func FromNodeExecutionModel(nodeExecutionModel models.NodeExecution) (*admin.Nod
 		},
 		InputUri: nodeExecutionModel.InputURI,
 		Closure:  &closure,
+		Metadata: &nodeExecutionMetadata,
 	}, nil
 }
 

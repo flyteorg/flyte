@@ -35,4 +35,6 @@ const (
 	Attributes            = "attributes"
 	MatchingAttributes    = "matching_attributes"
 	Resourcetype          = "resource_type"
+	// Parent of a node execution in the node executions table
+	ParentID = "parent_id"
 )

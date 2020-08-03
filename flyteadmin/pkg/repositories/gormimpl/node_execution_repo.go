@@ -56,7 +56,7 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.GetNodeExe
 				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
 			},
 		},
-	}).First(&nodeExecution)
+	}).Preload("ChildNodeExecutions").First(&nodeExecution)
 	timer.Stop()
 	if tx.Error != nil {
 		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -103,7 +103,7 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 		return interfaces.NodeExecutionCollectionOutput{}, err
 	}
 	var nodeExecutions []models.NodeExecution
-	tx := r.db.Limit(input.Limit).Offset(input.Offset)
+	tx := r.db.Limit(input.Limit).Offset(input.Offset).Preload("ChildNodeExecutions")
 	// And add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
 	// (this query isn't called for deletes).
 	tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+

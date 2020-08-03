@@ -59,6 +59,73 @@ func TestCreateNodeExecution(t *testing.T) {
 	assert.True(t, proto.Equal(occurredAtProto, response.Closure.StartedAt))
 }
 
+func TestCreateNodeExecutionWithParent(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	populateWorkflowExecutionForTestingOnly(project, domain, name)
+
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	occurredAt := time.Now()
+	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	_, err := client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
+		RequestId: "request id",
+		Event: &event.NodeExecutionEvent{
+			Id:         nodeExecutionId,
+			Phase:      core.NodeExecution_RUNNING,
+			InputUri:   inputURI,
+			OccurredAt: occurredAtProto,
+		},
+	})
+	assert.Nil(t, err)
+
+	response, err := client.GetNodeExecution(ctx, &admin.NodeExecutionGetRequest{
+		Id: nodeExecutionId,
+	})
+	assert.Nil(t, err)
+	assert.False(t, response.Metadata.IsParentNode)
+	assert.True(t, proto.Equal(nodeExecutionId, response.Id))
+
+	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
+		RequestId: "request id",
+		Event: &event.NodeExecutionEvent{
+			Id: &core.NodeExecutionIdentifier{
+				NodeId:      "child",
+				ExecutionId: nodeExecutionId.ExecutionId,
+			},
+			Phase:      core.NodeExecution_RUNNING,
+			InputUri:   inputURI,
+			OccurredAt: occurredAtProto,
+			SpecNodeId: "spec",
+			RetryGroup: "1",
+			ParentNodeMetadata: &event.ParentNodeExecutionMetadata{
+				NodeId: nodeExecutionId.NodeId,
+			},
+		},
+	})
+	response, err = client.GetNodeExecution(ctx, &admin.NodeExecutionGetRequest{
+		Id: &core.NodeExecutionIdentifier{
+			NodeId:      "child",
+			ExecutionId: nodeExecutionId.ExecutionId,
+		},
+	})
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
+		NodeId:      "child",
+		ExecutionId: nodeExecutionId.ExecutionId,
+	}, response.Id))
+	assert.Nil(t, err)
+	assert.False(t, response.Metadata.IsParentNode)
+
+	response, err = client.GetNodeExecution(ctx, &admin.NodeExecutionGetRequest{
+		Id: nodeExecutionId,
+	})
+	assert.Nil(t, err)
+	assert.True(t, response.Metadata.IsParentNode)
+	assert.True(t, proto.Equal(nodeExecutionId, response.Id))
+}
+
 func TestCreateAndUpdateNodeExecution(t *testing.T) {
 	truncateAllTablesForTestingOnly()
 	populateWorkflowExecutionForTestingOnly(project, domain, name)
@@ -185,6 +252,113 @@ func TestCreateAndListNodeExecutions(t *testing.T) {
 	assert.Len(t, response.NodeExecutions, 1)
 	nodeExecutionResponse := response.NodeExecutions[0]
 	assert.True(t, proto.Equal(nodeExecutionId, nodeExecutionResponse.Id))
+	assert.Equal(t, core.NodeExecution_RUNNING, nodeExecutionResponse.Closure.Phase)
+	assert.Equal(t, inputURI, nodeExecutionResponse.InputUri)
+	assert.True(t, proto.Equal(occurredAtProto, nodeExecutionResponse.Closure.StartedAt))
+}
+
+func TestListNodeExecutionWithParent(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	populateWorkflowExecutionForTestingOnly(project, domain, name)
+
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	occurredAt := time.Now()
+	occurredAtProto, _ := ptypes.TimestampProto(occurredAt)
+	_, err := client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
+		RequestId: "request id",
+		Event: &event.NodeExecutionEvent{
+			Id:         nodeExecutionId,
+			Phase:      core.NodeExecution_RUNNING,
+			InputUri:   inputURI,
+			OccurredAt: occurredAtProto,
+		},
+	})
+	assert.Nil(t, err)
+
+	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
+		RequestId: "request id",
+		Event: &event.NodeExecutionEvent{
+			Id: &core.NodeExecutionIdentifier{
+				NodeId:      "child",
+				ExecutionId: nodeExecutionId.ExecutionId,
+			},
+			Phase:      core.NodeExecution_RUNNING,
+			InputUri:   inputURI,
+			OccurredAt: occurredAtProto,
+			SpecNodeId: "spec",
+			RetryGroup: "1",
+			ParentNodeMetadata: &event.ParentNodeExecutionMetadata{
+				NodeId: nodeExecutionId.NodeId,
+			},
+		},
+	})
+	assert.Nil(t, err)
+
+	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
+		RequestId: "request id",
+		Event: &event.NodeExecutionEvent{
+			Id: &core.NodeExecutionIdentifier{
+				NodeId:      "child2",
+				ExecutionId: nodeExecutionId.ExecutionId,
+			},
+			Phase:      core.NodeExecution_RUNNING,
+			InputUri:   inputURI,
+			OccurredAt: occurredAtProto,
+			SpecNodeId: "spec",
+			RetryGroup: "1",
+			ParentNodeMetadata: &event.ParentNodeExecutionMetadata{
+				NodeId: nodeExecutionId.NodeId,
+			},
+		},
+	})
+	assert.Nil(t, err)
+
+	response, err := client.ListNodeExecutions(ctx, &admin.NodeExecutionListRequest{
+		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+		Limit: 10,
+	})
+
+	assert.Nil(t, err)
+	assert.Len(t, response.NodeExecutions, 1)
+	nodeExecutionResponse := response.NodeExecutions[0]
+	assert.True(t, proto.Equal(nodeExecutionId, nodeExecutionResponse.Id))
+	assert.Equal(t, core.NodeExecution_RUNNING, nodeExecutionResponse.Closure.Phase)
+	assert.Equal(t, inputURI, nodeExecutionResponse.InputUri)
+	assert.True(t, proto.Equal(occurredAtProto, nodeExecutionResponse.Closure.StartedAt))
+
+	response, err = client.ListNodeExecutions(ctx, &admin.NodeExecutionListRequest{
+		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+		UniqueParentId: nodeExecutionId.NodeId,
+		Limit:          10,
+	})
+
+	assert.Nil(t, err)
+	assert.Len(t, response.NodeExecutions, 2)
+	nodeExecutionResponse = response.NodeExecutions[0]
+	assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
+		NodeId:      "child",
+		ExecutionId: nodeExecutionId.ExecutionId,
+	}, nodeExecutionResponse.Id))
+	assert.Equal(t, core.NodeExecution_RUNNING, nodeExecutionResponse.Closure.Phase)
+	assert.Equal(t, inputURI, nodeExecutionResponse.InputUri)
+	assert.True(t, proto.Equal(occurredAtProto, nodeExecutionResponse.Closure.StartedAt))
+
+	nodeExecutionResponse = response.NodeExecutions[1]
+	assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
+		NodeId:      "child2",
+		ExecutionId: nodeExecutionId.ExecutionId,
+	}, nodeExecutionResponse.Id))
 	assert.Equal(t, core.NodeExecution_RUNNING, nodeExecutionResponse.Closure.Phase)
 	assert.Equal(t, inputURI, nodeExecutionResponse.InputUri)
 	assert.True(t, proto.Equal(occurredAtProto, nodeExecutionResponse.Closure.StartedAt))
