@@ -6,7 +6,7 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic)
 ![GitHub milestones Completed](https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic)
-![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/6?style=plastic)
+![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/7?style=plastic)
 ![Twitter Follow](https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
 
@@ -91,12 +91,13 @@ Resources that would help you get a better understanding of Flyte.
  - Qubole Hive
  - Presto Queries
  - Distributed Pytorch (K8s Native) - Pytorch Operator
+ - Sagemaker (builtin algorithms)
+ - Distributed Tensorflow (K8s Native) - TFOperator
+ - Papermill Notebook execution (python and spark)
 
 ## Coming soon
- - Sagemaker
+ - Sagemaker (custom models)
  - Flink-K8s
- - Distributed Tensorflow (K8s Native) - TFOperator
- - Papermill Notebook execution
 
 # Current Usage 
 - Lyft Rideshare
