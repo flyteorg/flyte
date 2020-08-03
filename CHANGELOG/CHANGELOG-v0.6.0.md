@@ -15,3 +15,6 @@
 ## Plugins
 - Sagemaker Support for Builtin Algorithms with simplified API
 
+## Flytekit
+Support for Spark 3
+Basic notebook task support via Papermill
