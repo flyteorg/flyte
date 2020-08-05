@@ -46,10 +46,11 @@ func TestGetTolerationsForResources(t *testing.T) {
 		resources v12.ResourceRequirements
 	}
 	tests := []struct {
-		name   string
-		args   args
-		setVal map[v12.ResourceName][]v12.Toleration
-		want   []v12.Toleration
+		name        string
+		args        args
+		setVal      map[v12.ResourceName][]v12.Toleration
+		setDefaults []v12.Toleration
+		want        []v12.Toleration
 	}{
 		{
 			"no-tolerations-limits",
@@ -62,6 +63,7 @@ func TestGetTolerationsForResources(t *testing.T) {
 				},
 			},
 			emptyConfig,
+			nil,
 			empty,
 		},
 		{
@@ -75,6 +77,7 @@ func TestGetTolerationsForResources(t *testing.T) {
 				},
 			},
 			emptyConfig,
+			nil,
 			empty,
 		},
 		{
@@ -92,6 +95,7 @@ func TestGetTolerationsForResources(t *testing.T) {
 				},
 			},
 			emptyConfig,
+			nil,
 			empty,
 		},
 		{
@@ -108,6 +112,7 @@ func TestGetTolerationsForResources(t *testing.T) {
 				v12.ResourceStorage: {tolStorage},
 				ResourceNvidiaGPU:   {tolGPU},
 			},
+			nil,
 			[]v12.Toleration{tolStorage},
 		},
 		{
@@ -124,6 +129,7 @@ func TestGetTolerationsForResources(t *testing.T) {
 				v12.ResourceStorage: {tolStorage},
 				ResourceNvidiaGPU:   {tolGPU},
 			},
+			nil,
 			[]v12.Toleration{tolStorage},
 		},
 		{
@@ -144,6 +150,7 @@ func TestGetTolerationsForResources(t *testing.T) {
 				v12.ResourceStorage: {tolStorage},
 				ResourceNvidiaGPU:   {tolGPU},
 			},
+			nil,
 			[]v12.Toleration{tolStorage},
 		},
 		{
@@ -165,12 +172,20 @@ func TestGetTolerationsForResources(t *testing.T) {
 				v12.ResourceStorage: {tolStorage},
 				ResourceNvidiaGPU:   {tolGPU},
 			},
+			nil,
 			[]v12.Toleration{tolStorage, tolGPU},
+		},
+		{
+			"default-tolerations",
+			args{},
+			nil,
+			[]v12.Toleration{tolStorage},
+			[]v12.Toleration{tolStorage},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{ResourceTolerations: tt.setVal}))
+			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{ResourceTolerations: tt.setVal, DefaultTolerations: tt.setDefaults}))
 			if got := GetPodTolerations(true, tt.args.resources); len(got) != len(tt.want) {
 				t.Errorf("GetPodTolerations() = %v, want %v", got, tt.want)
 			} else {

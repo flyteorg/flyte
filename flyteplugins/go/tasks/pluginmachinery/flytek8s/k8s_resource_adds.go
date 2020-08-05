@@ -136,6 +136,7 @@ func GetPodTolerations(interruptible bool, resourceRequirements ...v1.ResourceRe
 			resourceNames.Insert(r.String())
 		}
 	}
+
 	resourceTols := config.GetK8sPluginConfig().ResourceTolerations
 	for _, r := range resourceNames.UnsortedList() {
 		if v, ok := resourceTols[v1.ResourceName(r)]; ok {
@@ -144,9 +145,12 @@ func GetPodTolerations(interruptible bool, resourceRequirements ...v1.ResourceRe
 	}
 
 	// 2. Get the tolerations for interruptible pods
-	if interruptible && len(config.GetK8sPluginConfig().InterruptibleTolerations) > 0 {
+	if interruptible {
 		tolerations = append(tolerations, config.GetK8sPluginConfig().InterruptibleTolerations...)
 	}
+
+	// 3. Add default tolerations
+	tolerations = append(tolerations, config.GetK8sPluginConfig().DefaultTolerations...)
 
 	return tolerations
 }
