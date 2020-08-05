@@ -13,6 +13,7 @@ import (
 	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
 const PodKind = "pod"
@@ -39,17 +40,7 @@ func ToK8sPodSpec(ctx context.Context, taskExecutionMetadata pluginsCore.TaskExe
 	containers := []v1.Container{
 		*c,
 	}
-	if taskExecutionMetadata.IsInterruptible() && len(config.GetK8sPluginConfig().InterruptibleNodeSelector) > 0 {
-		return &v1.PodSpec{
-			// We could specify Scheduler, Affinity, nodename etc
-			RestartPolicy:      v1.RestartPolicyNever,
-			Containers:         containers,
-			Tolerations:        GetPodTolerations(taskExecutionMetadata.IsInterruptible(), c.Resources),
-			ServiceAccountName: taskExecutionMetadata.GetK8sServiceAccount(),
-			NodeSelector:       config.GetK8sPluginConfig().InterruptibleNodeSelector,
-			SchedulerName:      config.GetK8sPluginConfig().SchedulerName,
-		}, nil
-	}
+
 	pod := &v1.PodSpec{
 		// We could specify Scheduler, Affinity, nodename etc
 		RestartPolicy:      v1.RestartPolicyNever,
@@ -57,6 +48,12 @@ func ToK8sPodSpec(ctx context.Context, taskExecutionMetadata pluginsCore.TaskExe
 		Tolerations:        GetPodTolerations(taskExecutionMetadata.IsInterruptible(), c.Resources),
 		ServiceAccountName: taskExecutionMetadata.GetK8sServiceAccount(),
 		SchedulerName:      config.GetK8sPluginConfig().SchedulerName,
+		NodeSelector:       config.GetK8sPluginConfig().DefaultNodeSelector,
+		Affinity:           config.GetK8sPluginConfig().DefaultAffinity,
+	}
+
+	if taskExecutionMetadata.IsInterruptible() {
+		pod.NodeSelector = utils.UnionMaps(pod.NodeSelector, config.GetK8sPluginConfig().InterruptibleNodeSelector)
 	}
 
 	if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, pod, task.GetInterface(), taskExecutionMetadata, inputs, outputPaths, task.GetContainer().GetDataConfig()); err != nil {
