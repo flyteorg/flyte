@@ -17,5 +17,6 @@
 
 ## Flytekit
 - Support for Spark 3
+- Support for GPU's in Spark
 - Papermill based notebook task support for - Python and Spark (basic input and output types)
 - Simplified Sagemaker Interface for leveraging Builtin Algorithms
