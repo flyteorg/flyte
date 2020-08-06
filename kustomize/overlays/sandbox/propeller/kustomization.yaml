@@ -24,7 +24,7 @@ configMapGenerator:
     - plugins/qubole/config.yaml
 
 patches:
-- propeller.yaml
+- deployment.yaml
 # add the volumemount for each plugin configmap
 - plugins/spark/propeller-patch.yaml
 - plugins/container/propeller-patch.yaml

@@ -10,7 +10,7 @@ configMapGenerator:
 # the main admin configmap
 - name: flyte-admin-config
   files:
-    - flyteadmin_config.yaml
+    - config.yaml
 # cluster resource templates
 - name: clusterresource-template
   files:
@@ -22,4 +22,4 @@ configMapGenerator:
     - clusterresource-templates/ae_spark-service-account.yaml
     - clusterresource-templates/af_spark-role-binding.yaml
 patches:
-- admindeployment.yaml
+- deployment.yaml

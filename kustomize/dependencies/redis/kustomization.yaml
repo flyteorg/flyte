@@ -1,3 +1,4 @@
+namespace: flyte
 resources:
 - deployment.yaml
 - service.yaml

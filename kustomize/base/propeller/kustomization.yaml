@@ -1,3 +1,5 @@
+namespace: flyte
+
 resources:
 - deployment.yaml
 - rbac.yaml

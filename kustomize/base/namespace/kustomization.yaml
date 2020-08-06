@@ -1,2 +1,4 @@
+namespace: flyte
+
 resources:
 - namespace.yaml

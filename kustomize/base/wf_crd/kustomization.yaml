@@ -1,2 +1,4 @@
+namespace: flyte
+
 resources:
 - wf_crd.yaml

@@ -7,7 +7,7 @@ bases:
 # user plane / control plane resources
 - ../../../base/ingress
 - ../../../dependencies/contour_ingress_controller
-- ../admindeployment
+- ../admin
 - ../datacatalog
 - ../console
 
