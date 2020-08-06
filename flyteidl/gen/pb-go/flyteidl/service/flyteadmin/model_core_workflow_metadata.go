@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// Metadata for the entire workflow. Defines execution behavior that does not change the final outputs of the workflow.
+// This is workflow layer metadata. These settings are only applicable to the workflow as a whole, and do not percolate down to child entities (like tasks) launched by the workflow.
 type CoreWorkflowMetadata struct {
 	// Indicates the runtime priority of workflow executions.
 	QualityOfService *CoreQualityOfService `json:"quality_of_service,omitempty"`

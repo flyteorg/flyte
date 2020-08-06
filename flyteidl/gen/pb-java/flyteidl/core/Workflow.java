@@ -10243,7 +10243,8 @@ public final class Workflow {
   }
   /**
    * <pre>
-   * Metadata for the entire workflow. Defines execution behavior that does not change the final outputs of the workflow.
+   * This is workflow layer metadata. These settings are only applicable to the workflow as a whole, and do not
+   * percolate down to child entities (like tasks) launched by the workflow.
    * </pre>
    *
    * Protobuf type {@code flyteidl.core.WorkflowMetadata}
@@ -10694,7 +10695,8 @@ public final class Workflow {
     }
     /**
      * <pre>
-     * Metadata for the entire workflow. Defines execution behavior that does not change the final outputs of the workflow.
+     * This is workflow layer metadata. These settings are only applicable to the workflow as a whole, and do not
+     * percolate down to child entities (like tasks) launched by the workflow.
      * </pre>
      *
      * Protobuf type {@code flyteidl.core.WorkflowMetadata}
@@ -11133,9 +11135,7 @@ public final class Workflow {
 
     /**
      * <pre>
-     * Identify whether workflow is interruptible.
-     * The value set at the workflow level will be the defualt value used for nodes
-     * unless explicitly set at the node level.
+     * Whether child nodes of the workflow are interruptible.
      * </pre>
      *
      * <code>bool interruptible = 1;</code>
@@ -11144,7 +11144,12 @@ public final class Workflow {
   }
   /**
    * <pre>
-   * Default Workflow Metadata for the entire workflow.
+   * The difference between these settings and the WorkflowMetadata ones is that these are meant to be passed down to
+   * a workflow's underlying entities (like tasks). For instance, 'interruptible' has no meaning at the workflow layer, it
+   * is only relevant when a task executes. The settings here are the defaults that are passed to all nodes
+   * unless explicitly overridden at the node layer.
+   * If you are adding a setting that applies to both the Workflow itself, and everything underneath it, it should be
+   * added to both this object and the WorkflowMetadata object above.
    * </pre>
    *
    * Protobuf type {@code flyteidl.core.WorkflowMetadataDefaults}
@@ -11226,9 +11231,7 @@ public final class Workflow {
     private boolean interruptible_;
     /**
      * <pre>
-     * Identify whether workflow is interruptible.
-     * The value set at the workflow level will be the defualt value used for nodes
-     * unless explicitly set at the node level.
+     * Whether child nodes of the workflow are interruptible.
      * </pre>
      *
      * <code>bool interruptible = 1;</code>
@@ -11395,7 +11398,12 @@ public final class Workflow {
     }
     /**
      * <pre>
-     * Default Workflow Metadata for the entire workflow.
+     * The difference between these settings and the WorkflowMetadata ones is that these are meant to be passed down to
+     * a workflow's underlying entities (like tasks). For instance, 'interruptible' has no meaning at the workflow layer, it
+     * is only relevant when a task executes. The settings here are the defaults that are passed to all nodes
+     * unless explicitly overridden at the node layer.
+     * If you are adding a setting that applies to both the Workflow itself, and everything underneath it, it should be
+     * added to both this object and the WorkflowMetadata object above.
      * </pre>
      *
      * Protobuf type {@code flyteidl.core.WorkflowMetadataDefaults}
@@ -11547,9 +11555,7 @@ public final class Workflow {
       private boolean interruptible_ ;
       /**
        * <pre>
-       * Identify whether workflow is interruptible.
-       * The value set at the workflow level will be the defualt value used for nodes
-       * unless explicitly set at the node level.
+       * Whether child nodes of the workflow are interruptible.
        * </pre>
        *
        * <code>bool interruptible = 1;</code>
@@ -11559,9 +11565,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * Identify whether workflow is interruptible.
-       * The value set at the workflow level will be the defualt value used for nodes
-       * unless explicitly set at the node level.
+       * Whether child nodes of the workflow are interruptible.
        * </pre>
        *
        * <code>bool interruptible = 1;</code>
@@ -11574,9 +11578,7 @@ public final class Workflow {
       }
       /**
        * <pre>
-       * Identify whether workflow is interruptible.
-       * The value set at the workflow level will be the defualt value used for nodes
-       * unless explicitly set at the node level.
+       * Whether child nodes of the workflow are interruptible.
        * </pre>
        *
        * <code>bool interruptible = 1;</code>
