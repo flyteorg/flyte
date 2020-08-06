@@ -27,7 +27,7 @@ type RedisClient interface {
 }
 
 type Redis struct {
-	c *redis.Client
+	c redis.UniversalClient
 }
 
 func (r *Redis) SCard(key string) (int64, error) {
@@ -55,9 +55,15 @@ func (r *Redis) Ping() (string, error) {
 }
 
 func NewRedisClient(ctx context.Context, config config.RedisConfig) (RedisClient, error) {
+	// Backward compatibility
+	if len(config.HostPaths) == 0 && len(config.HostPath) > 0 {
+		config.HostPaths = []string{config.HostPath}
+	}
+
 	client := &Redis{
-		c: redis.NewClient(&redis.Options{
-			Addr:       config.HostPath,
+		c: redis.NewUniversalClient(&redis.UniversalOptions{
+			Addrs:      config.HostPaths,
+			MasterName: config.PrimaryName,
 			Password:   config.HostKey,
 			DB:         0, // use default DB
 			MaxRetries: config.MaxRetries,
@@ -66,10 +72,10 @@ func NewRedisClient(ctx context.Context, config config.RedisConfig) (RedisClient
 
 	_, err := client.Ping()
 	if err != nil {
-		logger.Errorf(ctx, "Error creating Redis client at [%s]. Error: %v", config.HostPath, err)
+		logger.Errorf(ctx, "Error creating Redis client at [%+v]. Error: %v", config.HostPaths, err)
 		return nil, err
 	}
 
-	logger.Infof(ctx, "Created Redis client with host [%s]...", config.HostPath)
+	logger.Infof(ctx, "Created Redis client with host [%+v]...", config.HostPaths)
 	return client, nil
 }
