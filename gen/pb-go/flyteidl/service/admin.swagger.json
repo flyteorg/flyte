@@ -5416,7 +5416,7 @@
           "description": "Defines how the system should behave when a failure is detected in the workflow execution."
         }
       },
-      "description": "Metadata for the entire workflow. Defines execution behavior that does not change the final outputs of the workflow."
+      "description": "This is workflow layer metadata. These settings are only applicable to the workflow as a whole, and do not\npercolate down to child entities (like tasks) launched by the workflow."
     },
     "coreWorkflowMetadataDefaults": {
       "type": "object",
@@ -5424,10 +5424,10 @@
         "interruptible": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Identify whether workflow is interruptible.\nThe value set at the workflow level will be the defualt value used for nodes\nunless explicitly set at the node level."
+          "description": "Whether child nodes of the workflow are interruptible."
         }
       },
-      "description": "Default Workflow Metadata for the entire workflow."
+      "description": "The difference between these settings and the WorkflowMetadata ones is that these are meant to be passed down to\na workflow's underlying entities (like tasks). For instance, 'interruptible' has no meaning at the workflow layer, it\nis only relevant when a task executes. The settings here are the defaults that are passed to all nodes\nunless explicitly overridden at the node layer.\nIf you are adding a setting that applies to both the Workflow itself, and everything underneath it, it should be\nadded to both this object and the WorkflowMetadata object above."
     },
     "coreWorkflowNode": {
       "type": "object",
