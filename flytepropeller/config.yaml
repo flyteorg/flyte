@@ -61,14 +61,14 @@ plugins:
     roleArn: "arn:aws:iam::123456789012:role/test-development"
     region: "us-east-1"
     prebuiltAlgorithms:
-      - name: xgboost
+      - name: "XGBOOST"
         regionalConfigs:
           - region: "us-east-1"
             versionConfigs:
-              - version: 0.72
-                image: "811284229777.dkr.ecr.us-east-1.amazonaws.com/xgboost:latest"
-              - version: 0.90
-                image: "683313688378.dkr.ecr.us-east-1.amazonaws.com/xgboost:latest"
+              - version: "0.90"
+                image: "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:0.90-2-cpu-py3"
+              - version: "1.0"
+                image: "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.0-1-cpu-py3"
   # Logging configuration
   logs:
     kubernetes-enabled: true
