@@ -1,4 +1,8 @@
+[Back to Cookbook Menu](../..)
+
 # Run arbitrary containers without *flytekit* (java or python)
+
+
 Since Flyte is container native and specification driven, there is no need for users to have flytekit as a dependency in their containers.
 Flytekit makes it easier for users to author workflows and provides a lot of tools and systems to optimize their flow. But, this is not necessary.
 It is possible to use a local script with a open source container (or custom built container), and still access the type system of Flyte. 

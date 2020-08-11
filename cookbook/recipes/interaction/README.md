@@ -1,3 +1,5 @@
+[Back to Cookbook Menu](../..)
+
 # Interactive development and debugging with Flyte
 
 In this recipe we will talk about how to interact with an existing Workflow or execution. This is not a tutorial for developing a Workflow interactively.

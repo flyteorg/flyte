@@ -1,3 +1,4 @@
+[Back to Plugins Menu](..)
 # PyTorch plugin usage example
 
 This demo is built on top of this `example`_

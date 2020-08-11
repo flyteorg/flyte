@@ -1,3 +1,5 @@
+[Back to Python Menu](..)
+
 # Simplest Example of a Flyte Workflow
 
 [Example: edges.py](edges.py)

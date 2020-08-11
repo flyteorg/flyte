@@ -1,4 +1,8 @@
+[Back to Cookbook Menu](../..)
+
 # Types in Flyte through Flytekit (python)
+
+
 Flyte's comes with its own type system, which closely maps most programming languages. These types are what power Flyte's magic of
  - Data lineage
  - Memoization

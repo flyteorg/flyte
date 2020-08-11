@@ -9,10 +9,10 @@ Also refer to the [Getting started guide](https://lyft.github.io/flyte/user/gett
 to start diving deeper.
 
 # Index
-1. [Simple Examples using Flytekit Python](./python/README.md)
-2. [Cookbook for recipes to leverage various features of Flytekit Python](./cookbook/README.md)
-3. [Examples of using Flyte Plugins in Flytekit Python](./plugins/README.md)
-4. [Jupyter Notebook Examples](./notebooks/README.md)
-5. [Past Demos examples](./demos/README.md)
+1. [Simple Examples using Flytekit Python](./python)
+2. [Cookbook for recipes to leverage various features of Flytekit Python](./cookbook)
+3. [Examples of using Flyte Plugins in Flytekit Python](./plugins)
+4. [Jupyter Notebook Examples](./notebooks)
+5. [Past Demos examples](./demos)
 
 

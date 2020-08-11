@@ -1,3 +1,4 @@
+[Back to Cookbook Menu](../..)
 # How do I yield a dynamic workflow?
 
 If all you need to do is to run a **dynamic_task** that will yield an arbitrary number of tasks, or arbitrary kinds of tasks, depending on the values of some input, then all you need are plain dynamic tasks. The contents of this example are not what you are looking for.

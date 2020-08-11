@@ -1,4 +1,7 @@
+[Back to Cookbook Menu](../../)
+
 # Writing Tasks
+
 Tasks are the fundamental building blocks in Flyte. To get started, please review the main Flyte docs on [tasks](https://lyft.github.io/flyte/user/concepts/tasks.html) and the various [task types](https://lyft.github.io/flyte/user/tasktypes/index.html) that Flyte currently has.
 
 The most common tasks used today are Python tasks so we should start there. Python tasks begin their lives as functions. Let's say we have a function called `def rotate` that rotates an image.

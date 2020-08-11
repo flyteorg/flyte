@@ -1,3 +1,4 @@
+[Back to Plugins Menu](..)
 # Spark Jobs as Flyte Tasks/Workflows
 
 This section provides examples of how to author spark tasks and workflows using FlyteKit as well as additional setup required to run Spark Jobs via Flyte.

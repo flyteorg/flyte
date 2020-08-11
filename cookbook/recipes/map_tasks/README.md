@@ -1,3 +1,5 @@
+[Back to Cookbook Menu](../..)
+
 # Map Tasks
 
 If you have an array of inputs that you would like to run the same task over, Flyte provides a `dynamic_task` construct. Dynamic tasks are so named because they can produce additional tasks, the quantity and type of which is only known at run time, instead of regular Python tasks, which are all incorporated into workflows at compile time.
