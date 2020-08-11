@@ -23,7 +23,7 @@ require (
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/lyft/datacatalog v0.2.1
 	github.com/lyft/flyteidl v0.18.0
-	github.com/lyft/flyteplugins v0.4.2
+	github.com/lyft/flyteplugins v0.4.4
 	github.com/lyft/flytestdlib v0.3.9
 	github.com/magiconair/properties v1.8.1
 	github.com/mattn/go-colorable v0.1.6 // indirect
