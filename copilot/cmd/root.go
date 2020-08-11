@@ -6,7 +6,12 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/config"
 	"github.com/lyft/flytestdlib/config/viper"
@@ -19,6 +24,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -66,6 +72,41 @@ func (r RootOptions) UploadError(ctx context.Context, code string, recvErr error
 	})
 }
 
+func PollUntilTimeout(ctx context.Context, pollInterval, timeout time.Duration, condition wait.ConditionFunc) error {
+	childCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	return wait.PollUntil(pollInterval, condition, childCtx.Done())
+}
+
+func checkAWSCreds() error {
+	cfg, err := session.NewSession(&aws.Config{})
+	if err != nil {
+		return err
+	}
+
+	role := &ec2rolecreds.EC2RoleProvider{
+		Client: ec2metadata.New(cfg),
+	}
+	creds, err := role.Retrieve()
+	if err != nil {
+		return err
+	}
+	if creds.AccessKeyID == "" || creds.SecretAccessKey == "" || creds.SessionToken == "" {
+		return fmt.Errorf("invalid data in credential fetch")
+	}
+	return nil
+}
+
+func waitForAWSCreds(ctx context.Context, timeout time.Duration) error {
+	return PollUntilTimeout(ctx, time.Second*5, timeout, func() (bool, error) {
+		if err := checkAWSCreds(); err != nil {
+			logger.Errorf(ctx, "Failed to Get credentials.")
+			return false, nil
+		}
+		return true, nil
+	})
+}
+
 // NewCommand returns a new instance of the co-pilot root command
 func NewDataCommand() *cobra.Command {
 	rootOpts := &RootOptions{}
@@ -79,6 +120,11 @@ func NewDataCommand() *cobra.Command {
 			}
 			rootOpts.Scope = promutils.NewScope("flyte:data")
 			cfg := storage.GetConfig()
+			if cfg.Type == storage.TypeS3 {
+				if err := waitForAWSCreds(context.Background(), time.Minute*10); err != nil {
+					return err
+				}
+			}
 			store, err := storage.NewDataStore(cfg, rootOpts.Scope)
 			if err != nil {
 				return errors.Wrap(err, "failed to create datastore client")
