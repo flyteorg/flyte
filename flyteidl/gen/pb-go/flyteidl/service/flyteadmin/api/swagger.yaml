@@ -5051,15 +5051,27 @@ definitions:
       outputs:
         description: "Signed url to fetch a core.LiteralMap of node execution outputs."
         $ref: "#/definitions/adminUrlBlob"
+      full_inputs:
+        description: "Optional, full_inputs will only be populated if they are under\
+          \ a configured size threshold."
+        $ref: "#/definitions/coreLiteralMap"
+      full_outputs:
+        description: "Optional, full_outputs will only be populated if they are under\
+          \ a configured size threshold."
+        $ref: "#/definitions/coreLiteralMap"
     description: "Response structure for NodeExecutionGetDataRequest which contains\
       \ inputs and outputs for a node execution."
     example:
       outputs:
         bytes: "bytes"
         url: "url"
+      full_inputs:
+        literals: {}
       inputs:
         bytes: "bytes"
         url: "url"
+      full_outputs:
+        literals: {}
   adminNodeExecutionList:
     type: "object"
     properties:
@@ -5901,15 +5913,27 @@ definitions:
       outputs:
         description: "Signed url to fetch a core.LiteralMap of task execution outputs."
         $ref: "#/definitions/adminUrlBlob"
+      full_inputs:
+        description: "Optional, full_inputs will only be populated if they are under\
+          \ a configured size threshold."
+        $ref: "#/definitions/coreLiteralMap"
+      full_outputs:
+        description: "Optional, full_outputs will only be populated if they are under\
+          \ a configured size threshold."
+        $ref: "#/definitions/coreLiteralMap"
     description: "Response structure for TaskExecutionGetDataRequest which contains\
       \ inputs and outputs for a task execution."
     example:
       outputs:
         bytes: "bytes"
         url: "url"
+      full_inputs:
+        literals: {}
       inputs:
         bytes: "bytes"
         url: "url"
+      full_outputs:
+        literals: {}
   adminTaskExecutionList:
     type: "object"
     properties:
@@ -11998,15 +12022,27 @@ definitions:
       inputs:
         description: "Signed url to fetch a core.LiteralMap of execution inputs."
         $ref: "#/definitions/adminUrlBlob"
+      full_inputs:
+        description: "Optional, full_inputs will only be populated if they are under\
+          \ a configured size threshold."
+        $ref: "#/definitions/coreLiteralMap"
+      full_outputs:
+        description: "Optional, full_outputs will only be populated if they are under\
+          \ a configured size threshold."
+        $ref: "#/definitions/coreLiteralMap"
     description: "Response structure for WorkflowExecutionGetDataRequest which contains\
       \ inputs and outputs for an execution."
     example:
       outputs:
         bytes: "bytes"
         url: "url"
+      full_inputs:
+        literals: {}
       inputs:
         bytes: "bytes"
         url: "url"
+      full_outputs:
+        literals: {}
   adminWorkflowList:
     type: "object"
     properties:

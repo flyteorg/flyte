@@ -15,4 +15,8 @@ type AdminTaskExecutionGetDataResponse struct {
 	Inputs *AdminUrlBlob `json:"inputs,omitempty"`
 	// Signed url to fetch a core.LiteralMap of task execution outputs.
 	Outputs *AdminUrlBlob `json:"outputs,omitempty"`
+	// Optional, full_inputs will only be populated if they are under a configured size threshold.
+	FullInputs *CoreLiteralMap `json:"full_inputs,omitempty"`
+	// Optional, full_outputs will only be populated if they are under a configured size threshold.
+	FullOutputs *CoreLiteralMap `json:"full_outputs,omitempty"`
 }

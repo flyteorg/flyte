@@ -8181,6 +8181,12 @@ export namespace flyteidl {
 
             /** WorkflowExecutionGetDataResponse inputs */
             inputs?: (flyteidl.admin.IUrlBlob|null);
+
+            /** WorkflowExecutionGetDataResponse fullInputs */
+            fullInputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** WorkflowExecutionGetDataResponse fullOutputs */
+            fullOutputs?: (flyteidl.core.ILiteralMap|null);
         }
 
         /** Represents a WorkflowExecutionGetDataResponse. */
@@ -8197,6 +8203,12 @@ export namespace flyteidl {
 
             /** WorkflowExecutionGetDataResponse inputs. */
             public inputs?: (flyteidl.admin.IUrlBlob|null);
+
+            /** WorkflowExecutionGetDataResponse fullInputs. */
+            public fullInputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** WorkflowExecutionGetDataResponse fullOutputs. */
+            public fullOutputs?: (flyteidl.core.ILiteralMap|null);
 
             /**
              * Creates a new WorkflowExecutionGetDataResponse instance using the specified properties.
@@ -10364,6 +10376,12 @@ export namespace flyteidl {
 
             /** NodeExecutionGetDataResponse outputs */
             outputs?: (flyteidl.admin.IUrlBlob|null);
+
+            /** NodeExecutionGetDataResponse fullInputs */
+            fullInputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** NodeExecutionGetDataResponse fullOutputs */
+            fullOutputs?: (flyteidl.core.ILiteralMap|null);
         }
 
         /** Represents a NodeExecutionGetDataResponse. */
@@ -10380,6 +10398,12 @@ export namespace flyteidl {
 
             /** NodeExecutionGetDataResponse outputs. */
             public outputs?: (flyteidl.admin.IUrlBlob|null);
+
+            /** NodeExecutionGetDataResponse fullInputs. */
+            public fullInputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** NodeExecutionGetDataResponse fullOutputs. */
+            public fullOutputs?: (flyteidl.core.ILiteralMap|null);
 
             /**
              * Creates a new NodeExecutionGetDataResponse instance using the specified properties.
@@ -11945,6 +11969,12 @@ export namespace flyteidl {
 
             /** TaskExecutionGetDataResponse outputs */
             outputs?: (flyteidl.admin.IUrlBlob|null);
+
+            /** TaskExecutionGetDataResponse fullInputs */
+            fullInputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** TaskExecutionGetDataResponse fullOutputs */
+            fullOutputs?: (flyteidl.core.ILiteralMap|null);
         }
 
         /** Represents a TaskExecutionGetDataResponse. */
@@ -11961,6 +11991,12 @@ export namespace flyteidl {
 
             /** TaskExecutionGetDataResponse outputs. */
             public outputs?: (flyteidl.admin.IUrlBlob|null);
+
+            /** TaskExecutionGetDataResponse fullInputs. */
+            public fullInputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** TaskExecutionGetDataResponse fullOutputs. */
+            public fullOutputs?: (flyteidl.core.ILiteralMap|null);
 
             /**
              * Creates a new TaskExecutionGetDataResponse instance using the specified properties.
