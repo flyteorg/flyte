@@ -96,8 +96,8 @@ Let's look at the following config section and go into what each value represent
       sender:  "flyte-notifications@company.com"
       body: >
         Execution \"{{ workflow.name }} [{{ name }}]\" has {{ phase }} in \"{{ domain }}\". View details at
-        <a href=\http://flyte.company.net/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
-        http://flyte.lyft.net/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
+        <a href=\http://flyte.company.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
+        http://flyte.company.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
 
 * **type**: in this case because AWS is the only cloud back-end supported for executing scheduled workflows, only ``"aws"`` is a valid value. By default, the no-op executor is used.
 * **region**: this specifies which region AWS clients should will use when creating SNS and SQS clients
