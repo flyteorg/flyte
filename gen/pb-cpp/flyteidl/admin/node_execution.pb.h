@@ -35,6 +35,7 @@
 #include "flyteidl/core/execution.pb.h"
 #include "flyteidl/core/catalog.pb.h"
 #include "flyteidl/core/identifier.pb.h"
+#include "flyteidl/core/literals.pb.h"
 #include <google/protobuf/timestamp.pb.h>
 #include <google/protobuf/duration.pb.h>
 // @@protoc_insertion_point(includes)
@@ -1689,6 +1690,24 @@ class NodeExecutionGetDataResponse final :
   ::flyteidl::admin::UrlBlob* mutable_outputs();
   void set_allocated_outputs(::flyteidl::admin::UrlBlob* outputs);
 
+  // .flyteidl.core.LiteralMap full_inputs = 3;
+  bool has_full_inputs() const;
+  void clear_full_inputs();
+  static const int kFullInputsFieldNumber = 3;
+  const ::flyteidl::core::LiteralMap& full_inputs() const;
+  ::flyteidl::core::LiteralMap* release_full_inputs();
+  ::flyteidl::core::LiteralMap* mutable_full_inputs();
+  void set_allocated_full_inputs(::flyteidl::core::LiteralMap* full_inputs);
+
+  // .flyteidl.core.LiteralMap full_outputs = 4;
+  bool has_full_outputs() const;
+  void clear_full_outputs();
+  static const int kFullOutputsFieldNumber = 4;
+  const ::flyteidl::core::LiteralMap& full_outputs() const;
+  ::flyteidl::core::LiteralMap* release_full_outputs();
+  ::flyteidl::core::LiteralMap* mutable_full_outputs();
+  void set_allocated_full_outputs(::flyteidl::core::LiteralMap* full_outputs);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.NodeExecutionGetDataResponse)
  private:
   class HasBitSetters;
@@ -1696,6 +1715,8 @@ class NodeExecutionGetDataResponse final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::flyteidl::admin::UrlBlob* inputs_;
   ::flyteidl::admin::UrlBlob* outputs_;
+  ::flyteidl::core::LiteralMap* full_inputs_;
+  ::flyteidl::core::LiteralMap* full_outputs_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fnode_5fexecution_2eproto;
 };
@@ -3333,6 +3354,96 @@ inline void NodeExecutionGetDataResponse::set_allocated_outputs(::flyteidl::admi
   }
   outputs_ = outputs;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionGetDataResponse.outputs)
+}
+
+// .flyteidl.core.LiteralMap full_inputs = 3;
+inline bool NodeExecutionGetDataResponse::has_full_inputs() const {
+  return this != internal_default_instance() && full_inputs_ != nullptr;
+}
+inline const ::flyteidl::core::LiteralMap& NodeExecutionGetDataResponse::full_inputs() const {
+  const ::flyteidl::core::LiteralMap* p = full_inputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionGetDataResponse.full_inputs)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::LiteralMap*>(
+      &::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* NodeExecutionGetDataResponse::release_full_inputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NodeExecutionGetDataResponse.full_inputs)
+  
+  ::flyteidl::core::LiteralMap* temp = full_inputs_;
+  full_inputs_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::LiteralMap* NodeExecutionGetDataResponse::mutable_full_inputs() {
+  
+  if (full_inputs_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::LiteralMap>(GetArenaNoVirtual());
+    full_inputs_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NodeExecutionGetDataResponse.full_inputs)
+  return full_inputs_;
+}
+inline void NodeExecutionGetDataResponse::set_allocated_full_inputs(::flyteidl::core::LiteralMap* full_inputs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(full_inputs_);
+  }
+  if (full_inputs) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      full_inputs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, full_inputs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  full_inputs_ = full_inputs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionGetDataResponse.full_inputs)
+}
+
+// .flyteidl.core.LiteralMap full_outputs = 4;
+inline bool NodeExecutionGetDataResponse::has_full_outputs() const {
+  return this != internal_default_instance() && full_outputs_ != nullptr;
+}
+inline const ::flyteidl::core::LiteralMap& NodeExecutionGetDataResponse::full_outputs() const {
+  const ::flyteidl::core::LiteralMap* p = full_outputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionGetDataResponse.full_outputs)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::LiteralMap*>(
+      &::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* NodeExecutionGetDataResponse::release_full_outputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NodeExecutionGetDataResponse.full_outputs)
+  
+  ::flyteidl::core::LiteralMap* temp = full_outputs_;
+  full_outputs_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::LiteralMap* NodeExecutionGetDataResponse::mutable_full_outputs() {
+  
+  if (full_outputs_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::LiteralMap>(GetArenaNoVirtual());
+    full_outputs_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NodeExecutionGetDataResponse.full_outputs)
+  return full_outputs_;
+}
+inline void NodeExecutionGetDataResponse::set_allocated_full_outputs(::flyteidl::core::LiteralMap* full_outputs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(full_outputs_);
+  }
+  if (full_outputs) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      full_outputs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, full_outputs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  full_outputs_ = full_outputs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionGetDataResponse.full_outputs)
 }
 
 #ifdef __GNUC__

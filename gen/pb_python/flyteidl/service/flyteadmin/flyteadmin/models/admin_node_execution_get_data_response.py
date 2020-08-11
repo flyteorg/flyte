@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.admin_url_blob import AdminUrlBlob  # noqa: F401,E501
+from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 
 
 class AdminNodeExecutionGetDataResponse(object):
@@ -34,25 +35,35 @@ class AdminNodeExecutionGetDataResponse(object):
     """
     swagger_types = {
         'inputs': 'AdminUrlBlob',
-        'outputs': 'AdminUrlBlob'
+        'outputs': 'AdminUrlBlob',
+        'full_inputs': 'CoreLiteralMap',
+        'full_outputs': 'CoreLiteralMap'
     }
 
     attribute_map = {
         'inputs': 'inputs',
-        'outputs': 'outputs'
+        'outputs': 'outputs',
+        'full_inputs': 'full_inputs',
+        'full_outputs': 'full_outputs'
     }
 
-    def __init__(self, inputs=None, outputs=None):  # noqa: E501
+    def __init__(self, inputs=None, outputs=None, full_inputs=None, full_outputs=None):  # noqa: E501
         """AdminNodeExecutionGetDataResponse - a model defined in Swagger"""  # noqa: E501
 
         self._inputs = None
         self._outputs = None
+        self._full_inputs = None
+        self._full_outputs = None
         self.discriminator = None
 
         if inputs is not None:
             self.inputs = inputs
         if outputs is not None:
             self.outputs = outputs
+        if full_inputs is not None:
+            self.full_inputs = full_inputs
+        if full_outputs is not None:
+            self.full_outputs = full_outputs
 
     @property
     def inputs(self):
@@ -99,6 +110,52 @@ class AdminNodeExecutionGetDataResponse(object):
         """
 
         self._outputs = outputs
+
+    @property
+    def full_inputs(self):
+        """Gets the full_inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+
+        Optional, full_inputs will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :return: The full_inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._full_inputs
+
+    @full_inputs.setter
+    def full_inputs(self, full_inputs):
+        """Sets the full_inputs of this AdminNodeExecutionGetDataResponse.
+
+        Optional, full_inputs will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :param full_inputs: The full_inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._full_inputs = full_inputs
+
+    @property
+    def full_outputs(self):
+        """Gets the full_outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+
+        Optional, full_outputs will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :return: The full_outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._full_outputs
+
+    @full_outputs.setter
+    def full_outputs(self, full_outputs):
+        """Sets the full_outputs of this AdminNodeExecutionGetDataResponse.
+
+        Optional, full_outputs will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :param full_outputs: The full_outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._full_outputs = full_outputs
 
     def to_dict(self):
         """Returns the model properties as a dict"""

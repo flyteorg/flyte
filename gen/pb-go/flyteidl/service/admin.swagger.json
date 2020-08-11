@@ -3673,6 +3673,14 @@
         "outputs": {
           "$ref": "#/definitions/adminUrlBlob",
           "description": "Signed url to fetch a core.LiteralMap of node execution outputs."
+        },
+        "full_inputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Optional, full_inputs will only be populated if they are under a configured size threshold."
+        },
+        "full_outputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Optional, full_outputs will only be populated if they are under a configured size threshold."
         }
       },
       "description": "Response structure for NodeExecutionGetDataRequest which contains inputs and outputs for a node execution."
@@ -4044,6 +4052,14 @@
         "outputs": {
           "$ref": "#/definitions/adminUrlBlob",
           "description": "Signed url to fetch a core.LiteralMap of task execution outputs."
+        },
+        "full_inputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Optional, full_inputs will only be populated if they are under a configured size threshold."
+        },
+        "full_outputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Optional, full_outputs will only be populated if they are under a configured size threshold."
         }
       },
       "description": "Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution."
@@ -4272,6 +4288,14 @@
         "inputs": {
           "$ref": "#/definitions/adminUrlBlob",
           "description": "Signed url to fetch a core.LiteralMap of execution inputs."
+        },
+        "full_inputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Optional, full_inputs will only be populated if they are under a configured size threshold."
+        },
+        "full_outputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Optional, full_outputs will only be populated if they are under a configured size threshold."
         }
       },
       "description": "Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution."

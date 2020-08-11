@@ -385,9 +385,10 @@ static void InitDefaultsWorkflowExecutionGetDataResponse_flyteidl_2fadmin_2fexec
   ::flyteidl::admin::WorkflowExecutionGetDataResponse::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_WorkflowExecutionGetDataResponse_flyteidl_2fadmin_2fexecution_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsWorkflowExecutionGetDataResponse_flyteidl_2fadmin_2fexecution_2eproto}, {
-      &scc_info_UrlBlob_flyteidl_2fadmin_2fcommon_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_WorkflowExecutionGetDataResponse_flyteidl_2fadmin_2fexecution_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsWorkflowExecutionGetDataResponse_flyteidl_2fadmin_2fexecution_2eproto}, {
+      &scc_info_UrlBlob_flyteidl_2fadmin_2fcommon_2eproto.base,
+      &scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto.base,}};
 
 void InitDefaults_flyteidl_2fadmin_2fexecution_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_ExecutionCreateRequest_flyteidl_2fadmin_2fexecution_2eproto.base);
@@ -555,6 +556,8 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fexecution_2eprot
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowExecutionGetDataResponse, outputs_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowExecutionGetDataResponse, inputs_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowExecutionGetDataResponse, full_inputs_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::WorkflowExecutionGetDataResponse, full_outputs_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::admin::ExecutionCreateRequest)},
@@ -676,17 +679,19 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fexecution_2eproto[] =
   "Identifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTe"
   "rminateResponse\"Y\n\037WorkflowExecutionGetD"
   "ataRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.W"
-  "orkflowExecutionIdentifier\"u\n WorkflowEx"
-  "ecutionGetDataResponse\022(\n\007outputs\030\001 \001(\0132"
-  "\027.flyteidl.admin.UrlBlob\022\'\n\006inputs\030\002 \001(\013"
-  "2\027.flyteidl.admin.UrlBlobB3Z1github.com/"
-  "lyft/flyteidl/gen/pb-go/flyteidl/adminb\006"
-  "proto3"
+  "orkflowExecutionIdentifier\"\326\001\n WorkflowE"
+  "xecutionGetDataResponse\022(\n\007outputs\030\001 \001(\013"
+  "2\027.flyteidl.admin.UrlBlob\022\'\n\006inputs\030\002 \001("
+  "\0132\027.flyteidl.admin.UrlBlob\022.\n\013full_input"
+  "s\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014fu"
+  "ll_outputs\030\004 \001(\0132\031.flyteidl.core.Literal"
+  "MapB3Z1github.com/lyft/flyteidl/gen/pb-g"
+  "o/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fexecution_2eproto,
-  "flyteidl/admin/execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fexecution_2eproto, 3126,
+  "flyteidl/admin/execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fexecution_2eproto, 3224,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fexecution_2eproto() {
@@ -7978,11 +7983,17 @@ void WorkflowExecutionGetDataResponse::InitAsDefaultInstance() {
       ::flyteidl::admin::UrlBlob::internal_default_instance());
   ::flyteidl::admin::_WorkflowExecutionGetDataResponse_default_instance_._instance.get_mutable()->inputs_ = const_cast< ::flyteidl::admin::UrlBlob*>(
       ::flyteidl::admin::UrlBlob::internal_default_instance());
+  ::flyteidl::admin::_WorkflowExecutionGetDataResponse_default_instance_._instance.get_mutable()->full_inputs_ = const_cast< ::flyteidl::core::LiteralMap*>(
+      ::flyteidl::core::LiteralMap::internal_default_instance());
+  ::flyteidl::admin::_WorkflowExecutionGetDataResponse_default_instance_._instance.get_mutable()->full_outputs_ = const_cast< ::flyteidl::core::LiteralMap*>(
+      ::flyteidl::core::LiteralMap::internal_default_instance());
 }
 class WorkflowExecutionGetDataResponse::HasBitSetters {
  public:
   static const ::flyteidl::admin::UrlBlob& outputs(const WorkflowExecutionGetDataResponse* msg);
   static const ::flyteidl::admin::UrlBlob& inputs(const WorkflowExecutionGetDataResponse* msg);
+  static const ::flyteidl::core::LiteralMap& full_inputs(const WorkflowExecutionGetDataResponse* msg);
+  static const ::flyteidl::core::LiteralMap& full_outputs(const WorkflowExecutionGetDataResponse* msg);
 };
 
 const ::flyteidl::admin::UrlBlob&
@@ -7992,6 +8003,14 @@ WorkflowExecutionGetDataResponse::HasBitSetters::outputs(const WorkflowExecution
 const ::flyteidl::admin::UrlBlob&
 WorkflowExecutionGetDataResponse::HasBitSetters::inputs(const WorkflowExecutionGetDataResponse* msg) {
   return *msg->inputs_;
+}
+const ::flyteidl::core::LiteralMap&
+WorkflowExecutionGetDataResponse::HasBitSetters::full_inputs(const WorkflowExecutionGetDataResponse* msg) {
+  return *msg->full_inputs_;
+}
+const ::flyteidl::core::LiteralMap&
+WorkflowExecutionGetDataResponse::HasBitSetters::full_outputs(const WorkflowExecutionGetDataResponse* msg) {
+  return *msg->full_outputs_;
 }
 void WorkflowExecutionGetDataResponse::clear_outputs() {
   if (GetArenaNoVirtual() == nullptr && outputs_ != nullptr) {
@@ -8005,9 +8024,23 @@ void WorkflowExecutionGetDataResponse::clear_inputs() {
   }
   inputs_ = nullptr;
 }
+void WorkflowExecutionGetDataResponse::clear_full_inputs() {
+  if (GetArenaNoVirtual() == nullptr && full_inputs_ != nullptr) {
+    delete full_inputs_;
+  }
+  full_inputs_ = nullptr;
+}
+void WorkflowExecutionGetDataResponse::clear_full_outputs() {
+  if (GetArenaNoVirtual() == nullptr && full_outputs_ != nullptr) {
+    delete full_outputs_;
+  }
+  full_outputs_ = nullptr;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int WorkflowExecutionGetDataResponse::kOutputsFieldNumber;
 const int WorkflowExecutionGetDataResponse::kInputsFieldNumber;
+const int WorkflowExecutionGetDataResponse::kFullInputsFieldNumber;
+const int WorkflowExecutionGetDataResponse::kFullOutputsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 WorkflowExecutionGetDataResponse::WorkflowExecutionGetDataResponse()
@@ -8029,6 +8062,16 @@ WorkflowExecutionGetDataResponse::WorkflowExecutionGetDataResponse(const Workflo
   } else {
     inputs_ = nullptr;
   }
+  if (from.has_full_inputs()) {
+    full_inputs_ = new ::flyteidl::core::LiteralMap(*from.full_inputs_);
+  } else {
+    full_inputs_ = nullptr;
+  }
+  if (from.has_full_outputs()) {
+    full_outputs_ = new ::flyteidl::core::LiteralMap(*from.full_outputs_);
+  } else {
+    full_outputs_ = nullptr;
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.WorkflowExecutionGetDataResponse)
 }
 
@@ -8036,8 +8079,8 @@ void WorkflowExecutionGetDataResponse::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_WorkflowExecutionGetDataResponse_flyteidl_2fadmin_2fexecution_2eproto.base);
   ::memset(&outputs_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&inputs_) -
-      reinterpret_cast<char*>(&outputs_)) + sizeof(inputs_));
+      reinterpret_cast<char*>(&full_outputs_) -
+      reinterpret_cast<char*>(&outputs_)) + sizeof(full_outputs_));
 }
 
 WorkflowExecutionGetDataResponse::~WorkflowExecutionGetDataResponse() {
@@ -8048,6 +8091,8 @@ WorkflowExecutionGetDataResponse::~WorkflowExecutionGetDataResponse() {
 void WorkflowExecutionGetDataResponse::SharedDtor() {
   if (this != internal_default_instance()) delete outputs_;
   if (this != internal_default_instance()) delete inputs_;
+  if (this != internal_default_instance()) delete full_inputs_;
+  if (this != internal_default_instance()) delete full_outputs_;
 }
 
 void WorkflowExecutionGetDataResponse::SetCachedSize(int size) const {
@@ -8073,6 +8118,14 @@ void WorkflowExecutionGetDataResponse::Clear() {
     delete inputs_;
   }
   inputs_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && full_inputs_ != nullptr) {
+    delete full_inputs_;
+  }
+  full_inputs_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && full_outputs_ != nullptr) {
+    delete full_outputs_;
+  }
+  full_outputs_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -8109,6 +8162,32 @@ const char* WorkflowExecutionGetDataResponse::_InternalParse(const char* begin, 
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::flyteidl::admin::UrlBlob::_InternalParse;
         object = msg->mutable_inputs();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.LiteralMap full_inputs = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::LiteralMap::_InternalParse;
+        object = msg->mutable_full_inputs();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.LiteralMap full_outputs = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::LiteralMap::_InternalParse;
+        object = msg->mutable_full_outputs();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -8167,6 +8246,28 @@ bool WorkflowExecutionGetDataResponse::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.core.LiteralMap full_inputs = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_full_inputs()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.core.LiteralMap full_outputs = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_full_outputs()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -8206,6 +8307,18 @@ void WorkflowExecutionGetDataResponse::SerializeWithCachedSizes(
       2, HasBitSetters::inputs(this), output);
   }
 
+  // .flyteidl.core.LiteralMap full_inputs = 3;
+  if (this->has_full_inputs()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      3, HasBitSetters::full_inputs(this), output);
+  }
+
+  // .flyteidl.core.LiteralMap full_outputs = 4;
+  if (this->has_full_outputs()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, HasBitSetters::full_outputs(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -8231,6 +8344,20 @@ void WorkflowExecutionGetDataResponse::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         2, HasBitSetters::inputs(this), target);
+  }
+
+  // .flyteidl.core.LiteralMap full_inputs = 3;
+  if (this->has_full_inputs()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        3, HasBitSetters::full_inputs(this), target);
+  }
+
+  // .flyteidl.core.LiteralMap full_outputs = 4;
+  if (this->has_full_outputs()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        4, HasBitSetters::full_outputs(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -8268,6 +8395,20 @@ size_t WorkflowExecutionGetDataResponse::ByteSizeLong() const {
         *inputs_);
   }
 
+  // .flyteidl.core.LiteralMap full_inputs = 3;
+  if (this->has_full_inputs()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *full_inputs_);
+  }
+
+  // .flyteidl.core.LiteralMap full_outputs = 4;
+  if (this->has_full_outputs()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *full_outputs_);
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -8301,6 +8442,12 @@ void WorkflowExecutionGetDataResponse::MergeFrom(const WorkflowExecutionGetDataR
   if (from.has_inputs()) {
     mutable_inputs()->::flyteidl::admin::UrlBlob::MergeFrom(from.inputs());
   }
+  if (from.has_full_inputs()) {
+    mutable_full_inputs()->::flyteidl::core::LiteralMap::MergeFrom(from.full_inputs());
+  }
+  if (from.has_full_outputs()) {
+    mutable_full_outputs()->::flyteidl::core::LiteralMap::MergeFrom(from.full_outputs());
+  }
 }
 
 void WorkflowExecutionGetDataResponse::CopyFrom(const ::google::protobuf::Message& from) {
@@ -8330,6 +8477,8 @@ void WorkflowExecutionGetDataResponse::InternalSwap(WorkflowExecutionGetDataResp
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(outputs_, other->outputs_);
   swap(inputs_, other->inputs_);
+  swap(full_inputs_, other->full_inputs_);
+  swap(full_outputs_, other->full_outputs_);
 }
 
 ::google::protobuf::Metadata WorkflowExecutionGetDataResponse::GetMetadata() const {
