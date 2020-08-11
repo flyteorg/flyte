@@ -60,7 +60,7 @@ func getTrainingImage(ctx context.Context, job *sagemakerSpec.TrainingJob) (stri
 			}
 		}
 		if foundAlgorithmCfg == nil {
-			return "", errors.Errorf("Failed to find a image for algorithm [%v]", apiAlgorithmName)
+			return "", errors.Errorf("Failed to find an image for algorithm [%v]", apiAlgorithmName)
 		}
 
 		for _, regionalCfg := range foundAlgorithmCfg.RegionalConfig {
@@ -70,7 +70,7 @@ func getTrainingImage(ctx context.Context, job *sagemakerSpec.TrainingJob) (stri
 			}
 		}
 		if foundRegionalCfg == nil {
-			return "", errors.Errorf("Failed to find a image for algorithm [%v] region [%v]",
+			return "", errors.Errorf("Failed to find an image for algorithm [%v] region [%v]",
 				job.GetAlgorithmSpecification().GetAlgorithmName(), cfg.Region)
 		}
 
@@ -97,15 +97,15 @@ func getTrainingImage(ctx context.Context, job *sagemakerSpec.TrainingJob) (stri
 				return "", errors.Wrapf(err, "Unable to cast version specified by the user [%v] to a semver", userSpecifiedVer)
 			}
 			if configSemVer.Equal(userSpecifiedSemVer) {
-				logger.Infof(ctx, "Image [%v] is picked for algorithm [] region [] version [] ",
+				logger.Infof(ctx, "Image [%v] is picked for algorithm [%v] region [%v] version [%v] ",
 					versionCfg.Image, apiAlgorithmName, cfg.Region, userSpecifiedSemVer)
 				return versionCfg.Image, nil
 			}
 		}
-		logger.Errorf(ctx, "Failed to find a image for [%v]:[%v]:[%v]",
+		logger.Errorf(ctx, "Failed to find an image for [%v]:[%v]:[%v]",
 			job.GetAlgorithmSpecification().GetAlgorithmName(), cfg.Region, job.GetAlgorithmSpecification().GetAlgorithmVersion())
 
-		return "", errors.Errorf("Failed to find a image for [%v]:[%v]:[%v]",
+		return "", errors.Errorf("Failed to find an image for [%v]:[%v]:[%v]",
 			job.GetAlgorithmSpecification().GetAlgorithmName(), cfg.Region, job.GetAlgorithmSpecification().GetAlgorithmVersion())
 	}
 	return "custom image", errors.Errorf("Custom images are not supported yet")
@@ -154,6 +154,9 @@ func buildParameterRanges(hpoJobConfig *sagemakerSpec.HyperparameterTuningJobCon
 
 func convertHyperparameterTuningJobConfigToSpecType(hpoJobConfigLiteral *core.Literal) (*sagemakerSpec.HyperparameterTuningJobConfig, error) {
 	var retValue = &sagemakerSpec.HyperparameterTuningJobConfig{}
+	if hpoJobConfigLiteral.GetScalar() == nil || hpoJobConfigLiteral.GetScalar().GetBinary() == nil {
+		return nil, errors.Errorf("[Hyperparameters] should be of type [Scalar.Binary]")
+	}
 	hpoJobConfigByteArray := hpoJobConfigLiteral.GetScalar().GetBinary().GetValue()
 	err := proto.Unmarshal(hpoJobConfigByteArray, retValue)
 	if err != nil {
@@ -164,6 +167,9 @@ func convertHyperparameterTuningJobConfigToSpecType(hpoJobConfigLiteral *core.Li
 
 func convertStaticHyperparamsLiteralToSpecType(hyperparamLiteral *core.Literal) ([]*commonv1.KeyValuePair, error) {
 	var retValue []*commonv1.KeyValuePair
+	if hyperparamLiteral.GetScalar() == nil || hyperparamLiteral.GetScalar().GetGeneric() == nil {
+		return nil, errors.Errorf("[Hyperparameters] should be of type [Scalar.Generic]")
+	}
 	hyperFields := hyperparamLiteral.GetScalar().GetGeneric().GetFields()
 	if hyperFields == nil {
 		return nil, errors.Errorf("Failed to get the static hyperparameters field from the literal")

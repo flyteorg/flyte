@@ -8,6 +8,11 @@ import (
 
 	commonv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/common"
 	sagemakerSpec "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
+	"github.com/lyft/flytestdlib/config/viper"
+	"github.com/stretchr/testify/assert"
+
+	stdConfig "github.com/lyft/flytestdlib/config"
+
 	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 	sagemakerConfig "github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 )
@@ -68,8 +73,9 @@ func generateMockHyperparameterTuningJobConfig() *sagemakerSpec.HyperparameterTu
 
 func generateMockSageMakerConfig() *sagemakerConfig.Config {
 	return &sagemakerConfig.Config{
-		RoleArn: "default",
-		Region:  "us-east-1",
+		RoleArn:           "default",
+		Region:            "us-east-1",
+		RoleAnnotationKey: "role_annotation_key",
 		// https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-algo-docker-registry-paths.html
 		PrebuiltAlgorithms: []sagemakerConfig.PrebuiltAlgorithmConfig{
 			{
@@ -273,4 +279,32 @@ func Test_getTrainingImage(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_getTrainingImage_LoadConfig(t *testing.T) {
+	configAccessor := viper.NewAccessor(stdConfig.Options{
+		StrictMode:  true,
+		SearchPaths: []string{"testdata/config.yaml"},
+	})
+
+	err := configAccessor.UpdateConfig(context.TODO())
+	assert.NoError(t, err)
+
+	assert.NotNil(t, config.GetSagemakerConfig())
+
+	image, err := getTrainingImage(context.TODO(), &sagemakerSpec.TrainingJob{AlgorithmSpecification: &sagemakerSpec.AlgorithmSpecification{
+		AlgorithmName:    sagemakerSpec.AlgorithmName_XGBOOST,
+		AlgorithmVersion: "0.90",
+	}})
+
+	assert.NoError(t, err)
+	assert.Equal(t, "image-0.90", image)
+
+	image, err = getTrainingImage(context.TODO(), &sagemakerSpec.TrainingJob{AlgorithmSpecification: &sagemakerSpec.AlgorithmSpecification{
+		AlgorithmName:    sagemakerSpec.AlgorithmName_XGBOOST,
+		AlgorithmVersion: "1.0",
+	}})
+
+	assert.NoError(t, err)
+	assert.Equal(t, "image-1.0", image)
 }

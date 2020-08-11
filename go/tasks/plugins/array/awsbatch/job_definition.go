@@ -8,6 +8,7 @@ import (
 	pluginErrors "github.com/lyft/flyteplugins/go/tasks/errors"
 	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	awsUtils "github.com/lyft/flyteplugins/go/tasks/plugins/awsutils"
 	"github.com/lyft/flytestdlib/errors"
 	"github.com/lyft/flytestdlib/logger"
 
@@ -18,14 +19,6 @@ import (
 func getContainerImage(_ context.Context, task *core.TaskTemplate) string {
 	if task.GetContainer() != nil && len(task.GetContainer().Image) > 0 {
 		return task.GetContainer().Image
-	}
-
-	return ""
-}
-
-func getRole(_ context.Context, roleAnnotationKey string, annotations map[string]string) string {
-	if len(roleAnnotationKey) > 0 {
-		return annotations[roleAnnotationKey]
 	}
 
 	return ""
@@ -57,7 +50,7 @@ func EnsureJobDefinition(ctx context.Context, tCtx pluginCore.TaskExecutionConte
 		return nil, errors.Errorf(pluginErrors.BadTaskSpecification, "Tasktemplate does not contain a container image.")
 	}
 
-	role := getRole(ctx, cfg.RoleAnnotationKey, tCtx.TaskExecutionMetadata().GetAnnotations())
+	role := awsUtils.GetRole(ctx, cfg.RoleAnnotationKey, tCtx.TaskExecutionMetadata().GetAnnotations())
 
 	cacheKey := definition.NewCacheKey(role, containerImage)
 	if existingArn, found := definitionCache.Get(cacheKey); found {

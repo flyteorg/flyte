@@ -8,7 +8,7 @@ const sagemakerConfigSectionKey = "sagemaker"
 
 var (
 	defaultConfig = Config{
-		RoleArn: "default",
+		RoleArn: "default_role",
 		Region:  "us-east-1",
 		// https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-algo-docker-registry-paths.html
 		PrebuiltAlgorithms: []PrebuiltAlgorithmConfig{
@@ -19,8 +19,8 @@ var (
 						Region: "us-east-1",
 						VersionConfigs: []VersionConfig{
 							{
-								Version: "0.91",
-								Image:   "811284229777.dkr.ecr.us-east-1.amazonaws.com/xgboost:latest",
+								Version: "0.90",
+								Image:   "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:0.90-2-cpu-py3",
 							},
 						},
 					},
@@ -32,10 +32,11 @@ var (
 	sagemakerConfigSection = pluginsConfig.MustRegisterSubSection(sagemakerConfigSectionKey, &defaultConfig)
 )
 
-//Sagemaker plugin configs
+// Sagemaker plugin configs
 type Config struct {
 	RoleArn            string                    `json:"roleArn" pflag:",The role the SageMaker plugin uses to communicate with the SageMaker service"`
 	Region             string                    `json:"region" pflag:",The AWS region the SageMaker plugin communicates to"`
+	RoleAnnotationKey  string                    `json:"roleAnnotationKey" pflag:",Map key to use to lookup role from task annotations."`
 	PrebuiltAlgorithms []PrebuiltAlgorithmConfig `json:"prebuiltAlgorithms" pflag:"-,A List of PrebuiltAlgorithm configs"`
 }
 type PrebuiltAlgorithmConfig struct {
