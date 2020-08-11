@@ -127,7 +127,7 @@ func (s *StowStore) LoadContainer(ctx context.Context, container string, createI
 	c, err := s.loc.Container(container)
 	if err != nil {
 		if createIfNotFound {
-			logger.Infof(ctx, "Container [%s] lookup failed, err [%s], will try to create a new one", err)
+			logger.Infof(ctx, "Container [%s] lookup failed, err [%s], will try to create a new one", container, err)
 			if IsNotFound(err) || awsBucketIsNotFound(err) {
 				c, err := s.loc.CreateContainer(container)
 				// If the container's already created, move on. Otherwise, fail with error.
