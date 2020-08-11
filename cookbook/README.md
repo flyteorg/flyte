@@ -4,20 +4,21 @@ This is a collection of short "how to" articles demonstrating the various capabi
 Note this currently does not include articles/tid-bits on how to use the Flyte platform at large, though in the future we may expand it to that.
 
 ## Contents   
-1. [Write and Execute a Task](recipes/task/README.md)
-2. [Create a workflow from Tasks](recipes/workflows/README.md)
-3. [Launch Plans](recipes/launchplans/README.md)
-4. [Multiple Schedules for a Workflow](recipes/multi_schedules/README.md)
-5. [Executing pre-created tasks & workflows](recipes/fetch/README.md)
-6. [Interact with Past Workflow / Task Executions](recipes/interaction/README.md)
-7. [Working with Types](recipes/types/README.md)
-8. [Composing a Workflow from shared tasks and workflows](recipes/shared/README.md)
-9. [(WIP)Dynamic Tasks](recipes/dynamictasks/README.md)
-10. [Compose a Workflow from other workflows](recipes/compose/README.md)
-10. [Dynamically Generate a Workflow at Runtime](recipes/dynamic_wfs/README.md)
-11. [Tasks without flytekit or Using arbitrary containers](recipes/rawcontainers/README.md)
-12. [(WIP)Using Papermill & Jupyter notebook to author tasks](recipes/papermill/README.md)
-13. [(WIP)Different container per task](recipes/differentcontainers/README.md) 
+1. [Write and Execute a Task](recipes/task)
+1. [Create a workflow from Tasks](recipes/workflows)
+1. [Launch Plans](recipes/launchplans)
+1. [Multiple Schedules for a Workflow](recipes/multi_schedules)
+1. [Executing pre-created tasks & workflows](recipes/fetch)
+1. [Interact with Past Workflow / Task Executions](recipes/interaction)
+1. [Working with Types](recipes/types)
+1. [Composing a Workflow from shared tasks and workflows](recipes/shared)
+1. [Map/Array Tasks](recipes/map_tasks)
+1. [Compose a Workflow from other workflows](recipes/compose)
+1. [Dynamically Generate a Workflow at Runtime](recipes/dynamic_wfs)
+1. [(WIP)Dynamic Tasks](recipes/dynamictasks)
+1. [Tasks without flytekit or Using arbitrary containers](recipes/rawcontainers)
+1. [(WIP)Using Papermill & Jupyter notebook to author tasks](recipes/papermill)
+1. [(WIP)Different container per task](recipes/differentcontainers) 
 
 Each example is organized into a separate folder at this layer, and each has the Readme file linked to in the Contents, as well as supporting .py and .ipynb files, some of which contain information in a lot more depth.
 

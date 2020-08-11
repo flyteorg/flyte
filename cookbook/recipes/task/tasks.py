@@ -25,7 +25,7 @@ def scale(wf_params, image, scale_factor, out_image):
 @python_task(cache=True, cache_version="1")
 def rotate(wf_params, image, angle, fail, out_image):
     """
-    Rotate a given image by x-degress.
+    Rotate a given image by x-degrees.
     NOTE: Caching is enabled. So re-running for the same image should be NO-OP (or immediate return)
     """
     if fail:
