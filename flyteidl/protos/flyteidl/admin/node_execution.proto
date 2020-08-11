@@ -7,6 +7,7 @@ import "flyteidl/admin/common.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/catalog.proto";
 import "flyteidl/core/identifier.proto";
+import "flyteidl/core/literals.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
@@ -164,4 +165,10 @@ message NodeExecutionGetDataResponse {
 
     // Signed url to fetch a core.LiteralMap of node execution outputs.
     UrlBlob outputs                            = 2;
+
+    // Optional, full_inputs will only be populated if they are under a configured size threshold.
+    core.LiteralMap full_inputs                = 3;
+
+    // Optional, full_outputs will only be populated if they are under a configured size threshold. 
+    core.LiteralMap full_outputs               = 4;
 }

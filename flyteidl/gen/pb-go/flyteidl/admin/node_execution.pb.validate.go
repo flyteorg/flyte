@@ -978,6 +978,26 @@ func (m *NodeExecutionGetDataResponse) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetFullInputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NodeExecutionGetDataResponseValidationError{
+				field:  "FullInputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetFullOutputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NodeExecutionGetDataResponseValidationError{
+				field:  "FullOutputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

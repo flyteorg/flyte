@@ -19609,6 +19609,8 @@ export const flyteidl = $root.flyteidl = (() => {
              * @interface IWorkflowExecutionGetDataResponse
              * @property {flyteidl.admin.IUrlBlob|null} [outputs] WorkflowExecutionGetDataResponse outputs
              * @property {flyteidl.admin.IUrlBlob|null} [inputs] WorkflowExecutionGetDataResponse inputs
+             * @property {flyteidl.core.ILiteralMap|null} [fullInputs] WorkflowExecutionGetDataResponse fullInputs
+             * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] WorkflowExecutionGetDataResponse fullOutputs
              */
 
             /**
@@ -19643,6 +19645,22 @@ export const flyteidl = $root.flyteidl = (() => {
             WorkflowExecutionGetDataResponse.prototype.inputs = null;
 
             /**
+             * WorkflowExecutionGetDataResponse fullInputs.
+             * @member {flyteidl.core.ILiteralMap|null|undefined} fullInputs
+             * @memberof flyteidl.admin.WorkflowExecutionGetDataResponse
+             * @instance
+             */
+            WorkflowExecutionGetDataResponse.prototype.fullInputs = null;
+
+            /**
+             * WorkflowExecutionGetDataResponse fullOutputs.
+             * @member {flyteidl.core.ILiteralMap|null|undefined} fullOutputs
+             * @memberof flyteidl.admin.WorkflowExecutionGetDataResponse
+             * @instance
+             */
+            WorkflowExecutionGetDataResponse.prototype.fullOutputs = null;
+
+            /**
              * Creates a new WorkflowExecutionGetDataResponse instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.WorkflowExecutionGetDataResponse
@@ -19670,6 +19688,10 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.UrlBlob.encode(message.outputs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                 if (message.inputs != null && message.hasOwnProperty("inputs"))
                     $root.flyteidl.admin.UrlBlob.encode(message.inputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.fullInputs != null && message.hasOwnProperty("fullInputs"))
+                    $root.flyteidl.core.LiteralMap.encode(message.fullInputs, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
+                    $root.flyteidl.core.LiteralMap.encode(message.fullOutputs, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 return writer;
             };
 
@@ -19696,6 +19718,12 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 2:
                         message.inputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
+                        break;
+                    case 3:
+                        message.fullInputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                        break;
+                    case 4:
+                        message.fullOutputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -19725,6 +19753,16 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.UrlBlob.verify(message.inputs);
                     if (error)
                         return "inputs." + error;
+                }
+                if (message.fullInputs != null && message.hasOwnProperty("fullInputs")) {
+                    let error = $root.flyteidl.core.LiteralMap.verify(message.fullInputs);
+                    if (error)
+                        return "fullInputs." + error;
+                }
+                if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs")) {
+                    let error = $root.flyteidl.core.LiteralMap.verify(message.fullOutputs);
+                    if (error)
+                        return "fullOutputs." + error;
                 }
                 return null;
             };
@@ -24801,6 +24839,8 @@ export const flyteidl = $root.flyteidl = (() => {
              * @interface INodeExecutionGetDataResponse
              * @property {flyteidl.admin.IUrlBlob|null} [inputs] NodeExecutionGetDataResponse inputs
              * @property {flyteidl.admin.IUrlBlob|null} [outputs] NodeExecutionGetDataResponse outputs
+             * @property {flyteidl.core.ILiteralMap|null} [fullInputs] NodeExecutionGetDataResponse fullInputs
+             * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] NodeExecutionGetDataResponse fullOutputs
              */
 
             /**
@@ -24835,6 +24875,22 @@ export const flyteidl = $root.flyteidl = (() => {
             NodeExecutionGetDataResponse.prototype.outputs = null;
 
             /**
+             * NodeExecutionGetDataResponse fullInputs.
+             * @member {flyteidl.core.ILiteralMap|null|undefined} fullInputs
+             * @memberof flyteidl.admin.NodeExecutionGetDataResponse
+             * @instance
+             */
+            NodeExecutionGetDataResponse.prototype.fullInputs = null;
+
+            /**
+             * NodeExecutionGetDataResponse fullOutputs.
+             * @member {flyteidl.core.ILiteralMap|null|undefined} fullOutputs
+             * @memberof flyteidl.admin.NodeExecutionGetDataResponse
+             * @instance
+             */
+            NodeExecutionGetDataResponse.prototype.fullOutputs = null;
+
+            /**
              * Creates a new NodeExecutionGetDataResponse instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.NodeExecutionGetDataResponse
@@ -24862,6 +24918,10 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.UrlBlob.encode(message.inputs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                 if (message.outputs != null && message.hasOwnProperty("outputs"))
                     $root.flyteidl.admin.UrlBlob.encode(message.outputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.fullInputs != null && message.hasOwnProperty("fullInputs"))
+                    $root.flyteidl.core.LiteralMap.encode(message.fullInputs, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
+                    $root.flyteidl.core.LiteralMap.encode(message.fullOutputs, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 return writer;
             };
 
@@ -24888,6 +24948,12 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 2:
                         message.outputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
+                        break;
+                    case 3:
+                        message.fullInputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                        break;
+                    case 4:
+                        message.fullOutputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -24917,6 +24983,16 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.UrlBlob.verify(message.outputs);
                     if (error)
                         return "outputs." + error;
+                }
+                if (message.fullInputs != null && message.hasOwnProperty("fullInputs")) {
+                    let error = $root.flyteidl.core.LiteralMap.verify(message.fullInputs);
+                    if (error)
+                        return "fullInputs." + error;
+                }
+                if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs")) {
+                    let error = $root.flyteidl.core.LiteralMap.verify(message.fullOutputs);
+                    if (error)
+                        return "fullOutputs." + error;
                 }
                 return null;
             };
@@ -28421,6 +28497,8 @@ export const flyteidl = $root.flyteidl = (() => {
              * @interface ITaskExecutionGetDataResponse
              * @property {flyteidl.admin.IUrlBlob|null} [inputs] TaskExecutionGetDataResponse inputs
              * @property {flyteidl.admin.IUrlBlob|null} [outputs] TaskExecutionGetDataResponse outputs
+             * @property {flyteidl.core.ILiteralMap|null} [fullInputs] TaskExecutionGetDataResponse fullInputs
+             * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] TaskExecutionGetDataResponse fullOutputs
              */
 
             /**
@@ -28455,6 +28533,22 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskExecutionGetDataResponse.prototype.outputs = null;
 
             /**
+             * TaskExecutionGetDataResponse fullInputs.
+             * @member {flyteidl.core.ILiteralMap|null|undefined} fullInputs
+             * @memberof flyteidl.admin.TaskExecutionGetDataResponse
+             * @instance
+             */
+            TaskExecutionGetDataResponse.prototype.fullInputs = null;
+
+            /**
+             * TaskExecutionGetDataResponse fullOutputs.
+             * @member {flyteidl.core.ILiteralMap|null|undefined} fullOutputs
+             * @memberof flyteidl.admin.TaskExecutionGetDataResponse
+             * @instance
+             */
+            TaskExecutionGetDataResponse.prototype.fullOutputs = null;
+
+            /**
              * Creates a new TaskExecutionGetDataResponse instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.TaskExecutionGetDataResponse
@@ -28482,6 +28576,10 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.UrlBlob.encode(message.inputs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                 if (message.outputs != null && message.hasOwnProperty("outputs"))
                     $root.flyteidl.admin.UrlBlob.encode(message.outputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.fullInputs != null && message.hasOwnProperty("fullInputs"))
+                    $root.flyteidl.core.LiteralMap.encode(message.fullInputs, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
+                    $root.flyteidl.core.LiteralMap.encode(message.fullOutputs, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 return writer;
             };
 
@@ -28508,6 +28606,12 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 2:
                         message.outputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
+                        break;
+                    case 3:
+                        message.fullInputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                        break;
+                    case 4:
+                        message.fullOutputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -28537,6 +28641,16 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.UrlBlob.verify(message.outputs);
                     if (error)
                         return "outputs." + error;
+                }
+                if (message.fullInputs != null && message.hasOwnProperty("fullInputs")) {
+                    let error = $root.flyteidl.core.LiteralMap.verify(message.fullInputs);
+                    if (error)
+                        return "fullInputs." + error;
+                }
+                if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs")) {
+                    let error = $root.flyteidl.core.LiteralMap.verify(message.fullOutputs);
+                    if (error)
+                        return "fullOutputs." + error;
                 }
                 return null;
             };
