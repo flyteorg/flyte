@@ -3,6 +3,7 @@ module github.com/lyft/flyteplugins/copilot
 go 1.13
 
 require (
+	github.com/aws/aws-sdk-go v1.28.11
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.2
