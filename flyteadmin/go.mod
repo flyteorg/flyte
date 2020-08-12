@@ -22,8 +22,8 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/lib/pq v1.3.0
-	github.com/lyft/flyteidl v0.17.38
-	github.com/lyft/flytepropeller v0.2.64
+	github.com/lyft/flyteidl v0.18.1
+	github.com/lyft/flytepropeller v0.3.7
 	github.com/lyft/flytestdlib v0.3.9
 	github.com/magiconair/properties v1.8.1
 	github.com/mitchellh/mapstructure v1.1.2
@@ -37,7 +37,7 @@ require (
 	gopkg.in/gormigrate.v1 v1.6.0
 	k8s.io/api v0.17.3
 	k8s.io/apimachinery v0.17.3
-	k8s.io/client-go v11.0.0+incompatible
+	k8s.io/client-go v11.0.1-0.20190918222721-c0e3722d5cf0+incompatible
 	sigs.k8s.io/controller-runtime v0.5.1
 )
 
