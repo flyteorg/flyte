@@ -5317,6 +5317,10 @@ definitions:
           $ref: "#/definitions/adminDomain"
       description:
         type: "string"
+      labels:
+        description: "Leverage Labels from flyteidel.admin.common.proto to\ntag projects\
+          \ with ownership information."
+        $ref: "#/definitions/adminLabels"
     description: "Top-level namespace used to classify different entities like workflows\
       \ and executions."
     example:
@@ -5328,6 +5332,9 @@ definitions:
         id: "id"
       description: "description"
       id: "id"
+      labels:
+        values:
+          key: "values"
   adminProjectDomainAttributes:
     type: "object"
     properties:
@@ -5448,6 +5455,9 @@ definitions:
           id: "id"
         description: "description"
         id: "id"
+        labels:
+          values:
+            key: "values"
       - name: "name"
         domains:
         - name: "name"
@@ -5456,6 +5466,9 @@ definitions:
           id: "id"
         description: "description"
         id: "id"
+        labels:
+          values:
+            key: "values"
   adminRawOutputDataConfig:
     type: "object"
     properties:
