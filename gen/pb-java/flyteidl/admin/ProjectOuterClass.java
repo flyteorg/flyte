@@ -811,6 +811,34 @@ public final class ProjectOuterClass {
      */
     com.google.protobuf.ByteString
         getDescriptionBytes();
+
+    /**
+     * <pre>
+     * Leverage Labels from flyteidel.admin.common.proto to
+     * tag projects with ownership information.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 5;</code>
+     */
+    boolean hasLabels();
+    /**
+     * <pre>
+     * Leverage Labels from flyteidel.admin.common.proto to
+     * tag projects with ownership information.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 5;</code>
+     */
+    flyteidl.admin.Common.Labels getLabels();
+    /**
+     * <pre>
+     * Leverage Labels from flyteidel.admin.common.proto to
+     * tag projects with ownership information.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 5;</code>
+     */
+    flyteidl.admin.Common.LabelsOrBuilder getLabelsOrBuilder();
   }
   /**
    * <pre>
@@ -884,6 +912,19 @@ public final class ProjectOuterClass {
               java.lang.String s = input.readStringRequireUtf8();
 
               description_ = s;
+              break;
+            }
+            case 42: {
+              flyteidl.admin.Common.Labels.Builder subBuilder = null;
+              if (labels_ != null) {
+                subBuilder = labels_.toBuilder();
+              }
+              labels_ = input.readMessage(flyteidl.admin.Common.Labels.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(labels_);
+                labels_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -1067,6 +1108,42 @@ public final class ProjectOuterClass {
       }
     }
 
+    public static final int LABELS_FIELD_NUMBER = 5;
+    private flyteidl.admin.Common.Labels labels_;
+    /**
+     * <pre>
+     * Leverage Labels from flyteidel.admin.common.proto to
+     * tag projects with ownership information.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 5;</code>
+     */
+    public boolean hasLabels() {
+      return labels_ != null;
+    }
+    /**
+     * <pre>
+     * Leverage Labels from flyteidel.admin.common.proto to
+     * tag projects with ownership information.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 5;</code>
+     */
+    public flyteidl.admin.Common.Labels getLabels() {
+      return labels_ == null ? flyteidl.admin.Common.Labels.getDefaultInstance() : labels_;
+    }
+    /**
+     * <pre>
+     * Leverage Labels from flyteidel.admin.common.proto to
+     * tag projects with ownership information.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Labels labels = 5;</code>
+     */
+    public flyteidl.admin.Common.LabelsOrBuilder getLabelsOrBuilder() {
+      return getLabels();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1093,6 +1170,9 @@ public final class ProjectOuterClass {
       if (!getDescriptionBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, description_);
       }
+      if (labels_ != null) {
+        output.writeMessage(5, getLabels());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1114,6 +1194,10 @@ public final class ProjectOuterClass {
       }
       if (!getDescriptionBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, description_);
+      }
+      if (labels_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getLabels());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1138,6 +1222,11 @@ public final class ProjectOuterClass {
           .equals(other.getDomainsList())) return false;
       if (!getDescription()
           .equals(other.getDescription())) return false;
+      if (hasLabels() != other.hasLabels()) return false;
+      if (hasLabels()) {
+        if (!getLabels()
+            .equals(other.getLabels())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1159,6 +1248,10 @@ public final class ProjectOuterClass {
       }
       hash = (37 * hash) + DESCRIPTION_FIELD_NUMBER;
       hash = (53 * hash) + getDescription().hashCode();
+      if (hasLabels()) {
+        hash = (37 * hash) + LABELS_FIELD_NUMBER;
+        hash = (53 * hash) + getLabels().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1309,6 +1402,12 @@ public final class ProjectOuterClass {
         }
         description_ = "";
 
+        if (labelsBuilder_ == null) {
+          labels_ = null;
+        } else {
+          labels_ = null;
+          labelsBuilder_ = null;
+        }
         return this;
       }
 
@@ -1349,6 +1448,11 @@ public final class ProjectOuterClass {
           result.domains_ = domainsBuilder_.build();
         }
         result.description_ = description_;
+        if (labelsBuilder_ == null) {
+          result.labels_ = labels_;
+        } else {
+          result.labels_ = labelsBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1435,6 +1539,9 @@ public final class ProjectOuterClass {
         if (!other.getDescription().isEmpty()) {
           description_ = other.description_;
           onChanged();
+        }
+        if (other.hasLabels()) {
+          mergeLabels(other.getLabels());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1931,6 +2038,168 @@ public final class ProjectOuterClass {
         description_ = value;
         onChanged();
         return this;
+      }
+
+      private flyteidl.admin.Common.Labels labels_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Labels, flyteidl.admin.Common.Labels.Builder, flyteidl.admin.Common.LabelsOrBuilder> labelsBuilder_;
+      /**
+       * <pre>
+       * Leverage Labels from flyteidel.admin.common.proto to
+       * tag projects with ownership information.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 5;</code>
+       */
+      public boolean hasLabels() {
+        return labelsBuilder_ != null || labels_ != null;
+      }
+      /**
+       * <pre>
+       * Leverage Labels from flyteidel.admin.common.proto to
+       * tag projects with ownership information.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 5;</code>
+       */
+      public flyteidl.admin.Common.Labels getLabels() {
+        if (labelsBuilder_ == null) {
+          return labels_ == null ? flyteidl.admin.Common.Labels.getDefaultInstance() : labels_;
+        } else {
+          return labelsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Leverage Labels from flyteidel.admin.common.proto to
+       * tag projects with ownership information.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 5;</code>
+       */
+      public Builder setLabels(flyteidl.admin.Common.Labels value) {
+        if (labelsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          labels_ = value;
+          onChanged();
+        } else {
+          labelsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Leverage Labels from flyteidel.admin.common.proto to
+       * tag projects with ownership information.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 5;</code>
+       */
+      public Builder setLabels(
+          flyteidl.admin.Common.Labels.Builder builderForValue) {
+        if (labelsBuilder_ == null) {
+          labels_ = builderForValue.build();
+          onChanged();
+        } else {
+          labelsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Leverage Labels from flyteidel.admin.common.proto to
+       * tag projects with ownership information.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 5;</code>
+       */
+      public Builder mergeLabels(flyteidl.admin.Common.Labels value) {
+        if (labelsBuilder_ == null) {
+          if (labels_ != null) {
+            labels_ =
+              flyteidl.admin.Common.Labels.newBuilder(labels_).mergeFrom(value).buildPartial();
+          } else {
+            labels_ = value;
+          }
+          onChanged();
+        } else {
+          labelsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Leverage Labels from flyteidel.admin.common.proto to
+       * tag projects with ownership information.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 5;</code>
+       */
+      public Builder clearLabels() {
+        if (labelsBuilder_ == null) {
+          labels_ = null;
+          onChanged();
+        } else {
+          labels_ = null;
+          labelsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Leverage Labels from flyteidel.admin.common.proto to
+       * tag projects with ownership information.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 5;</code>
+       */
+      public flyteidl.admin.Common.Labels.Builder getLabelsBuilder() {
+        
+        onChanged();
+        return getLabelsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Leverage Labels from flyteidel.admin.common.proto to
+       * tag projects with ownership information.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 5;</code>
+       */
+      public flyteidl.admin.Common.LabelsOrBuilder getLabelsOrBuilder() {
+        if (labelsBuilder_ != null) {
+          return labelsBuilder_.getMessageOrBuilder();
+        } else {
+          return labels_ == null ?
+              flyteidl.admin.Common.Labels.getDefaultInstance() : labels_;
+        }
+      }
+      /**
+       * <pre>
+       * Leverage Labels from flyteidel.admin.common.proto to
+       * tag projects with ownership information.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Labels labels = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Labels, flyteidl.admin.Common.Labels.Builder, flyteidl.admin.Common.LabelsOrBuilder> 
+          getLabelsFieldBuilder() {
+        if (labelsBuilder_ == null) {
+          labelsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.Labels, flyteidl.admin.Common.Labels.Builder, flyteidl.admin.Common.LabelsOrBuilder>(
+                  getLabels(),
+                  getParentForChildren(),
+                  isClean());
+          labels_ = null;
+        }
+        return labelsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -4234,16 +4503,18 @@ public final class ProjectOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\034flyteidl/admin/project.proto\022\016flyteidl" +
-      ".admin\"\"\n\006Domain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001" +
-      "(\t\"a\n\007Project\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022" +
-      "\'\n\007domains\030\003 \003(\0132\026.flyteidl.admin.Domain" +
-      "\022\023\n\013description\030\004 \001(\t\"5\n\010Projects\022)\n\010pro" +
-      "jects\030\001 \003(\0132\027.flyteidl.admin.Project\"\024\n\022" +
-      "ProjectListRequest\"B\n\026ProjectRegisterReq" +
-      "uest\022(\n\007project\030\001 \001(\0132\027.flyteidl.admin.P" +
-      "roject\"\031\n\027ProjectRegisterResponseB3Z1git" +
-      "hub.com/lyft/flyteidl/gen/pb-go/flyteidl" +
-      "/adminb\006proto3"
+      ".admin\032\033flyteidl/admin/common.proto\"\"\n\006D" +
+      "omain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\"\211\001\n\007Proj" +
+      "ect\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\'\n\007domains" +
+      "\030\003 \003(\0132\026.flyteidl.admin.Domain\022\023\n\013descri" +
+      "ption\030\004 \001(\t\022&\n\006labels\030\005 \001(\0132\026.flyteidl.a" +
+      "dmin.Labels\"5\n\010Projects\022)\n\010projects\030\001 \003(" +
+      "\0132\027.flyteidl.admin.Project\"\024\n\022ProjectLis" +
+      "tRequest\"B\n\026ProjectRegisterRequest\022(\n\007pr" +
+      "oject\030\001 \001(\0132\027.flyteidl.admin.Project\"\031\n\027" +
+      "ProjectRegisterResponseB3Z1github.com/ly" +
+      "ft/flyteidl/gen/pb-go/flyteidl/adminb\006pr" +
+      "oto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4256,6 +4527,7 @@ public final class ProjectOuterClass {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          flyteidl.admin.Common.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_admin_Domain_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -4268,7 +4540,7 @@ public final class ProjectOuterClass {
     internal_static_flyteidl_admin_Project_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Project_descriptor,
-        new java.lang.String[] { "Id", "Name", "Domains", "Description", });
+        new java.lang.String[] { "Id", "Name", "Domains", "Description", "Labels", });
     internal_static_flyteidl_admin_Projects_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_admin_Projects_fieldAccessorTable = new
@@ -4293,6 +4565,7 @@ public final class ProjectOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectRegisterResponse_descriptor,
         new java.lang.String[] { });
+    flyteidl.admin.Common.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -16,8 +16,9 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Labels_flyteidl_2fadmin_2fcommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fproject_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Domain_flyteidl_2fadmin_2fproject_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fproject_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Project_flyteidl_2fadmin_2fproject_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fproject_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_Project_flyteidl_2fadmin_2fproject_2eproto;
 namespace flyteidl {
 namespace admin {
 class DomainDefaultTypeInternal {
@@ -71,9 +72,10 @@ static void InitDefaultsProject_flyteidl_2fadmin_2fproject_2eproto() {
   ::flyteidl::admin::Project::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_Project_flyteidl_2fadmin_2fproject_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsProject_flyteidl_2fadmin_2fproject_2eproto}, {
-      &scc_info_Domain_flyteidl_2fadmin_2fproject_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_Project_flyteidl_2fadmin_2fproject_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsProject_flyteidl_2fadmin_2fproject_2eproto}, {
+      &scc_info_Domain_flyteidl_2fadmin_2fproject_2eproto.base,
+      &scc_info_Labels_flyteidl_2fadmin_2fcommon_2eproto.base,}};
 
 static void InitDefaultsProjects_flyteidl_2fadmin_2fproject_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -163,6 +165,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fproject_2eproto:
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Project, name_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Project, domains_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Project, description_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Project, labels_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Projects, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -189,10 +192,10 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fproject_2eproto:
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::admin::Domain)},
   { 7, -1, sizeof(::flyteidl::admin::Project)},
-  { 16, -1, sizeof(::flyteidl::admin::Projects)},
-  { 22, -1, sizeof(::flyteidl::admin::ProjectListRequest)},
-  { 27, -1, sizeof(::flyteidl::admin::ProjectRegisterRequest)},
-  { 33, -1, sizeof(::flyteidl::admin::ProjectRegisterResponse)},
+  { 17, -1, sizeof(::flyteidl::admin::Projects)},
+  { 23, -1, sizeof(::flyteidl::admin::ProjectListRequest)},
+  { 28, -1, sizeof(::flyteidl::admin::ProjectRegisterRequest)},
+  { 34, -1, sizeof(::flyteidl::admin::ProjectRegisterResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -212,28 +215,31 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_flyteidl_2fadmin_2fproject_2eproto[] =
   "\n\034flyteidl/admin/project.proto\022\016flyteidl"
-  ".admin\"\"\n\006Domain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001"
-  "(\t\"a\n\007Project\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022"
-  "\'\n\007domains\030\003 \003(\0132\026.flyteidl.admin.Domain"
-  "\022\023\n\013description\030\004 \001(\t\"5\n\010Projects\022)\n\010pro"
-  "jects\030\001 \003(\0132\027.flyteidl.admin.Project\"\024\n\022"
-  "ProjectListRequest\"B\n\026ProjectRegisterReq"
-  "uest\022(\n\007project\030\001 \001(\0132\027.flyteidl.admin.P"
-  "roject\"\031\n\027ProjectRegisterResponseB3Z1git"
-  "hub.com/lyft/flyteidl/gen/pb-go/flyteidl"
-  "/adminb\006proto3"
+  ".admin\032\033flyteidl/admin/common.proto\"\"\n\006D"
+  "omain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\"\211\001\n\007Proj"
+  "ect\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\'\n\007domains"
+  "\030\003 \003(\0132\026.flyteidl.admin.Domain\022\023\n\013descri"
+  "ption\030\004 \001(\t\022&\n\006labels\030\005 \001(\0132\026.flyteidl.a"
+  "dmin.Labels\"5\n\010Projects\022)\n\010projects\030\001 \003("
+  "\0132\027.flyteidl.admin.Project\"\024\n\022ProjectLis"
+  "tRequest\"B\n\026ProjectRegisterRequest\022(\n\007pr"
+  "oject\030\001 \001(\0132\027.flyteidl.admin.Project\"\031\n\027"
+  "ProjectRegisterResponseB3Z1github.com/ly"
+  "ft/flyteidl/gen/pb-go/flyteidl/adminb\006pr"
+  "oto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fproject_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fproject_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fproject_2eproto,
-  "flyteidl/admin/project.proto", &assign_descriptors_table_flyteidl_2fadmin_2fproject_2eproto, 414,
+  "flyteidl/admin/project.proto", &assign_descriptors_table_flyteidl_2fadmin_2fproject_2eproto, 484,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fproject_2eproto() {
   static constexpr ::google::protobuf::internal::InitFunc deps[1] =
   {
+    ::AddDescriptors_flyteidl_2fadmin_2fcommon_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fadmin_2fproject_2eproto, deps, 0);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fadmin_2fproject_2eproto, deps, 1);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -614,16 +620,30 @@ void Domain::InternalSwap(Domain* other) {
 // ===================================================================
 
 void Project::InitAsDefaultInstance() {
+  ::flyteidl::admin::_Project_default_instance_._instance.get_mutable()->labels_ = const_cast< ::flyteidl::admin::Labels*>(
+      ::flyteidl::admin::Labels::internal_default_instance());
 }
 class Project::HasBitSetters {
  public:
+  static const ::flyteidl::admin::Labels& labels(const Project* msg);
 };
 
+const ::flyteidl::admin::Labels&
+Project::HasBitSetters::labels(const Project* msg) {
+  return *msg->labels_;
+}
+void Project::clear_labels() {
+  if (GetArenaNoVirtual() == nullptr && labels_ != nullptr) {
+    delete labels_;
+  }
+  labels_ = nullptr;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Project::kIdFieldNumber;
 const int Project::kNameFieldNumber;
 const int Project::kDomainsFieldNumber;
 const int Project::kDescriptionFieldNumber;
+const int Project::kLabelsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Project::Project()
@@ -648,6 +668,11 @@ Project::Project(const Project& from)
   if (from.description().size() > 0) {
     description_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.description_);
   }
+  if (from.has_labels()) {
+    labels_ = new ::flyteidl::admin::Labels(*from.labels_);
+  } else {
+    labels_ = nullptr;
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.Project)
 }
 
@@ -657,6 +682,7 @@ void Project::SharedCtor() {
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   description_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  labels_ = nullptr;
 }
 
 Project::~Project() {
@@ -668,6 +694,7 @@ void Project::SharedDtor() {
   id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   description_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete labels_;
 }
 
 void Project::SetCachedSize(int size) const {
@@ -689,6 +716,10 @@ void Project::Clear() {
   id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (GetArenaNoVirtual() == nullptr && labels_ != nullptr) {
+    delete labels_;
+  }
+  labels_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -767,6 +798,19 @@ const char* Project::_InternalParse(const char* begin, const char* end, void* ob
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // .flyteidl.admin.Labels labels = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::admin::Labels::_InternalParse;
+        object = msg->mutable_labels();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
         break;
       }
       default: {
@@ -859,6 +903,17 @@ bool Project::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.admin.Labels labels = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_labels()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -925,6 +980,12 @@ void Project::SerializeWithCachedSizes(
       4, this->description(), output);
   }
 
+  // .flyteidl.admin.Labels labels = 5;
+  if (this->has_labels()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      5, HasBitSetters::labels(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -977,6 +1038,13 @@ void Project::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         4, this->description(), target);
+  }
+
+  // .flyteidl.admin.Labels labels = 5;
+  if (this->has_labels()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        5, HasBitSetters::labels(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1032,6 +1100,13 @@ size_t Project::ByteSizeLong() const {
         this->description());
   }
 
+  // .flyteidl.admin.Labels labels = 5;
+  if (this->has_labels()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *labels_);
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -1072,6 +1147,9 @@ void Project::MergeFrom(const Project& from) {
 
     description_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.description_);
   }
+  if (from.has_labels()) {
+    mutable_labels()->::flyteidl::admin::Labels::MergeFrom(from.labels());
+  }
 }
 
 void Project::CopyFrom(const ::google::protobuf::Message& from) {
@@ -1106,6 +1184,7 @@ void Project::InternalSwap(Project* other) {
     GetArenaNoVirtual());
   description_.Swap(&other->description_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
+  swap(labels_, other->labels_);
 }
 
 ::google::protobuf::Metadata Project::GetMetadata() const {

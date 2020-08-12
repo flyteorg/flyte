@@ -10580,6 +10580,9 @@ export namespace flyteidl {
 
             /** Project description */
             description?: (string|null);
+
+            /** Project labels */
+            labels?: (flyteidl.admin.ILabels|null);
         }
 
         /** Represents a Project. */
@@ -10602,6 +10605,9 @@ export namespace flyteidl {
 
             /** Project description. */
             public description: string;
+
+            /** Project labels. */
+            public labels?: (flyteidl.admin.ILabels|null);
 
             /**
              * Creates a new Project instance using the specified properties.

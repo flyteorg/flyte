@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.admin_domain import AdminDomain  # noqa: F401,E501
+from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 
 
 class AdminProject(object):
@@ -36,23 +37,26 @@ class AdminProject(object):
         'id': 'str',
         'name': 'str',
         'domains': 'list[AdminDomain]',
-        'description': 'str'
+        'description': 'str',
+        'labels': 'AdminLabels'
     }
 
     attribute_map = {
         'id': 'id',
         'name': 'name',
         'domains': 'domains',
-        'description': 'description'
+        'description': 'description',
+        'labels': 'labels'
     }
 
-    def __init__(self, id=None, name=None, domains=None, description=None):  # noqa: E501
+    def __init__(self, id=None, name=None, domains=None, description=None, labels=None):  # noqa: E501
         """AdminProject - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
         self._name = None
         self._domains = None
         self._description = None
+        self._labels = None
         self.discriminator = None
 
         if id is not None:
@@ -63,6 +67,8 @@ class AdminProject(object):
             self.domains = domains
         if description is not None:
             self.description = description
+        if labels is not None:
+            self.labels = labels
 
     @property
     def id(self):
@@ -149,6 +155,29 @@ class AdminProject(object):
         """
 
         self._description = description
+
+    @property
+    def labels(self):
+        """Gets the labels of this AdminProject.  # noqa: E501
+
+        Leverage Labels from flyteidel.admin.common.proto to tag projects with ownership information.  # noqa: E501
+
+        :return: The labels of this AdminProject.  # noqa: E501
+        :rtype: AdminLabels
+        """
+        return self._labels
+
+    @labels.setter
+    def labels(self, labels):
+        """Sets the labels of this AdminProject.
+
+        Leverage Labels from flyteidel.admin.common.proto to tag projects with ownership information.  # noqa: E501
+
+        :param labels: The labels of this AdminProject.  # noqa: E501
+        :type: AdminLabels
+        """
+
+        self._labels = labels
 
     def to_dict(self):
         """Returns the model properties as a dict"""
