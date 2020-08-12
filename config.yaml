@@ -32,8 +32,9 @@ tasks:
       - container
       - K8S-ARRAY
       - qubole-hive-executor
-      - sagemaker_training
-      - sagemaker_hyperparameter_tuning
+# Uncomment to enable sagemaker plugin
+#      - sagemaker_training
+#      - sagemaker_hyperparameter_tuning
 # Sample plugins config
 plugins:
   # All k8s plugins default configuration

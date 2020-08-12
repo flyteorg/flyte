@@ -44,8 +44,14 @@ type FlyteWorkflow struct {
 	ServiceAccountName string `json:"serviceAccountName,omitempty" protobuf:"bytes,8,opt,name=serviceAccountName"`
 	// Status is the only mutable section in the workflow. It holds all the execution information
 	Status WorkflowStatus `json:"status,omitempty"`
+	// RawOutputDataConfig defines the configurations to use for generating raw outputs (e.g. blobs, schemas).
+	RawOutputDataConfig RawOutputDataConfig `json:"rawOutputDataConfig,omitempty"`
 
-	// non-Serialized fields
+	// non-Serialized fields (these will not get written to etcd)
+	// As of 2020-07, the only real implementation of this interface is a URLPathConstructor, which is just an empty
+	// struct. However, because this field is an interface, we create it once when the crd is hydrated from etcd,
+	// so that it can be used downstream without any confusion.
+	// This field is here because it's easier to put it here than pipe through a new object through all of propeller.
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
 }
 
@@ -108,6 +114,10 @@ func (in *FlyteWorkflow) GetServiceAccountName() string {
 
 func (in *FlyteWorkflow) IsInterruptible() bool {
 	return in.NodeDefaults.Interruptible
+}
+
+func (in *FlyteWorkflow) GetRawOutputDataConfig() RawOutputDataConfig {
+	return in.RawOutputDataConfig
 }
 
 type Inputs struct {

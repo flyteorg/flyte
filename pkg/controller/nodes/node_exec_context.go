@@ -135,7 +135,11 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 	return e.maxDatasetSizeBytes
 }
 
-func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, maxDatasetSize int64, er events.TaskEventRecorder, tr handler.TaskReader, nsm *nodeStateManager, enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
+func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
+	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool,
+	maxDatasetSize int64, er events.TaskEventRecorder, tr handler.TaskReader, nsm *nodeStateManager,
+	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
+
 	md := nodeExecMetadata{
 		Meta: execContext,
 		nodeExecID: &core.NodeExecutionIdentifier{
@@ -175,7 +179,8 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 	}
 }
 
-func (c *nodeExecutor) newNodeExecContextDefault(ctx context.Context, currentNodeID v1alpha1.NodeID, executionContext executors.ExecutionContext, nl executors.NodeLookup) (*nodeExecContext, error) {
+func (c *nodeExecutor) newNodeExecContextDefault(ctx context.Context, currentNodeID v1alpha1.NodeID,
+	executionContext executors.ExecutionContext, nl executors.NodeLookup) (*nodeExecContext, error) {
 	n, ok := nl.GetNode(currentNodeID)
 	if !ok {
 		return nil, fmt.Errorf("failed to find node with ID [%s] in execution [%s]", currentNodeID, executionContext.GetID())
@@ -198,17 +203,22 @@ func (c *nodeExecutor) newNodeExecContextDefault(ctx context.Context, currentNod
 		return nil
 	}
 
-	interrutible := executionContext.IsInterruptible()
+	interruptible := executionContext.IsInterruptible()
 	if n.IsInterruptible() != nil {
-		interrutible = *n.IsInterruptible()
+		interruptible = *n.IsInterruptible()
 	}
 
 	s := nl.GetNodeExecutionStatus(ctx, currentNodeID)
 
 	// a node is not considered interruptible if the system failures have exceeded the configured threshold
-	if interrutible && s.GetSystemFailures() >= c.interruptibleFailureThreshold {
-		interrutible = false
+	if interruptible && s.GetSystemFailures() >= c.interruptibleFailureThreshold {
+		interruptible = false
 		c.metrics.InterruptedThresholdHit.Inc(ctx)
+	}
+
+	rawOutputPrefix := c.defaultDataSandbox
+	if executionContext.GetRawOutputDataConfig().RawOutputDataConfig != nil && len(executionContext.GetRawOutputDataConfig().OutputLocationPrefix) > 0 {
+		rawOutputPrefix = storage.DataReference(executionContext.GetRawOutputDataConfig().OutputLocationPrefix)
 	}
 
 	return newNodeExecContext(ctx, c.store, executionContext, nl, n, s,
@@ -224,15 +234,13 @@ func (c *nodeExecutor) newNodeExecContextDefault(ctx context.Context, currentNod
 				),
 			),
 		),
-		interrutible,
+		interruptible,
 		c.maxDatasetSizeBytes,
 		&taskEventRecorder{TaskEventRecorder: c.taskRecorder},
 		tr,
 		newNodeStateManager(ctx, s),
 		workflowEnqueuer,
-		// Eventually we want to replace this with per workflow sandboxes
-		// https://github.com/lyft/flyte/issues/211
-		c.defaultDataSandbox,
+		rawOutputPrefix,
 		c.shardSelector,
 	), nil
 }

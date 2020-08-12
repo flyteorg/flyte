@@ -344,6 +344,38 @@ func (_m *MetaExtended) GetOwnerReference() v1.OwnerReference {
 	return r0
 }
 
+type MetaExtended_GetRawOutputDataConfig struct {
+	*mock.Call
+}
+
+func (_m MetaExtended_GetRawOutputDataConfig) Return(_a0 v1alpha1.RawOutputDataConfig) *MetaExtended_GetRawOutputDataConfig {
+	return &MetaExtended_GetRawOutputDataConfig{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MetaExtended) OnGetRawOutputDataConfig() *MetaExtended_GetRawOutputDataConfig {
+	c := _m.On("GetRawOutputDataConfig")
+	return &MetaExtended_GetRawOutputDataConfig{Call: c}
+}
+
+func (_m *MetaExtended) OnGetRawOutputDataConfigMatch(matchers ...interface{}) *MetaExtended_GetRawOutputDataConfig {
+	c := _m.On("GetRawOutputDataConfig", matchers...)
+	return &MetaExtended_GetRawOutputDataConfig{Call: c}
+}
+
+// GetRawOutputDataConfig provides a mock function with given fields:
+func (_m *MetaExtended) GetRawOutputDataConfig() v1alpha1.RawOutputDataConfig {
+	ret := _m.Called()
+
+	var r0 v1alpha1.RawOutputDataConfig
+	if rf, ok := ret.Get(0).(func() v1alpha1.RawOutputDataConfig); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.RawOutputDataConfig)
+	}
+
+	return r0
+}
+
 type MetaExtended_GetServiceAccountName struct {
 	*mock.Call
 }

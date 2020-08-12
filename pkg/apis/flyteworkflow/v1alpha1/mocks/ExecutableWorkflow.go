@@ -696,6 +696,38 @@ func (_m *ExecutableWorkflow) GetOwnerReference() v1.OwnerReference {
 	return r0
 }
 
+type ExecutableWorkflow_GetRawOutputDataConfig struct {
+	*mock.Call
+}
+
+func (_m ExecutableWorkflow_GetRawOutputDataConfig) Return(_a0 v1alpha1.RawOutputDataConfig) *ExecutableWorkflow_GetRawOutputDataConfig {
+	return &ExecutableWorkflow_GetRawOutputDataConfig{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableWorkflow) OnGetRawOutputDataConfig() *ExecutableWorkflow_GetRawOutputDataConfig {
+	c := _m.On("GetRawOutputDataConfig")
+	return &ExecutableWorkflow_GetRawOutputDataConfig{Call: c}
+}
+
+func (_m *ExecutableWorkflow) OnGetRawOutputDataConfigMatch(matchers ...interface{}) *ExecutableWorkflow_GetRawOutputDataConfig {
+	c := _m.On("GetRawOutputDataConfig", matchers...)
+	return &ExecutableWorkflow_GetRawOutputDataConfig{Call: c}
+}
+
+// GetRawOutputDataConfig provides a mock function with given fields:
+func (_m *ExecutableWorkflow) GetRawOutputDataConfig() v1alpha1.RawOutputDataConfig {
+	ret := _m.Called()
+
+	var r0 v1alpha1.RawOutputDataConfig
+	if rf, ok := ret.Get(0).(func() v1alpha1.RawOutputDataConfig); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.RawOutputDataConfig)
+	}
+
+	return r0
+}
+
 type ExecutableWorkflow_GetServiceAccountName struct {
 	*mock.Call
 }
