@@ -432,6 +432,7 @@ type Meta interface {
 	GetName() string
 	GetServiceAccountName() string
 	IsInterruptible() bool
+	GetRawOutputDataConfig() RawOutputDataConfig
 }
 
 type TaskDetailsGetter interface {

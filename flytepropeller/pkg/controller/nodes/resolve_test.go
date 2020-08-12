@@ -96,6 +96,10 @@ func (d *dummyBaseWorkflow) IsInterruptible() bool {
 	return d.Interruptible
 }
 
+func (d *dummyBaseWorkflow) GetRawOutputDataConfig() v1alpha1.RawOutputDataConfig {
+	return v1alpha1.RawOutputDataConfig{}
+}
+
 func (d *dummyBaseWorkflow) GetName() string {
 	return d.ID
 }

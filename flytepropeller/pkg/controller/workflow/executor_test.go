@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
 	"github.com/stretchr/testify/mock"
@@ -240,7 +242,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 
 	wJSON, err := yamlutils.ReadYamlFileAsJSON("testdata/benchmark_wf.yaml")
 	if assert.NoError(t, err) {
-		w := &v1alpha1.FlyteWorkflow{}
+		w := &v1alpha1.FlyteWorkflow{
+			RawOutputDataConfig: v1alpha1.RawOutputDataConfig{RawOutputDataConfig: &admin.RawOutputDataConfig{}},
+		}
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we know how many rounds it needs
 			// Number of rounds = 7 + 1
@@ -318,7 +322,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 
 	wJSON, err := yamlutils.ReadYamlFileAsJSON("testdata/benchmark_wf.yaml")
 	if assert.NoError(t, err) {
-		w := &v1alpha1.FlyteWorkflow{}
+		w := &v1alpha1.FlyteWorkflow{
+			RawOutputDataConfig: v1alpha1.RawOutputDataConfig{RawOutputDataConfig: &admin.RawOutputDataConfig{}},
+		}
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we know how many rounds it needs
 			// Number of rounds = 28
@@ -464,7 +470,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 
 	wJSON, err := yamlutils.ReadYamlFileAsJSON("testdata/benchmark_wf.yaml")
 	if assert.NoError(t, err) {
-		w := &v1alpha1.FlyteWorkflow{}
+		w := &v1alpha1.FlyteWorkflow{
+			RawOutputDataConfig: v1alpha1.RawOutputDataConfig{RawOutputDataConfig: &admin.RawOutputDataConfig{}},
+		}
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we will run into the first failure on round 6
 
@@ -554,7 +562,9 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 
 	wJSON, err := yamlutils.ReadYamlFileAsJSON("testdata/benchmark_wf.yaml")
 	if assert.NoError(t, err) {
-		w := &v1alpha1.FlyteWorkflow{}
+		w := &v1alpha1.FlyteWorkflow{
+			RawOutputDataConfig: v1alpha1.RawOutputDataConfig{RawOutputDataConfig: &admin.RawOutputDataConfig{}},
+		}
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we know how many rounds it needs
 			// Number of rounds = 28 ?

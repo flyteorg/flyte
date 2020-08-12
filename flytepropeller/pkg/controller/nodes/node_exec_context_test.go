@@ -4,6 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	mocks2 "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/lyft/flytestdlib/promutils"
@@ -51,4 +54,61 @@ func Test_NodeContext(t *testing.T) {
 	assert.Equal(t, "id", nCtx.NodeExecutionMetadata().GetLabels()["node-id"])
 	assert.Equal(t, "false", nCtx.NodeExecutionMetadata().GetLabels()["interruptible"])
 	assert.Equal(t, "task-name", nCtx.NodeExecutionMetadata().GetLabels()["task-name"])
+}
+
+func Test_NodeContextDefault(t *testing.T) {
+	ctx := context.Background()
+
+	w1 := &v1alpha1.FlyteWorkflow{
+		NodeDefaults: v1alpha1.NodeDefaults{Interruptible: false},
+		RawOutputDataConfig: v1alpha1.RawOutputDataConfig{RawOutputDataConfig: &admin.RawOutputDataConfig{
+			OutputLocationPrefix: ""},
+		},
+		WorkflowSpec: &v1alpha1.WorkflowSpec{
+			ID: "some.workflow",
+		},
+		Tasks: map[v1alpha1.TaskID]*v1alpha1.TaskSpec{
+			"taskID": {
+				TaskTemplate: &core.TaskTemplate{
+					Id: &core.Identifier{
+						ResourceType: 1,
+						Project:      "proj",
+						Domain:       "domain",
+						Name:         "taskID",
+						Version:      "abc",
+					},
+				},
+			},
+		},
+	}
+	dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	taskID := "taskID"
+	n := &v1alpha1.NodeSpec{
+		ID:      "id",
+		TaskRef: &taskID,
+		Kind:    v1alpha1.NodeKindTask,
+	}
+	nodeLookup := &mocks2.NodeLookup{}
+	nodeLookup.OnGetNode("node-a").Return(n, true)
+	nodeLookup.OnGetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
+		SystemFailures: 0,
+	})
+
+	nodeExecutor := nodeExecutor{
+		interruptibleFailureThreshold: 0,
+		maxDatasetSizeBytes:           0,
+		defaultDataSandbox:            "s3://bucket-a",
+		store:                         dataStore,
+		shardSelector:                 ioutils.NewConstantShardSelector([]string{"x"}),
+		enqueueWorkflow:               func(workflowID v1alpha1.WorkflowID) {},
+	}
+
+	nodeExecContext, err := nodeExecutor.newNodeExecContextDefault(context.Background(), "node-a", w1, nodeLookup)
+	assert.NoError(t, err)
+	assert.Equal(t, "s3://bucket-a", nodeExecContext.rawOutputPrefix.String())
+
+	w1.RawOutputDataConfig.OutputLocationPrefix = "s3://bucket-b"
+	nodeExecContext, err = nodeExecutor.newNodeExecContextDefault(context.Background(), "node-a", w1, nodeLookup)
+	assert.NoError(t, err)
+	assert.Equal(t, "s3://bucket-b", nodeExecContext.rawOutputPrefix.String())
 }
