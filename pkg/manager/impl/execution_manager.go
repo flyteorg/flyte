@@ -65,9 +65,11 @@ type executionSystemMetrics struct {
 }
 
 type executionUserMetrics struct {
-	Scope                      promutils.Scope
-	ScheduledExecutionDelays   projectDomainScopedStopWatchMap
-	WorkflowExecutionDurations projectDomainScopedStopWatchMap
+	Scope                        promutils.Scope
+	ScheduledExecutionDelays     projectDomainScopedStopWatchMap
+	WorkflowExecutionDurations   projectDomainScopedStopWatchMap
+	WorkflowExecutionInputBytes  prometheus.Summary
+	WorkflowExecutionOutputBytes prometheus.Summary
 }
 
 type ExecutionManager struct {
@@ -1019,10 +1021,32 @@ func (m *ExecutionManager) GetExecutionData(
 	if err != nil {
 		return nil, err
 	}
-	return &admin.WorkflowExecutionGetDataResponse{
+	response := &admin.WorkflowExecutionGetDataResponse{
 		Outputs: &signedOutputsURLBlob,
 		Inputs:  &inputsURLBlob,
-	}, nil
+	}
+	maxDataSize := m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes
+	if maxDataSize == 0 || inputsURLBlob.Bytes < maxDataSize {
+		var fullInputs core.LiteralMap
+		err := m.storageClient.ReadProtobuf(ctx, executionModel.InputsURI, &fullInputs)
+		if err != nil {
+			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", executionModel.InputsURI, err)
+		}
+		response.FullInputs = &fullInputs
+	}
+	if maxDataSize == 0 || (signedOutputsURLBlob.Bytes < maxDataSize && execution.Closure.GetOutputs() != nil) {
+		var fullOutputs core.LiteralMap
+		outputsURI := execution.Closure.GetOutputs().GetUri()
+		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(outputsURI), &fullOutputs)
+		if err != nil {
+			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v", outputsURI, err)
+		}
+		response.FullOutputs = &fullOutputs
+	}
+
+	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
+	m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+	return response, nil
 }
 
 func (m *ExecutionManager) ListExecutions(
@@ -1234,6 +1258,10 @@ func NewExecutionManager(
 		Scope:                      userScope,
 		ScheduledExecutionDelays:   make(map[string]map[string]*promutils.StopWatch),
 		WorkflowExecutionDurations: make(map[string]map[string]*promutils.StopWatch),
+		WorkflowExecutionInputBytes: userScope.MustNewSummary("input_size_bytes",
+			"size in bytes of serialized execution inputs"),
+		WorkflowExecutionOutputBytes: userScope.MustNewSummary("output_size_bytes",
+			"size in bytes of serialized execution outputs"),
 	}
 
 	resourceManager := resources.NewResourceManager(db, config.ApplicationConfiguration())

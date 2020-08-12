@@ -3,13 +3,18 @@ package impl
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/lyft/flytestdlib/storage"
 
 	"github.com/lyft/flyteadmin/pkg/common"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	commonMocks "github.com/lyft/flyteadmin/pkg/common/mocks"
 	dataMocks "github.com/lyft/flyteadmin/pkg/data/mocks"
 	flyteAdminErrors "github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories"
@@ -170,7 +175,8 @@ func TestCreateTaskEvent(t *testing.T) {
 			}, input)
 			return nil
 		})
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	resp, err := taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 	assert.True(t, getTaskCalled)
 	assert.True(t, createTaskCalled)
@@ -283,7 +289,8 @@ func TestCreateTaskEvent_Update(t *testing.T) {
 		OutputUri: expectedOutputResult.OutputUri,
 	}
 
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	resp, err := taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 	assert.True(t, getTaskCalled)
 	assert.True(t, updateTaskCalled)
@@ -298,7 +305,8 @@ func TestCreateTaskEvent_MissingExecution(t *testing.T) {
 		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
 			return models.NodeExecution{}, expectedErr
 		})
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	resp, err := taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 	assert.EqualError(t, err, "failed to get existing node execution id: [node_id:\"node-id\""+
 		" execution_id:<project:\"project\" domain:\"domain\" name:\"name\" > ] "+
@@ -318,7 +326,8 @@ func TestCreateTaskEvent_CreateDatabaseError(t *testing.T) {
 		func(ctx context.Context, input models.TaskExecution) error {
 			return expectedErr
 		})
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	resp, err := taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 	assert.EqualError(t, err, expectedErr.Error())
 	assert.Nil(t, resp)
@@ -358,7 +367,8 @@ func TestCreateTaskEvent_UpdateDatabaseError(t *testing.T) {
 		func(ctx context.Context, execution models.TaskExecution) error {
 			return expectedErr
 		})
-	nodeExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	nodeExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	resp, err := nodeExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 	assert.EqualError(t, err, expectedErr.Error())
 	assert.Nil(t, resp)
@@ -391,7 +401,8 @@ func TestCreateTaskEvent_UpdateTerminalEventError(t *testing.T) {
 			}, nil
 		})
 	taskEventRequest.Event.Phase = core.TaskExecution_RUNNING
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	resp, err := taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 
 	assert.Nil(t, resp)
@@ -458,7 +469,8 @@ func TestCreateTaskEvent_PhaseVersionChange(t *testing.T) {
 	taskEventRequest.Event.PhaseVersion = uint32(1)
 	taskEventRequest.Event.OccurredAt = taskEventUpdatedAtProto
 
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	resp, err := taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 	assert.True(t, getTaskCalled)
 	assert.True(t, updateTaskCalled)
@@ -524,7 +536,8 @@ func TestGetTaskExecution(t *testing.T) {
 				},
 			}, nil
 		})
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	taskExecution, err := taskExecManager.GetTaskExecution(context.Background(), admin.TaskExecutionGetRequest{
 		Id: &core.TaskExecutionIdentifier{
 			TaskId:          sampleTaskID,
@@ -574,7 +587,8 @@ func TestGetTaskExecution_TransformerError(t *testing.T) {
 				Closure:   []byte("i'm an invalid task closure"),
 			}, nil
 		})
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	taskExecution, err := taskExecManager.GetTaskExecution(context.Background(), admin.TaskExecutionGetRequest{
 		Id: &core.TaskExecutionIdentifier{
 			TaskId:          sampleTaskID,
@@ -684,7 +698,8 @@ func TestListTaskExecutions(t *testing.T) {
 				},
 			}, nil
 		})
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	taskExecutions, err := taskExecManager.ListTaskExecutions(context.Background(), admin.TaskExecutionListRequest{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			NodeId: "nodey b",
@@ -755,7 +770,8 @@ func TestListTaskExecutions_NoFilters(t *testing.T) {
 			listTaskCalled = true
 			return interfaces.TaskExecutionCollectionOutput{}, nil
 		})
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	_, err := taskExecManager.ListTaskExecutions(context.Background(), admin.TaskExecutionListRequest{
 		Token: "1",
 		Limit: 99,
@@ -773,7 +789,8 @@ func TestListTaskExecutions_NoLimit(t *testing.T) {
 			getTaskCalled = true
 			return interfaces.TaskExecutionCollectionOutput{}, nil
 		})
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	_, err := taskExecManager.ListTaskExecutions(context.Background(), admin.TaskExecutionListRequest{
 		Limit: 0,
 	})
@@ -804,7 +821,8 @@ func TestListTaskExecutions_NothingToReturn(t *testing.T) {
 			listTasksCalled = true
 			return interfaces.TaskCollectionOutput{}, nil
 		})
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	_, err := taskExecManager.ListTaskExecutions(context.Background(), admin.TaskExecutionListRequest{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -882,7 +900,32 @@ func TestGetTaskExecutionData(t *testing.T) {
 
 		return admin.UrlBlob{}, errors.New("unexpected input")
 	}
-	taskExecManager := NewTaskExecutionManager(repository, mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
+	mockStorage := commonMocks.GetMockStorageClient()
+	fullInputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": testutils.MakeStringLiteral("foo-value-1"),
+		},
+	}
+	fullOutputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"bar": testutils.MakeStringLiteral("bar-value-1"),
+		},
+	}
+	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
+		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		if reference.String() == "input-uri.pb" {
+			marshalled, _ := proto.Marshal(fullInputs)
+			_ = proto.Unmarshal(marshalled, msg)
+			return nil
+		} else if reference.String() == "test-output.pb" {
+			marshalled, _ := proto.Marshal(fullOutputs)
+			_ = proto.Unmarshal(marshalled, msg)
+			return nil
+		}
+		return fmt.Errorf("unexpected call to find value in storage [%v]", reference.String())
+	}
+	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), mockStorage,
+		mockScope.NewTestScope(), mockTaskExecutionRemoteURL)
 	dataResponse, err := taskExecManager.GetTaskExecutionData(context.Background(), admin.TaskExecutionGetDataRequest{
 		Id: &core.TaskExecutionIdentifier{
 			TaskId:          sampleTaskID,
@@ -901,5 +944,7 @@ func TestGetTaskExecutionData(t *testing.T) {
 			Url:   "outputs",
 			Bytes: 200,
 		},
+		FullInputs:  fullInputs,
+		FullOutputs: fullOutputs,
 	}, dataResponse))
 }

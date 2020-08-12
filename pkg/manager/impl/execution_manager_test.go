@@ -168,7 +168,7 @@ func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 		return nil
 	}
 	workflowClosure := testutils.GetWorkflowClosure()
-	if err := mockStorage.WriteProtobuf(ctx, storage.DataReference(remoteClosureIdentifier), defaultStorageOptions, workflowClosure); err != nil {
+	if err := mockStorage.WriteProtobuf(ctx, remoteClosureIdentifier, defaultStorageOptions, workflowClosure); err != nil {
 		return nil
 	}
 	return mockStorage
@@ -2013,10 +2013,34 @@ func TestGetExecutionData(t *testing.T) {
 
 		return admin.UrlBlob{}, errors.New("unexpected input")
 	}
+	mockStorage := commonMocks.GetMockStorageClient()
+	fullInputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": testutils.MakeStringLiteral("foo-value-1"),
+		},
+	}
+	fullOutputs := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"bar": testutils.MakeStringLiteral("bar-value-1"),
+		},
+	}
+	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
+		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		if reference.String() == "inputs" {
+			marshalled, _ := proto.Marshal(fullInputs)
+			_ = proto.Unmarshal(marshalled, msg)
+			return nil
+		} else if reference.String() == outputURI {
+			marshalled, _ := proto.Marshal(fullOutputs)
+			_ = proto.Unmarshal(marshalled, msg)
+			return nil
+		}
+		return fmt.Errorf("unexpected call to find value in storage [%v]", reference.String())
+	}
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 	execManager := NewExecutionManager(
-		repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), workflowengineMocks.NewMockExecutor(),
+		repository, getMockExecutionsConfigProvider(), mockStorage, workflowengineMocks.NewMockExecutor(),
 		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil)
 	dataResponse, err := execManager.GetExecutionData(context.Background(), admin.WorkflowExecutionGetDataRequest{
 		Id: &executionIdentifier,
@@ -2031,6 +2055,8 @@ func TestGetExecutionData(t *testing.T) {
 			Url:   "inputs",
 			Bytes: 200,
 		},
+		FullInputs:  fullInputs,
+		FullOutputs: fullOutputs,
 	}, dataResponse))
 }
 
@@ -2215,6 +2241,12 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 			Url:   "inputs",
 			Bytes: 200,
 		},
+		FullInputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": testutils.MakeStringLiteral("foo-value-1"),
+			},
+		},
+		FullOutputs: &core.LiteralMap{},
 	}, dataResponse))
 	var inputs core.LiteralMap
 	err = storageClient.ReadProtobuf(context.Background(), storage.DataReference("s3://bucket/metadata/project/domain/name/inputs"), &inputs)

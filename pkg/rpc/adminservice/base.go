@@ -157,9 +157,9 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		ExecutionManager:   executionManager,
 		NamedEntityManager: namedEntityManager,
 		NodeExecutionManager: manager.NewNodeExecutionManager(
-			db, adminScope.NewSubScope("node_execution_manager"), urlData),
+			db, configuration, dataStorageClient, adminScope.NewSubScope("node_execution_manager"), urlData),
 		TaskExecutionManager: manager.NewTaskExecutionManager(
-			db, adminScope.NewSubScope("task_execution_manager"), urlData),
+			db, configuration, dataStorageClient, adminScope.NewSubScope("task_execution_manager"), urlData),
 		ProjectManager:  manager.NewProjectManager(db, configuration),
 		ResourceManager: resources.NewResourceManager(db, configuration.ApplicationConfiguration()),
 		Metrics:         InitMetrics(adminScope),
