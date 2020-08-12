@@ -8,7 +8,7 @@ project.proto
 flyteidl.admin.Domain
 ---------------------
 
-`[flyteidl.admin.Domain proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L7>`_
+`[flyteidl.admin.Domain proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L10>`_
 
 Namespace within a project commonly used to differentiate between different service instances.
 e.g. "production", "development", etc.
@@ -38,7 +38,7 @@ name
 flyteidl.admin.Project
 ----------------------
 
-`[flyteidl.admin.Project proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L15>`_
+`[flyteidl.admin.Project proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L18>`_
 
 Top-level namespace used to classify different entities like workflows and executions.
 
@@ -48,7 +48,8 @@ Top-level namespace used to classify different entities like workflows and execu
     "id": "...",
     "name": "...",
     "domains": [],
-    "description": "..."
+    "description": "...",
+    "labels": "{...}"
   }
 
 .. _api_field_flyteidl.admin.Project.id:
@@ -72,6 +73,13 @@ domains
 description
   (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
   
+.. _api_field_flyteidl.admin.Project.labels:
+
+labels
+  (:ref:`flyteidl.admin.Labels <api_msg_flyteidl.admin.Labels>`) Leverage Labels from flyteidel.admin.common.proto to
+  tag projects with ownership information.
+  
+  
 
 
 .. _api_msg_flyteidl.admin.Projects:
@@ -79,7 +87,7 @@ description
 flyteidl.admin.Projects
 -----------------------
 
-`[flyteidl.admin.Projects proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L26>`_
+`[flyteidl.admin.Projects proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L33>`_
 
 
 .. code-block:: json
@@ -100,7 +108,7 @@ projects
 flyteidl.admin.ProjectListRequest
 ---------------------------------
 
-`[flyteidl.admin.ProjectListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L30>`_
+`[flyteidl.admin.ProjectListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L37>`_
 
 
 .. code-block:: json
@@ -115,7 +123,7 @@ flyteidl.admin.ProjectListRequest
 flyteidl.admin.ProjectRegisterRequest
 -------------------------------------
 
-`[flyteidl.admin.ProjectRegisterRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L33>`_
+`[flyteidl.admin.ProjectRegisterRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L40>`_
 
 
 .. code-block:: json
@@ -136,7 +144,7 @@ project
 flyteidl.admin.ProjectRegisterResponse
 --------------------------------------
 
-`[flyteidl.admin.ProjectRegisterResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L37>`_
+`[flyteidl.admin.ProjectRegisterResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L44>`_
 
 
 .. code-block:: json

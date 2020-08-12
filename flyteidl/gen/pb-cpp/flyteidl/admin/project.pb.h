@@ -31,6 +31,7 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
+#include "flyteidl/admin/common.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fproject_2eproto
@@ -369,6 +370,15 @@ class Project final :
   ::std::string* release_description();
   void set_allocated_description(::std::string* description);
 
+  // .flyteidl.admin.Labels labels = 5;
+  bool has_labels() const;
+  void clear_labels();
+  static const int kLabelsFieldNumber = 5;
+  const ::flyteidl::admin::Labels& labels() const;
+  ::flyteidl::admin::Labels* release_labels();
+  ::flyteidl::admin::Labels* mutable_labels();
+  void set_allocated_labels(::flyteidl::admin::Labels* labels);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.Project)
  private:
   class HasBitSetters;
@@ -378,6 +388,7 @@ class Project final :
   ::google::protobuf::internal::ArenaStringPtr id_;
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::google::protobuf::internal::ArenaStringPtr description_;
+  ::flyteidl::admin::Labels* labels_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_2eproto;
 };
@@ -1132,6 +1143,51 @@ inline void Project::set_allocated_description(::std::string* description) {
   }
   description_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), description);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Project.description)
+}
+
+// .flyteidl.admin.Labels labels = 5;
+inline bool Project::has_labels() const {
+  return this != internal_default_instance() && labels_ != nullptr;
+}
+inline const ::flyteidl::admin::Labels& Project::labels() const {
+  const ::flyteidl::admin::Labels* p = labels_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Project.labels)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Labels*>(
+      &::flyteidl::admin::_Labels_default_instance_);
+}
+inline ::flyteidl::admin::Labels* Project::release_labels() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Project.labels)
+  
+  ::flyteidl::admin::Labels* temp = labels_;
+  labels_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Labels* Project::mutable_labels() {
+  
+  if (labels_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Labels>(GetArenaNoVirtual());
+    labels_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Project.labels)
+  return labels_;
+}
+inline void Project::set_allocated_labels(::flyteidl::admin::Labels* labels) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(labels_);
+  }
+  if (labels) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      labels = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, labels, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  labels_ = labels;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Project.labels)
 }
 
 // -------------------------------------------------------------------

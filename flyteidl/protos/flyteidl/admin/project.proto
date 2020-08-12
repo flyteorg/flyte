@@ -3,6 +3,9 @@ syntax = "proto3";
 package flyteidl.admin;
 option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
 
+
+import "flyteidl/admin/common.proto";
+
 // Namespace within a project commonly used to differentiate between different service instances.
 // e.g. "production", "development", etc.
 message Domain {
@@ -22,6 +25,10 @@ message Project {
     repeated Domain domains = 3;
 
     string description      = 4;
+
+    // Leverage Labels from flyteidel.admin.common.proto to
+    // tag projects with ownership information.
+    Labels labels = 5;
 }
 
 message Projects {

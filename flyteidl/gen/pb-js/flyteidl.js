@@ -25306,6 +25306,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {string|null} [name] Project name
              * @property {Array.<flyteidl.admin.IDomain>|null} [domains] Project domains
              * @property {string|null} [description] Project description
+             * @property {flyteidl.admin.ILabels|null} [labels] Project labels
              */
 
             /**
@@ -25357,6 +25358,14 @@ export const flyteidl = $root.flyteidl = (() => {
             Project.prototype.description = "";
 
             /**
+             * Project labels.
+             * @member {flyteidl.admin.ILabels|null|undefined} labels
+             * @memberof flyteidl.admin.Project
+             * @instance
+             */
+            Project.prototype.labels = null;
+
+            /**
              * Creates a new Project instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.Project
@@ -25389,6 +25398,8 @@ export const flyteidl = $root.flyteidl = (() => {
                         $root.flyteidl.admin.Domain.encode(message.domains[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                 if (message.description != null && message.hasOwnProperty("description"))
                     writer.uint32(/* id 4, wireType 2 =*/34).string(message.description);
+                if (message.labels != null && message.hasOwnProperty("labels"))
+                    $root.flyteidl.admin.Labels.encode(message.labels, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                 return writer;
             };
 
@@ -25423,6 +25434,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 4:
                         message.description = reader.string();
+                        break;
+                    case 5:
+                        message.labels = $root.flyteidl.admin.Labels.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -25461,6 +25475,11 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.description != null && message.hasOwnProperty("description"))
                     if (!$util.isString(message.description))
                         return "description: string expected";
+                if (message.labels != null && message.hasOwnProperty("labels")) {
+                    let error = $root.flyteidl.admin.Labels.verify(message.labels);
+                    if (error)
+                        return "labels." + error;
+                }
                 return null;
             };
 
