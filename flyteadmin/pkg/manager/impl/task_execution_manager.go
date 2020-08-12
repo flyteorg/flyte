@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/lyft/flytestdlib/storage"
+
 	"github.com/lyft/flytestdlib/contextutils"
 
 	"github.com/lyft/flytestdlib/promutils"
@@ -20,6 +22,7 @@ import (
 	repoInterfaces "github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
+	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/logger"
@@ -35,12 +38,16 @@ type taskExecutionMetrics struct {
 	MissingTaskExecution       prometheus.Counter
 	MissingTaskDefinition      prometheus.Counter
 	ClosureSizeBytes           prometheus.Summary
+	TaskExecutionInputBytes    prometheus.Summary
+	TaskExecutionOutputBytes   prometheus.Summary
 }
 
 type TaskExecutionManager struct {
-	db      repositories.RepositoryInterface
-	metrics taskExecutionMetrics
-	urlData dataInterfaces.RemoteURLInterface
+	db            repositories.RepositoryInterface
+	config        runtimeInterfaces.Configuration
+	storageClient *storage.DataStore
+	metrics       taskExecutionMetrics
+	urlData       dataInterfaces.RemoteURLInterface
 }
 
 func getTaskExecutionContext(ctx context.Context, identifier *core.TaskExecutionIdentifier) context.Context {
@@ -275,14 +282,36 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 			return nil, err
 		}
 	}
-	return &admin.TaskExecutionGetDataResponse{
+	response := &admin.TaskExecutionGetDataResponse{
 		Inputs:  &signedInputsURLBlob,
 		Outputs: &signedOutputsURLBlob,
-	}, nil
+	}
+	maxDataSize := m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes
+	if maxDataSize == 0 || signedInputsURLBlob.Bytes < maxDataSize {
+		var fullInputs core.LiteralMap
+		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(taskExecution.InputUri), &fullInputs)
+		if err != nil {
+			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", taskExecution.InputUri, err)
+		}
+		response.FullInputs = &fullInputs
+	}
+	if maxDataSize == 0 || (signedOutputsURLBlob.Bytes < maxDataSize && len(taskExecution.Closure.GetOutputUri()) > 0) {
+		var fullOutputs core.LiteralMap
+		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(taskExecution.Closure.GetOutputUri()), &fullOutputs)
+		if err != nil {
+			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v",
+				taskExecution.Closure.GetOutputUri(), err)
+		}
+		response.FullOutputs = &fullOutputs
+	}
+
+	m.metrics.TaskExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
+	m.metrics.TaskExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+	return response, nil
 }
 
 func NewTaskExecutionManager(
-	db repositories.RepositoryInterface,
+	db repositories.RepositoryInterface, config runtimeInterfaces.Configuration, storageClient *storage.DataStore,
 	scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface) interfaces.TaskExecutionInterface {
 	metrics := taskExecutionMetrics{
 		Scope: scope,
@@ -300,10 +329,16 @@ func NewTaskExecutionManager(
 			"overall count of task execution events received that are missing a task definition"),
 		ClosureSizeBytes: scope.MustNewSummary("closure_size_bytes",
 			"size in bytes of serialized task execution closure"),
+		TaskExecutionInputBytes: scope.MustNewSummary("input_size_bytes",
+			"size in bytes of serialized node execution inputs"),
+		TaskExecutionOutputBytes: scope.MustNewSummary("output_size_bytes",
+			"size in bytes of serialized node execution outputs"),
 	}
 	return &TaskExecutionManager{
-		db:      db,
-		metrics: metrics,
-		urlData: urlData,
+		db:            db,
+		config:        config,
+		storageClient: storageClient,
+		metrics:       metrics,
+		urlData:       urlData,
 	}
 }

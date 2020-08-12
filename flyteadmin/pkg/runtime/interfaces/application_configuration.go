@@ -110,6 +110,8 @@ type RemoteDataConfig struct {
 	// Some cloud providers require a region to be set.
 	Region    string    `json:"region"`
 	SignedURL SignedURL `json:"signedUrls"`
+	// Specifies the max size in bytes for which execution data such as inputs and outputs will be populated in line.
+	MaxSizeInBytes int64 `json:"maxSizeInBytes"`
 }
 
 // This section handles configuration for the workflow notifications pipeline.

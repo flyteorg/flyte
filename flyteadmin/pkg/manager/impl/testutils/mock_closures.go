@@ -48,3 +48,20 @@ func GetWorkflowClosureBytes() []byte {
 	var workflowClosureBytes, _ = proto.Marshal(GetWorkflowClosure())
 	return workflowClosureBytes
 }
+
+func MakeStringLiteral(value string) *core.Literal {
+	p := &core.Primitive{
+		Value: &core.Primitive_StringValue{
+			StringValue: value,
+		},
+	}
+	return &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Primitive{
+					Primitive: p,
+				},
+			},
+		},
+	}
+}

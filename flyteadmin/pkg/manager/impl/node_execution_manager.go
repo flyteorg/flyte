@@ -4,6 +4,8 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/lyft/flytestdlib/storage"
+
 	"github.com/lyft/flytestdlib/contextutils"
 
 	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
@@ -25,6 +27,7 @@ import (
 	repoInterfaces "github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
+	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"google.golang.org/grpc/codes"
@@ -38,12 +41,16 @@ type nodeExecutionMetrics struct {
 	NodeExecutionEventsCreated prometheus.Counter
 	MissingWorkflowExecution   prometheus.Counter
 	ClosureSizeBytes           prometheus.Summary
+	NodeExecutionInputBytes    prometheus.Summary
+	NodeExecutionOutputBytes   prometheus.Summary
 }
 
 type NodeExecutionManager struct {
-	db      repositories.RepositoryInterface
-	metrics nodeExecutionMetrics
-	urlData dataInterfaces.RemoteURLInterface
+	db            repositories.RepositoryInterface
+	config        runtimeInterfaces.Configuration
+	storageClient *storage.DataStore
+	metrics       nodeExecutionMetrics
+	urlData       dataInterfaces.RemoteURLInterface
 }
 
 type updateNodeExecutionStatus int
@@ -391,15 +398,38 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 			return nil, err
 		}
 	}
-	return &admin.NodeExecutionGetDataResponse{
+	response := &admin.NodeExecutionGetDataResponse{
 		Inputs:  &signedInputsURLBlob,
 		Outputs: &signedOutputsURLBlob,
-	}, nil
+	}
+	maxDataSize := m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes
+	if maxDataSize == 0 || signedInputsURLBlob.Bytes < maxDataSize {
+		var fullInputs core.LiteralMap
+		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecution.InputUri), &fullInputs)
+		if err != nil {
+			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", nodeExecution.InputUri, err)
+		}
+		response.FullInputs = &fullInputs
+	}
+	if maxDataSize == 0 || (signedOutputsURLBlob.Bytes < maxDataSize && len(nodeExecution.Closure.GetOutputUri()) > 0) {
+		var fullOutputs core.LiteralMap
+		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecution.Closure.GetOutputUri()), &fullOutputs)
+		if err != nil {
+			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v",
+				nodeExecution.Closure.GetOutputUri(), err)
+		}
+		response.FullOutputs = &fullOutputs
+	}
+
+	m.metrics.NodeExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
+	m.metrics.NodeExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+
+	return response, nil
 }
 
 func NewNodeExecutionManager(
-	db repositories.RepositoryInterface, scope promutils.Scope,
-	urlData dataInterfaces.RemoteURLInterface) interfaces.NodeExecutionInterface {
+	db repositories.RepositoryInterface, config runtimeInterfaces.Configuration, storageClient *storage.DataStore,
+	scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface) interfaces.NodeExecutionInterface {
 	metrics := nodeExecutionMetrics{
 		Scope: scope,
 		ActiveNodeExecutions: scope.MustNewGauge("active_node_executions",
@@ -414,10 +444,16 @@ func NewNodeExecutionManager(
 			"overall count of node execution events received that are missing a parent workflow execution"),
 		ClosureSizeBytes: scope.MustNewSummary("closure_size_bytes",
 			"size in bytes of serialized node execution closure"),
+		NodeExecutionInputBytes: scope.MustNewSummary("input_size_bytes",
+			"size in bytes of serialized node execution inputs"),
+		NodeExecutionOutputBytes: scope.MustNewSummary("output_size_bytes",
+			"size in bytes of serialized node execution outputs"),
 	}
 	return &NodeExecutionManager{
-		db:      db,
-		metrics: metrics,
-		urlData: urlData,
+		db:            db,
+		config:        config,
+		storageClient: storageClient,
+		metrics:       metrics,
+		urlData:       urlData,
 	}
 }
