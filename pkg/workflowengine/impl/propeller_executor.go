@@ -122,6 +122,12 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
 	flyteWf.Annotations = annotations
 
+	if input.Reference.Spec.RawOutputDataConfig != nil {
+		flyteWf.RawOutputDataConfig = v1alpha1.RawOutputDataConfig{
+			RawOutputDataConfig: input.Reference.Spec.RawOutputDataConfig,
+		}
+	}
+
 	/*
 		TODO(katrogan): uncomment once propeller has updated the flyte workflow CRD.
 		queueingBudgetSeconds := int64(input.QueueingBudget.Seconds())
