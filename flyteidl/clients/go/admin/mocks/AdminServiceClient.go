@@ -1985,6 +1985,54 @@ func (_m *AdminServiceClient) UpdateNamedEntity(ctx context.Context, in *admin.N
 	return r0, r1
 }
 
+type AdminServiceClient_UpdateProject struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_UpdateProject) Return(_a0 *admin.ProjectUpdateResponse, _a1 error) *AdminServiceClient_UpdateProject {
+	return &AdminServiceClient_UpdateProject{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnUpdateProject(ctx context.Context, in *admin.Project, opts ...grpc.CallOption) *AdminServiceClient_UpdateProject {
+	c := _m.On("UpdateProject", ctx, in, opts)
+	return &AdminServiceClient_UpdateProject{Call: c}
+}
+
+func (_m *AdminServiceClient) OnUpdateProjectMatch(matchers ...interface{}) *AdminServiceClient_UpdateProject {
+	c := _m.On("UpdateProject", matchers...)
+	return &AdminServiceClient_UpdateProject{Call: c}
+}
+
+// UpdateProject provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) UpdateProject(ctx context.Context, in *admin.Project, opts ...grpc.CallOption) (*admin.ProjectUpdateResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ProjectUpdateResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.Project, ...grpc.CallOption) *admin.ProjectUpdateResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ProjectUpdateResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.Project, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_UpdateProjectDomainAttributes struct {
 	*mock.Call
 }

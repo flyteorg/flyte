@@ -42,7 +42,7 @@ struct TableStruct_flyteidl_2fadmin_2fproject_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[6]
+  static const ::google::protobuf::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -66,6 +66,9 @@ extern ProjectRegisterRequestDefaultTypeInternal _ProjectRegisterRequest_default
 class ProjectRegisterResponse;
 class ProjectRegisterResponseDefaultTypeInternal;
 extern ProjectRegisterResponseDefaultTypeInternal _ProjectRegisterResponse_default_instance_;
+class ProjectUpdateResponse;
+class ProjectUpdateResponseDefaultTypeInternal;
+extern ProjectUpdateResponseDefaultTypeInternal _ProjectUpdateResponse_default_instance_;
 class Projects;
 class ProjectsDefaultTypeInternal;
 extern ProjectsDefaultTypeInternal _Projects_default_instance_;
@@ -78,6 +81,7 @@ template<> ::flyteidl::admin::Project* Arena::CreateMaybeMessage<::flyteidl::adm
 template<> ::flyteidl::admin::ProjectListRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectListRequest>(Arena*);
 template<> ::flyteidl::admin::ProjectRegisterRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectRegisterRequest>(Arena*);
 template<> ::flyteidl::admin::ProjectRegisterResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectRegisterResponse>(Arena*);
+template<> ::flyteidl::admin::ProjectUpdateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectUpdateResponse>(Arena*);
 template<> ::flyteidl::admin::Projects* Arena::CreateMaybeMessage<::flyteidl::admin::Projects>(Arena*);
 }  // namespace protobuf
 }  // namespace google
@@ -835,6 +839,111 @@ class ProjectRegisterResponse final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_2eproto;
 };
+// -------------------------------------------------------------------
+
+class ProjectUpdateResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ProjectUpdateResponse) */ {
+ public:
+  ProjectUpdateResponse();
+  virtual ~ProjectUpdateResponse();
+
+  ProjectUpdateResponse(const ProjectUpdateResponse& from);
+
+  inline ProjectUpdateResponse& operator=(const ProjectUpdateResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ProjectUpdateResponse(ProjectUpdateResponse&& from) noexcept
+    : ProjectUpdateResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline ProjectUpdateResponse& operator=(ProjectUpdateResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ProjectUpdateResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ProjectUpdateResponse* internal_default_instance() {
+    return reinterpret_cast<const ProjectUpdateResponse*>(
+               &_ProjectUpdateResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(ProjectUpdateResponse* other);
+  friend void swap(ProjectUpdateResponse& a, ProjectUpdateResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ProjectUpdateResponse* New() const final {
+    return CreateMaybeMessage<ProjectUpdateResponse>(nullptr);
+  }
+
+  ProjectUpdateResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ProjectUpdateResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ProjectUpdateResponse& from);
+  void MergeFrom(const ProjectUpdateResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ProjectUpdateResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectUpdateResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fproject_2eproto;
+};
 // ===================================================================
 
 
@@ -1287,9 +1396,15 @@ inline void ProjectRegisterRequest::set_allocated_project(::flyteidl::admin::Pro
 
 // ProjectRegisterResponse
 
+// -------------------------------------------------------------------
+
+// ProjectUpdateResponse
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

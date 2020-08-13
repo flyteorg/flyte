@@ -1667,6 +1667,40 @@
         ]
       }
     },
+    "/api/v1/projects/{id}": {
+      "put": {
+        "summary": "flyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
+        "description": "Update a project.",
+        "operationId": "UpdateProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProject"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
         "description": "Retrieve an existing task execution.",
@@ -3858,6 +3892,9 @@
       }
     },
     "adminProjectRegisterResponse": {
+      "type": "object"
+    },
+    "adminProjectUpdateResponse": {
       "type": "object"
     },
     "adminProjects": {
