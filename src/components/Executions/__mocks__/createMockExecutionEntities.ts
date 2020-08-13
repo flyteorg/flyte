@@ -35,11 +35,14 @@ export function createMockExecutionEntities({
     compiledWorkflow.tasks = tasks.concat(cloneDeep(mockTasks));
     workflow.closure = workflowClosure;
 
+    const workflowExecution = { ...mockWorkflowExecution };
+    workflowExecution.closure.workflowId = workflow.id;
+
     return {
         nodes,
         nodeExecutions,
         tasks,
         workflow,
-        workflowExecution: mockWorkflowExecution
+        workflowExecution
     };
 }

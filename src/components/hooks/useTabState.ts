@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 export function useTabState(
-    tabs: { [k: string]: string },
+    tabs: { [k: string]: string | object },
     defaultValue: string
 ) {
     const [value, setValue] = useState(defaultValue);

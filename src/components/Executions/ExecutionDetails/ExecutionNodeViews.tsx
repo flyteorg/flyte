@@ -10,6 +10,7 @@ import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
 import { NodeExecutionsTable } from '../Tables/NodeExecutionsTable';
 import { useWorkflowExecutionState } from '../useWorkflowExecutionState';
+import { tabs } from './constants';
 import { ExecutionWorkflowGraph } from './ExecutionWorkflowGraph';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -29,14 +30,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-interface ExecutionNodeViewsProps {
+export interface ExecutionNodeViewsProps {
     execution: Execution;
 }
-
-const tabIds = {
-    nodes: 'nodes',
-    graph: 'graph'
-};
 
 /** Contains the available ways to visualize the nodes of a WorkflowExecution */
 export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
@@ -44,22 +40,28 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
 }) => {
     const styles = useStyles();
     const filterState = useNodeExecutionFiltersState();
-    const tabState = useTabState(tabIds, tabIds.nodes);
+    const tabState = useTabState(tabs, tabs.nodes.id);
+
+    /* We want to maintain the filter selection when switching away from the Nodes
+    tab and back, but do not want to filter the nodes when viewing the graph. So,
+    we will only pass filters to the execution state when on the nodes tab. */
+    const appliedFilters =
+        tabState.value === tabs.nodes.id ? filterState.appliedFilters : [];
 
     const {
         workflow,
         nodeExecutions,
         nodeExecutionsRequestConfig
-    } = useWorkflowExecutionState(execution, filterState.appliedFilters);
+    } = useWorkflowExecutionState(execution, appliedFilters);
 
     return (
         <WaitForData {...workflow}>
             <Tabs className={styles.tabs} {...tabState}>
-                <Tab value={tabIds.nodes} label="Nodes" />
-                <Tab value={tabIds.graph} label="Graph" />
+                <Tab value={tabs.nodes.id} label={tabs.nodes.label} />
+                <Tab value={tabs.graph.id} label={tabs.graph.label} />
             </Tabs>
             <div className={styles.nodesContainer}>
-                {tabState.value === tabIds.nodes && (
+                {tabState.value === tabs.nodes.id && (
                     <>
                         <div className={styles.filters}>
                             <ExecutionFilters {...filterState} />
@@ -76,7 +78,7 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
                         </WaitForData>
                     </>
                 )}
-                {tabState.value === tabIds.graph && (
+                {tabState.value === tabs.graph.id && (
                     <WaitForData {...nodeExecutions}>
                         <ExecutionWorkflowGraph
                             nodeExecutions={nodeExecutions.value}

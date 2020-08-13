@@ -1,5 +1,6 @@
 import { compact, flatMap } from 'lodash';
 import { FilterOperation } from 'models';
+import { filterLabels } from './constants';
 import { durationFilters } from './durationFilters';
 import {
     nodeExecutionStartTimeFilters,
@@ -40,26 +41,26 @@ export function useWorkflowExecutionFiltersState() {
             options: workflowExecutionStatusFilters,
             defaultValue: [],
             filterKey: 'phase',
-            label: 'Status',
+            label: filterLabels.status,
             listHeader: 'Filter By',
             queryStateKey: 'status'
         }),
         useSearchFilterState({
             filterKey: 'workflow.version',
-            label: 'Version',
+            label: filterLabels.version,
             placeholder: 'Enter Version String',
             queryStateKey: 'version'
         }),
         useSingleFilterState({
             options: workflowExecutionStartTimeFilters,
             defaultValue: workflowExecutionStartTimeFilters.all,
-            label: 'Start Time',
+            label: filterLabels.startTime,
             queryStateKey: 'startTime'
         }),
         useSingleFilterState({
             options: durationFilters,
             defaultValue: durationFilters.all,
-            label: 'Duration',
+            label: filterLabels.duration,
             queryStateKey: 'duration'
         })
     ]);
@@ -71,20 +72,20 @@ export function useNodeExecutionFiltersState() {
             options: nodeExecutionStatusFilters,
             defaultValue: [],
             filterKey: 'phase',
-            label: 'Status',
+            label: filterLabels.status,
             listHeader: 'Filter By',
             queryStateKey: 'status'
         }),
         useSingleFilterState({
             options: nodeExecutionStartTimeFilters,
             defaultValue: nodeExecutionStartTimeFilters.all,
-            label: 'Start Time',
+            label: filterLabels.startTime,
             queryStateKey: 'startTime'
         }),
         useSingleFilterState({
             options: durationFilters,
             defaultValue: durationFilters.all,
-            label: 'Duration',
+            label: filterLabels.duration,
             queryStateKey: 'duration'
         })
     ]);
