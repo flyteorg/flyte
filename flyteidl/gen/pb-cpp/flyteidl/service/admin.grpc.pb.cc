@@ -46,6 +46,7 @@ static const char* AdminService_method_names[] = {
   "/flyteidl.service.AdminService/ListNodeExecutionsForTask",
   "/flyteidl.service.AdminService/GetNodeExecutionData",
   "/flyteidl.service.AdminService/RegisterProject",
+  "/flyteidl.service.AdminService/UpdateProject",
   "/flyteidl.service.AdminService/ListProjects",
   "/flyteidl.service.AdminService/CreateWorkflowEvent",
   "/flyteidl.service.AdminService/CreateNodeEvent",
@@ -98,23 +99,24 @@ AdminService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chann
   , rpcmethod_ListNodeExecutionsForTask_(AdminService_method_names[23], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetNodeExecutionData_(AdminService_method_names[24], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_RegisterProject_(AdminService_method_names[25], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListProjects_(AdminService_method_names[26], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_CreateWorkflowEvent_(AdminService_method_names[27], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_CreateNodeEvent_(AdminService_method_names[28], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_CreateTaskEvent_(AdminService_method_names[29], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetTaskExecution_(AdminService_method_names[30], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListTaskExecutions_(AdminService_method_names[31], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetTaskExecutionData_(AdminService_method_names[32], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_UpdateProjectDomainAttributes_(AdminService_method_names[33], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetProjectDomainAttributes_(AdminService_method_names[34], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_DeleteProjectDomainAttributes_(AdminService_method_names[35], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_UpdateWorkflowAttributes_(AdminService_method_names[36], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetWorkflowAttributes_(AdminService_method_names[37], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_DeleteWorkflowAttributes_(AdminService_method_names[38], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListMatchableAttributes_(AdminService_method_names[39], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListNamedEntities_(AdminService_method_names[40], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetNamedEntity_(AdminService_method_names[41], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_UpdateNamedEntity_(AdminService_method_names[42], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateProject_(AdminService_method_names[26], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListProjects_(AdminService_method_names[27], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_CreateWorkflowEvent_(AdminService_method_names[28], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_CreateNodeEvent_(AdminService_method_names[29], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_CreateTaskEvent_(AdminService_method_names[30], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetTaskExecution_(AdminService_method_names[31], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListTaskExecutions_(AdminService_method_names[32], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetTaskExecutionData_(AdminService_method_names[33], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateProjectDomainAttributes_(AdminService_method_names[34], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetProjectDomainAttributes_(AdminService_method_names[35], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_DeleteProjectDomainAttributes_(AdminService_method_names[36], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateWorkflowAttributes_(AdminService_method_names[37], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetWorkflowAttributes_(AdminService_method_names[38], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_DeleteWorkflowAttributes_(AdminService_method_names[39], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListMatchableAttributes_(AdminService_method_names[40], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListNamedEntities_(AdminService_method_names[41], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetNamedEntity_(AdminService_method_names[42], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateNamedEntity_(AdminService_method_names[43], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status AdminService::Stub::CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::flyteidl::admin::TaskCreateResponse* response) {
@@ -845,6 +847,34 @@ void AdminService::Stub::experimental_async::RegisterProject(::grpc::ClientConte
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectRegisterResponse>::Create(channel_.get(), cq, rpcmethod_RegisterProject_, context, request, false);
 }
 
+::grpc::Status AdminService::Stub::UpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project& request, ::flyteidl::admin::ProjectUpdateResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_UpdateProject_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::UpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::ProjectUpdateResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_UpdateProject_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::UpdateProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectUpdateResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_UpdateProject_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::UpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::ProjectUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_UpdateProject_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::UpdateProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_UpdateProject_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectUpdateResponse>* AdminService::Stub::AsyncUpdateProjectRaw(::grpc::ClientContext* context, const ::flyteidl::admin::Project& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateProject_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ProjectUpdateResponse>* AdminService::Stub::PrepareAsyncUpdateProjectRaw(::grpc::ClientContext* context, const ::flyteidl::admin::Project& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateProject_, context, request, false);
+}
+
 ::grpc::Status AdminService::Stub::ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest& request, ::flyteidl::admin::Projects* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_ListProjects_, context, request, response);
 }
@@ -1455,85 +1485,90 @@ AdminService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[26],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::Project, ::flyteidl::admin::ProjectUpdateResponse>(
+          std::mem_fn(&AdminService::Service::UpdateProject), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[27],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectListRequest, ::flyteidl::admin::Projects>(
           std::mem_fn(&AdminService::Service::ListProjects), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[27],
+      AdminService_method_names[28],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::WorkflowExecutionEventRequest, ::flyteidl::admin::WorkflowExecutionEventResponse>(
           std::mem_fn(&AdminService::Service::CreateWorkflowEvent), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[28],
+      AdminService_method_names[29],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NodeExecutionEventRequest, ::flyteidl::admin::NodeExecutionEventResponse>(
           std::mem_fn(&AdminService::Service::CreateNodeEvent), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[29],
+      AdminService_method_names[30],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::TaskExecutionEventRequest, ::flyteidl::admin::TaskExecutionEventResponse>(
           std::mem_fn(&AdminService::Service::CreateTaskEvent), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[30],
+      AdminService_method_names[31],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::TaskExecutionGetRequest, ::flyteidl::admin::TaskExecution>(
           std::mem_fn(&AdminService::Service::GetTaskExecution), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[31],
+      AdminService_method_names[32],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::TaskExecutionListRequest, ::flyteidl::admin::TaskExecutionList>(
           std::mem_fn(&AdminService::Service::ListTaskExecutions), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[32],
+      AdminService_method_names[33],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::TaskExecutionGetDataRequest, ::flyteidl::admin::TaskExecutionGetDataResponse>(
           std::mem_fn(&AdminService::Service::GetTaskExecutionData), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[33],
+      AdminService_method_names[34],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectDomainAttributesUpdateRequest, ::flyteidl::admin::ProjectDomainAttributesUpdateResponse>(
           std::mem_fn(&AdminService::Service::UpdateProjectDomainAttributes), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[34],
+      AdminService_method_names[35],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectDomainAttributesGetRequest, ::flyteidl::admin::ProjectDomainAttributesGetResponse>(
           std::mem_fn(&AdminService::Service::GetProjectDomainAttributes), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[35],
+      AdminService_method_names[36],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectDomainAttributesDeleteRequest, ::flyteidl::admin::ProjectDomainAttributesDeleteResponse>(
           std::mem_fn(&AdminService::Service::DeleteProjectDomainAttributes), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[36],
+      AdminService_method_names[37],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::WorkflowAttributesUpdateRequest, ::flyteidl::admin::WorkflowAttributesUpdateResponse>(
           std::mem_fn(&AdminService::Service::UpdateWorkflowAttributes), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[37],
+      AdminService_method_names[38],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::WorkflowAttributesGetRequest, ::flyteidl::admin::WorkflowAttributesGetResponse>(
           std::mem_fn(&AdminService::Service::GetWorkflowAttributes), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[38],
+      AdminService_method_names[39],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::WorkflowAttributesDeleteRequest, ::flyteidl::admin::WorkflowAttributesDeleteResponse>(
           std::mem_fn(&AdminService::Service::DeleteWorkflowAttributes), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[39],
+      AdminService_method_names[40],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ListMatchableAttributesRequest, ::flyteidl::admin::ListMatchableAttributesResponse>(
           std::mem_fn(&AdminService::Service::ListMatchableAttributes), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[40],
+      AdminService_method_names[41],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityListRequest, ::flyteidl::admin::NamedEntityList>(
           std::mem_fn(&AdminService::Service::ListNamedEntities), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[41],
+      AdminService_method_names[42],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityGetRequest, ::flyteidl::admin::NamedEntity>(
           std::mem_fn(&AdminService::Service::GetNamedEntity), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[42],
+      AdminService_method_names[43],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityUpdateRequest, ::flyteidl::admin::NamedEntityUpdateResponse>(
           std::mem_fn(&AdminService::Service::UpdateNamedEntity), this)));
@@ -1718,6 +1753,13 @@ AdminService::Service::~Service() {
 }
 
 ::grpc::Status AdminService::Service::RegisterProject(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::UpdateProject(::grpc::ServerContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::ProjectUpdateResponse* response) {
   (void) context;
   (void) request;
   (void) response;

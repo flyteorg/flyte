@@ -153,3 +153,18 @@ flyteidl.admin.ProjectRegisterResponse
 
 
 
+
+.. _api_msg_flyteidl.admin.ProjectUpdateResponse:
+
+flyteidl.admin.ProjectUpdateResponse
+------------------------------------
+
+`[flyteidl.admin.ProjectUpdateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L47>`_
+
+
+.. code-block:: json
+
+  {}
+
+
+

@@ -156,6 +156,11 @@ class AdminServiceStub(object):
         request_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectRegisterRequest.SerializeToString,
         response_deserializer=flyteidl_dot_admin_dot_project__pb2.ProjectRegisterResponse.FromString,
         )
+    self.UpdateProject = channel.unary_unary(
+        '/flyteidl.service.AdminService/UpdateProject',
+        request_serializer=flyteidl_dot_admin_dot_project__pb2.Project.SerializeToString,
+        response_deserializer=flyteidl_dot_admin_dot_project__pb2.ProjectUpdateResponse.FromString,
+        )
     self.ListProjects = channel.unary_unary(
         '/flyteidl.service.AdminService/ListProjects',
         request_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectListRequest.SerializeToString,
@@ -430,6 +435,14 @@ class AdminServiceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def UpdateProject(self, request, context):
+    """flyteidl.admin.Project should be passed but the domains property should be empty;
+    it will be ignored in the handler as domains cannot be updated via this API.
+    """
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
   def ListProjects(self, request, context):
     # missing associated documentation comment in .proto file
     pass
@@ -681,6 +694,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
           servicer.RegisterProject,
           request_deserializer=flyteidl_dot_admin_dot_project__pb2.ProjectRegisterRequest.FromString,
           response_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectRegisterResponse.SerializeToString,
+      ),
+      'UpdateProject': grpc.unary_unary_rpc_method_handler(
+          servicer.UpdateProject,
+          request_deserializer=flyteidl_dot_admin_dot_project__pb2.Project.FromString,
+          response_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectUpdateResponse.SerializeToString,
       ),
       'ListProjects': grpc.unary_unary_rpc_method_handler(
           servicer.ListProjects,
