@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](http://github.com/lyft/flyteconsole/compare/v0.8.0...v0.8.1) (2020-08-13)
+
+
+### Bug Fixes
+
+* only use NE filter for Nodes tab ([#88](http://github.com/lyft/flyteconsole/issues/88)) ([f4ba80b](http://github.com/lyft/flyteconsole/commit/f4ba80b0498a0b37dc73ed3c3c8e72844101dcb5))
+
 # [0.8.0](http://github.com/lyft/flyteconsole/compare/v0.7.3...v0.8.0) (2020-07-20)
 
 
