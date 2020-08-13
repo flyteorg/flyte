@@ -113,6 +113,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**terminate_execution**](docs/AdminServiceApi.md#terminate_execution) | **DELETE** /api/v1/executions/{id.project}/{id.domain}/{id.name} | 
 *AdminServiceApi* | [**update_launch_plan**](docs/AdminServiceApi.md#update_launch_plan) | **PUT** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | 
 *AdminServiceApi* | [**update_named_entity**](docs/AdminServiceApi.md#update_named_entity) | **PUT** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | 
+*AdminServiceApi* | [**update_project**](docs/AdminServiceApi.md#update_project) | **PUT** /api/v1/projects/{id} | flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
 *AdminServiceApi* | [**update_project_domain_attributes**](docs/AdminServiceApi.md#update_project_domain_attributes) | **PUT** /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain} | 
 *AdminServiceApi* | [**update_workflow_attributes**](docs/AdminServiceApi.md#update_workflow_attributes) | **PUT** /api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow} | 
 
@@ -182,6 +183,7 @@ Class | Method | HTTP request | Description
  - [AdminProjectDomainAttributesUpdateResponse](docs/AdminProjectDomainAttributesUpdateResponse.md)
  - [AdminProjectRegisterRequest](docs/AdminProjectRegisterRequest.md)
  - [AdminProjectRegisterResponse](docs/AdminProjectRegisterResponse.md)
+ - [AdminProjectUpdateResponse](docs/AdminProjectUpdateResponse.md)
  - [AdminProjects](docs/AdminProjects.md)
  - [AdminRawOutputDataConfig](docs/AdminRawOutputDataConfig.md)
  - [AdminSchedule](docs/AdminSchedule.md)

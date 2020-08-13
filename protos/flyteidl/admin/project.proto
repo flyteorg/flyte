@@ -44,3 +44,6 @@ message ProjectRegisterRequest {
 
 message ProjectRegisterResponse {
 }
+
+message ProjectUpdateResponse {
+}

@@ -10838,6 +10838,52 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a ProjectUpdateResponse. */
+        interface IProjectUpdateResponse {
+        }
+
+        /** Represents a ProjectUpdateResponse. */
+        class ProjectUpdateResponse implements IProjectUpdateResponse {
+
+            /**
+             * Constructs a new ProjectUpdateResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectUpdateResponse);
+
+            /**
+             * Creates a new ProjectUpdateResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectUpdateResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectUpdateResponse): flyteidl.admin.ProjectUpdateResponse;
+
+            /**
+             * Encodes the specified ProjectUpdateResponse message. Does not implicitly {@link flyteidl.admin.ProjectUpdateResponse.verify|verify} messages.
+             * @param message ProjectUpdateResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectUpdateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectUpdateResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectUpdateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectUpdateResponse;
+
+            /**
+             * Verifies a ProjectUpdateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a ProjectDomainAttributes. */
         interface IProjectDomainAttributes {
 
@@ -13168,6 +13214,20 @@ export namespace flyteidl {
             public registerProject(request: flyteidl.admin.IProjectRegisterRequest): Promise<flyteidl.admin.ProjectRegisterResponse>;
 
             /**
+             * Calls UpdateProject.
+             * @param request Project message or plain object
+             * @param callback Node-style callback called with the error, if any, and ProjectUpdateResponse
+             */
+            public updateProject(request: flyteidl.admin.IProject, callback: flyteidl.service.AdminService.UpdateProjectCallback): void;
+
+            /**
+             * Calls UpdateProject.
+             * @param request Project message or plain object
+             * @returns Promise
+             */
+            public updateProject(request: flyteidl.admin.IProject): Promise<flyteidl.admin.ProjectUpdateResponse>;
+
+            /**
              * Calls ListProjects.
              * @param request ProjectListRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and Projects
@@ -13589,6 +13649,13 @@ export namespace flyteidl {
              * @param [response] ProjectRegisterResponse
              */
             type RegisterProjectCallback = (error: (Error|null), response?: flyteidl.admin.ProjectRegisterResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#updateProject}.
+             * @param error Error, if any
+             * @param [response] ProjectUpdateResponse
+             */
+            type UpdateProjectCallback = (error: (Error|null), response?: flyteidl.admin.ProjectUpdateResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listProjects}.
