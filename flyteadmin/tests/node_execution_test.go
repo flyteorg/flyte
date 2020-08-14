@@ -347,7 +347,7 @@ func TestListNodeExecutionWithParent(t *testing.T) {
 	assert.Len(t, response.NodeExecutions, 2)
 	nodeExecutionResponse = response.NodeExecutions[0]
 	assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
-		NodeId:      "child",
+		NodeId:      "child2",
 		ExecutionId: nodeExecutionId.ExecutionId,
 	}, nodeExecutionResponse.Id))
 	assert.Equal(t, core.NodeExecution_RUNNING, nodeExecutionResponse.Closure.Phase)
@@ -356,7 +356,7 @@ func TestListNodeExecutionWithParent(t *testing.T) {
 
 	nodeExecutionResponse = response.NodeExecutions[1]
 	assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
-		NodeId:      "child2",
+		NodeId:      "child",
 		ExecutionId: nodeExecutionId.ExecutionId,
 	}, nodeExecutionResponse.Id))
 	assert.Equal(t, core.NodeExecution_RUNNING, nodeExecutionResponse.Closure.Phase)
