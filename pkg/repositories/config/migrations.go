@@ -233,9 +233,17 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Model(&models.NodeExecution{}).DropColumn("cache_status").Error
 		},
 	},
-
 	{
 		ID: "2020-07-31-node-execution",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.NodeExecution{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Model(&models.NodeExecution{}).DropColumn("parent_id").DropColumn("node_execution_metadata").Error
+		},
+	},
+	{
+		ID: "2020-08-13-node-execution",
 		Migrate: func(tx *gorm.DB) error {
 			return tx.AutoMigrate(&models.NodeExecution{}).Error
 		},
