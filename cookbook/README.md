@@ -10,17 +10,17 @@ Note this currently does not include articles/tid-bits on how to use the Flyte p
 1. [Create a workflow from Tasks](recipes/workflows)
 1. [Launch Plans](recipes/launchplans)
 1. [Multiple Schedules for a Workflow](recipes/multi_schedules)
-1. [Executing pre-created tasks & workflows](recipes/fetch)
+1. [Executing pre-created tasks & workflows](recipes/interaction)
 1. [Interact with Past Workflow / Task Executions](recipes/interaction)
 1. [Working with Types](recipes/types)
 1. [Composing a Workflow from shared tasks and workflows](recipes/shared)
 1. [Map/Array Tasks](recipes/map_tasks)
 1. [Compose a Workflow from other workflows](recipes/compose)
 1. [Dynamically Generate a Workflow at Runtime](recipes/dynamic_wfs)
-1. [(WIP)Dynamic Tasks](recipes/dynamictasks)
+1. [Dynamic Tasks](recipes/dynamictasks)
 1. [Tasks without flytekit or Using arbitrary containers](recipes/rawcontainers)
-1. [(WIP)Using Papermill & Jupyter notebook to author tasks](recipes/papermill)
-1. [(WIP)Different container per task](recipes/differentcontainers) 
+1. [Jupyter notebook as a task](recipes/notebook_tasks)
+1. [Different container per task](recipes/differentcontainers) 
 
 Each example is organized into a separate folder at this layer, and each has the Readme file linked to in the Contents, as well as supporting .py and .ipynb files, some of which contain information in a lot more depth.
 
