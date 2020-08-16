@@ -1,19 +1,17 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+import os
 
-from flytekit.sdk.types import Types
-from flytekit.sdk.tasks import inputs, outputs
-
-from flytekit.sdk.workflow import workflow_class, Input
 from flytekit.contrib.notebook.tasks import spark_notebook
-from flytekit.models.task import  Container, Resources
+from flytekit.sdk.tasks import inputs, outputs
+from flytekit.sdk.types import Types
+from flytekit.sdk.workflow import workflow_class, Input
 
 
-interactive_spark = spark_notebook(notebook_path="./notebook-task-examples/spark-notebook.ipynb",
-                                          inputs=inputs(partitions=Types.Integer),
-                                          outputs=outputs(pi=Types.Float),
-                                        )
+interactive_spark = spark_notebook(
+    notebook_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), "spark-notebook.ipynb"),
+    inputs=inputs(partitions=Types.Integer),
+    outputs=outputs(pi=Types.Float),
+    )
+
 
 @workflow_class
 class FlyteNotebookSparkWorkflow(object):
