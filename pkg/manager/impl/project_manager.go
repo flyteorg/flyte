@@ -61,7 +61,7 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request admin.Project
 }
 
 func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.Project) (*admin.ProjectUpdateResponse, error) {
-	var response *admin.ProjectUpdateResponse
+	var response admin.ProjectUpdateResponse
 	projectRepo := m.db.ProjectRepo()
 
 	// Fetch the existing project if exists. If not, return err and do not update.
@@ -78,7 +78,7 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 		return nil, err
 	}
 
-	return response, nil
+	return &response, nil
 }
 
 func NewProjectManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration) interfaces.ProjectInterface {
