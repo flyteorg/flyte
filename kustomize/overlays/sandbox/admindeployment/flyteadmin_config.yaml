@@ -7,7 +7,12 @@ server:
   security:
     secure: false
     useAuth: false
-    allowCors: false
+    allowCors: true
+    allowedOrigins:
+      # Accepting all domains for Sandbox installation
+      - "*"
+    allowedHeaders:
+      - "Content-Type"
 flyteadmin:
   roleNameKey: "iam.amazonaws.com/role"
   profilerPort: 10254
