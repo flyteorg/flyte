@@ -3,7 +3,9 @@
 package mocks
 
 import (
+	executors "github.com/lyft/flytepropeller/pkg/controller/executors"
 	mock "github.com/stretchr/testify/mock"
+
 	types "k8s.io/apimachinery/pkg/types"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -111,6 +113,38 @@ func (_m *ExecutionContext) GetCreationTimestamp() v1.Time {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(v1.Time)
+	}
+
+	return r0
+}
+
+type ExecutionContext_GetEventVersion struct {
+	*mock.Call
+}
+
+func (_m ExecutionContext_GetEventVersion) Return(_a0 v1alpha1.EventVersion) *ExecutionContext_GetEventVersion {
+	return &ExecutionContext_GetEventVersion{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutionContext) OnGetEventVersion() *ExecutionContext_GetEventVersion {
+	c := _m.On("GetEventVersion")
+	return &ExecutionContext_GetEventVersion{Call: c}
+}
+
+func (_m *ExecutionContext) OnGetEventVersionMatch(matchers ...interface{}) *ExecutionContext_GetEventVersion {
+	c := _m.On("GetEventVersion", matchers...)
+	return &ExecutionContext_GetEventVersion{Call: c}
+}
+
+// GetEventVersion provides a mock function with given fields:
+func (_m *ExecutionContext) GetEventVersion() v1alpha1.EventVersion {
+	ret := _m.Called()
+
+	var r0 v1alpha1.EventVersion
+	if rf, ok := ret.Get(0).(func() v1alpha1.EventVersion); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.EventVersion)
 	}
 
 	return r0
@@ -369,6 +403,40 @@ func (_m *ExecutionContext) GetOwnerReference() v1.OwnerReference {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(v1.OwnerReference)
+	}
+
+	return r0
+}
+
+type ExecutionContext_GetParentInfo struct {
+	*mock.Call
+}
+
+func (_m ExecutionContext_GetParentInfo) Return(_a0 executors.ImmutableParentInfo) *ExecutionContext_GetParentInfo {
+	return &ExecutionContext_GetParentInfo{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutionContext) OnGetParentInfo() *ExecutionContext_GetParentInfo {
+	c := _m.On("GetParentInfo")
+	return &ExecutionContext_GetParentInfo{Call: c}
+}
+
+func (_m *ExecutionContext) OnGetParentInfoMatch(matchers ...interface{}) *ExecutionContext_GetParentInfo {
+	c := _m.On("GetParentInfo", matchers...)
+	return &ExecutionContext_GetParentInfo{Call: c}
+}
+
+// GetParentInfo provides a mock function with given fields:
+func (_m *ExecutionContext) GetParentInfo() executors.ImmutableParentInfo {
+	ret := _m.Called()
+
+	var r0 executors.ImmutableParentInfo
+	if rf, ok := ret.Get(0).(func() executors.ImmutableParentInfo); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(executors.ImmutableParentInfo)
+		}
 	}
 
 	return r0

@@ -94,6 +94,7 @@ func (in *NodeMetadata) DeepCopyInto(out *NodeMetadata) {
 
 type NodeSpec struct {
 	ID            NodeID                        `json:"id"`
+	Name          string                        `json:"name,omitempty"`
 	Resources     *typesv1.ResourceRequirements `json:"resources,omitempty"`
 	Kind          NodeKind                      `json:"kind"`
 	BranchNode    *BranchNodeSpec               `json:"branch,omitempty"`
@@ -143,6 +144,10 @@ type NodeSpec struct {
 	// The value set to True means task is OK with getting interrupted
 	// +optional
 	Interruptibe *bool `json:"interruptible,omitempty"`
+}
+
+func (in *NodeSpec) GetName() string {
+	return in.Name
 }
 
 func (in *NodeSpec) GetRetryStrategy() *RetryStrategy {

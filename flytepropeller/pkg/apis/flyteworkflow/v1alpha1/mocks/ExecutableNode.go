@@ -251,6 +251,38 @@ func (_m *ExecutableNode) GetKind() v1alpha1.NodeKind {
 	return r0
 }
 
+type ExecutableNode_GetName struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetName) Return(_a0 string) *ExecutableNode_GetName {
+	return &ExecutableNode_GetName{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetName() *ExecutableNode_GetName {
+	c := _m.On("GetName")
+	return &ExecutableNode_GetName{Call: c}
+}
+
+func (_m *ExecutableNode) OnGetNameMatch(matchers ...interface{}) *ExecutableNode_GetName {
+	c := _m.On("GetName", matchers...)
+	return &ExecutableNode_GetName{Call: c}
+}
+
+// GetName provides a mock function with given fields:
+func (_m *ExecutableNode) GetName() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type ExecutableNode_GetOutputAlias struct {
 	*mock.Call
 }

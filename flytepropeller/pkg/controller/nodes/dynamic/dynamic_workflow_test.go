@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/lyft/flytepropeller/pkg/utils"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	mocks3 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
@@ -108,6 +110,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		dynamicNS.On("SetOutputDir", mock.Anything).Return()
 		dynamicNS.On("SetParentTaskID", mock.Anything).Return()
 		dynamicNS.OnGetNodeExecutionStatus(ctx, "n1-1-Node_1").Return(subNs)
+		dynamicNS.OnGetNodeExecutionStatus(ctx, "Node_1").Return(subNs)
 		dynamicNS.OnGetNodeExecutionStatus(ctx, v1alpha1.EndNodeID).Return(endNodeStatus)
 
 		ns := &mocks2.ExecutableNodeStatus{}
@@ -127,8 +130,6 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			Phase: v1alpha1.DynamicNodePhaseExecuting,
 		})
 		nCtx.OnNodeStateReader().Return(r)
-		execContext := &mocks4.ExecutionContext{}
-		nCtx.OnExecutionContext().Return(execContext)
 		return nCtx
 	}
 
@@ -180,12 +181,94 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			lpReader:        mockLPLauncher,
 			metrics:         newMetrics(promutils.NewTestScope()),
 		}
+
+		execContext := &mocks4.ExecutionContext{}
+		immutableParentInfo := mocks4.ImmutableParentInfo{}
+		immutableParentInfo.OnGetUniqueID().Return("c1")
+		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
+		execContext.OnGetParentInfo().Return(&immutableParentInfo)
+		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+		nCtx.OnExecutionContext().Return(execContext)
+
 		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.True(t, callsAdmin)
 		assert.True(t, dCtx.isDynamic)
 		assert.NotNil(t, dCtx.subWorkflow)
 		assert.NotNil(t, dCtx.execContext)
+		assert.NotNil(t, dCtx.execContext.GetParentInfo())
+		expectedParentUniqueID, err := utils.FixedLengthUniqueIDForParts(20, "c1", "2", "n1")
+		assert.Nil(t, err)
+		assert.Equal(t, expectedParentUniqueID, dCtx.execContext.GetParentInfo().GetUniqueID())
+		assert.Equal(t, uint32(1), dCtx.execContext.GetParentInfo().CurrentAttempt())
+		assert.NotNil(t, dCtx.nodeLookup)
+	})
+
+	t.Run("launch plan interfaces match parent task interface no parent", func(t *testing.T) {
+		ctx := context.Background()
+		lpID := &core.Identifier{
+			ResourceType: core.ResourceType_LAUNCH_PLAN,
+			Name:         "my_plan",
+			Project:      "p",
+			Domain:       "d",
+		}
+		djSpec := createDynamicJobSpecWithLaunchPlans()
+		finalOutput := storage.DataReference("/subnode")
+		nCtx := createNodeContext("test", finalOutput)
+		s := &dynamicNodeStateHolder{}
+		nCtx.On("NodeStateWriter").Return(s)
+		f, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures.pb")
+		assert.NoError(t, err)
+		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, djSpec))
+
+		mockLPLauncher := &mocks5.Reader{}
+		var callsAdmin = false
+		mockLPLauncher.OnGetLaunchPlanMatch(ctx, lpID).Run(func(args mock.Arguments) {
+			// When a launch plan node is detected, a call should be made to Admin to fetch the interface for the LP
+			callsAdmin = true
+		}).Return(&admin.LaunchPlan{
+			Id: lpID,
+			Closure: &admin.LaunchPlanClosure{
+				ExpectedInputs: &core.ParameterMap{},
+				ExpectedOutputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"x": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+							Description: "output of the launch plan",
+						},
+					},
+				},
+			},
+		}, nil)
+		h := &mocks6.TaskNodeHandler{}
+		n := &mocks4.Node{}
+		d := dynamicNodeTaskNodeHandler{
+			TaskNodeHandler: h,
+			nodeExecutor:    n,
+			lpReader:        mockLPLauncher,
+			metrics:         newMetrics(promutils.NewTestScope()),
+		}
+
+		execContext := &mocks4.ExecutionContext{}
+		execContext.OnGetParentInfo().Return(nil)
+		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		nCtx.OnExecutionContext().Return(execContext)
+
+		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
+		assert.NoError(t, err)
+		assert.True(t, callsAdmin)
+		assert.True(t, dCtx.isDynamic)
+		assert.NotNil(t, dCtx.subWorkflow)
+		assert.NotNil(t, dCtx.execContext)
+		assert.NotNil(t, dCtx.execContext.GetParentInfo())
+		expectedParentUniqueID, err := utils.FixedLengthUniqueIDForParts(20, "", "", "n1")
+		assert.Nil(t, err)
+		assert.Equal(t, expectedParentUniqueID, dCtx.execContext.GetParentInfo().GetUniqueID())
+		assert.Equal(t, uint32(1), dCtx.execContext.GetParentInfo().CurrentAttempt())
 		assert.NotNil(t, dCtx.nodeLookup)
 	})
 
@@ -237,6 +320,10 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			lpReader:        mockLPLauncher,
 			metrics:         newMetrics(promutils.NewTestScope()),
 		}
+		execContext := &mocks4.ExecutionContext{}
+		execContext.OnGetParentInfo().Return(nil)
+		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		nCtx.OnExecutionContext().Return(execContext)
 
 		_, err = d.buildContextualDynamicWorkflow(ctx, nCtx)
 		assert.Error(t, err)

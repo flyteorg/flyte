@@ -26,6 +26,7 @@ type FlyteWorkflow struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 	*WorkflowSpec     `json:"spec"`
+	WorkflowMeta      *WorkflowMeta                `json:"workflowMeta,omitempty"`
 	Inputs            *Inputs                      `json:"inputs,omitempty"`
 	ExecutionID       ExecutionID                  `json:"executionId"`
 	Tasks             map[TaskID]*TaskSpec         `json:"tasks"`
@@ -54,6 +55,24 @@ type FlyteWorkflow struct {
 	// This field is here because it's easier to put it here than pipe through a new object through all of propeller.
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
 }
+
+func (in *FlyteWorkflow) GetEventVersion() EventVersion {
+	if in.WorkflowMeta != nil {
+		return in.WorkflowMeta.EventVersion
+	}
+	return EventVersion0
+}
+
+type WorkflowMeta struct {
+	EventVersion EventVersion `json:"eventVersion,omitempty"`
+}
+
+type EventVersion int
+
+const (
+	EventVersion0 EventVersion = iota
+	EventVersion1
+)
 
 type NodeDefaults struct {
 	// Default behaviour for Interruptible for nodes unless explicitly set at the node level.

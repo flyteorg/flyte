@@ -248,7 +248,6 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we know how many rounds it needs
 			// Number of rounds = 7 + 1
-
 			for i := 0; i < 11; i++ {
 				err := executor.HandleFlyteWorkflow(ctx, w)
 				for k, v := range w.Status.NodeStatus {
