@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/lyft/flytepropeller/pkg/controller/executors"
+
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -28,6 +30,14 @@ type dummyBaseWorkflow struct {
 	Status         map[v1alpha1.NodeID]*v1alpha1.NodeStatus
 	DataStore      *storage.DataStore
 	Interruptible  bool
+}
+
+func (d *dummyBaseWorkflow) GetParentInfo() executors.ImmutableParentInfo {
+	return nil
+}
+
+func (d *dummyBaseWorkflow) GetEventVersion() v1alpha1.EventVersion {
+	return v1alpha1.EventVersion0
 }
 
 func (d *dummyBaseWorkflow) GetOnFailurePolicy() v1alpha1.WorkflowOnFailurePolicy {

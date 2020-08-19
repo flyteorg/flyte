@@ -82,6 +82,38 @@ func (_m *Meta) GetCreationTimestamp() v1.Time {
 	return r0
 }
 
+type Meta_GetEventVersion struct {
+	*mock.Call
+}
+
+func (_m Meta_GetEventVersion) Return(_a0 v1alpha1.EventVersion) *Meta_GetEventVersion {
+	return &Meta_GetEventVersion{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Meta) OnGetEventVersion() *Meta_GetEventVersion {
+	c := _m.On("GetEventVersion")
+	return &Meta_GetEventVersion{Call: c}
+}
+
+func (_m *Meta) OnGetEventVersionMatch(matchers ...interface{}) *Meta_GetEventVersion {
+	c := _m.On("GetEventVersion", matchers...)
+	return &Meta_GetEventVersion{Call: c}
+}
+
+// GetEventVersion provides a mock function with given fields:
+func (_m *Meta) GetEventVersion() v1alpha1.EventVersion {
+	ret := _m.Called()
+
+	var r0 v1alpha1.EventVersion
+	if rf, ok := ret.Get(0).(func() v1alpha1.EventVersion); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.EventVersion)
+	}
+
+	return r0
+}
+
 type Meta_GetExecutionID struct {
 	*mock.Call
 }

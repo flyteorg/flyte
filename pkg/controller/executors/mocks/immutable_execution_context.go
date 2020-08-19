@@ -82,6 +82,38 @@ func (_m *ImmutableExecutionContext) GetCreationTimestamp() v1.Time {
 	return r0
 }
 
+type ImmutableExecutionContext_GetEventVersion struct {
+	*mock.Call
+}
+
+func (_m ImmutableExecutionContext_GetEventVersion) Return(_a0 v1alpha1.EventVersion) *ImmutableExecutionContext_GetEventVersion {
+	return &ImmutableExecutionContext_GetEventVersion{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ImmutableExecutionContext) OnGetEventVersion() *ImmutableExecutionContext_GetEventVersion {
+	c := _m.On("GetEventVersion")
+	return &ImmutableExecutionContext_GetEventVersion{Call: c}
+}
+
+func (_m *ImmutableExecutionContext) OnGetEventVersionMatch(matchers ...interface{}) *ImmutableExecutionContext_GetEventVersion {
+	c := _m.On("GetEventVersion", matchers...)
+	return &ImmutableExecutionContext_GetEventVersion{Call: c}
+}
+
+// GetEventVersion provides a mock function with given fields:
+func (_m *ImmutableExecutionContext) GetEventVersion() v1alpha1.EventVersion {
+	ret := _m.Called()
+
+	var r0 v1alpha1.EventVersion
+	if rf, ok := ret.Get(0).(func() v1alpha1.EventVersion); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.EventVersion)
+	}
+
+	return r0
+}
+
 type ImmutableExecutionContext_GetExecutionID struct {
 	*mock.Call
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/common"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	errors2 "github.com/lyft/flytestdlib/errors"
 
@@ -300,7 +302,9 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 	if np != nodeStatus.GetPhase() {
 		// assert np == Queued!
 		logger.Infof(ctx, "Change in node state detected from [%s] -> [%s]", nodeStatus.GetPhase().String(), np.String())
-		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(), p, nCtx.InputReader(), nodeStatus)
+		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+			p, nCtx.InputReader(), nodeStatus, nCtx.ExecutionContext().GetEventVersion(),
+			nCtx.ExecutionContext().GetParentInfo(), nCtx.node)
 		if err != nil {
 			return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "could not convert phase info to event")
 		}
@@ -407,7 +411,9 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx *node
 	if np != nodeStatus.GetPhase() && np != v1alpha1.NodePhaseRetryableFailure {
 		// assert np == skipped, succeeding or failing
 		logger.Infof(ctx, "Change in node state detected from [%s] -> [%s], (handler phase [%s])", nodeStatus.GetPhase().String(), np.String(), p.GetPhase().String())
-		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(), p, nCtx.InputReader(), nCtx.NodeStatus())
+		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+			p, nCtx.InputReader(), nCtx.NodeStatus(), nCtx.ExecutionContext().GetEventVersion(),
+			nCtx.ExecutionContext().GetParentInfo(), nCtx.node)
 		if err != nil {
 			return executors.NodeStatusUndefined, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "could not convert phase info to event")
 		}
@@ -792,8 +798,20 @@ func (c *nodeExecutor) AbortHandler(ctx context.Context, execContext executors.E
 		if err != nil {
 			return err
 		}
+		nodeExecutionID := &core.NodeExecutionIdentifier{
+			ExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID().ExecutionId,
+			NodeId:      nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId,
+		}
+		if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
+			currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nodeExecutionID.NodeId)
+			if err != nil {
+				return err
+			}
+			nodeExecutionID.NodeId = currentNodeUniqueID
+		}
+
 		err = c.IdempotentRecordEvent(ctx, &event.NodeExecutionEvent{
-			Id:         nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+			Id:         nodeExecutionID,
 			Phase:      core.NodeExecution_ABORTED,
 			OccurredAt: ptypes.TimestampNow(),
 			OutputResult: &event.NodeExecutionEvent_Error{

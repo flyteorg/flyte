@@ -193,6 +193,38 @@ func (_m *ExecutableWorkflow) GetCreationTimestamp() v1.Time {
 	return r0
 }
 
+type ExecutableWorkflow_GetEventVersion struct {
+	*mock.Call
+}
+
+func (_m ExecutableWorkflow_GetEventVersion) Return(_a0 v1alpha1.EventVersion) *ExecutableWorkflow_GetEventVersion {
+	return &ExecutableWorkflow_GetEventVersion{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableWorkflow) OnGetEventVersion() *ExecutableWorkflow_GetEventVersion {
+	c := _m.On("GetEventVersion")
+	return &ExecutableWorkflow_GetEventVersion{Call: c}
+}
+
+func (_m *ExecutableWorkflow) OnGetEventVersionMatch(matchers ...interface{}) *ExecutableWorkflow_GetEventVersion {
+	c := _m.On("GetEventVersion", matchers...)
+	return &ExecutableWorkflow_GetEventVersion{Call: c}
+}
+
+// GetEventVersion provides a mock function with given fields:
+func (_m *ExecutableWorkflow) GetEventVersion() v1alpha1.EventVersion {
+	ret := _m.Called()
+
+	var r0 v1alpha1.EventVersion
+	if rf, ok := ret.Get(0).(func() v1alpha1.EventVersion); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.EventVersion)
+	}
+
+	return r0
+}
+
 type ExecutableWorkflow_GetExecutionID struct {
 	*mock.Call
 }
