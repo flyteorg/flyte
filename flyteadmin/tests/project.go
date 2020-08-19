@@ -80,6 +80,9 @@ func TestUpdateProjectDescription(t *testing.T) {
 		Description: "a-new-description",
 	})
 
+	// Assert that update went through without an error.
+	assert.Nil(t, err)
+
 	// Fetch updated projects.
 	projectsUpdated, err := client.ListProjects(ctx, &admin.ProjectListRequest{})
 	assert.Nil(t, err)
@@ -133,6 +136,9 @@ func TestUpdateProjectLabels(t *testing.T) {
 			},
 		},
 	})
+
+	// Assert that update went through without an error.
+	assert.Nil(t, err)
 
 	// Fetch updated projects.
 	projectsUpdated, err := client.ListProjects(ctx, &admin.ProjectListRequest{})
