@@ -12,6 +12,7 @@ import (
 )
 
 func TestCreateProject(t *testing.T) {
+	truncateAllTablesForTestingOnly()
 	ctx := context.Background()
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
@@ -42,4 +43,114 @@ func TestCreateProject(t *testing.T) {
 		}
 	}
 	assert.True(t, sawNewProject)
+}
+
+func TestUpdateProjectDescription(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	// Create a new project.
+	req := admin.ProjectRegisterRequest{
+		Project: &admin.Project{
+			Id:   "potato",
+			Name: "spud",
+			Labels: &admin.Labels{
+				Values: map[string]string{
+					"foo": "bar",
+					"bar": "baz",
+				},
+			},
+		},
+	}
+	_, err := client.RegisterProject(ctx, &req)
+	assert.Nil(t, err)
+
+	// Verify the project has been registered.
+	projects, err := client.ListProjects(ctx, &admin.ProjectListRequest{})
+	assert.Nil(t, err)
+	assert.NotEmpty(t, projects.Projects)
+
+	// Attempt to modify the name of the Project. Labels should be a no-op.
+	// Name and Description should modify just fine.
+	_, err = client.UpdateProject(ctx, &admin.Project{
+		Id:          "potato",
+		Name:        "foobar",
+		Description: "a-new-description",
+	})
+
+	// Fetch updated projects.
+	projectsUpdated, err := client.ListProjects(ctx, &admin.ProjectListRequest{})
+	assert.Nil(t, err)
+	assert.NotEmpty(t, projectsUpdated.Projects)
+
+	// Verify that the project's Name has not been modified but the Description has.
+	updatedProject := projectsUpdated.Projects[0]
+	assert.Equal(t, updatedProject.Id, "potato")										 // unchanged
+	assert.Equal(t, updatedProject.Name, "foobar")                   // changed
+	assert.Equal(t, updatedProject.Description, "a-new-description") // changed
+
+	// Verify that project labels are not removed.
+	labelsMap := updatedProject.Labels
+	fooVal, fooExists := labelsMap.Values["foo"]
+	barVal, barExists := labelsMap.Values["bar"]
+	assert.Equal(t, fooExists, true)
+	assert.Equal(t, fooVal, "bar")
+	assert.Equal(t, barExists, true)
+	assert.Equal(t, barVal, "baz")
+}
+
+func TestUpdateProjectLabels(t *testing.T) {
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	// Create a new project.
+	req := admin.ProjectRegisterRequest{
+		Project: &admin.Project{
+			Id:   "potato",
+			Name: "spud",
+		},
+	}
+	_, err := client.RegisterProject(ctx, &req)
+	assert.Nil(t, err)
+
+	// Verify the project has been registered.
+	projects, err := client.ListProjects(ctx, &admin.ProjectListRequest{})
+	assert.Nil(t, err)
+	assert.NotEmpty(t, projects.Projects)
+
+	// Attempt to modify the name of the Project. Labels and name should be
+	// modified.
+	_, err = client.UpdateProject(ctx, &admin.Project{
+		Id:   "potato",
+		Name: "foobar",
+		Labels: &admin.Labels{
+			Values: map[string]string{
+				"foo": "bar",
+				"bar": "baz",
+			},
+		},
+	})
+
+	// Fetch updated projects.
+	projectsUpdated, err := client.ListProjects(ctx, &admin.ProjectListRequest{})
+	assert.Nil(t, err)
+	assert.NotEmpty(t, projectsUpdated.Projects)
+
+	// Check the name has been modified.
+	// Verify that the project's Name has not been modified but the Description has.
+	updatedProject := projectsUpdated.Projects[0]
+	assert.Equal(t, updatedProject.Id, "potato")										 // unchanged
+	assert.Equal(t, updatedProject.Name, "foobar")                   // changed
+
+	// Verify that the expected labels have been added to the project.
+	labelsMap := updatedProject.Labels
+	fooVal, fooExists := labelsMap.Values["foo"]
+	barVal, barExists := labelsMap.Values["bar"]
+	assert.Equal(t, fooExists, true)
+	assert.Equal(t, fooVal, "bar")
+	assert.Equal(t, barExists, true)
+	assert.Equal(t, barVal, "baz")
 }

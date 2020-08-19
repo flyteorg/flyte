@@ -63,3 +63,30 @@ func (m *AdminService) ListProjects(ctx context.Context, request *admin.ProjectL
 	m.Metrics.projectEndpointMetrics.list.Success()
 	return response, nil
 }
+
+func (m *AdminService) UpdateProject(ctx context.Context, request *admin.Project) (
+	*admin.ProjectUpdateResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	requestedAt := time.Now()
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.ProjectUpdateResponse
+	var err error
+	m.Metrics.projectEndpointMetrics.register.Time(func() {
+		response, err = m.ProjectManager.UpdateProject(ctx, *request)
+	})
+	audit.NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
+		"UpdateProject",
+		map[string]string{
+			audit.Project: request.Id,
+		},
+		audit.ReadWrite,
+		requestedAt,
+	).WithResponse(time.Now(), err).Log(ctx)
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.projectEndpointMetrics.update)
+	}
+
+	return response, nil
+}

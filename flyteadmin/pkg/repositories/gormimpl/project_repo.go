@@ -70,3 +70,15 @@ func NewProjectRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer,
 		metrics:          metrics,
 	}
 }
+
+func (r *ProjectRepo) UpdateProject(ctx context.Context, projectUpdate models.Project) error {
+	// Use gorm client to update the two fields that are changed.
+	writeTx := r.db.Model(&projectUpdate).Updates(projectUpdate)
+
+	// Return error if applies.
+	if writeTx.Error != nil {
+		return r.errorTransformer.ToFlyteAdminError(writeTx.Error)
+	}
+
+	return nil
+}

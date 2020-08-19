@@ -54,6 +54,7 @@ type projectEndpointMetrics struct {
 
 	register util.RequestMetrics
 	list     util.RequestMetrics
+	update   util.RequestMetrics
 }
 
 type attributeEndpointMetrics struct {
@@ -154,6 +155,7 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			scope:    adminScope,
 			register: util.NewRequestMetrics(adminScope, "register_project"),
 			list:     util.NewRequestMetrics(adminScope, "list_projects"),
+			update:   util.NewRequestMetrics(adminScope, "update_project"),
 		},
 		projectAttributesEndpointMetrics: attributeEndpointMetrics{
 			scope:  adminScope,
