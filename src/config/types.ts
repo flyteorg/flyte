@@ -13,4 +13,5 @@ export interface Env extends NodeJS.ProcessEnv {
     CORS_PROXY_PREFIX: string;
     DISABLE_ANALYTICS?: string;
     STATUS_URL?: string;
+    DISABLE_AUTH?: string;
 }

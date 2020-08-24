@@ -1,6 +1,9 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { env } from 'common/env';
+import { toBoolean } from 'common/utils';
 
 import { generateAdminApiQuery } from './AdminApiQuery';
+
 import { transformRequestError } from './transformRequestError';
 import {
     AdminEntityTransformer,
@@ -44,7 +47,7 @@ async function request(
     const finalOptions = {
         ...options,
         url: adminApiUrl(endpoint),
-        withCredentials: true
+        withCredentials: !toBoolean(env.DISABLE_AUTH)
     };
 
     try {
@@ -70,7 +73,7 @@ export async function getProtobufObject<ResponseType>(
         headers,
         method: 'get',
         responseType: 'arraybuffer',
-        withCredentials: true
+        withCredentials: !toBoolean(env.DISABLE_AUTH)
     };
 
     const { data } = await axios.request(options);
