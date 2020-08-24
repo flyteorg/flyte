@@ -6,6 +6,7 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccountName: flyteadmin
       initContainers:
       - name: check-db-ready
         image: postgres:10.1
