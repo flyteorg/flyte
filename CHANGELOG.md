@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0](http://github.com/lyft/flyteconsole/compare/v0.8.1...v0.9.0) (2020-08-24)
+
+
+### Features
+
+* Authentication can be optionally disabled ([#89](http://github.com/lyft/flyteconsole/issues/89)) ([d92a127](http://github.com/lyft/flyteconsole/commit/d92a1277af27a31863103eeda231d71b4e037151))
+
 ## [0.8.1](http://github.com/lyft/flyteconsole/compare/v0.8.0...v0.8.1) (2020-08-13)
 
 
