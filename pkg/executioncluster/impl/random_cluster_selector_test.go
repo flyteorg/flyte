@@ -144,6 +144,16 @@ func TestRandomClusterSelectorGetTargetForDomainAndExecution2(t *testing.T) {
 
 func TestRandomClusterSelectorGetRandomTarget(t *testing.T) {
 	cluster := getRandomClusterSelectorForTest(t)
+	target, err := cluster.GetTarget(context.Background(), &executioncluster.ExecutionTargetSpec{
+		Project: "",
+	})
+	assert.Nil(t, err)
+	assert.True(t, target.ID == "testcluster1" || target.ID == "testcluster2" || target.ID == "testcluster3")
+	assert.True(t, target.Enabled)
+}
+
+func TestRandomClusterSelectorGetRandomTargetUsingEmptySpec(t *testing.T) {
+	cluster := getRandomClusterSelectorForTest(t)
 	_, err := cluster.GetTarget(context.Background(), nil)
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "empty executionTargetSpec")
