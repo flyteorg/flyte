@@ -3,3 +3,4 @@ bases:
 
 patches:
 - console.yaml
+- config.yaml
