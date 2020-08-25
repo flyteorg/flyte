@@ -130,7 +130,6 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 		if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
 			return nil, err
 		}
-		return nil, err
 	}
 	var weightedRandomList random.WeightedRandomList
 	if resource != nil && resource.Attributes.GetExecutionClusterLabel() != nil {
