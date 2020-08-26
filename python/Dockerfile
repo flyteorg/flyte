@@ -12,8 +12,9 @@ RUN apt-get update && apt-get install -y python3.6 python3.6-venv make build-ess
 # opencv support
 RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev
 
-# Run this before dealing with our own virtualenv. The AWS CLI uses its own virtual environment
-RUN pip3 install awscli
+# Run this before dealing with our own virtualenv. The AWS CLI uses its own virtual environment. 
+# NOTE: We are installing multi-cloud Download managers to make the examples completely portable. In your repos, please install only the utilities for cloud providers that you use.
+RUN pip3 install awscli gsutil
 
 # Set up a virtual environment to use with our workflows
 RUN python3.6 -m venv ${VENV}
