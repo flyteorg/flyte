@@ -91,6 +91,7 @@ func TestToK8sPodIterruptible(t *testing.T) {
 
 	op := &pluginsIOMock.OutputFilePaths{}
 	op.On("GetOutputPrefixPath").Return(storage.DataReference(""))
+	op.On("GetRawOutputPrefix").Return(storage.DataReference(""))
 
 	x := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
 		Limits: v1.ResourceList{
@@ -139,6 +140,7 @@ func TestToK8sPod(t *testing.T) {
 
 	op := &pluginsIOMock.OutputFilePaths{}
 	op.On("GetOutputPrefixPath").Return(storage.DataReference(""))
+	op.On("GetRawOutputPrefix").Return(storage.DataReference(""))
 
 	t.Run("WithGPU", func(t *testing.T) {
 		x := dummyTaskExecutionMetadata(&v1.ResourceRequirements{

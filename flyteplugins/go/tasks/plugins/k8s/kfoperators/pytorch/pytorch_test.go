@@ -107,6 +107,7 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 	outputReader := &pluginIOMocks.OutputWriter{}
 	outputReader.OnGetOutputPath().Return(storage.DataReference("/data/outputs.pb"))
 	outputReader.OnGetOutputPrefixPath().Return(storage.DataReference("/data/"))
+	outputReader.OnGetRawOutputPrefix().Return(storage.DataReference(""))
 	taskCtx.OnOutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}

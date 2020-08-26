@@ -172,6 +172,7 @@ func TestArrayJobToBatchInput(t *testing.T) {
 
 	or := &mocks2.OutputWriter{}
 	or.OnGetOutputPrefixPath().Return("/path/output")
+	or.OnGetRawOutputPrefix().Return("s3://")
 
 	taskCtx := &mocks.TaskExecutionContext{}
 	taskCtx.OnTaskExecutionMetadata().Return(tMetadata)
