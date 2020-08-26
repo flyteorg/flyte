@@ -19,6 +19,7 @@ var inputFileRegex = regexp.MustCompile(`(?i){{\s*[\.$]Input\s*}}`)
 var inputPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]InputPrefix\s*}}`)
 var outputRegex = regexp.MustCompile(`(?i){{\s*[\.$]OutputPrefix\s*}}`)
 var inputVarRegex = regexp.MustCompile(`(?i){{\s*[\.$]Inputs\.(?P<input_name>[^}\s]+)\s*}}`)
+var rawOutputDataPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]RawOutputDataPrefix\s*}}`)
 
 // Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive
 // Supported templates are:
@@ -68,6 +69,7 @@ func replaceTemplateCommandArgs(ctx context.Context, commandTemplate string, in 
 	val := inputFileRegex.ReplaceAllString(commandTemplate, in.GetInputPath().String())
 	val = outputRegex.ReplaceAllString(val, out.GetOutputPrefixPath().String())
 	val = inputPrefixRegex.ReplaceAllString(val, in.GetInputPrefixPath().String())
+	val = rawOutputDataPrefixRegex.ReplaceAllString(val, out.GetRawOutputPrefix().String())
 
 	inputs, err := in.Get(ctx)
 	if err != nil {

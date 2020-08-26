@@ -43,5 +43,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "roleArn"), defaultConfig.RoleArn, "The role the SageMaker plugin uses to communicate with the SageMaker service")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "region"), defaultConfig.Region, "The AWS region the SageMaker plugin communicates to")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "roleAnnotationKey"), defaultConfig.RoleAnnotationKey, "Map key to use to lookup role from task annotations.")
 	return cmdFlags
 }
