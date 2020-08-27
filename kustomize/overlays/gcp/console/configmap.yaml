@@ -4,4 +4,5 @@ metadata:
   name: flyte-console-config
   namespace: flyte
 data:
-  ADMIN_API_URL: http://flyteadmin.flyte.svc.cluster.local:80
+  # TODO: use the internal load balancer IP or the DNS name associated with it if any
+  ADMIN_API_URL: http://flyteadmin-internal-lb

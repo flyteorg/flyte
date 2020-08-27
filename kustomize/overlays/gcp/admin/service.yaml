@@ -15,4 +15,3 @@ spec:
   - name: http-metrics
     protocol: TCP
     port: 10254
-    targetPort: 10254

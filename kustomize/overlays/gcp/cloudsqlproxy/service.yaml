@@ -10,4 +10,3 @@ spec:
   - name: http
     protocol: TCP
     port: 5432
-    targetPort: 5432

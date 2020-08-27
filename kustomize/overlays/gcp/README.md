@@ -49,7 +49,8 @@ balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-b
 
 ## flyteconsole
 
-There is nothing to change or configure for flyteconsole to work.
+[flyteconsole configmap](console/configmap.yaml) needs to be updated with flyteadmin internal load
+balancer IP address or the DNS name associated with it if any.
 
 flyteconsole is exposed as a service using [internal load
 balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
