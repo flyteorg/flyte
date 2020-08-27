@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flytepropeller
+  namespace: flyte
+spec:
+  template:
+    spec:
+      volumes:
+      - name: container-config-volume
+        configMap:
+          name: flyte-container-config
+      containers:
+      - name: flytepropeller
+        volumeMounts:
+        - name: container-config-volume
+          mountPath: /etc/flyte/config-container

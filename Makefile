@@ -17,16 +17,16 @@ end2end_execute:
 	@end2end/execute.sh
 
 # Use this target to build the rsts directory only. In order to build the entire flyte docs, use update_ref_docs && all_docs
-.PHONY: docs
-docs:
+.PHONY: generate-local-docs
+generate-local-docs:
 	@docker run -t -v `pwd`:/base lyft/docbuilder:v2.2.0 sphinx-build -E -b html /base/rsts/. /base/_build
 
 # Builds the entire doc tree. Assumes update_ref_docs has run and that all externals rsts are in _rsts/ dir
-.PHONY: all_docs
-all_docs:
-	@./script/generate_docs.sh
+.PHONY: generate-docs
+generate-docs: generate-dependent-repo-docs
+	@FLYTEKIT_VERSION=0.11.3 ./script/generate_docs.sh
 
 # updates referenced docs from other repositories (e.g. flyteidl, flytekit)
-.PHONY: update_ref_docs
-update_ref_docs:
-	@./script/update_ref_docs.sh
+.PHONY: generate-dependent-repo-docs
+generate-dependent-repo-docs:
+	@FLYTEKIT_VERSION=0.11.3 FLYTEIDL_VERSION=0.18.0 ./script/update_ref_docs.sh

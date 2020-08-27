@@ -18,11 +18,8 @@ RSTS_DIR=`mktemp -d "${BASEDIR}/rsts_tmp/XXXXXXXXX"`
 cp -R rsts/* ${RSTS_DIR}
 cp -R _rsts/* ${RSTS_DIR}
 
-# The toctree in this index file requires that the idl/sdk rsts are in the same folder
-cp docs_infra/index.rst ${RSTS_DIR}
-
 # Generate documentation by running script inside the generation container
-docker run -t -v ${BASEDIR}:/base -v ${BASEDIR}/docs:/docs -v ${RSTS_DIR}:/rsts lyft/docbuilder:v2.2.0 /base/docs_infra/in_container_html_generation.sh
+docker run --rm -t -e FLYTEKIT_VERSION=${FLYTEKIT_VERSION} -v ${BASEDIR}:/base -v ${BASEDIR}/docs:/docs -v ${RSTS_DIR}:/rsts lyft/docbuilder:v2.2.0 /base/docs_infra/in_container_html_generation.sh
 
 # Cleanup
 rm -rf ${RSTS_DIR} || true

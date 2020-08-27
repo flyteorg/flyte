@@ -1,0 +1,3 @@
+bases:
+  - github.com/kubeflow/manifests/pytorch-job/pytorch-job-crds/base?ref=v1.0.0
+  - github.com/kubeflow/manifests/pytorch-job/pytorch-operator/base?ref=v1.0.0

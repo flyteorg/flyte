@@ -6,15 +6,15 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic)
 ![GitHub milestones Completed](https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic)
-![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/3?style=plastic)
+![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/7?style=plastic)
 ![Twitter Follow](https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
 
 Flyte is a container-native, type-safe workflow and pipelines platform optimized for large scale processing and machine learning written in Golang. Workflows can be written in any language, with out of the box support for Python. 
 
 # Homepage
-https://flyte.org
-Docs: https://lyft.github.io/flyte
+- [flyte.org](https://flyte.org)
+- [Docs](https://lyft.github.io/flyte)
 
 # Introduction
 Flyte is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
@@ -27,11 +27,23 @@ python, making it perfect for modern Machine Learning and Data processing pipeli
 # Resources
 Resources that would help you get a better understanding of Flyte.
 
+# Communication channels
+- [Slack Org](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
+- [Email list](https://groups.google.com/a/flyte.org/g/users)
+
+# Biweekly Community Sync
+- Starting April 21 2020, the Flyte community meets every other Tuesday at 9:00 AM PST (US West coast time).
+- You can join the [zoom link]( https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
+- Meeting notes are captured in [Doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e)
+- Demo Signup [Sheet](https://docs.google.com/spreadsheets/d/1Bz-s3SpMm1hGl6Z5y3HcxrNBcg9ZhSgqVgmCxK_eEhs/edit#gid=0)
+
 ## Conference Talks
 - Kubecon 2019 - Flyte: Cloud Native Machine Learning and Data Processing Platform [video](https://www.youtube.com/watch?v=KdUJGSP1h9U) | [deck](https://kccncna19.sched.com/event/UaYY/flyte-cloud-native-machine-learning-data-processing-platform-ketan-umare-haytham-abuelfutuh-lyft)
 - Kubecon 2019 - Running LargeScale Stateful workloads on Kubernetes at Lyft [video](https://www.youtube.com/watch?v=ECeVQoble0g)
 - re:invent 2019 - Implementing ML workflows with Kubernetes and Amazon Sagemaker  [video](https://youtu.be/G-wzIQQJKaE)
 - Cloud-native machine learning at Lyft with AWS Batch and Amazon EKS [video](https://youtu.be/n_rRb8u1GSM)
+- OSS + ELC NA 2020 [splash](https://ossna2020.sched.com/event/313cec91aa38a430a25f9571039874b8)
+- Datacouncil [splash](https://docs.google.com/document/d/1ZsCDOZ5ZJBPWzCNc45FhNtYQOxYHz0PAu9lrtDVnUpw/edit)
 
 ## Blog Posts
  1. [Introducing Flyte: A Cloud Native Machine Learning and Data Processing Platform](https://eng.lyft.com/introducing-flyte-cloud-native-machine-learning-and-data-processing-platform-fb2bb3046a59)
@@ -42,8 +54,9 @@ Resources that would help you get a better understanding of Flyte.
 
 
 # Features
- - Used at Scale in production by 500+ users at Lyft with more than 400k workflows a month and more than 20+ million container executions per month
+ - Used at Scale in production by 500+ users at Lyft with more than *900k* workflow executed a month and more than *30+* million container executions per month
  - Centralized Inventory of Tasks, Workflows and Executions
+ - Single Task Execution support - Start executing a task and then convert it to a workflow
  - gRPC / REST interface to define and executes tasks and workflows
  - Type safe construction of pipelines, each task has an interface which is characterized by its input and outputs. Thus illegal construction of pipelines fails during declaration rather than at
    runtime
@@ -52,7 +65,7 @@ Resources that would help you get a better understanding of Flyte.
  - Workflows features
   * Multiple Schedules for every workflow
   * Parallel step execution
-  * Extensible Backend to add customized plugin experiences
+  * Extensible Backend to add customized plugin experiences (with simplified User experiences)
   * Arbitrary container execution
   * Branching
   * Inline Subworkflows (a workflow can be embeded within one node of the top level workflow)
@@ -60,6 +73,7 @@ Resources that would help you get a better understanding of Flyte.
   * Array Tasks (map some function over a large dataset, controlled execution of 1000's of containers)
   * Dynamic Workflow creation and execution - with runtime type safety
   * Container side plugins with first class support in python
+  * PreAlpha: Arbitrary flytekit less containers supported (RawContainer)
  - Maintain an inventory of tasks and workflows
  - Record history of all executions and executions (as long as they follow convention) are completely repeatable
  - Multi Cloud support (AWS, GCP and others)
@@ -74,10 +88,10 @@ Resources that would help you get a better understanding of Flyte.
  - Written in Golang and optimized for performance
 
 ## Coming Soon
- - Single Task Execution support
+ - Golang CLI - flytectl
  - Reactive pipelines
+ - Grafana templates (user/system observability)
  - More integrations
-
 
 # Available Plugins
  - Containers
@@ -87,20 +101,24 @@ Resources that would help you get a better understanding of Flyte.
  - K8s Spark (native pyspark and java/scala)
  - Qubole Hive
  - Presto Queries
+ - Distributed Pytorch (K8s Native) - Pytorch Operator
+ - Sagemaker (builtin algorithms)
+ - Distributed Tensorflow (K8s Native) - TFOperator
+ - Papermill Notebook execution (python and spark)
+
+## Coming soon
+ - Sagemaker (custom models)
+ - Flink-K8s
 
 # Current Usage 
-- Lyft Rideshare
-- Lyft L5 autonomous
-- Juno
+- [Freenome](https://www.freenome.com/)
+- [Lyft Rideshare, Mapping](https://www.lyft.com/)
+- [Lyft L5 autonomous](https://self-driving.lyft.com/level5/)
+- [Spotify](https://www.spotify.com/)
 
 # Changelogs
 [Changelogs](CHANGELOG/README.md)
 
-# Biweekly Community Sync
-Starting April 21 2020, the Flyte community meets every other Tuesday at 9:00 AM.
-You can join the [hangouts](https://hangouts.google.com/hangouts/_/calendar/a2V0YW4udW1hcmVAZ21haWwuY29t.5km2218c99820cggkefdb5549e?authuser=0)
-Meeting notes are captured in [Doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e)
-- We will soon have a demo signup sheet
 
 # Component Repos 
 Repo | Language | Purpose

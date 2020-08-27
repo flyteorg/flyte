@@ -11,6 +11,8 @@ while ! systemctl is-active --quiet multi-user.target; do
   sleep 2
   if [ "$SECONDS" -gt "$K8S_TIMEOUT" ]; then
     echo "ERROR: timed out waiting for kubernetes to start."
+    kubectl get all --all-namespaces
+    kubectl describe nodes
     exit 1
   fi
 done
