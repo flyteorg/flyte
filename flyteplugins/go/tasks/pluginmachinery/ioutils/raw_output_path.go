@@ -4,7 +4,9 @@ import (
 	"context"
 	"crypto/sha1" // #nosec
 	"encoding/hex"
+	"strconv"
 
+	core2 "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/storage"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
@@ -44,8 +46,8 @@ func NewShardedDeterministicRawOutputPath(ctx context.Context, sharder ShardSele
 }
 
 // A simple Output sandbox at a given path
-func NewRawOutputPaths(_ context.Context, outputSandboxPath storage.DataReference) io.RawOutputPaths {
-	return precomputedRawOutputPaths{path: outputSandboxPath}
+func NewRawOutputPaths(_ context.Context, rawOutputPrefix storage.DataReference) io.RawOutputPaths {
+	return precomputedRawOutputPaths{path: rawOutputPrefix}
 }
 
 // Creates an OutputSandbox in the basePath using the uniqueID and a sharder
@@ -57,6 +59,35 @@ func NewShardedRawOutputPath(ctx context.Context, sharder ShardSelector, basePat
 		return nil, err
 	}
 	path, err := store.ConstructReference(ctx, basePath, prefix, uniqueID)
+	if err != nil {
+		return nil, err
+	}
+	return precomputedRawOutputPaths{
+		path: path,
+	}, nil
+}
+
+// Constructs an output path that is deterministic and unique within the given outputPrefix. No sharding is performed
+func NewDeterministicUniqueRawOutputPath(ctx context.Context, rawOutputPrefix, outputMetadataPrefix storage.DataReference, store storage.ReferenceConstructor) (io.RawOutputPaths, error) {
+	o := []byte(outputMetadataPrefix)
+	/* #nosec */
+	// We use SHA1 for sheer speed instead of no collisions. As because of the shard Prefix + hash is pretty unique :)
+	m := sha1.New()
+	if _, err := m.Write(o); err != nil {
+		return nil, err
+	}
+	path, err := store.ConstructReference(ctx, rawOutputPrefix, hex.EncodeToString(m.Sum(nil)))
+	if err != nil {
+		return nil, err
+	}
+	return precomputedRawOutputPaths{
+		path: path,
+	}, nil
+}
+
+// Generates a RawOutput Path that looks like the TaskExecutionID and can be easily cross referenced with Flyte generated TaskExecution ID
+func NewTaskIDRawOutputPath(ctx context.Context, rawOutputPrefix storage.DataReference, taskID *core2.TaskExecutionIdentifier, store storage.ReferenceConstructor) (io.RawOutputPaths, error) {
+	path, err := store.ConstructReference(ctx, rawOutputPrefix, taskID.GetNodeExecutionId().GetExecutionId().GetProject(), taskID.GetNodeExecutionId().GetExecutionId().GetDomain(), taskID.GetNodeExecutionId().GetExecutionId().GetName(), taskID.GetNodeExecutionId().GetNodeId(), strconv.Itoa(int(taskID.GetRetryAttempt())), taskID.GetTaskId().GetName())
 	if err != nil {
 		return nil, err
 	}
