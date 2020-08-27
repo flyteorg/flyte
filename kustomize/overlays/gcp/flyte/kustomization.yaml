@@ -1,0 +1,14 @@
+bases:
+# global resources
+- ../../../base/namespace
+- ../cloudsqlproxy
+
+# user plane / control plane resources
+- ../admin
+- ../console
+- ../datacatalog
+
+# data plane resources
+- ../../../base/wf_crd
+- ../../../base/adminserviceaccount
+- ../propeller

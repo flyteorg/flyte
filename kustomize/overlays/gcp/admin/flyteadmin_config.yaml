@@ -1,0 +1,61 @@
+logger:
+  show-source: true
+  level: 5
+server:
+  httpPort: 8088
+  grpcPort: 8089
+  security:
+    secure: false
+    useAuth: false
+    allowCors: true
+    allowedOrigins:
+    # TODO: use real origin
+    - http://flyte.example.com
+flyteadmin:
+  roleNameKey: "iam.amazonaws.com/role"
+  profilerPort: 10254
+  metricsScope: "flyte:"
+  metadataStoragePrefix:
+    - "metadata"
+    - "admin"
+  testing:
+    host: http://flyteadmin
+database:
+  port: 5432
+  username: flyte
+  host: cloudsqlproxy
+  dbname: flyte
+  options: "sslmode=disable"
+  passwordPath: /etc/gcp/db_pwd.txt
+remoteData:
+  scheme: "gcp"
+storage:
+  type: stow
+  stow:
+    kind: google
+    config:
+      json: ""
+      # TODO: replace <project-id> with the GCP project ID
+      project_id: <project-id>
+      scopes: https://www.googleapis.com/auth/devstorage.read_write
+  container: "flyte"
+task_resources:
+  defaults:
+    cpu: 1000m
+    memory: 1000Mi
+    storage: 5Mi
+  limits:
+    cpu: 2
+    memory: 2G
+    storage: 20Mi
+task_type_whitelist: {}
+domains:
+  - id: development
+    name: development
+  - id: staging
+    name: staging
+  - id: production
+    name: production
+cluster_resources:
+  templatePath: "/etc/flyte/clusterresource/templates"
+  refresh: 5m
