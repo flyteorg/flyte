@@ -863,6 +863,7 @@ spec:
             - mountPath: /etc/gcp
               name: db-user-pass
           restartPolicy: OnFailure
+          serviceAccountName: flyteadmin
           volumes:
           - configMap:
               name: clusterresource-template-dgc9fcm2kh

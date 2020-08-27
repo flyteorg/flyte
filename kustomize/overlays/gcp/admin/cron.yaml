@@ -9,6 +9,7 @@ spec:
     spec:
       template:
         spec:
+          serviceAccountName: flyteadmin
           containers:
           - name: sync-cluster-resources
             image: docker.io/lyft/flyteadmin:v0.3.0
