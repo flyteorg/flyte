@@ -1204,13 +1204,13 @@ spec:
       labels:
         app: flyteconsole
         app.kubernetes.io/name: flyteconsole
-        app.kubernetes.io/version: 0.8.0
+        app.kubernetes.io/version: 0.9.0
     spec:
       containers:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: docker.io/lyft/flyteconsole:v0.8.0
+        image: docker.io/lyft/flyteconsole:v0.9.0
         name: flyteconsole
         ports:
         - containerPort: 8080
