@@ -20,7 +20,8 @@ Note this currently does not include articles/tid-bits on how to use the Flyte p
 1. [Dynamic Tasks](recipes/dynamictasks)
 1. [Tasks without flytekit or Using arbitrary containers](recipes/rawcontainers)
 1. [Jupyter notebook as a task](recipes/notebook_tasks)
-1. [Different container per task](recipes/differentcontainers) 
+1. [Different container per task](recipes/differentcontainers)
+1. [Customize Offloaded Data Location](recipes/offloaded_output_data) 
 
 Each example is organized into a separate folder at this layer, and each has the Readme file linked to in the Contents, as well as supporting .py and .ipynb files, some of which contain information in a lot more depth.
 

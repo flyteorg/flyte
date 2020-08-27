@@ -5,7 +5,7 @@ import cv2
 from flytekit.common import utils
 from flytekit.sdk.tasks import dynamic_task, inputs, outputs, python_task
 from flytekit.sdk.types import Types
-from flytekit.sdk.workflow import Input, workflow_class, Output
+from flytekit.sdk.workflow import Input, workflow_class
 
 default_images = [
     'https://upload.wikimedia.org/wikipedia/commons/a/a8/Fractal_pyramid.jpg',
