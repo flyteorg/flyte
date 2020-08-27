@@ -2,7 +2,7 @@
 
 set -ex
 
-DEPLOYMENT=${1:-sandbox test eks}
+DEPLOYMENT=${1:-sandbox test eks gcp}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 KUSTOMIZE_IMAGE="lyft/kustomizer:v3.1.0"
