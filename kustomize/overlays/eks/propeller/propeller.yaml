@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flytepropeller
+  namespace: flyte
+spec:
+  template:
+    spec:
+      containers:
+      - name: flytepropeller
+        env:
+        - name: QUBOLE_API_KEY
+          value: notarealkey
+        resources:
+          limits:
+            memory: "100Mi"
+            cpu: "0.1"
+            ephemeral-storage: "100Mi"

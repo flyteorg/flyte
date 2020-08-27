@@ -10,7 +10,7 @@ set -x
 
 # We're generating documentation for flytesdk, which references flyteidl.  autodoc complains if the python libraries
 # referenced are not installed, so let's install them
-pip install -U flytekit[all]
+pip install -U flytekit[all]==${FLYTEKIT_VERSION}
 
 # Generate the RST files for flytekit
 sphinx-apidoc --force --tocfile index --ext-autodoc --output-dir /repos/flytekit/docs /repos/flytekit/flytekit

@@ -33,7 +33,7 @@ Lets create a new project called ``myflyteproject``. Use the project creation en
 Writing a Task
 *****************
 
-The most basic Flyte primitive is a "task". Flyte Tasks are units of work that can be composed in a workflow. The simplest way to write a Flyte task is using the FlyteSDK.
+The most basic Flyte primitive is a "task". Flyte Tasks are units of work that can be composed in a workflow. The simplest way to write a Flyte task is using the Flyte Python SDK - flytekit.
 
 Start by creating a new file ::
 
@@ -109,7 +109,7 @@ Flyte fulfills tasks using docker images. You'll need to build a docker image fr
 
 If you have the flyte sandbox installed on your local machine, the image will be accessible to to your Flyte system. If you're running a remote Flyte instance, you'll need to upload this image to a remote registry such as Dockerhub, Amazon ECR, or Google Container Registry, so that it can be used by the Flyte system. 
 
-To upload to a remote registry, use ::
+To upload to a remote registry (or even local registry), use ::
 
   DOCKER_REGISTRY_USERNAME={username} DOCKER_REGISTRY_PASSWORD={pass} REGISTRY=docker.io make docker_build
 

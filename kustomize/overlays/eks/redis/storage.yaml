@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: flyte
+spec:
+  template:
+    spec:
+      volumes:
+      - name: redis-data
+        emptyDir: {}

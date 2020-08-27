@@ -7,3 +7,7 @@ plugins:
       - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
       - FLYTE_AWS_ACCESS_KEY_ID: minio
       - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+    co-pilot:
+      name: "flyte-copilot-"
+      image: "docker.io/lyft/flytecopilot:v0.3.35"
+      start-timeout: "30s"

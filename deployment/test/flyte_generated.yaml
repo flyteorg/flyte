@@ -367,9 +367,66 @@ data:
     spec:
       finalizers:
       - kubernetes
+  ab_project-resource-quota.yaml: "apiVersion: v1\nkind: ResourceQuota\nmetadata:\n
+    \ name: project-quota\n  namespace: {{ namespace }} \nspec:\n  hard:\n    limits.cpu:
+    {{ projectQuotaCpu }} \n    limits.memory: {{ projectQuotaMemory }}\n\n"
+  ac_project-copilot-dataconfig.yaml: |
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: flyte-data-config
+      namespace: {{ namespace }}
+    data:
+      config.yaml: |
+        storage:
+          connection:
+            access-key: minio
+            auth-type: accesskey
+            disable-ssl: true
+            endpoint: http://minio.flyte.svc.cluster.local:9000
+            region: us-east-1
+            secret-key: miniostorage
+          type: minio
+          container: my-s3-bucket
+          enable-multicontainer: true
+  ad_spark-role.yaml: |
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: Role
+    metadata:
+      name: spark-role
+      namespace: {{ namespace }}
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - pods
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - services
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      verbs:
+      - '*'
+  ae_spark-service-account.yaml: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: spark
+      namespace: {{ namespace }}
+  af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1beta1\nkind:
+    RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace
+    }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n-
+    kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-dgc9fcm2kh
+  name: clusterresource-template-kf62ttf64k
   namespace: flyte
 ---
 apiVersion: v1
@@ -384,7 +441,12 @@ data:
       security:
         secure: false
         useAuth: false
-        allowCors: false
+        allowCors: true
+        allowedOrigins:
+          # Accepting all domains for Sandbox installation
+          - "*"
+        allowedHeaders:
+          - "Content-Type"
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
       profilerPort: 10254
@@ -424,10 +486,6 @@ data:
         cpu: 2
         memory: 2G
         storage: 20Mi
-    task_type_whitelist:
-      spark:
-        - project: flytekit
-        - project: flytetester
     domains:
       - id: development
         name: development
@@ -435,19 +493,33 @@ data:
         name: staging
       - id: production
         name: production
-      - id: domain
-        name: domain
     cluster_resources:
       templatePath: "/etc/flyte/clusterresource/templates"
+      customData:
+        production:
+          - projectQuotaCpu:
+              value: "5"
+          - projectQuotaMemory:
+              value: "4000Mi"
+        staging:
+          - projectQuotaCpu:
+              value: "2"
+          - projectQuotaMemory:
+              value: "3000Mi"
+        development:
+          - projectQuotaCpu:
+              value: "2"
+          - projectQuotaMemory:
+              value: "3000Mi"
       refresh: 5m
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-4k466cfctf
+  name: flyte-admin-config-42k268hb6k
   namespace: flyte
 ---
 apiVersion: v1
 data:
-  config.yaml: |
+  config.yaml: |+
     plugins:
       logs:
         kubernetes-enabled: true
@@ -457,15 +529,21 @@ data:
           - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
           - FLYTE_AWS_ACCESS_KEY_ID: minio
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        co-pilot:
+          name: "flyte-copilot-"
+          image: "docker.io/lyft/flytecopilot:v0.3.35"
+          start-timeout: "5s"
+
 kind: ConfigMap
 metadata:
-  name: flyte-plugin-config-b525btf774
+  name: flyte-plugin-config-ckftmk9b6k
   namespace: flyte
 ---
 apiVersion: v1
 data:
   config.yaml: |
     propeller:
+      rawoutput-prefix: s3://my-container/
       metadata-prefix: metadata/propeller
       workers: 4
       max-workflow-retries: 30
@@ -523,7 +601,7 @@ data:
           - k8s-array
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-hd7h56fg47
+  name: flyte-propeller-config-2m8ffmc746
   namespace: flyte
 ---
 apiVersion: v1
@@ -627,7 +705,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.2.5
+        app.kubernetes.io/version: 0.3.0
     spec:
       containers:
       - command:
@@ -636,7 +714,7 @@ spec:
         - --config
         - /etc/flyte/config/flyteadmin_config.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.2.5
+        image: docker.io/lyft/flyteadmin:v0.3.0
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -687,7 +765,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.2.5
+        image: docker.io/lyft/flyteadmin:v0.3.0
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -703,7 +781,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: docker.io/lyft/flyteadmin:v0.2.5
+        image: docker.io/lyft/flyteadmin:v0.3.0
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -716,7 +794,7 @@ spec:
         - /etc/flyte/config/flyteadmin_config.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.2.5
+        image: docker.io/lyft/flyteadmin:v0.3.0
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -727,12 +805,12 @@ spec:
       serviceAccountName: flyteadmin
       volumes:
       - configMap:
-          name: clusterresource-template-dgc9fcm2kh
+          name: clusterresource-template-kf62ttf64k
         name: resource-templates
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-4k466cfctf
+          name: flyte-admin-config-42k268hb6k
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -755,7 +833,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.2.20
+        app.kubernetes.io/version: 0.3.2
     spec:
       containers:
       - args:
@@ -768,7 +846,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.2.20
+        image: docker.io/lyft/flytepropeller:v0.3.2
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -786,10 +864,10 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-hd7h56fg47
+          name: flyte-propeller-config-2m8ffmc746
         name: config-volume
       - configMap:
-          name: flyte-plugin-config-b525btf774
+          name: flyte-plugin-config-ckftmk9b6k
         name: plugin-config-volume
 ---
 apiVersion: apps/v1
@@ -1014,7 +1092,7 @@ spec:
             - /etc/flyte/config/flyteadmin_config.yaml
             - clusterresource
             - sync
-            image: docker.io/lyft/flyteadmin:v0.2.5
+            image: docker.io/lyft/flyteadmin:v0.3.0
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -1026,10 +1104,10 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-dgc9fcm2kh
+              name: clusterresource-template-kf62ttf64k
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-4k466cfctf
+              name: flyte-admin-config-42k268hb6k
             name: config-volume
   schedule: '*/1 * * * *'
 ---

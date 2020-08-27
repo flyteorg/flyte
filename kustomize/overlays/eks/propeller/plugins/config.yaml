@@ -1,0 +1,9 @@
+plugins:
+  logs:
+    kubernetes-enabled: true
+    kubernetes-url: "http://localhost:30082"
+  k8s:
+    default-env-vars:
+      - AWS_RETRY_MODE: standard
+      - AWS_METADATA_SERVICE_TIMEOUT: 5
+      - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
