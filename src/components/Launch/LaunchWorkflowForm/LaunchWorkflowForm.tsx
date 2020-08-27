@@ -9,6 +9,7 @@ import {
 import { WaitForData } from 'components/common';
 import { ButtonCircularProgress } from 'components/common/ButtonCircularProgress';
 import { APIContextValue, useAPIContext } from 'components/data/apiContext';
+import { isLoadingState } from 'components/hooks/fetchMachine';
 import {
     FilterOperationName,
     NamedEntityIdentifier,
@@ -16,7 +17,7 @@ import {
     workflowSortFields
 } from 'models';
 import * as React from 'react';
-import { formStrings, unsupportedRequiredInputsString } from './constants';
+import { formStrings } from './constants';
 import { InputValueCacheContext } from './inputValueCache';
 import { LaunchWorkflowFormInputs } from './LaunchWorkflowFormInputs';
 import { SearchableSelector } from './SearchableSelector';
@@ -55,8 +56,7 @@ function generateFetchSearchResults(
 /** Renders the form for initiating a Launch request based on a Workflow */
 export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
     const state = useLaunchWorkflowFormState(props);
-    const { submissionState } = state;
-    const launchPlanSelected = !!state.selectedLaunchPlan;
+    const { submissionState, unsupportedRequiredInputs, workflows } = state;
     const styles = useStyles();
     const fetchSearchResults = generateFetchSearchResults(
         useAPIContext(),
@@ -68,10 +68,11 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
         state.onSubmit();
     };
 
+    const submissionInFlight = isLoadingState(submissionState.state);
     const preventSubmit =
-        submissionState.loading ||
-        !state.inputLoadingState.hasLoaded ||
-        state.unsupportedRequiredInputs.length > 0;
+        submissionInFlight ||
+        !state.inputsReady ||
+        unsupportedRequiredInputs.length > 0;
 
     return (
         <InputValueCacheContext.Provider value={state.inputValueCache}>
@@ -80,10 +81,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                 <Typography variant="h6">{state.workflowName}</Typography>
             </DialogTitle>
             <DialogContent dividers={true} className={styles.inputsSection}>
-                <WaitForData
-                    spinnerVariant="medium"
-                    {...state.workflowOptionsLoadingState}
-                >
+                <WaitForData spinnerVariant="medium" {...workflows}>
                     <section
                         title={formStrings.workflowVersion}
                         className={styles.formControl}
@@ -97,10 +95,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                             selectedItem={state.selectedWorkflow}
                         />
                     </section>
-                    <WaitForData
-                        {...state.launchPlanOptionsLoadingState}
-                        spinnerVariant="medium"
-                    >
+                    <WaitForData {...state.launchPlans} spinnerVariant="medium">
                         <section
                             title={formStrings.launchPlan}
                             className={styles.formControl}
@@ -114,26 +109,21 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                             />
                         </section>
                     </WaitForData>
-                    {launchPlanSelected ? (
-                        <WaitForData
-                            spinnerVariant="medium"
-                            {...state.inputLoadingState}
-                        >
-                            <section title={formStrings.inputs}>
-                                {state.unsupportedRequiredInputs.length > 0 ? (
-                                    <UnsupportedRequiredInputsError
-                                        inputs={state.unsupportedRequiredInputs}
-                                    />
-                                ) : (
-                                    <LaunchWorkflowFormInputs
-                                        key={state.formKey}
-                                        inputs={state.inputs}
-                                        ref={state.formInputsRef}
-                                        showErrors={state.showErrors}
-                                    />
-                                )}
-                            </section>
-                        </WaitForData>
+                    {state.inputsReady ? (
+                        <section title={formStrings.inputs}>
+                            {state.unsupportedRequiredInputs.length > 0 ? (
+                                <UnsupportedRequiredInputsError
+                                    inputs={state.unsupportedRequiredInputs}
+                                />
+                            ) : (
+                                <LaunchWorkflowFormInputs
+                                    key={state.formKey}
+                                    inputs={state.inputs}
+                                    ref={state.formInputsRef}
+                                    showErrors={state.showErrors}
+                                />
+                            )}
+                        </section>
                     ) : null}
                 </WaitForData>
             </DialogContent>
@@ -146,7 +136,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                 <DialogActions>
                     <Button
                         color="primary"
-                        disabled={submissionState.loading}
+                        disabled={submissionInFlight}
                         id="launch-workflow-cancel"
                         onClick={state.onCancel}
                         variant="outlined"
@@ -162,7 +152,7 @@ export const LaunchWorkflowForm: React.FC<LaunchWorkflowFormProps> = props => {
                         variant="contained"
                     >
                         {formStrings.submit}
-                        {submissionState.loading && <ButtonCircularProgress />}
+                        {submissionInFlight && <ButtonCircularProgress />}
                     </Button>
                 </DialogActions>
             </div>

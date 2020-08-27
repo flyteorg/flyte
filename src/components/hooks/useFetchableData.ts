@@ -1,17 +1,22 @@
-import { useContext, useEffect, useState } from 'react';
-
+import { useMachine } from '@xstate/react';
+import { env } from 'common/env';
 import { createDebugLogger } from 'common/log';
-import { CacheContext, getCacheKey } from 'components/Cache';
-import { useAPIContext } from 'components/data/apiContext';
+import { CacheContext, getCacheKey, ValueCache } from 'components/Cache';
+import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import { NotAuthorizedError } from 'errors';
-import { FetchableData, FetchFn } from './types';
+import { useContext, useEffect, useMemo, useRef } from 'react';
+import { fetchMachine } from './fetchMachine';
+import {
+    FetchableData,
+    FetchEventObject,
+    fetchEvents,
+    FetchFn,
+    FetchMachine,
+    FetchStateContext,
+    fetchStates
+} from './types';
 
 const log = createDebugLogger('useFetchableData');
-
-interface FetchState<T> {
-    promise: Promise<T>;
-    key?: string;
-}
 
 export interface FetchableDataConfig<T, DataType> {
     autoFetch?: boolean;
@@ -27,6 +32,61 @@ function isHashableInput(value: any): value is object | string {
         typeof value === 'string' ||
         typeof value === 'symbol'
     );
+}
+
+interface CreateFetchFnConfig<T, DataType> {
+    apiContext: APIContextValue;
+    cache: ValueCache;
+    cacheKey?: string;
+    debugName?: string;
+    data: DataType;
+    doFetch: FetchFn<T, DataType>;
+    useCache: boolean;
+}
+function createFetchFn<T extends object, DataType>({
+    apiContext,
+    cache,
+    cacheKey,
+    data,
+    debugName = '',
+    doFetch,
+    useCache
+}: CreateFetchFnConfig<T, DataType>): (
+    context: FetchStateContext<T>
+) => Promise<T> {
+    return async context => {
+        if (useCache && cacheKey !== undefined) {
+            const cachedValue = cache.get(cacheKey) as T | undefined;
+            if (cachedValue !== undefined) {
+                log(
+                    `${debugName} found cached value for hash ${cacheKey.toString()}`
+                );
+                return cachedValue;
+            }
+        }
+
+        try {
+            const response = await doFetch(data, context.value);
+            let mergedValue = response;
+            if (useCache) {
+                if (cacheKey === undefined) {
+                    log(
+                        `${debugName} failed to cache value. Unexpected empty cache key`
+                    );
+                } else {
+                    mergedValue = cache.mergeValue(cacheKey, response) as T;
+                }
+            }
+            return mergedValue;
+        } catch (error) {
+            if (error instanceof NotAuthorizedError) {
+                apiContext.loginStatus.setExpired(true);
+            }
+            return Promise.reject(
+                error instanceof Error ? error : new Error(error)
+            );
+        }
+    };
 }
 
 export function useFetchableData<T, DataType extends object | string>(
@@ -54,110 +114,73 @@ export function useFetchableData<T extends object, DataType>(
     config: FetchableDataConfig<T, DataType>,
     data: DataType
 ): FetchableData<T> {
-    const cacheKey = isHashableInput(data) ? getCacheKey(data) : undefined;
     const {
         autoFetch = true,
-        useCache: allowCache = false,
+        useCache = false,
         debugName = '',
         defaultValue,
         doFetch
     } = config;
 
-    const [lastError, setLastError] = useState<Error | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [fetchState, setFetchState] = useState<FetchState<T> | null>(null);
-    const [hasLoaded, setHasLoaded] = useState(false);
-    const [value, setValue] = useState<T>(defaultValue);
+    const cacheKey = isHashableInput(data) ? getCacheKey(data) : undefined;
+    const contextCacheKey = useRef<string>();
     const cache = useContext(CacheContext);
     const apiContext = useAPIContext();
-
-    let cancelled = false;
-    const cancel = () => {
-        cancelled = true;
-    };
-
-    const onValue = (newValue: T) => {
-        let mergedValue = newValue;
-        if (allowCache) {
-            if (cacheKey === undefined) {
-                log(
-                    `${debugName} failed to cache value. Unexpected empty cache key`
-                );
-            } else {
-                mergedValue = cache.mergeValue(cacheKey, newValue) as T;
-            }
-        }
-        if (cancelled) {
-            return mergedValue;
-        }
-        setValue(mergedValue);
-        setFetchState(null);
-        setHasLoaded(true);
-        setLoading(false);
-        return mergedValue;
-    };
-
-    const onError = (error: Error) => {
-        if (error instanceof NotAuthorizedError) {
-            apiContext.loginStatus.setExpired(true);
-        }
-        if (cancelled) {
-            return Promise.reject(error);
-        }
-        setLastError(error instanceof Error ? error : new Error(error));
-        setFetchState(null);
-        setLoading(false);
-        return Promise.resolve(defaultValue);
-    };
-
-    const fetch = async ({ force } = { force: false }) => {
-        if (fetchState && fetchState.key === cacheKey) {
-            log(`${debugName} Fetch already in progress, skipping`);
-            return fetchState.promise;
-        }
-
-        setLastError(null);
-
-        // If caching is enabled and this is not a force-refresh, we can check
-        // for a cached value
-        if (!force && allowCache && cacheKey !== undefined) {
-            const cachedValue = cache.get(cacheKey) as T | undefined;
-            if (cachedValue !== undefined) {
-                log(
-                    `${debugName} found cached value for hash ${cacheKey.toString()}`
-                );
-                return onValue(cachedValue);
-            }
-        }
-
-        setLoading(true);
-
-        const newFetchPromise = doFetch(data, value).then(onValue, onError);
-
-        setFetchState({ promise: newFetchPromise, key: cacheKey });
-        return newFetchPromise;
-    };
-
-    useEffect(
-        () => {
-            setFetchState(null);
-            setLastError(null);
-            setValue(defaultValue);
-            setLoading(false);
-            setHasLoaded(false);
-        },
-        cacheKey === undefined ? [] : [cacheKey]
+    const fetchFn = useMemo(
+        () =>
+            createFetchFn({
+                apiContext,
+                cache,
+                cacheKey,
+                data,
+                debugName,
+                doFetch,
+                useCache
+            }),
+        [apiContext, cache, cacheKey, data, debugName, doFetch, useCache]
     );
 
-    // We initiate auto-fetch separately because we want it to run *after*
-    // the reset occurs in the above effect. Otherwise doFetch will use a stale
-    // `value` when invoking the passed fetch function.
+    const [lastState, sendEvent] = useMachine<
+        FetchStateContext<T>,
+        FetchEventObject
+    >(fetchMachine as FetchMachine<T>, {
+        devTools: env.NODE_ENV === 'development',
+        context: {
+            debugName,
+            defaultValue,
+            value: defaultValue
+        },
+        services: {
+            doFetch: fetchFn
+        }
+    });
+
+    const fetch = useMemo(() => () => sendEvent(fetchEvents.LOAD), [sendEvent]);
+    let state = lastState;
+
+    // If the cacheKey changes, immediately reset the state to avoid returning
+    // any stale state below.
+    if (
+        contextCacheKey.current !== cacheKey &&
+        !lastState.matches(fetchStates.IDLE)
+    ) {
+        state = sendEvent(fetchEvents.RESET);
+        contextCacheKey.current = cacheKey;
+    }
+
+    const isIdle = state.matches(fetchStates.IDLE);
     useEffect(() => {
-        if (!hasLoaded && autoFetch) {
+        if (autoFetch && isIdle) {
             fetch();
         }
-        return cancel;
-    }, [autoFetch, hasLoaded, cacheKey]);
+    }, [autoFetch, isIdle]);
 
-    return { debugName, fetch, lastError, loading, hasLoaded, value };
+    const { lastError, value } = state.context;
+    return {
+        debugName,
+        fetch,
+        lastError,
+        state,
+        value
+    };
 }

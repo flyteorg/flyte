@@ -4,17 +4,59 @@ import {
     PaginatedEntityResponse,
     RequestConfig
 } from 'models';
+import { EventObject, State, StateMachine } from 'xstate';
 
-export interface FetchArgs {
-    force?: boolean;
+export enum fetchStates {
+    IDLE = 'IDLE',
+    LOADING = 'LOADING',
+    LOADED = 'LOADED',
+    FAILED = 'FAILED',
+    FAILED_RETRYING = 'FAILED_RETRYING',
+    REFRESHING = 'REFRESHING',
+    REFRESH_FAILED = 'REFRESH_FAILED',
+    REFRESH_FAILED_RETRYING = 'REFRESH_FAILED_RETRYING'
 }
 
-export interface FetchableData<T> {
-    fetch(fetchArgs?: FetchArgs): Promise<any>;
-    hasLoaded: boolean;
+export enum fetchEvents {
+    CANCEL = 'CANCEL',
+    FAILURE = 'FAILURE',
+    LOAD = 'LOAD',
+    RESET = 'RESET',
+    SUCCESS = 'SUCCESS'
+}
+
+export interface FetchEventObject extends EventObject {
+    type: fetchEvents;
+}
+
+export interface FetchStateSchema {
+    states: { [k in fetchStates]: any };
+}
+
+export interface FetchStateContext<T> {
+    debugName?: string;
+    defaultValue: T;
     lastError: Error | null;
-    loading: boolean;
+    value: T;
+}
+
+export type FetchableState<T> = State<
+    FetchStateContext<T>,
+    FetchEventObject,
+    FetchStateSchema
+>;
+
+export type FetchMachine<T> = StateMachine<
+    FetchStateContext<T>,
+    FetchStateSchema,
+    FetchEventObject
+>;
+
+export interface FetchableData<T> {
     debugName: string;
+    fetch(): void;
+    lastError: Error | null;
+    state: FetchableState<T>;
     value: T;
 }
 

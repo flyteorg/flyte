@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import { FixedRateUnit, Identifier } from '../Common/types';
 import {
     LaunchPlan,
@@ -47,7 +48,7 @@ export const createMockLaunchPlan: (
 ) => LaunchPlan = (name: string, version: string = 'abcdefg') => ({
     id: workflowId(name, version),
     spec: createMockLaunchPlanSpec(),
-    closure: { ...basicLaunchPlanClosure }
+    closure: cloneDeep(basicLaunchPlanClosure)
 });
 
 export const mockLaunchPlanSchedules = {

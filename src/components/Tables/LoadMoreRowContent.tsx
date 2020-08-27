@@ -1,6 +1,8 @@
 import { Button } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { useCommonStyles } from 'components/common/styles';
+import { isLoadingState } from 'components/hooks/fetchMachine';
+import { FetchableState } from 'components/hooks/types';
 import * as React from 'react';
 import { ButtonCircularProgress } from '../common';
 import { loadMoreRowGridHeight } from './constants';
@@ -23,7 +25,7 @@ export const useStyles = makeStyles((theme: Theme) => ({
 export interface LoadMoreRowContentProps {
     className?: string;
     lastError: string | Error | null;
-    loading: boolean;
+    state: FetchableState<any>;
     style?: any;
     loadMoreRows: () => void;
 }
@@ -34,12 +36,12 @@ export interface LoadMoreRowContentProps {
 export const LoadMoreRowContent: React.FC<LoadMoreRowContentProps> = props => {
     const commonStyles = useCommonStyles();
     const styles = useStyles();
-    const { loading, loadMoreRows, lastError, style } = props;
+    const { loadMoreRows, lastError, state, style } = props;
 
     const button = (
         <Button onClick={loadMoreRows} size="small" variant="outlined">
             Load More
-            {loading ? <ButtonCircularProgress /> : null}
+            {isLoadingState(state) ? <ButtonCircularProgress /> : null}
         </Button>
     );
     const errorContent = lastError ? (

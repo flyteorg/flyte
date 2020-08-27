@@ -1,29 +1,35 @@
-import { FetchableData, FetchFn } from '../types';
+import { State } from 'xstate';
+import { FetchableData, FetchFn, fetchStates } from '../types';
 
 export function createMockFetchable<T>(
     value: any,
-    fetch: FetchFn<T, any>
+    fetch: () => void
 ): FetchableData<T> {
     return {
         fetch,
         value,
         debugName: '',
-        hasLoaded: false,
         lastError: null,
-        loading: false
+        state: State.from(fetchStates.IDLE)
     };
 }
 
 export function loadingFetchable<T>(
     value: any,
-    fetch: FetchFn<T, any>
+    fetch: () => void
 ): FetchableData<T> {
-    return { ...createMockFetchable(value, fetch), loading: true };
+    return {
+        ...createMockFetchable(value, fetch),
+        state: State.from(fetchStates.LOADING)
+    };
 }
 
 export function loadedFetchable<T>(
     value: any,
-    fetch: FetchFn<T, any>
+    fetch: () => void
 ): FetchableData<T> {
-    return { ...createMockFetchable(value, fetch), hasLoaded: true };
+    return {
+        ...createMockFetchable(value, fetch),
+        state: State.from(fetchStates.LOADED)
+    };
 }

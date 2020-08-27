@@ -1,6 +1,6 @@
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Core } from 'flyteidl';
-import { mapValues } from 'lodash';
+import { cloneDeep, mapValues } from 'lodash';
 import * as Long from 'long';
 import {
     BlobDimensionality,
@@ -109,7 +109,7 @@ export function createMockWorkflowInputsInterface(
 ): TypedInterface {
     return {
         inputs: {
-            variables: { ...variables }
+            variables: cloneDeep(variables)
         }
     };
 }

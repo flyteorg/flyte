@@ -127,7 +127,7 @@ export const DataTableImpl: React.FC<DataTableImplProps> = props => {
         height,
         value: items,
         lastError,
-        loading,
+        state,
         moreItemsAvailable,
         rowContentRenderer = defaultTableRowRenderer,
         width
@@ -149,7 +149,7 @@ export const DataTableImpl: React.FC<DataTableImplProps> = props => {
                     <LoadMoreRowContent
                         className={className}
                         loadMoreRows={loadMoreRows}
-                        loading={loading}
+                        state={state}
                         lastError={lastError}
                         style={style}
                     />

@@ -10,8 +10,10 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import { escapeKeyListener } from 'components/common/keyboardEvents';
 import { useCommonStyles } from 'components/common/styles';
-import { FetchableData, FetchFn, useFetchableData } from 'components/hooks';
+import { isLoadingState } from 'components/hooks/fetchMachine';
+import { FetchableData, FetchFn } from 'components/hooks/types';
 import { useDebouncedValue } from 'components/hooks/useDebouncedValue';
+import { useFetchableData } from 'components/hooks/useFetchableData';
 import * as React from 'react';
 import reactLoadingSkeleton from 'react-loading-skeleton';
 
@@ -149,9 +151,7 @@ function useSearchableSelectorState<DataType>({
     };
 
     const showSearchResults =
-        (searchResults.hasLoaded || searchResults.loading) &&
-        focused &&
-        minimumQueryMet;
+        searchResults.value.length && focused && minimumQueryMet;
     const showList = showSearchResults || isExpanded;
 
     return {
@@ -195,7 +195,7 @@ const SearchableSelectorItems = <DataType extends {}>({
 }: SearchableSelectorState<DataType>) => {
     const styles = useStyles();
     const commonStyles = useCommonStyles();
-    if (searchResults.loading) {
+    if (isLoadingState(searchResults.state)) {
         return <LoadingContent />;
     }
     if (items.length === 0) {

@@ -1,5 +1,6 @@
 import { getCacheKey } from 'components/Cache';
 import { Admin } from 'flyteidl';
+import { cloneDeep } from 'lodash';
 import { Identifier } from '../Common';
 import { Workflow, WorkflowClosure } from '../Workflow';
 import * as simpleClosure from './simpleWorkflowClosure.json';
@@ -25,9 +26,8 @@ export const createMockWorkflow: (
     id: workflowId(name, version)
 });
 
-export const createMockWorkflowClosure: () => WorkflowClosure = () => ({
-    ...decodedClosure
-});
+export const createMockWorkflowClosure: () => WorkflowClosure = () =>
+    cloneDeep(decodedClosure);
 
 export const createMockWorkflows: Fn<Workflow[]> = () => [
     createMockWorkflow('workflow1'),

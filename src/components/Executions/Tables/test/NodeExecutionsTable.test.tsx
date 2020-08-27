@@ -10,6 +10,7 @@ import {
 } from 'components/Executions/contexts';
 import { ExecutionDataCache } from 'components/Executions/types';
 import { createExecutionDataCache } from 'components/Executions/useExecutionDataCache';
+import { fetchStates } from 'components/hooks/types';
 import {
     FilterOperationName,
     getTask,
@@ -27,6 +28,7 @@ import {
 import { mockTasks } from 'models/Task/__mocks__/mockTaskData';
 import * as React from 'react';
 import { Identifier } from 'typescript';
+import { State } from 'xstate';
 import {
     NodeExecutionsTable,
     NodeExecutionsTableProps
@@ -96,7 +98,7 @@ describe('NodeExecutionsTable', () => {
         props = {
             value: nodeExecutions,
             lastError: null,
-            loading: false,
+            state: State.from(fetchStates.LOADED),
             moreItemsAvailable: false,
             fetch: jest.fn()
         };

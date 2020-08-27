@@ -1,8 +1,8 @@
 import { log } from 'common/log';
-import { useWorkflowExecutionInputs } from 'components/Executions/useWorkflowExecution';
-import { FetchableData } from 'components/hooks';
+import { useAPIContext } from 'components/data/apiContext';
+import { fetchWorkflowExecutionInputs } from 'components/Executions/useWorkflowExecution';
+import { FetchableData, useFetchableData } from 'components/hooks';
 import { Execution, Variable } from 'models';
-import { useEffect, useState } from 'react';
 import { InitialLaunchParameters, LiteralValueMap } from './types';
 import { createInputCacheKey, getInputDefintionForLiteralType } from './utils';
 
@@ -18,37 +18,49 @@ export function useExecutionLaunchConfiguration({
 }: UseExecutionLaunchConfigurationArgs): FetchableData<
     InitialLaunchParameters
 > {
-    const inputs = useWorkflowExecutionInputs(execution);
-    const [values, setValues] = useState<LiteralValueMap>(new Map());
-    const {
-        closure: { workflowId },
-        spec: { launchPlan }
-    } = execution;
+    const apiContext = useAPIContext();
+    return useFetchableData<
+        InitialLaunchParameters,
+        UseExecutionLaunchConfigurationArgs
+    >(
+        {
+            debugName: 'ExecutionLaunchConfiguration',
+            defaultValue: {} as InitialLaunchParameters,
+            doFetch: async ({ execution, workflowInputs }) => {
+                const {
+                    closure: { workflowId },
+                    spec: { launchPlan }
+                } = execution;
 
-    const value = { launchPlan, values, workflow: workflowId };
-
-    useEffect(() => {
-        const { literals } = inputs.value;
-        const convertedValues: LiteralValueMap = Object.keys(literals).reduce(
-            (out, name) => {
-                const workflowInput = workflowInputs[name];
-                if (!workflowInput) {
-                    log.error(`Unexpected missing workflow input: ${name}`);
-                    return out;
-                }
-                const typeDefinition = getInputDefintionForLiteralType(
-                    workflowInput.type
+                const inputs = await fetchWorkflowExecutionInputs(
+                    execution,
+                    apiContext
                 );
 
-                const key = createInputCacheKey(name, typeDefinition);
-                out.set(key, literals[name]);
-                return out;
-            },
-            new Map()
-        );
+                const { literals } = inputs;
+                const values: LiteralValueMap = Object.keys(literals).reduce(
+                    (out, name) => {
+                        const workflowInput = workflowInputs[name];
+                        if (!workflowInput) {
+                            log.error(
+                                `Unexpected missing workflow input: ${name}`
+                            );
+                            return out;
+                        }
+                        const typeDefinition = getInputDefintionForLiteralType(
+                            workflowInput.type
+                        );
 
-        setValues(convertedValues);
-    }, [inputs.value]);
+                        const key = createInputCacheKey(name, typeDefinition);
+                        out.set(key, literals[name]);
+                        return out;
+                    },
+                    new Map()
+                );
 
-    return { ...inputs, value };
+                return { launchPlan, values, workflow: workflowId };
+            }
+        },
+        { execution, workflowInputs }
+    );
 }

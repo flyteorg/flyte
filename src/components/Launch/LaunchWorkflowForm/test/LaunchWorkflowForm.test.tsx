@@ -17,7 +17,6 @@ import * as Long from 'long';
 import {
     createWorkflowExecution,
     CreateWorkflowExecutionArguments,
-    getLaunchPlan,
     getWorkflow,
     Identifier,
     LaunchPlan,
@@ -57,6 +56,7 @@ import { createMockObjects } from './utils';
 describe('LaunchWorkflowForm', () => {
     let onClose: jest.Mock;
     let mockLaunchPlans: LaunchPlan[];
+    let mockSingleLaunchPlan: LaunchPlan;
     let mockWorkflow: Workflow;
     let mockWorkflowVersions: Workflow[];
     let workflowId: NamedEntityIdentifier;
@@ -64,7 +64,6 @@ describe('LaunchWorkflowForm', () => {
 
     let mockListLaunchPlans: jest.Mock<ReturnType<typeof listLaunchPlans>>;
     let mockListWorkflows: jest.Mock<ReturnType<typeof listWorkflows>>;
-    let mockGetLaunchPlan: jest.Mock<ReturnType<typeof getLaunchPlan>>;
     let mockGetWorkflow: jest.Mock<ReturnType<typeof getWorkflow>>;
     let mockCreateWorkflowExecution: jest.Mock<ReturnType<
         typeof createWorkflowExecution
@@ -76,7 +75,8 @@ describe('LaunchWorkflowForm', () => {
     });
 
     afterEach(() => {
-        jest.clearAllTimers();
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
     });
 
     const createMockWorkflowWithInputs = (id: Identifier) => {
@@ -94,6 +94,7 @@ describe('LaunchWorkflowForm', () => {
         const mockObjects = createMockObjects(variables);
         mockWorkflow = mockObjects.mockWorkflow;
         mockLaunchPlans = mockObjects.mockLaunchPlans;
+        mockSingleLaunchPlan = mockLaunchPlans[0];
 
         // We want the second launch plan to have inputs which differ, so we'll
         // remove one of the inputs
@@ -105,7 +106,6 @@ describe('LaunchWorkflowForm', () => {
 
         workflowId = mockWorkflow.id;
         mockCreateWorkflowExecution = jest.fn();
-        mockGetLaunchPlan = jest.fn().mockResolvedValue(mockLaunchPlans[0]);
         // Return our mock inputs for any version requested
         mockGetWorkflow = jest
             .fn()
@@ -120,7 +120,7 @@ describe('LaunchWorkflowForm', () => {
                     // code is searching for a specific item. So we'll
                     // return a single-item list containing it.
                     if (filter && filter[0].key === 'version') {
-                        const launchPlan = { ...mockLaunchPlans[0] };
+                        const launchPlan = { ...mockSingleLaunchPlan };
                         launchPlan.id = {
                             ...scope,
                             version: filter[0].value
@@ -160,7 +160,6 @@ describe('LaunchWorkflowForm', () => {
                 <APIContext.Provider
                     value={mockAPIContextValue({
                         createWorkflowExecution: mockCreateWorkflowExecution,
-                        getLaunchPlan: mockGetLaunchPlan,
                         getWorkflow: mockGetWorkflow,
                         listLaunchPlans: mockListLaunchPlans,
                         listWorkflows: mockListWorkflows
@@ -186,7 +185,7 @@ describe('LaunchWorkflowForm', () => {
 
     describe('With Simple Inputs', () => {
         beforeEach(() => {
-            variables = mockSimpleVariables;
+            variables = cloneDeep(mockSimpleVariables);
             createMocks();
         });
 
@@ -352,7 +351,6 @@ describe('LaunchWorkflowForm', () => {
             delete mockLaunchPlans[1].closure!.expectedInputs.parameters[
                 stringInputName
             ];
-            mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[1]);
 
             // Click the expander for the launch plan, select the second item
             const launchPlanDiv = getByTitle(formStrings.launchPlan);
@@ -418,7 +416,7 @@ describe('LaunchWorkflowForm', () => {
 
             expect(getByText(errorString)).toBeInTheDocument();
 
-            mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[1]);
+            mockSingleLaunchPlan = mockLaunchPlans[1];
             // Click the expander for the launch plan, select the second item
             const launchPlanDiv = getByTitle(formStrings.launchPlan);
             const expander = getByRole(launchPlanDiv, 'button');
@@ -469,7 +467,6 @@ describe('LaunchWorkflowForm', () => {
                 parameters[integerInputName].default = {
                     scalar: { primitive: { integer: Long.fromNumber(10000) } }
                 } as Literal;
-                mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[0]);
 
                 const { getByLabelText } = renderForm();
                 await waitFor(() => {});
@@ -488,7 +485,6 @@ describe('LaunchWorkflowForm', () => {
                 const parameters = mockLaunchPlans[0].closure!.expectedInputs
                     .parameters;
                 parameters[stringInputName].required = true;
-                mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[0]);
 
                 const { getByText } = renderForm();
                 await waitFor(() => {});
@@ -674,7 +670,7 @@ describe('LaunchWorkflowForm', () => {
             });
 
             it('loads preferred workflow version when it does not exist in the list of suggestions', async () => {
-                const missingWorkflow = cloneDeep(mockWorkflowVersions[0]);
+                const missingWorkflow = mockWorkflowVersions[0];
                 missingWorkflow.id.version = 'missingVersionString';
                 const initialParameters: InitialLaunchParameters = {
                     workflow: missingWorkflow.id
@@ -687,7 +683,7 @@ describe('LaunchWorkflowForm', () => {
             });
 
             it('loads the preferred launch plan when it does not exist in the list of suggestions', async () => {
-                const missingLaunchPlan = cloneDeep(mockLaunchPlans[0]);
+                const missingLaunchPlan = mockLaunchPlans[0];
                 missingLaunchPlan.id.name = 'missingLaunchPlanName';
                 const initialParameters: InitialLaunchParameters = {
                     launchPlan: missingLaunchPlan.id
@@ -753,81 +749,86 @@ describe('LaunchWorkflowForm', () => {
                 );
             });
         });
-    });
 
-    describe('With Unsupported Required Inputs', () => {
-        beforeEach(() => {
-            variables = mockSimpleVariables;
-            createMocks();
-            // Binary is currently unsupported, setting the binary input to
-            // required and removing the default value will trigger our use case
-            const parameters = mockLaunchPlans[0].closure!.expectedInputs
-                .parameters;
-            parameters[binaryInputName].required = true;
-            delete parameters[binaryInputName].default;
-            mockGetLaunchPlan.mockResolvedValue(mockLaunchPlans[0]);
-        });
-
-        it('should render error message', async () => {
-            const { getByText } = renderForm();
-            const errorElement = await waitFor(() =>
-                getByText(cannotLaunchWorkflowString)
-            );
-            expect(errorElement).toBeInTheDocument();
-        });
-
-        it('should show unsupported inputs', async () => {
-            const { getByText } = renderForm();
-            const inputElement = await waitFor(() =>
-                getByText(binaryInputName, { exact: false })
-            );
-            expect(inputElement).toBeInTheDocument();
-        });
-
-        it('should print input labels without decoration', async () => {
-            const { getByText } = renderForm();
-            const inputElement = await waitFor(() =>
-                getByText(binaryInputName, { exact: false })
-            );
-            expect(inputElement.textContent).not.toContain(requiredInputSuffix);
-        });
-
-        it('should disable submission', async () => {
-            const { getByRole } = renderForm();
-
-            const submitButton = await waitFor(() =>
-                getByRole('button', { name: formStrings.submit })
-            );
-
-            expect(submitButton).toBeDisabled();
-        });
-
-        it('should not show error if launch plan has default value', async () => {
-            mockLaunchPlans[0].closure!.expectedInputs.parameters[
-                binaryInputName
-            ].default = simpleVariableDefaults.simpleBinary as Literal;
-            const { queryByText } = renderForm();
-            await waitFor(() => queryByText(binaryInputName, { exact: false }));
-            expect(queryByText(cannotLaunchWorkflowString)).toBeNull();
-        });
-
-        it('should not show error if initial value is provided', async () => {
-            const parameters = mockLaunchPlans[0].closure!.expectedInputs
-                .parameters;
-            const values = new Map();
-            const cacheKey = createInputCacheKey(
-                binaryInputName,
-                getInputDefintionForLiteralType(
-                    parameters[binaryInputName].var.type
-                )
-            );
-            values.set(cacheKey, simpleVariableDefaults.simpleBinary);
-            const { queryByText } = renderForm({
-                initialParameters: { values }
+        describe('With Unsupported Required Inputs', () => {
+            beforeEach(() => {
+                // variables = mockSimpleVariables;
+                // createMocks();
+                // Binary is currently unsupported, setting the binary input to
+                // required and removing the default value will trigger our use case
+                const parameters = mockLaunchPlans[0].closure!.expectedInputs
+                    .parameters;
+                parameters[binaryInputName].required = true;
+                delete parameters[binaryInputName].default;
             });
 
-            await waitFor(() => queryByText(binaryInputName, { exact: false }));
-            expect(queryByText(cannotLaunchWorkflowString)).toBeNull();
+            it('should render error message', async () => {
+                const { getByText } = renderForm();
+                const errorElement = await waitFor(() =>
+                    getByText(cannotLaunchWorkflowString)
+                );
+                expect(errorElement).toBeInTheDocument();
+            });
+
+            it('should show unsupported inputs', async () => {
+                const { getByText } = renderForm();
+                const inputElement = await waitFor(() =>
+                    getByText(binaryInputName, { exact: false })
+                );
+                expect(inputElement).toBeInTheDocument();
+            });
+
+            it('should print input labels without decoration', async () => {
+                const { getByText } = renderForm();
+                const inputElement = await waitFor(() =>
+                    getByText(binaryInputName, { exact: false })
+                );
+                expect(inputElement.textContent).not.toContain(
+                    requiredInputSuffix
+                );
+            });
+
+            it('should disable submission', async () => {
+                const { getByRole } = renderForm();
+
+                const submitButton = await waitFor(() =>
+                    getByRole('button', { name: formStrings.submit })
+                );
+
+                expect(submitButton).toBeDisabled();
+            });
+
+            it('should not show error if launch plan has default value', async () => {
+                mockLaunchPlans[0].closure!.expectedInputs.parameters[
+                    binaryInputName
+                ].default = simpleVariableDefaults.simpleBinary as Literal;
+                const { queryByText } = renderForm();
+                await waitFor(() =>
+                    queryByText(binaryInputName, { exact: false })
+                );
+                expect(queryByText(cannotLaunchWorkflowString)).toBeNull();
+            });
+
+            it('should not show error if initial value is provided', async () => {
+                const parameters = mockLaunchPlans[0].closure!.expectedInputs
+                    .parameters;
+                const values = new Map();
+                const cacheKey = createInputCacheKey(
+                    binaryInputName,
+                    getInputDefintionForLiteralType(
+                        parameters[binaryInputName].var.type
+                    )
+                );
+                values.set(cacheKey, simpleVariableDefaults.simpleBinary);
+                const { queryByText } = renderForm({
+                    initialParameters: { values }
+                });
+
+                await waitFor(() =>
+                    queryByText(binaryInputName, { exact: false })
+                );
+                expect(queryByText(cannotLaunchWorkflowString)).toBeNull();
+            });
         });
     });
 });

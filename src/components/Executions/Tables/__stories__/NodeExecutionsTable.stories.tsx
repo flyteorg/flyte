@@ -6,9 +6,11 @@ import { APIContext } from 'components/data/apiContext';
 import { createMockExecutionEntities } from 'components/Executions/__mocks__/createMockExecutionEntities';
 import { ExecutionDataCacheContext } from 'components/Executions/contexts';
 import { createExecutionDataCache } from 'components/Executions/useExecutionDataCache';
+import { fetchStates } from 'components/hooks/types';
 import { keyBy } from 'lodash';
 import { createMockTaskExecutionForNodeExecution } from 'models/Execution/__mocks__/mockTaskExecutionsData';
 import * as React from 'react';
+import { State } from 'xstate';
 import {
     NodeExecutionsTable,
     NodeExecutionsTableProps
@@ -79,7 +81,7 @@ const fetchAction = action('fetch');
 const props: NodeExecutionsTableProps = {
     value: nodeExecutions,
     lastError: null,
-    loading: false,
+    state: State.from(fetchStates.LOADED),
     moreItemsAvailable: false,
     fetch: () => Promise.resolve(() => fetchAction() as unknown)
 };
