@@ -11,6 +11,8 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -23,7 +25,7 @@ var serveCmd = &cobra.Command{
 
 		// serve a http healthcheck endpoint
 		go func() {
-			err := serveHealthcheck(ctx, cfg)
+			err := serveHTTPHealthcheck(ctx, cfg)
 			if err != nil {
 				logger.Errorf(ctx, "Unable to serve http", config.GetConfig().GetHTTPHostAddress(), err)
 			}
@@ -54,13 +56,18 @@ func serveInsecure(ctx context.Context, cfg *config.Config) error {
 func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
 	grpcServer := grpc.NewServer()
 	datacatalog.RegisterDataCatalogServer(grpcServer, datacatalogservice.NewDataCatalogService())
+
+	healthServer := health.NewServer()
+	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
+	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)
+
 	if cfg.GrpcServerReflection {
 		reflection.Register(grpcServer)
 	}
 	return grpcServer
 }
 
-func serveHealthcheck(ctx context.Context, cfg *config.Config) error {
+func serveHTTPHealthcheck(ctx context.Context, cfg *config.Config) error {
 	mux := http.NewServeMux()
 
 	// Register Healthcheck
