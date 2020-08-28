@@ -3,6 +3,7 @@
 .DS_Store
 .vscode/
 .vendor-new/
+.swp
 
 vendor/
 node_modules/

@@ -20,6 +20,8 @@ import (
 	"github.com/lyft/flyteadmin/pkg/server"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/lyft/flyteadmin/pkg/common"
@@ -90,6 +92,11 @@ func newGRPCServer(ctx context.Context, cfg *config.ServerConfig, authContext in
 	grpcServer := grpc.NewServer(serverOpts...)
 	grpc_prometheus.Register(grpcServer)
 	flyteService.RegisterAdminServiceServer(grpcServer, adminservice.NewAdminServer(cfg.KubeConfig, cfg.Master))
+
+	healthServer := health.NewServer()
+	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
+	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)
+
 	if cfg.GrpcServerReflection {
 		reflection.Register(grpcServer)
 	}
