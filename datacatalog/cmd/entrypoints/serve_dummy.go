@@ -31,7 +31,7 @@ func init() {
 func serveDummy(ctx context.Context, cfg *config.Config) error {
 	// serve a http healthcheck endpoint
 	go func() {
-		err := serveHealthcheck(ctx, cfg)
+		err := serveHTTPHealthcheck(ctx, cfg)
 		if err != nil {
 			logger.Errorf(ctx, "Unable to serve http", cfg.GetGrpcHostAddress(), err)
 		}
