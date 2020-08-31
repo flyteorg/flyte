@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](http://github.com/lyft/flyteconsole/compare/v0.9.0...v0.10.0) (2020-08-31)
+
+
+### Features
+
+* Expose caching status for NodeExecutions ([#91](http://github.com/lyft/flyteconsole/issues/91)) ([cb200bd](http://github.com/lyft/flyteconsole/commit/cb200bdd4d2708315a556e1e7d8b3d1df6af029b))
+
 # [0.9.0](http://github.com/lyft/flyteconsole/compare/v0.8.1...v0.9.0) (2020-08-24)
 
 
