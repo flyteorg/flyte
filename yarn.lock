@@ -1779,10 +1779,10 @@
   dependencies:
     core-js "^2.5.7"
 
-"@lyft/flyteidl@^0.17.34":
-  version "0.17.34"
-  resolved "https://registry.yarnpkg.com/@lyft/flyteidl/-/flyteidl-0.17.34.tgz#f61ad0bb0824d1505745f656029cb14c9a76e29d"
-  integrity sha512-g0xpgT8Gzrdr7wY7jvjl7mb3DVFYUyrqePz+4cAp6T0LjUu4WGDnCiFdSzoNP1C3E+vcpHl0SS6L6Bh+bFE0Iw==
+"@lyft/flyteidl@^0.18.4":
+  version "0.18.4"
+  resolved "https://registry.yarnpkg.com/@lyft/flyteidl/-/flyteidl-0.18.4.tgz#47177a33e082355a105f8276bfe15cd2388fcb4a"
+  integrity sha512-kQ40KN6ffUogPsQmaoLyVRvrg8tcxVaoVSDiGol4cnspeLxsB6728qBHzQY1oRcOeRBFCRASyImJrbbBVpNXeg==
 
 "@marionebl/sander@^0.6.0":
   version "0.6.1"

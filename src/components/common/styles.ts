@@ -98,6 +98,9 @@ export const useCommonStyles = makeStyles((theme: Theme) => ({
     iconRight: {
         marginLeft: theme.spacing(1)
     },
+    iconSecondary: {
+        color: theme.palette.text.secondary
+    },
     linkUnstyled: {
         ...unstyledLinkProps,
         '&:hover': {

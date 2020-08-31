@@ -135,6 +135,7 @@ export const useColumnStyles = makeStyles((theme: Theme) => ({
         flexBasis: nodeExecutionsTableColumnWidths.type
     },
     columnStatus: {
+        display: 'flex',
         flexBasis: nodeExecutionsTableColumnWidths.phase
     },
     columnStartedAt: {

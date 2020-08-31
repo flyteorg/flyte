@@ -1,5 +1,6 @@
-import { Admin } from 'flyteidl';
+import { Admin, Core } from 'flyteidl';
 import {
+    Identifier,
     NamedEntity,
     NamedEntityIdentifier,
     NamedEntityMetadata,
@@ -20,6 +21,17 @@ function createNamedEntity(
         id,
         resourceType,
         metadata: { ...defaultMetadata, ...metadataOverrides }
+    };
+}
+
+export function makeIdentifier(id?: Partial<Identifier>): Identifier {
+    return {
+        resourceType: Core.ResourceType.UNSPECIFIED,
+        project: 'project',
+        domain: 'domain',
+        name: 'name',
+        version: 'version',
+        ...id
     };
 }
 

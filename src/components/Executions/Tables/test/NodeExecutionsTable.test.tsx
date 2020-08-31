@@ -2,6 +2,7 @@ import { render, waitFor } from '@testing-library/react';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext, APIContextValue } from 'components/data/apiContext';
 import { createMockExecutionEntities } from 'components/Executions/__mocks__/createMockExecutionEntities';
+import { cacheStatusMessages } from 'components/Executions/constants';
 import {
     ExecutionContext,
     ExecutionContextData,
@@ -11,15 +12,20 @@ import {
 import { ExecutionDataCache } from 'components/Executions/types';
 import { createExecutionDataCache } from 'components/Executions/useExecutionDataCache';
 import { fetchStates } from 'components/hooks/types';
+import { Core } from 'flyteidl';
 import {
     FilterOperationName,
     getTask,
     NodeExecution,
     RequestConfig,
+    TaskNodeMetadata,
     WorkflowExecutionIdentifier
 } from 'models';
 import { createMockExecution } from 'models/__mocks__/executionsData';
-import { createMockTaskExecutionsListResponse } from 'models/Execution/__mocks__/mockTaskExecutionsData';
+import {
+    createMockTaskExecutionsListResponse,
+    mockExecution as mockTaskExecution
+} from 'models/Execution/__mocks__/mockTaskExecutionsData';
 import {
     getExecution,
     listTaskExecutionChildren,
@@ -27,6 +33,7 @@ import {
 } from 'models/Execution/api';
 import { mockTasks } from 'models/Task/__mocks__/mockTaskData';
 import * as React from 'react';
+import { makeIdentifier } from 'test/modelUtils';
 import { Identifier } from 'typescript';
 import { State } from 'xstate';
 import {
@@ -149,6 +156,53 @@ describe('NodeExecutionsTable', () => {
         expect(mockListTaskExecutionChildren).toHaveBeenCalledWith(
             taskExecutions[0].id,
             expect.objectContaining(requestConfig)
+        );
+    });
+
+    describe('for task nodes with cache status', () => {
+        let taskNodeMetadata: TaskNodeMetadata;
+        let cachedNodeExecution: NodeExecution;
+        beforeEach(() => {
+            cachedNodeExecution = mockNodeExecutions[0];
+            taskNodeMetadata = {
+                cacheStatus: Core.CatalogCacheStatus.CACHE_MISS,
+                catalogKey: {
+                    datasetId: makeIdentifier({
+                        resourceType: Core.ResourceType.DATASET
+                    }),
+                    sourceTaskExecution: { ...mockTaskExecution.id }
+                }
+            };
+            cachedNodeExecution.closure.taskNodeMetadata = taskNodeMetadata;
+        });
+
+        [
+            Core.CatalogCacheStatus.CACHE_HIT,
+            Core.CatalogCacheStatus.CACHE_LOOKUP_FAILURE,
+            Core.CatalogCacheStatus.CACHE_POPULATED,
+            Core.CatalogCacheStatus.CACHE_PUT_FAILURE
+        ].forEach(cacheStatusValue =>
+            it(`renders correct icon for ${Core.CatalogCacheStatus[cacheStatusValue]}`, async () => {
+                taskNodeMetadata.cacheStatus = cacheStatusValue;
+                const { getByTitle } = renderTable();
+                await waitFor(() =>
+                    getByTitle(cacheStatusMessages[cacheStatusValue])
+                );
+            })
+        );
+
+        [
+            Core.CatalogCacheStatus.CACHE_DISABLED,
+            Core.CatalogCacheStatus.CACHE_MISS
+        ].forEach(cacheStatusValue =>
+            it(`renders no icon for ${Core.CatalogCacheStatus[cacheStatusValue]}`, async () => {
+                taskNodeMetadata.cacheStatus = cacheStatusValue;
+                const { getByText, queryByTitle } = renderTable();
+                await waitFor(() => getByText(cachedNodeExecution.id.nodeId));
+                expect(
+                    queryByTitle(cacheStatusMessages[cacheStatusValue])
+                ).toBeNull();
+            })
         );
     });
 });

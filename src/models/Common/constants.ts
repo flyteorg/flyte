@@ -18,6 +18,7 @@ export const endpointPrefixes = {
 };
 
 export const identifierPrefixes: { [k in ResourceType]: string } = {
+    [ResourceType.DATASET]: '',
     [ResourceType.LAUNCH_PLAN]: '/launch_plan_ids',
     [ResourceType.TASK]: '/task_ids',
     [ResourceType.UNSPECIFIED]: '',

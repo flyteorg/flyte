@@ -4,6 +4,7 @@ import {
     secondaryTextColor,
     statusColors
 } from 'components/Theme';
+import { Core } from 'flyteidl';
 import { TaskType } from 'models';
 import {
     NodeExecutionPhase,
@@ -176,3 +177,20 @@ export const taskTypeToNodeExecutionDisplayType: {
     [TaskType.UNKNOWN]: NodeExecutionDisplayType.UnknownTask,
     [TaskType.WAITABLE]: NodeExecutionDisplayType.WaitableTask
 };
+
+export const cacheStatusMessages: { [k in Core.CatalogCacheStatus]: string } = {
+    [Core.CatalogCacheStatus.CACHE_DISABLED]:
+        'Caching was disabled for this execution.',
+    [Core.CatalogCacheStatus.CACHE_HIT]:
+        'Output for this execution was read from cache.',
+    [Core.CatalogCacheStatus.CACHE_LOOKUP_FAILURE]:
+        'Failed to lookup cache information.',
+    [Core.CatalogCacheStatus.CACHE_MISS]:
+        'No cached output was found for this execution.',
+    [Core.CatalogCacheStatus.CACHE_POPULATED]:
+        'The result of this execution was written to cache.',
+    [Core.CatalogCacheStatus.CACHE_PUT_FAILURE]:
+        'Failed to write output for this execution to cache.'
+};
+export const unknownCacheStatusString = 'Cache status is unknown';
+export const viewSourceExecutionString = 'View source execution';

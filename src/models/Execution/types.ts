@@ -64,6 +64,17 @@ export type ExecutionsMap = Map<string, Execution>;
 export interface WorkflowNodeMetadata {
     executionId: WorkflowExecutionIdentifier;
 }
+
+export interface CatalogMetadata extends Core.ICatalogMetadata {
+    artifactTag?: RequiredNonNullable<Core.ICatalogArtifactTag>;
+    datasetId: Identifier;
+    sourceTaskExecution: TaskExecutionIdentifier;
+}
+
+export interface TaskNodeMetadata extends Admin.ITaskNodeMetadata {
+    cacheStatus: Core.CatalogCacheStatus;
+    catalogKey?: CatalogMetadata;
+}
 export interface NodeExecutionIdentifier extends Core.INodeExecutionIdentifier {
     nodeId: string;
     executionId: WorkflowExecutionIdentifier;
@@ -81,6 +92,7 @@ export interface NodeExecutionClosure extends Admin.INodeExecutionClosure {
     outputUri: string;
     phase: NodeExecutionPhase;
     startedAt?: Protobuf.ITimestamp;
+    taskNodeMetadata?: TaskNodeMetadata;
     workflowNodeMetadata?: WorkflowNodeMetadata;
 }
 

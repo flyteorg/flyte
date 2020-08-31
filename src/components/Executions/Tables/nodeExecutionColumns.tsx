@@ -6,9 +6,12 @@ import {
 } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
+import { Core } from 'flyteidl';
+import { TaskNodeMetadata } from 'models';
 import { NodeExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
 import { ExecutionStatusBadge, getNodeExecutionTimingMS } from '..';
+import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
 import { SelectNodeExecutionLink } from './SelectNodeExecutionLink';
 import { useColumnStyles } from './styles';
 import {
@@ -44,6 +47,20 @@ const NodeExecutionName: React.FC<NodeExecutionCellRendererData> = ({
     );
 };
 
+const hiddenCacheStatuses = [
+    Core.CatalogCacheStatus.CACHE_MISS,
+    Core.CatalogCacheStatus.CACHE_DISABLED
+];
+function hasCacheStatus(
+    taskNodeMetadata?: TaskNodeMetadata
+): taskNodeMetadata is TaskNodeMetadata {
+    if (!taskNodeMetadata) {
+        return false;
+    }
+    const { cacheStatus } = taskNodeMetadata;
+    return !hiddenCacheStatuses.includes(cacheStatus);
+}
+
 export function generateColumns(
     styles: ReturnType<typeof useColumnStyles>
 ): NodeExecutionColumnDefinition[] {
@@ -64,9 +81,22 @@ export function generateColumns(
         {
             cellRenderer: ({
                 execution: {
-                    closure: { phase = NodeExecutionPhase.UNDEFINED }
+                    closure: {
+                        phase = NodeExecutionPhase.UNDEFINED,
+                        taskNodeMetadata
+                    }
                 }
-            }) => <ExecutionStatusBadge phase={phase} type="node" />,
+            }) => (
+                <>
+                    <ExecutionStatusBadge phase={phase} type="node" />
+                    {hasCacheStatus(taskNodeMetadata) ? (
+                        <NodeExecutionCacheStatus
+                            taskNodeMetadata={taskNodeMetadata}
+                            variant="iconOnly"
+                        />
+                    ) : null}
+                </>
+            ),
             className: styles.columnStatus,
             key: 'phase',
             label: 'status'

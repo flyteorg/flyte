@@ -1,4 +1,4 @@
-import { IconButton, Typography } from '@material-ui/core';
+import { IconButton, SvgIconProps, Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
@@ -13,6 +13,7 @@ import { LocationDescriptor } from 'history';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Routes } from 'routes';
+import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
 import { DetailedNodeExecution, NodeExecutionDisplayType } from '../types';
 import { NodeExecutionInputs } from './NodeExecutionInputs';
 import { NodeExecutionOutputs } from './NodeExecutionOutputs';
@@ -202,6 +203,9 @@ export const NodeExecutionDetails: React.FC<NodeExecutionDetailsProps> = ({
                         {execution.displayId}
                     </Typography>
                     {statusContent}
+                    <NodeExecutionCacheStatus
+                        taskNodeMetadata={execution.closure.taskNodeMetadata}
+                    />
                     <ExecutionTypeDetails execution={execution} />
                 </div>
             </header>
