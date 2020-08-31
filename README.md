@@ -6,7 +6,7 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic)
 ![GitHub milestones Completed](https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic)
-![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/7?style=plastic)
+![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/8?style=plastic)
 ![Twitter Follow](https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
 
