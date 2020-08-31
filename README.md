@@ -147,4 +147,4 @@ Repo | Language | Purpose
 # Top Contributors
 Thank you to the community for making Flyte possible.
 @wild-endeavor, @katrogan, @EngHabu, @akhurana001, @anandswaminathan, @kanterov, @honnix, @jeevb, @jonathanburns, @migueltol22, @varshaparthay, @pingsutw, @narape, @lu4nm3, @bnsblue, @RubenBarragan,
-@schottra, @evalsocket, @matthewphsmith, @slai, @derwiki, @tnsetting, @jbrambleDC, @igorvalko, @chanadian, @surindersinghp, @vsbus, @catalinii, @kumare3
+@schottra, @evalsocket, @matthewphsmith, @slai, @derwiki, @tnsetting, @jbrambleDC, @igorvalko, @chanadian, @surindersinghp, @vsbus, @catalinii, @kumare3,
