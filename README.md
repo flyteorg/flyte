@@ -121,18 +121,21 @@ Resources that would help you get a better understanding of Flyte.
 
 
 # Component Repos 
-Repo | Language | Purpose
---- | --- | ---
-[flyte](https://github.com/lyft/flyte) | Kustomize,RST | deployment, documentation, issues
-[flyteidl](https://github.com/lyft/flyteidl) | Protobuf | interface definitions
-[flytepropeller](https://github.com/lyft/flytepropeller) | Go | execution engine
-[flyteadmin](https://github.com/lyft/flyteadmin) | Go | control plane
-[flytekit](https://github.com/lyft/flytekit) | Python | python SDK and tools
-[flyteconsole](https://github.com/lyft/flyteconsole) | Typescript | admin console
-[datacatalog](https://github.com/lyft/datacatalog) | Go  | manage input & output artifacts
-[flyteplugins](https://github.com/lyft/flyteplugins) | Go  | flyte plugins
-[flytestdlib](https://github.com/lyft/flytestdlib) |  Go | standard library
-[flytesnacks](https://github.com/lyft/flytesnacks) | Python | examples, tips, and tricks
+Repo | Language | Purpose | Status
+--- | --- | --- | ---
+[flyte](https://github.com/lyft/flyte) | Kustomize,RST | deployment, documentation, issues | Production-grade
+[flyteidl](https://github.com/lyft/flyteidl) | Protobuf | interface definitions | Production-grade
+[flytepropeller](https://github.com/lyft/flytepropeller) | Go | execution engine | Production-grade
+[flyteadmin](https://github.com/lyft/flyteadmin) | Go | control plane | Production-grade
+[flytekit](https://github.com/lyft/flytekit) | Python | python SDK and tools | Production-grade
+[flyteconsole](https://github.com/lyft/flyteconsole) | Typescript | admin console | Production-grade
+[datacatalog](https://github.com/lyft/datacatalog) | Go  | manage input & output artifacts | Production-grade
+[flyteplugins](https://github.com/lyft/flyteplugins) | Go  | flyte plugins | Production-grade
+[flytestdlib](https://github.com/lyft/flytestdlib) |  Go | standard library | Production-grade
+[flytesnacks](https://github.com/lyft/flytesnacks) | Python | examples, tips, and tricks | Incubating
+[flytekit-java](https://github.com/spotify/flytekit-java) | Java/Scala | Java & scala SDK for authoring Flyte workflows | Incubating
+[flytectl](https://github.com/lyft/flytectl) | Java/Scala | Java & scala SDK for authoring Flyte workflows | Incomplete
+
 
 # Production K8s Operators
 
@@ -140,3 +143,8 @@ Repo | Language | Purpose
 --- | --- | ---
 [Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go | Apache Spark batch
 [Flink](https://github.com/lyft/flinkk8soperator) | Go | Apache Flink streaming
+
+# Top Contributors
+Thank you to the community for making Flyte possible.
+@wild-endeavor, @katrogan, @EngHabu, @akhurana001, @anandswaminathan, @kanterov, @honnix, @jeevb, @jonathanburns, @migueltol22, @varshaparthay, @pingsutw, @narape, @lu4nm3, @bnsblue, @RubenBarragan,
+@schottra, @evalsocket, @matthewphsmith, @slai, @derwiki, @tnsetting, @jbrambleDC, @igorvalko, @chanadian, @surindersinghp, @vsbus, @catalinii, @kumare3
