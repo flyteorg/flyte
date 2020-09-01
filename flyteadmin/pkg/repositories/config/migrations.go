@@ -260,4 +260,13 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Model(&models.Project{}).DropColumn("labels").Error
 		},
 	},
+	{
+		ID: "2020-09-01-task-exec-idx",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&TaskExecution{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Model(&TaskExecution{}).RemoveIndex("idx_task_executions_exec").Error
+		},
+	},
 }

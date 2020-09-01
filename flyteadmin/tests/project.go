@@ -90,7 +90,7 @@ func TestUpdateProjectDescription(t *testing.T) {
 
 	// Verify that the project's Name has not been modified but the Description has.
 	updatedProject := projectsUpdated.Projects[0]
-	assert.Equal(t, updatedProject.Id, "potato")										 // unchanged
+	assert.Equal(t, updatedProject.Id, "potato")                     // unchanged
 	assert.Equal(t, updatedProject.Name, "foobar")                   // changed
 	assert.Equal(t, updatedProject.Description, "a-new-description") // changed
 
@@ -148,8 +148,8 @@ func TestUpdateProjectLabels(t *testing.T) {
 	// Check the name has been modified.
 	// Verify that the project's Name has not been modified but the Description has.
 	updatedProject := projectsUpdated.Projects[0]
-	assert.Equal(t, updatedProject.Id, "potato")										 // unchanged
-	assert.Equal(t, updatedProject.Name, "foobar")                   // changed
+	assert.Equal(t, updatedProject.Id, "potato")   // unchanged
+	assert.Equal(t, updatedProject.Name, "foobar") // changed
 
 	// Verify that the expected labels have been added to the project.
 	labelsMap := updatedProject.Labels
