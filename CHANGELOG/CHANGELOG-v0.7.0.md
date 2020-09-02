@@ -11,8 +11,8 @@
 ## Console
  - Ability to track lineage and caching information directly in the UI. On a cache hit - possible to jump to the orginating execution.
  - Ability to clone an execution
+ - bug fixes
 
 ## Flytekit
- - Custom tasks on Sagemaker
  - Resiliency with S3 usage
- - Portable Workflows - possible to run a flytekit native workflow on AWS/GCP
+ - Portable Workflows - possible to run a flytekit native workflow on AWS/GCP/Sandbox
