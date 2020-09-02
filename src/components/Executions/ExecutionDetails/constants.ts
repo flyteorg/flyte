@@ -16,3 +16,7 @@ export const tabs = {
         label: 'Graph'
     }
 };
+
+export const executionActionStrings = {
+    clone: 'Clone Execution'
+};

@@ -6,7 +6,7 @@ export function pendingPromise<T = any>(): Promise<T> {
     return new Promise(() => {});
 }
 
-interface DelayedPromiseResult<T> {
+export interface DelayedPromiseResult<T> {
     promise: Promise<T>;
     resolve: (value: T) => void;
     reject: (value: any) => void;

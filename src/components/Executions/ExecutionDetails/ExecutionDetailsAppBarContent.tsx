@@ -3,10 +3,11 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import * as classnames from 'classnames';
 import { navbarGridHeight } from 'common/layout';
+import { MoreOptionsMenu } from 'components/common/MoreOptionsMenu';
 import { useCommonStyles } from 'components/common/styles';
 import { useLocationState } from 'components/hooks/useLocationState';
 import { NavBarContent } from 'components/Navigation/NavBarContent';
-import { interactiveTextDisabledColor, smallFontSize } from 'components/Theme';
+import { interactiveTextDisabledColor } from 'components/Theme';
 import { Execution } from 'models';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -15,10 +16,14 @@ import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { TerminateExecutionButton } from '../TerminateExecution';
 import { executionIsTerminal } from '../utils';
+import { executionActionStrings } from './constants';
 import { RelaunchExecutionForm } from './RelaunchExecutionForm';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
+        actionButton: {
+            marginLeft: theme.spacing(2)
+        },
         actions: {
             alignItems: 'center',
             display: 'flex',
@@ -37,6 +42,17 @@ const useStyles = makeStyles((theme: Theme) => {
             flex: '1 1 auto',
             maxWidth: '100%'
         },
+        inputsOutputsLink: {
+            color: interactiveTextDisabledColor
+        },
+        moreActions: {
+            marginLeft: theme.spacing(1),
+            marginRight: theme.spacing(-2)
+        },
+        title: {
+            flex: '0 1 auto',
+            marginLeft: theme.spacing(2)
+        },
         titleContainer: {
             alignItems: 'center',
             display: 'flex',
@@ -44,16 +60,6 @@ const useStyles = makeStyles((theme: Theme) => {
             flexDirection: 'column',
             maxHeight: theme.spacing(navbarGridHeight),
             overflow: 'hidden'
-        },
-        inputsOutputsLink: {
-            color: interactiveTextDisabledColor
-        },
-        actionButton: {
-            marginLeft: theme.spacing(2)
-        },
-        title: {
-            flex: '0 1 auto',
-            marginLeft: theme.spacing(2)
         },
         version: {
             flex: '0 1 auto',
@@ -70,10 +76,8 @@ export const ExecutionDetailsAppBarContent: React.FC<{
     const styles = useStyles();
     const [showInputsOutputs, setShowInputsOutputs] = React.useState(false);
     const [showRelaunchForm, setShowRelaunchForm] = React.useState(false);
-
     const { domain, name, project } = execution.id;
     const { phase, workflowId } = execution.closure;
-
     const {
         backLink = Routes.WorkflowDetails.makeUrl(
             workflowId.project,
@@ -81,6 +85,10 @@ export const ExecutionDetailsAppBarContent: React.FC<{
             workflowId.name
         )
     } = useLocationState();
+    const isTerminal = executionIsTerminal(execution);
+    const onClickShowInputsOutputs = () => setShowInputsOutputs(true);
+    const onClickRelaunch = () => setShowRelaunchForm(true);
+    const onCloseRelaunch = () => setShowRelaunchForm(false);
 
     let modalContent: JSX.Element | null = null;
     if (showInputsOutputs) {
@@ -92,11 +100,8 @@ export const ExecutionDetailsAppBarContent: React.FC<{
             />
         );
     }
-    const onClickShowInputsOutputs = () => setShowInputsOutputs(true);
-    const onClickRelaunch = () => setShowRelaunchForm(true);
-    const onCloseRelaunch = () => setShowRelaunchForm(false);
 
-    const actionContent = executionIsTerminal(execution) ? (
+    const actionContent = isTerminal ? (
         <Button
             variant="outlined"
             color="primary"
@@ -112,6 +117,20 @@ export const ExecutionDetailsAppBarContent: React.FC<{
     ) : (
         <TerminateExecutionButton className={styles.actionButton} />
     );
+
+    // For running executions, add an overflow menu with the ability to clone
+    // while we are still running.
+    const moreActionsContent = !isTerminal ? (
+        <MoreOptionsMenu
+            className={styles.moreActions}
+            options={[
+                {
+                    label: executionActionStrings.clone,
+                    onClick: onClickRelaunch
+                }
+            ]}
+        />
+    ) : null;
 
     return (
         <>
@@ -145,6 +164,7 @@ export const ExecutionDetailsAppBarContent: React.FC<{
                             View Inputs &amp; Outputs
                         </Link>
                         {actionContent}
+                        {moreActionsContent}
                     </div>
                 </div>
                 <Dialog

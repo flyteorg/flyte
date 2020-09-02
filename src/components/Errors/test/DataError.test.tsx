@@ -13,13 +13,13 @@ describe('DataError', () => {
         const { container } = render(
             <DataError {...defaultProps} error={new NotAuthorizedError()} />
         );
-        expect(container).toBeEmpty();
+        expect(container).toBeEmptyDOMElement();
     });
 
     it('renders not found for NotFound errors', () => {
         const { getByText } = render(
             <DataError {...defaultProps} error={new NotFoundError('')} />
         );
-        expect(getByText('Not found')).not.toBeEmpty();
+        expect(getByText('Not found')).not.toBeEmptyDOMElement();
     });
 });
