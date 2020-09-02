@@ -30,7 +30,7 @@ spec:
           name: datacatalog-config
       initContainers:
       - name: run-migrations
-        image: docker.io/lyft/datacatalog:0.2.2
+        image: docker.io/lyft/datacatalog:v0.2.2
         imagePullPolicy: IfNotPresent
         command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/datacatalog_config.yaml", "migrate", "run"]
         volumeMounts:
@@ -38,7 +38,7 @@ spec:
           mountPath: /etc/datacatalog/config
       containers:
       - name: datacatalog
-        image: docker.io/lyft/datacatalog:0.2.2
+        image: docker.io/lyft/datacatalog:v0.2.2
         imagePullPolicy: IfNotPresent
         command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/datacatalog_config.yaml", "serve"]
         ports:
