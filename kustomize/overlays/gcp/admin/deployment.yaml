@@ -19,7 +19,7 @@ spec:
         - name: db-user-pass
           mountPath: /etc/gcp
       - name: seed-projects
-        image: docker.io/lyft/flyteadmin:v0.3.4
+        image: docker.io/lyft/flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
                   "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
@@ -29,7 +29,7 @@ spec:
         - name: db-user-pass
           mountPath: /etc/gcp
       - name: sync-cluster-resources
-        image: docker.io/lyft/flyteadmin:v0.3.4
+        image: docker.io/lyft/flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
         volumeMounts:
