@@ -23,7 +23,7 @@ require (
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/lyft/datacatalog v0.2.1
 	github.com/lyft/flyteidl v0.18.1
-	github.com/lyft/flyteplugins v0.4.5
+	github.com/lyft/flyteplugins v0.4.8
 	github.com/lyft/flytestdlib v0.3.9
 	github.com/magiconair/properties v1.8.1
 	github.com/mattn/go-colorable v0.1.6 // indirect
@@ -32,6 +32,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.5.0
 	github.com/prometheus/procfs v0.0.10 // indirect
+	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.6.1
