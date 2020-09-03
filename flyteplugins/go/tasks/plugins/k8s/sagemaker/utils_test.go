@@ -2,9 +2,12 @@ package sagemaker
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"strconv"
 	"testing"
+
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	commonv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/common"
 	sagemakerSpec "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
@@ -13,6 +16,7 @@ import (
 
 	stdConfig "github.com/lyft/flytestdlib/config"
 
+	flyteSagemakerIdl "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
 	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 	sagemakerConfig "github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 )
@@ -221,7 +225,7 @@ func Test_getLatestTrainingImage(t *testing.T) {
 	}
 }
 
-func Test_getTrainingImage(t *testing.T) {
+func Test_getPrebuiltTrainingImage(t *testing.T) {
 	ctx := context.TODO()
 
 	_ = sagemakerConfig.SetSagemakerConfig(generateMockSageMakerConfig())
@@ -265,23 +269,23 @@ func Test_getTrainingImage(t *testing.T) {
 				InputContentType:  0,
 			},
 			TrainingJobResourceConfig: nil,
-		}}, want: "custom image", wantErr: true},
+		}}, want: "", wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getTrainingImage(tt.args.ctx, tt.args.job)
+			got, err := getPrebuiltTrainingImage(tt.args.ctx, tt.args.job)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getTrainingImage() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getPrebuiltTrainingImage() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("getTrainingImage() got = %v, want %v", got, tt.want)
+				t.Errorf("getPrebuiltTrainingImage() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_getTrainingImage_LoadConfig(t *testing.T) {
+func Test_getPrebuiltTrainingImage_LoadConfig(t *testing.T) {
 	configAccessor := viper.NewAccessor(stdConfig.Options{
 		StrictMode:  true,
 		SearchPaths: []string{"testdata/config.yaml"},
@@ -292,19 +296,127 @@ func Test_getTrainingImage_LoadConfig(t *testing.T) {
 
 	assert.NotNil(t, config.GetSagemakerConfig())
 
-	image, err := getTrainingImage(context.TODO(), &sagemakerSpec.TrainingJob{AlgorithmSpecification: &sagemakerSpec.AlgorithmSpecification{
+	image, err := getPrebuiltTrainingImage(context.TODO(), &sagemakerSpec.TrainingJob{AlgorithmSpecification: &sagemakerSpec.AlgorithmSpecification{
 		AlgorithmName:    sagemakerSpec.AlgorithmName_XGBOOST,
 		AlgorithmVersion: "0.90",
 	}})
 
 	assert.NoError(t, err)
-	assert.Equal(t, "image-0.90", image)
+	assert.Equal(t, "XGBOOST_us-west-2_image-0.90", image)
 
-	image, err = getTrainingImage(context.TODO(), &sagemakerSpec.TrainingJob{AlgorithmSpecification: &sagemakerSpec.AlgorithmSpecification{
+	image, err = getPrebuiltTrainingImage(context.TODO(), &sagemakerSpec.TrainingJob{AlgorithmSpecification: &sagemakerSpec.AlgorithmSpecification{
 		AlgorithmName:    sagemakerSpec.AlgorithmName_XGBOOST,
 		AlgorithmVersion: "1.0",
 	}})
 
 	assert.NoError(t, err)
-	assert.Equal(t, "image-1.0", image)
+	assert.Equal(t, "XGBOOST_us-west-2_image-1.0", image)
+}
+
+func Test_getTrainingJobImage(t *testing.T) {
+
+	ctx := context.TODO()
+	defaultCfg := config.GetSagemakerConfig()
+	defer func() {
+		_ = config.SetSagemakerConfig(defaultCfg)
+	}()
+
+	type Result struct {
+		name    string
+		want    string
+		wantErr bool
+	}
+
+	configAccessor := viper.NewAccessor(stdConfig.Options{
+		StrictMode:  true,
+		SearchPaths: []string{"testdata/config.yaml"},
+	})
+
+	err := configAccessor.UpdateConfig(context.TODO())
+	assert.NoError(t, err)
+
+	expectedResult := Result{
+		"Should retrieve image url from config for built-in algorithms", "XGBOOST_us-west-2_image-0.90", false,
+	}
+	t.Run(expectedResult.name, func(t *testing.T) {
+		tjObj := generateMockTrainingJobCustomObj(
+			flyteSagemakerIdl.InputMode_FILE,
+			flyteSagemakerIdl.AlgorithmName_XGBOOST,
+			"0.90",
+			[]*flyteSagemakerIdl.MetricDefinition{},
+			flyteSagemakerIdl.InputContentType_TEXT_CSV,
+			1,
+			"ml.m4.xlarge",
+			25)
+		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
+		taskCtx := generateMockTrainingJobTaskContext(taskTemplate, false)
+		sagemakerTrainingJob := flyteSagemakerIdl.TrainingJob{}
+		err := utils.UnmarshalStruct(taskTemplate.GetCustom(), &sagemakerTrainingJob)
+		if err != nil {
+			panic(err)
+		}
+
+		got, err := getTrainingJobImage(ctx, taskCtx, &sagemakerTrainingJob)
+		if (err != nil) != expectedResult.wantErr {
+			t.Errorf("getTrainingJobImage() error = %v, wantErr %v", err, expectedResult.wantErr)
+			return
+		}
+		if got != expectedResult.want {
+			t.Errorf("getTrainingJobImage() got = %v, want %v", got, expectedResult.want)
+		}
+	})
+
+}
+
+func Test_makeHyperparametersKeysValuesFromArgs(t *testing.T) {
+	outputPrefix := "s3://abcdefghijklmnopqrtsuvwxyz/abcdefghijklmnopqrtsuvwxyz/abcdefghijklmnopqrtsuvwxyz"
+	inputs := "s3://abcdefghijklmnopqrtsuvwxyz/abcdefghijklmnopqrtsuvwxyz/abcdefghijklmnopqrtsuvwxyz/inputs.pb"
+	type args struct {
+		in0  context.Context
+		args []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []*commonv1.KeyValuePair
+	}{
+		{name: "service pyflyte-execute",
+			args: args{
+				in0: context.TODO(),
+				args: []string{
+					"service_venv",
+					"pyflyte-execute",
+					"--task-module",
+					"abc",
+					"--task-name",
+					"abc",
+					"--output-prefix",
+					outputPrefix,
+					"--inputs",
+					inputs,
+					"--test",
+				},
+			},
+			want: []*commonv1.KeyValuePair{
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 0, "service_venv", FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 1, "pyflyte-execute", FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 2, "--task-module", FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 3, "abc", FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 4, "--task-name", FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 5, "abc", FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 6, "--output-prefix", FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 7, outputPrefix, FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 8, "--inputs", FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 9, inputs, FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+				{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 10, "--test", FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := makeHyperparametersKeysValuesFromArgs(tt.args.in0, tt.args.args); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("makeHyperparametersKeysValuesFromArgs() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

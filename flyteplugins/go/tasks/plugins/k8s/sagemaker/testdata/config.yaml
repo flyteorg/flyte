@@ -9,6 +9,6 @@ plugins:
           - region: "us-west-2"
             versionConfigs:
               - version: "0.90"
-                image: "image-0.90"
+                image: "XGBOOST_us-west-2_image-0.90"
               - version: "1.0"
-                image: "image-1.0"
+                image: "XGBOOST_us-west-2_image-1.0"

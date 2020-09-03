@@ -1,18 +1,12 @@
 package sagemaker
 
 import (
-	"context"
-	"testing"
+	"github.com/lyft/flytestdlib/promutils"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
+	"github.com/pkg/errors"
 
 	"github.com/golang/protobuf/proto"
 
-	stdConfig "github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/config/viper"
-
-	hpojobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/hyperparametertuningjob"
-	trainingjobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/trainingjob"
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	flyteIdlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -23,7 +17,6 @@ import (
 	pluginIOMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/lyft/flytestdlib/storage"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -39,7 +32,18 @@ var (
 	}
 
 	testArgs = []string{
-		"test-args",
+		"service_venv",
+		"pyflyte-execute",
+		"--test-opt1",
+		"value1",
+		"--test-opt2",
+		"value2",
+		"--test-flag",
+	}
+
+	testCmds = []string{
+		"test-cmds1",
+		"test-cmds2",
 	}
 
 	resourceRequirements = &corev1.ResourceRequirements{
@@ -74,9 +78,10 @@ func generateMockTrainingJobTaskTemplate(id string, trainingJobCustomObj *sagema
 		Type: "container",
 		Target: &flyteIdlCore.TaskTemplate_Container{
 			Container: &flyteIdlCore.Container{
-				Image: testImage,
-				Args:  testArgs,
-				Env:   dummyEnvVars,
+				Command: testCmds,
+				Image:   testImage,
+				Args:    testArgs,
+				Env:     dummyEnvVars,
 			},
 		},
 		Custom: &structObj,
@@ -107,10 +112,113 @@ func generateMockHyperparameterTuningJobTaskTemplate(id string, hpoJobCustomObj 
 			},
 		},
 		Custom: &structObj,
+		Interface: &flyteIdlCore.TypedInterface{
+			Inputs: &flyteIdlCore.VariableMap{
+				Variables: map[string]*flyteIdlCore.Variable{
+					"input": {
+						Type: &flyteIdlCore.LiteralType{
+							Type: &flyteIdlCore.LiteralType_CollectionType{
+								CollectionType: &flyteIdlCore.LiteralType{Type: &flyteIdlCore.LiteralType_Simple{Simple: flyteIdlCore.SimpleType_INTEGER}},
+							},
+						},
+					},
+				},
+			},
+			Outputs: &flyteIdlCore.VariableMap{
+				Variables: map[string]*flyteIdlCore.Variable{
+					"output": {
+						Type: &flyteIdlCore.LiteralType{
+							Type: &flyteIdlCore.LiteralType_CollectionType{
+								CollectionType: &flyteIdlCore.LiteralType{Type: &flyteIdlCore.LiteralType_Simple{Simple: flyteIdlCore.SimpleType_INTEGER}},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 }
 
-func generateMockTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate) pluginsCore.TaskExecutionContext {
+// nolint
+func generateMockCustomTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate, outputReaderPutError bool) pluginsCore.TaskExecutionContext {
+	taskCtx := &mocks.TaskExecutionContext{}
+	inputReader := &pluginIOMocks.InputReader{}
+	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/input/prefix"))
+	inputReader.OnGetInputPath().Return(storage.DataReference("/input"))
+
+	trainBlobLoc := storage.DataReference("train-blob-loc")
+	validationBlobLoc := storage.DataReference("validation-blob-loc")
+
+	inputReader.OnGetMatch(mock.Anything).Return(
+		&flyteIdlCore.LiteralMap{
+			Literals: map[string]*flyteIdlCore.Literal{
+				"train":      generateMockBlobLiteral(trainBlobLoc),
+				"validation": generateMockBlobLiteral(validationBlobLoc),
+				"hp_int":     utils.MustMakeLiteral(1),
+				"hp_float":   utils.MustMakeLiteral(1.5),
+				"hp_bool":    utils.MustMakeLiteral(false),
+				"hp_string":  utils.MustMakeLiteral("a"),
+			},
+		}, nil)
+	taskCtx.OnInputReader().Return(inputReader)
+
+	outputReader := &pluginIOMocks.OutputWriter{}
+	outputReader.OnGetOutputPath().Return(storage.DataReference("/data/outputs.pb"))
+	outputReader.OnGetOutputPrefixPath().Return(storage.DataReference("/data/"))
+	outputReader.OnGetRawOutputPrefix().Return(storage.DataReference("/raw/"))
+	if outputReaderPutError {
+		outputReader.OnPutMatch(mock.Anything, mock.Anything).Return(errors.Errorf("err"))
+	} else {
+		outputReader.OnPutMatch(mock.Anything, mock.Anything).Return(nil)
+	}
+	taskCtx.OnOutputWriter().Return(outputReader)
+
+	taskReader := &mocks.TaskReader{}
+	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
+	taskCtx.OnTaskReader().Return(taskReader)
+
+	tID := &mocks.TaskExecutionID{}
+	tID.OnGetID().Return(flyteIdlCore.TaskExecutionIdentifier{
+		NodeExecutionId: &flyteIdlCore.NodeExecutionIdentifier{
+			ExecutionId: &flyteIdlCore.WorkflowExecutionIdentifier{
+				Name:    "my_name",
+				Project: "my_project",
+				Domain:  "my_domain",
+			},
+		},
+	})
+	tID.OnGetGeneratedName().Return("some-acceptable-name")
+
+	resources := &mocks.TaskOverrides{}
+	resources.OnGetResources().Return(resourceRequirements)
+
+	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
+	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
+	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
+	taskExecutionMetadata.OnGetAnnotations().Return(map[string]string{"iam.amazonaws.com/role": "metadata_role"})
+	taskExecutionMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
+		Kind: "node",
+		Name: "blah",
+	})
+	taskExecutionMetadata.OnIsInterruptible().Return(true)
+	taskExecutionMetadata.OnGetOverrides().Return(resources)
+	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
+	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+
+	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	if err != nil {
+		panic(err)
+	}
+	taskCtx.OnDataStore().Return(dataStore)
+
+	taskCtx.OnMaxDatasetSizeBytes().Return(10000)
+
+	return taskCtx
+}
+
+// nolint
+func generateMockTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate, outputReaderPutError bool) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/input/prefix"))
@@ -120,43 +228,12 @@ func generateMockTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate)
 	validationBlobLoc := storage.DataReference("validation-blob-loc")
 	shp := map[string]string{"a": "1", "b": "2"}
 	shpStructObj, _ := utils.MarshalObjToStruct(shp)
+
 	inputReader.OnGetMatch(mock.Anything).Return(
 		&flyteIdlCore.LiteralMap{
 			Literals: map[string]*flyteIdlCore.Literal{
-				"train": {
-					Value: &flyteIdlCore.Literal_Scalar{
-						Scalar: &flyteIdlCore.Scalar{
-							Value: &flyteIdlCore.Scalar_Blob{
-								Blob: &flyteIdlCore.Blob{
-									Uri: trainBlobLoc.String(),
-									Metadata: &flyteIdlCore.BlobMetadata{
-										Type: &flyteIdlCore.BlobType{
-											Dimensionality: flyteIdlCore.BlobType_SINGLE,
-											Format:         "csv",
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-				"validation": {
-					Value: &flyteIdlCore.Literal_Scalar{
-						Scalar: &flyteIdlCore.Scalar{
-							Value: &flyteIdlCore.Scalar_Blob{
-								Blob: &flyteIdlCore.Blob{
-									Uri: validationBlobLoc.String(),
-									Metadata: &flyteIdlCore.BlobMetadata{
-										Type: &flyteIdlCore.BlobType{
-											Dimensionality: flyteIdlCore.BlobType_SINGLE,
-											Format:         "csv",
-										},
-									},
-								},
-							},
-						},
-					},
-				},
+				"train":                  generateMockBlobLiteral(trainBlobLoc),
+				"validation":             generateMockBlobLiteral(validationBlobLoc),
 				"static_hyperparameters": utils.MakeGenericLiteral(shpStructObj),
 			},
 		}, nil)
@@ -165,6 +242,10 @@ func generateMockTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate)
 	outputReader := &pluginIOMocks.OutputWriter{}
 	outputReader.OnGetOutputPath().Return(storage.DataReference("/data/outputs.pb"))
 	outputReader.OnGetOutputPrefixPath().Return(storage.DataReference("/data/"))
+	outputReader.OnGetRawOutputPrefix().Return(storage.DataReference("/raw/"))
+	if outputReaderPutError {
+		outputReader.OnPutMatch(mock.Anything).Return(errors.Errorf("err"))
+	}
 	taskCtx.OnOutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
@@ -200,6 +281,26 @@ func generateMockTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
+}
+
+func generateMockBlobLiteral(loc storage.DataReference) *flyteIdlCore.Literal {
+	return &flyteIdlCore.Literal{
+		Value: &flyteIdlCore.Literal_Scalar{
+			Scalar: &flyteIdlCore.Scalar{
+				Value: &flyteIdlCore.Scalar_Blob{
+					Blob: &flyteIdlCore.Blob{
+						Uri: loc.String(),
+						Metadata: &flyteIdlCore.BlobMetadata{
+							Type: &flyteIdlCore.BlobType{
+								Dimensionality: flyteIdlCore.BlobType_SINGLE,
+								Format:         "csv",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate) pluginsCore.TaskExecutionContext {
@@ -238,40 +339,8 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 	inputReader.OnGetMatch(mock.Anything).Return(
 		&flyteIdlCore.LiteralMap{
 			Literals: map[string]*flyteIdlCore.Literal{
-				"train": {
-					Value: &flyteIdlCore.Literal_Scalar{
-						Scalar: &flyteIdlCore.Scalar{
-							Value: &flyteIdlCore.Scalar_Blob{
-								Blob: &flyteIdlCore.Blob{
-									Uri: trainBlobLoc.String(),
-									Metadata: &flyteIdlCore.BlobMetadata{
-										Type: &flyteIdlCore.BlobType{
-											Dimensionality: flyteIdlCore.BlobType_SINGLE,
-											Format:         "csv",
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-				"validation": {
-					Value: &flyteIdlCore.Literal_Scalar{
-						Scalar: &flyteIdlCore.Scalar{
-							Value: &flyteIdlCore.Scalar_Blob{
-								Blob: &flyteIdlCore.Blob{
-									Uri: validationBlobLoc.String(),
-									Metadata: &flyteIdlCore.BlobMetadata{
-										Type: &flyteIdlCore.BlobType{
-											Dimensionality: flyteIdlCore.BlobType_SINGLE,
-											Format:         "csv",
-										},
-									},
-								},
-							},
-						},
-					},
-				},
+				"train":                            generateMockBlobLiteral(trainBlobLoc),
+				"validation":                       generateMockBlobLiteral(validationBlobLoc),
 				"static_hyperparameters":           utils.MakeGenericLiteral(shpStructObj),
 				"hyperparameter_tuning_job_config": utils.MakeBinaryLiteral(hpoJobConfigByteArray),
 			},
@@ -281,12 +350,18 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 	outputReader := &pluginIOMocks.OutputWriter{}
 	outputReader.OnGetOutputPath().Return(storage.DataReference("/data/outputs.pb"))
 	outputReader.OnGetOutputPrefixPath().Return(storage.DataReference("/data/"))
+	outputReader.OnGetRawOutputPrefix().Return(storage.DataReference("/raw/"))
 	taskCtx.OnOutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
 	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
 	taskCtx.OnTaskReader().Return(taskReader)
+	taskExecutionMetadata := genMockTaskExecutionMetadata()
+	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
+	return taskCtx
+}
 
+func genMockTaskExecutionMetadata() *mocks.TaskExecutionMetadata {
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetID().Return(flyteIdlCore.TaskExecutionIdentifier{
 		NodeExecutionId: &flyteIdlCore.NodeExecutionIdentifier{
@@ -297,6 +372,7 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 			},
 		},
 	})
+
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
 
 	resources := &mocks.TaskOverrides{}
@@ -314,8 +390,7 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 	taskExecutionMetadata.OnIsInterruptible().Return(true)
 	taskExecutionMetadata.OnGetOverrides().Return(resources)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
-	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
-	return taskCtx
+	return taskExecutionMetadata
 }
 
 // nolint
@@ -345,110 +420,5 @@ func generateMockHyperparameterTuningJobCustomObj(
 		TrainingJob:             trainingJob,
 		MaxNumberOfTrainingJobs: maxNumberOfTrainingJobs,
 		MaxParallelTrainingJobs: maxParallelTrainingJobs,
-	}
-}
-
-func Test_awsSagemakerPlugin_BuildResourceForTrainingJob(t *testing.T) {
-	// Default config does not contain a roleAnnotationKey -> expecting to get the role from default config
-	ctx := context.TODO()
-	defaultCfg := config.GetSagemakerConfig()
-	awsSageMakerTrainingJobHandler := awsSagemakerPlugin{TaskType: trainingJobTaskType}
-
-	tjObj := generateMockTrainingJobCustomObj(
-		sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-		sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
-	taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
-
-	trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, generateMockTrainingJobTaskContext(taskTemplate))
-	assert.NoError(t, err)
-	assert.NotNil(t, trainingJobResource)
-
-	trainingJob, ok := trainingJobResource.(*trainingjobv1.TrainingJob)
-	assert.True(t, ok)
-	assert.Equal(t, "default_role", *trainingJob.Spec.RoleArn)
-	assert.Equal(t, "File", string(trainingJob.Spec.AlgorithmSpecification.TrainingInputMode))
-
-	// Injecting a config which contains a matching roleAnnotationKey -> expecting to get the role from metadata
-	configAccessor := viper.NewAccessor(stdConfig.Options{
-		StrictMode:  true,
-		SearchPaths: []string{"testdata/config.yaml"},
-	})
-
-	err = configAccessor.UpdateConfig(context.TODO())
-	assert.NoError(t, err)
-
-	awsSageMakerTrainingJobHandler = awsSagemakerPlugin{TaskType: trainingJobTaskType}
-
-	tjObj = generateMockTrainingJobCustomObj(
-		sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-		sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
-	taskTemplate = generateMockTrainingJobTaskTemplate("the job", tjObj)
-
-	trainingJobResource, err = awsSageMakerTrainingJobHandler.BuildResource(ctx, generateMockTrainingJobTaskContext(taskTemplate))
-	assert.NoError(t, err)
-	assert.NotNil(t, trainingJobResource)
-
-	trainingJob, ok = trainingJobResource.(*trainingjobv1.TrainingJob)
-	assert.True(t, ok)
-	assert.Equal(t, "metadata_role", *trainingJob.Spec.RoleArn)
-
-	// Injecting a config which contains a mismatched roleAnnotationKey -> expecting to get the role from the config
-	configAccessor = viper.NewAccessor(stdConfig.Options{
-		StrictMode: true,
-		// Use a different
-		SearchPaths: []string{"testdata/config2.yaml"},
-	})
-
-	err = configAccessor.UpdateConfig(context.TODO())
-	assert.NoError(t, err)
-
-	awsSageMakerTrainingJobHandler = awsSagemakerPlugin{TaskType: trainingJobTaskType}
-
-	tjObj = generateMockTrainingJobCustomObj(
-		sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-		sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
-	taskTemplate = generateMockTrainingJobTaskTemplate("the job", tjObj)
-
-	trainingJobResource, err = awsSageMakerTrainingJobHandler.BuildResource(ctx, generateMockTrainingJobTaskContext(taskTemplate))
-	assert.NoError(t, err)
-	assert.NotNil(t, trainingJobResource)
-
-	trainingJob, ok = trainingJobResource.(*trainingjobv1.TrainingJob)
-	assert.True(t, ok)
-	assert.Equal(t, "config_role", *trainingJob.Spec.RoleArn)
-
-	err = config.SetSagemakerConfig(defaultCfg)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func Test_awsSagemakerPlugin_BuildResourceForHyperparameterTuningJob(t *testing.T) {
-	// Default config does not contain a roleAnnotationKey -> expecting to get the role from default config
-	ctx := context.TODO()
-	defaultCfg := config.GetSagemakerConfig()
-	awsSageMakerHPOJobHandler := awsSagemakerPlugin{TaskType: hyperparameterTuningJobTaskType}
-
-	tjObj := generateMockTrainingJobCustomObj(
-		sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-		sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
-	htObj := generateMockHyperparameterTuningJobCustomObj(tjObj, 10, 5)
-	taskTemplate := generateMockHyperparameterTuningJobTaskTemplate("the job", htObj)
-	hpoJobResource, err := awsSageMakerHPOJobHandler.BuildResource(ctx, generateMockHyperparameterTuningJobTaskContext(taskTemplate))
-	assert.NoError(t, err)
-	assert.NotNil(t, hpoJobResource)
-
-	hpoJob, ok := hpoJobResource.(*hpojobv1.HyperparameterTuningJob)
-	assert.True(t, ok)
-	assert.NotNil(t, hpoJob.Spec.TrainingJobDefinition)
-	assert.Equal(t, 1, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.IntegerParameterRanges))
-	assert.Equal(t, 0, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.ContinuousParameterRanges))
-	assert.Equal(t, 0, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.CategoricalParameterRanges))
-	assert.Equal(t, "us-east-1", *hpoJob.Spec.Region)
-	assert.Equal(t, "default_role", *hpoJob.Spec.TrainingJobDefinition.RoleArn)
-
-	err = config.SetSagemakerConfig(defaultCfg)
-	if err != nil {
-		panic(err)
 	}
 }
