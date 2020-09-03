@@ -2,9 +2,7 @@ package runtime
 
 import (
 	"context"
-	"go/build"
 	"os"
-	"strings"
 	"testing"
 
 	"path/filepath"
@@ -15,13 +13,13 @@ import (
 )
 
 func initTestClusterResourceConfig() error {
-	var searchPaths []string
-	for _, goPath := range strings.Split(build.Default.GOPATH, string(os.PathListSeparator)) {
-		searchPaths = append(searchPaths, filepath.Join(goPath, "src/github.com/lyft/flyteadmin/pkg/runtime/testdata/cluster_resource_config.yaml"))
+	pwd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
 
 	configAccessor := viper.NewAccessor(config.Options{
-		SearchPaths: searchPaths,
+		SearchPaths: []string{filepath.Join(pwd, "testdata/cluster_resource_config.yaml")},
 		StrictMode:  false,
 	})
 	return configAccessor.UpdateConfig(context.TODO())
