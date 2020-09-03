@@ -10,11 +10,15 @@ ENV PYTHONPATH /app
 RUN apt-get update && apt-get install -y python3.6 python3.6-venv make build-essential libssl-dev python3-venv python3-pip curl
 
 # opencv support
-RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev
+RUN apt-get install -y libsm6 libxext6 libxrender-dev
+
+# Google Cloud SDK & Configure gcloud
+RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV PATH="$PATH:/root/google-cloud-sdk/bin"
 
 # Run this before dealing with our own virtualenv. The AWS CLI uses its own virtual environment. 
 # NOTE: We are installing multi-cloud Download managers to make the examples completely portable. In your repos, please install only the utilities for cloud providers that you use.
-RUN pip3 install awscli gsutil
+RUN pip3 install awscli
 
 # Set up a virtual environment to use with our workflows
 RUN python3.6 -m venv ${VENV}
