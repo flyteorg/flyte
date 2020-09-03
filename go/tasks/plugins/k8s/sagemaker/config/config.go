@@ -60,3 +60,7 @@ func GetSagemakerConfig() *Config {
 func SetSagemakerConfig(cfg *Config) error {
 	return sagemakerConfigSection.SetConfig(cfg)
 }
+
+func ResetSagemakerConfig() error {
+	return sagemakerConfigSection.SetConfig(&defaultConfig)
+}
