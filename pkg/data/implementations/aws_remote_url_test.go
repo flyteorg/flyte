@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSplitURI(t *testing.T) {
+func TestAWSSplitURI(t *testing.T) {
 	remoteURL := AWSRemoteURL{}
 	s3Object, err := remoteURL.splitURI(context.Background(), "s3://i/am/valid")
 	assert.Nil(t, err)
@@ -20,7 +20,7 @@ func TestSplitURI(t *testing.T) {
 	assert.Equal(t, "am/valid", s3Object.key)
 }
 
-func TestSplitURI_InvalidScheme(t *testing.T) {
+func TestAWSSplitURI_InvalidScheme(t *testing.T) {
 	remoteURL := AWSRemoteURL{}
 	_, err := remoteURL.splitURI(context.Background(), "azure://i/am/invalid")
 	assert.NotNil(t, err)
@@ -46,7 +46,7 @@ func (m *mockS3Impl) GetObjectRequest(input *s3.GetObjectInput) (req *request.Re
 	return m.getObjectFunc(input)
 }
 
-func TestGet(t *testing.T) {
+func TestAWSGet(t *testing.T) {
 	contentLength := int64(100)
 	presignDuration := 3 * time.Minute
 

@@ -118,6 +118,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 	urlData := data.GetRemoteDataHandler(data.RemoteDataHandlerConfig{
 		CloudProvider:            remoteDataConfig.Scheme,
 		SignedURLDurationMinutes: remoteDataConfig.SignedURL.DurationMinutes,
+		SigningPrincipal:         remoteDataConfig.SignedURL.SigningPrincipal,
 		Region:                   remoteDataConfig.Region,
 		Retries:                  defaultRetries,
 		RemoteDataStoreClient:    dataStorageClient,

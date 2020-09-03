@@ -22,6 +22,7 @@ type RemoteDataHandlerConfig struct {
 	Retries                  int // Number of times to attempt to initialize a new config on failure.
 	Region                   string
 	SignedURLDurationMinutes int
+	SigningPrincipal         string
 	RemoteDataStoreClient    *storage.DataStore
 }
 
@@ -45,6 +46,12 @@ func GetRemoteDataHandler(cfg RemoteDataHandlerConfig) RemoteDataHandler {
 		return &remoteDataHandler{
 			remoteURL: implementations.NewAWSRemoteURL(awsConfig, presignedURLDuration),
 		}
+	case common.GCP:
+		signedURLDuration := time.Minute * time.Duration(cfg.SignedURLDurationMinutes)
+		return &remoteDataHandler{
+			remoteURL: implementations.NewGCPRemoteURL(cfg.SigningPrincipal, signedURLDuration),
+		}
+
 	case common.Local:
 		logger.Infof(context.TODO(), "setting up local signer ----- ")
 		// Since minio = aws s3, we are creating the same client but using the config primitives from aws
