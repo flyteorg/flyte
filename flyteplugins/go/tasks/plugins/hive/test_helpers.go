@@ -77,6 +77,9 @@ func GetMockTaskExecutionMetadata() core.TaskExecutionMetadata {
 
 	tID := &coreMock.TaskExecutionID{}
 	tID.On("GetID").Return(idlCore.TaskExecutionIdentifier{
+		TaskId: &idlCore.Identifier{
+			Domain: "production",
+		},
 		NodeExecutionId: &idlCore.NodeExecutionIdentifier{
 			ExecutionId: &idlCore.WorkflowExecutionIdentifier{
 				Name:    "my_wf_exec_name",
