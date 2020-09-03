@@ -2,10 +2,8 @@ package impl
 
 import (
 	"context"
-	"go/build"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -32,13 +30,13 @@ const testDomain = "domain"
 const testWorkflow = "name"
 
 func initTestConfig(fileName string) error {
-	var searchPaths []string
-	for _, goPath := range strings.Split(build.Default.GOPATH, string(os.PathListSeparator)) {
-		searchPaths = append(searchPaths, filepath.Join(goPath, "src/github.com/lyft/flyteadmin/pkg/executioncluster/testdata/", fileName))
+	pwd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
 
 	configAccessor := viper.NewAccessor(config.Options{
-		SearchPaths: searchPaths,
+		SearchPaths: []string{filepath.Join(pwd, "../testdata", fileName)},
 		StrictMode:  false,
 	})
 	return configAccessor.UpdateConfig(context.Background())
