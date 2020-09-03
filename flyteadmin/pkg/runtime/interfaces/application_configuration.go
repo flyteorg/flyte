@@ -100,6 +100,8 @@ type SchedulerConfig struct {
 type SignedURL struct {
 	// The amount of time for which a signed URL is valid.
 	DurationMinutes int `json:"durationMinutes"`
+	// The principal that signs the URL. This is only applicable to GCS URL.
+	SigningPrincipal string `json:"signingPrincipal"`
 }
 
 // This configuration handles all requests to get remote data such as execution inputs & outputs.
