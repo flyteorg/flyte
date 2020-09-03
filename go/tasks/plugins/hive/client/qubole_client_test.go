@@ -83,7 +83,7 @@ func TestQuboleClient_GetCommandStatus(t *testing.T) {
 func TestQuboleClient_ExecuteHiveCommand(t *testing.T) {
 	client := createQuboleClient(createCommandResponse)
 	details, err := client.ExecuteHiveCommand(context.Background(),
-		"", 0, "clusterLabel", "", nil)
+		"", 0, "clusterLabel", "", nil, CommandMetadata{})
 	assert.NoError(t, err)
 	assert.Equal(t, int64(3850), details.ID)
 	assert.Equal(t, QuboleStatusWaiting, details.Status)
@@ -98,7 +98,7 @@ func TestQuboleClient_KillCommand(t *testing.T) {
 func TestQuboleClient_ExecuteHiveCommandError(t *testing.T) {
 	client := createQuboleErrorClient("bad token")
 	details, err := client.ExecuteHiveCommand(context.Background(),
-		"", 0, "clusterLabel", "", nil)
+		"", 0, "clusterLabel", "", nil, CommandMetadata{})
 	assert.Error(t, err)
 	assert.Nil(t, details)
 }

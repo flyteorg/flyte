@@ -88,12 +88,13 @@ func TestGetQueryInfo(t *testing.T) {
 	taskMetadata.On("GetLabels").Return(map[string]string{"sample": "label"})
 	mockTaskExecutionContext.On("TaskExecutionMetadata").Return(taskMetadata)
 
-	query, cluster, tags, timeout, err := GetQueryInfo(ctx, &mockTaskExecutionContext)
+	query, cluster, tags, timeout, taskName, err := GetQueryInfo(ctx, &mockTaskExecutionContext)
 	assert.NoError(t, err)
 	assert.Equal(t, "select 'one'", query)
 	assert.Equal(t, "default", cluster)
 	assert.Equal(t, []string{"flyte_plugin_test", "ns:myproject-staging", "sample:label"}, tags)
 	assert.Equal(t, 500, int(timeout))
+	assert.Equal(t, "sample_hive_task_test_name", taskName)
 }
 
 func TestValidateQuboleHiveJob(t *testing.T) {
@@ -327,7 +328,7 @@ func TestKickOffQuery(t *testing.T) {
 	}
 	mockQubole := &quboleMocks.QuboleClient{}
 	mockQubole.OnExecuteHiveCommandMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything,
-		mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+		mock.Anything, mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
 		quboleCalled = true
 	}).Return(quboleCommandDetails, nil)
 

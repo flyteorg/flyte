@@ -43,6 +43,12 @@ type QuboleCommandDetails struct {
 	URI    url.URL
 }
 
+type CommandMetadata struct {
+	TaskName string
+	Domain   string
+	Project  string
+}
+
 // QuboleClient API Request Body, meant to be passed into JSON.marshal
 // Any nil, 0 or "" fields will not be marshaled
 type RequestBody struct {
@@ -62,7 +68,7 @@ type RequestBody struct {
 // Interface to interact with QuboleClient for hive tasks
 type QuboleClient interface {
 	ExecuteHiveCommand(ctx context.Context, commandStr string, timeoutVal uint32, clusterPrimaryLabel string,
-		accountKey string, tags []string) (*QuboleCommandDetails, error)
+		accountKey string, tags []string, commandMetadata CommandMetadata) (*QuboleCommandDetails, error)
 	KillCommand(ctx context.Context, commandID string, accountKey string) error
 	GetCommandStatus(ctx context.Context, commandID string, accountKey string) (QuboleStatus, error)
 }
@@ -124,7 +130,8 @@ func closeBody(ctx context.Context, response *http.Response) {
 }
 
 // Helper method to execute the requests
-func (q *quboleClient) executeRequest(ctx context.Context, method string, u *url.URL, body *RequestBody, accountKey string) (*http.Response, error) {
+func (q *quboleClient) executeRequest(ctx context.Context, method string, u *url.URL,
+	body *RequestBody, accountKey string) (*http.Response, error) {
 	var req *http.Request
 	var err error
 
@@ -159,6 +166,7 @@ func (q *quboleClient) executeRequest(ctx context.Context, method string, u *url
 	param: string commandStr: the query to execute
 	param: uint32 timeoutVal: timeout for the query to execute in seconds
 	param: string ClusterLabel: label for cluster on which to execute the Hive Command.
+	param: CommandMetadata _: additional labels for the command
 	return: *int64: CommandID for the command executed
 	return: error: error in-case of a failure
 */
@@ -168,7 +176,8 @@ func (q *quboleClient) ExecuteHiveCommand(
 	timeoutVal uint32,
 	clusterPrimaryLabel string,
 	accountKey string,
-	tags []string) (*QuboleCommandDetails, error) {
+	tags []string,
+	_ CommandMetadata) (*QuboleCommandDetails, error) {
 
 	requestBody := RequestBody{
 		CommandType:  hiveCommandType,

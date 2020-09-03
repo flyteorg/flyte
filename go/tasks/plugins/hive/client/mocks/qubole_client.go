@@ -23,8 +23,8 @@ func (_m QuboleClient_ExecuteHiveCommand) Return(_a0 *client.QuboleCommandDetail
 	return &QuboleClient_ExecuteHiveCommand{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *QuboleClient) OnExecuteHiveCommand(ctx context.Context, commandStr string, timeoutVal uint32, clusterPrimaryLabel string, accountKey string, tags []string) *QuboleClient_ExecuteHiveCommand {
-	c := _m.On("ExecuteHiveCommand", ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags)
+func (_m *QuboleClient) OnExecuteHiveCommand(ctx context.Context, commandStr string, timeoutVal uint32, clusterPrimaryLabel string, accountKey string, tags []string, commandMetadata client.CommandMetadata) *QuboleClient_ExecuteHiveCommand {
+	c := _m.On("ExecuteHiveCommand", ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags, commandMetadata)
 	return &QuboleClient_ExecuteHiveCommand{Call: c}
 }
 
@@ -33,13 +33,13 @@ func (_m *QuboleClient) OnExecuteHiveCommandMatch(matchers ...interface{}) *Qubo
 	return &QuboleClient_ExecuteHiveCommand{Call: c}
 }
 
-// ExecuteHiveCommand provides a mock function with given fields: ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags
-func (_m *QuboleClient) ExecuteHiveCommand(ctx context.Context, commandStr string, timeoutVal uint32, clusterPrimaryLabel string, accountKey string, tags []string) (*client.QuboleCommandDetails, error) {
-	ret := _m.Called(ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags)
+// ExecuteHiveCommand provides a mock function with given fields: ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags, commandMetadata
+func (_m *QuboleClient) ExecuteHiveCommand(ctx context.Context, commandStr string, timeoutVal uint32, clusterPrimaryLabel string, accountKey string, tags []string, commandMetadata client.CommandMetadata) (*client.QuboleCommandDetails, error) {
+	ret := _m.Called(ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags, commandMetadata)
 
 	var r0 *client.QuboleCommandDetails
-	if rf, ok := ret.Get(0).(func(context.Context, string, uint32, string, string, []string) *client.QuboleCommandDetails); ok {
-		r0 = rf(ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags)
+	if rf, ok := ret.Get(0).(func(context.Context, string, uint32, string, string, []string, client.CommandMetadata) *client.QuboleCommandDetails); ok {
+		r0 = rf(ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags, commandMetadata)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*client.QuboleCommandDetails)
@@ -47,8 +47,8 @@ func (_m *QuboleClient) ExecuteHiveCommand(ctx context.Context, commandStr strin
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, uint32, string, string, []string) error); ok {
-		r1 = rf(ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags)
+	if rf, ok := ret.Get(1).(func(context.Context, string, uint32, string, string, []string, client.CommandMetadata) error); ok {
+		r1 = rf(ctx, commandStr, timeoutVal, clusterPrimaryLabel, accountKey, tags, commandMetadata)
 	} else {
 		r1 = ret.Error(1)
 	}
