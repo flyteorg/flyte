@@ -6,7 +6,7 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic)
 ![GitHub milestones Completed](https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic)
-![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/7?style=plastic)
+![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/8?style=plastic)
 ![Twitter Follow](https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
 
@@ -121,18 +121,21 @@ Resources that would help you get a better understanding of Flyte.
 
 
 # Component Repos 
-Repo | Language | Purpose
---- | --- | ---
-[flyte](https://github.com/lyft/flyte) | Kustomize,RST | deployment, documentation, issues
-[flyteidl](https://github.com/lyft/flyteidl) | Protobuf | interface definitions
-[flytepropeller](https://github.com/lyft/flytepropeller) | Go | execution engine
-[flyteadmin](https://github.com/lyft/flyteadmin) | Go | control plane
-[flytekit](https://github.com/lyft/flytekit) | Python | python SDK and tools
-[flyteconsole](https://github.com/lyft/flyteconsole) | Typescript | admin console
-[datacatalog](https://github.com/lyft/datacatalog) | Go  | manage input & output artifacts
-[flyteplugins](https://github.com/lyft/flyteplugins) | Go  | flyte plugins
-[flytestdlib](https://github.com/lyft/flytestdlib) |  Go | standard library
-[flytesnacks](https://github.com/lyft/flytesnacks) | Python | examples, tips, and tricks
+Repo | Language | Purpose | Status
+--- | --- | --- | ---
+[flyte](https://github.com/lyft/flyte) | Kustomize,RST | deployment, documentation, issues | Production-grade
+[flyteidl](https://github.com/lyft/flyteidl) | Protobuf | interface definitions | Production-grade
+[flytepropeller](https://github.com/lyft/flytepropeller) | Go | execution engine | Production-grade
+[flyteadmin](https://github.com/lyft/flyteadmin) | Go | control plane | Production-grade
+[flytekit](https://github.com/lyft/flytekit) | Python | python SDK and tools | Production-grade
+[flyteconsole](https://github.com/lyft/flyteconsole) | Typescript | admin console | Production-grade
+[datacatalog](https://github.com/lyft/datacatalog) | Go  | manage input & output artifacts | Production-grade
+[flyteplugins](https://github.com/lyft/flyteplugins) | Go  | flyte plugins | Production-grade
+[flytestdlib](https://github.com/lyft/flytestdlib) |  Go | standard library | Production-grade
+[flytesnacks](https://github.com/lyft/flytesnacks) | Python | examples, tips, and tricks | Incubating
+[flytekit-java](https://github.com/spotify/flytekit-java) | Java/Scala | Java & scala SDK for authoring Flyte workflows | Incubating
+[flytectl](https://github.com/lyft/flytectl) | Java/Scala | Java & scala SDK for authoring Flyte workflows | Incomplete
+
 
 # Production K8s Operators
 
@@ -140,3 +143,37 @@ Repo | Language | Purpose
 --- | --- | ---
 [Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go | Apache Spark batch
 [Flink](https://github.com/lyft/flinkk8soperator) | Go | Apache Flink streaming
+
+# Top Contributors
+Thank you to the community for making Flyte possible.
+ - [@wild-endeavor](https://github.com/wild-endeavor)
+ - [@katrogan](https://github.com/katrogan)
+ - [@EngHabu](https://github.com/EngHabu)
+ - [@akhurana001](https://github.com/akhurana001)
+ - [@anandswaminathan](https://github.com/anandswaminathan)
+ - [@kanterov](https://github.com/kanterov)
+ - [@honnix](https://github.com/honnix)
+ - [@jeevb](https://github.com/jeevb)
+ - [@jonathanburns](https://github.com/jonathanburns)
+ - [@migueltol22](https://github.com/migueltol22)
+ - [@varshaparthay](https://github.com/varshaparthay)
+ - [@pingsutw](https://github.com/pingsutw)
+ - [@narape](https://github.com/narape)
+ - [@lu4nm3](https://github.com/lu4nm3)
+ - [@bnsblue](https://github.com/bnsblue)
+ - [@RubenBarragan](https://github.com/RubenBarragan)
+ - [@schottra](https://github.com/schottra)
+ - [@evalsocket](https://github.com/evalsocket)
+ - [@matthewphsmith](https://github.com/matthewphsmith)
+ - [@slai](https://github.com/slai)
+ - [@derwiki](https://github.com/derwiki)
+ - [@tnsetting](https://github.com/tnsetting)
+ - [@jbrambleDC](https://github.com/jbrambleDC)
+ - [@igorvalko](https://github.com/igorvalko)
+ - [@chanadian](https://github.com/chanadian)
+ - [@surindersinghp](https://github.com/surindersinghp)
+ - [@vsbus](https://github.com/vsbus)
+ - [@catalinii](https://github.com/catalinii)
+ - [@kumare3](https://github.com/kumare3)
+
+
